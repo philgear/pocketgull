@@ -116,7 +116,7 @@ import { RevealDirective } from '../directives/reveal.directive';
     }
 
     <!--Content Area-->
-    <div #contentArea class="flex-1 overflow-y-auto px-8 pt-8 min-h-0 relative bg-[#F9FAFB]">
+    <div #contentArea class="flex-1 overflow-y-auto px-8 pt-8 min-h-0 bg-[#F9FAFB]">
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-6 py-6 pb-24">
         <!--Clinical Overview Dashboard-->
@@ -360,9 +360,9 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
     if (!raw) return null;
     try {
       const sections: ReportSection[] = [];
-      let globalNodeId = 0;
       const parts = raw.split(/\n(?=#{1,3}\s)/);
-      for (const part of parts) {
+      for (let sIdx = 0; sIdx < parts.length; sIdx++) {
+        const part = parts[sIdx];
         if (!part.trim()) continue;
         const lines = part.split('\n');
         const headingMarkdown = lines.find(l => l.trim().startsWith('#')) || lines[0] || '';
@@ -376,8 +376,9 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
         const tokens = parser.lexer(contentMarkdown);
         const nodes: SummaryNode[] = [];
 
-        for (const token of tokens) {
-          const key = (token as any).text || token.raw || `node - ${globalNodeId} `;
+        for (let nIdx = 0; nIdx < tokens.length; nIdx++) {
+          const token = tokens[nIdx];
+          const key = (token as any).text || token.raw || `node-${sIdx}-${nIdx}`;
           const annotation = (this.lensAnnotations()[this.activeLens()] || {})[key] || { note: '', bracketState: 'normal' };
           // const annotation = (this.lensAnnotations()[this.activeLens()] || {})[key] || { note: '', bracketState: 'normal' };
 
@@ -418,7 +419,7 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
             const content = annotation.modifiedText || cleanedText;
 
             nodes.push({
-              id: `node-${globalNodeId++}`,
+              id: `sec-${sIdx}-node-${nIdx}`,
               key,
               type: 'paragraph',
               rawHtml: applyHighlights(parser.parseInline(content) as string, verification.issues),
@@ -432,18 +433,18 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
             });
           } else if (token.type === 'list') {
             nodes.push({
-              id: `node-${globalNodeId++}`,
+              id: `sec-${sIdx}-node-${nIdx}`,
               key,
               type: 'list',
               ordered: token.ordered || false,
-              items: token.items.map(item => {
+              items: token.items.map((item, iIdx) => {
                 const itemKey = item.text;
                 const itemAnnotation = (this.lensAnnotations()[this.activeLens()] || {})[itemKey] || { note: '', bracketState: 'normal' };
                 const { suggestions, proposedText, cleanedText } = extractMetadata(item.text);
                 const content = itemAnnotation.modifiedText || cleanedText;
 
                 return {
-                  id: `item-${globalNodeId++}`,
+                  id: `sec-${sIdx}-node-${nIdx}-item-${iIdx}`,
                   key: itemKey,
                   html: applyHighlights(parser.parseInline(content) as string, verification.issues),
                   bracketState: itemAnnotation.bracketState,
@@ -459,7 +460,7 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
             });
           } else {
             nodes.push({
-              id: `node-${globalNodeId++}`,
+              id: `sec-${sIdx}-node-${nIdx}`,
               key,
               type: 'raw',
               rawHtml: parser.parse(token.raw) as string,

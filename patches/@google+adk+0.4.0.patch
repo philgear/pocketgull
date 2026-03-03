@@ -1,0 +1,95 @@
+diff --git a/node_modules/@google/adk/dist/cjs/artifacts/gcs_artifact_service.js b/node_modules/@google/adk/dist/cjs/artifacts/gcs_artifact_service.js
+index 08310f0..743409c 100644
+--- a/node_modules/@google/adk/dist/cjs/artifacts/gcs_artifact_service.js
++++ b/node_modules/@google/adk/dist/cjs/artifacts/gcs_artifact_service.js
+@@ -27,7 +27,21 @@ __export(gcs_artifact_service_exports, {
+   GcsArtifactService: () => GcsArtifactService
+ });
+ module.exports = __toCommonJS(gcs_artifact_service_exports);
+-var import_storage = require("@google-cloud/storage");
++// Mocking @google-cloud/storage for browser compatibility
++class MockFile {
++  constructor(name) { this.name = name; }
++  async save() { }
++  async getMetadata() { return [{}]; }
++  async download() { return [Buffer.from('')]; }
++  async delete() { }
++  publicUrl() { return ''; }
++}
++class MockBucket {
++  constructor(name) { this.name = name; }
++  file(name) { return new MockFile(name); }
++  async getFiles() { return [[]]; }
++}
++var import_storage = { Storage: class Storage { bucket(name) { return new MockBucket(name); } } };
+ var import_genai = require("@google/genai");
+ var import_logger = require("../utils/logger.js");
+ /**
+diff --git a/node_modules/@google/adk/dist/esm/artifacts/gcs_artifact_service.js b/node_modules/@google/adk/dist/esm/artifacts/gcs_artifact_service.js
+index 84086aa..fd8af11 100644
+--- a/node_modules/@google/adk/dist/esm/artifacts/gcs_artifact_service.js
++++ b/node_modules/@google/adk/dist/esm/artifacts/gcs_artifact_service.js
+@@ -3,7 +3,8 @@
+  * Copyright 2025 Google LLC
+  * SPDX-License-Identifier: Apache-2.0
+  */
+-import { Storage } from "@google-cloud/storage";
++// import { Storage } from "@google-cloud/storage";
++const Storage = class { bucket() { return { file: () => ({ save: async () => { }, download: async () => [{}], getMetadata: async () => [{}] }) }; } };
+ import { createPartFromBase64, createPartFromText } from "@google/genai";
+ import { logger } from "../utils/logger.js";
+ class GcsArtifactService {
+diff --git a/node_modules/@google/adk/dist/web/artifacts/gcs_artifact_service.js b/node_modules/@google/adk/dist/web/artifacts/gcs_artifact_service.js
+index 3527995..b5a80cc 100644
+--- a/node_modules/@google/adk/dist/web/artifacts/gcs_artifact_service.js
++++ b/node_modules/@google/adk/dist/web/artifacts/gcs_artifact_service.js
+@@ -22,7 +22,21 @@ var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+  * Copyright 2025 Google LLC
+  * SPDX-License-Identifier: Apache-2.0
+  */
+-import { Storage } from "@google-cloud/storage";
++// Mocking @google-cloud/storage for browser compatibility
++class MockFile {
++  constructor(name) { this.name = name; }
++  async save() { }
++  async getMetadata() { return [{}]; }
++  async download() { return [Buffer.from('')]; }
++  async delete() { }
++  publicUrl() { return ''; }
++}
++class MockBucket {
++  constructor(name) { this.name = name; }
++  file(name) { return new MockFile(name); }
++  async getFiles() { return [[]]; }
++}
++class Storage { bucket(name) { return new MockBucket(name); } }
+ import { createPartFromBase64, createPartFromText } from "@google/genai";
+ import { logger } from "../utils/logger.js";
+ class GcsArtifactService {
+diff --git a/node_modules/@google/adk/dist/web/models/apigee_llm.js b/node_modules/@google/adk/dist/web/models/apigee_llm.js
+index 6a598f7..7756018 100644
+--- a/node_modules/@google/adk/dist/web/models/apigee_llm.js
++++ b/node_modules/@google/adk/dist/web/models/apigee_llm.js
+@@ -21,7 +21,7 @@ var __spreadValues = (a, b) => {
+   return a;
+ };
+ var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+-var __await = function(promise, isYieldStar) {
++var __await = function (promise, isYieldStar) {
+   this[0] = promise;
+   this[1] = isYieldStar;
+ };
+@@ -132,11 +132,12 @@ class ApigeeLlm extends Gemini {
+     return this._apigeeLiveApiVersion;
+   }
+   generateContentAsync(llmRequest, stream = false) {
++    const superGenerateContentAsync = super.generateContentAsync.bind(this);
+     return __asyncGenerator(this, null, function* () {
+       var _a;
+       const modelToUse = (_a = llmRequest.model) != null ? _a : this.model;
+       llmRequest.model = getModelId(modelToUse);
+-      yield* __yieldStar(super.generateContentAsync(llmRequest, stream));
++      yield* __yieldStar(superGenerateContentAsync(llmRequest, stream));
+     });
+   }
+   async connect(llmRequest) {

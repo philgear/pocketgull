@@ -46,7 +46,6 @@
               "@google-cloud/opentelemetry-cloud-monitoring-exporter",
               "@google-cloud/opentelemetry-cloud-trace-exporter",
               "@opentelemetry/resource-detector-gcp",
-              "@google-cloud/storage",
               "@mikro-orm/mariadb",
               "@mikro-orm/mssql",
               "@mikro-orm/mysql",
@@ -63,7 +62,8 @@
             ],
             "security": {
               "allowedHosts": [
-                "localhost"
+                "localhost",
+                "understory-444980566010.us-west1.run.app"
               ]
             },
             "server": "src/main.server.ts",

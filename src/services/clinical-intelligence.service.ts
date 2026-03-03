@@ -155,7 +155,8 @@ If a section has no relevant source data, output the heading followed by: "*No s
     }
 
     private async generateVisualMetrics(report: Record<string, string>): Promise<void> {
-        const reportText = Object.values(report).join('\n\n');
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Monitoring & Follow-up', 'Patient Education'];
+        const reportText = lenses.map(lens => report[lens]).filter(Boolean).join('\n\n');
         const cacheKey = await this.cache.generateKey([reportText, 'visual-metrics-v2']);
 
         try {
@@ -210,7 +211,6 @@ If a section has no relevant source data, output the heading followed by: "*No s
             }
         }
 
-        const adkModel = await this.ai.getAdkModel();
 
         try {
             const orchestrationPromises = lenses.map(async (lens) => {
@@ -226,32 +226,19 @@ If a section has no relevant source data, output the heading followed by: "*No s
                         newReport[lens] = responseText;
                         this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
                     } else {
-                        // ADK Multi-Agent Orchestration
-                        const { LlmAgent, InMemoryRunner } = await import('@google/adk');
-
-                        const agent = new LlmAgent({
-                            name: `Clinical_${lens.replace(/[^A-Za-z]/g, '')}`,
-                            model: adkModel,
-                            instruction: sysInstruction
+                        // Stream-based generation using browser-compatible genai
+                        responseText = await new Promise<string>((resolve, reject) => {
+                            let accumulated = '';
+                            this.ai.generateReportStream(patientData, lens, sysInstruction).subscribe({
+                                next: (chunk: string) => {
+                                    accumulated += chunk;
+                                    newReport[lens] = accumulated;
+                                    this.analysisResults.update(all => ({ ...all, [lens]: accumulated }));
+                                },
+                                error: reject,
+                                complete: () => resolve(accumulated)
+                            });
                         });
-
-                        const runner = new InMemoryRunner({ agent });
-                        const events = runner.runEphemeral({
-                            userId: 'user',
-                            newMessage: { role: 'user', parts: [{ text: patientData }] }
-                        });
-
-                        for await (const event of events) {
-                            if (event.content?.role === 'model') {
-                                const newText = event.content?.parts?.[0]?.text;
-                                if (newText) {
-                                    responseText += newText;
-                                    newReport[lens] = responseText;
-                                    this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
-                                }
-                            }
-                        }
-
                         await this.cache.set(cacheKey, responseText);
                     }
 
@@ -274,7 +261,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
             this.lastRefreshTime.set(new Date());
             await this.generateVisualMetrics(newReport as Record<string, string>);
 
-            const reportText = Object.values(newReport).join('\n\n');
+            const reportText = lenses.map(lens => newReport[lens]).filter(Boolean).join('\n\n');
             const masterKey = await this.cache.generateKey([reportText, 'MASTER_SNAPSHOT_V1']);
             await this.cache.set(masterKey, {
                 report: newReport,

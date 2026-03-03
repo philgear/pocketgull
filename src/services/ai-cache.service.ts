@@ -14,15 +14,19 @@ export class AiCacheService {
     private readonly STORE_NAME = 'ai-responses';
     private readonly DB_VERSION = 1;
     private readonly MAX_ENTRIES = 50;
-    private dbPromise: Promise<IDBDatabase>;
-    private encryptionKeyPromise: Promise<CryptoKey>;
+    private dbPromise: Promise<IDBDatabase | null>;
+    private encryptionKeyPromise: Promise<CryptoKey | null>;
 
     constructor() {
         this.dbPromise = this.initDB();
         this.encryptionKeyPromise = this.initEncryptionKey();
     }
 
-    private async initEncryptionKey(): Promise<CryptoKey> {
+    private async initEncryptionKey(): Promise<CryptoKey | null> {
+        if (typeof crypto === 'undefined' || !crypto.subtle) {
+            return null;
+        }
+
         // In production, this would be a user-specific secret or managed via Key Vault.
         const secret = 'understory-clinical-vault-key-poc';
         const enc = new TextEncoder();
@@ -48,10 +52,10 @@ export class AiCacheService {
         );
     }
 
-    private initDB(): Promise<IDBDatabase> {
+    private initDB(): Promise<IDBDatabase | null> {
         return new Promise((resolve, reject) => {
-            if (typeof indexedDB === 'undefined') {
-                reject(new Error('IndexedDB is not supported'));
+            if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
+                resolve(null);
                 return;
             }
 
@@ -79,6 +83,9 @@ export class AiCacheService {
      */
     async generateKey(components: any[]): Promise<string> {
         const rawString = JSON.stringify(components);
+        if (typeof crypto === 'undefined' || !crypto.subtle) {
+            return rawString.length.toString();
+        }
         const msgBuffer = new TextEncoder().encode(rawString);
         const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -90,6 +97,8 @@ export class AiCacheService {
    */
     async get<T = any>(key: string): Promise<T | null> {
         const db = await this.dbPromise;
+        if (!db) return null;
+
         const entry: CacheEntry | null = await new Promise((resolve, reject) => {
             const transaction = db.transaction(this.STORE_NAME, 'readonly');
             const store = transaction.objectStore(this.STORE_NAME);
@@ -106,6 +115,8 @@ export class AiCacheService {
 
         try {
             const keyObj = await this.encryptionKeyPromise;
+            if (!keyObj) return null;
+
             const decrypted = await crypto.subtle.decrypt(
                 { name: 'AES-GCM', iv: entry.iv as any },
                 keyObj,
@@ -124,6 +135,8 @@ export class AiCacheService {
     async set(key: string, value: any): Promise<void> {
         const db = await this.dbPromise;
         const keyObj = await this.encryptionKeyPromise;
+        if (!db || !keyObj) return;
+
         const iv = crypto.getRandomValues(new Uint8Array(12));
         const data = new TextEncoder().encode(JSON.stringify(value));
 
@@ -154,6 +167,7 @@ export class AiCacheService {
 
     private async updateLastUsed(key: string, entry: CacheEntry) {
         const db = await this.dbPromise;
+        if (!db) return;
         entry.lastUsed = Date.now();
         const transaction = db.transaction(this.STORE_NAME, 'readwrite');
         const store = transaction.objectStore(this.STORE_NAME);
@@ -165,6 +179,7 @@ export class AiCacheService {
      */
     private async vacuum(): Promise<void> {
         const db = await this.dbPromise;
+        if (!db) return;
         const transaction = db.transaction(this.STORE_NAME, 'readwrite');
         const store = transaction.objectStore(this.STORE_NAME);
 
@@ -193,6 +208,7 @@ export class AiCacheService {
     async getAllEntries(): Promise<{ key: string; value: any; lastUsed: number }[]> {
         const db = await this.dbPromise;
         const keyObj = await this.encryptionKeyPromise;
+        if (!db || !keyObj) return [];
 
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(this.STORE_NAME, 'readonly');
@@ -234,6 +250,7 @@ export class AiCacheService {
      */
     async clear(): Promise<void> {
         const db = await this.dbPromise;
+        if (!db) return;
         return new Promise((resolve, reject) => {
             const transaction = db.transaction(this.STORE_NAME, 'readwrite');
             const store = transaction.objectStore(this.STORE_NAME);

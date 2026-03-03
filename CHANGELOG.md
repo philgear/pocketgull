@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-02-28
+
+### Added
+- **Offline Printable Stationery**: CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis.
+- **Smartwatch Optimization**: Responsive UI scaling down to extremely constrained viewports (e.g., Pixel Watch 2 at 286px width).
+- **Box Breathing UX**: 16-second box breathing visual animations integrated into primary intake text areas to promote practitioner mindfulness.
+
+### Changed
+- **Server-Side Rendering (SSR)**: Transitioned architecture to Angular SSR for performance optimization.
+- **Mobile Navigation**: Implemented tabbed view-switching (Tasks / Analysis) optimized for constrained mobile environments.
+
+### Fixed
+- **SSR Build Stability**: Resolved "no exports" optimization bailouts caused by unresolved TypeScript properties in `PatientStateService`.
+- **Mobile Scrolling**: Fixed mobile page scrolling flow by removing forced height constraints.
+- **UI Clipping**: Fixed horizontal/vertical clipping of action buttons and contents in the analysis report.
+- **Type Safety**: Ensured strict type checking and proper exports for patient history and summary models across services.
+
 ## [0.1.0] - 2026-02-22
 
 ### Added

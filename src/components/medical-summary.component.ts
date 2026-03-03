@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, inject, computed, ViewChild, ElementRef, AfterViewInit, effect, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, ElementRef, effect, signal, viewChild, untracked } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { PatientStateService, PatientState } from '../services/patient-state.service';
 import { PatientManagementService, HistoryEntry, Patient } from '../services/patient-management.service';
+import { DraftSummaryItem } from '../services/patient.types';
 import { ExportService } from '../services/export.service';
 import { DictationService } from '../services/dictation.service';
 import { marked } from 'marked';
@@ -61,15 +62,16 @@ import { UnderstoryBadgeComponent } from './shared/understory-badge.component';
                 <!-- Current Visit / Chief Complaint -->
                 <div class="mb-8 font-sans">
                   <div class="flex justify-between items-center mb-3">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-[0.15em] flex items-center gap-2">
+                    <h2 class="block text-xs font-bold text-gray-500 uppercase tracking-[0.15em] flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                         Current Visit / Chief Complaint
-                    </label>
+                    </h2>
                     <understory-button 
                       variant="ghost" 
                       size="xs" 
                       (click)="dictateVisitNote()" 
                       title="Dictate"
+                      ariaLabel="Dictate Visit Note"
                       icon="M12 14q-1.25 0-2.125-.875T9 11V5q0-1.25.875-2.125T12 2q1.25 0 2.125.875T15 5v6q0 1.25-.875 2.125T12 14m-1 7v-3.075q-2.6-.35-4.3-2.325T5 11h2q0 2.075 1.463 3.537T12 16q2.075 0 3.538-1.463T17 11h2q0 2.225-1.7 4.2T13 17.925V21z">
                     </understory-button>
                   </div>
@@ -182,31 +184,40 @@ import { UnderstoryBadgeComponent } from './shared/understory-badge.component';
                 </div>
 
                 <!-- Patient Trends Chart -->
-                <section>
+                @defer (on viewport) {
+                  <section>
+                      <h2 class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] mb-6">Retrospective Data Visualization</h2>
+                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
+                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Pain Path / 0–10</h3>
+                              <div class="relative flex-1 min-h-0"><canvas #painChart></canvas></div>
+                          </div>
+                          <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
+                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Blood Pressure / Composite</h3>
+                              <div class="relative flex-1 min-h-0"><canvas #bpChart></canvas></div>
+                          </div>
+                          <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
+                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Pulse Rate / BPM</h3>
+                              <div class="relative flex-1 min-h-0"><canvas #hrChart></canvas></div>
+                          </div>
+                          <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
+                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Oxygen Saturation / %</h3>
+                              <div class="relative flex-1 min-h-0"><canvas #spo2Chart></canvas></div>
+                          </div>
+                          <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col md:col-span-2">
+                              <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Core Temperature / Trend</h3>
+                              <div class="relative flex-1 min-h-0"><canvas #tempChart></canvas></div>
+                          </div>
+                      </div>
+                  </section>
+                } @placeholder {
+                  <section>
                     <h2 class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] mb-6">Retrospective Data Visualization</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
-                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Pain Path / 0–10</h3>
-                            <div class="relative flex-1 min-h-0"><canvas #painChart></canvas></div>
-                        </div>
-                        <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
-                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Blood Pressure / Composite</h3>
-                            <div class="relative flex-1 min-h-0"><canvas #bpChart></canvas></div>
-                        </div>
-                        <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
-                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Pulse Rate / BPM</h3>
-                            <div class="relative flex-1 min-h-0"><canvas #hrChart></canvas></div>
-                        </div>
-                        <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col">
-                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Oxygen Saturation / %</h3>
-                            <div class="relative flex-1 min-h-0"><canvas #spo2Chart></canvas></div>
-                        </div>
-                        <div class="w-full h-64 bg-white border border-gray-100 rounded p-6 flex flex-col md:col-span-2">
-                            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">Core Temperature / Trend</h3>
-                            <div class="relative flex-1 min-h-0"><canvas #tempChart></canvas></div>
-                        </div>
+                    <div class="h-64 w-full flex items-center justify-center bg-gray-50/50 border border-dashed border-gray-200 rounded">
+                      <span class="text-xs font-bold uppercase tracking-widest text-gray-400">Scroll to load charts</span>
                     </div>
-                </section>
+                  </section>
+                }
 
                 <!-- Pre-existing Conditions -->
                 @if(p.preexistingConditions.length > 0) {
@@ -221,7 +232,7 @@ import { UnderstoryBadgeComponent } from './shared/understory-badge.component';
                 }
 
                 <!-- Draft Care Plan -->
-                @if (state.draftCarePlanItems().length > 0) {
+                @if (state.draftSummaryItems().length > 0) {
                   <section class="bg-gray-50 p-6 border border-gray-200 rounded">
                     <h2 class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em] mb-4 flex justify-between items-center">
                       <understory-badge label="Care Recommendation Draft" severity="success" [hasIcon]="true">
@@ -229,16 +240,17 @@ import { UnderstoryBadgeComponent } from './shared/understory-badge.component';
                       </understory-badge>
                     </h2>
                     <ul class="space-y-3 text-[13px] text-[#1C1C1C]">
-                      @for (item of state.draftCarePlanItems(); track $index) {
+                      @for (item of state.draftSummaryItems(); track $index) {
                         <li class="pl-0">
                           <div class="flex justify-between items-start gap-3 group">
                              <div class="w-1 h-4 bg-gray-200 mt-0.5 shrink-0 group-hover:bg-[#689F38] transition-colors"></div>
-                            <span class="flex-1 font-medium">{{ item }}</span>
+                            <span class="flex-1 font-medium">{{ item.text }}</span>
                             <understory-button 
                               (click)="removeDraftItem(item)" 
                               variant="ghost" 
                               size="xs" 
                               title="Remove"
+                              ariaLabel="Remove Draft Item"
                               icon="M18 6L6 18M6 6l12 12">
                             </understory-button>
                           </div>
@@ -285,12 +297,13 @@ import { UnderstoryBadgeComponent } from './shared/understory-badge.component';
               variant="ghost" 
               size="sm" 
               (click)="closePreview()" 
+              ariaLabel="Close Preview Modal"
               icon="M18 6L6 18M6 6l12 12">
             </understory-button>
           </div>
           <div class="flex-1 overflow-y-auto p-6 bg-white">
              <div class="mb-2 flex justify-between items-center">
-                <label class="block text-xs font-bold text-[#689F38] uppercase tracking-[0.15em]">Final Care Plan Document</label>
+                <h3 class="block text-xs font-bold text-[#689F38] uppercase tracking-[0.15em]">Final Care Plan Document</h3>
              </div>
              <understory-input
                type="textarea"
@@ -331,7 +344,7 @@ import { UnderstoryBadgeComponent } from './shared/understory-badge.component';
     }
   `
 })
-export class MedicalChartSummaryComponent implements AfterViewInit {
+export class MedicalChartSummaryComponent {
   state = inject(PatientStateService);
   patientManager = inject(PatientManagementService);
   exportService = inject(ExportService);
@@ -343,11 +356,11 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
   showPreviewModal = signal(false);
   previewText = signal('');
 
-  @ViewChild('painChart') painChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('bpChart') bpChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('hrChart') hrChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('spo2Chart') spo2ChartRef!: ElementRef<HTMLCanvasElement>;
-  @ViewChild('tempChart') tempChartRef!: ElementRef<HTMLCanvasElement>;
+  painChartRef = viewChild<ElementRef<HTMLCanvasElement>>('painChart');
+  bpChartRef = viewChild<ElementRef<HTMLCanvasElement>>('bpChart');
+  hrChartRef = viewChild<ElementRef<HTMLCanvasElement>>('hrChart');
+  spo2ChartRef = viewChild<ElementRef<HTMLCanvasElement>>('spo2Chart');
+  tempChartRef = viewChild<ElementRef<HTMLCanvasElement>>('tempChart');
 
   private charts: { [key: string]: any | null } = {
     pain: null,
@@ -386,7 +399,7 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
   });
 
   activeCarePlanHTML = computed(() => {
-    const plan = this.state.activeCarePlan();
+    const plan = this.state.activePatientSummary();
     if (!plan) return null;
     try {
       return marked.parse(plan, { gfm: true, breaks: true }) as string;
@@ -399,17 +412,22 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
   constructor() {
     effect(() => {
       // Re-render chart when patient, vitals, or issues change
+      // or when the viewChild charts become available on screen via @defer
       const p = this.patient();
       this.state.vitals();
       this.state.issues();
-      if (p) {
-        setTimeout(() => this.renderChart(), 0);
+      const pc = this.painChartRef();
+      const bp = this.bpChartRef();
+      const hr = this.hrChartRef();
+      const spo2 = this.spo2ChartRef();
+      const temp = this.tempChartRef();
+
+      if (p && pc && bp && hr && spo2 && temp) {
+        untracked(() => {
+          setTimeout(() => this.renderChart(), 0);
+        });
       }
     });
-  }
-
-  ngAfterViewInit() {
-    this.renderChart();
   }
 
   private async renderChart() {
@@ -494,7 +512,7 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
     spo2Levels.push(parseNum(this.state.vitals().spO2));
     tempLevels.push(parseNum(this.state.vitals().temp));
 
-    const createChart = (ref: ElementRef<HTMLCanvasElement>, label: string, data: (number | null)[], color: string, dataset2?: any, yOpts?: any) => {
+    const createChart = (ref: ElementRef<HTMLCanvasElement> | undefined, label: string, data: (number | null)[], color: string, dataset2?: any, yOpts?: any) => {
       if (!ref || !ref.nativeElement) return null;
 
       // Destroy existing chart if present to prevent "Canvas is already in use" error
@@ -623,15 +641,15 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
     };
 
     setTimeout(() => {
-      this.charts['pain'] = createChart(this.painChartRef, 'PAIN LEVEL', painLevels, '#689F38', undefined, { max: 10, beginAtZero: true, ticks: { stepSize: 2 } });
-      this.charts['bp'] = createChart(this.bpChartRef, 'SYSTOLIC', systolicLevels, '#D0021B', {
+      this.charts['pain'] = createChart(this.painChartRef(), 'PAIN LEVEL', painLevels, '#689F38', undefined, { max: 10, beginAtZero: true, ticks: { stepSize: 2 } });
+      this.charts['bp'] = createChart(this.bpChartRef(), 'SYSTOLIC', systolicLevels, '#D0021B', {
         label: 'DIASTOLIC',
         data: diastolicLevels,
         borderColor: '#64748B'
       });
-      this.charts['hr'] = createChart(this.hrChartRef, 'HEART RATE', hrLevels, '#94A3B8');
-      this.charts['spo2'] = createChart(this.spo2ChartRef, 'OXYGEN SATURATION', spo2Levels, '#94A3B8');
-      this.charts['temp'] = createChart(this.tempChartRef, 'CORE TEMPERATURE', tempLevels, '#94A3B8');
+      this.charts['hr'] = createChart(this.hrChartRef(), 'HEART RATE', hrLevels, '#94A3B8');
+      this.charts['spo2'] = createChart(this.spo2ChartRef(), 'OXYGEN SATURATION', spo2Levels, '#94A3B8');
+      this.charts['temp'] = createChart(this.tempChartRef(), 'CORE TEMPERATURE', tempLevels, '#94A3B8');
     }, 0);
   }
 
@@ -651,25 +669,15 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
     this.patientManager.addHistoryEntry(patientId, historyEntry);
   }
 
-  removeDraftItem(item: string) {
-    this.state.removeDraftCarePlanItem(item);
+  removeDraftItem(item: DraftSummaryItem) {
+    this.state.removeDraftSummaryItem(item.id);
   }
 
-  finalizeDraftPlan() {
-    const draftItems = this.state.draftCarePlanItems();
-    if (draftItems.length === 0) return;
-
-    const currentPlan = this.state.activeCarePlan() || '';
-
-    const newContent = draftItems.map(item => `- ${item}`).join('\n');
-
-    const updatedPlan = currentPlan
-      ? `${currentPlan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}`
-      : `### Care Plan\n${newContent}`;
-
-    this.state.updateActiveCarePlan(updatedPlan);
-    this.state.clearDraftCarePlanItems();
+  get hasDraftItems() {
+    const draftItems = this.state.draftSummaryItems();
+    return draftItems && draftItems.length > 0;
   }
+
   updateVital(key: keyof PatientState['vitals'], event: any) {
     this.state.updateVital(key, event.target.value);
   }
@@ -722,14 +730,24 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
     this.showExportMenu.set(false);
   }
 
-  openFinalizePreview() {
-    let plan = this.state.activeCarePlan() || '';
-    const draftItems = this.state.draftCarePlanItems();
-    if (draftItems.length > 0) {
-      const newContent = draftItems.map(item => `- ${item}`).join('\n');
-      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Care Plan\n${newContent}`;
+  discardDrafts() {
+    const draftItems = this.state.draftSummaryItems();
+
+    if (draftItems && draftItems.length > 0) {
+      if (confirm('Discard your draft modifications and revert to the saved Patient Summary?')) {
+        this.state.clearDraftSummaryItems();
+      }
     }
-    this.previewText.set(plan || 'No Active Care Plan recorded for this visit.');
+  }
+
+  openFinalizePreview() {
+    let plan = this.state.activePatientSummary() || '';
+    const draftItems = this.state.draftSummaryItems();
+    if (draftItems.length > 0) {
+      const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
+      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
+    }
+    this.previewText.set(plan || 'No Active Patient Summary recorded for this visit.');
     this.showPreviewModal.set(true);
   }
 
@@ -746,9 +764,9 @@ export class MedicalChartSummaryComponent implements AfterViewInit {
   }
 
   confirmFinalize() {
-    this.state.updateActiveCarePlan(this.previewText());
-    if (this.state.draftCarePlanItems().length > 0) {
-      this.state.clearDraftCarePlanItems();
+    this.state.updateActivePatientSummary(this.previewText());
+    if (this.state.draftSummaryItems().length > 0) {
+      this.state.clearDraftSummaryItems();
     }
     this.finalizeChart();
     this.closePreview();

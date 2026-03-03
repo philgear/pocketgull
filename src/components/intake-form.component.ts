@@ -134,6 +134,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                           [disabled]="!formState().description"
                           (click)="copyNotesToClipboard()"
                           [icon]="justCopied() ? 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z' : 'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z'"
+                          ariaLabel="Copy notes"
                           [title]="justCopied() ? 'Copied!' : 'Copy notes'">
                         </understory-button>
 
@@ -145,6 +146,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                             (click)="openDictation()"
                             [loading]="dictation.isListening()"
                             icon="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"
+                            ariaLabel="Dictate notes"
                             title="Dictate Notes">
                           </understory-button>
                         }
@@ -191,6 +193,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                         [disabled]="!formState().recommendation"
                         (click)="copyRecToClipboard()"
                         [icon]="justCopiedRec() ? 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z' : 'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z'"
+                        ariaLabel="Copy recommendation"
                         [title]="justCopiedRec() ? 'Copied!' : 'Copy recommendation'">
                       </understory-button>
                       @if (note.isCurrent) {
@@ -199,6 +202,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                                 size="sm"
                                 [loading]="dictation.isListening()"
                                 icon="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"
+                                ariaLabel="Dictate recommendation"
                                 title="Dictate Recommendation">
                         </understory-button>
                       }

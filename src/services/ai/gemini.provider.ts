@@ -52,28 +52,6 @@ export class GeminiProvider implements IntelligenceProvider {
         return this._ai;
     }
 
-    private _adkModel: any = null;
-    async getAdkModel(): Promise<any> {
-        if (!this._adkModel) {
-            let initialKey = (window as any).GEMINI_API_KEY || this.config.apiKey;
-            if (!initialKey && typeof localStorage !== 'undefined') {
-                initialKey = localStorage.getItem('GEMINI_API_KEY');
-            }
-            if (!initialKey && typeof process !== 'undefined' && process.env) {
-                initialKey = process.env.GEMINI_API_KEY;
-            }
-            if (!initialKey) {
-                throw new Error("API key must be set when using the Gemini API for ADK.");
-            }
-            const { Gemini } = await import('@google/adk');
-            this._adkModel = new Gemini({
-                model: this.config.defaultModel.modelId,
-                apiKey: initialKey
-            });
-        }
-        return this._adkModel;
-    }
-
 
     private chat: any = null;
     private verifier = inject(VerifyAiService);

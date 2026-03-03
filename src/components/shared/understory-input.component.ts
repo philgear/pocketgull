@@ -25,6 +25,7 @@ import { FormsModule } from '@angular/forms';
             #inputEl
             [id]="inputId()"
             [placeholder]="placeholder()"
+            [attr.aria-label]="ariaLabel() || label() || placeholder()"
             [disabled]="disabled()"
             [ngModel]="value()"
             (ngModelChange)="onModelChange($event)"
@@ -37,6 +38,7 @@ import { FormsModule } from '@angular/forms';
             [id]="inputId()"
             [type]="type()"
             [placeholder]="placeholder()"
+            [attr.aria-label]="ariaLabel() || label() || placeholder()"
             [disabled]="disabled()"
             [ngModel]="value()"
             (ngModelChange)="onModelChange($event)"
@@ -178,6 +180,7 @@ export class UnderstoryInputComponent implements AfterViewInit {
   hint = input<string>('');
   icon = input<string>('');
   rows = input<number>(4);
+  ariaLabel = input<string>('');
 
   breathing = input<boolean>(false);
   autofocus = input<boolean>(false);

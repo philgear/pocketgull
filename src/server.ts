@@ -13,7 +13,7 @@ import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const browserDistFolder = join(__dirname, '../browser').replace(/\\/g, '/'); // root dir of dist/app/server when built
+const browserDistFolder = join(__dirname, '..').replace(/\\/g, '/'); // root dir of dist when built
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();

@@ -10,7 +10,7 @@ import {
 } from './patient.types';
 
 // Re-export for use in other components
-export type { BodyPartIssue };
+export type { BodyPartIssue, HistoryEntry, Patient };
 
 // Mock Data
 const MOCK_PATIENTS: Patient[] = [

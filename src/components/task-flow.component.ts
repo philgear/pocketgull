@@ -108,10 +108,10 @@ import { RevealDirective } from '../directives/reveal.directive';
             name="taskInputText"
             #itemInput
             (keydown.enter)="handleEnter($event, itemInput)"
+            (input)="autoResize(itemInput)"
             placeholder="Type a clinical note or task... (Shift+Enter for new line)" 
             rows="1"
             class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#416B1F]/30 focus:border-[#416B1F] transition-all placeholder-gray-400 resize-none max-h-32"
-            oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight < 128 ? this.scrollHeight : 128) + 'px'"
         ></textarea>
         <div class="flex justify-end gap-2">
             <button (click)="submitNote(itemInput)" class="px-4 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200 hover:bg-gray-200 rounded transition-colors uppercase tracking-widest flex items-center gap-1.5">
@@ -179,5 +179,18 @@ export class TaskFlowComponent {
 
   removeTask(id: string) {
     this.state.removeChecklistItem(id);
+  }
+
+  autoResize(el: HTMLTextAreaElement) {
+    // Schedule resize for next frame to avoid synchronous layout thrashing
+    requestAnimationFrame(() => {
+      const currentHeight = el.style.height;
+      el.style.height = 'auto';
+      const scrollHeight = el.scrollHeight;
+      el.style.height = currentHeight;
+      requestAnimationFrame(() => {
+        el.style.height = (scrollHeight < 128 ? scrollHeight : 128) + 'px';
+      });
+    });
   }
 }

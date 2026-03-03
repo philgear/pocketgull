@@ -68,7 +68,7 @@ import { RevealDirective } from './directives/reveal.directive';
       } @else {
         <main class="flex-1 flex flex-col min-w-0 relative group/main"> <!-- Main Content -->
         <!-- Navbar: Pure utility, no decoration -->
-        <nav class="h-14 border-b border-[#EEEEEE] flex items-center justify-between px-3 sm:px-6 shrink-0 bg-white z-20 no-print">
+        <nav class="h-14 border-b border-[#EEEEEE] flex items-center justify-between px-3 sm:px-6 shrink-0 bg-white z-50 no-print">
           <div class="flex items-center gap-4">
               <div class="flex items-center gap-3">
                   <svg width="42" height="42" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
@@ -131,6 +131,7 @@ import { RevealDirective } from './directives/reveal.directive';
             <app-patient-dropdown></app-patient-dropdown>
             
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
+                    aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
                     [class.bg-gray-800]="state.isLiveAgentActive()"
                     [class.border-gray-800]="state.isLiveAgentActive()"
@@ -149,6 +150,7 @@ import { RevealDirective } from './directives/reveal.directive';
             </button>
             
             <button (click)="state.toggleResearchFrame()"
+                    aria-label="Toggle Research Frame"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 text-gray-700 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] hover:border-gray-400 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
               <span class="hidden sm:inline">Research</span>
@@ -160,60 +162,6 @@ import { RevealDirective } from './directives/reveal.directive';
           </div>
         </nav>
 
-        <!-- Main Grid Layout -->
-        <div #mainContainer class="flex-1 flex flex-col md:flex-row md:overflow-hidden relative bg-[#F9FAFB] p-2 md:p-6 gap-3 md:gap-6">
-
-
-          
-          <!-- Column 1: Patient Medical Chart -->
-          <div class="relative w-full md:h-full bg-white rounded-xl shadow-sm border border-gray-200 md:overflow-hidden flex flex-col md:block flex-shrink-0"
-               [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined"
-               [class.transition-all]="!isDragging()"
-               [class.duration-500]="!isDragging()"
-               [class.ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]]="!isDragging()"
-               [style.--panel-width.px]="isChartCollapsed() ? 0 : (isAnalysisCollapsed() ? null : inputPanelWidth())"
-               [class.md:w-[var(--panel-width)]]="!isAnalysisCollapsed() && inputPanelWidth() !== undefined"
-               [class.hidden]="isChartCollapsed()"
-               [class.max-md:hidden]="!!state.selectedPartId()">
-               <div class="md:h-full w-full md:overflow-hidden flex-1 flex flex-col">
-                 <app-medical-chart class="no-print md:h-full block md:overflow-y-auto w-full"></app-medical-chart>
-               </div>
-            </div>
-
-            <!-- RESIZER V -->
-            <div title="Drag to resize, Double-click to maximize chart" class="hidden md:flex w-2 shrink-0 items-center justify-center cursor-col-resize z-20 no-print group relative"
-                 [class.md:hidden]="isChartCollapsed() || isAnalysisCollapsed()"
-                 (mousedown)="startColumnDrag($event)"
-                 (dblclick)="maximizeChart()">
-                
-                <!-- Full-width background bar -->
-                <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-4 bg-transparent group-hover:bg-gray-100 transition-colors rounded-full z-0"></div>
-                <div class="absolute inset-0 bg-gray-100 group-hover:bg-gray-200 transition-colors rounded"></div>
-                <!-- Handle -->
-                <div class="h-12 w-1.5 rounded-full bg-gray-200 group-hover:bg-gray-300 transition-colors relative z-10"></div>
-
-                <!-- Quick Actions (V4) -->
-                <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white shadow-xl border border-gray-200 rounded-full p-1.5 z-30">
-                   
-                   <!-- Panel Management -->
-                   <div class="flex flex-col gap-1 border-b border-gray-100 pb-1.5 mb-0.5">
-                      <button (click)="$event.stopPropagation(); toggleChart()" [class.bg-black]="!isChartCollapsed()" [class.text-white]="!isChartCollapsed()"
-                              title="Toggle Medical Chart" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-black transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path></svg>
-                      </button>
-                      <button (click)="$event.stopPropagation(); toggleAnalysis()" [class.bg-black]="!isAnalysisCollapsed()" [class.text-white]="!isAnalysisCollapsed()"
-                              title="Toggle Analysis Panel" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-black transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                      </button>
-                      <button (click)="$event.stopPropagation(); maximizeChart()" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-black transition-colors" title="Maximize Chart">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                    </svg>
-                    <span class="hidden sm:inline">Voice Assistant</span>
-                </button>
-            </div>
-          </div>
-        </nav>
 
         <!-- Main Grid Layout -->
         <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] p-2 md:p-6 gap-3 md:gap-6">
@@ -314,7 +262,7 @@ import { RevealDirective } from './directives/reveal.directive';
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
                  <!-- Section 1: Medical Summary -->
-                 <div class="shrink-0 overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md"
+                 <div class="shrink-0 overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-shadow duration-300 hover:shadow-md"
                       [style.height.px]="topSectionHeight()"
                       [class.flex-[0_0_40%]]="topSectionHeight() === undefined">
                      <div class="flex-1 w-full h-full overflow-y-auto min-h-[50vh] md:min-h-0 min-w-0">
@@ -341,7 +289,7 @@ import { RevealDirective } from './directives/reveal.directive';
                  </div>
 
                  <!-- Section 2: Analysis Intake Container -->
-                 <div class="overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md flex-1 min-h-[50vh] md:min-h-0"
+                 <div class="overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-shadow duration-300 hover:shadow-md flex-1 min-h-[50vh] md:min-h-0"
                       [style.height.px]="analysisSectionHeight()">
                      <app-analysis-container class="block h-full min-h-0 min-w-0" appReveal [revealDelay]="100"></app-analysis-container>
                  </div>

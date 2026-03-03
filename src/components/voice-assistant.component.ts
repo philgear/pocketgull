@@ -242,8 +242,13 @@ export class VoiceAssistantComponent implements OnDestroy {
     constructor() {
         effect(() => {
             const input = this.state.liveAgentInput();
-            if (input) {
+            if (input && this.agentState() === 'idle') {
                 this.messageText.set(input);
+                this.state.liveAgentInput.set('');
+
+                untracked(() => {
+                    setTimeout(() => this.sendMessage(), 50);
+                });
             }
         }, { allowSignalWrites: true });
 

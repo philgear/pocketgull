@@ -20,6 +20,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@google-cloud/storage": [
+        "./src/mocks/empty.ts"
       ]
     }
   },

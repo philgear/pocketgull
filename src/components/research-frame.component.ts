@@ -83,12 +83,12 @@ export interface PubMedSearchResult {
               <understory-input [value]="doi()" (valueChange)="doi.set($event)" placeholder="DOI (e.g. 10.1038/s41586-021-03503-x)" size="sm"></understory-input>
             </div>
             <div class="flex items-center gap-4">
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="checkbox" [checked]="isPeerReviewed()" (change)="isPeerReviewed.set(!isPeerReviewed())" class="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+              <label for="peer-reviewed-checkbox" class="flex items-center gap-1.5 cursor-pointer">
+                <input id="peer-reviewed-checkbox" type="checkbox" [checked]="isPeerReviewed()" (change)="isPeerReviewed.set(!isPeerReviewed())" class="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <span class="text-[11px] text-gray-600">Peer Reviewed</span>
               </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="checkbox" [checked]="autoCite()" (change)="autoCite.set(!autoCite())" class="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+              <label for="auto-cite-checkbox" class="flex items-center gap-1.5 cursor-pointer">
+                <input id="auto-cite-checkbox" type="checkbox" [checked]="autoCite()" (change)="autoCite.set(!autoCite())" class="w-3 h-3 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                 <span class="text-[11px] text-gray-600">Include in Summary References</span>
               </label>
             </div>

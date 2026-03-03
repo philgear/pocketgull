@@ -36,9 +36,4 @@ export interface IntelligenceProvider {
     startChat(patientData: string, context: string): Promise<void>;
     sendMessage(message: string): Promise<string>;
     getInitialGreeting(prompt: string): Promise<string>;
-
-    /**
-     * ADK Interoperability
-     */
-    getAdkModel(): Promise<any>;
 }

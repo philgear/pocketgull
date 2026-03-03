@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal, viewChild, ElementRef, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, viewChild, ElementRef, effect, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { PatientState, Patient, HistoryEntry } from '../services/patient.types';
@@ -133,13 +133,15 @@ export class MedicalChartComponent {
   historyContainer = viewChild<ElementRef<HTMLDivElement>>('historyContainer');
 
   el = inject(ElementRef);
+  platformId = inject(PLATFORM_ID);
 
   constructor() {
     effect(() => {
       // depend on history to trigger scroll
       const history = this.filteredHistory();
-      if (history) {
-        setTimeout(() => {
+      if (history && isPlatformBrowser(this.platformId)) {
+        // Use requestAnimationFrame to avoid synchronous layout thrashing (forced reflows)
+        requestAnimationFrame(() => {
           // Scroll the inner container
           const histEl = this.historyContainer()?.nativeElement;
           if (histEl && typeof histEl.scrollTo === 'function') {
@@ -150,7 +152,7 @@ export class MedicalChartComponent {
           if (mainEl && typeof mainEl.scrollTo === 'function') {
             mainEl.scrollTo({ top: mainEl.scrollHeight, behavior: 'smooth' });
           }
-        }, 100);
+        });
       }
     });
   }

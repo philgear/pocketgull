@@ -14,6 +14,7 @@ import {
 } from './patient.types';
 
 export { BODY_PART_NAMES, BODY_PART_MAPPING };
+export type { PatientState };
 
 
 @Injectable({
@@ -30,7 +31,7 @@ export class PatientStateService {
   readonly requestedResearchUrl = signal<string | null>(null);
   readonly requestedResearchQuery = signal<string | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
-  readonly bodyViewerMode = signal<'3d' | '2d'>('2d');
+  readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
   readonly isInternalView = signal<boolean>(false);
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<DraftSummaryItem[]>([]);
