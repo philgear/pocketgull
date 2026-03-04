@@ -93,7 +93,7 @@ import { DEMO_ANALYSIS_REPORT } from './demo-data';
             </button>
             <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"
               class="block text-xs text-[#416B1F] hover:text-[#244626] transition-colors mb-8">
-              Get a free API key at <span class="font-bold">ai.dev</span> →
+              Get an API key at <span class="font-bold">ai.dev</span> →
             </a>
 
             <!-- Divider -->
