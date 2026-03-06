@@ -443,6 +443,8 @@ export class MedicalChartSummaryComponent {
     }
   });
 
+  private chartRenderTimeout?: ReturnType<typeof setTimeout>;
+
   constructor() {
     effect(() => {
       // Re-render chart when patient, vitals, or issues change
@@ -458,7 +460,10 @@ export class MedicalChartSummaryComponent {
 
       if (p && pc && bp && hr && spo2 && temp) {
         untracked(() => {
-          setTimeout(() => this.renderChart(), 0);
+          if (this.chartRenderTimeout) {
+            clearTimeout(this.chartRenderTimeout);
+          }
+          this.chartRenderTimeout = setTimeout(() => this.renderChart(), 600);
         });
       }
     });

@@ -624,6 +624,88 @@ export class AppComponent implements OnDestroy {
             }
           }
         });
+
+        // Register research_clinical_term
+        navigator.modelContext.registerTool({
+          name: 'research_clinical_term',
+          description: 'Initiates a deep search for a clinical term or question in the Research Frame.',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              query: { type: 'string', description: 'The clinical term or question to research.' }
+            },
+            required: ['query']
+          },
+          execute: async (params: any) => {
+            try {
+              this.ngZone.run(() => {
+                this.state.requestResearchSearch(params.query);
+              });
+              return { content: [{ type: 'text', text: `Initiated research for: ${params.query}` }] };
+            } catch (e: any) {
+              return { content: [{ type: 'text', text: `Failed to initiate research: ${e.message}` }], isError: true };
+            }
+          }
+        });
+
+        // Register load_research_url
+        navigator.modelContext.registerTool({
+          name: 'load_research_url',
+          description: 'Loads a specific URL into the Research Frame (e.g., from a previous search result).',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              url: { type: 'string', description: 'The URL to load.' }
+            },
+            required: ['url']
+          },
+          execute: async (params: any) => {
+            try {
+              this.ngZone.run(() => {
+                this.state.requestResearchUrl(params.url);
+                this.state.toggleResearchFrame(true);
+              });
+              return { content: [{ type: 'text', text: `Loaded URL: ${params.url}` }] };
+            } catch (e: any) {
+              return { content: [{ type: 'text', text: `Failed to load URL: ${e.message}` }], isError: true };
+            }
+          }
+        });
+
+        // Register add_research_bookmark
+        navigator.modelContext.registerTool({
+          name: 'add_research_bookmark',
+          description: "Pre-stages a relevant literature link in the patient's bookmarks.",
+          inputSchema: {
+            type: 'object',
+            properties: {
+              title: { type: 'string', description: 'The title of the bookmark.' },
+              url: { type: 'string', description: 'The URL of the bookmark.' },
+              authors: { type: 'string', description: 'The authors of the literature.' },
+              doi: { type: 'string', description: 'The DOI of the literature.' },
+              isPeerReviewed: { type: 'boolean', description: 'Whether the literature is peer-reviewed.' },
+              cited: { type: 'boolean', description: 'Whether to include in summary references.' }
+            },
+            required: ['title', 'url']
+          },
+          execute: async (params: any) => {
+            try {
+              this.ngZone.run(() => {
+                this.patientMgmt.addBookmark({
+                  title: params.title,
+                  url: params.url,
+                  authors: params.authors,
+                  doi: params.doi,
+                  isPeerReviewed: params.isPeerReviewed || false,
+                  cited: params.cited !== undefined ? params.cited : true
+                });
+              });
+              return { content: [{ type: 'text', text: `Added bookmark: ${params.title}` }] };
+            } catch (e: any) {
+              return { content: [{ type: 'text', text: `Failed to add bookmark: ${e.message}` }], isError: true };
+            }
+          }
+        });
       }
     });
 
