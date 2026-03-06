@@ -1,0 +1,54 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/index.html",
+          "/index.csr.html",
+          "/manifest.webmanifest",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/icons/**",
+          "/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
+        ],
+        "urls": [
+          "https://fonts.googleapis.com/**",
+          "https://fonts.gstatic.com/**"
+        ]
+      }
+    }
+  ],
+  "dataGroups": [
+    {
+      "name": "api-network-first",
+      "urls": [
+        "/api/**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 50,
+        "maxAge": "10m",
+        "timeout": "10s"
+      }
+    }
+  ],
+  "navigationUrls": [
+    "/**",
+    "!/**/*.*",
+    "!/**/*__*",
+    "!/**/*__*/**"
+  ]
+}

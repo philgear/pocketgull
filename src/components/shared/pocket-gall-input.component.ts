@@ -225,4 +225,10 @@ export class PocketGallInputComponent implements AfterViewInit {
       this.breathing() ? 'animate-box-breathing' : ''
     ].join(' ');
   }
+
+  focus() {
+    setTimeout(() => {
+      this.inputEl?.nativeElement?.focus();
+    }, 50);
+  }
 }

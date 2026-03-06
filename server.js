@@ -132,9 +132,53 @@ app.get('/api/pubmed/summary', async (req, res) => {
   }
 });
 
+// Enable parsing JSON bodies for POST requests
+app.use(express.json({ limit: '50mb' }));
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
+});
+
+// JSON File Database Configuration
+const dataDir = join(rootDir, 'data');
+const patientsDbPath = join(dataDir, 'patients.json');
+
+// Ensure data directory and empty DB exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+if (!fs.existsSync(patientsDbPath)) {
+  fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2));
+}
+
+// Patients API Endpoints
+app.get('/api/patients', (req, res) => {
+  try {
+    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  } catch (err) {
+    console.error('[API] Error reading patients database:', err);
+    res.status(500).json({ error: 'Internal server error while reading database' });
+  }
+});
+
+app.post('/api/patients', (req, res) => {
+  try {
+    if (!req.body || !Array.isArray(req.body)) {
+      return res.status(400).json({ error: 'Body must be a JSON array of patients' });
+    }
+
+    // Save exactly what the frontend sends
+    fs.writeFileSync(patientsDbPath, JSON.stringify(req.body, null, 2));
+
+    console.log(`[API] Saved ${req.body.length} patients to database.`);
+    res.status(200).json({ success: true, count: req.body.length });
+  } catch (err) {
+    console.error('[API] Error saving patients database:', err);
+    res.status(500).json({ error: 'Internal server error while saving database' });
+  }
 });
 
 // Serve static files via Express directly to avoid generic filesystem deadlocks

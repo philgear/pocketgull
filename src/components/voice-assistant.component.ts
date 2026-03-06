@@ -85,153 +85,123 @@ export interface ChatEntry {
                     <div #transcriptContainer class="flex-1 overflow-y-auto w-full scroll-smooth pt-8 lg:pt-16 pb-32 px-4 lg:px-8 bg-white">
                         <div class="max-w-3xl mx-auto space-y-12">
                             
-                            <!-- Grand Intro Greeting -->
-                            @if (agentState() === 'typing') {
-                                <div class="flex flex-col items-center justify-center text-center mt-12 fade-in-up">
-                                    <div class="w-20 h-20 rounded-sm bg-green-50/50 border border-green-100 flex items-center justify-center mb-8 pulse-ring">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-green-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                                    </div>
-                                    <h1 class="text-2xl sm:text-3xl lg:text-4xl font-light text-gray-900 leading-tight md:leading-snug max-w-2xl mx-auto tracking-tight">
-                                        <span class="typing-text" [innerHTML]="typingIntroText() | safeHtml"></span><span class="animate-pulse text-green-500">_</span>
-                                    </h1>
-                                </div>
-                            }
+
 
                             <!-- Regular Transcript -->
                             @for (entry of parsedTranscript(); track $index) {
-                                <div class="group flex gap-3 sm:gap-5 w-full sm:max-w-[95%] animate-in fade-in slide-in-from-bottom-2 duration-300" [class.ml-auto]="entry.role === 'user'" [class.flex-row-reverse]="entry.role === 'user'">
-                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-sm flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 border"
-                                         [class.bg-white]="entry.role === 'model'"
-                                         [class.border-gray-200]="entry.role === 'model'"
-                                         [class.text-[#416B1F]]="entry.role === 'model'"
-                                         [class.bg-[#1C1C1C]]="entry.role === 'user'"
-                                         [class.border-[#1C1C1C]]="entry.role === 'user'"
-                                         [class.text-white]="entry.role === 'user'">
-                                         {{ entry.role === 'model' ? 'AI' : 'DR' }}
-                                    </div>
+                                <div class="group flex gap-[7px] items-start w-full animate-in fade-in slide-in-from-bottom-2 duration-300" [class.flex-row-reverse]="entry.role === 'user'">
                                     @if (entry.role === 'model') {
-                                        <div class="flex flex-col gap-2 w-full pt-1.5 min-w-0">
-                                            <div class="text-[#1C1C1C] rams-typography text-lg leading-relaxed font-light break-words" [innerHTML]="entry.htmlContent | safeHtml"></div>
-                                            
-                                            <!-- ─── Rich Media Cards ──────────────────────── -->
+                                        <div class="shrink-0 w-[20px] h-[20px] rounded-full bg-[#1C1C1C] text-white flex items-center justify-center mt-[1px]">
+                                            <svg viewBox="0 -960 960 960" fill="currentColor" width="11" height="11"><path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Z"/></svg>
+                                        </div>
+                                    }
+                                     @if (entry.role === 'model') {
+                                         <div class="flex flex-col gap-2 w-full min-w-0 max-w-[calc(100%-30px)]">
+                                             <!-- Model Bubble -->
+                                             <div class="text-[14px] font-light tracking-wide leading-relaxed text-[#F9FAFB] bg-[#262626] border border-[#404040] rounded-[8px_8px_8px_2px] px-[16px] py-[12px] w-full break-words [&_p]:mb-3 [&_ul]:pl-5 [&_ul]:mb-3 [&_ol]:pl-5 [&_ol]:mb-3 [&_li]:mb-1 [&_strong]:font-medium [&_strong]:text-[#FFFFFF] [&_h2]:text-[10px] [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-widest [&_h2]:mt-4 [&_h2]:mb-2 [&_h2]:text-[#9CA3AF] [&_h3]:text-[10px] [&_h3]:font-bold [&_h3]:uppercase [&_h3]:tracking-widest [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:text-[#9CA3AF] [&_h4]:text-[10px] [&_h4]:font-bold [&_h4]:uppercase [&_h4]:tracking-widest [&_h4]:mt-4 [&_h4]:mb-2 [&_h4]:text-[#9CA3AF]" [innerHTML]="entry.htmlContent | safeHtml"></div>
+                                             
+                                             <!-- ─── Rich Media Cards ──────────────────────── -->
                                             @if (entry.richCards && entry.richCards.length > 0) {
-                                                <div class="flex flex-col gap-4 mt-2 mb-2">
+                                                <div class="rm-panel">
                                                     @for (card of entry.richCards; track card.query) {
 
                                                         <!-- 3D Model -->
                                                         @if (card.kind === 'model-3d' && card.models?.length) {
-                                                            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 transform-gpu">
-                                                                <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
-                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="16" height="16" class="text-blue-500"><path d="M440-183v-274L200-596v274l240 139Zm80 0 240-139v-274L520-457v274Zm-40-343 237-137-237-137-237 137 237 137ZM160-252q-19-11-29.5-29T120-321v-318q0-22 10.5-40t29.5-29l280-161q19-11 40-11t40 11l280 161q19 11 29.5 29t10.5 40v318q0 22-10.5 40T800-252L520-91q-19 11-40 11t-40-11L160-252Z"/></svg>
-                                                                    <span class="text-sm font-semibold text-gray-800">{{ card.models[0].name }}</span>
-                                                                    <span class="ml-auto text-[10px] font-bold tracking-wider text-blue-600 uppercase bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">3D Model</span>
+                                                            <div class="rm-card rm-card--model">
+                                                                <div class="rm-card-header">
+                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="12" height="12"><path d="M440-183v-274L200-596v274l240 139Zm80 0 240-139v-274L520-457v274Zm-40-343 237-137-237-137-237 137 237 137ZM160-252q-19-11-29.5-29T120-321v-318q0-22 10.5-40t29.5-29l280-161q19-11 40-11t40 11l280 161q19 11 29.5 29t10.5 40v318q0 22-10.5 40T800-252L520-91q-19 11-40 11t-40-11L160-252Z"/></svg>
+                                                                    <span class="rm-card-title">{{ card.models[0].name }}</span>
+                                                                    <span class="rm-card-badge">3D Model</span>
                                                                 </div>
-                                                                <div class="h-[240px] w-full bg-[#fdfdfd] relative contain-strict">
+                                                                <div class="rm-model-frame-wrap">
                                                                     @defer (on viewport; prefetch on idle) {
                                                                         <app-medical-3d-viewer 
                                                                             [threejsId]="card.models[0].threejsId"
                                                                             [severity]="card.severity"
                                                                             [afflictionHighlight]="card.afflictionHighlight"
                                                                             [particles]="card.particles"
-                                                                            class="w-full h-full block">
+                                                                            class="rm-model-frame">
                                                                         </app-medical-3d-viewer>
                                                                     } @placeholder {
-                                                                        <div class="absolute inset-0 flex items-center justify-center bg-[#FDFDFD] border border-[#EEEEEE] rounded-sm">
+                                                                        <div class="h-[200px] w-full flex items-center justify-center bg-[#FDFDFD] border border-[#EEEEEE] rounded-sm">
                                                                             <div class="w-6 h-6 rounded-sm border-2 border-gray-300 border-t-black animate-spin"></div>
                                                                         </div>
                                                                     }
                                                                 </div>
-                                                                <div class="px-4 py-2 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 font-medium">Interactive Volume · Procedural Generation</div>
+                                                                <div class="rm-card-footer">Interactive Volume · Procedural Generation</div>
                                                             </div>
                                                         }
 
                                                         <!-- Image Gallery -->
                                                         @if (card.kind === 'image-gallery') {
-                                                            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 transform-gpu">
-                                                                <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
-                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="16" height="16" class="text-purple-500"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-800v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Z"/></svg>
-                                                                    <span class="text-sm font-semibold text-gray-800">Medical Illustrations: {{ card.query }}</span>
-                                                                    <span class="ml-auto text-[10px] font-bold tracking-wider text-purple-600 uppercase bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">Wikimedia</span>
+                                                            <div class="rm-card rm-card--gallery">
+                                                                <div class="rm-card-header">
+                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="12" height="12"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-800v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Z"/></svg>
+                                                                    <span class="rm-card-title">Medical Illustrations: {{ card.query }}</span>
+                                                                    <span class="rm-card-badge">Wikimedia</span>
                                                                 </div>
                                                                 @if (card.loading) {
-                                                                    <div class="px-4 py-6 text-sm text-gray-500 italic animate-pulse flex items-center gap-3">
-                                                                        <div class="w-4 h-4 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin"></div>
-                                                                        Searching Wikimedia Commons…
-                                                                    </div>
+                                                                    <div class="rm-loading">Searching Wikimedia Commons…</div>
                                                                 } @else if (card.images?.length) {
-                                                                    <div class="flex overflow-x-auto gap-3 p-4 bg-gray-50 scrollbar-hide snap-x">
+                                                                    <div class="rm-gallery-strip">
                                                                         @for (img of card.images; track img.url) {
-                                                                            <a [href]="img.descriptionUrl" target="_blank" rel="noopener" class="shrink-0 w-48 group snap-start block">
-                                                                                <div class="aspect-video w-full rounded-lg overflow-hidden bg-white border border-gray-200 mb-2 relative shadow-sm hover:shadow-md transition-shadow">
-                                                                                    <img [src]="img.thumbUrl" [alt]="img.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
-                                                                                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-                                                                                </div>
-                                                                                <span class="text-xs text-gray-600 group-hover:text-black line-clamp-2 transition-colors">{{ img.title | slice:0:40 }}</span>
+                                                                            <a [href]="img.descriptionUrl" target="_blank" rel="noopener" class="rm-gallery-item block">
+                                                                                <img [src]="img.thumbUrl" [alt]="img.title" class="rm-gallery-img" loading="lazy">
+                                                                                <span class="rm-gallery-caption">{{ img.title | slice:0:40 }}</span>
                                                                             </a>
                                                                         }
                                                                     </div>
                                                                 } @else {
-                                                                    <div class="px-4 py-6 text-sm text-gray-500 italic flex items-center gap-2">
-                                                                        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-gray-400" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                                                        No illustrations found for "{{ card.query }}"
-                                                                    </div>
+                                                                    <div class="rm-empty">No illustrations found for "{{ card.query }}"</div>
                                                                 }
-                                                                <div class="px-4 py-2 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 font-medium">Public domain · Wikimedia Commons</div>
+                                                                <div class="rm-card-footer">Public domain · <a [href]="'https://commons.wikimedia.org/w/index.php?search=' + card.query + '&title=Special:MediaSearch&go=Go&type=image'" target="_blank" rel="noopener" class="hover:underline hover:text-purple-600 transition-colors">Wikimedia Commons</a></div>
                                                             </div>
                                                         }
 
                                                         <!-- PubMed Citations -->
                                                         @if (card.kind === 'pubmed-refs') {
-                                                            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 transform-gpu">
-                                                                <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
-                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="16" height="16" class="text-teal-600"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
-                                                                    <span class="text-sm font-semibold text-gray-800">Research: {{ card.query }}</span>
-                                                                    <span class="ml-auto text-[10px] font-bold tracking-wider text-teal-700 uppercase bg-teal-50 px-2 py-0.5 rounded-full border border-teal-100">PubMed</span>
+                                                            <div class="rm-card rm-card--pubmed">
+                                                                <div class="rm-card-header">
+                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="12" height="12"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
+                                                                    <span class="rm-card-title">Research: {{ card.query }}</span>
+                                                                    <span class="rm-card-badge">PubMed</span>
                                                                 </div>
                                                                 @if (card.loading) {
-                                                                    <div class="px-4 py-6 text-sm text-gray-500 italic animate-pulse flex items-center gap-3">
-                                                                        <div class="w-4 h-4 border-2 border-gray-300 border-t-teal-600 rounded-full animate-spin"></div>
-                                                                        Searching PubMed…
-                                                                    </div>
+                                                                    <div class="rm-loading">Searching PubMed…</div>
                                                                 } @else if (card.citations?.length) {
-                                                                    <div class="flex flex-col">
+                                                                    <div class="rm-citations">
                                                                         @for (cite of card.citations; track cite.pmid) {
-                                                                            <a [href]="cite.url" target="_blank" rel="noopener" class="group px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors block">
-                                                                                <div class="text-sm font-medium text-gray-900 leading-snug group-hover:text-teal-700 transition-colors">{{ cite.title }}</div>
-                                                                                <div class="text-xs text-gray-500 mt-1 line-clamp-1 truncate">{{ cite.authors }} · <em class="not-italic font-semibold text-gray-600">{{ cite.journal }}</em> · {{ cite.year }}</div>
-                                                                                <div class="text-[10px] font-mono text-gray-400 mt-1 uppercase tracking-wider group-hover:text-teal-600 transition-colors">PMID {{ cite.pmid }} ↗</div>
+                                                                            <a [href]="cite.url" target="_blank" rel="noopener" class="rm-citation block">
+                                                                                <div class="rm-citation-title">{{ cite.title }}</div>
+                                                                                <div class="rm-citation-meta">{{ cite.authors }} · <em>{{ cite.journal }}</em> · {{ cite.year }}</div>
+                                                                                <div class="rm-citation-pmid">PMID {{ cite.pmid }} ↗</div>
                                                                             </a>
                                                                         }
                                                                     </div>
                                                                 } @else {
-                                                                    <div class="px-4 py-6 text-sm text-gray-500 italic flex items-center gap-2">
-                                                                        <svg viewBox="0 0 24 24" fill="none" class="w-4 h-4 text-gray-400" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                                                        No results found
-                                                                    </div>
+                                                                    <div class="rm-empty">No results found</div>
                                                                 }
-                                                                <div class="px-4 py-2 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 font-medium">NIH National Library of Medicine</div>
+                                                                <div class="rm-card-footer">NIH National Library of Medicine</div>
                                                             </div>
                                                         }
 
                                                         <!-- PHIL Image -->
                                                         @if (card.kind === 'phil-image' && card.philImages?.length) {
-                                                            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 transform-gpu">
-                                                                <div class="px-4 py-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
-                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="16" height="16" class="text-orange-600"><path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Z"/></svg>
-                                                                    <span class="text-sm font-semibold text-gray-800">{{ card.philImages[0].title }}</span>
-                                                                    <span class="ml-auto text-[10px] font-bold tracking-wider text-orange-700 uppercase bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">CDC PHIL</span>
+                                                            <div class="rm-card rm-card--phil">
+                                                                <div class="rm-card-header">
+                                                                    <svg viewBox="0 -960 960 960" fill="currentColor" width="12" height="12"><path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Z"/></svg>
+                                                                    <span class="rm-card-title">{{ card.philImages[0].title }}</span>
+                                                                    <span class="rm-card-badge">CDC PHIL</span>
                                                                 </div>
-                                                                <div class="flex overflow-x-auto gap-3 p-4 bg-gray-50 scrollbar-hide snap-x">
+                                                                <div class="rm-gallery-strip">
                                                                     @for (img of card.philImages; track img.id) {
-                                                                        <div class="shrink-0 w-56 group snap-start block">
-                                                                            <div class="aspect-square w-full rounded-lg overflow-hidden bg-white border border-gray-200 mb-2 shadow-sm relative">
-                                                                                <img [src]="img.thumbUrl" [alt]="img.title" class="w-full h-full object-contain p-2" loading="lazy" (error)="img.thumbUrl = img.url">
-                                                                            </div>
-                                                                            <span class="text-[10px] text-gray-500 block leading-tight">{{ img.credit }}</span>
+                                                                        <div class="rm-gallery-item block">
+                                                                            <img [src]="img.thumbUrl" [alt]="img.title" class="rm-gallery-img" loading="lazy" (error)="img.thumbUrl = img.url">
+                                                                            <span class="rm-gallery-caption">{{ img.credit }}</span>
                                                                         </div>
                                                                     }
                                                                 </div>
-                                                                <div class="px-4 py-2 bg-gray-50 border-t border-gray-100 text-[10px] text-gray-500 font-medium">Public domain · CDC Public Health Image Library</div>
+                                                                <div class="rm-card-footer">Public domain · CDC Public Health Image Library</div>
                                                             </div>
                                                         }
                                                     }
@@ -245,20 +215,29 @@ export interface ChatEntry {
                                             </div>
                                         </div>
                                     } @else {
-                                        <div class="px-6 py-4 rounded-3xl rounded-tr-sm text-base font-medium leading-relaxed bg-gray-100 text-gray-900 border border-transparent flex flex-col gap-2 min-w-0 break-words">
-                                          <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
+                                        <div class="flex flex-col gap-2 w-full min-w-0 max-w-[calc(100%-30px)]">
+                                            <!-- User Bubble -->
+                                            <div class="text-[11.5px] leading-[1.6] text-[#FFFFFF] bg-[#1C1C1C] border border-transparent rounded-[8px_8px_2px_8px] px-[10px] py-[6px] w-full break-words [&_strong]:text-white">
+                                                <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
+                                            </div>
                                         </div>
                                     }
                                 </div>
                             }
 
                             @if (agentState() === 'processing') {
-                                <div class="flex gap-5 max-w-[85%] animate-pulse">
-                                    <div class="w-10 h-10 rounded-sm border border-gray-200 flex items-center justify-center text-sm font-bold shrink-0 text-[#416B1F]">AI</div>
-                                    <div class="pt-4 flex items-center gap-2">
-                                       <span class="w-2 h-2 rounded-sm bg-green-500 animate-bounce" style="animation-delay: 0ms"></span>
-                                       <span class="w-2 h-2 rounded-sm bg-green-500 animate-bounce" style="animation-delay: 150ms"></span>
-                                       <span class="w-2 h-2 rounded-sm bg-green-500 animate-bounce" style="animation-delay: 300ms"></span>
+                                <div class="group flex gap-[7px] items-start w-full animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                    <div class="shrink-0 w-[20px] h-[20px] rounded-full bg-[#1C1C1C] text-white flex items-center justify-center mt-[1px]">
+                                        <svg viewBox="0 -960 960 960" fill="currentColor" width="11" height="11"><path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Z"/></svg>
+                                    </div>
+                                    <div class="flex flex-col gap-2 w-full min-w-0 max-w-[calc(100%-30px)]">
+                                        <div class="text-[11.5px] leading-[1.6] text-[#374151] bg-[#FFFFFF] border border-[#E5E7EB] rounded-[8px_8px_8px_2px] px-[10px] py-[6px] w-fit break-words">
+                                            <div class="flex gap-[3px] items-center py-[2px]">
+                                                <span class="inline-block w-[5px] h-[5px] bg-[#9CA3AF] rounded-full animate-[dot-pulse_1.2s_infinite_ease-in-out]"></span>
+                                                <span class="inline-block w-[5px] h-[5px] bg-[#9CA3AF] rounded-full animate-[dot-pulse_1.2s_infinite_ease-in-out_0.2s]"></span>
+                                                <span class="inline-block w-[5px] h-[5px] bg-[#9CA3AF] rounded-full animate-[dot-pulse_1.2s_infinite_ease-in-out_0.4s]"></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             }
@@ -312,6 +291,7 @@ export interface ChatEntry {
 
                                 <div class="flex-1 py-1">
                                     <pocket-gall-input
+                                        #chatInput
                                         type="text"
                                         [value]="messageText()"
                                         (valueChange)="messageText.set($event)"
@@ -353,6 +333,7 @@ export class VoiceAssistantComponent implements OnDestroy {
 
     transcriptContainer = viewChild<ElementRef<HTMLDivElement>>('transcriptContainer');
     fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+    chatInputRef = viewChild<any>('chatInput');
 
     // --- Chat State ---
     agentState = signal<'idle' | 'listening' | 'processing' | 'speaking' | 'typing'>('idle');
@@ -499,26 +480,13 @@ Only include a rich-media block when the user explicitly requests visual or rese
         await this.intel.ai.startChat(rawPatientData, context);
         console.log("Chat session started.");
 
-        this.agentState.set('typing');
+        setTimeout(() => this.chatInputRef()?.focus(), 100);
+
+        this.agentState.set('idle');
         const greeting = await this.intel.getInitialGreeting();
+        this._appendModel(greeting);
+        this.speak(greeting);
 
-        this.typingIntroText.set('');
-        let i = 0;
-        const typingSpeed = 30;
-
-        const typeWriter = () => {
-            if (i < greeting.length) {
-                this.typingIntroText.set(this.typingIntroText() + greeting.charAt(i));
-                i++;
-                setTimeout(typeWriter, typingSpeed);
-            } else {
-                this.agentState.set('idle');
-                this._appendModel(greeting);
-                this.typingIntroText.set('');
-                this.speak(greeting);
-            }
-        };
-        typeWriter();
     }
 
     activateDictation() {
@@ -575,15 +543,28 @@ Only include a rich-media block when the user explicitly requests visual or rese
     }
 
     private _appendModel(md: string) {
-        const richMediaRegex = /```rich-media\\s*([\\s\\S]*?)```/i;
-        const match = md.match(richMediaRegex);
         let richCards: RichMediaCard[] | undefined;
         let cleanMd = md;
 
+        const fencedRegex = /```(?:rich-media|json)?\s*(\{[\s\S]*?"cards"\s*:[\s\S]*?\})\s*```/i;
+        let match = md.match(fencedRegex);
+        let jsonStr = '';
+
         if (match) {
-            cleanMd = md.replace(richMediaRegex, '').trim();
+            jsonStr = match[1];
+            cleanMd = md.replace(match[0], '').trim();
+        } else if (md.includes('"cards"')) {
+            const startIdx = md.indexOf('{');
+            const endIdx = md.lastIndexOf('}');
+            if (startIdx !== -1 && endIdx > startIdx) {
+                jsonStr = md.substring(startIdx, endIdx + 1);
+                cleanMd = md.replace(jsonStr, '').trim();
+            }
+        }
+
+        if (jsonStr) {
             try {
-                const parsed = JSON.parse(match[1].trim());
+                const parsed = JSON.parse(jsonStr.trim());
                 const rawCards: Array<{ kind: string; query: string; severity?: string; afflictionHighlight?: string; particles?: boolean }> = parsed.cards ?? [];
                 richCards = rawCards
                     .filter(c => ['model-3d', 'image-gallery', 'pubmed-refs', 'phil-image'].includes(c.kind))

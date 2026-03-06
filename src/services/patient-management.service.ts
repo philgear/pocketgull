@@ -1,4 +1,6 @@
 import { Injectable, inject, signal, effect, WritableSignal, computed, untracked } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { PatientStateService } from './patient-state.service';
 import { ClinicalIntelligenceService, AnalysisLens } from './clinical-intelligence.service';
 import {
@@ -152,6 +154,7 @@ const MOCK_PATIENTS: Patient[] = [
 export class PatientManagementService {
   private patientState = inject(PatientStateService);
   private geminiService = inject(ClinicalIntelligenceService);
+  private http = inject(HttpClient);
 
   readonly patients = signal<Patient[]>(MOCK_PATIENTS);
   readonly selectedPatientId: WritableSignal<string | null> = signal(MOCK_PATIENTS[0]?.id || null);
@@ -455,6 +458,20 @@ export class PatientManagementService {
     this.patientState.clearIssuesAndGoalsForReview();
     this.geminiService.loadArchivedAnalysis(analysis.report);
     this.patientState.setViewingPastVisit(analysis);
+  }
+
+  /** Synchronizes the current patient list with the Node.js backend. */
+  async syncToCloud(): Promise<boolean> {
+    this.saveCurrentPatientState(); // Ensure the latest state is saved
+    try {
+      const patientsToSync = this.patients();
+      await firstValueFrom(this.http.post('/api/patients', patientsToSync));
+      console.log('[PatientManagementService] Successfully synced to cloud');
+      return true;
+    } catch (error) {
+      console.error('[PatientManagementService] Error syncing to cloud', error);
+      return false;
+    }
   }
 
 

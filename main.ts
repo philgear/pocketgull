@@ -1,13 +1,16 @@
 
 import { bootstrapApplication, provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, isDevMode } from '@angular/core';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppComponent } from './src/app.component';
 import { AI_CONFIG, AiProviderConfig } from './src/services/ai-provider.types';
 import { IntelligenceProviderToken } from './src/services/ai/intelligence.provider.token';
 import { GeminiProvider } from './src/services/ai/gemini.provider';
+import { provideServiceWorker } from '@angular/service-worker';
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideHttpClient(withFetch()),
     provideZonelessChangeDetection(),
     {
       provide: AI_CONFIG,
@@ -20,7 +23,10 @@ bootstrapApplication(AppComponent, {
     {
       provide: IntelligenceProviderToken,
       useClass: GeminiProvider
-    }, provideClientHydration(withEventReplay())
+    }, provideClientHydration(withEventReplay()), provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ]
 }).catch(err => console.error(err));
 

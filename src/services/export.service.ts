@@ -113,8 +113,9 @@ export class ExportService {
                 <div class="lens-header">
                     <h2 class="lens-title">Clinical Summary</h2>
                 </div>
-                <div class="lens-body">
-                    <p class="summary-text">${summary}</p>
+                <div class="lens-body rams-typography">
+                    ${renderMd(summary)}
+                    <br/>
                 </div>
             </section>` : '';
 
@@ -280,36 +281,42 @@ export class ExportService {
     }
 
     /* ─── RAM Typography ────────────────────────────── */
-    .rams-typography h3 {
-      font-size: 9.5pt;
+    .rams-typography h3, .rams-typography h4 {
+      font-size: 7.5pt;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--ink);
-      margin: 16px 0 8px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.15em;
+      color: var(--ink-muted);
+      margin: 24px 0 12px;
+      padding-bottom: 0;
+      border-bottom: none;
     }
-    .rams-typography h3:first-child { margin-top: 0; }
+    .rams-typography h3:first-child, .rams-typography h4:first-child { margin-top: 0; }
 
     .rams-typography p {
-      font-size: 9.5pt;
-      margin-bottom: 10px;
-      color: #374151;
+      font-size: 10.5pt;
+      font-weight: 300;
+      line-height: 1.8;
+      letter-spacing: 0.01em;
+      margin-bottom: 14px;
+      color: var(--ink);
     }
 
     .rams-typography ul, .rams-typography ol {
       padding-left: 18px;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
     .rams-typography li {
-      font-size: 9.5pt;
-      margin-bottom: 4px;
-      color: #374151;
+      font-size: 10.5pt;
+      font-weight: 300;
+      line-height: 1.8;
+      letter-spacing: 0.01em;
+      margin-bottom: 6px;
+      color: var(--ink);
     }
-    .rams-typography li strong { color: var(--ink); }
+    .rams-typography li strong { color: var(--ink); font-weight: 500; }
 
-    .rams-typography strong { font-weight: 600; color: var(--ink); }
+    .rams-typography strong { font-weight: 500; color: var(--ink); }
     .rams-typography em { font-style: italic; }
 
     /* Tables */
@@ -831,28 +838,36 @@ export class ExportService {
       border-bottom: 1px solid var(--border);
     }
     .care-plan-body h1:first-child, .care-plan-body h2:first-child { margin-top: 0; }
-    .care-plan-body h3 {
-      font-size: 9.5pt;
+    .care-plan-body h3, .care-plan-body h4 {
+      font-size: 7.5pt;
       font-weight: 700;
-      color: var(--brand-dark);
-      margin: 14px 0 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--ink-muted);
+      margin: 18px 0 8px;
     }
     .care-plan-body p {
-      font-size: 9.5pt;
-      margin-bottom: 10px;
-      color: #374151;
+      font-size: 10.5pt;
+      font-weight: 300;
+      line-height: 1.8;
+      letter-spacing: 0.01em;
+      margin-bottom: 14px;
+      color: var(--ink);
     }
     .care-plan-body ul, .care-plan-body ol {
       padding-left: 18px;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
     }
     .care-plan-body li {
-      font-size: 9.5pt;
+      font-size: 10.5pt;
+      font-weight: 300;
+      line-height: 1.8;
+      letter-spacing: 0.01em;
       margin-bottom: 6px;
-      color: #374151;
+      color: var(--ink);
     }
-    .care-plan-body li strong { color: var(--ink); font-weight: 600; }
-    .care-plan-body strong { font-weight: 600; color: var(--ink); }
+    .care-plan-body li strong { color: var(--ink); font-weight: 500; }
+    .care-plan-body strong { font-weight: 500; color: var(--ink); }
     .care-plan-body em { font-style: italic; }
     .care-plan-body table {
       width: 100%;

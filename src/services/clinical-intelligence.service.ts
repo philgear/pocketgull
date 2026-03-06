@@ -103,38 +103,30 @@ A structured list of all sources cited in this report. Format: **Author(s)** (Ye
 
 Analyze the patient overview and recommend specific, evidence-based interventions structured as follows:
 
-### Diagnostic Workup
-A markdown table of recommended labs/tests with columns: **Test** | **Rationale** | **Priority**
+### Immediate Actions (To start within 72 hours)
+(List critical interventions to initiate immediately.)
 
-### Nutrition & Lifestyle
-Bullet list of dietary and lifestyle modifications. Each item: **bold action**: brief evidence-based rationale.
+### Foundation (Diet & Lifestyle)
+(Provide recommendations focusing on sleep, nutrition, and movement.)
 
 ### Supplementation
-A markdown table with columns: **Supplement** | **Dose** | **Frequency** | **Rationale**
+(Generate a Markdown table with columns: Intervention | Dose | Timing | Rationale. Ensure the table is properly formatted.)
 
-### Movement & Rehabilitation
-Bullet list of activity recommendations tailored to the patient's functional status.
-
-### Mind-Body
-Brief bullet recommendations for stress management, sleep hygiene, or cognitive support if clinically relevant. Omit this section if not applicable.
-` + this.FORMATTING_RULES,
+### Functional Protocols
+(Describe any specific therapeutic protocols like "5R Gut Protocol", "HPA Axis Support".)` + this.FORMATTING_RULES,
 
         'Monitoring & Follow-up': `You are a care coordination AI for a clinical decision-support tool.
 
 Generate a structured monitoring and follow-up plan organized by time horizon:
 
-### Immediate (24–72 hours)
-Bullet list of urgent monitoring tasks, vitals to track, or actions to complete.
+### Immediate Next Steps (0-30 days)
+(Provide an ordered list of high-priority actions.)
 
-### Short-Term (Week 1–2)
-Bullet list of follow-up appointments, lab re-checks, or medication adjustments.
+### Ongoing (Month 1-3)
+(Generate a markdown table of tracking parameters with columns: Parameter | Target | Frequency | Escalation Trigger. Only output the table in this section, do not include preamble.)
 
-### Ongoing (Month 1–3)
-A markdown table of tracking parameters with columns: **Parameter** | **Target** | **Frequency** | **Escalation Trigger**
-
-### Red Flags
-> ⚠️ List critical warning signs that warrant immediate clinical attention. Use a blockquote with bullet points. Be specific about thresholds (e.g., "Temperature > 101.5°F", "Systolic BP > 180 mmHg").
-` + this.FORMATTING_RULES,
+### Long-term Trajectory (6+ months)
+(Provide a brief narrative on expected outcomes.)` + this.FORMATTING_RULES,
 
         'Patient Education': `You are a patient education specialist for a clinical decision-support tool. Translate the documented clinical findings into patient-friendly language.
 
@@ -343,7 +335,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
         await this.cache.clear();
     }
 
-    async translateReadingLevel(text: string, targetLevel: 'simplified' | 'dyslexia'): Promise<string> {
+    async translateReadingLevel(text: string, targetLevel: 'simplified' | 'dyslexia' | 'child' | 'bagua' | 'ikigai' | 'purusarthas'): Promise<string> {
         this.isLoading.set(true);
         this.error.set(null);
         try {

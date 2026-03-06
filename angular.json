@@ -29,6 +29,16 @@
                 "glob": "**/*",
                 "input": "src/.well-known",
                 "output": "/.well-known"
+              },
+              {
+                "glob": "manifest.webmanifest",
+                "input": "public",
+                "output": "/"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "/icons"
               }
             ],
             "styles": [
@@ -65,6 +75,7 @@
                 "localhost",
                 "pocket-gall-444980566010.us-west1.run.app",
                 "understory-315235665910.us-west1.run.app",
+                "pocket-gall-315235665910.us-west1.run.app",
                 "pocketgall.app"
               ]
             },
@@ -79,7 +90,8 @@
             "production": {
               "outputHashing": "all",
               "sourceMap": true,
-              "optimization": true
+              "optimization": true,
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,

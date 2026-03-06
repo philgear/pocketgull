@@ -615,7 +615,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                               } @else {
                                 <div class="rm-empty">No illustrations found for "{{ card.query }}"</div>
                               }
-                              <div class="rm-card-footer">Public domain · Wikimedia Commons</div>
+                              <div class="rm-card-footer">Public domain · <a [href]="'https://commons.wikimedia.org/w/index.php?search=' + card.query + '&title=Special:MediaSearch&go=Go&type=image'" target="_blank" rel="noopener" class="hover:underline hover:text-purple-600 transition-colors">Wikimedia Commons</a></div>
                             </div>
                           }
 
@@ -992,15 +992,28 @@ Only include a rich-media block when the user explicitly requests visual or rese
 
   private _appendModel(md: string) {
     // ─── Parse out any rich-media fenced block ───────────────────────────────
-    const richMediaRegex = /```rich-media\s*([\s\S]*?)```/i;
-    const match = md.match(richMediaRegex);
     let richCards: RichMediaCard[] | undefined;
     let cleanMd = md;
 
+    const fencedRegex = /```(?:rich-media|json)?\s*(\{[\s\S]*?"cards"\s*:[\s\S]*?\})\s*```/i;
+    let match = md.match(fencedRegex);
+    let jsonStr = '';
+
     if (match) {
-      cleanMd = md.replace(richMediaRegex, '').trim();
+      jsonStr = match[1];
+      cleanMd = md.replace(match[0], '').trim();
+    } else if (md.includes('"cards"')) {
+      const startIdx = md.indexOf('{');
+      const endIdx = md.lastIndexOf('}');
+      if (startIdx !== -1 && endIdx > startIdx) {
+        jsonStr = md.substring(startIdx, endIdx + 1);
+        cleanMd = md.replace(jsonStr, '').trim();
+      }
+    }
+
+    if (jsonStr) {
       try {
-        const parsed = JSON.parse(match[1].trim());
+        const parsed = JSON.parse(jsonStr.trim());
         const rawCards: Array<{ kind: string; query: string; severity?: string; afflictionHighlight?: string; particles?: boolean }> = parsed.cards ?? [];
         richCards = rawCards
           .filter(c => ['model-3d', 'image-gallery', 'pubmed-refs', 'phil-image'].includes(c.kind))

@@ -104,17 +104,6 @@ interface ChatEntry {
                 }
             </div>
 
-            <!-- Suggestion Pills -->
-            @if (showSuggestions() && !isLoading()) {
-                <div class="node-agent-suggestions">
-                    @for (s of suggestedQuestions(); track s) {
-                        <pocket-gall-button variant="outline" size="xs" [icon]="ClinicalIcons.Suggestion" (clicked)="sendSuggestion(s)">
-                            {{ s }}
-                        </pocket-gall-button>
-                    }
-                </div>
-            }
-
             <!-- Input Row -->
             <div class="node-agent-input-container">
                 @if (selectedFiles().length > 0) {
@@ -129,10 +118,38 @@ interface ChatEntry {
                         }
                     </div>
                 }
-                <div class="node-agent-input-row">
-                    <button class="node-agent-attach" (click)="triggerFileInput()" [disabled]="isLoading()">
+                <div class="node-agent-input-row relative">
+                    <button class="node-agent-attach" (click)="triggerFileInput()" [disabled]="isLoading()" title="Attach file">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                     </button>
+                    
+                    @if (suggestedQuestions().length > 0) {
+                        <button class="node-agent-attach" (click)="showSuggestionsDropdown.set(!showSuggestionsDropdown())" [disabled]="isLoading()" title="Suggested Questions" [class.bg-[#E5E7EB]]="showSuggestionsDropdown()">
+                            <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-4 h-4 flex items-center justify-center"></div>
+                        </button>
+                    }
+
+                    <!-- Suggestions Dropdown -->
+                    @if (showSuggestionsDropdown() && !isLoading()) {
+                        <!-- Invisible overlay to catch clicks outside -->
+                        <div class="fixed inset-0 z-40" (click)="showSuggestionsDropdown.set(false)"></div>
+                        
+                        <div class="absolute bottom-full left-14 mb-2 w-72 bg-white rounded-xl shadow-[0_12px_28px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] overflow-hidden z-50 flex flex-col border border-gray-100 transform origin-bottom-left transition-all">
+                            <div class="px-3 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+                                <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-3.5 h-3.5 text-indigo-500 flex items-center justify-center"></div>
+                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Initial Questions</span>
+                            </div>
+                            <div class="p-1">
+                                @for (s of suggestedQuestions(); track s) {
+                                    <button class="w-full text-left px-3 py-2 text-[11.5px] text-gray-700 hover:bg-gray-50 hover:text-indigo-600 rounded-lg transition-colors flex items-center gap-2 group" (click)="sendSuggestion(s); showSuggestionsDropdown.set(false)">
+                                        <span class="flex-1">{{ s }}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+
                     <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*,video/*" class="hidden" style="display: none;">
                     <input #inputEl
                         class="node-agent-input"
@@ -270,6 +287,37 @@ interface ChatEntry {
             padding: 10px 13px;
             max-width: calc(100% - 36px);
         }
+        .node-agent-message--model .node-agent-bubble {
+            background: #262626;
+            color: #F9FAFB;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 1.6;
+            letter-spacing: 0.01em;
+            padding: 12px 16px;
+        }
+        .node-agent-message--model .node-agent-bubble p {
+            margin-bottom: 12px;
+        }
+        .node-agent-message--model .node-agent-bubble p:last-child {
+            margin-bottom: 0;
+        }
+        .node-agent-message--model .node-agent-bubble strong {
+            font-weight: 500;
+            color: #FFFFFF;
+        }
+        .node-agent-message--model .node-agent-bubble h1, 
+        .node-agent-message--model .node-agent-bubble h2, 
+        .node-agent-message--model .node-agent-bubble h3,
+        .node-agent-message--model .node-agent-bubble h4 {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            color: #9ca3af; /* Tailwind gray-400 */
+        }
         .node-agent-message--user .node-agent-bubble {
             background: #1C1C1C;
             color: #FFFFFF;
@@ -306,6 +354,13 @@ interface ChatEntry {
         .node-agent-bubble.rams-typography th { background: #F3F4F6; padding: 5px 8px; border: 1px solid #E5E7EB; font-size: 9px; text-transform: uppercase; }
         .node-agent-bubble.rams-typography td { padding: 5px 8px; border: 1px solid #E5E7EB; }
         .node-agent-message--user .node-agent-bubble.rams-typography strong { color: #FFFFFF; }
+        
+        .node-agent-message--model .node-agent-bubble.rams-typography h1,
+        .node-agent-message--model .node-agent-bubble.rams-typography h2,
+        .node-agent-message--model .node-agent-bubble.rams-typography h3,
+        .node-agent-message--model .node-agent-bubble.rams-typography strong { color: #FFFFFF; }
+        .node-agent-message--model .node-agent-bubble.rams-typography th { background: #404040; padding: 5px 8px; border: 1px solid #525252; color: #FFFFFF; }
+        .node-agent-message--model .node-agent-bubble.rams-typography td { border: 1px solid #525252; }
 
         /* Thinking dots */
         .node-agent-bubble--thinking {
@@ -341,36 +396,6 @@ interface ChatEntry {
         }
         @keyframes cursor-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* Suggestion pills */
-        .node-agent-suggestions {
-            padding: 8px 16px 4px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            flex-shrink: 0;
-            border-top: 1px solid #F3F4F6;
-        }
-        .node-agent-pill {
-            font-family: 'Inter', system-ui, sans-serif;
-            font-size: 8px;
-            font-weight: 700;
-            color: #1C1C1C;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            background: transparent;
-            border: 0.5pt solid #1C1C1C;
-            border-radius: 0;
-            padding: 5px 10px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            text-align: left;
-            display: inline-flex;
-            align-items: center;
-        }
-        .node-agent-pill:hover {
-            background: #1C1C1C;
-            color: #FFFFFF;
-        }
 
         /* Input Row */
         .node-agent-input-container {
@@ -488,7 +513,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
     isOpen = signal(false);
     isLoading = signal(false);
     chatHistory = signal<ChatEntry[]>([]);
-    showSuggestions = signal(true);
+    showSuggestionsDropdown = signal(false);
     selectedFiles = signal<File[]>([]);
     userInput = '';
     contextHtml = signal('');
@@ -621,7 +646,7 @@ Keep responses concise and clinically precise. Use markdown for structure when h
 
         this.userInput = '';
         this.selectedFiles.set([]);
-        this.showSuggestions.set(false);
+        this.showSuggestionsDropdown.set(false);
 
         // create message with text and file indicators for user UI
         let userDisplayHtml = text ? `<p>${text}</p>` : '';

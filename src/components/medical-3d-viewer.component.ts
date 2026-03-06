@@ -216,8 +216,9 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
         const h = this.afflictionHighlight()!.toLowerCase();
         if (h.includes(label) || h === 'all') {
+            const sevColor = this.severity() ? this.PALETTE.severity[this.severity()!] : this.PALETTE.severity.red;
             const highlightMaterial = new THREE.MeshBasicMaterial({
-                color: this.severity() ? this.PALETTE.severity[this.severity()!] : this.PALETTE.severity.red,
+                color: sevColor,
                 wireframe: true,
                 transparent: true,
                 opacity: 0.8
@@ -225,6 +226,37 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
             const highlightMesh = new THREE.Mesh(mesh.geometry, highlightMaterial);
             highlightMesh.scale.setScalar(1.05); // tightly envelop the original object
             highlightMesh.userData = { isHighlight: true, tick: 0 };
+
+            if (this.particles() === true) {
+                mesh.geometry.computeBoundingBox();
+                const bbox = mesh.geometry.boundingBox;
+                if (bbox) {
+                    const size = new THREE.Vector3();
+                    bbox.getSize(size);
+                    const center = new THREE.Vector3();
+                    bbox.getCenter(center);
+
+                    const pCount = 60;
+                    const pGeo = new THREE.BufferGeometry();
+                    const pPos = new Float32Array(pCount * 3);
+                    for (let i = 0; i < pCount * 3; i += 3) {
+                        pPos[i] = center.x + (Math.random() - 0.5) * size.x * 1.5;
+                        pPos[i + 1] = center.y + (Math.random() - 0.5) * size.y * 1.5;
+                        pPos[i + 2] = center.z + (Math.random() - 0.5) * size.z * 1.5;
+                    }
+                    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+                    const pMat = new THREE.PointsMaterial({
+                        color: sevColor,
+                        size: 0.08,
+                        transparent: true,
+                        opacity: 0.9,
+                        blending: THREE.AdditiveBlending
+                    });
+                    const pSys = new THREE.Points(pGeo, pMat);
+                    pSys.userData = { isHighlightParticle: true };
+                    highlightMesh.add(pSys);
+                }
+            }
             mesh.add(highlightMesh);
         }
     }
@@ -302,17 +334,38 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         const mat = this.createBaseMaterial();
 
         // Add vertebrae
-        for (let i = 0; i < 10; i++) {
-            const vertebraGeo = new THREE.BoxGeometry(1.5, 0.5, 1.5);
-            const vertebra = new THREE.Mesh(vertebraGeo, mat);
-            // Straight spine for a clean geometric aesthetic
-            vertebra.position.set(0, i * 0.7 - 3, 0);
-            this.addHighlight(vertebra, `vertebra-${i}`);
-            this.addHighlight(vertebra, 'spine');
-            this.currentModelGroup.add(vertebra);
+        for (let i = 0; i < 11; i++) {
+            const vertebraGroup = new THREE.Group();
+            vertebraGroup.position.set(0, i * 0.65 - 3.2, 0);
+
+            // Vertebral body (anterior cylinder)
+            const bodyGeo = new THREE.CylinderGeometry(0.65, 0.65, 0.45, 16);
+            const bodyMesh = new THREE.Mesh(bodyGeo, mat);
+            bodyMesh.position.set(0, 0, 0.4);
+            this.addHighlight(bodyMesh, `vertebra-${i}`);
+            this.addHighlight(bodyMesh, 'spine');
+            vertebraGroup.add(bodyMesh);
+
+            // Spinous process (posterior projection)
+            const spinousGeo = new THREE.BoxGeometry(0.2, 0.25, 0.9);
+            const spinousMesh = new THREE.Mesh(spinousGeo, mat);
+            spinousMesh.position.set(0, 0, -0.45);
+            this.addHighlight(spinousMesh, `vertebra-${i}`);
+            this.addHighlight(spinousMesh, 'spine');
+            vertebraGroup.add(spinousMesh);
+
+            // Transverse processes (lateral projections)
+            const transverseGeo = new THREE.BoxGeometry(2.0, 0.2, 0.25);
+            const transverseMesh = new THREE.Mesh(transverseGeo, mat);
+            transverseMesh.position.set(0, 0, -0.1);
+            this.addHighlight(transverseMesh, `vertebra-${i}`);
+            this.addHighlight(transverseMesh, 'spine');
+            vertebraGroup.add(transverseMesh);
+
+            this.currentModelGroup.add(vertebraGroup);
         }
 
-        this.addParticles(150, 3, new THREE.Vector3(0, -1, 0));
+        this.addParticles(200, 3, new THREE.Vector3(0, -1, 0));
         this.currentModelGroup.userData = { type: 'spine', tick: 0 };
     }
 
@@ -341,6 +394,10 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
                         child.userData.tick += 0.05;
                         const pulse = 1.05 + Math.sin(child.userData.tick) * 0.03;
                         child.scale.setScalar(pulse);
+                    }
+                    if (child instanceof THREE.Points && child.userData?.isHighlightParticle) {
+                        child.rotation.y += 0.02;
+                        child.rotation.x += 0.01;
                     }
                     if (child instanceof THREE.Points && child.userData?.isFlowing) {
                         const positions = child.geometry.attributes['position'];

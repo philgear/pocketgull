@@ -317,6 +317,9 @@ import { SafeHtmlPipe } from '../pipes/safe-html.pipe';
                     <option value="standard">Standard Default</option>
                     <option value="simplified">Simplified (6th Grade)</option>
                     <option value="dyslexia">Dyslexia-Friendly</option>
+                    <option value="bagua">Bagua (Balance & Flow)</option>
+                    <option value="ikigai">Ikigai (Purpose & Passion)</option>
+                    <option value="purusarthas">Four Purusarthas</option>
                   </select>
                 </div>
              </div>
@@ -384,7 +387,7 @@ export class MedicalChartSummaryComponent {
   showPreviewModal = signal(false);
   previewText = signal('');
   originalPreviewText = signal('');
-  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia'>('standard');
+  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'bagua' | 'ikigai' | 'purusarthas'>('standard');
   isTranslating = this.clinicalAI.isLoading;
 
   painChartRef = viewChild<ElementRef<HTMLCanvasElement>>('painChart');
@@ -790,7 +793,7 @@ export class MedicalChartSummaryComponent {
   }
 
   async changeReadingLevel(event: Event) {
-    const level = (event.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia';
+    const level = (event.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'bagua' | 'ikigai' | 'purusarthas';
     this.selectedReadingLevel.set(level);
 
     if (level === 'standard') {

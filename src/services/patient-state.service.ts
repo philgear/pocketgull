@@ -162,7 +162,15 @@ export class PatientStateService {
 
   // --- Care Plan Drafting Actions ---
   addClinicalNote(note: ClinicalNote) {
-    this.clinicalNotes.update(notes => [...notes, note]);
+    this.clinicalNotes.update(notes => {
+      const existing = notes.findIndex(n => n.id === note.id);
+      if (existing > -1) {
+        const next = [...notes];
+        next[existing] = note;
+        return next;
+      }
+      return [...notes, note];
+    });
   }
 
   removeClinicalNote(id: string) {

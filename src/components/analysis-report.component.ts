@@ -380,7 +380,17 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
         const verification = (this.intel.verificationResults()[this.activeLens()] || { status: 'verified', issues: [] });
         const parser = this.markdownService.parser();
         if (!parser) continue;
-        const tokens = parser.lexer(contentMarkdown);
+
+        let cleanMarkdown = contentMarkdown;
+        // Strip out ```markdown code blocks if they consist of a table
+        cleanMarkdown = cleanMarkdown.replace(/```(?:markdown)?\s*\n([\s\S]*?)\n```/g, (match, innerText) => {
+          if (innerText.trim().startsWith('|')) {
+            return innerText;
+          }
+          return match;
+        });
+
+        const tokens = parser.lexer(cleanMarkdown);
         const nodes: SummaryNode[] = [];
 
         for (let nIdx = 0; nIdx < tokens.length; nIdx++) {

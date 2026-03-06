@@ -8,7 +8,6 @@ import { MedicalChartComponent } from './components/medical-chart.component';
 import { VisitReviewComponent } from './components/visit-review.component';
 import { AnalysisContainerComponent } from './components/analysis-container.component';
 import { DictationModalComponent } from './components/dictation-modal.component';
-import { MedicalChartSummaryComponent } from './components/medical-summary.component';
 import { TaskFlowComponent } from './components/task-flow.component';
 import { IntakeFormComponent } from './components/intake-form.component';
 import { VoiceAssistantComponent } from './components/voice-assistant.component';
@@ -30,7 +29,6 @@ import { DEMO_ANALYSIS_REPORT } from './demo-data';
     MedicalChartComponent,
     AnalysisContainerComponent,
     DictationModalComponent,
-    MedicalChartSummaryComponent,
     TaskFlowComponent,
     ResearchFrameComponent,
     IntakeFormComponent,
@@ -201,6 +199,20 @@ import { DEMO_ANALYSIS_REPORT } from './demo-data';
           <div class="flex items-center gap-2">
             <app-patient-dropdown></app-patient-dropdown>
             
+            <!-- Sync to Mobile Button -->
+            <button (click)="syncToMobile()"
+                    [disabled]="isSyncing()"
+                    aria-label="Sync Data to Mobile App"
+                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 transition-colors text-xs font-bold uppercase tracking-widest disabled:opacity-50 text-gray-700 hover:bg-[#EEEEEE] hover:border-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.animate-spin]="isSyncing()">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                <path d="M16 21v-5h5"/>
+              </svg>
+              <span class="hidden sm:inline">{{ isSyncing() ? 'Syncing...' : 'Sync Data' }}</span>
+            </button>
+            
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
@@ -326,42 +338,14 @@ import { DEMO_ANALYSIS_REPORT } from './demo-data';
                </div>
             }
 
-            <!-- Column 3 (Right Area): Split View -->
+             <!-- Column 3 (Right Area): Split View -->
             <div class="flex-1 flex md:overflow-hidden relative gap-3 md:gap-6 flex-col"
                  [class.hidden]="isAnalysisCollapsed()"
                  [class.max-md:hidden]="!!state.selectedPartId() && mobileActiveTab() !== 'analysis'"
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
-                 <!-- Section 1: Medical Summary -->
-                 <div class="shrink-0 overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-shadow duration-300 hover:shadow-md"
-                      [style.height.px]="topSectionHeight()"
-                      [class.flex-[0_0_40%]]="topSectionHeight() === undefined">
-                     <div class="flex-1 w-full h-full overflow-y-auto min-h-[50vh] md:min-h-0 min-w-0">
-                         <app-medical-summary class="block h-full overflow-y-auto" appReveal></app-medical-summary>
-                     </div>
-                 </div>
-
-                 <!-- RESIZER 1: Row Resizer -->
-                 <div title="Drag to resize" class="shrink-0 hidden md:flex items-center justify-center z-20 no-print group relative h-4 cursor-row-resize"
-                      (mousedown)="startTopRowDrag($event)">
-                     
-                     <div class="absolute bg-transparent group-hover:bg-gray-100 transition-colors rounded-full z-0 inset-x-0 top-1/2 -translate-y-1/2 h-4"></div>
-                     <div class="absolute inset-0 bg-gray-100 group-hover:bg-gray-200 transition-colors rounded"></div>
-                     <div class="rounded-full bg-gray-200 group-hover:bg-gray-300 transition-colors relative z-10 w-12 h-1.5"></div>
-                     
-                     <div class="absolute opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 bg-white shadow-sm border border-gray-200 rounded-md p-1 right-0 top-1/2 -translate-y-1/2 flex-row">
-                        <button (click)="$event.stopPropagation(); maximizeSummary()" title="Maximize Summary" class="p-1 hover:bg-gray-100 rounded text-gray-500">
-                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><path d="M5 15l7-7 7 7"></path></svg>
-                        </button>
-                        <button (click)="$event.stopPropagation(); resetRowHeights()" title="Reset Layout" class="p-1 hover:bg-gray-100 rounded text-gray-500">
-                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-3 h-3"><path d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                     </div>
-                 </div>
-
-                 <!-- Section 2: Analysis Intake Container -->
-                 <div class="overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-shadow duration-300 hover:shadow-md flex-1 min-h-[50vh] md:min-h-0"
-                      [style.height.px]="analysisSectionHeight()">
+                 <!-- Section 1: Analysis Intake Container -->
+                 <div class="overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50vh]">
                      <app-analysis-container class="block h-full min-h-0 min-w-0" appReveal [revealDelay]="100"></app-analysis-container>
                  </div>
             </div>
@@ -404,6 +388,19 @@ export class AppComponent implements OnDestroy {
   apiKeyError = signal<string | null>(null);
   isChartCollapsed = signal<boolean>(false);
   isAnalysisCollapsed = signal<boolean>(false);
+  isSyncing = signal<boolean>(false);
+
+  async syncToMobile() {
+    this.isSyncing.set(true);
+    try {
+      await this.patientMgmt.syncToCloud();
+      // Optional: Show a brief success message or handle it centrally
+    } catch (e) {
+      console.error('Failed to sync to mobile', e);
+    } finally {
+      this.isSyncing.set(false);
+    }
+  }
 
   // --- Resizable Panel State ---
   mainContainer = viewChild<ElementRef<HTMLDivElement>>('mainContainer');
@@ -414,39 +411,12 @@ export class AppComponent implements OnDestroy {
   private initialColumnDragX = 0;
   private initialInputPanelWidth = 0;
 
-  // Horizontal Panel Resizing (Top Row)
-  topSectionHeight = signal<number | undefined>(undefined);
-  isDraggingTopRow = signal<boolean>(false);
-  private initialTopRowDragY = 0;
-  private initialTopSectionHeight = 0;
-
-  // Right Area Horizontal Resizing (Summary Column)
-  summaryColWidth = signal<number | undefined>(undefined);
-  isDraggingSummaryCol = signal<boolean>(false);
-  private initialSummaryDragX = 0;
-  private initialSummaryWidth = 0;
-
-  // Right Area Horizontal Resizing (Analysis Column)
-  analysisColWidth = signal<number | undefined>(undefined);
-  isDraggingAnalysisCol = signal<boolean>(false);
-  private initialAnalysisDragX = 0;
-  private initialAnalysisWidth = 0;
-
   // New Voice Column Resizing
   voiceColWidth = signal<number | undefined>(undefined);
   isDraggingVoiceCol = signal<boolean>(false);
   private initialVoiceDragX = 0;
   private initialVoiceWidth = 0;
 
-  // Right Area Vertical Resizing (Analysis Column Row)
-  analysisSectionHeight = signal<number | undefined>(undefined);
-  isDraggingAnalysisRow = signal<boolean>(false);
-  private initialAnalysisRowDragY = 0;
-  private initialAnalysisHeight = 0;
-
-  // Proportional height tracking for responsive resize
-  private topHeightRatio = 0.4;
-  private analysisHeightRatio = 0.3;
   private lastContainerHeight = 0;
   private lastContainerWidth = 0;
   private boundOnWindowResize: (() => void) | null = null;
@@ -465,22 +435,10 @@ export class AppComponent implements OnDestroy {
     return pastVisit && (pastVisit.type === 'Visit' || pastVisit.type === 'ChartArchived') && !this.state.selectedPartId();
   });
 
-  isDragging = computed(() => this.isDraggingColumn() || this.isDraggingTopRow() || this.isDraggingSummaryCol() || this.isDraggingAnalysisCol() || this.isDraggingAnalysisRow());
+  isDragging = computed(() => this.isDraggingColumn());
 
   private boundDoColumnDrag = this.doColumnDrag.bind(this);
   private boundStopColumnDrag = this.stopColumnDrag.bind(this);
-
-  private boundDoTopRowDrag = this.doTopRowDrag.bind(this);
-  private boundStopTopRowDrag = this.stopTopRowDrag.bind(this);
-
-  private boundDoSummaryColDrag = this.doSummaryColDrag.bind(this);
-  private boundStopSummaryColDrag = this.stopSummaryColDrag.bind(this);
-
-  private boundDoAnalysisColDrag = this.doAnalysisColDrag.bind(this);
-  private boundStopAnalysisColDrag = this.stopAnalysisColDrag.bind(this);
-
-  private boundDoAnalysisRowDrag = this.doAnalysisRowDrag.bind(this);
-  private boundStopAnalysisRowDrag = this.stopAnalysisRowDrag.bind(this);
 
   private boundDoVoiceColDrag = this.doVoiceColDrag.bind(this);
   private boundStopVoiceColDrag = this.stopVoiceColDrag.bind(this);
@@ -538,11 +496,7 @@ export class AppComponent implements OnDestroy {
 
       // If window resizes, revert panels back to their flexible, percentage-based dimensions
       this.inputPanelWidth.set(undefined);
-      this.topSectionHeight.set(undefined);
       this.voiceColWidth.set(undefined);
-      this.analysisSectionHeight.set(undefined);
-      this.summaryColWidth.set(undefined);
-      this.analysisColWidth.set(undefined);
     }, 150);
   }
 
@@ -584,8 +538,6 @@ export class AppComponent implements OnDestroy {
     // Inject pre-baked analysis outputs (no API call)
     setTimeout(() => {
       this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT);
-      // Minimise the medical summary pane so the analysis report is immediately visible
-      this.maximizeReport();
     }, 350);
   }
 
@@ -660,174 +612,8 @@ export class AppComponent implements OnDestroy {
     }
   }
 
-  // --- Top Row Resizing Logic ---
-  startTopRowDrag(event: MouseEvent): void {
-    event.preventDefault();
-    this.isDraggingTopRow.set(true);
-    this.initialTopRowDragY = event.clientY;
-
-    if (this.topSectionHeight() === undefined) {
-      const topSectionEl = (event.target as HTMLElement).previousElementSibling as HTMLElement;
-      this.initialTopSectionHeight = topSectionEl.offsetHeight;
-      this.topSectionHeight.set(this.initialTopSectionHeight);
-    } else {
-      this.initialTopSectionHeight = this.topSectionHeight()!;
-    }
-
-    document.body.style.cursor = 'row-resize';
-    document.addEventListener('mousemove', this.boundDoTopRowDrag);
-    document.addEventListener('mouseup', this.boundStopTopRowDrag, { once: true });
-  }
-
-  private doTopRowDrag(event: MouseEvent): void {
-    if (!this.isDraggingTopRow()) return;
-
-    const deltaY = event.clientY - this.initialTopRowDragY;
-
-    // Find right column parent height
-    const containerEl = document.querySelector('.flex-col.gap-6') as HTMLElement;
-    const containerHeight = containerEl ? containerEl.offsetHeight : (this.mainContainer()?.nativeElement.offsetHeight ?? window.innerHeight);
-
-    const newHeight = this.initialTopSectionHeight + deltaY;
-    const minTopHeight = 200;
-    const minBottomHeight = 200;
-    const resizerHeight = 8; // one resizer
-
-    const maxTopHeight = containerHeight - minBottomHeight - resizerHeight;
-
-    const computedNewHeight = Math.max(minTopHeight, Math.min(newHeight, maxTopHeight));
-    this.topSectionHeight.set(computedNewHeight);
-    // Update ratio for responsive resize
-    const ch = this.mainContainer()?.nativeElement.offsetHeight ?? window.innerHeight;
-    this.topHeightRatio = computedNewHeight / ch;
-  }
-
-  private stopTopRowDrag(): void {
-    this.isDraggingTopRow.set(false);
-    document.body.style.cursor = '';
-    document.removeEventListener('mousemove', this.boundDoTopRowDrag);
-  }
-
   resetColumnWidth(): void {
     this.inputPanelWidth.set(undefined);
-  }
-
-  resetRowHeights(): void {
-    const containerHeight = this.mainContainer()?.nativeElement.offsetHeight ?? window.innerHeight;
-    this.topSectionHeight.set(containerHeight * 0.40);
-    const containerWidth = this.mainContainer()?.nativeElement.offsetWidth ?? window.innerWidth;
-    this.summaryColWidth.set(300);
-    this.analysisColWidth.set(containerWidth * 0.40);
-  }
-
-  maximizeReport(): void {
-    this.topSectionHeight.set(200);
-  }
-
-  maximizeSummary(): void {
-    const containerHeight = this.mainContainer()?.nativeElement.offsetHeight ?? window.innerHeight;
-    this.topSectionHeight.set(containerHeight - 300); // give mostly to summary
-  }
-
-  // --- 3-Column Split Resizing Logic ---
-  startSummaryColDrag(event: MouseEvent): void {
-    event.preventDefault();
-    this.isDraggingSummaryCol.set(true);
-    this.initialSummaryDragX = event.clientX;
-    this.initialSummaryWidth = this.summaryColWidth();
-
-    document.body.style.cursor = 'col-resize';
-    document.addEventListener('mousemove', this.boundDoSummaryColDrag);
-    document.addEventListener('mouseup', this.boundStopSummaryColDrag, { once: true });
-  }
-
-  private doSummaryColDrag(event: MouseEvent): void {
-    if (!this.isDraggingSummaryCol()) return;
-
-    const deltaX = event.clientX - this.initialSummaryDragX;
-    const newWidth = this.initialSummaryWidth + deltaX;
-
-    const minWidth = 200;
-    const maxWidth = 800; // Hard max, realistically flex-1 absorbs the rest
-
-    const computedNewWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
-    this.summaryColWidth.set(computedNewWidth);
-  }
-
-  private stopSummaryColDrag(): void {
-    this.isDraggingSummaryCol.set(false);
-    document.body.style.cursor = '';
-    document.removeEventListener('mousemove', this.boundDoSummaryColDrag);
-  }
-
-  startAnalysisColDrag(event: MouseEvent): void {
-    event.preventDefault();
-    this.isDraggingAnalysisCol.set(true);
-    this.initialAnalysisDragX = event.clientX;
-    this.initialAnalysisWidth = this.analysisColWidth();
-
-    document.body.style.cursor = 'col-resize';
-    document.addEventListener('mousemove', this.boundDoAnalysisColDrag);
-    document.addEventListener('mouseup', this.boundStopAnalysisColDrag, { once: true });
-  }
-
-  private doAnalysisColDrag(event: MouseEvent): void {
-    if (!this.isDraggingAnalysisCol()) return;
-
-    const deltaX = event.clientX - this.initialAnalysisDragX;
-    const newWidth = this.initialAnalysisWidth + deltaX;
-
-    const minWidth = 200;
-    const maxWidth = 800;
-
-    const computedNewWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
-    this.analysisColWidth.set(computedNewWidth);
-  }
-
-  private stopAnalysisColDrag(): void {
-    this.isDraggingAnalysisCol.set(false);
-    document.body.style.cursor = '';
-    document.removeEventListener('mousemove', this.boundDoAnalysisColDrag);
-  }
-
-  startAnalysisRowDrag(event: MouseEvent): void {
-    event.preventDefault();
-    this.isDraggingAnalysisRow.set(true);
-    this.initialAnalysisRowDragY = event.clientY;
-    this.initialAnalysisHeight = this.analysisSectionHeight() || (this.mainContainer()?.nativeElement.offsetHeight ?? window.innerHeight) * 0.5;
-
-    document.body.style.cursor = 'row-resize';
-    document.addEventListener('mousemove', this.boundDoAnalysisRowDrag);
-    document.addEventListener('mouseup', this.boundStopAnalysisRowDrag, { once: true });
-  }
-
-  private doAnalysisRowDrag(event: MouseEvent): void {
-    if (!this.isDraggingAnalysisRow()) return;
-
-    const deltaY = event.clientY - this.initialAnalysisRowDragY;
-
-    // Find Analysis column parent height
-    const containerEl = document.querySelector('.flex-col.gap-6') as HTMLElement;
-    const containerHeight = containerEl ? containerEl.offsetHeight : (this.mainContainer()?.nativeElement.offsetHeight ?? window.innerHeight);
-
-    const newHeight = this.initialAnalysisHeight + deltaY;
-    const minTopHeight = 200;
-    const minBottomHeight = 200;
-    const resizerHeight = 16;
-
-    const maxTopHeight = containerHeight - minBottomHeight - resizerHeight;
-
-    const computedNewHeight = Math.max(minTopHeight, Math.min(newHeight, maxTopHeight));
-    this.analysisSectionHeight.set(computedNewHeight);
-    // Update ratio for responsive resize
-    const totalHeight = this.mainContainer()?.nativeElement.offsetHeight ?? window.innerHeight;
-    this.analysisHeightRatio = computedNewHeight / totalHeight;
-  }
-
-  private stopAnalysisRowDrag(): void {
-    this.isDraggingAnalysisRow.set(false);
-    document.body.style.cursor = '';
-    document.removeEventListener('mousemove', this.boundDoAnalysisRowDrag);
   }
 
   // --- Voice Column Resizing Logic ---

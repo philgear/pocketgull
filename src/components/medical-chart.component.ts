@@ -9,11 +9,12 @@ import { PatientScansComponent } from './patient-scans.component';
 import { DictationService } from '../services/dictation.service';
 import { PocketGallButtonComponent } from './shared/pocket-gall-button.component';
 import { PocketGallCardComponent } from './shared/pocket-gall-card.component';
+import { MedicalChartSummaryComponent } from './medical-summary.component';
 
 @Component({
   selector: 'app-medical-chart',
   standalone: true,
-  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGallButtonComponent, PocketGallCardComponent],
+  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGallButtonComponent, PocketGallCardComponent, MedicalChartSummaryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full min-h-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#F9FAFB]">
@@ -63,6 +64,23 @@ import { PocketGallCardComponent } from './shared/pocket-gall-card.component';
                 </div>
               </div>
             }
+          </div>
+        }
+      </pocket-gall-card>
+
+      <!-- Medical Summary Card -->
+      <pocket-gall-card 
+        title="Medical Summary" 
+        [icon]="summaryIcon"
+        [noPadding]="true">
+        
+        <div right-action (click)="isSummaryExpanded.set(!isSummaryExpanded())" class="cursor-pointer hover:bg-black/5 p-1 rounded-md transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 transition-transform duration-200" [class.rotate-180]="!isSummaryExpanded()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+
+        @if(isSummaryExpanded()) {
+          <div class="h-[500px] xl:h-[600px] overflow-hidden bg-white shrink-0 min-h-0 min-w-0 border-b border-gray-100 last:border-0 p-0">
+             <app-medical-summary class="block h-full overflow-y-auto"></app-medical-summary>
           </div>
         }
       </pocket-gall-card>
@@ -185,6 +203,11 @@ export class MedicalChartComponent {
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
   `;
+  summaryIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  `;
   scansIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -193,6 +216,7 @@ export class MedicalChartComponent {
 
   // --- Accordion State ---
   isViewerExpanded = signal(true);
+  isSummaryExpanded = signal(true);
   isHistoryExpanded = signal(true);
   isScansExpanded = signal(true);
 

@@ -722,6 +722,10 @@ export class IntakeFormComponent implements OnDestroy {
   updatePain(event: Event) {
     const val = parseInt((event.target as HTMLInputElement).value, 10);
     this.localPainLevel.set(val);
+    const currentNote = this.viewedNote();
+    if (currentNote && currentNote.isCurrent) {
+      this.state.updateIssue(currentNote.id, { ...currentNote, painLevel: val });
+    }
   }
 
   updateDesc(event: Event) {
