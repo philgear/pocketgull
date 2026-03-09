@@ -42,13 +42,21 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
 
           <!-- Anatomy Layers -->
           <div class="flex flex-col gap-1 bg-white p-1 rounded-sm shadow-sm border border-[#EEEEEE]">
-            <button (click)="state.isInternalView.set(false)" [class.bg-black]="!state.isInternalView()" [class.text-white]="!state.isInternalView()"
-                    title="Surface View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black">
+            <button (click)="state.anatomyViewMode.set('skin')" [class.bg-black]="state.anatomyViewMode() === 'skin'" [class.text-white]="state.anatomyViewMode() === 'skin'"
+                    title="Skin View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </button>
-            <button (click)="state.isInternalView.set(true)" [class.bg-black]="state.isInternalView()" [class.text-white]="state.isInternalView()"
-                    title="Skeletal View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black">
+            <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-black]="state.anatomyViewMode() === 'muscle'" [class.text-white]="state.anatomyViewMode() === 'muscle'"
+                    title="Muscle View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="6.5"></line></svg>
+            </button>
+            <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-black]="state.anatomyViewMode() === 'skeleton'" [class.text-white]="state.anatomyViewMode() === 'skeleton'"
+                    title="Skeletal View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 2v20"></path><path d="M7 7h10"></path><path d="M5 12h14"></path><path d="M7 17h10"></path></svg>
+            </button>
+            <button (click)="state.anatomyViewMode.set('mind')" [class.bg-black]="state.anatomyViewMode() === 'mind'" [class.text-white]="state.anatomyViewMode() === 'mind'"
+                    title="Mind View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
             </button>
           </div>
         </div>
@@ -57,7 +65,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
           @defer {
             <app-body-3d-viewer 
               class="w-full h-full"
-              [isInternal]="state.isInternalView()"
+              [anatomyViewMode]="state.anatomyViewMode()"
               (partSelected)="onPartSelected($event)">
             </app-body-3d-viewer>
           } @placeholder {
@@ -73,8 +81,8 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
               <g [attr.transform]="bodyTransform()">
                 @if (view() === 'front') {
                   <g id="static-anatomy-front">
-                    <path class="skin-base" [attr.d]="fullBodySkinPathFront()" [class.opacity-20]="state.isInternalView()" />
-                    <g class="skeleton-layer" [class.opacity-100]="state.isInternalView()" [class.opacity-40]="!state.isInternalView()">
+                    <path class="skin-base" [attr.d]="fullBodySkinPathFront()" [class.opacity-20]="state.anatomyViewMode() !== 'skin'" />
+                    <g class="skeleton-layer" [class.opacity-100]="state.anatomyViewMode() === 'skeleton'" [class.opacity-40]="state.anatomyViewMode() !== 'skeleton'">
                       <path class="skeleton-path" d="M100 18 C 90 18, 85 24, 85 38 V 48 H 115 V 38 C 115 24, 110 18, 100 18 Z M 95 54 C 92 58, 93 62, 98 62 H 102 C 107 62, 108 58, 105 54 Z" />
                       <path class="skeleton-path" d="M100 65 V 170 M 82 75 H 118 M 80 85 C 85 95, 85 115, 80 125 M 120 85 C 115 95, 115 115, 120 125 M 82 100 H 118 M 85 115 H 115" />
                     </g>
@@ -91,8 +99,8 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
 
                 @if (view() === 'back') {
                   <g id="static-anatomy-back">
-                    <path class="skin-base" [attr.d]="fullBodySkinPathBack()" [class.opacity-20]="state.isInternalView()" />
-                    <g class="skeleton-layer" [class.opacity-100]="state.isInternalView()" [class.opacity-40]="!state.isInternalView()">
+                    <path class="skin-base" [attr.d]="fullBodySkinPathBack()" [class.opacity-20]="state.anatomyViewMode() !== 'skin'" />
+                    <g class="skeleton-layer" [class.opacity-100]="state.anatomyViewMode() === 'skeleton'" [class.opacity-40]="state.anatomyViewMode() !== 'skeleton'">
                       <path class="skeleton-path" d="M100 18 C 90 18, 85 24, 85 38 V 48 H 115 V 38 C 115 24, 110 18, 100 18 Z" />
                       <path class="skeleton-path" d="M100 65 V 170 M90 75 L80 85 L90 110 Z M110 75 L120 85 L110 110 Z" />
                     </g>

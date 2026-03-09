@@ -32,7 +32,7 @@ export class PatientStateService {
   readonly requestedResearchQuery = signal<string | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
-  readonly isInternalView = signal<boolean>(false);
+  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'mind'>('skin');
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<DraftSummaryItem[]>([]);
 
