@@ -38,3 +38,6 @@ lighthouse-*.html
 bundle-*.json
 dist_*.json
 .lighthouseci/
+
+# Sandbox environment
+sandbox/
