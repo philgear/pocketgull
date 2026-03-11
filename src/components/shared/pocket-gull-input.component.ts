@@ -10,14 +10,14 @@ import { FormsModule } from '@angular/forms';
   template: `
     <div class="flex flex-col gap-1.5 w-full">
       @if (label()) {
-        <label [for]="inputId()" class="text-xs font-bold uppercase tracking-widest text-gray-500 ml-1">
+        <label [for]="inputId()" class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400 ml-1">
           {{ label() }}
         </label>
       }
       
       <div class="relative group">
         @if (icon()) {
-          <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors h-4 w-4 flex items-center justify-center" [innerHTML]="iconHtml()"></div>
+          <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-[#689F38] dark:group-focus-within:text-[#8bc34a] transition-colors h-4 w-4 flex items-center justify-center" [innerHTML]="iconHtml()"></div>
         }
         
         @if (type() === 'textarea') {
@@ -48,14 +48,14 @@ import { FormsModule } from '@angular/forms';
         }
         
         @if (error()) {
-          <div class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 animate-pulse">
+          <div class="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 dark:text-red-400 animate-pulse">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           </div>
         }
       </div>
       
       @if (error() || hint()) {
-        <p [class]="error() ? 'text-red-500' : 'text-gray-400'" class="text-xs font-medium tracking-wide ml-1">
+        <p [class]="error() ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-zinc-500'" class="text-xs font-medium tracking-wide ml-1">
           {{ error() || hint() }}
         </p>
       }
@@ -97,6 +97,36 @@ import { FormsModule } from '@angular/forms';
     .input-error:focus {
       border-color: #EF4444;
       box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+    
+    /* Dark Mode Defaults */
+    :host-context(.dark) .input-base,
+    :host-context(html.dark) .input-base {
+      background: rgba(24, 24, 27, 0.6);
+      border-color: #27272a;
+      color: #fafafa;
+    }
+    :host-context(.dark) .input-base:focus,
+    :host-context(html.dark) .input-base:focus {
+      background: #18181b;
+      border-color: #8bc34a;
+      box-shadow: 0 0 0 4px rgba(139, 195, 74, 0.1);
+    }
+    :host-context(.dark) .input-base:disabled,
+    :host-context(html.dark) .input-base:disabled {
+      background: #09090b;
+      border-color: #18181b;
+      color: #71717a;
+    }
+    :host-context(.dark) .input-error,
+    :host-context(html.dark) .input-error {
+      border-color: #991b1b;
+      background: rgba(127, 29, 29, 0.2);
+    }
+    :host-context(.dark) .input-error:focus,
+    :host-context(html.dark) .input-error:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
     }
 
     .has-icon {

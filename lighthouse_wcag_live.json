@@ -1,17 +1,17 @@
 {
   "lighthouseVersion": "13.0.3",
-  "requestedUrl": "http://localhost:4200/",
-  "mainDocumentUrl": "http://localhost:4200/",
-  "finalDisplayedUrl": "http://localhost:4200/",
-  "finalUrl": "http://localhost:4200/",
-  "fetchTime": "2026-03-09T20:16:00.830Z",
+  "requestedUrl": "https://pocketgall.app/",
+  "mainDocumentUrl": "https://pocketgall.app/",
+  "finalDisplayedUrl": "https://pocketgall.app/",
+  "finalUrl": "https://pocketgall.app/",
+  "fetchTime": "2026-03-09T21:08:26.286Z",
   "gatherMode": "navigation",
   "runWarnings": [],
   "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
   "environment": {
     "networkUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Mobile Safari/537.36",
     "hostUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
-    "benchmarkIndex": 1250,
+    "benchmarkIndex": 1317.5,
     "credits": {
       "axe-core": "4.11.1"
     }
@@ -299,9 +299,9 @@
     },
     "color-contrast": {
       "id": "color-contrast",
-      "title": "Background and foreground colors have a sufficient contrast ratio",
+      "title": "Background and foreground colors do not have a sufficient contrast ratio.",
       "description": "Low-contrast text is difficult or impossible for many users to read. [Learn how to provide sufficient color contrast](https://dequeuniversity.com/rules/axe/4.11/color-contrast).",
-      "score": 1,
+      "score": 0,
       "scoreDisplayMode": "binary",
       "details": {
         "type": "table",
@@ -316,7 +316,318 @@
             "label": "Failing Elements"
           }
         ],
-        "items": []
+        "items": [
+          {
+            "node": {
+              "type": "node",
+              "lhId": "1-0-P",
+              "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN,3,DIV,0,P",
+              "selector": "div.min-h-[100dvh] > main.fixed > div.w-full > p.text-gray-500",
+              "boundingRect": {
+                "top": 422,
+                "bottom": 462,
+                "left": 24,
+                "right": 388,
+                "width": 364,
+                "height": 40
+              },
+              "snippet": "<p _ngcontent-ng-c1427170910=\"\" class=\"text-gray-500 mb-4 text-sm\">",
+              "nodeLabel": "Enter your Gemini API key to access the live practitioner dashboard.",
+              "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #6b7280, background color: #18181b, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            "subItems": {
+              "type": "subitems",
+              "items": [
+                {
+                  "relatedNode": {
+                    "type": "node",
+                    "lhId": "1-1-MAIN",
+                    "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN",
+                    "selector": "body > app-root > div.min-h-[100dvh] > main.fixed",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 823,
+                      "left": 0,
+                      "right": 412,
+                      "width": 412,
+                      "height": 823
+                    },
+                    "snippet": "<main _ngcontent-ng-c1427170910=\"\" class=\"fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center…\">",
+                    "nodeLabel": "POCKET GULL\n\nCLINICAL INTELLIGENCE PLATFORM\n\nEnter your Gemini API key to acces…"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "type": "node",
+              "lhId": "1-2-INPUT",
+              "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN,3,DIV,1,DIV,0,INPUT",
+              "selector": "main.fixed > div.w-full > div.relative > input#api-key-input",
+              "boundingRect": {
+                "top": 479,
+                "bottom": 523,
+                "left": 25,
+                "right": 347,
+                "width": 322,
+                "height": 44
+              },
+              "snippet": "<input _ngcontent-ng-c1427170910=\"\" id=\"api-key-input\" placeholder=\"Paste your Gemini API key here\" class=\"flex-1 px-4 py-3 text-sm bg-transparent outline-none font-mono text-gray-8…\" type=\"password\">",
+              "nodeLabel": "main.fixed > div.w-full > div.relative > input#api-key-input",
+              "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 1.2 (foreground color: #1f2937, background color: #18181b, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            "subItems": {
+              "type": "subitems",
+              "items": [
+                {
+                  "relatedNode": {
+                    "type": "node",
+                    "lhId": "1-1-MAIN",
+                    "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN",
+                    "selector": "body > app-root > div.min-h-[100dvh] > main.fixed",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 823,
+                      "left": 0,
+                      "right": 412,
+                      "width": 412,
+                      "height": 823
+                    },
+                    "snippet": "<main _ngcontent-ng-c1427170910=\"\" class=\"fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center…\">",
+                    "nodeLabel": "POCKET GULL\n\nCLINICAL INTELLIGENCE PLATFORM\n\nEnter your Gemini API key to acces…"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "type": "node",
+              "lhId": "1-3-A",
+              "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN,3,DIV,4,A",
+              "selector": "div.min-h-[100dvh] > main.fixed > div.w-full > a.block",
+              "boundingRect": {
+                "top": 584,
+                "bottom": 600,
+                "left": 24,
+                "right": 388,
+                "width": 364,
+                "height": 16
+              },
+              "snippet": "<a _ngcontent-ng-c1427170910=\"\" href=\"https://aistudio.google.com/apikey\" target=\"_blank\" rel=\"noopener\" class=\"block text-xs text-[#416B1F] hover:text-[#244626] transition-colors mb-8\">",
+              "nodeLabel": "Get an API key at ai.dev →",
+              "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 2.82 (foreground color: #416b1f, background color: #18181b, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            "subItems": {
+              "type": "subitems",
+              "items": [
+                {
+                  "relatedNode": {
+                    "type": "node",
+                    "lhId": "1-1-MAIN",
+                    "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN",
+                    "selector": "body > app-root > div.min-h-[100dvh] > main.fixed",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 823,
+                      "left": 0,
+                      "right": 412,
+                      "width": 412,
+                      "height": 823
+                    },
+                    "snippet": "<main _ngcontent-ng-c1427170910=\"\" class=\"fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center…\">",
+                    "nodeLabel": "POCKET GULL\n\nCLINICAL INTELLIGENCE PLATFORM\n\nEnter your Gemini API key to acces…"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "type": "node",
+              "lhId": "1-4-SPAN",
+              "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN,3,DIV,4,A,1,SPAN",
+              "selector": "main.fixed > div.w-full > a.block > span.font-bold",
+              "boundingRect": {
+                "top": 584,
+                "bottom": 600,
+                "left": 229,
+                "right": 263,
+                "width": 34,
+                "height": 16
+              },
+              "snippet": "<span _ngcontent-ng-c1427170910=\"\" class=\"font-bold\">",
+              "nodeLabel": "ai.dev",
+              "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 2.82 (foreground color: #416b1f, background color: #18181b, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            "subItems": {
+              "type": "subitems",
+              "items": [
+                {
+                  "relatedNode": {
+                    "type": "node",
+                    "lhId": "1-1-MAIN",
+                    "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN",
+                    "selector": "body > app-root > div.min-h-[100dvh] > main.fixed",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 823,
+                      "left": 0,
+                      "right": 412,
+                      "width": 412,
+                      "height": 823
+                    },
+                    "snippet": "<main _ngcontent-ng-c1427170910=\"\" class=\"fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center…\">",
+                    "nodeLabel": "POCKET GULL\n\nCLINICAL INTELLIGENCE PLATFORM\n\nEnter your Gemini API key to acces…"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "type": "node",
+              "lhId": "1-5-SPAN",
+              "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN,3,DIV,5,DIV,1,SPAN",
+              "selector": "main.fixed > div.w-full > div.relative > span.text-xs",
+              "boundingRect": {
+                "top": 632,
+                "bottom": 648,
+                "left": 197,
+                "right": 215,
+                "width": 19,
+                "height": 16
+              },
+              "snippet": "<span _ngcontent-ng-c1427170910=\"\" class=\"text-xs text-gray-500 uppercase tracking-widest\">",
+              "nodeLabel": "OR",
+              "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #6b7280, background color: #18181b, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            "subItems": {
+              "type": "subitems",
+              "items": [
+                {
+                  "relatedNode": {
+                    "type": "node",
+                    "lhId": "1-1-MAIN",
+                    "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN",
+                    "selector": "body > app-root > div.min-h-[100dvh] > main.fixed",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 823,
+                      "left": 0,
+                      "right": 412,
+                      "width": 412,
+                      "height": 823
+                    },
+                    "snippet": "<main _ngcontent-ng-c1427170910=\"\" class=\"fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center…\">",
+                    "nodeLabel": "POCKET GULL\n\nCLINICAL INTELLIGENCE PLATFORM\n\nEnter your Gemini API key to acces…"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "type": "node",
+              "lhId": "1-6-BUTTON",
+              "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN,3,DIV,6,BUTTON",
+              "selector": "div.min-h-[100dvh] > main.fixed > div.w-full > button.w-full",
+              "boundingRect": {
+                "top": 680,
+                "bottom": 722,
+                "left": 24,
+                "right": 388,
+                "width": 364,
+                "height": 42
+              },
+              "snippet": "<button _ngcontent-ng-c1427170910=\"\" class=\"w-full py-3 border border-gray-200 text-gray-600 text-xs font-bold upperca…\">",
+              "nodeLabel": "TRY DEMO — NO KEY REQUIRED",
+              "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 2.34 (foreground color: #4b5563, background color: #18181b, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            "subItems": {
+              "type": "subitems",
+              "items": [
+                {
+                  "relatedNode": {
+                    "type": "node",
+                    "lhId": "1-1-MAIN",
+                    "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN",
+                    "selector": "body > app-root > div.min-h-[100dvh] > main.fixed",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 823,
+                      "left": 0,
+                      "right": 412,
+                      "width": 412,
+                      "height": 823
+                    },
+                    "snippet": "<main _ngcontent-ng-c1427170910=\"\" class=\"fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center…\">",
+                    "nodeLabel": "POCKET GULL\n\nCLINICAL INTELLIGENCE PLATFORM\n\nEnter your Gemini API key to acces…"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "node": {
+              "type": "node",
+              "lhId": "1-7-P",
+              "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN,3,DIV,7,P",
+              "selector": "div.min-h-[100dvh] > main.fixed > div.w-full > p.text-gray-500",
+              "boundingRect": {
+                "top": 730,
+                "bottom": 746,
+                "left": 24,
+                "right": 388,
+                "width": 364,
+                "height": 16
+              },
+              "snippet": "<p _ngcontent-ng-c1427170910=\"\" class=\"text-gray-500 text-xs mt-2\">",
+              "nodeLabel": "Loads a pre-sampled patient with example AI analysis outputs.",
+              "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.66 (foreground color: #6b7280, background color: #18181b, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            "subItems": {
+              "type": "subitems",
+              "items": [
+                {
+                  "relatedNode": {
+                    "type": "node",
+                    "lhId": "1-1-MAIN",
+                    "path": "1,HTML,1,BODY,0,APP-ROOT,0,DIV,1,MAIN",
+                    "selector": "body > app-root > div.min-h-[100dvh] > main.fixed",
+                    "boundingRect": {
+                      "top": 0,
+                      "bottom": 823,
+                      "left": 0,
+                      "right": 412,
+                      "width": 412,
+                      "height": 823
+                    },
+                    "snippet": "<main _ngcontent-ng-c1427170910=\"\" class=\"fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center…\">",
+                    "nodeLabel": "POCKET GULL\n\nCLINICAL INTELLIGENCE PLATFORM\n\nEnter your Gemini API key to acces…"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "debugData": {
+          "type": "debugdata",
+          "impact": "serious",
+          "tags": [
+            "cat.color",
+            "wcag2aa",
+            "wcag143",
+            "TTv5",
+            "TT13.c",
+            "EN-301-549",
+            "EN-9.1.4.3",
+            "ACT",
+            "RGAAv4",
+            "RGAA-3.2.1"
+          ]
+        }
       }
     },
     "definition-list": {
@@ -1204,7 +1515,7 @@
         }
       ],
       "id": "accessibility",
-      "score": 1
+      "score": 0.95
     }
   },
   "categoryGroups": {
@@ -1296,9 +1607,9 @@
   ],
   "entities": [
     {
-      "name": "localhost",
+      "name": "pocketgall.app",
       "origins": [
-        "http://localhost:4200"
+        "https://pocketgall.app"
       ],
       "isFirstParty": true,
       "isUnrecognized": true
@@ -1307,605 +1618,678 @@
       "name": "Google Fonts",
       "homepage": "https://fonts.google.com/",
       "origins": [
-        "https://fonts.googleapis.com"
+        "https://fonts.gstatic.com"
       ],
       "category": "cdn"
     }
   ],
   "fullPageScreenshot": {
     "screenshot": {
-      "data": "data:image/webp;base64,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",
+      "data": "data:image/webp;base64,UklGRkIbAABXRUJQVlA4WAoAAAAgAAAAmwEANgMASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZWUDggVBkAADDLAJ0BKpwBNwM/EYa7V6wpJqmjMtoJgCIJaW78cDltIccqBrH34A1LR9fom/3PT2237dT/WN/j3Tm31L54/13qC+cfv/gnXmRNbDbJ3gHOz/L2YLAufQTGOeA/5PKp+0+op97HbgHKRY0fTFfOEO5eHcvDuXh21V6AykK0BlIVoDKQrQGSqqqqqqqqqqqqqqqqqqqqqqqqqqk9uqqqqqqqqqqqqqqmdZ4McdhFWAmZmZmZmZmZmZmZVbbCLQEsfLfXIiIiIiIiIiB+QcNbBAWwlvPY3HEqhLSXyJY94G2XZMji9jIH1ViqCWzMzMzMx18JlInB5TdHqWfaTSNHV5G+/cdB7wwOrRtpzu7qogXu/2ZA4WZKQA5nmZmZmZmZ6u1na01FL4010v3KjHlwaA8eQtNcGOH9f////////yJxXnylbjqxlMVZL/+um40GDZm11rMzMzMzQh4p2n4bX16cO80cEpLf/iGf+84u7u+UTd3d3d3cHsxcEL74rrAKFJEzf/MDJEREREREQ31LqeTZGFGG1LFWJ0Y1pkRERERERDt75m0xVqwzMzMzMzMzLl3QiTjYPFystZcsuWXJGgfJu7J8ZVVVVVVAQf3osoAMWDT4Rl1bcs3H0b0Tx3d3d3d2imNApgZ5njgqAdaqqqqqpiKyC7u7u7i8bu7u7u7iILn1E/fss7avOhAmA7/SfkVVVVVVVqnt73ve973ukqqqqqqqqqqqqqqqqqqqqqqqqqgB+eXHiSdYZH1Ox8Lczz5XisVRfB7J1mZmZmZmZlrZdatrOGrlknPoxzjzRv8CUhfPaiJkFPRbghYVqF7CQ/IeWnxaLYNUwaOER54BKgHs/31SV+sstiYGI9WEneJXRuPRAEezMzMzMKXzDb1mkAvrsRcUTmreWKG8J+g5AOk2B5SxQodOURebxkgThr5Pr1ks4+rYOz5wyN5TtqqqqqlsSqGiuogNeIIFLRN/fAkCyQKVAeoHpJ8Ja50wCgMCJbCRx+QnaCf4kRERERGi9vGMYw+iJOvuiIiHvnqjFRFKyFRu0bamPkd+oiJ243cMF99Yjq9MdnTiQGhnm5o00exyYv4pacPbYeiCcaV3YJS4rhpXZF/AgVBGysNLtbBhYFcmo0zh4H608SPQjhQNk86ijWaXcL5hpHoP8dVYzI4e9vgTc6n3p3/SBYbysU3LuOynX3L7/O/DVzR2OFeZbLrQP6zlrD7ewlLU67cGLTfJdOdpPflksa3dzZahJqy5ZcstPlrLllyy5ZcczjtuP2WypSlGyQFQrqlt2PqjPT89N3EAZBHQ5LWhjcEvtURUqFgkpS5zkigCOdX2NJ0faWU6UhXc6s6A8h/hW3y6EuKhC9uNYBf77/be3co4BU7FI/zUbA0ctdERn9tFKriT0qqSAUxPINoX6OrcnY0eu2awY5oL3HQ5vJacyNnbOcslqJPSAHelWUfL1VlysolTWwmzERJXljuRFTqAdUB9ZfJpSlKJbu7u7s84hx+3d7wbWm9AJt0Yzys4r4QZhnDNCwYqIDZ2X2V+WEAZl5L2ETMzM74AAAAAh7FPOlFu7u7vmjVt73r1Xtn3LUl+ZjNM4z5wMx1LlSlKUldVVVVJwuf7XZ0FW7899My/lAaKNL8wdlwp0DMmZlVVVVVVVVVmuyRO28SP/////jkHAoS1CTVlxy3VkbP3FY3qM5LUJNWXHLIYx0rLllyy5ZcrARvzgq4yOqjOS1CTVlyuOZmZmZmZolbCgkIQhCEGOks+I/Fos7avOg4FCWoSasuWXLLkQJQFyqY3Xu+I8MsjX6uWc07VHn9mmC/CFMd+Ac+BFQrStHT+11ei+feA2myswegkYIpYHx9sdYPoY/pGOY/wAoUGY+Ug49AbCu7aLvo+OPoH5wskB3GKa5gFBk7cquV3aKXjbQQD18BeOuliT9au7LpVEdv/hSMWgLEaDLEn6zG3BYv++F7kkHt8FYdiHotDttx5pQB+UPg6f3BAk8AKAoJUwGGCjX42nbCZG/ZHNgT+OmYgo0BRU2sML8HaFE7ym7Kux6CPTDFtYYjE8Sg6TROAqMsTErKr4i8Er7mnyqrVOdsCgmuRFFmnc8Q6VVVVVcZInru7u7u7u7u7u7u7u8O2qqqqqqqqqqqqqq8+7u7u7u7u7u7u7u7u7u7u7u7u7u2gAP7+Q2vF45gtDmLCYsJiwmLCYsJiwmLCYsJiwl/gAAAC3b77HZ4EEAh5QRHxfHx2ZVc7zSyGcgwTIqbiyNHjAy8AC4809KxGqLJe2gNrDtiKjliKR6idRUI5qQByAgwffadHXCVsgmhuSqK7rM8jYu/ezHIRT6TiSY78FXJA5G9aC0IKHlRejiLvrjEIsLO5f9nGxbfvxsgfDjDABDPDvTOLHbqJnlkIQwtACbhRtQOFksdafGcyUCK6p30rWE1NQGmR7aMXdj+T6dAVK7RlOgLhjblbyQbJ25reK6/5mUEh9+/hSYdWrrA9wCx4wPr5e1usd7O1dRnEbLl4oBNGxeUPIcopNWTj7eLPviJ+NwBgmyXlu7Uj1xWa9zZEwX/FHqpo1BkDMR9svyDZNtz8Rnmx8dpMvgrkDvTOM/qrhWeA8rX+IxC1SW3YmQELdNTa8Unerpe2m3jnljiOlNG2etcaY9jywX6N1cnhsvBpWVQjo3gn4ZcjxBw0b1+azaX5Le97G8mi0mAHVHcJyx/9I3d7SxcR60caHH0Xw/+K4YMnr7nplSvj47AVcOXNw/oxbVGl9zUfmzhHl1RIjmyBJoB7OZJk62lg8XEUzUzqdX89jPM3OEIZSRL8w9d/Fs3QTj8//5BoqpNwX9o5L3VD+NTcuDMvyZH91l1QzgJX+/QMQDuY6Y+LOmS0gbml1SFttwo74Sj3XqfQPVTm1kszaSmSmGXAB0/7fhU0cLlW+vKLCvBp9kXthQFDl4EsJljWvWO67EXf8QqKwfI590od4ufTWVBxkBWU0J8Ickhg675+4CsAALvH4Xz64gl2duer1u/3SB/8DRU4WlkGIYcVon+1TkhAIWC3o+kc4PHIK4Z2OHB+aopVn4RJfutRTq7m8U0fOBpDV6MLk3xV/QrnoSmHM2dpMmC3l3Hmk3rRVmZmM/C3ZdwPIjlnrKxSHTLMi1itGjk3AmRRvA7bEgEuZoXnD95ygAAAXuRZTEt2u2TvE3u6jiSGm+pxVjRKwftWbTcQMlP8+tG1+RsbFESMlHV8y7Vovw2psf5BHzQem2v6wkZ0x6e3oqGeQ6dfPR8Id125sxQcyABl9FMDemJe1EIqDA41NqXyTr4vh3BStm7EiV3k9tFNRcKSFU/jEI+30w7cn3XpFCgCmYerGn+WhphzQ3E94jnpG20bHQhi4brcfWd6sABfkdfFubq7V2o9tTLHhalWwOC6QMHw4/WM+OXDv+vpLxbw3lOog911/EFlAZ43duvdEEN/aMlhIER5O7Z8i30+l6rm58fgnZA38/fFEhUmzjwIlSKLpLXq+fHUVt/WQFLxE1deO0oxpKoztjj+o1V1Cpp485IFpThPxjr9LknKjeway2r6eIe8ND558P9yiUssRSrKZZfLXzjNzv2oCK12mUh5LGKxAiQ996pQ5LnJwMzlVC/P3A3DhLGoKMN4+/wWLCHoZV4TBrP7rZjPz8ZjO1+RETBXTM0xBpwsQrMDtWJEy+4/mbJbgnXagofK+VX1AkfLZ8h/1T7401nDJDEcGNmzgH3w/LPaBbuK4CQCKPLQuI/D2LcFG/MYsm2+ToL9Cl8Ce1ZtMdSl9WCzZfGleTDdEmfhUQqXy9BeaPaP/81U3ljMpAZ9GjYDT2T04qaB4NdUGJcVwMlxu2mTyTuvHqBL7/WwBhAXaLB+Lu6Wk00CxrB7yktPQks/j6OYx5saA9RhTH2EpZg2aQJyQgUrsF6B6Uxocuf7a33b7fWAD+HTZ6lNKBfgMppCeYewMEHVaPu8JNpOziVNsM9IJ/UgGAtTRuFHaK7542HXVr73kF3Na/T1Q8HRarvYHtk6TRQuD3tLcjw9UI5Jc8Vw7+Z7A2IX3Q0YLNLVHik1Vkf7ITnfUo3GawXSOhsA29HXTOe3P00iIJ7fb0FPITZ5Ud7UehDIdPTN+vR5sewClgflcH9yjqw0vIrTPHnwyfzpDVt1tpBg8HgDC9PcJA1RBN5kRb8N6/Z7t8Ov2mlJNw1r+1ttcTtTppC6hZ451ZVsnk4pob7Zn9DL2833m1ApIm0R/9pY1NrbK04Pg4NQav6n94fyZMHKq2i+0U5WSlA11CDvVpXoBXOslv3eQwEKVpLBkGjL40i4vqoyFF64mvSUqmCRWAEx0hR/cgOOb8XiNWvAWCN6y4mk/Mf1QDYz6DPNcQ+jQlf8ANjaM/s1KFsGvJu08/MGN1QN1gpRyVwxgafGp4Jr/8sNeHCTCg43jegxAcnIfnnyNbsoX1DnryAu3f1e/tpS3IFEU6YGogvUGtiW4A93DZLgBtrVX7PBmVEDZMSHQrKpyF/sYpvhl5GQ/wPSov0Ti+QALwK3kNZ7sgfRiTQq7/zRSH6LkaHDyibnU5GgkmctNgMi93GA5Hyk8rQJBf4Yt8JaU+U+tf94YEkLxsE/o3hhQEVIzO0OAntIU6gyPeGY5FpKcLy5ZNubwMjBTmbME4P7AwRW0lUlaHmESsC01lNrsQmXI17su4IQziO0qzua7p+eU7z0iuX15LEsNhDsXcGdXiGRZgtTERg3e9WK2iwugHvP9IOWvVZOGiZDB+nAa7zv3vkuLXcGfkOwJ/wBHyr4mymhv9DSMwPKUnojBRsc5MTA6HelhdAPef6N8Dz9MG2tZvdSGkjFlqsm9pMD+HhQNw4VjpwYlpTCahxIxmKRJbPY/TT7Jvhr/eAaplVc8PUjFt0zjsHYeVwLJu/1hvw09f2hHup67UhoSCf1N3m3OxwjrH8QoipOOpBwHav8zC9BReFIPiO1fzNv27FMGvymccscFqIOdlPI6J6ITEqmX7Xy031WfLaH8nc6NP6kPJI2KiyJifrx8KbpAfTM9o0+RW3XlLOO2w1nwVVjuzwc8fagr0iMpvtlodEEe6PONRwg/rGSWgWPLOj2ETyjrmWPBCtapBZEP8Id993SOCcVnUK7XWx7NefsZixZHyM3RduhXtyCY6u9yLQx1QC2OS+/bOn6ixpJapOYCZmevuTNdTxvZkUDPumIVzK2zwtfHIBWJl24dPWoNHIXTKBSmSt3tsIHxfpYgeCtOBGVg04pnlG764ihF1XzIYqzvQiIKMFZU5NJXzl5U12Eevu+NOi5jY7eOWXnOyjG834Wm54+Lxlj4YsoqNMjtZGirW8oAvxX9lGP/mL3ULjj+TcqZuam80JQqvOocZz/sijPSemLh6Tj86/JOkdmnycBc7xffrQZT0wSY4Lf7N3HU0BoyMAcP7e4QIrkapaeyA/3MmhVMN2fX7RRvNU/fc/yHXnkJKZJztjuIDhOrbou0/l+lyrwIFOO4Zbp7ryClysv1r64Ng4j12CL69mdKfFJNBO4Z4XkJ95vTiDus/YVdHd2xoAFXAe1d1o4ujb6DzJxVWkTtecvU90tGcb5apP57tcEUYJLFUKP2siGoECQupCgdWlSecE8RmksCFWSgLTiIYeH1ot6GfW23ZPnVR6UN0DvQDZ8wYwYppu0a0KZZpNf/YueuJL9hxlPYdn8TGCYESEAxTMwA2xaeNmNCv5T6u3bgBTowYmDXCrEhi3Ls9FKgch70kY8uD+z7Fmg+ZR2KL68rOl/TXWWXaV3uCHovrJ8GU+L4JXgMC4q2KBzgcNi3LAtKl1ZpCs8k4omXCYer/xLdlvGKBQg2Zm7K7IUSB9ZhDKzOAWvgTxKzXDsWYFoUMRgEG1Klf9/8rj0wtoiN55le2TXyTIDC7L9dGOwss8qq5tZQLIAginbDC8Lj82xDSno6hfAoDfoYQOpz5tlDScT9OptbZFHeajSYfVERfm4jgCh/Dl+Sw56H0NNR5BRtpNN4lTVdiro+9G344hvfeAaX4Q+T/wU5cAOGrqUtTVLhv2+at2EVuSFC05rA9GVmghHg2gGUNeJXnSLX/Ue7qzymXN31Y78E+Ldo0tNo1S09x6z/nAD8v2CWkjhWVkZ9Zhrls0TsOs96M1YXoKFwiNw0PXQAQam1MycJFeBYl2gNSF94FDh6ULMPQKW2PvrhmjGP++OLpqBStrgyoZY5KeOcHDVhl9WZ09JO522Gq7rQyj7vKe5APCUNBs19g9QUVdVqqqGO2Ue6V8kGdn8pevskXZ68/3ptIlJNDVMahrNhGa9JyA4atBH9wj+PTJVDtKCEUHIvf8qvGfXfy0V6rzcbeBxz4mOmzsPwDyL5lIeq4KgTAyQ2qMSdGF8ylmzz7ar24GVBCd9kBxjKzO6vx07Kb7MXTPqS+0DxZbCKgdk7JQNonLPxAlcjEalKpxD41PnWHHn0uDfUdZEh3tsNK6xkhgyRn3cSzzQVfEXY43TTLKd6kIS5nkv7J6JIip8zTGwubUPH0dDia92T47n0pueJHNbbkUHUYFz37QfnUpegtmjOgnP870q22u7q9x6l1apK7BSheiIlwU/I1N+3DrMuAkXgEQE4owB6jqO7Wmr1XfSaKo3VLU6N+JNe24dwx61PyvM1ond79T2sFn2X+nvF24KMokNZEoqX0Ih3j67mk6G4d42vpXvHjG+lsK+6J94f/mnzI3oAAAAx9dg+7Fe0UhvVbVLHuhfOol/+M33Y25JghYGobxh9llPFUHdRwYPL/PesgBWQ66OGhtuj0Vbg9w9a4HPBeNEv4HT3LhwRp3j5fg2zgQsAMWP4/fHCTYFu+YufT0Q+smJypy2yHtI1IQ8VghxuVr+UH0aSJlolQSgXZD+1O2LRz5wNv3S9qMO3MthMITm7vSoeQOhQV0n6V4rLV4Y3zZXL9UvBzDQguxF7kWKeTi23Omewi80uXFZfmAnlmw31b5LUg3qGXUF4JHn/z+2yO1OQcO7v7/b5njTMgAAnFIGUrIsmh8svozxx6+ygQpnNI1WabRfegcugb6F3qTHs4aOXIYAASJK7gx+zPUoSuiWsXYlXrOs5K3BRYg+KS+z/jnNpHaWuy64LhAg60nkxXYG2LM1N7Nddsnwo8dCfrNtvaChXjfq8ph6wEVlJDpKVq7iBYTdpoc6z6yDzItXZSofEq4CFtMKB3Kw1QlNtvSPjg+RaBLYY7ttM0gm+Lq48qWXG+jKNisYiNrVicPIvY4sztdFpMN5TCbOcJrG4nxaGWsvvd4hDhXmzSASIptRQXZA5Oz7DRFC+xIDlM8e/5gLrFSsEURPc7lpbXYFXT70qd9fF1oH284iTu/BOAz/0lcetI9zBALcOq6+NIsyv5AAAxLzJg5ifpRHP+sVU4A1zGq+gdZDyT5u+0fADxI2a6nHrqZyAgcRSocQkkb26LYgjvx5BwCYOGQyoByYRcHByQUyvJeEUW46YZZjeL2kKrRMauh/LQMLot23DMWaXYIIL6qSWSGLoT8yXCFJe00CyjG2aKaonxeba7YuH/yH9fKJ3YUolValxnZg0URPinoitmfPyvXEsujDYcVDPaZv/FpBTSf5yZYvtb4PSBQXNwqQVb9j8oyXfQYWE5RdJwUEYsmcEkm3SQmvS3nG8C5LbO9sPxD55QmYxhiGnKehkgt/eKGXTmk9fGUOOeE+I7q0afiMLwNyvlv0EhBMZDLmL3H1JCoV7yB8A4qt/YtZxBUhfFiBkmzgesl1sHlSLhKmynk1HU45hGHnTZDF8K93JlREDAYhEyfB8Rvcs5yiOy0hYxQCV1AKaTgHMNX02JoaX/uTLbpF5iq8xzhdTytJBlljBF24Xj6a8QI+/p9HuocKMWhwJl7lkNTddQg7lPThG/yblP3HFW+iqgEZMmu34YxpBOyW7d3oxZZbSxMGcrl7/CexXnLcVi3nZ7ffNc/rzaVNDZL3ooTx8KaJ9oPpGdkcN/DFL3THAx+G0qifcu2b13Rw2j1QDQbzsiOlyfTmjmZbbOZYvdpWpAN8ilIQOYXL6xIn3CgQ362+i5aaiplEbr9gLf8fO2FXF7twI5VntcNxW2K4AhWsOeEBnH8AXiKULS78iH47gXjN1lEeGn0i2CDFBbpRii1gp3+DcqL8YV1Fi/UPSEBbP5Mr8LMdG9lmMPXIOwgSQwkgaRqpvbYhJsqIBIwvgGTrT7NoiN3ZMOCtLQvKzJVRiUSaG/JlN92i4qAtDy2O/vlEqxWSI5D0pgmw4K9GtwVbwjxbIqQ9aKWLibqg0lnLM0Epq8Ofz73D+7kMeaR4eU5vgdUT5FwlaPe+mRsvnMGba5q23qKVtnqYaseDDk8D6zgChUBtgTJIh881TZJ14cJtMTGqZKS62IwPUULodir8fzYexiOHmeuWi4E2kY2iDJRokvzlT2Ahn1LqPcSipnwifGdewsYtBl9pFhJ9PsZsOGFeYLszw9Cc6eMlVEiC2xOs1okJwxmrp14iY0ff8yp/5gQ7KZYX5ao/S0VJB+37dG5OW1njx9+jHRlhwD2drjfht2yHQf+TKyvW3qKkylK1mWwJp7KNnCAMvYu8gtpbwFiKzp8ierCw/W1BlEOnfz6cxdKxh+CluqrKA6ce+rcmWtmJAMeNGcBofBtOAAAAAAA=",
       "width": 412,
       "height": 823
     },
-    "nodes": {}
+    "nodes": {
+      "1-0-P": {
+        "id": "",
+        "top": 422,
+        "bottom": 462,
+        "left": 24,
+        "right": 388,
+        "width": 364,
+        "height": 40
+      },
+      "1-1-MAIN": {
+        "id": "",
+        "top": 0,
+        "bottom": 823,
+        "left": 0,
+        "right": 412,
+        "width": 412,
+        "height": 823
+      },
+      "1-2-INPUT": {
+        "id": "api-key-input",
+        "top": 479,
+        "bottom": 523,
+        "left": 25,
+        "right": 347,
+        "width": 322,
+        "height": 44
+      },
+      "1-3-A": {
+        "id": "",
+        "top": 584,
+        "bottom": 600,
+        "left": 24,
+        "right": 388,
+        "width": 364,
+        "height": 16
+      },
+      "1-4-SPAN": {
+        "id": "",
+        "top": 584,
+        "bottom": 600,
+        "left": 229,
+        "right": 263,
+        "width": 34,
+        "height": 16
+      },
+      "1-5-SPAN": {
+        "id": "",
+        "top": 632,
+        "bottom": 648,
+        "left": 197,
+        "right": 215,
+        "width": 19,
+        "height": 16
+      },
+      "1-6-BUTTON": {
+        "id": "",
+        "top": 680,
+        "bottom": 722,
+        "left": 24,
+        "right": 388,
+        "width": 364,
+        "height": 42
+      },
+      "1-7-P": {
+        "id": "",
+        "top": 730,
+        "bottom": 746,
+        "left": 24,
+        "right": 388,
+        "width": 364,
+        "height": 16
+      }
+    }
   },
   "timing": {
     "entries": [
       {
-        "startTime": 8223.11,
+        "startTime": 8328.31,
         "name": "lh:config",
-        "duration": 1172.57,
+        "duration": 1047.62,
         "entryType": "measure"
       },
       {
-        "startTime": 8225.68,
+        "startTime": 8332.55,
         "name": "lh:config:resolveArtifactsToDefns",
-        "duration": 145.7,
+        "duration": 107.43,
         "entryType": "measure"
       },
       {
-        "startTime": 9395.91,
+        "startTime": 9376.18,
         "name": "lh:runner:gather",
-        "duration": 5404.42,
+        "duration": 5900.47,
         "entryType": "measure"
       },
       {
-        "startTime": 9501.7,
+        "startTime": 9568.57,
         "name": "lh:driver:connect",
-        "duration": 13.97,
+        "duration": 15.58,
         "entryType": "measure"
       },
       {
-        "startTime": 9516.03,
+        "startTime": 9584.66,
         "name": "lh:driver:navigate",
-        "duration": 11.9,
+        "duration": 15.55,
         "entryType": "measure"
       },
       {
-        "startTime": 9528.37,
+        "startTime": 9600.88,
         "name": "lh:gather:getBenchmarkIndex",
-        "duration": 1008.05,
+        "duration": 1008.98,
         "entryType": "measure"
       },
       {
-        "startTime": 10536.85,
+        "startTime": 10610.12,
         "name": "lh:gather:getVersion",
-        "duration": 1.85,
+        "duration": 1.48,
         "entryType": "measure"
       },
       {
-        "startTime": 10538.88,
+        "startTime": 10611.82,
         "name": "lh:gather:getDevicePixelRatio",
-        "duration": 2.44,
+        "duration": 3.1,
         "entryType": "measure"
       },
       {
-        "startTime": 10542,
+        "startTime": 10616.18,
         "name": "lh:prepare:navigationMode",
-        "duration": 43.84,
+        "duration": 42.36,
         "entryType": "measure"
       },
       {
-        "startTime": 10543.72,
+        "startTime": 10618.38,
         "name": "lh:gather:getVersion",
-        "duration": 0.98,
+        "duration": 1.29,
         "entryType": "measure"
       },
       {
-        "startTime": 10582.2,
+        "startTime": 10655.35,
         "name": "lh:gather:prepareThrottlingAndNetwork",
+        "duration": 3.12,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 10672.91,
+        "name": "lh:driver:navigate",
+        "duration": 2929.64,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 13620.89,
+        "name": "lh:computed:NetworkRecords",
+        "duration": 2.34,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 13629.8,
+        "name": "lh:gather:getArtifact:DevtoolsLog",
+        "duration": 6.05,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 13635.93,
+        "name": "lh:gather:getArtifact:Accessibility",
+        "duration": 401.55,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 14037.77,
+        "name": "lh:gather:getArtifact:NetworkUserAgent",
+        "duration": 0.44,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 14038.24,
+        "name": "lh:gather:getArtifact:Stacks",
+        "duration": 28.93,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 14038.64,
+        "name": "lh:gather:collectStacks",
+        "duration": 28.5,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 14067.19,
+        "name": "lh:gather:getArtifact:FullPageScreenshot",
+        "duration": 1172.66,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15234.44,
+        "name": "lh:gather:getVersion",
+        "duration": 1.08,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15277.09,
+        "name": "lh:runner:audit",
+        "duration": 407.15,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15277.25,
+        "name": "lh:runner:auditing",
+        "duration": 405.89,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15280.95,
+        "name": "lh:audit:accesskeys",
+        "duration": 3.92,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15285.45,
+        "name": "lh:audit:aria-allowed-attr",
+        "duration": 9.1,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15295.82,
+        "name": "lh:audit:aria-allowed-role",
+        "duration": 4.99,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15301.98,
+        "name": "lh:audit:aria-command-name",
+        "duration": 3.86,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15306.62,
+        "name": "lh:audit:aria-conditional-attr",
+        "duration": 9.36,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15316.37,
+        "name": "lh:audit:aria-deprecated-role",
+        "duration": 2.16,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15318.92,
+        "name": "lh:audit:aria-dialog-name",
+        "duration": 1.86,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15321.17,
+        "name": "lh:audit:aria-hidden-body",
+        "duration": 8.22,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15330.04,
+        "name": "lh:audit:aria-hidden-focus",
+        "duration": 4.1,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15334.89,
+        "name": "lh:audit:aria-input-field-name",
+        "duration": 4,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15339.63,
+        "name": "lh:audit:aria-meter-name",
+        "duration": 3.43,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15343.51,
+        "name": "lh:audit:aria-progressbar-name",
+        "duration": 2.61,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15346.85,
+        "name": "lh:audit:aria-prohibited-attr",
+        "duration": 6.78,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15353.99,
+        "name": "lh:audit:aria-required-attr",
+        "duration": 2.98,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15357.76,
+        "name": "lh:audit:aria-required-children",
+        "duration": 2.71,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15360.83,
+        "name": "lh:audit:aria-required-parent",
+        "duration": 3.68,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15365.2,
+        "name": "lh:audit:aria-roles",
+        "duration": 2.82,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15368.41,
+        "name": "lh:audit:aria-text",
+        "duration": 3.58,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15372.71,
+        "name": "lh:audit:aria-toggle-field-name",
         "duration": 3.56,
         "entryType": "measure"
       },
       {
-        "startTime": 10596.57,
-        "name": "lh:driver:navigate",
-        "duration": 2698.96,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 13299.77,
-        "name": "lh:computed:NetworkRecords",
-        "duration": 0.97,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 13301.53,
-        "name": "lh:gather:getArtifact:DevtoolsLog",
-        "duration": 0.35,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 13301.9,
-        "name": "lh:gather:getArtifact:Accessibility",
-        "duration": 268.87,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 13571.15,
-        "name": "lh:gather:getArtifact:NetworkUserAgent",
-        "duration": 0.43,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 13571.61,
-        "name": "lh:gather:getArtifact:Stacks",
-        "duration": 20.94,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 13571.95,
-        "name": "lh:gather:collectStacks",
-        "duration": 20.56,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 13592.56,
-        "name": "lh:gather:getArtifact:FullPageScreenshot",
-        "duration": 1175.77,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14763.01,
-        "name": "lh:gather:getVersion",
-        "duration": 1.12,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14800.83,
-        "name": "lh:runner:audit",
-        "duration": 356.64,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14801,
-        "name": "lh:runner:auditing",
-        "duration": 355.67,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14804.08,
-        "name": "lh:audit:accesskeys",
-        "duration": 4.21,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14809.58,
-        "name": "lh:audit:aria-allowed-attr",
-        "duration": 14.99,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14825.2,
-        "name": "lh:audit:aria-allowed-role",
-        "duration": 2.33,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14828.09,
-        "name": "lh:audit:aria-command-name",
-        "duration": 2.57,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14831.25,
-        "name": "lh:audit:aria-conditional-attr",
-        "duration": 9.08,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14840.75,
-        "name": "lh:audit:aria-deprecated-role",
-        "duration": 2.07,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14843.21,
-        "name": "lh:audit:aria-dialog-name",
-        "duration": 2.02,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14845.69,
-        "name": "lh:audit:aria-hidden-body",
-        "duration": 6.48,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14852.74,
-        "name": "lh:audit:aria-hidden-focus",
-        "duration": 2.64,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14855.78,
-        "name": "lh:audit:aria-input-field-name",
-        "duration": 2.52,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14858.7,
-        "name": "lh:audit:aria-meter-name",
-        "duration": 2.14,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14861.24,
-        "name": "lh:audit:aria-progressbar-name",
-        "duration": 2.29,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14863.91,
-        "name": "lh:audit:aria-prohibited-attr",
-        "duration": 7.49,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14871.82,
-        "name": "lh:audit:aria-required-attr",
-        "duration": 2.65,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14874.9,
-        "name": "lh:audit:aria-required-children",
-        "duration": 2.68,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14877.99,
-        "name": "lh:audit:aria-required-parent",
-        "duration": 2.72,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14881.1,
-        "name": "lh:audit:aria-roles",
-        "duration": 3.24,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14884.73,
-        "name": "lh:audit:aria-text",
-        "duration": 3,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14888.13,
-        "name": "lh:audit:aria-toggle-field-name",
-        "duration": 3.02,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14891.51,
+        "startTime": 15376.66,
         "name": "lh:audit:aria-tooltip-name",
-        "duration": 2.9,
+        "duration": 3.76,
         "entryType": "measure"
       },
       {
-        "startTime": 14894.85,
+        "startTime": 15380.93,
         "name": "lh:audit:aria-treeitem-name",
-        "duration": 3.94,
+        "duration": 3.34,
         "entryType": "measure"
       },
       {
-        "startTime": 14899.15,
+        "startTime": 15384.63,
         "name": "lh:audit:aria-valid-attr-value",
-        "duration": 6.85,
+        "duration": 7.02,
         "entryType": "measure"
       },
       {
-        "startTime": 14906.39,
+        "startTime": 15392.08,
         "name": "lh:audit:aria-valid-attr",
-        "duration": 6.12,
+        "duration": 8.64,
         "entryType": "measure"
       },
       {
-        "startTime": 14912.98,
+        "startTime": 15401.1,
         "name": "lh:audit:button-name",
-        "duration": 11.51,
+        "duration": 10.86,
         "entryType": "measure"
       },
       {
-        "startTime": 14925.12,
+        "startTime": 15412.66,
         "name": "lh:audit:bypass",
-        "duration": 6.53,
+        "duration": 7.86,
         "entryType": "measure"
       },
       {
-        "startTime": 14932.05,
+        "startTime": 15420.88,
         "name": "lh:audit:color-contrast",
-        "duration": 6.49,
+        "duration": 6.03,
         "entryType": "measure"
       },
       {
-        "startTime": 14938.89,
+        "startTime": 15427.28,
         "name": "lh:audit:definition-list",
-        "duration": 3.46,
+        "duration": 3.43,
         "entryType": "measure"
       },
       {
-        "startTime": 14942.72,
+        "startTime": 15431.11,
         "name": "lh:audit:dlitem",
+        "duration": 3.75,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15435.26,
+        "name": "lh:audit:document-title",
+        "duration": 13.27,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15449.19,
+        "name": "lh:audit:duplicate-id-aria",
+        "duration": 3.3,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15452.84,
+        "name": "lh:audit:empty-heading",
+        "duration": 6.01,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15459.26,
+        "name": "lh:audit:form-field-multiple-labels",
+        "duration": 7.27,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15466.86,
+        "name": "lh:audit:frame-title",
         "duration": 3.39,
         "entryType": "measure"
       },
       {
-        "startTime": 14946.67,
-        "name": "lh:audit:document-title",
-        "duration": 5.45,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14952.67,
-        "name": "lh:audit:duplicate-id-aria",
-        "duration": 3.47,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14956.47,
-        "name": "lh:audit:empty-heading",
-        "duration": 6.14,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14962.97,
-        "name": "lh:audit:form-field-multiple-labels",
-        "duration": 5.26,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14968.56,
-        "name": "lh:audit:frame-title",
-        "duration": 3.28,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 14972.17,
+        "startTime": 15470.59,
         "name": "lh:audit:heading-order",
-        "duration": 5.91,
+        "duration": 5.89,
         "entryType": "measure"
       },
       {
-        "startTime": 14978.43,
+        "startTime": 15476.85,
         "name": "lh:audit:html-has-lang",
-        "duration": 5.35,
+        "duration": 8.2,
         "entryType": "measure"
       },
       {
-        "startTime": 14984.1,
+        "startTime": 15485.42,
         "name": "lh:audit:html-lang-valid",
-        "duration": 6.5,
+        "duration": 5.7,
         "entryType": "measure"
       },
       {
-        "startTime": 14990.98,
+        "startTime": 15491.53,
         "name": "lh:audit:html-xml-lang-mismatch",
-        "duration": 3.57,
+        "duration": 4.61,
         "entryType": "measure"
       },
       {
-        "startTime": 14994.9,
+        "startTime": 15496.69,
         "name": "lh:audit:identical-links-same-purpose",
-        "duration": 5.18,
+        "duration": 6.12,
         "entryType": "measure"
       },
       {
-        "startTime": 15000.43,
+        "startTime": 15503.21,
         "name": "lh:audit:image-alt",
-        "duration": 4.52,
+        "duration": 3.55,
         "entryType": "measure"
       },
       {
-        "startTime": 15005.6,
+        "startTime": 15507.44,
         "name": "lh:audit:image-redundant-alt",
-        "duration": 4.47,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15019.7,
-        "name": "lh:audit:input-button-name",
-        "duration": 6.59,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15026.68,
-        "name": "lh:audit:input-image-alt",
-        "duration": 3.61,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15030.63,
-        "name": "lh:audit:label-content-name-mismatch",
-        "duration": 3.87,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15034.87,
-        "name": "lh:audit:label",
-        "duration": 6.9,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15042.11,
-        "name": "lh:audit:landmark-one-main",
-        "duration": 4.83,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15047.26,
-        "name": "lh:audit:link-name",
-        "duration": 5.95,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15053.79,
-        "name": "lh:audit:link-in-text-block",
-        "duration": 3.91,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15058.06,
-        "name": "lh:audit:list",
-        "duration": 3.97,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15062.35,
-        "name": "lh:audit:listitem",
-        "duration": 4.24,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15066.93,
-        "name": "lh:audit:meta-refresh",
-        "duration": 6.81,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15074.09,
-        "name": "lh:audit:meta-viewport",
-        "duration": 5.45,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15079.85,
-        "name": "lh:audit:object-alt",
-        "duration": 5.54,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15086.02,
-        "name": "lh:audit:select-name",
-        "duration": 5.98,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15092.32,
-        "name": "lh:audit:skip-link",
-        "duration": 4.46,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15097.16,
-        "name": "lh:audit:tabindex",
-        "duration": 5.07,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15102.56,
-        "name": "lh:audit:table-duplicate-name",
-        "duration": 6.86,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15109.83,
-        "name": "lh:audit:table-fake-caption",
-        "duration": 6.31,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15116.5,
-        "name": "lh:audit:target-size",
         "duration": 6.51,
         "entryType": "measure"
       },
       {
-        "startTime": 15123.42,
+        "startTime": 15514.74,
+        "name": "lh:audit:input-button-name",
+        "duration": 4.2,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15519.33,
+        "name": "lh:audit:input-image-alt",
+        "duration": 4.69,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15524.4,
+        "name": "lh:audit:label-content-name-mismatch",
+        "duration": 4.34,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15529.09,
+        "name": "lh:audit:label",
+        "duration": 6.02,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15535.46,
+        "name": "lh:audit:landmark-one-main",
+        "duration": 6.69,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15542.48,
+        "name": "lh:audit:link-name",
+        "duration": 5.77,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15567.48,
+        "name": "lh:audit:link-in-text-block",
+        "duration": 4.78,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15572.83,
+        "name": "lh:audit:list",
+        "duration": 4.34,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15577.53,
+        "name": "lh:audit:listitem",
+        "duration": 4.84,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15582.71,
+        "name": "lh:audit:meta-refresh",
+        "duration": 6.42,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15589.59,
+        "name": "lh:audit:meta-viewport",
+        "duration": 5.37,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15595.28,
+        "name": "lh:audit:object-alt",
+        "duration": 7.9,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15603.85,
+        "name": "lh:audit:select-name",
+        "duration": 8.05,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15612.53,
+        "name": "lh:audit:skip-link",
+        "duration": 9.93,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15623.18,
+        "name": "lh:audit:tabindex",
+        "duration": 4.43,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15627.94,
+        "name": "lh:audit:table-duplicate-name",
+        "duration": 7.62,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15635.95,
+        "name": "lh:audit:table-fake-caption",
+        "duration": 5.25,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15641.55,
+        "name": "lh:audit:target-size",
+        "duration": 6.24,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15648.8,
         "name": "lh:audit:td-has-header",
-        "duration": 5.74,
+        "duration": 4.75,
         "entryType": "measure"
       },
       {
-        "startTime": 15129.6,
+        "startTime": 15653.9,
         "name": "lh:audit:td-headers-attr",
-        "duration": 5.63,
+        "duration": 5.1,
         "entryType": "measure"
       },
       {
-        "startTime": 15135.58,
+        "startTime": 15659.38,
         "name": "lh:audit:th-has-data-cells",
-        "duration": 6.5,
+        "duration": 7.74,
         "entryType": "measure"
       },
       {
-        "startTime": 15142.45,
+        "startTime": 15667.5,
         "name": "lh:audit:valid-lang",
-        "duration": 5.54,
+        "duration": 5,
         "entryType": "measure"
       },
       {
-        "startTime": 15148.32,
+        "startTime": 15672.84,
         "name": "lh:audit:video-caption",
-        "duration": 5.48,
+        "duration": 5,
         "entryType": "measure"
       },
       {
-        "startTime": 15153.87,
+        "startTime": 15677.88,
         "name": "lh:audit:custom-controls-labels",
-        "duration": 0.47,
+        "duration": 0.43,
         "entryType": "measure"
       },
       {
-        "startTime": 15154.36,
+        "startTime": 15678.34,
         "name": "lh:audit:custom-controls-roles",
-        "duration": 0.29,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15154.68,
-        "name": "lh:audit:focus-traps",
-        "duration": 0.25,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15154.95,
-        "name": "lh:audit:focusable-controls",
-        "duration": 0.25,
-        "entryType": "measure"
-      },
-      {
-        "startTime": 15155.23,
-        "name": "lh:audit:interactive-element-affordance",
         "duration": 0.23,
         "entryType": "measure"
       },
       {
-        "startTime": 15155.48,
+        "startTime": 15678.59,
+        "name": "lh:audit:focus-traps",
+        "duration": 0.21,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15678.82,
+        "name": "lh:audit:focusable-controls",
+        "duration": 0.17,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15679.01,
+        "name": "lh:audit:interactive-element-affordance",
+        "duration": 0.21,
+        "entryType": "measure"
+      },
+      {
+        "startTime": 15679.24,
         "name": "lh:audit:logical-tab-order",
-        "duration": 0.21,
+        "duration": 0.24,
         "entryType": "measure"
       },
       {
-        "startTime": 15155.71,
+        "startTime": 15679.59,
         "name": "lh:audit:managed-focus",
-        "duration": 0.21,
+        "duration": 1.1,
         "entryType": "measure"
       },
       {
-        "startTime": 15155.94,
+        "startTime": 15680.8,
         "name": "lh:audit:offscreen-content-hidden",
-        "duration": 0.2,
+        "duration": 1.08,
         "entryType": "measure"
       },
       {
-        "startTime": 15156.16,
+        "startTime": 15682.01,
         "name": "lh:audit:use-landmarks",
-        "duration": 0.2,
+        "duration": 0.74,
         "entryType": "measure"
       },
       {
-        "startTime": 15156.38,
+        "startTime": 15682.8,
         "name": "lh:audit:visual-order-follows-dom",
-        "duration": 0.26,
+        "duration": 0.3,
         "entryType": "measure"
       },
       {
-        "startTime": 15156.68,
+        "startTime": 15683.17,
         "name": "lh:runner:generate",
-        "duration": 0.77,
+        "duration": 1.04,
         "entryType": "measure"
       },
       {
-        "startTime": 15158.41,
+        "startTime": 15685.22,
         "name": "lh:computed:EntityClassification",
-        "duration": 1.84,
+        "duration": 1.99,
         "entryType": "measure"
       }
     ],
-    "total": 5761.06
+    "total": 6307.62
   },
   "i18n": {
     "rendererFormattedStrings": {
@@ -2140,7 +2524,7 @@
       "core/audits/accessibility/bypass.js | description": [
         "audits.bypass.description"
       ],
-      "core/audits/accessibility/color-contrast.js | title": [
+      "core/audits/accessibility/color-contrast.js | failureTitle": [
         "audits[color-contrast].title"
       ],
       "core/audits/accessibility/color-contrast.js | description": [

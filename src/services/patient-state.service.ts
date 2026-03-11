@@ -32,16 +32,32 @@ export class PatientStateService {
   readonly requestedResearchQuery = signal<string | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
-  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'mind'>('skin');
+  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<DraftSummaryItem[]>([]);
 
   // --- Patient Data State ---
   readonly issues = signal<Record<string, BodyPartIssue[]>>({});
   readonly patientGoals = signal<string>("");
-  readonly vitals = signal<PatientVitals>({
-    bp: '', hr: '', temp: '', spO2: '', weight: '', height: ''
-  });
+  readonly    vitals = signal<PatientVitals>({
+        bp: '',
+        hr: '',
+        temp: '',
+        spO2: '',
+        weight: '',
+        height: '',
+        vitC: '',
+        vitD3: '',
+        magnesium: '',
+        zinc: '',
+        b12: ''
+    });
+
+    readonly dynamicNutrients = signal<import('./patient.types').DynamicMarker[]>([]);
+  readonly oxidativeStressMarkers = signal<import('./patient.types').DynamicMarker[]>([]);
+  readonly antioxidantSources = signal<import('./patient.types').DynamicMarker[]>([]);
+  readonly medications = signal<import('./patient.types').DynamicMarker[]>([]);
+  
   readonly clinicalNotes = signal<ClinicalNote[]>([]);
   readonly checklist = signal<ChecklistItem[]>([]);
   readonly biometricHistory = signal<BiometricEntry[]>([]);
@@ -140,13 +156,80 @@ export class PatientStateService {
     this.patientGoals.set(goals);
   }
 
-  updateVital(field: keyof PatientVitals, value: string) {
-    this.vitals.update(current => ({
-      ...current,
-      [field]: value
-    }));
-  }
+    updateVital(key: keyof PatientVitals, value: string) {
+        this.vitals.update(vitals => ({ ...vitals, [key]: value }));
+    }
 
+    addDynamicNutrient() {
+        this.dynamicNutrients.update(nutrients => [
+            ...nutrients, 
+            { id: Date.now().toString(), name: '', value: '' }
+        ]);
+    }
+
+    updateDynamicNutrient(id: string, field: 'name' | 'value', value: string) {
+        this.dynamicNutrients.update(nutrients => 
+            nutrients.map(n => n.id === id ? { ...n, [field]: value } : n)
+        );
+    }
+
+    removeDynamicNutrient(id: string) {
+        this.dynamicNutrients.update(nutrients => nutrients.filter(n => n.id !== id));
+    }
+    
+    // --- Oxidative Stress Markers ---
+    addOxidativeStressMarker() {
+        this.oxidativeStressMarkers.update(markers => [
+            ...markers, 
+            { id: Date.now().toString(), name: '', value: '' }
+        ]);
+    }
+
+    updateOxidativeStressMarker(id: string, field: 'name' | 'value', value: string) {
+        this.oxidativeStressMarkers.update(markers => 
+            markers.map(n => n.id === id ? { ...n, [field]: value } : n)
+        );
+    }
+
+    removeOxidativeStressMarker(id: string) {
+        this.oxidativeStressMarkers.update(markers => markers.filter(n => n.id !== id));
+    }
+
+    // --- Antioxidant Sources ---
+    addAntioxidantSource() {
+        this.antioxidantSources.update(sources => [
+            ...sources, 
+            { id: Date.now().toString(), name: '', value: '' }
+        ]);
+    }
+
+    updateAntioxidantSource(id: string, field: 'name' | 'value', value: string) {
+        this.antioxidantSources.update(sources => 
+            sources.map(n => n.id === id ? { ...n, [field]: value } : n)
+        );
+    }
+
+    removeAntioxidantSource(id: string) {
+        this.antioxidantSources.update(sources => sources.filter(n => n.id !== id));
+    }
+
+    // --- Medications ---
+    addMedication() {
+        this.medications.update(meds => [
+            ...meds, 
+            { id: Date.now().toString(), name: '', value: '' }
+        ]);
+    }
+
+    updateMedication(id: string, field: 'name' | 'value', value: string) {
+        this.medications.update(meds => 
+            meds.map(n => n.id === id ? { ...n, [field]: value } : n)
+        );
+    }
+
+    removeMedication(id: string) {
+        this.medications.update(meds => meds.filter(n => n.id !== id));
+    }
   updateActivePatientSummary(plan: string | null) {
     this.activePatientSummary.set(plan);
   }
@@ -239,7 +322,14 @@ export class PatientStateService {
     this.isResearchFrameVisible.set(false);
     this.issues.set({});
     this.patientGoals.set('');
-    this.vitals.set({ bp: '', hr: '', temp: '', spO2: '', weight: '', height: '' });
+        this.vitals.set({
+            bp: '', hr: '', temp: '', spO2: '', weight: '', height: '',
+            vitC: '', vitD3: '', magnesium: '', zinc: '', b12: ''
+        });
+        this.dynamicNutrients.set([]);
+        this.oxidativeStressMarkers.set([]);
+        this.antioxidantSources.set([]);
+        this.medications.set([]);
     this.clinicalNotes.set([]);
     this.checklist.set([]);
     this.activePatientSummary.set(null);
@@ -264,8 +354,12 @@ export class PatientStateService {
   loadState(state: PatientState) {
     this.clearState(); // Start from a clean slate
     this.issues.set(state.issues);
-    this.patientGoals.set(state.patientGoals);
-    this.vitals.set(state.vitals);
+        if (state.patientGoals) this.patientGoals.set(state.patientGoals);
+        if (state.vitals) this.vitals.set(state.vitals);
+        if (state.dynamicNutrients) this.dynamicNutrients.set(state.dynamicNutrients);
+        if (state.oxidativeStressMarkers) this.oxidativeStressMarkers.set(state.oxidativeStressMarkers);
+        if (state.antioxidantSources) this.antioxidantSources.set(state.antioxidantSources);
+        if (state.medications) this.medications.set(state.medications);
     this.clinicalNotes.set(state.clinicalNotes || []);
     this.checklist.set(state.checklist || []);
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
@@ -274,12 +368,16 @@ export class PatientStateService {
   /** Returns the current patient state for saving. */
   getCurrentState(): PatientState {
     return {
-      issues: this.issues(),
-      patientGoals: this.patientGoals(),
-      vitals: this.vitals(),
-      clinicalNotes: this.clinicalNotes(),
-      checklist: this.checklist(),
-    };
+            issues: this.issues(),
+            patientGoals: this.patientGoals(),
+            vitals: this.vitals(),
+            dynamicNutrients: this.dynamicNutrients(),
+            oxidativeStressMarkers: this.oxidativeStressMarkers(),
+            antioxidantSources: this.antioxidantSources(),
+            medications: this.medications(),
+            clinicalNotes: this.clinicalNotes(),
+            checklist: this.checklist(),
+        };
   }
 
 
@@ -300,9 +398,26 @@ export class PatientStateService {
     - HR: ${vitals.hr || 'N/A'}
     - Temp: ${vitals.temp || 'N/A'}
     - SpO2: ${vitals.spO2 || 'N/A'}
-    - Weight: ${vitals.weight || 'N/A'}
-    - Height: ${vitals.height || 'N/A'}
-    `;
+    - Weight: ${vitals.weight || 'N/A'}, Height: ${vitals.height || 'N/A'}
+- Vitamin C: ${vitals.vitC || 'N/A'}
+- Vitamin D3: ${vitals.vitD3 || 'N/A'}
+- Magnesium: ${vitals.magnesium || 'N/A'}
+- Zinc: ${vitals.zinc || 'N/A'}
+- Vitamin B12: ${vitals.b12 || 'N/A'}
+
+Dynamic Nutrients:
+${this.dynamicNutrients().length > 0 ? this.dynamicNutrients().map(m => `- ${m.name}: ${m.value}`).join('\n') : 'None recorded'}
+
+Oxidative Stress Markers:
+${this.oxidativeStressMarkers().length > 0 ? this.oxidativeStressMarkers().map(m => `- ${m.name}: ${m.value}`).join('\n') : 'None recorded'}
+
+Antioxidant Sources:
+${this.antioxidantSources().length > 0 ? this.antioxidantSources().map(m => `- ${m.name}: ${m.value}`).join('\n') : 'None recorded'}
+
+Active Medications:
+${this.medications().length > 0 ? this.medications().map(m => `- ${m.name}: ${m.value}`).join('\n') : 'None recorded'}
+
+Pain Areas:   `;
 
     // 3. Historical Context (Last 3 visits and recent notes)
     const recentHistory = patientHistory

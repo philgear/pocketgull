@@ -25,10 +25,10 @@ export interface ChatEntry {
     imports: [CommonModule, FormsModule, PocketGullButtonComponent, PocketGullInputComponent, SafeHtmlPipe, Medical3DViewerComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div class="h-full bg-white z-10 flex flex-col no-print w-full">
+        <div class="h-full bg-white dark:bg-[#09090b] z-10 flex flex-col no-print w-full">
             
             <!-- Panel Header -->
-            <div class="flex items-center justify-between px-4 sm:px-6 py-4 lg:px-12 h-16 shrink-0 z-20 relative bg-white border-b border-gray-100">
+            <div class="flex items-center justify-between px-4 sm:px-6 py-4 lg:px-12 h-16 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800">
                 <div class="flex items-center gap-2 sm:gap-4 min-w-0">
                     <div class="flex items-center gap-3">
                         <svg width="24" height="24" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,13 +43,13 @@ export interface ChatEntry {
                              </g>
                            </g>
                         </svg>
-                        <span class="font-medium text-[#1C1C1C] tracking-[0.1em] sm:tracking-[0.15em] text-[10px] sm:text-sm uppercase truncate">Pocket Gull Intelligence</span>
+                        <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.1em] sm:tracking-[0.15em] text-[10px] sm:text-sm uppercase truncate">Pocket Gull Intelligence</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <button
                         (click)="isMuted.set(!isMuted())"
-                        class="text-gray-400 hover:text-black flex items-center justify-center transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
+                        class="text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                         title="Toggle Sound">
                         @if (isMuted()) {
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -64,7 +64,7 @@ export interface ChatEntry {
                     </button>
                     <button
                         (click)="endLiveConsult()"
-                        class="text-gray-400 hover:text-black flex items-center gap-1 sm:gap-2 transition-colors uppercase text-[10px] sm:text-xs font-bold tracking-wider sm:tracking-widest px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 shrink-0"
+                        class="text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-white flex items-center gap-1 sm:gap-2 transition-colors uppercase text-[10px] sm:text-xs font-bold tracking-wider sm:tracking-widest px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 shrink-0"
                         title="Close Voice Assistant">
                         <span class="hidden sm:inline">Close Session</span>
                         <span class="sm:hidden">Close</span>
@@ -75,14 +75,14 @@ export interface ChatEntry {
 
             <!-- MODE: SELECTION Placeholder (Removed, mostly skips strait to chat) -->
             @if (panelMode() === 'selection') {
-                <div class="flex-1 flex flex-col items-center justify-center gap-6 p-8 bg-white w-full"></div>
+                <div class="flex-1 flex flex-col items-center justify-center gap-6 p-8 bg-white dark:bg-[#09090b] w-full"></div>
             }
 
             <!-- MODE: CHAT -->
             @if (panelMode() === 'chat') {
-                <div class="flex-1 flex flex-col items-center justify-center overflow-hidden bg-white w-full relative">
+                <div class="flex-1 flex flex-col items-center justify-center overflow-hidden bg-white dark:bg-[#09090b] w-full relative">
                     <!-- Transcript Center Column -->
-                    <div #transcriptContainer class="flex-1 overflow-y-auto w-full scroll-smooth pt-8 lg:pt-16 pb-32 px-4 lg:px-8 bg-white">
+                    <div #transcriptContainer class="flex-1 overflow-y-auto w-full scroll-smooth pt-8 lg:pt-16 pb-32 px-4 lg:px-8 bg-white dark:bg-[#09090b]">
                         <div class="max-w-3xl mx-auto space-y-12">
                             
 

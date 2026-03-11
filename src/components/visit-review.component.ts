@@ -17,12 +17,12 @@ interface NotesByPart {
   imports: [CommonModule, PocketGullButtonComponent, PocketGullBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="h-full flex flex-col bg-white">
+    <div class="h-full flex flex-col bg-white dark:bg-[#09090b]">
       <!-- Header -->
-      <div class="h-14 border-b border-[#EEEEEE] flex items-center justify-between px-6 bg-white shrink-0">
+      <div class="h-14 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-[#09090b] shrink-0">
         <div class="flex flex-col">
-           <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Visit Review</span>
-           <span class="text-xs text-gray-500">Read-only view of notes from {{ visit().date }}</span>
+           <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Visit Review</span>
+           <span class="text-xs text-gray-500 dark:text-zinc-500">Read-only view of notes from {{ visit().date }}</span>
         </div>
         <pocket-gull-button 
            (click)="close()" 
@@ -34,14 +34,14 @@ interface NotesByPart {
 
       <div class="flex-1 overflow-y-auto p-8 space-y-8">
         <div>
-          <h2 class="text-2xl font-light text-[#1C1C1C] mb-1">Visit Summary</h2>
-          <p class="text-sm text-gray-600 italic">"{{ visit().summary }}"</p>
+          <h2 class="text-2xl font-light text-[#1C1C1C] dark:text-zinc-100 mb-1">Visit Summary</h2>
+          <p class="text-sm text-gray-600 dark:text-zinc-400 italic">"{{ visit().summary }}"</p>
         </div>
 
-        <div class="pt-8 border-t border-[#EEEEEE] space-y-6">
+        <div class="pt-8 border-t border-[#EEEEEE] dark:border-zinc-800 space-y-6">
             @for (part of notesByPart(); track part.partId) {
                 <div>
-                    <h3 class="text-sm font-bold text-[#1C1C1C] mb-3">{{ part.partName }}</h3>
+                    <h3 class="text-sm font-bold text-[#1C1C1C] dark:text-zinc-100 mb-3">{{ part.partName }}</h3>
                     <div class="space-y-2">
                         @for(note of part.notes; track note.noteId) {
                             <pocket-gull-button 
@@ -50,7 +50,7 @@ interface NotesByPart {
                                     size="md"
                                     class="w-full text-left">
                                 <div class="flex justify-between items-center w-full">
-                                    <p class="font-medium text-gray-800 flex-1 pr-4 text-xs text-left normal-case tracking-normal">{{ note.description || 'No description provided.' }}</p>
+                                    <p class="font-medium text-gray-800 dark:text-zinc-100 flex-1 pr-4 text-xs text-left normal-case tracking-normal">{{ note.description || 'No description provided.' }}</p>
                                     <pocket-gull-badge [severity]="note.painLevel > 7 ? 'danger' : note.painLevel > 4 ? 'warning' : 'neutral'" size="sm">
                                         {{ note.painLevel }}/10
                                     </pocket-gull-badge>

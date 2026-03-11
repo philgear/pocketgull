@@ -102,6 +102,18 @@ export interface PatientVitals {
     spO2: string;    // Oxygen Saturation
     weight: string;
     height: string;
+    // Biochemical Telemetry
+    vitC?: string;
+    vitD3?: string;
+    magnesium?: string;
+    zinc?: string;
+    b12?: string;
+}
+
+export interface DynamicMarker {
+    id: string;
+    name: string;
+    value: string;
 }
 
 export interface BiometricEntry {
@@ -145,6 +157,10 @@ export interface PatientState {
     issues: Record<string, BodyPartIssue[]>;
     patientGoals: string;
     vitals: PatientVitals;
+    dynamicNutrients?: DynamicMarker[];
+    oxidativeStressMarkers?: DynamicMarker[];
+    antioxidantSources?: DynamicMarker[];
+    medications?: DynamicMarker[];
     biometricHistory?: BiometricEntry[];
     clinicalNotes?: ClinicalNote[];
     checklist?: ChecklistItem[];

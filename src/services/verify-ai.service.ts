@@ -14,6 +14,11 @@ export class VerifyAiService {
     private async getAi(): Promise<any> {
         if (!this._ai) {
             let initialKey = (window as any).GEMINI_API_KEY || this.config.apiKey;
+            if (!initialKey && typeof localStorage !== 'undefined') {
+                try {
+                    initialKey = localStorage.getItem('GEMINI_API_KEY');
+                } catch (e) { console.error("VerifyAiService: localStorage error", e); }
+            }
             if (!initialKey && typeof process !== 'undefined' && process.env) {
                 initialKey = process.env.GEMINI_API_KEY;
             }
@@ -93,7 +98,13 @@ INSTRUCTIONS:
                 }
             });
 
-            const text = response.text;
+            let text = response.text;
+            if (text.startsWith('```json')) {
+                text = text.replace(/^```json\n?/, '').replace(/```$/, '').trim();
+            } else if (text.startsWith('```')) {
+                text = text.replace(/^```\n?/, '').replace(/```$/, '').trim();
+            }
+            
             const result = JSON.parse(text);
             await this.cache.set(cacheKey, result);
             return result;

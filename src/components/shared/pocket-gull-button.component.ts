@@ -131,6 +131,62 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       padding: 1rem 2rem;
       font-size: 14px;
     }
+    
+    /* Dark Mode Defaults */
+    :host-context(.dark) .btn-primary,
+    :host-context(html.dark) .btn-primary {
+      background: #fafafa;
+      color: #09090b;
+      border-color: #fafafa;
+    }
+    :host-context(.dark) .btn-primary:not(:disabled):hover,
+    :host-context(html.dark) .btn-primary:not(:disabled):hover {
+      background: #8bc34a;
+      border-color: #8bc34a;
+      color: #09090b;
+    }
+    :host-context(.dark) .btn-secondary,
+    :host-context(html.dark) .btn-secondary {
+      background: #18181b;
+      color: #e4e4e7;
+      border-color: #27272a;
+    }
+    :host-context(.dark) .btn-secondary:not(:disabled):hover,
+    :host-context(html.dark) .btn-secondary:not(:disabled):hover {
+      background: #27272a;
+      color: #fafafa;
+      border-color: #3f3f46;
+    }
+    :host-context(.dark) .btn-danger,
+    :host-context(html.dark) .btn-danger {
+      background: #18181b;
+      color: #f87171;
+      border-color: #7f1d1d;
+    }
+    :host-context(.dark) .btn-danger:not(:disabled):hover,
+    :host-context(html.dark) .btn-danger:not(:disabled):hover {
+      background: #450a0a;
+      border-color: #991b1b;
+    }
+    :host-context(.dark) .btn-ghost,
+    :host-context(html.dark) .btn-ghost {
+      color: #a1a1aa;
+    }
+    :host-context(.dark) .btn-ghost:not(:disabled):hover,
+    :host-context(html.dark) .btn-ghost:not(:disabled):hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fafafa;
+    }
+    :host-context(.dark) .btn-outline,
+    :host-context(html.dark) .btn-outline {
+      color: #fafafa;
+      border-color: #fafafa;
+    }
+    :host-context(.dark) .btn-outline:not(:disabled):hover,
+    :host-context(html.dark) .btn-outline:not(:disabled):hover {
+      background: #fafafa;
+      color: #09090b;
+    }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

@@ -7,20 +7,20 @@ import { DomSanitizer } from '@angular/platform-browser';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="glass-card rounded-xl border border-white/20 shadow-lg relative h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/40">
+    <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-[12px] rounded-xl border border-white/20 shadow-lg relative h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/40">
       <!-- Glow Effect (Clipped to card bounds) -->
       <div class="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>
       </div>
       
-      <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between border-b border-white/10 shrink-0 relative z-10 min-w-0">
+      <div class="px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/50 shrink-0 relative z-10 min-w-0">
         <div class="flex items-center gap-2 sm:gap-3 min-w-0">
           @if (icon()) {
             <div class="w-8 h-8 rounded-lg bg-primary-10 flex items-center justify-center text-[#689F38]">
               <div [innerHTML]="iconHtml()"></div>
             </div>
           }
-          <h3 class="text-sm font-bold uppercase tracking-widest text-[#111827]">{{ title() }}</h3>
+          <h3 class="text-sm font-bold uppercase tracking-widest text-[#111827] dark:text-zinc-100">{{ title() }}</h3>
         </div>
         <ng-content select="[right-action]"></ng-content>
       </div>
@@ -30,23 +30,13 @@ import { DomSanitizer } from '@angular/platform-browser';
       </div>
       
       @if (footer()) {
-        <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-white/10 text-xs text-gray-500 bg-black/5">
+        <div class="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 dark:border-zinc-800/50 text-xs text-gray-500 dark:text-zinc-400 bg-black/5 dark:bg-zinc-800/50">
           <ng-content select="[card-footer]"></ng-content>
         </div>
       }
     </div>
   `,
   styles: [`
-    .glass-card {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    
-    :host-context(.dark) .glass-card {
-      background: rgba(30, 41, 59, 0.7);
-    }
-    
     .bg-primary-10 {
       background: rgba(104, 159, 56, 0.1);
     }

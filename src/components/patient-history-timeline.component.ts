@@ -35,17 +35,20 @@ const ICONS: Record<string, string> = {
   template: `
    <div class="relative font-sans">
       <!-- The vertical line running through all entries -->
-      <div class="absolute left-3 top-2 h-full w-px bg-gray-100"></div>
+      <div class="absolute left-3 top-2 h-full w-px bg-gray-100 dark:bg-zinc-800"></div>
 
       @for (entry of history(); track (entry.date + entry.summary + $index); let isLast = $last) {
         <div class="relative pl-10" [class.pb-6]="!isLast">
           
           <!-- Icon Node on the timeline -->
-          <div class="absolute left-3 top-2 -translate-x-1/2 w-6 h-6 rounded-full bg-white flex items-center justify-center border"
+          <div class="absolute left-3 top-2 -translate-x-1/2 w-6 h-6 rounded-full bg-white dark:bg-[#09090b] flex items-center justify-center border"
                [class.border-gray-300]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
-               [class.border-gray-200]="entry.type !== 'Visit' && entry.type !== 'ChartArchived'">
+               [class.dark:border-zinc-700]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
+               [class.border-gray-200]="entry.type !== 'Visit' && entry.type !== 'ChartArchived'"
+               [class.dark:border-zinc-800]="entry.type !== 'Visit' && entry.type !== 'ChartArchived'">
             <span class="inline-flex items-center justify-center w-3.5 h-3.5"
                  [class.text-[#1C1C1C]]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
+                 [class.dark:text-zinc-100]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
                  [class.text-blue-500]="entry.type === 'PatientSummaryUpdate' || entry.type === 'FinalizedPatientSummary'"
                  [class.text-yellow-500]="entry.type === 'BookmarkAdded'"
                  [class.text-purple-500]="entry.type === 'NoteCreated'"
@@ -62,17 +65,23 @@ const ICONS: Record<string, string> = {
                 <button (click)="review.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
+                        [class.dark:bg-zinc-900]="activeVisit() === entry"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
+                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
                         [class.bg-white]="activeVisit() !== entry"
+                        [class.dark:bg-[#09090b]]="activeVisit() !== entry"
                         [class.hover:bg-gray-50]="activeVisit() !== entry"
+                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
                         [class.border-l-gray-100]="activeVisit() !== entry"
+                        [class.dark:border-l-zinc-800]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
-                        [class.border-gray-100]="true">
+                        [class.border-gray-100]="true"
+                        [class.dark:border-zinc-800]="true">
                   <div class="flex justify-between items-start gap-4">
                     <div class="flex-1">
-                      <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                      <p class="text-sm text-[#1C1C1C] mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
+                      <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                      <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                     </div>
                   </div>
                 </button>
@@ -81,73 +90,84 @@ const ICONS: Record<string, string> = {
                 <button (click)="review.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
+                        [class.dark:bg-zinc-900]="activeVisit() === entry"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
+                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
                         [class.bg-white]="activeVisit() !== entry"
+                        [class.dark:bg-[#09090b]]="activeVisit() !== entry"
                         [class.hover:bg-gray-50]="activeVisit() !== entry"
+                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
                         [class.border-l-gray-100]="activeVisit() !== entry"
+                        [class.dark:border-l-zinc-800]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
-                        [class.border-gray-100]="true">
-                    <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                    <p class="text-sm text-[#1C1C1C] mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
+                        [class.border-gray-100]="true"
+                        [class.dark:border-zinc-800]="true">
+                    <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                    <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                 </button>
               }
               @case ('PatientSummaryUpdate') {
-                <div class="p-4 bg-white border border-gray-100 border-l-4 border-l-blue-400 rounded">
+                <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-blue-400 rounded">
                   <div>
                     <p class="text-xs font-bold text-blue-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                    <p class="text-sm text-gray-800 mt-1 leading-relaxed whitespace-pre-wrap font-mono text-[11px] opacity-80">{{ entry.summary }}</p>
+                    <p class="text-sm text-gray-800 dark:text-zinc-300 mt-1 leading-relaxed whitespace-pre-wrap font-mono text-[11px] opacity-80">{{ entry.summary }}</p>
                   </div>
                 </div>
               }
               @case ('BookmarkAdded') {
-                 <div class="p-4 bg-white border border-gray-100 border-l-4 border-l-yellow-400 rounded flex gap-3 items-start">
+                 <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-yellow-400 rounded flex gap-3 items-start">
                   <div class="flex-1">
-                    <p class="text-xs font-bold text-yellow-700 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                    <p class="text-sm text-gray-800 mt-1 leading-relaxed truncate font-light">Bookmarked: "{{ entry.summary }}"</p>
+                    <p class="text-xs font-bold text-yellow-700 dark:text-yellow-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                    <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed truncate font-light">Bookmarked: "{{ entry.summary }}"</p>
                     <button (click)="openBookmark.emit(entry.bookmark.url)" 
-                            class="mt-3 text-xs font-bold text-gray-500 bg-gray-50 border border-gray-100 px-3 py-1 rounded hover:bg-gray-100 hover:border-gray-200 transition-all uppercase tracking-widest">
+                            class="mt-3 text-xs font-bold text-gray-500 dark:text-zinc-400 bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-all uppercase tracking-widest">
                       Open
                     </button>
                   </div>
                 </div>
               }
               @case ('NoteCreated') {
-                <div class="group relative p-4 bg-white border border-gray-100 border-l-4 border-l-purple-400 rounded transition-colors hover:bg-gray-50/50">
+                <div class="group relative p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-purple-400 rounded transition-colors hover:bg-gray-50/50 dark:hover:bg-zinc-900/50">
                   <button (click)="reviewNote.emit(entry)" class="w-full text-left">
                     <p class="text-xs font-bold text-purple-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                    <p class="text-sm text-gray-800 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
+                    <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                   </button>
                   <button (click)="deleteNote.emit(entry)"
-                          class="absolute top-2 right-2 p-1 rounded-full text-gray-300 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                          class="absolute top-2 right-2 p-1 rounded-full text-gray-300 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                           title="Delete this note entry">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586 16.95 5.636a1 1 0 1 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414L10.586 12 5.636 7.05a1 1 0 0 1 1.414-1.414L12 10.586z"/></svg>
                   </button>
                 </div>
               }
                @case ('NoteDeleted') {
-                <div class="p-4 bg-white border border-gray-100 border-l-4 border-l-red-400 rounded">
+                <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-red-400 rounded">
                   <p class="text-xs font-bold text-red-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                  <p class="text-sm text-gray-500 mt-1 leading-relaxed italic font-light">{{ entry.summary }}</p>
+                  <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 leading-relaxed italic font-light">{{ entry.summary }}</p>
                 </div>
               }
               @case ('AnalysisRun') {
                 <button (click)="reviewAnalysis.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
+                        [class.dark:bg-zinc-900]="activeVisit() === entry"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
+                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
                         [class.bg-white]="activeVisit() !== entry"
+                        [class.dark:bg-[#09090b]]="activeVisit() !== entry"
                         [class.hover:bg-gray-50]="activeVisit() !== entry"
+                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
                         [class.border-l-green-400]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
-                        [class.border-gray-100]="true">
+                        [class.border-gray-100]="true"
+                        [class.dark:border-zinc-800]="true">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-50 text-green-700 uppercase tracking-[0.1em] border border-green-100">AI Report</span>
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 uppercase tracking-[0.1em] border border-green-100 dark:border-green-800/50">AI Report</span>
+                        <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
-                    <p class="text-sm text-gray-800 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
+                    <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                   </div>
                 </button>
               }
@@ -155,19 +175,24 @@ const ICONS: Record<string, string> = {
                 <button (click)="reviewAnalysis.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
+                        [class.dark:bg-zinc-900]="activeVisit() === entry"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
+                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
                         [class.bg-white]="activeVisit() !== entry"
+                        [class.dark:bg-[#09090b]]="activeVisit() !== entry"
                         [class.hover:bg-gray-50]="activeVisit() !== entry"
+                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
                         [class.border-l-blue-400]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
-                        [class.border-gray-100]="true">
+                        [class.border-gray-100]="true"
+                        [class.dark:border-zinc-800]="true">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-blue-50 text-blue-600 uppercase tracking-[0.1em] border border-blue-100">Patient Summary</span>
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 uppercase tracking-[0.1em] border border-blue-100 dark:border-blue-800/50">Patient Summary</span>
+                        <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
-                    <p class="text-sm text-[#1C1C1C] mt-1 leading-relaxed font-bold">{{ entry.summary }}</p>
+                    <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-bold">{{ entry.summary }}</p>
                   </div>
                 </button>
               }

@@ -58,6 +58,10 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
                     title="Mind View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
             </button>
+            <button (click)="state.anatomyViewMode.set('molecular')" [class.bg-black]="state.anatomyViewMode() === 'molecular'" [class.text-white]="state.anatomyViewMode() === 'molecular'"
+                    title="Molecular View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="3"></circle><path d="m14 14 6 6"></path><circle cx="20" cy="20" r="3"></circle><path d="m14 10 6-6"></path><circle cx="20" cy="4" r="3"></circle><path d="m10 14-6 6"></path><circle cx="4" cy="20" r="3"></circle><path d="m10 10-6-6"></path><circle cx="4" cy="4" r="3"></circle></svg>
+            </button>
           </div>
         </div>
 

@@ -94,6 +94,15 @@ import { RevealDirective } from '../directives/reveal.directive';
             class="rounded-none px-4 -mb-px shadow-none">
             Interventions
           </pocket-gull-button>
+          <pocket-gull-button (click)="changeLens('Orthomolecular Nutrition')"
+            variant="ghost"
+            size="sm"
+            [class.border-b-2]="activeLens() === 'Orthomolecular Nutrition'"
+            [class.border-[#1C1C1C]]="activeLens() === 'Orthomolecular Nutrition'"
+            [class.text-[#1C1C1C]]="activeLens() === 'Orthomolecular Nutrition'"
+            class="rounded-none px-4 -mb-px shadow-none">
+            Orthomolecular
+          </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Monitoring & Follow-up')"
             variant="ghost"
             size="sm"
@@ -505,8 +514,8 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
 
   private getIconForSection(title: string): string {
     const lower = title.toLowerCase();
-    if (lower.includes('assessment') || lower.includes('overview')) return ClinicalIcons.Assessment;
-    if (lower.includes('protocol') || lower.includes('intervention')) return ClinicalIcons.Medication;
+    if (lower.includes('assessment') || lower.includes('overview') || lower.includes('orthomolecular')) return ClinicalIcons.Assessment;
+    if (lower.includes('protocol') || lower.includes('intervention') || lower.includes('nutrition')) return ClinicalIcons.Medication;
     if (lower.includes('monitor') || lower.includes('cadence')) return ClinicalIcons.FollowUp;
     if (lower.includes('education') || lower.includes('resource')) return ClinicalIcons.Education;
     return ClinicalIcons.Assessment;

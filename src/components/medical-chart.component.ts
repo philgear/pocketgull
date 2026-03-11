@@ -17,19 +17,19 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
   imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="w-full min-h-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#F9FAFB]">
+    <div class="w-full min-h-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#F9FAFB] dark:bg-transparent">
  
        <!-- Review Mode Banner -->
       @if(isReviewMode() && state.viewingPastVisit(); as visit) {
-          <div class="bg-yellow-50 border border-yellow-200 p-4 flex justify-between items-center text-sm rounded-xl shadow-sm mb-2">
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/50 p-4 flex justify-between items-center text-sm rounded-xl shadow-sm mb-2">
               <div class="flex items-center gap-3">
-                  <div class="p-2 bg-yellow-100 rounded-sm text-yellow-700">
+                  <div class="p-2 bg-yellow-100 dark:bg-yellow-800/40 rounded-sm text-yellow-700 dark:text-yellow-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                   </div>
                   @if (visit.type === 'Visit' || visit.type === 'ChartArchived') {
-                    <span class="font-medium text-yellow-900">Reviewing past entry from <strong class="font-bold">{{ visit.date }}</strong>. All fields are read-only.</span>
+                    <span class="font-medium text-yellow-900 dark:text-yellow-100">Reviewing past entry from <strong class="font-bold">{{ visit.date }}</strong>. All fields are read-only.</span>
                   } @else {
-                     <span class="font-medium text-yellow-900">Reviewing past AI Analysis from <strong class="font-bold">{{ visit.date }}</strong>.</span>
+                     <span class="font-medium text-yellow-900 dark:text-yellow-100">Reviewing past AI Analysis from <strong class="font-bold">{{ visit.date }}</strong>.</span>
                   }
               </div>
               <pocket-gull-button 
@@ -53,11 +53,11 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
         </div>
 
         @if(isViewerExpanded()) {
-          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white shrink-0">
+          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-transparent shrink-0">
             @defer (on viewport) {
               <app-body-viewer></app-body-viewer>
             } @placeholder {
-              <div class="h-full w-full flex items-center justify-center text-gray-500 bg-gray-50/50">
+              <div class="h-full w-full flex items-center justify-center text-gray-500 dark:text-zinc-400 bg-gray-50/50 dark:bg-zinc-800/50">
                 <div class="flex flex-col items-center gap-3">
                   <div class="w-6 h-6 border-2 border-gray-200 border-t-[#689F38] rounded-sm animate-spin"></div>
                   <span class="text-xs uppercase tracking-widest font-bold">Loading 3D Viewer...</span>
@@ -79,7 +79,7 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
         </div>
 
         @if(isSummaryExpanded()) {
-          <div class="bg-white shrink-0 min-h-0 min-w-0 border-b border-gray-100 last:border-0 p-0">
+          <div class="bg-white dark:bg-zinc-900 shrink-0 min-h-0 min-w-0 border-b border-gray-100 dark:border-zinc-800 last:border-0 p-0">
              <app-medical-summary class="block"></app-medical-summary>
           </div>
         }
@@ -152,7 +152,7 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
         </div>
 
         @if(isScansExpanded()) {
-          <div class="p-6 bg-[#F9FAFB]/50 border-b border-gray-100 last:border-0 min-h-0">
+          <div class="p-6 bg-[#F9FAFB]/50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 last:border-0 min-h-0">
              <app-patient-scans [scans]="patientScans()"></app-patient-scans>
           </div>
         }
@@ -173,23 +173,9 @@ export class MedicalChartComponent {
 
   constructor() {
     effect(() => {
-      // depend on history to trigger scroll
+      // depend on history but do NOT force scroll on load to avoid jarring layout jumps
       const history = this.filteredHistory();
-      if (history && isPlatformBrowser(this.platformId)) {
-        // Use requestAnimationFrame to avoid synchronous layout thrashing (forced reflows)
-        requestAnimationFrame(() => {
-          // Scroll the inner container
-          const histEl = this.historyContainer()?.nativeElement;
-          if (histEl && typeof histEl.scrollTo === 'function') {
-            histEl.scrollTo({ top: histEl.scrollHeight, behavior: 'smooth' });
-          }
-          // Scroll the host container, which has overflow-y-auto applied from app.component.ts
-          const mainEl = this.el.nativeElement as HTMLElement;
-          if (mainEl && typeof mainEl.scrollTo === 'function') {
-            mainEl.scrollTo({ top: mainEl.scrollHeight, behavior: 'smooth' });
-          }
-        });
-      }
+      // Unwanted scroll logic removed: The user wants to view the Medical Summary & 3D Viewer at the top upon load.
     });
   }
 

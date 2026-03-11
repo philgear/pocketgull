@@ -25,6 +25,19 @@ const MOCK_PATIENTS: Patient[] = [
     preexistingConditions: ['Essential Hypertension', 'Type 2 Diabetes Mellitus', 'Obesity (BMI 42)', 'Severe Obstructive Sleep Apnea', 'Metabolic Syndrome'],
     patientGoals: 'Discuss CPAP compliance issues and weight management strategies.',
     vitals: { bp: '152/95', hr: '88', temp: '98.4°F', spO2: '94%', weight: '295 lbs', height: `5'10"` },
+    oxidativeStressMarkers: [
+      { id: '1', name: 'Malondialdehyde (MDA)', value: '3.8 μmol/L' },
+      { id: '2', name: 'F2-Isoprostanes', value: '45 pg/mg creatinine' }
+    ],
+    antioxidantSources: [
+      { id: '1', name: 'Glutathione (GSH)', value: '1.2 μmol/g Hb' },
+      { id: '2', name: 'CoQ10', value: '0.45 μg/mL' }
+    ],
+    medications: [
+      { id: '1', name: 'Lisinopril', value: '20mg Daily' },
+      { id: '2', name: 'Metformin', value: '1000mg BID' },
+      { id: '3', name: 'Atorvastatin', value: '40mg Daily' }
+    ],
     issues: {
       'chest': [{ id: 'chest', noteId: 'note_p001_chest_1', name: 'Chest & Lungs', painLevel: 1, description: 'Reports waking up gasping for air frequently. Daytime somnolence affecting work performance.', symptoms: [] }],
       'head': [{ id: 'head', noteId: 'note_p001_head_1', name: 'Head & Neck', painLevel: 2, description: 'Morning headaches nearly every day, likely secondary to hypoxemia and OSA.', symptoms: [] }]
@@ -37,6 +50,17 @@ const MOCK_PATIENTS: Patient[] = [
         state: {
           patientGoals: 'Review sleep study results.',
           vitals: { bp: '148/92', hr: '85', temp: '98.6°F', spO2: '96%', weight: '298 lbs', height: `5'10"` },
+          oxidativeStressMarkers: [
+            { id: '1', name: 'Malondialdehyde (MDA)', value: '3.6 μmol/L' }
+          ],
+          antioxidantSources: [
+            { id: '1', name: 'Glutathione (GSH)', value: '1.4 μmol/g Hb' }
+          ],
+          medications: [
+            { id: '1', name: 'Lisinopril', value: '20mg Daily' },
+            { id: '2', name: 'Metformin', value: '1000mg BID' },
+            { id: '3', name: 'Atorvastatin', value: '40mg Daily' }
+          ],
           issues: {}
         }
       }
@@ -64,6 +88,16 @@ const MOCK_PATIENTS: Patient[] = [
     preexistingConditions: ['Asthma', 'Anxiety Disorder', 'Chronic Lower Back Pain', 'Opioid Use Disorder (in remission)', 'Depression'],
     patientGoals: 'Seeking alternative pain management options to avoid opioid relapse.',
     vitals: { bp: '118/72', hr: '76', temp: '98.2°F', spO2: '99%', weight: '145 lbs', height: `5'5"` },
+    oxidativeStressMarkers: [],
+    antioxidantSources: [
+      { id: '1', name: 'Vitamin C', value: '1.2 mg/dL' }
+    ],
+    medications: [
+      { id: '1', name: 'Albuterol Inhaler', value: '2 puffs PRN' },
+      { id: '2', name: 'Sertraline', value: '50mg Daily' },
+      { id: '3', name: 'Gabapentin', value: '300mg TID' },
+      { id: '4', name: 'Ibuprofen', value: '600mg PRN MSK Pain' }
+    ],
     issues: {
       'mid_back': [{ id: 'mid_back', noteId: 'note_p002_back_1', name: 'Lower Back', painLevel: 7, description: 'Constant aching pain in L4-L5 region radiating to the left glute. Worsens with prolonged standing.', symptoms: [] }]
     },
@@ -75,6 +109,13 @@ const MOCK_PATIENTS: Patient[] = [
         state: {
           patientGoals: 'Need help managing flare-ups without medication.',
           vitals: { bp: '120/75', hr: '74', temp: '98.5°F', spO2: '99%', weight: '148 lbs', height: `5'5"` },
+          oxidativeStressMarkers: [],
+          antioxidantSources: [],
+          medications: [
+            { id: '1', name: 'Albuterol Inhaler', value: '2 puffs PRN' },
+            { id: '2', name: 'Sertraline', value: '50mg Daily' },
+            { id: '3', name: 'Gabapentin', value: '300mg TID' }
+          ],
           issues: { 'mid_back': [{ id: 'mid_back', noteId: 'note_p002_back_hist1', name: 'Lower Back', painLevel: 6, description: 'Pain has been increasing recently due to work stress.', symptoms: [] }] }
         }
       }
@@ -114,12 +155,45 @@ const MOCK_PATIENTS: Patient[] = [
     preexistingConditions: ['Ischemic Heart Disease', 'Chronic Kidney Disease', "Mild Cognitive Impairment / Early Alzheimer's", 'Osteoarthritis', 'Fall Risk'],
     patientGoals: 'Family requested evaluation for increased confusion and recent fall at home.',
     vitals: { bp: '135/82', hr: '68', temp: '97.9°F', spO2: '97%', weight: '162 lbs', height: `5'9"` },
+    oxidativeStressMarkers: [
+      { id: '1', name: '8-OHdG', value: '15 ng/mg creatinine' },
+      { id: '2', name: 'Lipid Peroxides', value: '12 nmol/mL' }
+    ],
+    antioxidantSources: [
+      { id: '1', name: 'Alpha-Tocopherol', value: '11.5 mg/L' }
+    ],
+    medications: [
+      { id: '1', name: 'Donepezil', value: '5mg Daily' },
+      { id: '2', name: 'Aspirin', value: '81mg Daily' },
+      { id: '3', name: 'Furosemide', value: '20mg Daily' },
+      { id: '4', name: 'Acetaminophen', value: '500mg PRN OA Pain' }
+    ],
     issues: {
       'head': [{ id: 'head', noteId: 'note_p003_head_1', name: 'Brain & Cognition', painLevel: 0, description: `Daughter reports patient got lost returning from the grocery store yesterday. Requires prompting for ADLs. MoCA score: 18/30.`, symptoms: [] }],
       'r_arm': [{ id: 'r_arm', noteId: 'note_p003_arm_1', name: 'Right Arm / Wrist', painLevel: 4, description: 'Bruising and tenderness from mechanical fall two days ago. X-ray negative for fracture.', symptoms: [] }]
     },
     history: [
-      { type: 'Visit', date: '2024.06.12', summary: '6-month geriatric assessment.', state: { patientGoals: 'Routine check, family notes mild forgetfulness.', vitals: { bp: '130/80', hr: '70', temp: '98.1°F', spO2: '98%', weight: '165 lbs', height: `5'9"` }, issues: { 'head': [{ id: 'head', noteId: 'note_p003_head_hist2', name: 'Brain & Cognition', painLevel: 0, description: 'Mild short-term memory deficits noted.', symptoms: [] }] } } },
+      { 
+        type: 'Visit', 
+        date: '2024.06.12', 
+        summary: '6-month geriatric assessment.', 
+        state: { 
+          patientGoals: 'Routine check, family notes mild forgetfulness.', 
+          vitals: { bp: '130/80', hr: '70', temp: '98.1°F', spO2: '98%', weight: '165 lbs', height: `5'9"` }, 
+          oxidativeStressMarkers: [
+            { id: '1', name: '8-OHdG', value: '10 ng/mg creatinine' }
+          ],
+          antioxidantSources: [
+            { id: '1', name: 'Alpha-Tocopherol', value: '12.0 mg/L' }
+          ],
+          medications: [
+            { id: '1', name: 'Donepezil', value: '5mg Daily' },
+            { id: '2', name: 'Aspirin', value: '81mg Daily' },
+            { id: '3', name: 'Furosemide', value: '20mg Daily' }
+          ],
+          issues: { 'head': [{ id: 'head', noteId: 'note_p003_head_hist2', name: 'Brain & Cognition', painLevel: 0, description: 'Mild short-term memory deficits noted.', symptoms: [] }] } 
+        } 
+      },
     ],
     bookmarks: [],
     scans: [
@@ -314,11 +388,112 @@ const MOCK_PATIENTS: Patient[] = [
       }
     ],
     bookmarks: [],
+  },
+  {
+    id: 'p008',
+    name: 'Linus P (Orthomolecular Profile)',
+    age: 93,
+    gender: 'Male',
+    lastVisit: '2024.12.10',
+    preexistingConditions: ['Prostate Cancer', 'Coronary Artery Disease', 'Macular Degeneration'],
+    patientGoals: 'Evaluate high-dose ascorbic acid therapy and Lp(a) management.',
+    vitals: { 
+      bp: '125/78', hr: '68', temp: '98.2°F', spO2: '98%', weight: '165 lbs', height: `5'10"`,
+      vitC: '10000', // mg/day or serum level
+      vitD3: '85', // ng/mL
+      magnesium: '6.5', // mg/dL
+      zinc: '120', // mcg/dL
+      b12: '1200' // pg/mL
+    },
+    oxidativeStressMarkers: [{ id: '1', name: 'Oxidative Stress', value: '2.5' }],
+    antioxidantSources: [{ id: '1', name: 'Antioxidant Status', value: '9.2' }],
+    medications: [],
+    issues: {
+      'chest': [{ id: 'chest', noteId: 'note_p008_chest_1', name: 'Cardiovascular', painLevel: 1, description: 'Mild angina on heavy exertion. Managing with Pauling therapy.', symptoms: [] }],
+      'pelvis': [{ id: 'pelvis', noteId: 'note_p008_pelvis_1', name: 'Prostate', painLevel: 2, description: 'PSA stable at 4.2. Monitoring oxidative stress markers.', symptoms: [] }]
+    },
+    history: [
+      {
+        type: 'ChartArchived',
+        date: '2024.10.10',
+        summary: 'Initiated Pauling Therapy (Vit C + Lysine + Proline).',
+        state: {
+          patientGoals: 'Reduce lipoprotein(a) levels and arterial plaque.',
+          vitals: { 
+            bp: '135/85', hr: '72', temp: '98.4°F', spO2: '97%', weight: '168 lbs', height: `5'10"`,
+            vitC: '3000',
+            vitD3: '45',
+            magnesium: '4.2',
+            zinc: '85',
+            b12: '600'
+          },
+          oxidativeStressMarkers: [{ id: '1', name: 'Oxidative Stress', value: '6.8' }],
+          antioxidantSources: [{ id: '1', name: 'Antioxidant Status', value: '4.5' }],
+          medications: [],
+          dynamicNutrients: [
+            { id: '1', name: 'L-Lysine', value: '3000 mg' },
+            { id: '2', name: 'L-Proline', value: '1500 mg' },
+            { id: '3', name: 'Lipoprotein(a)', value: '150 mg/dL' }
+          ],
+          issues: {}
+        }
+      },
+      {
+        type: 'ChartArchived',
+        date: '2024.11.10',
+        summary: 'One month follow-up on Pauling Therapy.',
+        state: {
+          patientGoals: 'Titrating dose to bowel tolerance.',
+          vitals: { 
+            bp: '130/80', hr: '70', temp: '98.3°F', spO2: '98%', weight: '166 lbs', height: `5'10"`,
+            vitC: '6000',
+            vitD3: '65',
+            magnesium: '5.5',
+            zinc: '105',
+            b12: '900'
+          },
+          oxidativeStressMarkers: [{ id: '1', name: 'Oxidative Stress', value: '4.2' }],
+          antioxidantSources: [{ id: '1', name: 'Antioxidant Status', value: '7.1' }],
+          medications: [],
+          dynamicNutrients: [
+            { id: '1', name: 'L-Lysine', value: '5000 mg' },
+            { id: '2', name: 'L-Proline', value: '2500 mg' },
+            { id: '3', name: 'Lipoprotein(a)', value: '95 mg/dL' }
+          ],
+          issues: {}
+        }
+      },
+      {
+        type: 'Visit',
+        date: '2024.12.10',
+        summary: 'Two month follow-up. Symptoms improving.',
+        state: {
+          patientGoals: 'Evaluate high-dose ascorbic acid therapy and Lp(a) management.',
+          vitals: { 
+            bp: '125/78', hr: '68', temp: '98.2°F', spO2: '98%', weight: '165 lbs', height: `5'10"`,
+            vitC: '10000',
+            vitD3: '85',
+            magnesium: '6.5',
+            zinc: '120',
+            b12: '1200'
+          },
+          oxidativeStressMarkers: [{ id: '1', name: 'Oxidative Stress', value: '2.5' }],
+          antioxidantSources: [{ id: '1', name: 'Antioxidant Status', value: '9.2' }],
+          medications: [],
+          dynamicNutrients: [
+            { id: '1', name: 'L-Lysine', value: '6000 mg' },
+            { id: '2', name: 'L-Proline', value: '3000 mg' },
+            { id: '3', name: 'Lipoprotein(a)', value: '30 mg/dL' },
+            { id: '4', name: 'CoQ10', value: '400 mg' }
+          ],
+          issues: {}
+        }
+      }
+    ],
+    bookmarks: [],
     scans: []
   }
 ];
-
-
 @Injectable({
   providedIn: 'root'
 })

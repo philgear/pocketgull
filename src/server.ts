@@ -22,14 +22,9 @@ app.use(compression());
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
 app.set('trust proxy', true);
 
-// Redirect legacy understory and pocketgall URLs to the primary pocketgull.app domain
-app.use((req, res, next) => {
-  const host = req.hostname || '';
-  if (host.includes('understory') || host.includes('pocketgall')) {
-    return res.redirect(301, `https://pocketgull.app${req.originalUrl}`);
-  }
-  next();
-});
+// Disabled forced domain redirect to pocketgull.app because the GCP
+// verification system only allows pocketgal.app and pocketgall.app 
+// to be safely mapped under this project's tenant.
 
 const rootDir = process.cwd();
 
@@ -57,6 +52,10 @@ async function fetchGeminiApiKey() {
     let projectId = process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
 
     if (!projectId) {
+      if (process.env['NODE_ENV'] !== 'production' && !process.env['K_SERVICE']) {
+          console.warn('[WARN] Not running in GCP (no K_SERVICE). Skipping Secret Manager to prevent auth crash.');
+          return '';
+      }
       console.log('[Secrets] GOOGLE_CLOUD_PROJECT not set, attempting to resolve automatically...');
       projectId = await client.getProjectId();
     }
@@ -81,6 +80,8 @@ async function fetchGeminiApiKey() {
 
 fetchGeminiApiKey().then((key) => {
   geminiApiKeyCached = key;
+}).catch(err => {
+  console.warn('[WARN] Top-level error in fetchGeminiApiKey:', err.message);
 });
 
 // Security headers

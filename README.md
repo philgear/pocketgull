@@ -250,6 +250,13 @@ Clinical inputs are structured and physician-directed, reducing the risk of bias
 
 ---
 
+## ⚖️ Legal & Medical Disclaimer
+
+**Important Legal / Liability Note:**
+The software provided by Pocket Gull acts as a clinical support and administrative tool to aggregate and analyze explicitly provided medical data. It is not intended to independently diagnose, treat, or cure any disease, and final clinical judgments remain solely the responsibility of the licensed healthcare provider. The platform is not classified as a diagnostic medical device under FDA regulations.
+
+---
+
 ## License
 
 This project is licensed under the MIT License.

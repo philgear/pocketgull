@@ -19,6 +19,7 @@ import { PatientManagementService } from './services/patient-management.service'
 import { ThemeService } from './services/theme.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT } from './demo-data';
+import { FhirCallbackComponent } from './components/fhir-callback.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
@@ -36,18 +37,21 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     ResearchFrameComponent,
     IntakeFormComponent,
     VoiceAssistantComponent,
-    RevealDirective
+    RevealDirective,
+    FhirCallbackComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    
-    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
+    @if (showFhirCallback()) {
+      <app-fhir-callback></app-fhir-callback>
+    } @else {
+    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
       
       <app-dictation-modal></app-dictation-modal>
 
       @if (!hasApiKey()) {
-        <main class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center p-6 text-center landmark-main">
+        <main class="fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center justify-center p-6 text-center landmark-main">
           <!-- Origami Pocket Splash -->
           <div class="mb-10 relative w-full h-56 max-w-sm mx-auto flex items-end justify-center">
              <!-- The Pocket -->
@@ -77,22 +81,22 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                 </div>
             </div>
           </div>
-          <h1 class="text-xl font-bold mb-1 uppercase tracking-[0.2em]">Pocket Gull</h1>
-          <p class="text-gray-500 mb-8 text-xs uppercase tracking-widest">Clinical Intelligence Platform</p>
+          <h1 class="text-xl font-bold mb-1 uppercase tracking-[0.2em] text-[#1C1C1C] dark:text-zinc-100">Pocket Gull</h1>
+          <p class="text-gray-500 dark:text-zinc-400 mb-8 text-xs uppercase tracking-widest">Clinical Intelligence Platform</p>
 
           <!-- API Key Input -->
           <div class="w-full max-w-sm">
-            <p class="text-gray-500 mb-4 text-sm">Enter your Gemini API key to access the live practitioner dashboard.</p>
-            <div class="relative flex items-center border border-gray-200 rounded focus-within:border-gray-400 transition-colors mb-2">
+            <p class="text-gray-500 dark:text-zinc-400 mb-4 text-sm">Enter your Gemini API key to access the live practitioner dashboard.</p>
+            <div class="relative flex items-center border border-gray-200 dark:border-zinc-800 rounded focus-within:border-gray-400 dark:focus-within:border-zinc-600 transition-colors mb-2">
               <input
                 id="api-key-input"
                 [(ngModel)]="apiKeyInput"
                 [type]="showPassword() ? 'text' : 'password'"
                 placeholder="Paste your Gemini API key here"
-                class="flex-1 px-4 py-3 text-sm bg-transparent outline-none font-mono text-gray-800 placeholder-gray-300"
+                class="flex-1 px-4 py-3 text-sm bg-transparent outline-none font-mono text-gray-800 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600"
                 (keydown.enter)="submitApiKey()"
               />
-              <button (click)="showPassword.update(v => !v)" class="px-3 text-gray-500 hover:text-gray-600 transition-colors" [attr.aria-label]="showPassword() ? 'Hide key' : 'Show key'">
+              <button (click)="showPassword.update(v => !v)" class="px-3 text-gray-500 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors" [attr.aria-label]="showPassword() ? 'Hide key' : 'Show key'">
                 @if (showPassword()) {
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                 } @else {
@@ -104,43 +108,53 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
               <p class="text-red-500 text-xs mb-3">{{ apiKeyError() }}</p>
             }
             <button (click)="submitApiKey()" [disabled]="!apiKeyInput().trim()"
-              class="w-full py-3 bg-[#1C1C1C] text-white text-xs font-bold uppercase tracking-widest hover:bg-black transition-all disabled:opacity-40 disabled:cursor-not-allowed mb-3">
+              class="w-full py-3 bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-[#09090b] text-xs font-bold uppercase tracking-widest hover:bg-black dark:hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed mb-3">
               Enter Dashboard
             </button>
             <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"
-              class="block text-xs text-[#416B1F] hover:text-[#244626] transition-colors mb-8">
+              class="block text-xs text-[#416B1F] dark:text-[#689f38] hover:text-[#244626] dark:hover:text-[#8bc34a] transition-colors mb-8">
               Get an API key at <span class="font-bold">ai.dev</span> →
             </a>
 
             <!-- Divider -->
             <div class="relative flex items-center gap-4 mb-8">
-              <div class="flex-1 h-px bg-gray-100"></div>
-              <span class="text-xs text-gray-500 uppercase tracking-widest">or</span>
-              <div class="flex-1 h-px bg-gray-100"></div>
+              <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
+              <span class="text-xs text-gray-500 dark:text-zinc-500 uppercase tracking-widest">or</span>
+              <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
             </div>
 
             <!-- Demo Mode -->
             <button (click)="loadDemoMode()"
-              class="w-full py-3 border border-gray-200 text-gray-600 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 hover:border-gray-300 transition-all">
+              class="w-full py-3 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 transition-all">
               Try Demo — No Key Required
             </button>
-            <p class="text-gray-500 text-xs mt-2">Loads a pre-sampled patient with example AI analysis outputs.</p>
+            <p class="text-gray-500 dark:text-zinc-500 text-xs mt-2">Loads a pre-sampled patient with example AI analysis outputs.</p>
+          </div>
+
+          <!-- Legal & Medical Disclaimer -->
+          <div class="absolute bottom-6 left-6 right-6 text-center max-w-3xl mx-auto no-print">
+            <p class="text-[10px] text-gray-400 dark:text-zinc-600 leading-relaxed uppercase tracking-widest font-medium">
+              Important Legal / Liability Disclaimer
+            </p>
+            <p class="text-[10px] text-gray-400 dark:text-zinc-600 leading-relaxed mt-1">
+              The software provided by Pocket Gull acts as a clinical support and administrative tool to aggregate and analyze explicitly provided medical data. It is not intended to independently diagnose, treat, or cure any disease, and final clinical judgments remain solely the responsibility of the licensed healthcare provider.
+            </p>
           </div>
         </main>
       } @else {
         <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
         <!-- Demo Banner -->
         @if (isDemoMode()) {
-          <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between gap-4 no-print shrink-0">
+          <div class="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/30 px-4 py-2 flex items-center justify-between gap-4 no-print shrink-0">
             <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <p class="text-xs text-amber-800 font-medium">Demo Mode — Showing pre-sampled patient data. AI analysis generation requires an API key.</p>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p class="text-xs text-amber-800 dark:text-amber-200 font-medium">Demo Mode — Showing pre-sampled patient data. AI analysis generation requires an API key.</p>
             </div>
-            <button (click)="exitDemoMode()" class="text-xs font-bold text-amber-800 uppercase tracking-widest hover:text-amber-900 whitespace-nowrap transition-colors">Enter API Key →</button>
+            <button (click)="exitDemoMode()" class="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-widest hover:text-amber-900 dark:hover:text-amber-300 whitespace-nowrap transition-colors">Enter API Key →</button>
           </div>
         }
         <!-- Navbar: Pure utility, no decoration -->
-        <nav class="h-14 border-b border-[#EEEEEE] flex items-center justify-between px-3 sm:px-6 shrink-0 bg-white z-50 no-print">
+        <nav class="h-14 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center justify-between px-3 sm:px-6 shrink-0 bg-white dark:bg-[#111111] z-50 no-print">
           <div class="flex items-center gap-4">
               <div class="flex items-center gap-3">
                   <svg width="42" height="42" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
@@ -156,18 +170,18 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                       </g>
                     </g>
                   </svg>
-                  <span class="font-medium text-[#1C1C1C] tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
+                  <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
               </div>
             <div class="h-4 w-px bg-[#EEEEEE] hidden sm:block"></div>
-            <div class="text-xs text-gray-500 font-medium mr-4 hidden sm:block">INTAKE MODULE 01</div>
+            <div class="text-xs text-gray-500 dark:text-zinc-500 font-medium mr-4 hidden sm:block">INTAKE MODULE 01</div>
 
             <!-- System Status Indicator (Hidden on smallest watches) -->
-            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full border border-gray-200 hover:border-gray-300 transition-all cursor-help group relative no-print">
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-full border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-help group relative no-print">
             <div class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" style="will-change: transform, opacity;"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
             </div>
-            <span class="text-xs font-bold text-gray-600 uppercase tracking-widest">System Ready</span>
+            <span class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-widest">System Ready</span>
               
               <!-- Tooltip -->
               <div class="absolute top-full left-0 mt-2 w-64 bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-left">
@@ -203,10 +217,10 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             <app-patient-dropdown></app-patient-dropdown>
             
             <!-- Sync to Mobile Button -->
-            <button (click)="syncToMobile()"
-                    [disabled]="isSyncing()"
-                    aria-label="Sync Data to Mobile App"
-                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 transition-colors text-xs font-bold uppercase tracking-widest disabled:opacity-50 text-gray-700 hover:bg-[#EEEEEE] hover:border-gray-400">
+              <button (click)="syncToMobile()"
+                      [disabled]="isSyncing()"
+                      aria-label="Sync Data to Mobile App"
+                      class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 transition-colors text-xs font-bold uppercase tracking-widest disabled:opacity-50 text-gray-700 dark:text-zinc-300 hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.animate-spin]="isSyncing()">
                 <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                 <path d="M3 3v5h5"/>
@@ -220,13 +234,20 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
                     [class.bg-gray-800]="state.isLiveAgentActive()"
+                    [class.dark:bg-white]="state.isLiveAgentActive()"
                     [class.border-gray-800]="state.isLiveAgentActive()"
+                    [class.dark:border-white]="state.isLiveAgentActive()"
                     [class.text-white]="state.isLiveAgentActive()"
+                    [class.dark:text-[#111111]]="state.isLiveAgentActive()"
                     [class.bg-transparent]="!state.isLiveAgentActive()"
                     [class.border-gray-300]="!state.isLiveAgentActive()"
+                    [class.dark:border-zinc-700]="!state.isLiveAgentActive()"
                     [class.text-gray-700]="!state.isLiveAgentActive()"
+                    [class.dark:text-zinc-300]="!state.isLiveAgentActive()"
                     [class.hover:bg-[#EEEEEE]]="!state.isLiveAgentActive()"
-                    [class.hover:border-gray-400]="!state.isLiveAgentActive()">
+                    [class.dark:hover:bg-zinc-800]="!state.isLiveAgentActive()"
+                    [class.hover:border-gray-400]="!state.isLiveAgentActive()"
+                    [class.dark:hover:border-zinc-500]="!state.isLiveAgentActive()">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -237,25 +258,44 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             
             <button (click)="state.toggleResearchFrame()"
                     aria-label="Toggle Research Frame"
-                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 text-gray-700 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] hover:border-gray-400 transition-colors">
+                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
               <span class="hidden sm:inline">Research</span>
             </button>
-            <div class="hidden sm:flex items-center gap-6 text-xs font-medium text-gray-500 pl-4">
+            
+            <!-- Theme Toggle -->
+            <button (click)="cycleTheme()" 
+                    aria-label="Toggle Theme"
+                    [title]="'Theme: ' + theme.currentTheme()"
+                    class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer">
+              @switch (theme.currentTheme()) {
+                 @case ('dark') {
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>   
+                 }
+                 @case ('light') {
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                 }
+                 @case ('system') {
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                 }
+              }
+            </button>
+
+            <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-500 pl-4 border-l border-gray-100 dark:border-zinc-800">
               <span>{{ today | date:'yyyy.MM.dd' }}</span>
-              <span class="text-[#416B1F]">REQ. DR. SMITH</span>
+              <span class="text-[#416B1F] dark:text-[#689F38] pr-2">REQ. DR. SMITH</span>
             </div>
           </div>
         </nav>
 
 
         <!-- Main Grid Layout -->
-        <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
+        <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
 
 
           
           <!-- Column 1: Patient Medical Chart -->
-          <div class="relative w-full md:h-full bg-white rounded-xl shadow-sm border border-gray-200 md:overflow-hidden flex flex-col md:block flex-shrink-0"
+          <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined"
                [class.transition-all]="!isDragging()"
                [class.duration-500]="!isDragging()"
@@ -276,25 +316,25 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  (dblclick)="maximizeChart()">
                 
                 <!-- Full-width background bar -->
-                <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-4 bg-transparent group-hover:bg-gray-100 transition-colors rounded-full z-0"></div>
-                <div class="absolute inset-0 bg-gray-100 group-hover:bg-gray-200 transition-colors rounded"></div>
+                <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-4 bg-transparent group-hover:bg-gray-100/50 dark:group-hover:bg-zinc-800/50 transition-colors rounded-full z-0"></div>
+                <div class="absolute inset-0 bg-gray-100/50 dark:bg-zinc-800/50 group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors rounded"></div>
                 <!-- Handle -->
-                <div class="h-12 w-1.5 rounded-full bg-gray-200 group-hover:bg-gray-300 transition-colors relative z-10"></div>
+                <div class="h-12 w-1.5 rounded-full bg-gray-200 dark:bg-zinc-700 group-hover:bg-gray-300 dark:group-hover:bg-zinc-600 transition-colors relative z-10"></div>
 
                 <!-- Quick Actions (V4) -->
-                <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white shadow-xl border border-gray-200 rounded-full p-1.5 z-30">
+                <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white dark:bg-zinc-900 shadow-xl border border-gray-200 dark:border-zinc-800 rounded-full p-1.5 z-30">
                    
                    <!-- Panel Management -->
-                   <div class="flex flex-col gap-1 border-b border-gray-100 pb-1.5 mb-0.5">
-                      <button (click)="$event.stopPropagation(); toggleChart()" [class.bg-black]="!isChartCollapsed()" [class.text-white]="!isChartCollapsed()"
-                              title="Toggle Medical Chart" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-black transition-colors">
+                   <div class="flex flex-col gap-1 border-b border-gray-100 dark:border-zinc-800 pb-1.5 mb-0.5">
+                      <button (click)="$event.stopPropagation(); toggleChart()" [class.bg-black]="!isChartCollapsed()" [class.dark:bg-white]="!isChartCollapsed()" [class.text-white]="!isChartCollapsed()" [class.dark:text-black]="!isChartCollapsed()"
+                              title="Toggle Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); toggleAnalysis()" [class.bg-black]="!isAnalysisCollapsed()" [class.text-white]="!isAnalysisCollapsed()"
-                              title="Toggle Analysis Panel" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-black transition-colors">
+                      <button (click)="$event.stopPropagation(); toggleAnalysis()" [class.bg-black]="!isAnalysisCollapsed()" [class.dark:bg-white]="!isAnalysisCollapsed()" [class.text-white]="!isAnalysisCollapsed()" [class.dark:text-black]="!isAnalysisCollapsed()"
+                              title="Toggle Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); maximizeChart()" class="p-2 hover:bg-gray-100 rounded-full text-gray-500 hover:text-black transition-colors" title="Maximize Chart">
+                      <button (click)="$event.stopPropagation(); maximizeChart()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-colors" title="Maximize Chart">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="m15 18-6-6 6-6"></path></svg>
                       </button>
                    </div>
@@ -306,21 +346,21 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             <!-- Mobile Header: Back Button & Tabs -->
             @if (state.selectedPartId() && !state.isLiveAgentActive()) {
               <div class="w-full flex-col gap-3 shrink-0 z-20 hidden max-md:flex mb-3">
-                <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black self-start px-2 py-3 -ml-2 transition-colors min-h-[44px]">
+                <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-3 -ml-2 transition-colors min-h-[44px]">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                   <span>Back to Chart</span>
                 </button>
-                <div class="flex p-1.5 bg-gray-200 rounded-[10px] w-full">
+                <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full">
                   <button (click)="mobileActiveTab.set('tasks')" 
                           class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
-                          [class.bg-white]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.hover:text-gray-700]="mobileActiveTab() !== 'tasks'">
+                          [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
+                          [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'" [class.hover:text-gray-700]="mobileActiveTab() !== 'tasks'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'tasks'">
                     Tasks
                   </button>
                   <button (click)="mobileActiveTab.set('analysis')"
                           class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
-                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.hover:text-gray-700]="mobileActiveTab() !== 'analysis'">
+                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [class.dark:text-white]="mobileActiveTab() === 'analysis'"
+                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'" [class.hover:text-gray-700]="mobileActiveTab() !== 'analysis'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'analysis'">
                     Analysis
                   </button>
                 </div>
@@ -332,10 +372,10 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                <div class="shrink-0 w-full md:w-[400px] flex flex-col gap-3 md:gap-6 h-full z-20 transition-all duration-300"
                     [class.max-md:hidden]="mobileActiveTab() !== 'tasks'"
                     [class.tab-fade-enter]="mobileActiveTab() === 'tasks'">
-                  <div class="flex-1 min-h-0 overflow-hidden rounded-xl shadow-sm border border-gray-200">
+                  <div class="flex-1 min-h-0 overflow-hidden rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                     <app-intake-form appReveal></app-intake-form>
                   </div>
-                  <div class="flex-1 min-h-0 overflow-hidden rounded-xl shadow-sm border border-gray-200">
+                  <div class="flex-1 min-h-0 overflow-hidden rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                     <app-task-flow appReveal [revealDelay]="100"></app-task-flow>
                   </div>
                </div>
@@ -348,14 +388,14 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
                  <!-- Section 1: Analysis Intake Container -->
-                 <div class="overflow-hidden flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]">
+                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]">
                      <app-analysis-container class="block h-full min-h-0 min-w-0" appReveal [revealDelay]="100"></app-analysis-container>
                  </div>
             </div>
 
             <!-- Overlay: Full Screen Voice Assistant -->
             @if (state.isLiveAgentActive()) {
-              <div class="fixed inset-0 z-[100] bg-white flex flex-col transition-all duration-700 animate-in fade-in"
+              <div class="fixed inset-0 z-[100] bg-white dark:bg-[#111111] flex flex-col transition-all duration-700 animate-in fade-in"
                    style="animation: intro-fullscreen 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
                   <app-voice-assistant class="block h-full w-full"></app-voice-assistant>
               </div>
@@ -369,6 +409,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
       </main>
     }
   </div>
+  }
   `,
   styles: [`
     :host { display: block; min-height: 100%; }
@@ -380,7 +421,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 })
 export class AppComponent implements OnDestroy {
   state = inject(PatientStateService);
-  private theme = inject(ThemeService);
+  public theme = inject(ThemeService);
   private ngZone = inject(NgZone);
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
@@ -392,6 +433,15 @@ export class AppComponent implements OnDestroy {
   apiKeyError = signal<string | null>(null);
   isChartCollapsed = signal<boolean>(false);
   isAnalysisCollapsed = signal<boolean>(false);
+  showFhirCallback = signal<boolean>(false);
+
+  cycleTheme() {
+    const current = this.theme.currentTheme();
+    if (current === 'system') this.theme.setTheme('light');
+    else if (current === 'light') this.theme.setTheme('dark');
+    else this.theme.setTheme('system');
+  }
+
   isSyncing = signal<boolean>(false);
 
   async syncToMobile() {
@@ -450,6 +500,12 @@ export class AppComponent implements OnDestroy {
   constructor() {
     afterNextRender(async () => {
       if (typeof window === 'undefined') return;
+
+      if (window.location.pathname === '/fhir-callback') {
+        this.showFhirCallback.set(true);
+        return;
+      }
+
       this.isMobile.set(window.innerWidth < 768);
 
       // Check for stored API key first

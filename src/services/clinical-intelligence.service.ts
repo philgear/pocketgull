@@ -17,7 +17,7 @@ export interface NodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Monitoring & Follow-up' | 'Patient Education';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Orthomolecular Nutrition' | 'Monitoring & Follow-up' | 'Patient Education';
 
 export interface ClinicalMetrics {
     complexity: number; // 0-10
@@ -115,6 +115,22 @@ Analyze the patient overview and recommend specific, evidence-based intervention
 ### Functional Protocols
 (Describe any specific therapeutic protocols like "5R Gut Protocol", "HPA Axis Support".)` + this.FORMATTING_RULES,
 
+        'Orthomolecular Nutrition': `You are an expert in orthomolecular medicine and clinical nutrition for a clinical decision-support tool.
+
+Analyze the patient overview and telemetry with a strict focus on biochemical pathways, micronutrient deficiencies, and cellular health. Structure as follows:
+
+### Biochemical Assessment
+(2-3 sentences analyzing the patient's oxidative stress, antioxidant status, and micronutrient panel findings.)
+
+### Orthomolecular Targets
+(Bullet list of specific metabolic pathways or nutrient deficiencies to target, e.g., "**Vitamin C Deficit**: high oxidative load requires replenishment.")
+
+### Nutritional Interventions
+(Generate a Markdown table with columns: Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway. Focus on high-dose or targeted nutrient therapies.)
+
+### Dietary Adjustments
+(Crucial whole-food or specific dietary modifications to support the orthomolecular strategy.)` + this.FORMATTING_RULES,
+
         'Monitoring & Follow-up': `You are a care coordination AI for a clinical decision-support tool.
 
 Generate a structured monitoring and follow-up plan organized by time horizon:
@@ -165,7 +181,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
     }
 
     private async generateVisualMetrics(report: Record<string, string>): Promise<void> {
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Monitoring & Follow-up', 'Patient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Orthomolecular Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
         const reportText = lenses.map(lens => report[lens]).filter(Boolean).join('\n\n');
         const cacheKey = await this.cache.generateKey([reportText, 'visual-metrics-v2']);
 
@@ -196,7 +212,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
 
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Monitoring & Follow-up', 'Patient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Orthomolecular Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
         const newReport: Partial<Record<AnalysisLens, string>> = {};
 
         if (this.lastPatientData()) {

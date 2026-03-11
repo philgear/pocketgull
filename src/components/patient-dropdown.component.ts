@@ -25,35 +25,37 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
       </div>
 
       @if (isOpen()) {
-        <div class="origin-top-right absolute right-0 mt-2 w-72 rounded-sm shadow-xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden flex flex-col max-h-[60dvh]">
+        <div class="origin-top-right absolute right-0 mt-2 w-72 rounded-sm shadow-xl bg-white dark:bg-[#09090b] ring-1 ring-black dark:ring-white/10 ring-opacity-5 focus:outline-none overflow-hidden flex flex-col max-h-[60dvh]">
           
-          <div class="bg-gray-50 px-4 py-2 border-b border-gray-100 flex items-center justify-between shrink-0">
-             <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Active Roster</span>
-             <span class="text-xs font-bold text-gray-500">{{ patientManagement.patients().length }}</span>
+          <div class="bg-gray-50 dark:bg-zinc-900 px-4 py-2 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
+             <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Active Roster</span>
+             <span class="text-xs font-bold text-gray-500 dark:text-zinc-500">{{ patientManagement.patients().length }}</span>
           </div>
 
           <div class="py-1 overflow-y-auto flex-1 group/list">
             @for (patient of patientManagement.patients(); track patient.id) {
-              <button (click)="selectPatient(patient.id)" class="group w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#F8F9FA] hover:text-gray-900 flex items-center gap-3 transition-colors relative border-l-4" [class.bg-blue-50]="patient.id === patientManagement.selectedPatientId()" [class.border-[#689F38]]="patient.id === patientManagement.selectedPatientId()" [class.border-transparent]="patient.id !== patientManagement.selectedPatientId()">
+              <button (click)="selectPatient(patient.id)" class="group w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:bg-[#F8F9FA] dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white flex items-center gap-3 transition-colors relative border-l-4" [class.bg-blue-50]="patient.id === patientManagement.selectedPatientId()" [class.dark:bg-[#689F38]/10]="patient.id === patientManagement.selectedPatientId()" [class.border-[#689F38]]="patient.id === patientManagement.selectedPatientId()" [class.border-transparent]="patient.id !== patientManagement.selectedPatientId()">
                 
                 <div class="w-8 h-8 rounded-sm flex items-center justify-center text-xs shrink-0 font-bold shadow-sm"
                      [class.bg-[#689F38]]="patient.id === patientManagement.selectedPatientId()"
                      [class.text-white]="patient.id === patientManagement.selectedPatientId()"
                      [class.bg-gray-200]="patient.id !== patientManagement.selectedPatientId()"
-                     [class.text-gray-600]="patient.id !== patientManagement.selectedPatientId()">
+                     [class.dark:bg-zinc-700]="patient.id !== patientManagement.selectedPatientId()"
+                     [class.text-gray-600]="patient.id !== patientManagement.selectedPatientId()"
+                     [class.dark:text-zinc-300]="patient.id !== patientManagement.selectedPatientId()">
                   {{ patient.name.charAt(0) }}
                 </div>
                 <div class="min-w-0 flex-1">
-                  <div class="font-bold text-gray-900 text-sm truncate">{{ patient.name }}</div>
-                  <div class="text-xs text-gray-500 font-medium uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
+                  <div class="font-bold text-gray-900 dark:text-zinc-100 text-sm truncate">{{ patient.name }}</div>
+                  <div class="text-xs text-gray-500 dark:text-zinc-500 font-medium uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
                      <span class="whitespace-nowrap">{{ patient.age }} YRS</span>
-                     <span class="w-1 h-1 bg-gray-300 rounded-sm shrink-0"></span>
+                     <span class="w-1 h-1 bg-gray-300 dark:bg-zinc-600 rounded-sm shrink-0"></span>
                      <span class="truncate">{{ patient.gender }}</span>
                   </div>
                 </div>
 
                 <button (click)="removePatient($event, patient.id)" 
-                        class="opacity-0 group-hover:opacity-100 p-1.5 rounded-sm text-red-400 hover:text-red-600 hover:bg-red-50 transition-all shrink-0"
+                        class="opacity-0 group-hover:opacity-100 p-1.5 rounded-sm text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/50 transition-all shrink-0"
                         title="Remove Patient">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -63,7 +65,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
             }
           </div>
           
-          <div class="border-t border-gray-100 bg-white shrink-0 p-2 flex flex-col gap-1">
+          <div class="border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#09090b] shrink-0 p-2 flex flex-col gap-1">
              <pocket-gull-button 
                (click)="createNewPatient()" 
                variant="ghost" 

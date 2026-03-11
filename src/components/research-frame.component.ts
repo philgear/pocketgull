@@ -24,36 +24,42 @@ export interface PubMedSearchResult {
   imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="absolute flex flex-col bg-white shadow-2xl border border-gray-300 rounded-lg overflow-hidden z-40"
+    <div class="absolute flex flex-col bg-white dark:bg-[#09090b] shadow-2xl border border-gray-300 dark:border-zinc-800 rounded-lg overflow-hidden z-40"
          [style.left.px]="position().x"
          [style.top.px]="position().y"
          [style.width.px]="size().width"
          [style.height.px]="size().height">
       
       <!-- Header / Drag Handle -->
-      <div (mousedown)="startDrag($event)" class="h-10 px-4 flex items-center justify-between bg-gray-100 border-b border-gray-200 shrink-0 cursor-move select-none">
-        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-600">Research Frame</h3>
+      <div (mousedown)="startDrag($event)" class="h-10 px-4 flex items-center justify-between bg-gray-100 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shrink-0 cursor-move select-none">
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-zinc-400">Research Frame</h3>
         <pocket-gull-button variant="ghost" size="sm" (click)="close()" icon="M12 10.586 16.95 5.636a1 1 0 1 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414L10.586 12 5.636 7.05a1 1 0 0 1 1.414-1.414L12 10.586z" title="Close Research Window" ariaLabel="Close Research Window">
         </pocket-gull-button>
       </div>
 
       <!-- Toolbar -->
-      <div class="p-3 border-b border-gray-200 bg-gray-50/50 shrink-0">
+      <div class="p-3 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 shrink-0">
         <div class="flex items-center gap-2">
           <!-- Search Engine Toggle -->
-          <div class="flex items-center bg-gray-200 rounded-md p-0.5">
+          <div class="flex items-center bg-gray-200 dark:bg-zinc-800 rounded-md p-0.5">
             <button (click)="searchEngine.set('google')"
                     class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'google'"
+                    [class.dark:bg-zinc-600]="searchEngine() === 'google'"
                     [class.text-gray-800]="searchEngine() === 'google'"
-                    [class.text-gray-500]="searchEngine() !== 'google'">
+                    [class.dark:text-white]="searchEngine() === 'google'"
+                    [class.text-gray-500]="searchEngine() !== 'google'"
+                    [class.dark:text-zinc-400]="searchEngine() !== 'google'">
               Google
             </button>
             <button (click)="searchEngine.set('pubmed')"
                     class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'pubmed'"
+                    [class.dark:bg-zinc-600]="searchEngine() === 'pubmed'"
                     [class.text-gray-800]="searchEngine() === 'pubmed'"
-                    [class.text-gray-500]="searchEngine() !== 'pubmed'">
+                    [class.dark:text-white]="searchEngine() === 'pubmed'"
+                    [class.text-gray-500]="searchEngine() !== 'pubmed'"
+                    [class.dark:text-zinc-400]="searchEngine() !== 'pubmed'">
               PubMed
             </button>
           </div>
@@ -71,26 +77,26 @@ export interface PubMedSearchResult {
           </pocket-gull-button>
           <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="Bookmark current page" ariaLabel="Bookmark current page">
           </pocket-gull-button>
-          <pocket-gull-button variant="ghost" size="sm" (click)="showCitationForm.set(!showCitationForm())" [class.text-gray-800]="showCitationForm()" icon="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" title="Citation Metadata" ariaLabel="Citation Metadata">
+          <pocket-gull-button variant="ghost" size="sm" (click)="showCitationForm.set(!showCitationForm())" [class.text-gray-800]="showCitationForm()" [class.dark:text-white]="showCitationForm()" icon="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" title="Citation Metadata" ariaLabel="Citation Metadata">
           </pocket-gull-button>
         </div>
 
         <!-- Citation Metadata Form -->
         @if (showCitationForm()) {
-          <div class="mt-3 p-3 bg-white border border-gray-200 rounded-md shadow-inner space-y-2 animate-in fade-in slide-in-from-top-1">
-            <h4 class="text-[10px] font-bold text-gray-800 uppercase tracking-tighter mb-1">Citation Metadata (UKRIO Style)</h4>
+          <div class="mt-3 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-inner space-y-2 animate-in fade-in slide-in-from-top-1">
+            <h4 class="text-[10px] font-bold text-gray-800 dark:text-zinc-100 uppercase tracking-tighter mb-1">Citation Metadata (UKRIO Style)</h4>
             <div class="grid grid-cols-2 gap-2">
               <pocket-gull-input [value]="authors()" (valueChange)="authors.set($event)" placeholder="Authors (e.g. Smith et al.)" size="sm"></pocket-gull-input>
               <pocket-gull-input [value]="doi()" (valueChange)="doi.set($event)" placeholder="DOI (e.g. 10.1038/s41586-021-03503-x)" size="sm"></pocket-gull-input>
             </div>
             <div class="flex items-center gap-4">
               <label for="peer-reviewed-checkbox" class="flex items-center gap-1.5 cursor-pointer">
-                <input id="peer-reviewed-checkbox" type="checkbox" [checked]="isPeerReviewed()" (change)="isPeerReviewed.set(!isPeerReviewed())" class="w-3 h-3 rounded border-gray-300 text-gray-800 focus:ring-gray-500">
-                <span class="text-[11px] text-gray-600">Peer Reviewed</span>
+                <input id="peer-reviewed-checkbox" type="checkbox" [checked]="isPeerReviewed()" (change)="isPeerReviewed.set(!isPeerReviewed())" class="w-3 h-3 rounded border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-zinc-100 focus:ring-gray-500 dark:focus:ring-zinc-400 bg-white dark:bg-zinc-900">
+                <span class="text-[11px] text-gray-600 dark:text-zinc-400">Peer Reviewed</span>
               </label>
               <label for="auto-cite-checkbox" class="flex items-center gap-1.5 cursor-pointer">
-                <input id="auto-cite-checkbox" type="checkbox" [checked]="autoCite()" (change)="autoCite.set(!autoCite())" class="w-3 h-3 rounded border-gray-300 text-gray-800 focus:ring-gray-500">
-                <span class="text-[11px] text-gray-600">Include in Summary References</span>
+                <input id="auto-cite-checkbox" type="checkbox" [checked]="autoCite()" (change)="autoCite.set(!autoCite())" class="w-3 h-3 rounded border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-zinc-100 focus:ring-gray-500 dark:focus:ring-zinc-400 bg-white dark:bg-zinc-900">
+                <span class="text-[11px] text-gray-600 dark:text-zinc-400">Include in Summary References</span>
               </label>
             </div>
           </div>
@@ -99,32 +105,39 @@ export interface PubMedSearchResult {
 
       <!-- Bookmarks Bar -->
       @if (bookmarks().length > 0) {
-        <div class="p-2 border-b border-gray-200 bg-gray-50/50 shrink-0 flex items-center gap-2 flex-wrap">
+        <div class="p-2 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 shrink-0 flex items-center gap-2 flex-wrap">
           @for(bookmark of bookmarks(); track bookmark.url) {
             <div class="group flex items-center">
                 <button (click)="loadUrl(bookmark.url)" 
                         class="pl-2 pr-1 py-0.5 text-[11px] font-medium rounded-l-md transition-colors max-w-48 truncate flex items-center gap-1.5"
                         [class.bg-gray-800]="bookmark.cited"
+                        [class.dark:bg-zinc-700]="bookmark.cited"
                         [class.text-white]="bookmark.cited"
                         [class.bg-gray-100]="!bookmark.cited"
+                        [class.dark:bg-zinc-800]="!bookmark.cited"
                         [class.text-gray-500]="!bookmark.cited"
-                        [class.hover:bg-gray-200]="!bookmark.cited">
+                        [class.dark:text-zinc-400]="!bookmark.cited"
+                        [class.hover:bg-gray-200]="!bookmark.cited"
+                        [class.dark:hover:bg-zinc-700]="!bookmark.cited">
                   @if (bookmark.isPeerReviewed) {
                     <svg class="w-3 h-3 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
                   }
                   {{ bookmark.title }}
                 </button>
                 <button (click)="toggleCite(bookmark)"
-                        class="px-1.5 py-0.5 text-[10px] uppercase font-black transition-colors border-r border-gray-200/20"
+                        class="px-1.5 py-0.5 text-[10px] uppercase font-black transition-colors border-r border-gray-200/20 dark:border-zinc-800/50"
                         [class.bg-gray-900]="bookmark.cited"
+                        [class.dark:bg-zinc-900]="bookmark.cited"
                         [class.text-white]="bookmark.cited"
                         [class.bg-gray-50]="!bookmark.cited"
+                        [class.dark:bg-zinc-800]="!bookmark.cited"
                         [class.text-gray-400]="!bookmark.cited"
+                        [class.dark:text-zinc-500]="!bookmark.cited"
                         [title]="bookmark.cited ? 'Remove from summary references' : 'Include in summary references'">
                     {{ bookmark.cited ? 'CITED' : 'CITE' }}
                 </button>
                 <button (click)="removeBookmark(bookmark.url)"
-                        class="px-1 py-0.5 text-gray-400 bg-gray-100 hover:bg-red-100 hover:text-red-600 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
+                        class="px-1 py-0.5 text-gray-400 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-800 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
                     ×
                 </button>
             </div>
@@ -133,23 +146,23 @@ export interface PubMedSearchResult {
       }
 
       <!-- IFrame / Native Content -->
-      <div class="flex-1 bg-gray-200 overflow-y-auto">
+      <div class="flex-1 bg-gray-200 dark:bg-zinc-950 overflow-y-auto">
         @if (searchEngine() === 'pubmed' && (pubmedResults() !== null || isLoadingPubmed())) {
           <div class="p-4 space-y-4 max-w-3xl mx-auto">
             @if (isLoadingPubmed()) {
-              <div class="flex items-center justify-center p-8 text-gray-500">
+              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-500">
                 <p class="text-sm font-medium animate-pulse">Searching PubMed natively...</p>
               </div>
             } @else if (pubmedResults()?.length === 0) {
-              <div class="flex items-center justify-center p-8 text-gray-500">
+              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-500">
                 <p class="text-sm">No results found on PubMed.</p>
               </div>
             } @else {
               @for (res of pubmedResults(); track res.id) {
-                <div class="bg-white p-4 rounded-md shadow-sm border border-gray-200">
-                  <h4 class="font-bold text-gray-800 text-sm leading-snug mb-1" [innerHTML]="res.title | safeHtml"></h4>
-                  <p class="text-xs text-gray-600 mb-1 font-medium">{{ res.authors }}</p>
-                  <div class="text-[11px] text-gray-500 flex items-center gap-2 mb-3">
+                <div class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800">
+                  <h4 class="font-bold text-gray-800 dark:text-zinc-100 text-sm leading-snug mb-1" [innerHTML]="res.title | safeHtml"></h4>
+                  <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1 font-medium">{{ res.authors }}</p>
+                  <div class="text-[11px] text-gray-500 dark:text-zinc-500 flex items-center gap-2 mb-3">
                     <span class="font-bold">{{ res.source }}</span> • <span>{{ res.pubdate }}</span>
                     @if (res.doi) {
                       <span>• DOI: {{ res.doi }}</span>
@@ -159,7 +172,7 @@ export interface PubMedSearchResult {
                     <pocket-gull-button variant="primary" size="sm" (click)="addPubmedBookmark(res)" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z">
                       Bookmark & Cite
                     </pocket-gull-button>
-                    <a [href]="'https://pubmed.ncbi.nlm.nih.gov/' + res.id + '/'" target="_blank" class="text-xs font-semibold text-gray-600 hover:text-gray-800 transition-colors inline-block px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded">
+                    <a [href]="'https://pubmed.ncbi.nlm.nih.gov/' + res.id + '/'" target="_blank" class="text-xs font-semibold text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-white transition-colors inline-block px-2 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded">
                       Open in PubMed
                     </a>
                   </div>
@@ -168,9 +181,9 @@ export interface PubMedSearchResult {
             }
           </div>
         } @else if (sanitizedUrl(); as url) {
-          <iframe #iframeEl [src]="url" class="w-full h-full border-none bg-white"></iframe>
+          <iframe #iframeEl [src]="url" class="w-full h-full border-none bg-white dark:bg-zinc-950"></iframe>
         } @else {
-          <div class="w-full h-full flex items-center justify-center text-center text-gray-500 p-4">
+          <div class="w-full h-full flex items-center justify-center text-center text-gray-500 dark:text-zinc-500 p-4">
              <p class="text-xs">Search results and bookmarked pages will appear here.</p>
           </div>
         }

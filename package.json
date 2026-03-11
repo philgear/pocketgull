@@ -102,7 +102,7 @@
     "@opentelemetry/sdk-metrics": "^2.5.1",
     "@opentelemetry/sdk-trace-base": "^2.5.1",
     "@opentelemetry/sdk-trace-node": "^2.5.1",
-    "@tailwindcss/postcss": "^4.2.0",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/express": "^4.17.25",
     "@types/three": "^0.183.1",
     "autoprefixer": "^10.4.24",

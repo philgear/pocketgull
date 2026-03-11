@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform, Inject, PLATFORM_ID } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
-import DOMPurify from 'dompurify';
+import * as DOMPurify from 'dompurify';
 
 @Pipe({
     name: 'safeHtml',
@@ -21,8 +21,10 @@ export class SafeHtmlPipe implements PipeTransform {
         if (!value) return value;
         
         let cleanHtml = value;
-        if (this.isBrowser && typeof DOMPurify.sanitize === 'function') {
-            cleanHtml = DOMPurify.sanitize(value, {
+        const purify = (DOMPurify as any).default || DOMPurify;
+        
+        if (this.isBrowser && typeof purify.sanitize === 'function') {
+            cleanHtml = purify.sanitize(value, {
                 ADD_TAGS: ['svg', 'path', 'g', 'circle', 'line', 'polygon', 'rect'],
                 ADD_ATTR: ['viewBox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd']
             });

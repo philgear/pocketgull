@@ -45,6 +45,38 @@ export type BadgeSeverity = 'info' | 'success' | 'warning' | 'error' | 'neutral'
       color: #4B5563;
       border-color: rgba(107, 114, 128, 0.15);
     }
+    
+    /* Dark Mode Defaults */
+    :host-context(.dark) .severity-info,
+    :host-context(html.dark) .severity-info {
+      background: rgba(30, 136, 229, 0.15);
+      color: #64b5f6;
+      border-color: rgba(30, 136, 229, 0.3);
+    }
+    :host-context(.dark) .severity-success,
+    :host-context(html.dark) .severity-success {
+      background: rgba(104, 159, 56, 0.15);
+      color: #aed581;
+      border-color: rgba(104, 159, 56, 0.3);
+    }
+    :host-context(.dark) .severity-warning,
+    :host-context(html.dark) .severity-warning {
+      background: rgba(255, 179, 0, 0.15);
+      color: #ffd54f;
+      border-color: rgba(255, 179, 0, 0.3);
+    }
+    :host-context(.dark) .severity-error,
+    :host-context(html.dark) .severity-error {
+      background: rgba(229, 57, 53, 0.15);
+      color: #e57373;
+      border-color: rgba(229, 57, 53, 0.3);
+    }
+    :host-context(.dark) .severity-neutral,
+    :host-context(html.dark) .severity-neutral {
+      background: rgba(161, 161, 170, 0.15);
+      color: #a1a1aa;
+      border-color: rgba(161, 161, 170, 0.3);
+    }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
