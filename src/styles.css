@@ -2,15 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 
- * ─── DIETER RAMS DESIGN MANDATE ───
- * All UI updates must prioritize a premium, minimalist design:
- * - Clarity, neutrality, and functional excellence.
- * - Seamless mobile responsive layouts using `100dvh` (avoid `vh` and `h-screen`).
- * - Minimalist color palette (Obsidian, Slate, neutral backgrounds).
- * - Avoid hard-coded pixel heights for structural elements.
- */
-
 @keyframes wobble {
 
     0%,
