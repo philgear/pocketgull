@@ -191,6 +191,93 @@ app.post('/api/ai/translate', express.json(), async (req, res) => {
   }
 });
 
+app.post('/api/ai/analyze-translation', express.json(), async (req, res) => {
+  try {
+      const { analyzeTranslationFlow } = await import('./server/genkit.js');
+      const result = await analyzeTranslationFlow({
+          original: req.body.original,
+          translated: req.body.translated
+      });
+      res.json({ text: result });
+  } catch(e: any) {
+      res.status(500).json({error: e.message});
+  }
+});
+
+
+// Server-Side Streaming Endpoint (SSE) - replaces client-side GoogleGenAI call
+app.post('/api/ai/stream', express.json(), async (req, res) => {
+  try {
+    const { patientData, systemInstruction, model, temperature } = req.body;
+    const key = await getApiKey();
+    if (!key) {
+      res.status(500).json({ error: 'API key not available on server.' });
+      return;
+    }
+    const { GoogleGenAI } = await import('@google/genai');
+    const aiClient = new GoogleGenAI({ apiKey: key });
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const streamResult = await aiClient.models.generateContentStream({
+      model: model || 'gemini-2.5-flash',
+      contents: patientData,
+      config: { systemInstruction, temperature: temperature ?? 0.1 }
+    });
+
+    for await (const chunk of streamResult) {
+      if (chunk.text) {
+        res.write(`data: ${JSON.stringify({ text: chunk.text })}\n\n`);
+      }
+    }
+    res.write('data: [DONE]\n\n');
+    res.end();
+  } catch (e: any) {
+    try { res.write(`data: ${JSON.stringify({ error: e.message })}\n\n`); res.end(); } catch {}
+  }
+});
+
+// Server-Side Chat Session Management
+const chatSessions = new Map<string, any>();
+
+app.post('/api/ai/chat/start', express.json(), async (req, res) => {
+  try {
+    const { sessionId, systemInstruction, model, temperature } = req.body;
+    const key = await getApiKey();
+    if (!key) throw new Error('API key not available on server.');
+    const { GoogleGenAI } = await import('@google/genai');
+    const aiClient = new GoogleGenAI({ apiKey: key });
+    const chat = aiClient.chats.create({
+      model: model || 'gemini-2.5-flash',
+      config: { systemInstruction, temperature: temperature ?? 0.1 }
+    });
+    chatSessions.set(sessionId, chat);
+    // Clean up old sessions (keep max 50)
+    if (chatSessions.size > 50) {
+      const oldestKey = chatSessions.keys().next().value;
+      if (oldestKey) chatSessions.delete(oldestKey);
+    }
+    res.json({ ok: true });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/ai/chat/message', express.json(), async (req, res) => {
+  try {
+    const { sessionId, message } = req.body;
+    const chat = chatSessions.get(sessionId);
+    if (!chat) throw new Error('Chat session not found. Please refresh and try again.');
+    const result = await chat.sendMessage({ message });
+    res.json({ text: result.text });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 /**
  * Serve static files from /.
  */

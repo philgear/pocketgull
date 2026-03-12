@@ -16,4 +16,4 @@ RUN npm run build
 # Expose port and run
 EXPOSE 8080
 ENV PORT=8080
-CMD node dist/server/server.mjs 2>&1 | tee startup.log || sleep 10
+CMD ["node", "dist/server/server.mjs"]

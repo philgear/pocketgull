@@ -12,66 +12,53 @@ import { VerifyAiService } from '../verify-ai.service';
 })
 export class GeminiProvider implements IntelligenceProvider {
     private config = inject(AI_CONFIG);
-    private _ai: any = null;
-
-    private async getAi(): Promise<any> {
-        console.log("GeminiProvider: getAi() execution started");
-        if (!this._ai) {
-            console.log("GeminiProvider: _ai is null, initializing...");
-            let initialKey = (window as any).GEMINI_API_KEY || this.config.apiKey;
-            console.log("GeminiProvider: initialKey from window/config is defined?", !!initialKey);
-            if (!initialKey && typeof localStorage !== 'undefined') {
-                try {
-                    initialKey = localStorage.getItem('GEMINI_API_KEY');
-                    console.log("GeminiProvider: initialKey from localStorage is defined?", !!initialKey);
-                } catch (e) { console.error("GeminiProvider: localStorage error", e); }
-            }
-            if (!initialKey && typeof process !== 'undefined' && process.env) {
-                try {
-                    initialKey = process.env.GEMINI_API_KEY;
-                    console.log("GeminiProvider: initialKey from process.env is defined?", !!initialKey);
-                } catch (e) { console.error("GeminiProvider: process.env error", e); }
-            }
-            if (!initialKey) {
-                console.error("GeminiProvider: NO API KEY FOUND");
-                throw new Error("API key must be set when using the Gemini API. Ensure server injection or environment variable is present.");
-            }
-            console.log("GeminiProvider: Instantiating GoogleGenAI with key starting with...", initialKey.substring(0, 5));
-            try {
-                const { GoogleGenAI } = await import('@google/genai');
-                this._ai = new GoogleGenAI({ apiKey: initialKey });
-                console.log("GeminiProvider: GoogleGenAI instantiated successfully");
-            } catch (e) {
-                console.error("GeminiProvider: Error instantiating GoogleGenAI", e);
-                throw e;
-            }
-        } else {
-            console.log("GeminiProvider: _ai already exists, reusing");
-        }
-        console.log("GeminiProvider: getAi() returning");
-        return this._ai;
-    }
-
-
-    private chat: any = null;
     private verifier = inject(VerifyAiService);
+
+    // Chat session ID for server-side session management
+    private chatSessionId: string | null = null;
 
     generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string> {
         return new Observable<string>(subscriber => {
             (async () => {
                 try {
-                    const ai = await this.getAi();
-                    const streamResult = await ai.models.generateContentStream({
-                        model: this.config.defaultModel.modelId,
-                        contents: patientData,
-                        config: {
-                            systemInstruction: systemInstruction,
+                    const response = await fetch('/api/ai/stream', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            patientData,
+                            systemInstruction,
+                            model: this.config.defaultModel.modelId,
                             temperature: this.config.defaultModel.temperature
-                        }
+                        })
                     });
 
-                    for await (const chunk of streamResult) {
-                        subscriber.next(chunk.text);
+                    if (!response.ok || !response.body) {
+                        const err = await response.text();
+                        throw new Error(err || 'Stream request failed');
+                    }
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let buffer = '';
+
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+
+                        buffer += decoder.decode(value, { stream: true });
+                        const lines = buffer.split('\n\n');
+                        buffer = lines.pop() ?? '';
+
+                        for (const line of lines) {
+                            if (!line.startsWith('data: ')) continue;
+                            const data = line.slice(6).trim();
+                            if (data === '[DONE]') { subscriber.complete(); return; }
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.error) throw new Error(parsed.error);
+                                if (parsed.text) subscriber.next(parsed.text);
+                            } catch (e: any) { throw e; }
+                        }
                     }
                     subscriber.complete();
                 } catch (e) {
@@ -126,63 +113,58 @@ export class GeminiProvider implements IntelligenceProvider {
         return data.text;
     }
 
+    async analyzeTranslation(original: string, translated: string): Promise<string> {
+        const response = await fetch('/api/ai/analyze-translation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ original, translated })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        const data = await response.json();
+        return data.text;
+    }
+
+
     async startChat(patientData: string, context: string): Promise<void> {
-        console.log("GeminiProvider: startChat called");
         const systemInstruction = `${context}\n\nPatient Data:\n${patientData}`;
-        console.log("GeminiProvider: calling getAi...");
-        const ai = await this.getAi();
-        console.log("GeminiProvider: calling ai.chats.create...");
-        try {
-            this.chat = ai.chats.create({
+        this.chatSessionId = `chat_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+        const response = await fetch('/api/ai/chat/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId: this.chatSessionId,
+                systemInstruction,
                 model: this.config.defaultModel.modelId,
-                config: {
-                    systemInstruction,
-                    temperature: this.config.defaultModel.temperature
-                }
-            });
-            console.log("GeminiProvider: chat created successfully");
-        } catch (e) {
-            console.error("GeminiProvider: error in ai.chats.create", e);
-            throw e;
+                temperature: this.config.defaultModel.temperature
+            })
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to start chat session');
         }
     }
 
     async sendMessage(message: string, files?: File[]): Promise<string> {
-        if (!this.chat) throw new Error("Chat not started");
+        if (!this.chatSessionId) throw new Error('Chat not started');
 
-        let payload: any = message;
-
-        if (files && files.length > 0) {
-            const parts: any[] = [{ text: message }];
-            for (const file of files) {
-                const base64Data = await new Promise<string>((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        const res = reader.result as string;
-                        // Data URL looks like: data:image/png;base64,...
-                        const base64Str = res.includes(',') ? res.split(',')[1] : res;
-                        resolve(base64Str);
-                    };
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                });
-                parts.push({
-                    inlineData: {
-                        data: base64Data,
-                        mimeType: file.type
-                    }
-                });
-            }
-            payload = parts;
+        const response = await fetch('/api/ai/chat/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId: this.chatSessionId,
+                message
+            })
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'Failed to send message');
         }
-
-        const result = await this.chat.sendMessage({ message: payload });
-        return result.text;
+        const data = await response.json();
+        return data.text;
     }
 
     async getInitialGreeting(prompt: string): Promise<string> {
-        if (!this.chat) throw new Error("Chat not started");
-        const result = await this.chat.sendMessage({ message: prompt });
-        return result.text;
+        return this.sendMessage(prompt);
     }
 }

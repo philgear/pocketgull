@@ -36,6 +36,12 @@ export interface IntelligenceProvider {
     translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child'): Promise<string>;
 
     /**
+     * Analyzes translation accuracy and tone.
+     */
+    analyzeTranslation(original: string, translated: string): Promise<string>;
+
+
+    /**
      * Chat Session Management
      */
     startChat(patientData: string, context: string): Promise<void>;

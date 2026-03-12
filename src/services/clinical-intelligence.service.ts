@@ -364,4 +364,18 @@ If a section has no relevant source data, output the heading followed by: "*No s
             this.isLoading.set(false);
         }
     }
+
+    async analyzeTranslation(original: string, translated: string): Promise<string> {
+        this.isLoading.set(true);
+        this.error.set(null);
+        try {
+            return await this.ai.analyzeTranslation(original, translated);
+        } catch (e: any) {
+            const errorMsg = String(e?.message ?? e);
+            this.error.set(errorMsg);
+            throw new Error(`Analysis failed: ${errorMsg}`);
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
 }

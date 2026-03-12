@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, ElementRef, OnDestroy, AfterViewInit, input, viewChild, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ElementRef, OnDestroy, AfterViewInit, input, viewChild, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -9,7 +9,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div #canvasContainer class="w-full h-full relative cursor-grab active:cursor-grabbing"></div>
+        <div #canvasContainer class="w-full h-full relative" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+            <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-zinc-100 dark:bg-zinc-800/50 rounded-lg">
+                <svg class="w-10 h-10 text-zinc-400 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">3D view unavailable on this device</span>
+            </div>
+        </div>
     `,
     styles: [`
         :host { display: block; height: 100%; width: 100%; }
@@ -30,6 +37,8 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
     private controls!: OrbitControls;
     private currentModelGroup!: THREE.Group;
     private animationFrameId?: number;
+
+    readonly webglSupported = signal<boolean>(true);
 
     // Industrial Grace palette + Kaizen Severity
     private readonly PALETTE = {
@@ -57,13 +66,20 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        this.initScene();
-        this.startAnimation();
-        // Load initial model after slight delay to ensure container is ready
-        setTimeout(() => {
-            this.handleResize();
-            this.loadModel(this.threejsId());
-        }, 0);
+        try {
+            this.initScene();
+            this.startAnimation();
+            // Load initial model after slight delay to ensure container is ready
+            setTimeout(() => {
+                if (this.webglSupported()) {
+                    this.handleResize();
+                    this.loadModel(this.threejsId());
+                }
+            }, 0);
+        } catch (e) {
+            console.error("Failed to initialize Medical 3D Viewer:", e);
+            this.webglSupported.set(false);
+        }
     }
 
     ngOnDestroy() {
@@ -71,6 +87,15 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
             cancelAnimationFrame(this.animationFrameId);
         }
         this.renderer?.dispose();
+    }
+
+    private isWebGLAvailable(): boolean {
+        try {
+            const canvas = document.createElement('canvas');
+            return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+        } catch (e) {
+            return false;
+        }
     }
 
     private initScene() {
@@ -82,6 +107,10 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
         this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
         this.camera.position.set(0, 0, 10);
+
+        if (!this.isWebGLAvailable()) {
+            throw new Error('WebGL is not supported in this environment.');
+        }
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         this.renderer.setSize(container.clientWidth, container.clientHeight);

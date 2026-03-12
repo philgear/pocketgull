@@ -134,3 +134,36 @@ CRITICAL RULES:
       return response.text;
     }
 );
+
+// 4. Analyze Translation Flow
+export const analyzeTranslationFlow = ai.defineFlow(
+    {
+      name: 'analyzeTranslationFlow',
+      inputSchema: z.object({
+        original: z.string(),
+        translated: z.string()
+      }),
+      outputSchema: z.string(),
+    },
+    async ({ original, translated }) => {
+      const prompt = `Analyze the following translated/adjusted clinical text against the original text.
+Provide a brief critique (2-3 sentences) on:
+1. Did it maintain clinical accuracy?
+2. Is the tone appropriate for the target audience?
+3. Were any important details lost?
+
+ORIGINAL TEXT:
+${original}
+
+TRANSLATED TEXT:
+${translated}
+
+CRITIQUE:`;
+
+      const response = await ai.generate({
+        prompt,
+        config: { temperature: 0.2 }
+      });
+      return response.text;
+    }
+);

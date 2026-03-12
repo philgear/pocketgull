@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PatientStateService } from '../services/patient-state.service';
@@ -30,6 +30,7 @@ import { PatientStateService } from '../services/patient-state.service';
 })
 export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private readonly state = inject(PatientStateService);
+    private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
     @Output() partSelected = new EventEmitter<{ id: string, name: string }>();
@@ -72,13 +73,18 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
+        if (!isPlatformBrowser(this.platformId)) {
+            this.webglSupported.set(false);
+            return;
+        }
+
         try {
             this.initScene();
             this.createMannequin();
             this.startAnimation();
             this.setupInteractions();
         } catch (e) {
-            console.error("Failed to initialize 3D Viewer:", e);
+            console.warn("3D Viewer disabled: WebGL not supported on this device.", e);
             this.webglSupported.set(false);
         }
     }
@@ -94,8 +100,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
     private isWebGLAvailable(): boolean {
         try {
+            // Guard against SSR / non-browser environments
+            if (typeof window === 'undefined' || typeof document === 'undefined') {
+                return false;
+            }
             const canvas = document.createElement('canvas');
-            return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            return !!(
+                window.WebGLRenderingContext &&
+                (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+            );
         } catch (e) {
             return false;
         }
@@ -116,7 +129,11 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             throw new Error('WebGL is not supported in this environment.');
         }
 
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        try {
+            this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        } catch (e) {
+            throw new Error('WebGL is not supported in this environment.');
+        }
         this.renderer.setSize(width, height);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);

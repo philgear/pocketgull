@@ -71,12 +71,12 @@
     "build": "ng build",
     "lint": "tsc --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",
-    "start": "node dist/server/server.mjs",
-    "gcp-build": "npm run build",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
     "release": "npm run changelog && npm version patch -m \"chore(release): %s\"",
     "deploy": "npm run build && gcloud run deploy pocket-gull --source . --region=us-west1 --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest --quiet",
-    "serve:ssr:app": "node dist/server/server.mjs"
+    "serve:ssr:app": "node dist/server/server.mjs",
+    "start": "node dist/server/server.mjs",
+    "gcp-build": "npm run build && npm prune --production"
   },
   "dependencies": {
     "@angular/build": "^21.2.2",
