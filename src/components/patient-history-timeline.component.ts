@@ -80,7 +80,7 @@ const ICONS: Record<string, string> = {
                         [class.dark:border-zinc-800]="true">
                   <div class="flex justify-between items-start gap-4">
                     <div class="flex-1">
-                      <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                      <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                       <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                     </div>
                   </div>
@@ -103,7 +103,7 @@ const ICONS: Record<string, string> = {
                         [class.border-r]="true"
                         [class.border-gray-100]="true"
                         [class.dark:border-zinc-800]="true">
-                    <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                    <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                 </button>
               }
@@ -134,7 +134,7 @@ const ICONS: Record<string, string> = {
                     <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                   </button>
                   <button (click)="deleteNote.emit(entry)"
-                          class="absolute top-2 right-2 p-1 rounded-full text-gray-300 dark:text-zinc-600 hover:text-red-600 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                          class="absolute top-2 right-2 p-1 rounded-full text-gray-300 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                           title="Delete this note entry">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586 16.95 5.636a1 1 0 1 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414L10.586 12 5.636 7.05a1 1 0 0 1 1.414-1.414L12 10.586z"/></svg>
                   </button>
@@ -143,7 +143,7 @@ const ICONS: Record<string, string> = {
                @case ('NoteDeleted') {
                 <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-red-400 rounded">
                   <p class="text-xs font-bold text-red-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                  <p class="text-sm text-gray-500 dark:text-zinc-500 mt-1 leading-relaxed italic font-light">{{ entry.summary }}</p>
+                  <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1 leading-relaxed italic font-light">{{ entry.summary }}</p>
                 </div>
               }
               @case ('AnalysisRun') {
@@ -165,7 +165,7 @@ const ICONS: Record<string, string> = {
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
                         <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 uppercase tracking-[0.1em] border border-green-100 dark:border-green-800/50">AI Report</span>
-                        <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                        <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
                     <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                   </div>
@@ -190,7 +190,7 @@ const ICONS: Record<string, string> = {
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
                         <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 uppercase tracking-[0.1em] border border-blue-100 dark:border-blue-800/50">Patient Summary</span>
-                        <p class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                        <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
                     <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-bold">{{ entry.summary }}</p>
                   </div>

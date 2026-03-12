@@ -17,6 +17,7 @@ import { GeminiProvider } from './services/ai/gemini.provider';
 import { ClinicalIntelligenceService } from './services/clinical-intelligence.service';
 import { PatientManagementService } from './services/patient-management.service';
 import { ThemeService } from './services/theme.service';
+import { ExportService } from './services/export.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT } from './demo-data';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
@@ -46,7 +47,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     @if (showFhirCallback()) {
       <app-fhir-callback></app-fhir-callback>
     } @else {
-    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
+    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
       
       <app-dictation-modal></app-dictation-modal>
 
@@ -119,7 +120,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             <!-- Divider -->
             <div class="relative flex items-center gap-4 mb-8">
               <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
-              <span class="text-xs text-gray-500 dark:text-zinc-500 uppercase tracking-widest">or</span>
+              <span class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-widest">or</span>
               <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
             </div>
 
@@ -128,15 +129,15 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
               class="w-full py-3 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 transition-all">
               Try Demo — No Key Required
             </button>
-            <p class="text-gray-500 dark:text-zinc-500 text-xs mt-2">Loads a pre-sampled patient with example AI analysis outputs.</p>
+            <p class="text-gray-500 dark:text-zinc-400 text-xs mt-2">Loads a pre-sampled patient with example AI analysis outputs.</p>
           </div>
 
           <!-- Legal & Medical Disclaimer -->
           <div class="absolute bottom-6 left-6 right-6 text-center max-w-3xl mx-auto no-print">
-            <p class="text-[10px] text-gray-400 dark:text-zinc-600 leading-relaxed uppercase tracking-widest font-medium">
+            <p class="text-[10px] text-gray-500 dark:text-zinc-400 leading-relaxed uppercase tracking-widest font-medium">
               Important Legal / Liability Disclaimer
             </p>
-            <p class="text-[10px] text-gray-400 dark:text-zinc-600 leading-relaxed mt-1">
+            <p class="text-[10px] text-gray-500 dark:text-zinc-400 leading-relaxed mt-1">
               The software provided by Pocket Gull acts as a clinical support and administrative tool to aggregate and analyze explicitly provided medical data. It is not intended to independently diagnose, treat, or cure any disease, and final clinical judgments remain solely the responsibility of the licensed healthcare provider.
             </p>
           </div>
@@ -145,10 +146,10 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
         <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
         <!-- Demo Banner -->
         @if (isDemoMode()) {
-          <div class="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/30 px-4 py-2 flex items-center justify-between gap-4 no-print shrink-0">
+          <div class="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/30 px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 no-print shrink-0">
             <div class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <p class="text-xs text-amber-800 dark:text-amber-200 font-medium">Demo Mode — Showing pre-sampled patient data. AI analysis generation requires an API key.</p>
+              <p class="text-xs text-amber-800 dark:text-amber-200 font-medium">Demo Mode <span class="hidden sm:inline">— Showing pre-sampled patient data. AI analysis generation requires an API key.</span></p>
             </div>
             <button (click)="exitDemoMode()" class="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-widest hover:text-amber-900 dark:hover:text-amber-300 whitespace-nowrap transition-colors">Enter API Key →</button>
           </div>
@@ -173,7 +174,6 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                   <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
               </div>
             <div class="h-4 w-px bg-[#EEEEEE] hidden sm:block"></div>
-            <div class="text-xs text-gray-500 dark:text-zinc-500 font-medium mr-4 hidden sm:block">INTAKE MODULE 01</div>
 
             <!-- System Status Indicator (Hidden on smallest watches) -->
             <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-full border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-help group relative no-print">
@@ -214,22 +214,6 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           </div>
           
           <div class="flex items-center gap-2">
-            <app-patient-dropdown></app-patient-dropdown>
-            
-            <!-- Sync to Mobile Button -->
-              <button (click)="syncToMobile()"
-                      [disabled]="isSyncing()"
-                      aria-label="Sync Data to Mobile App"
-                      class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 transition-colors text-xs font-bold uppercase tracking-widest disabled:opacity-50 text-gray-700 dark:text-zinc-300 hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" [class.animate-spin]="isSyncing()">
-                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                <path d="M3 3v5h5"/>
-                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-                <path d="M16 21v-5h5"/>
-              </svg>
-              <span class="hidden sm:inline">{{ isSyncing() ? 'Syncing...' : 'Sync Data' }}</span>
-            </button>
-            
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
@@ -281,13 +265,77 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
               }
             </button>
 
-            <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-500 pl-4 border-l border-gray-100 dark:border-zinc-800">
+            <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400 pl-4 border-l border-gray-100 dark:border-zinc-800">
               <span>{{ today | date:'yyyy.MM.dd' }}</span>
               <span class="text-[#416B1F] dark:text-[#689F38] pr-2">REQ. DR. SMITH</span>
             </div>
           </div>
         </nav>
 
+        <!-- New Patient Navigation Bar -->
+        <nav class="h-12 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center px-3 sm:px-6 shrink-0 bg-gray-50 dark:bg-[#09090b] z-40 no-print gap-4">
+           <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:block">INTAKE MODULE 01</div>
+           <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
+           <app-patient-dropdown></app-patient-dropdown>
+
+           <div class="flex items-center gap-2 overflow-x-auto no-scrollbar min-w-0 pr-2 pb-1 pt-1 -mb-1 -mt-1 snap-x snap-mandatory">
+             <button (click)="exportPdf()"
+                     [disabled]="!hasReport()"
+                     class="snap-start shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 dark:group-hover:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+               <span>Export</span>
+             </button>
+
+             <button (click)="exportJson()"
+                     [disabled]="!hasReport()"
+                     class="snap-align-none shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 dark:group-hover:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+               <span>Export as JSON</span>
+             </button>
+
+             <button (click)="exportFhir()"
+                     [disabled]="!hasReport()"
+                     class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 dark:group-hover:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+               <span>Export as FHIR</span>
+             </button>
+
+             <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1"></div>
+
+             <button (click)="connectEpic()"
+                     class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#E33B44]/20 dark:border-[#E33B44]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-[#E33B44] dark:text-[#E33B44] bg-[#E33B44]/5 dark:bg-[#E33B44]/10 hover:bg-[#E33B44]/10 dark:hover:bg-[#E33B44]/20 rounded-md">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+               <span>Connect epic®</span>
+             </button>
+
+             <button (click)="connectGoogleHealth()"
+                     class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
+               <!-- Basic link icon representing connection -->
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+               <span>Health Connect</span>
+             </button>
+
+             <button (click)="connectAppleHealth()"
+                     class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#000000]/20 dark:border-[#FFFFFF]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-black dark:text-white bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 rounded-md">
+               <!-- Basic link icon representing connection -->
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+               <span>Apple Health</span>
+             </button>
+
+              <button (click)="uploadData()"
+                      aria-label="Upload Data"
+                      class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 dark:group-hover:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Upload</span>
+              </button>
+
+             <button (click)="finalizeRecord()"
+                     class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400 group-hover:text-gray-700 dark:group-hover:text-zinc-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+               <span>Finalize & Archive</span>
+             </button>
+           </div>
+        </nav>
 
         <!-- Main Grid Layout -->
         <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
@@ -327,14 +375,14 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                    <!-- Panel Management -->
                    <div class="flex flex-col gap-1 border-b border-gray-100 dark:border-zinc-800 pb-1.5 mb-0.5">
                       <button (click)="$event.stopPropagation(); toggleChart()" [class.bg-black]="!isChartCollapsed()" [class.dark:bg-white]="!isChartCollapsed()" [class.text-white]="!isChartCollapsed()" [class.dark:text-black]="!isChartCollapsed()"
-                              title="Toggle Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+                              title="Toggle Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path></svg>
                       </button>
                       <button (click)="$event.stopPropagation(); toggleAnalysis()" [class.bg-black]="!isAnalysisCollapsed()" [class.dark:bg-white]="!isAnalysisCollapsed()" [class.text-white]="!isAnalysisCollapsed()" [class.dark:text-black]="!isAnalysisCollapsed()"
-                              title="Toggle Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+                              title="Toggle Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); maximizeChart()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-500 hover:text-black dark:hover:text-white transition-colors" title="Maximize Chart">
+                      <button (click)="$event.stopPropagation(); maximizeChart()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors" title="Maximize Chart">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="m15 18-6-6 6-6"></path></svg>
                       </button>
                    </div>
@@ -406,6 +454,115 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
         @if(state.isResearchFrameVisible()) {
             <app-research-frame></app-research-frame>
         }
+
+    <!-- Preview & Print Modal -->
+    @if (showPreviewModal()) {
+      <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 no-print">
+        <div class="bg-white dark:bg-[#09090b] w-full max-w-4xl max-h-[85dvh] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-[#F9FAFB] dark:bg-zinc-900">
+            <div>
+              <h2 class="text-lg font-bold text-[#1C1C1C] dark:text-zinc-100">Preview & Print Care Plan</h2>
+              <p class="text-xs uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-wider mt-1">Review and edit finalized text before archiving</p>
+            </div>
+            <pocket-gull-button 
+              variant="ghost" 
+              size="sm" 
+              (click)="closePreview()" 
+              ariaLabel="Close Preview Modal"
+              icon="M18 6L6 18M6 6l12 12">
+            </pocket-gull-button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-6 bg-white dark:bg-[#09090b] relative">
+             <div class="mb-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+                <h3 class="block text-xs font-bold text-[#689F38] uppercase tracking-[0.15em]">Final Care Plan Document</h3>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Reading Level / Language</span>
+                  <select 
+                    [value]="selectedReadingLevel()" 
+                    (change)="changeReadingLevel($event)"
+                    [disabled]="isTranslating()"
+                    class="text-xs bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-800 rounded px-2 py-1.5 outline-none focus:border-[#689F38] focus:ring-1 focus:ring-[#689F38] transition-colors disabled:opacity-50"
+                  >
+                    <option value="standard">Standard Default</option>
+                    <optgroup label="Cognition Modes">
+                      <option value="simplified">Simplified (6th Grade)</option>
+                      <option value="dyslexia">Cognition (Dyslexia-Friendly)</option>
+                      <option value="child">Child (Pediatric)</option>
+                    </optgroup>
+                  </select>
+                </div>
+             </div>
+             
+             <div class="relative grid gap-4 transition-all duration-300" [class.grid-cols-1]="selectedReadingLevel() === 'standard'" [class.sm:grid-cols-2]="selectedReadingLevel() !== 'standard'">
+               
+               @if (selectedReadingLevel() !== 'standard') {
+                 <div class="flex flex-col gap-1.5 animate-in fade-in slide-in-from-left-4 duration-300">
+                    <label class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest ml-1">Original (English)</label>
+                    <pocket-gull-input
+                      type="textarea"
+                      [rows]="16"
+                      [value]="originalPreviewText()"
+                      (valueChange)="originalPreviewText.set($event)"
+                      [disabled]="isTranslating()"
+                      placeholder="No Active Care Plan recorded for this visit."
+                      class="w-full">
+                    </pocket-gull-input>
+                 </div>
+               }
+
+               <div class="flex flex-col gap-1.5">
+                  @if (selectedReadingLevel() !== 'standard') {
+                     <label class="text-[10px] font-bold text-[#689F38] uppercase tracking-widest ml-1 animate-in fade-in duration-300">Translated / Adjusted Plan</label>
+                  }
+                  <pocket-gull-input
+                    type="textarea"
+                    [rows]="16"
+                    [value]="previewText()"
+                    (valueChange)="previewText.set($event)"
+                    [disabled]="isTranslating()"
+                    placeholder="No Active Care Plan recorded for this visit."
+                    class="w-full">
+                  </pocket-gull-input>
+               </div>
+               
+               @if (isTranslating()) {
+                 <div class="absolute inset-0 bg-white/70 dark:bg-[#09090b]/70 backdrop-blur-[1px] flex flex-col items-center justify-center z-10 rounded">
+                    <div class="w-6 h-6 border-2 border-[#689F38] border-t-transparent rounded-full animate-spin"></div>
+                    <p class="mt-2 text-xs font-bold text-[#689F38] uppercase tracking-wider animate-pulse">Translating...</p>
+                 </div>
+               }
+             </div>
+             
+             <p class="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wider mt-3 pl-1">This text will be archived in the patient's chart as the final Care Plan for this visit.</p>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 bg-[#F9FAFB] dark:bg-zinc-900 flex justify-between items-center">
+            <pocket-gull-button 
+              (click)="printReport()" 
+              variant="secondary" 
+              size="sm" 
+              icon="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z">
+              Print Plan
+            </pocket-gull-button>
+            <div class="flex items-center gap-3">
+              <pocket-gull-button 
+                (click)="closePreview()" 
+                variant="ghost" 
+                size="sm">
+                Cancel
+              </pocket-gull-button>
+              <pocket-gull-button 
+                (click)="confirmFinalize()" 
+                variant="primary" 
+                size="sm" 
+                trailingIcon="M20 6L9 17l-5-5">
+                Commit to Chart
+              </pocket-gull-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
       </main>
     }
   </div>
@@ -434,6 +591,206 @@ export class AppComponent implements OnDestroy {
   isChartCollapsed = signal<boolean>(false);
   isAnalysisCollapsed = signal<boolean>(false);
   showFhirCallback = signal<boolean>(false);
+  showAnalysisPdf = signal<boolean>(false);
+
+  export = inject(ExportService);
+  showExportMenu = signal(false);
+  isSimplifying = signal(false);
+  isSimplifyingChild = signal(false);
+
+  // Finalize & Archive State
+  showPreviewModal = signal(false);
+  previewText = signal('');
+  originalPreviewText = signal('');
+  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
+  isTranslating = this.clinicalIntelligence.isLoading;
+
+  hasReport = computed(() => Object.keys(this.clinicalIntelligence.analysisResults()).length > 0);
+
+  exportPdf() {
+    const results = this.clinicalIntelligence.analysisResults();
+    const patient = this.patientMgmt.selectedPatient();
+    const patientName = patient?.name || 'Clinical User';
+
+    this.export.downloadAsPdf({
+      report: results,
+      summary: results['Summary Overview'] || 'No summary available.'
+    }, patientName);
+  }
+
+  async exportSimplifiedPdf() {
+    this.isSimplifying.set(true);
+    try {
+      const results = this.clinicalIntelligence.analysisResults();
+      const patient = this.patientMgmt.selectedPatient();
+      const patientName = patient?.name || 'Clinical User';
+
+      const originalSummary = results['Summary Overview'] || 'No summary available.';
+      const simplifiedSummary = await this.clinicalIntelligence.translateReadingLevel(originalSummary, 'dyslexia');
+
+      this.export.downloadAsPdf({
+        report: results,
+        summary: simplifiedSummary
+      }, patientName + ' (Cognition)');
+    } catch (e) {
+      console.error("Failed to generate simplified PDF", e);
+      alert("Failed to generated simplified export. " + (e as Error).message);
+    } finally {
+      this.isSimplifying.set(false);
+    }
+  }
+
+  async exportChildPdf() {
+    this.isSimplifyingChild.set(true);
+    try {
+      const results = this.clinicalIntelligence.analysisResults();
+      const patient = this.patientMgmt.selectedPatient();
+      const patientName = patient?.name || 'Clinical User';
+
+      const originalSummary = results['Summary Overview'] || 'No summary available.';
+      const simplifiedSummary = await this.clinicalIntelligence.translateReadingLevel(originalSummary, 'child');
+
+      this.export.downloadAsPdf({
+        report: results,
+        summary: simplifiedSummary
+      }, patientName + ' (Pediatric Overview)');
+    } catch (e) {
+      console.error("Failed to generate child PDF", e);
+      alert("Failed to generated child export. " + (e as Error).message);
+    } finally {
+      this.isSimplifyingChild.set(false);
+    }
+  }
+
+  exportFhir() {
+    const patient = this.patientMgmt.selectedPatient();
+    if (patient) {
+      this.export.downloadAsFhirBundle(patient);
+    } else {
+      // Fallback
+      const results = this.clinicalIntelligence.analysisResults();
+      this.export.downloadAsFhir({
+        report: results,
+        summary: results['Summary Overview']
+      }, 'Clinical User');
+    }
+  }
+
+  exportJson() {
+    const patient = this.patientMgmt.selectedPatient();
+    if (patient) {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(patient, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", patient.id + ".json");
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    }
+  }
+
+  connectEpic() {
+    alert("Epic Integration placeholder: Connecting to Epic MyChart...");
+  }
+
+  connectGoogleHealth() {
+    alert("Google Health Connect: Awaiting sync from Android Companion App...");
+  }
+
+  connectAppleHealth() {
+    alert("Apple HealthKit: Awaiting sync from iOS Companion App...");
+  }
+
+  uploadData() {
+    // Usually this triggers file upload dialog from patient-dropdown, but for now we'll trigger an alert or sync.
+    alert("Upload data modal placeholder");
+  }
+
+  openFinalizePreview() {
+    let plan = this.state.activePatientSummary() || '';
+    const draftItems = this.state.draftSummaryItems();
+    if (draftItems.length > 0) {
+      const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
+      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
+    }
+    const finalText = plan || 'No Active Patient Summary recorded for this visit.';
+    this.previewText.set(finalText);
+    this.originalPreviewText.set(finalText);
+    this.selectedReadingLevel.set('standard');
+    this.showPreviewModal.set(true);
+  }
+
+  closePreview() {
+    this.showPreviewModal.set(false);
+  }
+
+  async changeReadingLevel(event: Event) {
+    const level = (event.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child';
+    this.selectedReadingLevel.set(level);
+
+    if (level === 'standard') {
+      this.previewText.set(this.originalPreviewText());
+      return;
+    }
+
+    try {
+      const translated = await this.clinicalIntelligence.translateReadingLevel(this.originalPreviewText(), level);
+      this.previewText.set(translated);
+    } catch (error) {
+      console.error("Translation failed", error);
+      this.selectedReadingLevel.set('standard');
+      this.previewText.set(this.originalPreviewText());
+    }
+  }
+
+  printReport() {
+    const p = this.patientMgmt.selectedPatient();
+    const vitals = this.state.vitals();
+    this.export.downloadCarePlanPdf(
+      this.previewText(),
+      p?.name ?? 'Patient',
+      {
+        bp: vitals.bp || undefined,
+        hr: vitals.hr || undefined,
+        temp: vitals.temp || undefined,
+        spO2: vitals.spO2 || undefined,
+        weight: vitals.weight || undefined,
+      },
+      p?.preexistingConditions ?? []
+    );
+  }
+
+  confirmFinalize() {
+    this.state.updateActivePatientSummary(this.originalPreviewText());
+    if (this.state.draftSummaryItems().length > 0) {
+      this.state.clearDraftSummaryItems();
+    }
+    this.finalizeChart();
+    this.closePreview();
+  }
+
+  finalizeChart() {
+    const patientId = this.patientMgmt.selectedPatientId();
+    if (!patientId) return;
+
+    const chartState = this.state.getCurrentState();
+
+    const historyEntry = {
+      type: 'ChartArchived' as const,
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+      summary: 'Medical chart finalized and archived for this visit.',
+      state: chartState,
+      finalText: this.originalPreviewText(),
+      translatedText: this.selectedReadingLevel() !== 'standard' ? this.previewText() : undefined,
+      readingLevel: this.selectedReadingLevel()
+    };
+
+    this.patientMgmt.addHistoryEntry(patientId, historyEntry);
+  }
+
+  finalizeRecord() {
+    this.openFinalizePreview();
+  }
 
   cycleTheme() {
     const current = this.theme.currentTheme();

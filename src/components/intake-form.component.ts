@@ -22,13 +22,13 @@ interface NoteTimelineItem extends BodyPartIssue {
   imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="h-full flex flex-col bg-[#F9FAFB]">
+    <div class="h-full flex flex-col bg-[#F9FAFB] dark:bg-zinc-950">
       @if (state.selectedPartId()) {
         <!-- Global Header for the Panel -->
-        <div class="h-14 border-b border-gray-200 flex items-center justify-between px-6 bg-white shrink-0 z-10">
+        <div class="h-14 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-zinc-900 shrink-0 z-10">
           <div class="flex items-center gap-2">
-            <div class="w-2 h-2 rounded-sm bg-[#689F38]"></div>
-            <span class="text-xs font-bold uppercase tracking-widest text-gray-500">Assessment Panel</span>
+            <div class="w-2 h-2 rounded-sm bg-[#689F38] dark:bg-[#8bc34a]"></div>
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Assessment Panel</span>
           </div>
           <pocket-gull-button 
             variant="ghost" 
@@ -40,20 +40,20 @@ interface NoteTimelineItem extends BodyPartIssue {
         </div>
 
         <div class="flex-1 flex overflow-hidden">
-          <div class="flex-1 overflow-y-auto p-6 bg-[#F9FAFB]">
+          <div class="flex-1 overflow-y-auto p-6 bg-[#F9FAFB] dark:bg-zinc-950">
             
             @if (viewedNote(); as note) {
               <!-- TASK BRACKET: Active Assessment Card -->
               <!-- This visual container 'brackets' the current task, separating it from history -->
-              <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-8 transition-all duration-300 hover:shadow-md">
+              <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 overflow-hidden mb-8 transition-all duration-300 hover:shadow-md">
               
               <!-- Bracket Header -->
-              <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-100 flex justify-between items-start">
+              <div class="bg-gray-50/50 dark:bg-zinc-800/30 px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-start">
                 <div>
-                  <span class="text-xs font-bold uppercase tracking-widest text-[#416B1F] block mb-1">
+                  <span class="text-xs font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#8bc34a] block mb-1">
                     {{ note.isCurrent ? 'Active Input' : 'Historical Record' }}
                   </span>
-                  <h2 class="text-xl font-medium text-[#1C1C1C]">{{ state.selectedPartName() }}</h2>
+                  <h2 class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100">{{ state.selectedPartName() }}</h2>
                 </div>
                 @if (note.isCurrent) {
                   <pocket-gull-badge label="Live" severity="success" [hasIcon]="true">
@@ -70,19 +70,19 @@ interface NoteTimelineItem extends BodyPartIssue {
                 <!-- 1. Pain Level Section -->
                 <div class="mb-8">
                   <div class="flex justify-between items-end mb-4">
-                    <label for="painRange" class="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                    <label for="painRange" class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                         Pain Severity
                     </label>
                     <div class="flex items-baseline gap-1">
-                        <span class="text-3xl font-light text-[#1C1C1C]">{{ formState().painLevel }}</span>
-                        <span class="text-sm font-medium text-gray-500">/10</span>
+                        <span class="text-3xl font-light text-[#1C1C1C] dark:text-zinc-100">{{ formState().painLevel }}</span>
+                        <span class="text-sm font-medium text-gray-500 dark:text-zinc-400">/10</span>
                     </div>
                   </div>
                   
                   <div class="relative h-8 flex items-center group">
                     <!-- Track background -->
-                    <div class="absolute w-full h-1.5 bg-gray-100 rounded-sm overflow-hidden">
+                    <div class="absolute w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-sm overflow-hidden">
                         <div class="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 opacity-30"></div>
                     </div>
                     <!-- Active fill -->
@@ -101,13 +101,13 @@ interface NoteTimelineItem extends BodyPartIssue {
                       class="relative w-full h-8 opacity-0 z-10 cursor-pointer disabled:cursor-not-allowed">
                       
                     <!-- Custom Thumb (Visual only, follows input) -->
-                    <div class="absolute h-5 w-5 bg-white border-2 border-[#1C1C1C] rounded-sm shadow-sm pointer-events-none transition-all duration-150 ease-out flex items-center justify-center"
+                    <div class="absolute h-5 w-5 bg-white dark:bg-zinc-900 border-2 border-[#1C1C1C] dark:border-zinc-300 rounded-sm shadow-sm pointer-events-none transition-all duration-150 ease-out flex items-center justify-center"
                          [style.left.%]="formState().painLevel * 10"
                          [style.transform]="'translateX(-50%)'">
-                         <div class="w-1.5 h-1.5 bg-[#1C1C1C] rounded-sm"></div>
+                         <div class="w-1.5 h-1.5 bg-[#1C1C1C] dark:bg-zinc-300 rounded-sm"></div>
                     </div>
                   </div>
-                  <div class="flex justify-between text-xs text-gray-500 font-medium uppercase tracking-wider px-1">
+                  <div class="flex justify-between text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-wider px-1">
                     <span>None</span>
                     <span>Moderate</span>
                     <span>Severe</span>
@@ -154,7 +154,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                       </div>
                     </pocket-gull-input>
                   @if(dictation.permissionError(); as error) {
-                      <div class="flex items-center gap-2 text-red-600 bg-red-50 px-3 py-2 rounded-md border border-red-100">
+                      <div class="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded-md border border-red-100 dark:border-red-800/50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                         <p class="text-[11px] font-medium">{{ error }}</p>
                       </div>
@@ -164,9 +164,9 @@ interface NoteTimelineItem extends BodyPartIssue {
                 <!-- 3. Recommendations Section -->
                 <div class="space-y-3">
                   <div class="flex justify-between items-center mb-1">
-                    <label for="recommendation-input" class="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                      Recommendations
+                    <label for="recommendation-input" class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        Recommendations
                     </label>
                     @if (formState().recommendation && note.isCurrent) {
                       <pocket-gull-button
@@ -213,7 +213,7 @@ interface NoteTimelineItem extends BodyPartIssue {
               </div>
 
               <!-- Bracket Footer -->
-              <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-between items-center">
+              <div class="px-6 py-4 bg-gray-50 dark:bg-zinc-900/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center">
                 <pocket-gull-button 
                   variant="ghost" 
                   size="sm"
@@ -241,7 +241,7 @@ interface NoteTimelineItem extends BodyPartIssue {
 
                     <div class="space-y-px rams-typography">
                       @for (node of aiInsights(); track node.id) {
-                        <div class="bg-purple-50/30 border border-purple-100/50 rounded-lg p-4 transition-all hover:bg-purple-50/50 group mb-3">
+                        <div class="bg-purple-50/30 dark:bg-purple-900/10 border border-purple-100/50 dark:border-purple-800/30 rounded-lg p-4 transition-all hover:bg-purple-50/50 dark:hover:bg-purple-900/20 group mb-3">
                            @if (node.type === 'paragraph') {
                              <div [innerHTML]="node.rawHtml | safeHtml"></div>
                            } @else if (node.type === 'list') {
@@ -278,7 +278,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                 <!-- CONTEXT: History Timeline -->
                 <div class="mt-12 pl-2">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                        <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
                             History & Context
                         </h3>
@@ -294,22 +294,25 @@ interface NoteTimelineItem extends BodyPartIssue {
                     
                     <div class="relative pl-2">
                         <!-- Vertical Timeline Line -->
-                        <div class="absolute left-[11px] top-2 bottom-2 w-px bg-gray-200"></div>
+                        <div class="absolute left-[11px] top-2 bottom-2 w-px bg-gray-200 dark:bg-zinc-800"></div>
 
                         @for (timelineNote of noteTimeline(); track $index) {
                         <div class="relative pl-8 pb-6 group">
                             <!-- Node on the timeline -->
-                            <div class="absolute left-[7px] top-2.5 w-2.5 h-2.5 rounded-sm border-2 bg-white z-10 transition-colors"
+                            <div class="absolute left-[7px] top-2.5 w-2.5 h-2.5 rounded-sm border-2 bg-white dark:bg-zinc-950 z-10 transition-colors"
                                 [class.border-[#689F38]]="timelineNote.isCurrent"
-                                [class.border-gray-300]]="!timelineNote.isCurrent"
+                                [class.border-gray-300]="!timelineNote.isCurrent"
+                                [class.dark:border-zinc-700]="!timelineNote.isCurrent"
                                 [class.bg-[#689F38]]="timelineNote.noteId === state.selectedNoteId()">
                             </div>
                             
                             <!-- Data Card -->
                             <button (click)="selectNote(timelineNote.noteId)" 
-                                    class="w-full text-left p-3 rounded-lg border transition-all duration-200 hover:shadow-md group-hover:border-gray-300"
+                                    class="w-full text-left p-3 rounded-lg border transition-all duration-200 hover:shadow-md group-hover:border-gray-300 dark:border-zinc-800 dark:hover:border-zinc-600"
                                     [class.bg-white]="timelineNote.noteId !== state.selectedNoteId()"
+                                    [class.dark:bg-zinc-900]="timelineNote.noteId !== state.selectedNoteId()"
                                     [class.bg-[#F1F8E9]]="timelineNote.noteId === state.selectedNoteId()"
+                                    [class.dark:bg-[#1a2e0530]]="timelineNote.noteId === state.selectedNoteId()"
                                     [class.border-[#689F38]]="timelineNote.noteId === state.selectedNoteId()"
                                     [class.border-transparent]="timelineNote.noteId !== state.selectedNoteId()"
                                     [class.shadow-sm]="timelineNote.noteId !== state.selectedNoteId()">
@@ -317,27 +320,29 @@ interface NoteTimelineItem extends BodyPartIssue {
                                 <div class="flex justify-between items-start mb-1">
                                     <span class="text-xs font-bold uppercase tracking-widest"
                                        [class.text-[#416B1F]]="timelineNote.isCurrent"
-                                       [class.text-gray-500]="!timelineNote.isCurrent">
+                                       [class.dark:text-[#8bc34a]]="timelineNote.isCurrent"
+                                       [class.text-gray-500]="!timelineNote.isCurrent"
+                                       [class.dark:text-zinc-400]="!timelineNote.isCurrent">
                                         {{ timelineNote.date }}
                                     </span>
-                                    <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">
+                                    <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400">
                                         Pain: {{ timelineNote.painLevel }}
                                     </span>
                                 </div>
-                                <p class="text-xs font-medium text-gray-700 line-clamp-2 leading-relaxed">
+                                <p class="text-xs font-medium text-gray-700 dark:text-zinc-300 line-clamp-2 leading-relaxed">
                                     {{ timelineNote.description || 'No description provided.' }}
                                 </p>
                             </button>
                         </div>
                     } @empty {
-                        <div class="pl-8 text-xs text-gray-500 italic py-4">No prior history for this body part.</div>
+                        <div class="pl-8 text-xs text-gray-500 dark:text-zinc-400 italic py-4">No prior history for this body part.</div>
                     }
                 </div>
             </div>
 
         } @else {
            <div class="flex-1 flex flex-col items-center justify-center p-8 text-center opacity-40">
-              <p class="text-xs font-bold uppercase tracking-widest text-gray-500">Select a note to edit.</p>
+              <p class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Select a note to edit.</p>
            </div>
         }
           </div>
@@ -345,10 +350,10 @@ interface NoteTimelineItem extends BodyPartIssue {
 
       } @else {
         <div class="flex-1 flex flex-col items-center justify-center p-8 text-center opacity-40">
-           <div class="w-16 h-16 bg-gray-100 rounded-sm flex items-center justify-center mb-4 text-gray-300">
+           <div class="w-16 h-16 bg-gray-100 dark:bg-zinc-900 rounded-sm flex items-center justify-center mb-4 text-gray-300 dark:text-zinc-400">
              <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
            </div>
-           <p class="text-xs font-bold uppercase tracking-widest text-gray-500">Select a body part to begin assessment</p>
+           <p class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Select a body part to begin assessment</p>
         </div>
       }
     </div>

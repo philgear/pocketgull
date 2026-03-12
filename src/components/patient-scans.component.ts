@@ -52,17 +52,17 @@ import { DiagnosticScan } from '../services/patient.types';
           <div class="p-4 flex flex-col flex-1">
             <div class="flex items-center gap-2 mb-2">
               <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-[#09090b] uppercase tracking-[0.15em] shadow-sm">{{ scan.type }}</span>
-              <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest">{{ scan.date }}</span>
+              <span class="text-[10px] text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-widest">{{ scan.date }}</span>
             </div>
             <h4 class="text-sm font-bold text-[#1C1C1C] dark:text-zinc-100 leading-tight mb-2 uppercase tracking-wide">{{ scan.title }}</h4>
             <p class="text-xs text-gray-600 dark:text-zinc-400 line-clamp-3 leading-relaxed flex-1 font-light">{{ scan.description }}</p>
           </div>
         </div>
       } @empty {
-        <div class="col-span-full py-12 flex flex-col items-center justify-center text-gray-400 dark:text-zinc-600 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg bg-gray-50/50 dark:bg-zinc-900/50">
+        <div class="col-span-full py-12 flex flex-col items-center justify-center text-gray-500 dark:text-zinc-400 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg bg-gray-50/50 dark:bg-zinc-900/50">
            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-3 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/></svg>
-           <p class="text-xs font-bold uppercase tracking-[0.15em] text-gray-500 dark:text-zinc-500">No Scans or Diagnostics Available</p>
-           <p class="text-[10px] uppercase tracking-widest text-gray-400 mt-1">Patient records empty</p>
+           <p class="text-xs font-bold uppercase tracking-[0.15em] text-gray-500 dark:text-zinc-400">No Scans or Diagnostics Available</p>
+           <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Patient records empty</p>
         </div>
       }
     </div>

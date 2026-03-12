@@ -131,13 +131,13 @@ export interface PubMedSearchResult {
                         [class.text-white]="bookmark.cited"
                         [class.bg-gray-50]="!bookmark.cited"
                         [class.dark:bg-zinc-800]="!bookmark.cited"
-                        [class.text-gray-400]="!bookmark.cited"
-                        [class.dark:text-zinc-500]="!bookmark.cited"
+                        [class.text-gray-500]="!bookmark.cited"
+                        [class.dark:text-zinc-400]="!bookmark.cited"
                         [title]="bookmark.cited ? 'Remove from summary references' : 'Include in summary references'">
                     {{ bookmark.cited ? 'CITED' : 'CITE' }}
                 </button>
                 <button (click)="removeBookmark(bookmark.url)"
-                        class="px-1 py-0.5 text-gray-400 dark:text-zinc-500 bg-gray-100 dark:bg-zinc-800 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
+                        class="px-1 py-0.5 text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
                     ×
                 </button>
             </div>
@@ -150,11 +150,11 @@ export interface PubMedSearchResult {
         @if (searchEngine() === 'pubmed' && (pubmedResults() !== null || isLoadingPubmed())) {
           <div class="p-4 space-y-4 max-w-3xl mx-auto">
             @if (isLoadingPubmed()) {
-              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-500">
+              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-400">
                 <p class="text-sm font-medium animate-pulse">Searching PubMed natively...</p>
               </div>
             } @else if (pubmedResults()?.length === 0) {
-              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-500">
+              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-400">
                 <p class="text-sm">No results found on PubMed.</p>
               </div>
             } @else {
@@ -162,7 +162,7 @@ export interface PubMedSearchResult {
                 <div class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800">
                   <h4 class="font-bold text-gray-800 dark:text-zinc-100 text-sm leading-snug mb-1" [innerHTML]="res.title | safeHtml"></h4>
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1 font-medium">{{ res.authors }}</p>
-                  <div class="text-[11px] text-gray-500 dark:text-zinc-500 flex items-center gap-2 mb-3">
+                  <div class="text-[11px] text-gray-500 dark:text-zinc-400 flex items-center gap-2 mb-3">
                     <span class="font-bold">{{ res.source }}</span> • <span>{{ res.pubdate }}</span>
                     @if (res.doi) {
                       <span>• DOI: {{ res.doi }}</span>
@@ -183,7 +183,7 @@ export interface PubMedSearchResult {
         } @else if (sanitizedUrl(); as url) {
           <iframe #iframeEl [src]="url" class="w-full h-full border-none bg-white dark:bg-zinc-950"></iframe>
         } @else {
-          <div class="w-full h-full flex items-center justify-center text-center text-gray-500 dark:text-zinc-500 p-4">
+          <div class="w-full h-full flex items-center justify-center text-center text-gray-500 dark:text-zinc-400 p-4">
              <p class="text-xs">Search results and bookmarked pages will appear here.</p>
           </div>
         }

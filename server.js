@@ -1,5 +1,6 @@
 import express from 'express';
 import compression from 'compression';
+import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
@@ -10,6 +11,7 @@ const __dirname = dirname(__filename);
 
 const app = express();
 app.use(compression());
+app.use('/api', cors()); // Enable CORS for API routes so Flutter apps can sync data
 
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
 app.set('trust proxy', true);
@@ -23,7 +25,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const port = process.env.PORT || 4200;
+const port = process.env.PORT || 3000;
 
 // Use process.cwd() to ensure we are looking in the right place
 const rootDir = process.cwd();
@@ -178,6 +180,33 @@ app.post('/api/patients', (req, res) => {
   } catch (err) {
     console.error('[API] Error saving patients database:', err);
     res.status(500).json({ error: 'Internal server error while saving database' });
+  }
+});
+
+app.put('/api/patients/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!req.body || typeof req.body !== 'object') {
+      return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
+    }
+
+    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    const patients = JSON.parse(data);
+    const index = patients.findIndex(p => p.id === id);
+
+    if (index !== -1) {
+      patients[index] = { ...patients[index], ...req.body, id }; // Ensure ID stays same
+    } else {
+      // If it doesn't exist, we can create it
+      patients.push({ ...req.body, id });
+    }
+
+    fs.writeFileSync(patientsDbPath, JSON.stringify(patients, null, 2));
+    console.log(`[API] Synced patient ${id} from mobile/app to database.`);
+    res.status(200).json({ success: true, patient: patients.find(p => p.id === id) });
+  } catch (err) {
+    console.error('[API] Error syncing patient to database:', err);
+    res.status(500).json({ error: 'Internal server error while syncing patient' });
   }
 });
 

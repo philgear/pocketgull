@@ -45,7 +45,7 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 - **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
 - **Cognition & Child Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly or pediatric formats, outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
 - **Printable Clinical Stationery:** CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis, with user-selectable toggles for clinical summaries and history.
-- **Minimalist Dieter Rams Design:** A premium, minimalist UI prioritizing clarity, neutrality, functional excellence, and seamless mobile responsive layouts (`100dvh`). Includes dark-mode agent conversations.
+- **Minimalist Dieter Rams Design:** A premium, minimalist UI prioritizing clarity, neutrality, functional excellence, and seamless mobile responsive layouts (`100dvh`). Includes WCAG AA compliant Deep Dark Mode for accessible low-light clinical environments.
 - **Detailed 3D Medical Imagery:** Precise anatomical selection using a Three.js-powered skeletal and surface model (including detailed procedural spine geometry) with dynamic particle systems highlighting diagnostic severity.
 - **Smartwatch & Mobile Optimization:** Responsive Two-Column Grid UI scaling down to extremely constrained viewports (e.g., Pixel Watch 2 at 286px width) for ultra-portable clinical referencing.
 - **Scans & Diagnostics Library:** Integrated visual gallery within the patient profile for organizing and analyzing medical imagery (e.g., MRI, X-Rays), complete with dynamic Wikimedia Commons linking.
@@ -53,12 +53,12 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 - **Box Breathing UX:** Focused 16-second box breathing visual animations integrated into primary intake text areas to promote practitioner mindfulness.
 - **Interactive Task Bracketing:** Rapidly markup generated care plans using a double-click state machine (Normal, Added, Removed) to vet and customize AI recommendations.
 - **FHIR-Standard Data Portability & Localized Auto-Save:** Real-time persistence with visual "Saving..." / "Saved ✔" indicators, exported via Unicode-safe Base64 encoded FHIR Bundles.
-- **Patient Management System:** Full CRUD capabilities for patient records, including historical visit review and permanent record removal.
+- **Translation & Localization Tracking:** Doctors can review and explicitly edit multilingual translations of care plans (e.g., Spanish) side-by-side before permanently archiving them into the patient record.
 
 **Technologies Used:**
 - **Framework:** Angular v21.1 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
 - **Visualization:** Three.js (3D Anatomical Modeling)
-- **Intelligence:** Google GenAI SDK (`gemini-2.5-flash`) & Google Agent Development Kit (`@google/adk`)
+- **Intelligence:** Google Genkit (Serverless Tracing & AI Observability), Google GenAI SDK (`gemini-2.5-flash`) & Google Agent Development Kit (`@google/adk`)
 - **Research Integrations:** Google Programmable Search Engine (CSE) & NIH PubMed E-utilities
 - **Export Engine:** jsPDF & FHIR Bundle standard
 - **Styling:** Tailwind CSS & Dieter Rams Design System
@@ -108,8 +108,8 @@ To run this project in a local development environment:
 
 Pocket Gull's backend service and Express proxy layer is architecturally designed to deploy directly to **Google Cloud Run**.
 
-- **Proof of Action:** Successfully deployed to Google Cloud Run! The live application is available at: [https://pocketgall.app](https://pocketgall.app) (and [https://understory-315235665910.us-west1.run.app](https://understory-315235665910.us-west1.run.app))
-- **Repository Proof:** See `./server.js` and `./src/services/clinical-intelligence.service.ts` for Google Cloud infrastructure integrations.
+- **Proof of Action:** Successfully deployed to Google Cloud Run! The live application is available at: [https://pocketgull.app](https://pocketgull.app) (also serving `pocketgall.com`, `pocketgal.app`, `pocketgal.ai`)
+- **Repository Proof:** See `./server.ts` and `./src/server/genkit.ts` for Google Cloud infrastructure and server-side Genkit HTTP endpoint REST integrations.
 
 ---
 

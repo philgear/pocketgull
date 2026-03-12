@@ -124,7 +124,7 @@ interface ChatEntry {
                     </button>
                     
                     @if (suggestedQuestions().length > 0) {
-                        <button class="node-agent-attach" (click)="showSuggestionsDropdown.set(!showSuggestionsDropdown())" [disabled]="isLoading()" title="Suggested Questions" [class.bg-[#E5E7EB]]="showSuggestionsDropdown()">
+                        <button class="node-agent-attach" (click)="showSuggestionsDropdown.set(!showSuggestionsDropdown())" [disabled]="isLoading()" title="Suggested Questions" [class.bg-[#E5E7EB]]="showSuggestionsDropdown()" [class.dark:bg-[#27272a]]="showSuggestionsDropdown()">
                             <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-4 h-4 flex items-center justify-center"></div>
                         </button>
                     }
@@ -134,14 +134,14 @@ interface ChatEntry {
                         <!-- Invisible overlay to catch clicks outside -->
                         <div class="fixed inset-0 z-40" (click)="showSuggestionsDropdown.set(false)"></div>
                         
-                        <div class="absolute bottom-full left-14 mb-2 w-72 bg-white rounded-xl shadow-[0_12px_28px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] overflow-hidden z-50 flex flex-col border border-gray-100 transform origin-bottom-left transition-all">
-                            <div class="px-3 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
+                        <div class="absolute bottom-full left-14 mb-2 w-72 bg-white dark:bg-[#09090b] rounded-xl shadow-[0_12px_28px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] overflow-hidden z-50 flex flex-col border border-gray-100 dark:border-zinc-800 transform origin-bottom-left transition-all">
+                            <div class="px-3 py-2 bg-gray-50 dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 flex items-center gap-2">
                                 <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-3.5 h-3.5 text-indigo-500 flex items-center justify-center"></div>
-                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Initial Questions</span>
+                                <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Initial Questions</span>
                             </div>
                             <div class="p-1">
                                 @for (s of suggestedQuestions(); track s) {
-                                    <button class="w-full text-left px-3 py-2 text-[11.5px] text-gray-700 hover:bg-gray-50 hover:text-indigo-600 rounded-lg transition-colors flex items-center gap-2 group" (click)="sendSuggestion(s); showSuggestionsDropdown.set(false)">
+                                    <button class="w-full text-left px-3 py-2 text-[11.5px] text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-colors flex items-center gap-2 group" (click)="sendSuggestion(s); showSuggestionsDropdown.set(false)">
                                         <span class="flex-1">{{ s }}</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                                     </button>
@@ -493,6 +493,38 @@ interface ChatEntry {
         .node-agent-send:hover:not(:disabled) { background: #333333; }
         .node-agent-send:active:not(:disabled) { transform: scale(0.95); }
         .node-agent-send:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* --- Dark Mode Overrides --- */
+        .dark .node-agent-dialog { background: #09090b; border-color: #27272a; }
+        .dark .node-agent-header { background: #18181b; border-color: #27272a; }
+        .dark .node-agent-title { color: #f4f4f5; }
+        .dark .node-agent-section-chip { background: #1f2937; border-color: #374151; color: #8bc34a; }
+        .dark .node-agent-context { background: #18181b; border-color: #27272a; }
+        .dark .node-agent-context-text { color: #d4d4d8; }
+        .dark .node-agent-context-text strong { color: #f4f4f5; }
+        .dark .node-agent-avatar { background: #f4f4f5; color: #18181b; }
+        .dark .node-agent-bubble { background: #27272a; color: #d4d4d8; }
+        
+        .dark .node-agent-bubble.rams-typography h1, 
+        .dark .node-agent-bubble.rams-typography h2, 
+        .dark .node-agent-bubble.rams-typography h3, 
+        .dark .node-agent-bubble.rams-typography strong { color: #f4f4f5; }
+        .dark .node-agent-bubble.rams-typography th { background: #3f3f46; border-color: #52525b; color: #f4f4f5; }
+        .dark .node-agent-bubble.rams-typography td { border-color: #52525b; }
+        
+        .dark .node-agent-message--model .node-agent-bubble { background: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-message--user .node-agent-avatar { background: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-message--user .node-agent-bubble { background: #f4f4f5; color: #18181b; }
+        
+        .dark .node-agent-message--system .node-agent-bubble { background: #1f2937; border-color: #374151; color: #d4d4d8; }
+        
+        .dark .node-agent-input-container { background: #09090b; border-top-color: #27272a; }
+        .dark .node-agent-file-chip { background: #27272a; border-color: #3f3f46; color: #d4d4d8; }
+        .dark .node-agent-file-remove:hover { color: #f4f4f5; }
+        .dark .node-agent-attach:hover:not(:disabled) { color: #f4f4f5; background: #27272a; }
+        .dark .node-agent-input { background: #18181b; border-color: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-send { background: #f4f4f5; color: #18181b; }
+        .dark .node-agent-send:hover:not(:disabled) { background: #d4d4d8; }
     `]
 })
 export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {

@@ -19,12 +19,12 @@ import { RevealDirective } from '../directives/reveal.directive';
           </span>
           <h2 class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100">Clinical Tasks & Notes</h2>
         </div>
-        <div class="flex flex-col items-end gap-2">
+        <div class="flex flex-col items-end gap-1 sm:gap-2">
             <div class="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-[#689f38]/10 rounded-full border border-green-100 dark:border-[#689f38]/30">
               <div class="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-[#689f38] animate-pulse"></div>
-              <span class="text-xs font-medium text-green-700 dark:text-[#689f38] uppercase tracking-wide">Live</span>
+              <span class="text-[10px] sm:text-xs font-medium text-green-700 dark:text-[#689f38] uppercase tracking-wide">Live</span>
             </div>
-            <div class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">
+            <div class="text-[10px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest text-right">
                {{ clinicalNotes().length }} Notes • {{ checklist().length }} Tasks
             </div>
         </div>
@@ -34,7 +34,7 @@ import { RevealDirective } from '../directives/reveal.directive';
       <div class="flex-1 overflow-y-auto p-6 bg-[#F9FAFB] dark:bg-zinc-950">
         @if (clinicalNotes().length === 0 && checklist().length === 0) {
           <div class="h-full flex flex-col items-center justify-center opacity-40">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-4 text-gray-500 dark:text-zinc-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-4 text-gray-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-100 text-center max-w-xs leading-relaxed">
               No notes or tasks yet. <br/> Add items using the input below or from the Assessment Panel.
             </p>
@@ -44,7 +44,7 @@ import { RevealDirective } from '../directives/reveal.directive';
             <!-- Checklist Section -->
             @if (checklist().length > 0) {
               <div class="mb-4">
-                <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mb-3 px-1">Tasks</h3>
+                <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-3 px-1">Tasks</h3>
                 <div class="flex flex-col gap-2">
                   @for (task of checklist(); track task.id; let i = $index) {
                     <div appReveal [revealDelay]="i * 75" class="flex items-start gap-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-3 shadow-sm group hover:border-gray-300 dark:hover:border-zinc-700 transition-colors">
@@ -59,7 +59,7 @@ import { RevealDirective } from '../directives/reveal.directive';
                       <label [for]="'task-' + task.id" class="text-sm text-[#1C1C1C] dark:text-zinc-100 flex-1 cursor-pointer" [class.line-through]="task.completed" [class.opacity-50]="task.completed">
                         {{ task.text }}
                       </label>
-                      <button (click)="removeTask(task.id)" class="text-gray-300 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Task">
+                      <button (click)="removeTask(task.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Task">
                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                       </button>
                     </div>
@@ -71,7 +71,7 @@ import { RevealDirective } from '../directives/reveal.directive';
             <!-- Clinical Notes Section -->
             @if (clinicalNotes().length > 0) {
               <div>
-                <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest mb-3 px-1">Notes</h3>
+                <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-3 px-1">Notes</h3>
                 <div class="flex flex-col gap-4">
                   @for (note of clinicalNotes(); track note.id; let i = $index) {
                     <div appReveal [revealDelay]="i * 75" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-5 shadow-sm group hover:border-[#689F38] dark:hover:border-[#689F38] transition-colors relative">
@@ -79,12 +79,12 @@ import { RevealDirective } from '../directives/reveal.directive';
                         <span class="text-xs font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] bg-[#F1F8E9] dark:bg-[#689f38]/10 px-2 py-1 rounded inline-block">
                           {{ note.sourceLens }}
                         </span>
-                        <button (click)="removeNote(note.id)" class="text-gray-300 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove Note">
+                        <button (click)="removeNote(note.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove Note">
                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                       </div>
                       <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 font-medium leading-relaxed mb-4 whitespace-pre-wrap">{{ note.text }}</p>
-                      <div class="flex justify-between items-center text-xs text-gray-500 dark:text-zinc-500 font-bold uppercase tracking-widest pt-3 border-t border-gray-100 dark:border-zinc-800">
+                      <div class="flex justify-between items-center text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-widest pt-3 border-t border-gray-100 dark:border-zinc-800">
                         <span>{{ note.date | date:'MMM d, y, h:mm a' }}</span>
                         <span class="text-[#1C1C1C] dark:text-zinc-100 flex items-center gap-1">
                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -113,13 +113,13 @@ import { RevealDirective } from '../directives/reveal.directive';
             rows="1"
             class="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#416B1F]/30 focus:border-[#416B1F] transition-all placeholder-gray-400 dark:placeholder-zinc-600 resize-none max-h-32"
         ></textarea>
-        <div class="flex justify-end gap-2">
-            <button (click)="submitNote(itemInput)" class="px-4 py-1.5 text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200 hover:bg-gray-200 rounded transition-colors uppercase tracking-widest flex items-center gap-1.5">
-               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+            <button (click)="submitNote(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200 hover:bg-gray-200 rounded transition-colors uppercase tracking-widest flex items-center gap-1.5">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 border-gray-200 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                Add Note
             </button>
-            <button (click)="submitTask(itemInput)" class="px-4 py-1.5 text-xs font-bold text-white bg-[#1C1C1C] hover:bg-[#416B1F] rounded transition-colors uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
-               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <button (click)="submitTask(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-white bg-[#1C1C1C] hover:bg-[#416B1F] rounded transition-colors uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                Add Task
             </button>
         </div>

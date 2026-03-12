@@ -22,13 +22,27 @@ app.use(compression());
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
 app.set('trust proxy', true);
 
-// Disabled forced domain redirect to pocketgull.app because the GCP
-// verification system only allows pocketgal.app and pocketgall.app 
-// to be safely mapped under this project's tenant.
+// Forced domain redirect to pocketgull.app
+const targetDomain = 'pocketgull.app';
+const redirectDomains = [
+  'pocketgall.com',
+  'pocketgall.app',
+  'pocketgal.app',
+  'pocketgull.com',
+  'pocketgal.ai'
+];
+
+app.use((req, res, next) => {
+  const host = req.hostname;
+  if (redirectDomains.includes(host)) {
+    return res.redirect(301, `https://${targetDomain}${req.originalUrl}`);
+  }
+  next();
+});
 
 const rootDir = process.cwd();
 
-let geminiApiKeyCached = '';
+
 
 async function fetchGeminiApiKey() {
   if (process.env['GEMINI_API_KEY']) {
@@ -78,11 +92,26 @@ async function fetchGeminiApiKey() {
   }
 }
 
-fetchGeminiApiKey().then((key) => {
-  geminiApiKeyCached = key;
-}).catch(err => {
-  console.warn('[WARN] Top-level error in fetchGeminiApiKey:', err.message);
-});
+let geminiApiKeyCached: string | null = null;
+let fetchPromise: Promise<string> | null = null;
+
+async function getApiKey(): Promise<string> {
+  if (geminiApiKeyCached !== null) return geminiApiKeyCached;
+  if (!fetchPromise) {
+    fetchPromise = fetchGeminiApiKey().then(key => {
+       geminiApiKeyCached = key;
+       if (key) {
+         process.env['GEMINI_API_KEY'] = key;
+       }
+       return key;
+    }).catch(err => {
+       console.warn('[WARN] Top-level error in fetchGeminiApiKey:', err.message);
+       geminiApiKeyCached = '';
+       return '';
+    });
+  }
+  return fetchPromise;
+}
 
 // Security headers
 app.use((req, res, next) => {
@@ -125,6 +154,43 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
+// Genkit AI Endpoints
+app.post('/api/ai/metrics', express.json(), async (req, res) => {
+  try {
+      const { generateMetricsFlow } = await import('./server/genkit.js');
+      const result = await generateMetricsFlow(req.body.text);
+      res.json(result);
+  } catch(e: any) {
+      res.status(500).json({error: e.message});
+  }
+});
+
+app.post('/api/ai/changes', express.json(), async (req, res) => {
+  try {
+      const { detectClinicalChangesFlow } = await import('./server/genkit.js');
+      const result = await detectClinicalChangesFlow({
+          oldData: req.body.oldData,
+          newData: req.body.newData
+      });
+      res.json({ significant: result });
+  } catch(e: any) {
+      res.status(500).json({error: e.message});
+  }
+});
+
+app.post('/api/ai/translate', express.json(), async (req, res) => {
+  try {
+      const { translateReadingLevelFlow } = await import('./server/genkit.js');
+      const result = await translateReadingLevelFlow({
+          text: req.body.text,
+          level: req.body.level
+      });
+      res.json({ text: result });
+  } catch(e: any) {
+      res.status(500).json({error: e.message});
+  }
+});
+
 /**
  * Serve static files from /.
  */
@@ -149,9 +215,10 @@ app.use((req, res, next) => {
 
       // If the response is HTML and we have an API key, inject it
       const contentType = response.headers.get('content-type') || '';
-      if (contentType.includes('text/html') && geminiApiKeyCached) {
+      const key = await getApiKey();
+      if (contentType.includes('text/html') && key) {
         let html = await response.text();
-        const scriptTag = `<script px-api-key="true">window.GEMINI_API_KEY = "${geminiApiKeyCached}";</script>\n</head>`;
+        const scriptTag = `<script px-api-key="true">window.GEMINI_API_KEY = "${key}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
 
         const modRes = new Response(html, {

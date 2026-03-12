@@ -211,6 +211,7 @@
     padding-bottom: 1rem;
     letter-spacing: -0.025em;
 }
+.dark .rams-typography h1 { color: #f3f4f6; border-bottom-color: #3f3f46; }
 
 .rams-typography h2 {
     font-family: 'Inter', sans-serif;
@@ -223,6 +224,7 @@
     padding-bottom: 0.75rem;
     letter-spacing: -0.02em;
 }
+.dark .rams-typography h2 { color: #e5e7eb; border-bottom-color: #27272a; }
 
 .rams-typography h3 {
     font-family: 'Inter', sans-serif;
@@ -235,6 +237,7 @@
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
 }
+.dark .rams-typography h3 { color: #a1a1aa; }
 
 .rams-typography h4,
 .rams-typography h5,
@@ -246,6 +249,7 @@
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
 }
+.dark .rams-typography h4, .dark .rams-typography h5, .dark .rams-typography h6 { color: #f3f4f6; }
 
 .rams-typography p,
 .rams-typography li,
@@ -257,11 +261,13 @@
     line-height: 1.6;
     color: #374151;
 }
+.dark .rams-typography p, .dark .rams-typography li, .dark .rams-typography td, .dark .rams-typography th { color: #d1d5db; }
 
 .rams-typography strong {
     font-weight: 800;
     color: #111827;
 }
+.dark .rams-typography strong { color: #f9fafb; }
 
 .rams-typography ul {
     list-style: none;
@@ -285,6 +291,7 @@
     left: 0.75rem;
     top: 1.15em;
 }
+.dark .rams-typography li::before { background: #52525b; }
 
 .rams-typography blockquote {
     border-left: 4px solid #689F38;
@@ -296,6 +303,7 @@
     margin: 2rem 0;
     border-radius: 0 8px 8px 0;
 }
+.dark .rams-typography blockquote { background-color: #18181b; color: #a1a1aa; border-left-color: #8bc34a; }
 
 /* Tables — AI-generated tables for labs, medication, and monitoring */
 .rams-typography table {
@@ -307,10 +315,12 @@
     overflow: hidden;
     border: 1px solid #E5E7EB;
 }
+.dark .rams-typography table { border-color: #27272a; }
 
 .rams-typography thead {
     background: #F3F4F6;
 }
+.dark .rams-typography thead { background: #18181b; }
 
 .rams-typography th {
     text-align: left;
@@ -322,20 +332,24 @@
     color: #6B7280;
     border-bottom: 2px solid #E5E7EB;
 }
+.dark .rams-typography th { color: #a1a1aa; border-bottom-color: #27272a; }
 
 .rams-typography td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid #F3F4F6;
     vertical-align: top;
 }
+.dark .rams-typography td { border-bottom-color: #27272a; }
 
 .rams-typography tbody tr:nth-child(even) {
     background: #FAFBFC;
 }
+.dark .rams-typography tbody tr:nth-child(even) { background: #09090b; }
 
 .rams-typography tbody tr:hover {
     background: #F0FDF4;
 }
+.dark .rams-typography tbody tr:hover { background: #14532d; }
 
 /* Responsive table wrapper */
 .rams-typography .table-wrapper {

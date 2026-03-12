@@ -311,6 +311,32 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         .inline-bubble li { margin-bottom:2px; }
         .inline-bubble strong { font-weight:700; color:#1C1C1C; }
         .inline-msg--user .inline-bubble strong { color:#FFFFFF; }
+
+        /* ─── Dark Mode Overrides ────────────────── */
+        .dark .inline-chat { border-color: #27272a; background: #09090b; }
+        .dark .inline-chat-header { background: #18181b; border-bottom-color: #27272a; }
+        .dark .inline-chat-title { color: #a1a1aa; }
+        .dark .inline-chat-section { color: #8bc34a; background: #1a2e0530; border-color: #416b1f; }
+        .dark .breadcrumb-bar { background: #000000; border-bottom-color: #27272a; }
+        .dark .breadcrumb-item { color: #71717a; }
+        .dark .breadcrumb-item:hover { color: #e4e4e7; }
+        .dark .breadcrumb-item.active { color: #8bc34a; }
+        .dark .inline-bubble { background: #18181b; border-color: #27272a; color: #e4e4e7; }
+        .dark .inline-msg--user .inline-bubble { background: #fafafa; color: #18181b; }
+        .dark .claim-unit:hover { background: #1a2e0530; border-left-color: #8bc34a; }
+        .dark .claim-unit--heading { color: #e4e4e7; }
+        .dark .claim-action { background: rgba(24, 24, 27, 0.9); }
+        .dark .bracketed-panel { background: #1a2e0530; border-top-color: #416b1f; }
+        .dark .bracketed-claim-text { color: #e4e4e7; }
+        .dark .drill-banner { background: #1e3a8a30; border-color: #1e3a8a; color: #e4e4e7; }
+        .dark .inline-pills { border-top-color: #27272a; }
+        .dark .inline-pill { color: #e4e4e7; border-color: #52525b; }
+        .dark .inline-pill:hover { background: #e4e4e7; color: #18181b; }
+        .dark .inline-input-container { border-top-color: #27272a; background: #09090b; }
+        .dark .inline-input { background: #18181b; border-color: #27272a; color: #e4e4e7; }
+        .dark .inline-file-chip { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
+        .dark .inline-bubble h2, .dark .inline-bubble h3, .dark .inline-bubble h4, .dark .inline-bubble strong { color: #e4e4e7; }
+        .dark .inline-msg--user .inline-bubble strong { color: #18181b; }
     `],
   template: `
     <div class="relative node-wrapper group/node mb-4"
@@ -362,16 +388,17 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
       <!-- ─── Hover Toolbar ─────────────────── -->
       <div class="node-toolbar no-print">
         <pocket-gull-button (click)="toggleBracket()" variant="ghost" size="sm"
-          class="bg-white shadow-sm border border-gray-200" ariaLabel="Finalize"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Finalize"
           [icon]="ClinicalIcons.Verified">
         </pocket-gull-button>
         <pocket-gull-button (click)="onDoubleClick()" variant="ghost" size="sm"
-          class="bg-white shadow-sm border border-gray-200" ariaLabel="Add Note"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Add Note"
           [icon]="ClinicalIcons.Assessment">
         </pocket-gull-button>
         <pocket-gull-button (click)="toggleChat()" variant="ghost" size="sm"
-          class="bg-white shadow-sm border border-gray-200"
-          [class.text-green-600]="!showChat()" [class.text-gray-400]="showChat()"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800"
+          [class.text-green-600]="!showChat()" [class.text-gray-500]="showChat()"
+          [class.dark:text-[#8bc34a]]="!showChat()" [class.dark:text-zinc-400]="showChat()"
           [ariaLabel]="showChat() ? 'Close Agent' : 'Ask Agent'"
           [icon]="showChat() ? ClinicalIcons.Clear : ClinicalIcons.EvidenceFocus">
         </pocket-gull-button>
@@ -382,7 +409,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         <div class="mt-2 flex flex-col gap-2 no-print">
           @if (node().suggestions?.length) {
             <div class="flex flex-wrap gap-1.5 align-center">
-              <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mr-1 mt-1">Suggestions:</span>
+              <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mr-1 mt-1">Suggestions:</span>
               @for (sugg of node().suggestions; track sugg) {
                 <pocket-gull-badge [label]="sugg" severity="info" [hasIcon]="true"
                   class="cursor-pointer hover:scale-105 transition-transform"
@@ -393,15 +420,15 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             </div>
           }
           @if (node().proposedText && !proposalAccepted()) {
-            <div class="bg-amber-50 border border-amber-100 rounded-sm p-3 text-sm">
+            <div class="bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-900 rounded-sm p-3 text-sm">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-bold text-amber-700 uppercase tracking-widest">Proposed Improvement:</span>
+                <span class="text-xs font-bold text-amber-700 dark:text-amber-500 uppercase tracking-widest">Proposed Improvement:</span>
                 <pocket-gull-button (click)="acceptProposal()" variant="primary" size="sm"
                   icon="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z">
                   Accept Change
                 </pocket-gull-button>
               </div>
-              <p class="text-amber-900 italic">"{{ node().proposedText }}"</p>
+              <p class="text-amber-900 dark:text-amber-200 italic">"{{ node().proposedText }}"</p>
             </div>
           }
         </div>
@@ -410,24 +437,30 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
       <!-- ─── Verification Issues ───────────── -->
       @if (node().verificationStatus !== 'verified' && node().verificationIssues?.length) {
         <div class="mt-2 p-3 rounded-sm border flex flex-col gap-2 no-print"
-             [class.bg-red-50/50]="node().verificationStatus === 'error'"
+             [class.bg-red-50]="node().verificationStatus === 'error'"
+             [class.dark:bg-red-950]="node().verificationStatus === 'error'"
              [class.border-red-100]="node().verificationStatus === 'error'"
-             [class.bg-amber-50/50]="node().verificationStatus === 'warning'"
-             [class.border-amber-100]="node().verificationStatus === 'warning'">
+             [class.dark:border-red-900]="node().verificationStatus === 'error'"
+             [class.bg-amber-50]="node().verificationStatus === 'warning'"
+             [class.dark:bg-amber-950]="node().verificationStatus === 'warning'"
+             [class.border-amber-100]="node().verificationStatus === 'warning'"
+             [class.dark:border-amber-900]="node().verificationStatus === 'warning'">
           <div class="flex items-center gap-2">
             <pocket-gull-badge
               [label]="node().verificationStatus === 'error' ? 'Critical Accuracy Error' : 'Accuracy Warning'"
               [severity]="node().verificationStatus === 'error' ? 'error' : 'warning'" [hasIcon]="true">
               <div badge-icon [innerHTML]="ClinicalIcons.Risk | safeHtml"></div>
             </pocket-gull-badge>
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Medical Audit Result</span>
+            <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Medical Audit Result</span>
           </div>
           <div class="pl-1 flex flex-col gap-1">
             @for (issue of node().verificationIssues; track issue.message) {
               <div class="flex items-start gap-2 text-xs">
                 <span [class.text-red-600]="node().verificationStatus === 'error'"
-                      [class.text-amber-600]="node().verificationStatus === 'warning'">•</span>
-                <span class="text-gray-700 leading-relaxed">{{ issue.message }}</span>
+                      [class.dark:text-red-400]="node().verificationStatus === 'error'"
+                      [class.text-amber-600]="node().verificationStatus === 'warning'"
+                      [class.dark:text-amber-400]="node().verificationStatus === 'warning'">•</span>
+                <span class="text-gray-700 dark:text-zinc-300 leading-relaxed">{{ issue.message }}</span>
               </div>
             }
           </div>
@@ -436,7 +469,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 
       <!-- ─── Note Editor ────────────────────── -->
       @if (node().showNote) {
-        <div class="mt-2 ml-4 p-3 bg-[#f9fbf7] border-l-2 border-[#416B1F] rounded-r-sm">
+        <div class="mt-2 ml-4 p-3 bg-[#f9fbf7] dark:bg-[#1a2e05]/30 border-l-2 border-[#416B1F] dark:border-[#8bc34a] rounded-r-sm">
           <pocket-gull-input type="textarea" [rows]="2" [placeholder]="'Add medical rationale...'"
             [value]="node().note || ''" (valueChange)="updateNote($event)">
           </pocket-gull-input>

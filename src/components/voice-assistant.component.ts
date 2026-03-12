@@ -49,7 +49,7 @@ export interface ChatEntry {
                 <div class="flex items-center gap-2">
                     <button
                         (click)="isMuted.set(!isMuted())"
-                        class="text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
+                        class="text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                         title="Toggle Sound">
                         @if (isMuted()) {
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -64,7 +64,7 @@ export interface ChatEntry {
                     </button>
                     <button
                         (click)="endLiveConsult()"
-                        class="text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-white flex items-center gap-1 sm:gap-2 transition-colors uppercase text-[10px] sm:text-xs font-bold tracking-wider sm:tracking-widest px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 shrink-0"
+                        class="text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center gap-1 sm:gap-2 transition-colors uppercase text-[10px] sm:text-xs font-bold tracking-wider sm:tracking-widest px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 shrink-0"
                         title="Close Voice Assistant">
                         <span class="hidden sm:inline">Close Session</span>
                         <span class="sm:hidden">Close</span>
@@ -279,12 +279,12 @@ export interface ChatEntry {
                                             <span class="absolute inset-0 rounded-sm bg-red-500 animate-ping opacity-25"></span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-600 relative z-10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
                                         } @else {
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-gray-500 group-hover:text-blue-500 transition-colors" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
                                         }
                                     </div>
                                 </button>
 
-                                <button type="button" class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-gray-50 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0 text-gray-400 hover:text-blue-500" (click)="triggerFileInput()" [disabled]="agentState() !== 'idle'" title="Attach Files">
+                                <button type="button" class="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center hover:bg-gray-50 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0 text-gray-500 hover:text-blue-500" (click)="triggerFileInput()" [disabled]="agentState() !== 'idle'" title="Attach Files">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                                 </button>
                                 <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*,video/*" class="hidden" style="display: none;">
@@ -305,12 +305,12 @@ export interface ChatEntry {
                                 <button 
                                     type="submit" 
                                     [disabled]="!messageText().trim() || agentState() !== 'idle'"
-                                    class="w-10 h-10 sm:w-12 sm:h-12 rounded-sm flex items-center justify-center bg-black text-white disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors shrink-0 shadow-sm mr-1">
+                                    class="w-10 h-10 sm:w-12 sm:h-12 rounded-sm flex items-center justify-center bg-black text-white disabled:bg-gray-200 disabled:text-gray-500 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors shrink-0 shadow-sm mr-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5 sm:-mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                                 </button>
                             </form>
                             <div class="text-center">
-                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em]">Secure Live Clinical Inference</span>
+                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Secure Live Clinical Inference</span>
                             </div>
                         </div>
                     </div>

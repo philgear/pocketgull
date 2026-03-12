@@ -53,7 +53,7 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
         </div>
 
         @if(isViewerExpanded()) {
-          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-transparent shrink-0">
+          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-black/20 shrink-0">
             @defer (on viewport) {
               <app-body-viewer></app-body-viewer>
             } @placeholder {

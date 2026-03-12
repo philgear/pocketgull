@@ -491,7 +491,7 @@ export class ExportService {
 
       <!-- Footer -->
       <footer class="report-footer">
-        <div class="footer-brand">Pocket Gull &mdash; pocket-gull.app</div>
+        <div class="footer-brand">Pocket Gull &bull; pocketgull.app</div>
         <div class="footer-disclaimer">
           AI-generated content. For clinical reference only. Verify all recommendations with qualified clinical staff prior to implementation.
         </div>
@@ -1085,7 +1085,7 @@ export class ExportService {
 
       <!-- Footer -->
       <footer class="report-footer">
-        <div class="footer-brand">Pocket Gull &mdash; pocket-gull.app</div>
+        <div class="footer-brand">Pocket Gull &bull; pocketgull.app</div>
         <div class="footer-disclaimer">
           This care plan was generated with AI assistance. Review and approval by a licensed clinician is required before implementation.
         </div>
@@ -1231,7 +1231,7 @@ export class ExportService {
           birthDate: this._estimateBirthYear(patient.age),
           extension: [
             {
-              url: 'http://pocket-gull.app/fhir/StructureDefinition/last-visit',
+              url: 'http://pocketgull.app/fhir/StructureDefinition/last-visit',
               valueString: patient.lastVisit,
             }
           ]
@@ -1299,11 +1299,11 @@ export class ExportService {
               valueString: issue.description,
               extension: [
                 {
-                  url: 'http://pocket-gull.app/fhir/StructureDefinition/pain-level',
+                  url: 'http://pocketgull.app/fhir/StructureDefinition/pain-level',
                   valueInteger: issue.painLevel,
                 },
                 {
-                  url: 'http://pocket-gull.app/fhir/StructureDefinition/note-id',
+                  url: 'http://pocketgull.app/fhir/StructureDefinition/note-id',
                   valueString: issue.noteId,
                 },
               ]
@@ -1355,7 +1355,7 @@ export class ExportService {
         timestamp: new Date().toISOString(),
         meta: {
           tag: [{
-            system: 'http://pocket-gull.app/fhir',
+            system: 'http://pocketgull.app/fhir',
             code: 'pocket-gull-export',
             display: 'Pocket Gull Patient Export',
           }]

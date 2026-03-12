@@ -7,7 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bg-white/70 dark:bg-slate-800/70 backdrop-blur-[12px] rounded-xl border border-white/20 shadow-lg relative h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-white/40">
+    <div class="bg-white/70 dark:bg-zinc-900 backdrop-blur-[12px] rounded-xl border border-white/20 dark:border-zinc-800 shadow-lg relative h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-gray-200 dark:hover:border-zinc-700">
       <!-- Glow Effect (Clipped to card bounds) -->
       <div class="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl"></div>

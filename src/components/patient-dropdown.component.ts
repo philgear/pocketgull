@@ -28,8 +28,8 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
         <div class="origin-top-right absolute right-0 mt-2 w-72 rounded-sm shadow-xl bg-white dark:bg-[#09090b] ring-1 ring-black dark:ring-white/10 ring-opacity-5 focus:outline-none overflow-hidden flex flex-col max-h-[60dvh]">
           
           <div class="bg-gray-50 dark:bg-zinc-900 px-4 py-2 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
-             <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Active Roster</span>
-             <span class="text-xs font-bold text-gray-500 dark:text-zinc-500">{{ patientManagement.patients().length }}</span>
+             <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Active Roster</span>
+             <span class="text-xs font-bold text-gray-500 dark:text-zinc-400">{{ patientManagement.patients().length }}</span>
           </div>
 
           <div class="py-1 overflow-y-auto flex-1 group/list">
@@ -47,7 +47,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
                 </div>
                 <div class="min-w-0 flex-1">
                   <div class="font-bold text-gray-900 dark:text-zinc-100 text-sm truncate">{{ patient.name }}</div>
-                  <div class="text-xs text-gray-500 dark:text-zinc-500 font-medium uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
+                  <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
                      <span class="whitespace-nowrap">{{ patient.age }} YRS</span>
                      <span class="w-1 h-1 bg-gray-300 dark:bg-zinc-600 rounded-sm shrink-0"></span>
                      <span class="truncate">{{ patient.gender }}</span>

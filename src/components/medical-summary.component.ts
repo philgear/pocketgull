@@ -29,69 +29,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 <h1 class="text-3xl font-light text-[#1C1C1C] dark:text-zinc-100 tracking-tight">{{ p.name }}</h1>
                 <p class="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 dark:text-zinc-400 mt-2">{{ today | date:'fullDate' }}</p>
               </div>
-              <div class="flex items-center gap-2">
-                <!-- Export Menu -->
-                <div class="relative">
-                  <pocket-gull-button 
-                    (click)="showExportMenu.set(!showExportMenu())"
-                    variant="ghost"
-                    size="sm"
-                    icon="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                    aria-label="Export patient data">
-                    Export
-                  </pocket-gull-button>
-                  @if (showExportMenu()) {
-                    <div class="absolute right-0 mt-1 w-48 bg-white dark:bg-zinc-900 rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-                      <button (click)="exportNativeJson()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2.5 transition-colors">
-                        <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>
-                        Export as JSON
-                      </button>
-                      <button (click)="exportFhirBundle()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2.5 transition-colors">
-                        <svg class="w-4 h-4 text-gray-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" /></svg>
-                        Export as FHIR
-                      </button>
-                    </div>
-                  }
-                </div>
-                <!-- Import Data -->
-                <div class="flex gap-2 items-center">
-                  <pocket-gull-button 
-                    (click)="connectToEpic()"
-                    variant="primary"
-                    size="sm"
-                    class="relative group"
-                    icon="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
-                    aria-label="Connect to MyChart via SMART on FHIR">
-                    Connect epic&reg;
-                    
-                    <!-- Decorative Epic-red ping (subtle) to draw attention initially -->
-                    @if (!fhirAuth.hasValidToken()) {
-                      <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white dark:border-[#09090b]"></span>
-                      </span>
-                    }
-                  </pocket-gull-button>
 
-                  <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 mx-1"></div>
-
-                  <input type="file" #fileUpload class="hidden" accept=".json,.xml" (change)="handleImportFile($event)" />
-                  <pocket-gull-button 
-                    (click)="fileUpload.click()"
-                    variant="ghost"
-                    size="sm"
-                    icon="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-                    aria-label="Upload FHIR/Lucy Data">
-                    Upload
-                  </pocket-gull-button>
-                </div>
-                <pocket-gull-button 
-                  (click)="openFinalizePreview()" 
-                  variant="primary"
-                  size="md">
-                  Finalize & Archive
-                </pocket-gull-button>
-              </div>
             </div>
             
             <!-- Transient SMART on FHIR Success Notification -->
@@ -114,7 +52,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 <!-- Current Visit / Chief Complaint -->
                 <div class="mb-8 font-sans">
                   <div class="flex justify-between items-center mb-3">
-                    <h2 class="block text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] flex items-center gap-2">
+                    <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
                         Current Visit / Chief Complaint
                     </h2>
@@ -174,7 +112,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                         (valueChange)="state.updateVital('hr', $event)"
                         class="flex-1 min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-500 font-bold tracking-tighter shrink-0 uppercase">BPM</span>
+                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold tracking-tighter shrink-0 uppercase">BPM</span>
                     </div>
                   </div>
                   <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
@@ -188,7 +126,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                         (valueChange)="state.updateVital('spO2', $event)"
                         class="flex-1 min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-500 font-bold shrink-0">%</span>
+                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0">%</span>
                     </div>
                   </div>
                   <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
@@ -202,7 +140,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                         (valueChange)="state.updateVital('temp', $event)"
                         class="flex-1 min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-500 font-bold shrink-0">°F</span>
+                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0">°F</span>
                     </div>
                   </div>
                   <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
@@ -216,7 +154,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                         (valueChange)="state.updateVital('weight', $event)"
                         class="flex-1 min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-500 font-bold shrink-0 uppercase tracking-tighter">LBS</span>
+                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0 uppercase tracking-tighter">LBS</span>
                     </div>
                   </div>
                   <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
@@ -230,7 +168,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                         (valueChange)="state.updateVital('height', $event)"
                         class="flex-1 min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-500 font-bold shrink-0 uppercase tracking-tighter">FT</span>
+                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0 uppercase tracking-tighter">FT</span>
                     </div>
                   </div>
 
@@ -345,7 +283,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             }
                         </div>
                     } @else {
-                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
+                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-500 dark:text-zinc-400 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
                             No dynamic nutrients recorded. Click "Add Nutrient" to begin tracking specialized compounds.
                         </div>
                     }
@@ -395,7 +333,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             }
                         </div>
                     } @else {
-                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
+                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-500 dark:text-zinc-400 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
                             No active medications recorded. Click "Add Medication" to begin tracking.
                         </div>
                     }
@@ -445,7 +383,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             }
                         </div>
                     } @else {
-                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
+                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-500 dark:text-zinc-400 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
                             No oxidative stress markers recorded. Click "Add Marker" to begin tracking.
                         </div>
                     }
@@ -495,7 +433,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             }
                         </div>
                     } @else {
-                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-400 dark:text-zinc-500 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
+                        <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-sm font-light text-gray-500 dark:text-zinc-400 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-6 border border-dashed">
                             No antioxidant sources recorded. Click "Add Source" to begin tracking.
                         </div>
                     }
@@ -552,7 +490,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   <section>
                     <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-6">Retrospective Data Visualization</h2>
                     <div class="h-64 w-full flex items-center justify-center bg-gray-50/50 dark:bg-zinc-900 border border-dashed border-gray-200 dark:border-zinc-800 rounded">
-                      <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">Scroll to load charts</span>
+                      <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Scroll to load charts</span>
                     </div>
                   </section>
                 }
@@ -617,97 +555,12 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
       </div>
     </div>
     } @else {
-        <div class="p-8 text-center text-gray-500 dark:text-zinc-500 h-full flex items-center justify-center">
+        <div class="p-8 text-center text-gray-500 dark:text-zinc-400 h-full flex items-center justify-center">
             <p class="text-sm font-medium uppercase tracking-widest">No patient selected.</p>
         </div>
     }
 
-    <!-- Preview & Print Modal -->
-    @if (showPreviewModal()) {
-      <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 no-print">
-        <div class="bg-white dark:bg-[#09090b] w-full max-w-4xl max-h-[85dvh] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-[#F9FAFB] dark:bg-zinc-900">
-            <div>
-              <h2 class="text-lg font-bold text-[#1C1C1C] dark:text-zinc-100">Preview & Print Care Plan</h2>
-              <p class="text-xs uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-wider mt-1">Review and edit finalized text before archiving</p>
-            </div>
-            <pocket-gull-button 
-              variant="ghost" 
-              size="sm" 
-              (click)="closePreview()" 
-              ariaLabel="Close Preview Modal"
-              icon="M18 6L6 18M6 6l12 12">
-            </pocket-gull-button>
-          </div>
-          <div class="flex-1 overflow-y-auto p-6 bg-white dark:bg-[#09090b] relative">
-             <div class="mb-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-                <h3 class="block text-xs font-bold text-[#689F38] uppercase tracking-[0.15em]">Final Care Plan Document</h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-widest">Reading Level</span>
-                  <select 
-                    [value]="selectedReadingLevel()" 
-                    (change)="changeReadingLevel($event)"
-                    [disabled]="isTranslating()"
-                    class="text-xs bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-800 rounded px-2 py-1.5 outline-none focus:border-[#689F38] focus:ring-1 focus:ring-[#689F38] transition-colors disabled:opacity-50"
-                  >
-                    <option value="standard">Standard Default</option>
-                    <optgroup label="Cognition Modes">
-                      <option value="simplified">Simplified (6th Grade)</option>
-                      <option value="dyslexia">Cognition (Dyslexia-Friendly)</option>
-                      <option value="child">Child (Pediatric)</option>
-                    </optgroup>
-                  </select>
-                </div>
-             </div>
-             
-             <div class="relative">
-               <pocket-gull-input
-                 type="textarea"
-                 [rows]="16"
-                 [value]="previewText()"
-                 (valueChange)="previewText.set($event)"
-                 [disabled]="isTranslating()"
-                 placeholder="No Active Care Plan recorded for this visit."
-                 class="w-full">
-               </pocket-gull-input>
-               
-               @if (isTranslating()) {
-                 <div class="absolute inset-0 bg-white/70 dark:bg-[#09090b]/70 backdrop-blur-[1px] flex flex-col items-center justify-center z-10 rounded">
-                    <div class="w-6 h-6 border-2 border-[#689F38] border-t-transparent rounded-full animate-spin"></div>
-                    <p class="mt-2 text-xs font-bold text-[#689F38] uppercase tracking-wider animate-pulse">Translating...</p>
-                 </div>
-               }
-             </div>
-             
-             <p class="text-xs text-gray-500 dark:text-zinc-500 font-bold uppercase tracking-wider mt-3 pl-1">This text will be archived in the patient's chart as the final Care Plan for this visit.</p>
-          </div>
-          <div class="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 bg-[#F9FAFB] dark:bg-zinc-900 flex justify-between items-center">
-            <pocket-gull-button 
-              (click)="printReport()" 
-              variant="secondary" 
-              size="sm" 
-              icon="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z">
-              Print Plan
-            </pocket-gull-button>
-            <div class="flex items-center gap-3">
-              <pocket-gull-button 
-                (click)="closePreview()" 
-                variant="ghost" 
-                size="sm">
-                Cancel
-              </pocket-gull-button>
-              <pocket-gull-button 
-                (click)="confirmFinalize()" 
-                variant="primary" 
-                size="sm" 
-                trailingIcon="M20 6L9 17l-5-5">
-                Commit to Chart
-              </pocket-gull-button>
-            </div>
-          </div>
-        </div>
-      </div>
-    }
+
   `
 })
 export class MedicalChartSummaryComponent {
@@ -722,11 +575,7 @@ export class MedicalChartSummaryComponent {
   showExportMenu = signal(false);
   showEpicSuccess = signal(false);
 
-  showPreviewModal = signal(false);
-  previewText = signal('');
-  originalPreviewText = signal('');
-  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
-  isTranslating = this.clinicalAI.isLoading;
+
 
   painChartRef = viewChild<ElementRef<HTMLCanvasElement>>('painChart');
   bpChartRef = viewChild<ElementRef<HTMLCanvasElement>>('bpChart');
@@ -1079,21 +928,7 @@ export class MedicalChartSummaryComponent {
     }, 0);
   }
 
-  finalizeChart() {
-    const patientId = this.patientManager.selectedPatientId();
-    if (!patientId) return;
 
-    const chartState: PatientState = this.state.getCurrentState();
-
-    const historyEntry: HistoryEntry = {
-      type: 'ChartArchived',
-      date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      summary: 'Medical chart finalized and archived for this visit.',
-      state: chartState,
-    };
-
-    this.patientManager.addHistoryEntry(patientId, historyEntry);
-  }
 
   removeDraftItem(item: DraftSummaryItem) {
     this.state.removeDraftSummaryItem(item.id);
@@ -1170,70 +1005,14 @@ export class MedicalChartSummaryComponent {
     }
   }
 
-  openFinalizePreview() {
+  finalizeDraftPlan() {
     let plan = this.state.activePatientSummary() || '';
     const draftItems = this.state.draftSummaryItems();
     if (draftItems.length > 0) {
       const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
       plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
-    }
-    const finalText = plan || 'No Active Patient Summary recorded for this visit.';
-    this.previewText.set(finalText);
-    this.originalPreviewText.set(finalText);
-    this.selectedReadingLevel.set('standard');
-    this.showPreviewModal.set(true);
-  }
-
-  closePreview() {
-    this.showPreviewModal.set(false);
-  }
-
-  async changeReadingLevel(event: Event) {
-    const level = (event.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child';
-    this.selectedReadingLevel.set(level);
-
-    if (level === 'standard') {
-      this.previewText.set(this.originalPreviewText());
-      return;
-    }
-
-    try {
-      const translated = await this.clinicalAI.translateReadingLevel(this.originalPreviewText(), level);
-      this.previewText.set(translated);
-    } catch (error) {
-      console.error("Translation failed", error);
-      this.selectedReadingLevel.set('standard');
-      this.previewText.set(this.originalPreviewText());
-    }
-  }
-
-  updatePreviewText(event: Event) {
-    this.previewText.set((event.target as HTMLTextAreaElement).value);
-  }
-
-  printReport() {
-    const p = this.patient();
-    const vitals = this.state.vitals();
-    this.exportService.downloadCarePlanPdf(
-      this.previewText(),
-      p?.name ?? 'Patient',
-      {
-        bp: vitals.bp || undefined,
-        hr: vitals.hr || undefined,
-        temp: vitals.temp || undefined,
-        spO2: vitals.spO2 || undefined,
-        weight: vitals.weight || undefined,
-      },
-      p?.preexistingConditions ?? []
-    );
-  }
-
-  confirmFinalize() {
-    this.state.updateActivePatientSummary(this.previewText());
-    if (this.state.draftSummaryItems().length > 0) {
+      this.state.updateActivePatientSummary(plan);
       this.state.clearDraftSummaryItems();
     }
-    this.finalizeChart();
-    this.closePreview();
   }
 }
