@@ -98,17 +98,21 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 
         /* ─── Evidence Popover ─────────────────── */
         .evidence-popover {
-            position: absolute; left: 0; top: calc(100% + 5px); z-index: 40;
-            width: 260px; background: #1C1C1C; color: #F9FAFB;
-            border-radius: 10px; padding: 11px 13px;
-            box-shadow: 0 12px 28px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,.06);
+            position: absolute; left: 0; top: calc(100% + 8px); z-index: 40;
+            width: 280px; background: #1C1C1C; color: #FFFFFF;
+            border-radius: 4px; padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #333;
             pointer-events: none; opacity: 0; transform: translateY(4px);
-            transition: opacity .13s, transform .13s;
+            transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: top left;
         }
         .evidence-popover::before {
             content:''; position:absolute; top:-5px; left:22px;
-            width:10px; height:10px; background:#1C1C1C;
-            transform:rotate(45deg); border-radius:2px 0 0 0;
+            width:10px; height:10px; background: #1C1C1C;
+            transform:rotate(45deg); border-radius: 1px 0 0 0;
+            border-top: 1px solid #333;
+            border-left: 1px solid #333;
         }
         .node-wrapper:hover .evidence-popover { opacity:1; pointer-events:auto; transform:translateY(0); }
         .node-wrapper.has-inline-chat .evidence-popover { display:none; }
@@ -136,6 +140,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             max-height: 40px;
             padding: 6px 0;
             transition-delay: 0s;
+            overflow: visible;
         }
 
         /* ─── Inline Chat ────────────────────────── */
@@ -224,6 +229,34 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         .claim-action--drill   { color:#3B82F6; }
         .claim-action--drill:hover   { background:#EFF6FF; }
         .claim-action--bracketed { color:#FFFFFF !important; background:#689F38 !important; cursor:default; }
+
+        /* Tooltips for claim actions */
+        .claim-action[data-tooltip]::before,
+        .claim-action[data-tooltip]::after {
+            position: absolute; opacity: 0; pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 50; font-family: inherit; font-size: 10px;
+        }
+        .claim-action[data-tooltip]::after {
+            content: attr(data-tooltip);
+            bottom: calc(100% + 6px); left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: #1C1C1C; color: #FFFFFF;
+            padding: 4px 8px; border-radius: 2px; font-weight: 500;
+            white-space: nowrap; letter-spacing: 0.05em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #333;
+        }
+        .claim-action[data-tooltip]::before {
+            content: ''; bottom: calc(100% + 2px); left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            border-width: 4px 4px 0; border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        .claim-action[data-tooltip]:hover::after,
+        .claim-action[data-tooltip]:hover::before {
+            opacity: 1; transform: translateX(-50%) translateY(0);
+        }
 
         /* Claim unit content padding when toolbar is shown */
         .claim-unit:hover .claim-content { padding-right:46px; }
@@ -338,6 +371,32 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         .dark .inline-file-chip { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
         .dark .inline-bubble h2, .dark .inline-bubble h3, .dark .inline-bubble h4, .dark .inline-bubble strong { color: #e4e4e7; }
         .dark .inline-msg--user .inline-bubble strong { color: #18181b; }
+
+        /* Dark mode overrides for new tooltips and popover */
+        .dark .evidence-popover {
+            background: #FAFAFA; color: #18181b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            border-color: #E5E7EB;
+        }
+        .dark .evidence-popover::before {
+            background: #FAFAFA;
+            border-top: 1px solid #E5E7EB;
+            border-left: 1px solid #E5E7EB;
+        }
+        .dark .evidence-label {
+            color: #52525b; border-bottom-color: #E5E7EB;
+        }
+        .dark .evidence-popover a { color: #8B5CF6; }
+        .dark .evidence-popover a:hover { color: #7C3AED; }
+
+        .dark .claim-action[data-tooltip]::after {
+            background: #FAFAFA; color: #1C1C1C;
+            border-color: #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .dark .claim-action[data-tooltip]::before {
+            border-color: #E5E7EB transparent transparent transparent;
+        }
 
         /* ─── Ask Agent Pulse Animation ───────────── */
         @keyframes subtle-pulse {
@@ -587,7 +646,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                             <div class="claim-toolbar">
                               <!-- Bracket / extract button -->
                               @if (isBracketed(claim.id)) {
-                                <button class="claim-action claim-action--bracketed" title="Bracketed into plan">
+                                <button class="claim-action claim-action--bracketed" title="Bracketed into plan" data-tooltip="Bracketed into plan">
                                   <svg viewBox="0 -960 960 960" fill="currentColor" width="8" height="8">
                                     <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/>
                                   </svg>
@@ -595,6 +654,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                               } @else {
                                 <button class="claim-action claim-action--bracket"
                                         title="Bracket this claim into care plan"
+                                        data-tooltip="Bracket this claim into care plan"
                                         (click)="bracketClaim(claim)">
                                   <svg viewBox="0 -960 960 960" fill="currentColor" width="9" height="9">
                                     <path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Z"/>
@@ -604,6 +664,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                               <!-- Drill deeper button -->
                               <button class="claim-action claim-action--drill"
                                       title="Drill deeper into this claim"
+                                      data-tooltip="Drill deeper into this claim"
                                       [disabled]="chatIsLoading()"
                                       (click)="drillInto(claim)">
                                 <svg viewBox="0 -960 960 960" fill="currentColor" width="9" height="9">

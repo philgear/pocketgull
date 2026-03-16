@@ -15,6 +15,7 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       [disabled]="disabled() || loading()"
       [class]="buttonClasses()"
       [attr.aria-label]="ariaLabel() || null"
+      [attr.data-tooltip]="ariaLabel() || null"
       (click)="onClick($event)"
     >
       @if (loading()) {
@@ -46,7 +47,6 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       letter-spacing: 0.1em;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-      overflow: hidden;
       white-space: nowrap;
       cursor: pointer;
     }
@@ -54,6 +54,51 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
     .btn-base:disabled {
       cursor: not-allowed;
       opacity: 0.5;
+    }
+
+    /* Tooltips */
+    .btn-base[data-tooltip]::before,
+    .btn-base[data-tooltip]::after {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 50;
+      font-family: inherit;
+    }
+
+    .btn-base[data-tooltip]::after {
+      content: attr(data-tooltip);
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #1C1C1C;
+      color: #FFFFFF;
+      padding: 4px 8px;
+      border-radius: 2px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+      text-transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #333;
+    }
+    
+    .btn-base[data-tooltip]::before {
+      content: '';
+      bottom: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border-width: 4px 4px 0;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+
+    .btn-base[data-tooltip]:hover:not(:disabled)::after,
+    .btn-base[data-tooltip]:hover:not(:disabled)::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     /* Primary */
@@ -186,6 +231,19 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
     :host-context(html.dark) .btn-outline:not(:disabled):hover {
       background: #fafafa;
       color: #09090b;
+    }
+
+    /* Dark Mode Tooltips */
+    :host-context(.dark) .btn-base[data-tooltip]::after,
+    :host-context(html.dark) .btn-base[data-tooltip]::after {
+      background: #FAFAFA;
+      color: #1C1C1C;
+      border-color: #E5E7EB;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    :host-context(.dark) .btn-base[data-tooltip]::before,
+    :host-context(html.dark) .btn-base[data-tooltip]::before {
+      border-color: #E5E7EB transparent transparent transparent;
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
