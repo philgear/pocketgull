@@ -125,8 +125,8 @@ CRITICAL RULES:
   
       const response = await ai.generate({
         prompt,
+        system: systemInstruction,
         config: {
-          systemInstruction: systemInstruction,
           temperature: 0.2
         }
       });
