@@ -19,6 +19,7 @@ export interface ChatEntry {
     text: string;
     htmlContent?: string;
     richCards?: RichMediaCard[];
+    feedback?: 'up' | 'down';
 }
 
 @Component({
@@ -90,17 +91,21 @@ export interface ChatEntry {
             <div class="flex items-center justify-between px-4 sm:px-6 py-4 lg:px-12 h-16 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800">
                 <div class="flex items-center gap-2 sm:gap-4 min-w-0">
                     <div class="flex items-center gap-3">
-                        <svg width="24" height="24" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-                           <g transform="translate(0, -20)">
-                             <rect x="166" y="275" width="180" height="10" rx="2" fill="#76B362" />
-                             <g>
-                               <path d="M251 270 C200 250 155 200 155 145 C155 180 185 240 251 270Z" fill="#76B362" />
-                               <path d="M251 270 C240 210 215 155 185 145 C185 145 230 200 251 270Z" fill="#244626" />
-                             </g>
-                             <g transform="translate(512, 0) scale(-1, 1)">
-                               <path d="M251 270 C200 250 155 200 155 145 C155 180 185 240 251 270Z" fill="#76B362" />
-                             </g>
-                           </g>
+                        <svg class="w-6 h-6 shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Far Wing -->
+                            <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round" />
+                            <!-- Tail -->
+                            <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round" />
+                            <!-- Body Base -->
+                            <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
+                            <!-- Near Wing (Upper) -->
+                            <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
+                            <!-- Near Wing (Fold) -->
+                            <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
+                            <!-- Neck/Head -->
+                            <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
+                            <!-- Beak - Functional Braun Orange Accent -->
+                            <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
                         </svg>
                         <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.1em] sm:tracking-[0.15em] text-[10px] sm:text-sm uppercase truncate">Pocket Gull Intelligence</span>
                     </div>
@@ -232,6 +237,11 @@ export interface ChatEntry {
                                             <pocket-gull-button variant="ghost" size="xs" (click)="actionCopy(entry.text)" icon="M9 9h13v13H9V9zm-4 6H4v-9h9v1z" ariaLabel="Copy Message"></pocket-gull-button>
                                             <pocket-gull-button variant="ghost" size="xs" (click)="actionDictate(entry.text)" icon="M11 5L6 9H2v6h4l5 4V5zm8.07-.07a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" ariaLabel="Speak Aloud"></pocket-gull-button>
                                             <pocket-gull-button variant="ghost" size="xs" (click)="actionInsert(entry.text)" icon="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" ariaLabel="Insert into Clinical Notes"></pocket-gull-button>
+                                            @if (entry.role === 'model') {
+                                                <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 mx-1"></div>
+                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(entry)" icon="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" ariaLabel="Thumbs Up" [class.text-green-600]="entry.feedback === 'up'" [class.dark:text-green-400]="entry.feedback === 'up'"></pocket-gull-button>
+                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(entry)" icon="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2" ariaLabel="Thumbs Down" [class.text-red-600]="entry.feedback === 'down'" [class.dark:text-red-400]="entry.feedback === 'down'"></pocket-gull-button>
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -254,6 +264,21 @@ export interface ChatEntry {
                     <!-- Controls (Floating at bottom) -->
                     <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#09090b] dark:via-[#09090b]/90 dark:to-transparent flex justify-center z-20">
                          <div class="w-full max-w-3xl flex flex-col gap-3 relative">
+                            <!-- Smart Suggestions -->
+                            @if (chatHistory().length === 0 && agentState() === 'idle') {
+                              <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                     What is the most critical evidence?
+                                 </button>
+                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                     Alternative interventions?
+                                 </button>
+                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                     Explain rationale simply
+                                 </button>
+                              </div>
+                            }
+
                             <!-- ... [Rest of controls like error messages, file uploads remain the same] ... -->
 
                             <form (submit)="sendMessage($event)" class="w-full flex items-center gap-2 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-700 shadow-2xl rounded-full p-2 focus-within:border-gray-300 dark:focus-within:border-zinc-600 transition-all">
@@ -332,6 +357,16 @@ export class VoiceAssistantComponent implements OnDestroy {
     // --- Action Bar Logic ---
     actionCopy(text: string) {
         navigator.clipboard.writeText(text);
+    }
+
+    actionThumbsUp(entry: ChatEntry) {
+        entry.feedback = entry.feedback === 'up' ? undefined : 'up';
+        this.chatHistory.update(h => [...h]);
+    }
+
+    actionThumbsDown(entry: ChatEntry) {
+        entry.feedback = entry.feedback === 'down' ? undefined : 'down';
+        this.chatHistory.update(h => [...h]);
     }
 
     actionDictate(text: string) {

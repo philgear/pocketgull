@@ -33,6 +33,7 @@ interface InlineChatEntry {
   html?: string;
   claims?: ClaimUnit[];    // parsed claim units for model messages
   richCards?: RichMediaCard[]; // resolved rich media cards
+  feedback?: 'up' | 'down';
 }
 
 interface BracketedClaim {
@@ -337,11 +338,28 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         .dark .inline-file-chip { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
         .dark .inline-bubble h2, .dark .inline-bubble h3, .dark .inline-bubble h4, .dark .inline-bubble strong { color: #e4e4e7; }
         .dark .inline-msg--user .inline-bubble strong { color: #18181b; }
+
+        /* ─── Ask Agent Pulse Animation ───────────── */
+        @keyframes subtle-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(104, 159, 56, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(104, 159, 56, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(104, 159, 56, 0); }
+        }
+        .pulse-glow { animation: subtle-pulse 2s infinite; border-color: #689f38 !important; }
+        .dark .pulse-glow { border-color: #8bc34a !important; box-shadow: 0 0 0 0 rgba(139, 195, 74, 0.4); }
+        @keyframes dark-subtle-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 195, 74, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(139, 195, 74, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 195, 74, 0); }
+        }
+        .dark .pulse-glow { animation: dark-subtle-pulse 2s infinite; }
     `],
   template: `
     <div class="relative node-wrapper group/node mb-4"
          [class.has-inline-chat]="showChat()"
-         [class.mb-2]="type() === 'list-item'">
+         [class.mb-2]="type() === 'list-item'"
+         [class.opacity-50]="isRejected()"
+         [class.grayscale]="isRejected()">
 
       <!-- ─── Main Node Content ──────────────── -->
       @if (type() === 'paragraph') {
@@ -387,6 +405,11 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 
       <!-- ─── Hover Toolbar ─────────────────── -->
       <div class="node-toolbar no-print">
+        <pocket-gull-button (click)="rejectNode()" variant="ghost" size="sm"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Reject/Flag"
+          [class.text-red-600]="isRejected()"
+          icon="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2">
+        </pocket-gull-button>
         <pocket-gull-button (click)="toggleBracket()" variant="ghost" size="sm"
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Finalize"
           [icon]="ClinicalIcons.Verified">
@@ -397,6 +420,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         </pocket-gull-button>
         <pocket-gull-button (click)="toggleChat()" variant="ghost" size="sm"
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800"
+          [class.pulse-glow]="!hasDiscoveredEvidenceFocus()"
           [class.text-green-600]="!showChat()" [class.text-gray-500]="showChat()"
           [class.dark:text-[#8bc34a]]="!showChat()" [class.dark:text-zinc-400]="showChat()"
           [ariaLabel]="showChat() ? 'Close Agent' : 'Ask Agent'"
@@ -703,6 +727,13 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                         }
                       </div>
                     }
+
+                    <!-- Feedback Actions -->
+                    <div class="mt-2 flex items-center justify-end gap-2 border-t border-black/5 dark:border-white/5 pt-2">
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(msg)" icon="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" ariaLabel="Thumbs Up" [class.text-green-600]="msg.feedback === 'up'" [class.dark:text-green-400]="msg.feedback === 'up'"></pocket-gull-button>
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(msg)" icon="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2" ariaLabel="Thumbs Down" [class.text-red-600]="msg.feedback === 'down'" [class.dark:text-red-400]="msg.feedback === 'down'"></pocket-gull-button>
+                    </div>
+
                   </div>
                 </div>
               }
@@ -835,6 +866,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   proposalAccepted = signal(false);
+  isRejected = signal(false);
   listItemHtml = computed(() => this.node().rawHtml || (this.node() as any).html || '');
 
   // ─── Inline chat ─────────────────────────────
@@ -844,6 +876,14 @@ export class SummaryNodeComponent implements AfterViewChecked {
   showSuggestions = signal(true);
   selectedFiles = signal<File[]>([]);
   chatInputText = '';
+  hasDiscoveredEvidenceFocus = signal(true);
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const discovered = localStorage.getItem('pocketgull_evidence_focus_discovered');
+      this.hasDiscoveredEvidenceFocus.set(discovered === 'true');
+    }
+  }
 
   // ─── Claim bracketing ────────────────────────
   bracketedClaims = signal<BracketedClaim[]>([]);
@@ -874,6 +914,21 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   ngAfterViewChecked() {
     if (this.needsScroll) { this.scrollBottom(); this.needsScroll = false; }
+  }
+
+  // ─── Feedback Actions ─────────────────────────
+  rejectNode() {
+    this.isRejected.set(!this.isRejected());
+  }
+
+  actionThumbsUp(entry: InlineChatEntry) {
+    entry.feedback = entry.feedback === 'up' ? undefined : 'up';
+    this.chatHistory.update(h => [...h]);
+  }
+
+  actionThumbsDown(entry: InlineChatEntry) {
+    entry.feedback = entry.feedback === 'down' ? undefined : 'down';
+    this.chatHistory.update(h => [...h]);
   }
 
   // ─── isBracketed ─────────────────────────────
@@ -917,6 +972,13 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   // ─── Toggle chat open/closed ──────────────────
   toggleChat() {
+    if (!this.hasDiscoveredEvidenceFocus()) {
+      this.hasDiscoveredEvidenceFocus.set(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pocketgull_evidence_focus_discovered', 'true');
+      }
+    }
+
     if (this.showChat()) {
       this.showChat.set(false);
     } else {
