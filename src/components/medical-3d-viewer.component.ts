@@ -97,13 +97,19 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
-        this.renderer?.dispose();
+        if (this.renderer) {
+            this.renderer.dispose();
+            this.renderer.forceContextLoss();
+            this.renderer.domElement?.remove();
+        }
     }
 
     private isWebGLAvailable(): boolean {
         try {
+            if (typeof window === 'undefined' || typeof document === 'undefined') return false;
             const canvas = document.createElement('canvas');
-            return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+            return !!(window.WebGLRenderingContext && 
+                (canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
         } catch (e) {
             return false;
         }

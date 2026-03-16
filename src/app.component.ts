@@ -500,21 +500,38 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           <div class="flex-1 overflow-y-auto p-6 bg-white dark:bg-[#09090b] relative">
              <div class="mb-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
                 <h3 class="block text-xs font-bold text-[#689F38] uppercase tracking-[0.15em]">Final Care Plan Document</h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Reading Level / Language</span>
-                  <select 
-                    [value]="selectedReadingLevel()" 
-                    (change)="changeReadingLevel($event)"
-                    [disabled]="isTranslating()"
-                    class="text-xs bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-800 rounded px-2 py-1.5 outline-none focus:border-[#689F38] focus:ring-1 focus:ring-[#689F38] transition-colors disabled:opacity-50"
-                  >
-                    <option value="standard">Standard Default</option>
-                    <optgroup label="Cognition Modes">
-                      <option value="simplified">Simplified (6th Grade)</option>
-                      <option value="dyslexia">Cognition (Dyslexia-Friendly)</option>
-                      <option value="child">Child (Pediatric)</option>
-                    </optgroup>
-                  </select>
+                <div class="flex flex-col gap-1.5 w-full sm:w-auto mt-3 sm:mt-0">
+                  <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-0.5">Cognitive Level</span>
+                  <div class="flex flex-wrap bg-[#f4f4f5] dark:bg-zinc-900 p-1 rounded-lg border border-gray-200 dark:border-zinc-800 w-fit gap-1">
+                    <button 
+                      (click)="changeReadingLevel('standard')"
+                      [disabled]="isTranslating()"
+                      class="px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded-md transition-all duration-200 disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-[#689F38]"
+                      [ngClass]="selectedReadingLevel() === 'standard' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200'">
+                      Standard
+                    </button>
+                    <button 
+                      (click)="changeReadingLevel('simplified')"
+                      [disabled]="isTranslating()"
+                      class="px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded-md transition-all duration-200 disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-[#689F38]"
+                      [ngClass]="selectedReadingLevel() === 'simplified' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200'">
+                      Simplified
+                    </button>
+                    <button 
+                      (click)="changeReadingLevel('dyslexia')"
+                      [disabled]="isTranslating()"
+                      class="px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded-md transition-all duration-200 disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-[#689F38]"
+                      [ngClass]="selectedReadingLevel() === 'dyslexia' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200'">
+                      Cognition
+                    </button>
+                    <button 
+                      (click)="changeReadingLevel('child')"
+                      [disabled]="isTranslating()"
+                      class="px-3 py-1.5 text-[11px] uppercase tracking-wider font-bold rounded-md transition-all duration-200 disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-[#689F38]"
+                      [ngClass]="selectedReadingLevel() === 'child' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-200'">
+                      Pediatric
+                    </button>
+                  </div>
                 </div>
              </div>
              
@@ -556,6 +573,11 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                     <p class="mt-2 text-xs font-bold text-[#689F38] uppercase tracking-wider animate-pulse">Translating...</p>
                  </div>
                }
+               @if (translationError()) {
+                  <div class="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest animate-in fade-in duration-300">
+                    ⚠️ {{ translationError() }}
+                  </div>
+               }
              </div>
              
              <!-- NEW TRANSLATION ANALYSIS UI -->
@@ -582,6 +604,24 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                          {{ translationAnalysis() }}
                       </div>
                     }
+                  </div>
+                  
+                  <!-- PRINT STRATEGY TOGGLES -->
+                  <div class="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                      <input type="checkbox" 
+                             [checked]="includeAnalysisInPrint()" 
+                             (change)="includeAnalysisInPrint.set(!includeAnalysisInPrint())"
+                             class="w-4 h-4 text-[#689F38] rounded border-gray-300 focus:ring-[#689F38] dark:border-zinc-700 dark:bg-zinc-900" />
+                      <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-zinc-100 transition-colors">Include AI Translation Analysis in Print</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                      <input type="checkbox" 
+                             [checked]="includeOriginalInPrint()" 
+                             (change)="includeOriginalInPrint.set(!includeOriginalInPrint())"
+                             class="w-4 h-4 text-[#689F38] rounded border-gray-300 focus:ring-[#689F38] dark:border-zinc-700 dark:bg-zinc-900" />
+                      <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-zinc-100 transition-colors">Include Original Clinical Plan in Print</span>
+                    </label>
                   </div>
                </div>
              }
@@ -636,8 +676,9 @@ export class AppComponent implements OnDestroy {
   private ngZone = inject(NgZone);
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
+  private aiConfig = inject(AI_CONFIG, { optional: true });
   today = new Date();
-  hasApiKey = signal<boolean>(false);
+  hasApiKey = signal<boolean>(!!this.aiConfig?.apiKey);
   isDemoMode = signal<boolean>(false);
   apiKeyInput = signal<string>('');
   showPassword = signal<boolean>(false);
@@ -657,9 +698,12 @@ export class AppComponent implements OnDestroy {
   previewText = signal('');
   originalPreviewText = signal('');
   selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
-  isTranslating = this.clinicalIntelligence.isLoading;
+  isTranslating = signal<boolean>(false);
   translationAnalysis = signal<string>('');
   isAnalyzingTranslation = signal(false);
+  translationError = signal<string | null>(null);
+  includeAnalysisInPrint = signal<boolean>(true);
+  includeOriginalInPrint = signal<boolean>(true);
 
   // Navbar Dropdown States
   exportMenuOpen = signal(false);
@@ -795,7 +839,37 @@ export class AppComponent implements OnDestroy {
     const draftItems = this.state.draftSummaryItems();
     if (draftItems.length > 0) {
       const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
-      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
+      plan = plan ? `${plan}\n\n### Draft Notes\n${newContent}` : `### Draft Notes\n${newContent}`;
+    }
+
+    const checklist = this.state.checklist();
+    if (checklist.length > 0) {
+      const clContent = checklist.map(item => `- [${item.completed ? 'x' : ' '}] ${item.text}`).join('\n');
+      plan = plan ? `${plan}\n\n### Care Plan Instructions\n${clContent}` : `### Care Plan Instructions\n${clContent}`;
+    }
+
+    const dynamicNutrients = this.state.dynamicNutrients();
+    if (dynamicNutrients.length > 0) {
+      const tnContent = dynamicNutrients.map(item => `- **${item.name}**: ${item.value}`).join('\n');
+      plan = plan ? `${plan}\n\n### Targeted Nutrients\n${tnContent}` : `### Targeted Nutrients\n${tnContent}`;
+    }
+
+    const oxStress = this.state.oxidativeStressMarkers();
+    if (oxStress.length > 0) {
+      const oxContent = oxStress.map(item => `- **${item.name}**: ${item.value}`).join('\n');
+      plan = plan ? `${plan}\n\n### Oxidative Stress Markers\n${oxContent}` : `### Oxidative Stress Markers\n${oxContent}`;
+    }
+
+    const antiox = this.state.antioxidantSources();
+    if (antiox.length > 0) {
+      const antioxContent = antiox.map(item => `- **${item.name}**: ${item.value}`).join('\n');
+      plan = plan ? `${plan}\n\n### Antioxidant Sources\n${antioxContent}` : `### Antioxidant Sources\n${antioxContent}`;
+    }
+
+    const meds = this.state.medications();
+    if (meds.length > 0) {
+      const medsContent = meds.map(item => `- **${item.name}**: ${item.value}`).join('\n');
+      plan = plan ? `${plan}\n\n### Medications\n${medsContent}` : `### Medications\n${medsContent}`;
     }
     
     const finalText = plan || 'No Active Patient Summary recorded for this visit.';
@@ -809,23 +883,37 @@ export class AppComponent implements OnDestroy {
     this.showPreviewModal.set(false);
   }
 
-  async changeReadingLevel(event: Event) {
-    const level = (event.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child';
+  async changeReadingLevel(levelOrEvent: string | Event) {
+    let level: 'standard' | 'simplified' | 'dyslexia' | 'child';
+    if (typeof levelOrEvent === 'string') {
+      level = levelOrEvent as 'standard' | 'simplified' | 'dyslexia' | 'child';
+    } else {
+      level = (levelOrEvent.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child';
+    }
+    
     this.selectedReadingLevel.set(level);
     this.translationAnalysis.set('');
+    this.translationError.set(null);
 
     if (level === 'standard') {
       this.previewText.set(this.originalPreviewText());
       return;
     }
 
+    this.isTranslating.set(true);
     try {
       const translated = await this.clinicalIntelligence.translateReadingLevel(this.originalPreviewText(), level);
       this.previewText.set(translated);
+      // Automatically analyze the new translation
+      await this.analyzeCurrentTranslation();
     } catch (error) {
       console.error("Translation failed", error);
-      this.selectedReadingLevel.set('standard');
-      this.previewText.set(this.originalPreviewText());
+      this.translationError.set("Failed to translate plan. Please try again or check your connection.");
+      if (this.previewText().trim() === '') {
+        this.previewText.set(this.originalPreviewText());
+      }
+    } finally {
+      this.isTranslating.set(false);
     }
   }
 
@@ -850,8 +938,35 @@ export class AppComponent implements OnDestroy {
   printReport() {
     const p = this.patientMgmt.selectedPatient();
     const vitals = this.state.vitals();
+    let textToPrint = this.previewText();
+    const level = this.selectedReadingLevel();
+
+    if (level !== 'standard') {
+      const levelNames = {
+        'simplified': 'Simplified (6th Grade)',
+        'dyslexia': 'Cognition (Dyslexia-Friendly)',
+        'child': 'Child (Pediatric)'
+      };
+      
+      let compositePlan = `## COGNITIVE LEVEL PLAN: ${levelNames[level]?.toUpperCase() || level.toUpperCase()}\n\n`;
+      compositePlan += `${textToPrint}\n\n`;
+
+      if (this.includeAnalysisInPrint()) {
+        const analysis = this.translationAnalysis();
+        if (analysis) {
+          compositePlan += `---\n\n### AI Translation Analysis\n${analysis}\n\n`;
+        }
+      }
+
+      if (this.includeOriginalInPrint()) {
+        compositePlan += `---\n\n### Original Clinical Plan (Provider Reference)\n${this.originalPreviewText()}`;
+      }
+      
+      textToPrint = compositePlan;
+    }
+
     this.export.downloadCarePlanPdf(
-      this.previewText(),
+      textToPrint,
       p?.name ?? 'Patient',
       {
         bp: vitals.bp || undefined,

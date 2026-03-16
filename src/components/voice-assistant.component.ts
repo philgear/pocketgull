@@ -183,7 +183,7 @@ export interface ChatEntry {
                             </svg>
                         </div>
                         <div class="text-center -mt-8 md:-mt-16 transition-all duration-300" [class.opacity-0]="chatHistory().length > 0">
-                            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Cerebella AI</h2>
+                            <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Pocket Gull Intelligence</h2>
                             <p class="text-sm text-gray-500">Live Clinical Co-Pilot</p>
                         </div>
                     </div>
@@ -467,7 +467,7 @@ export class VoiceAssistantComponent implements OnDestroy {
         console.log("Starting chat session with patientData length:", rawPatientData.length);
 
         // We'll manually specify context for VoiceAssistant to ensure rich-media parsing is respected
-        const context = `You are a collaborative care plan co-pilot named "Cerebella". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.
+        const context = `You are a collaborative care plan co-pilot named "Pocket Gull". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.
 
 VISUAL GROUNDING: When the user asks for images, a 3D model, or research (e.g. "show me an image", "3D model of", "find research on"), respond with a \`\`\`rich-media\`\`\` JSON block BEFORE your prose explanation. Format:
 \`\`\`rich-media
