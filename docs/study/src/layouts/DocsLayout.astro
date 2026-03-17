@@ -1,0 +1,531 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Engineering documentation for Pocket Gull — a voice-first clinical co-pilot.' } = Astro.props;
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+const navItems = [
+  { href: '/', label: 'Overview' },
+  { href: '/architecture', label: 'Architecture' },
+  { href: '/features', label: 'Features' },
+  { href: '/data', label: 'Data & Privacy' },
+  { href: '/responsible-ai', label: 'Responsible AI' },
+  { href: '/getting-started', label: 'Getting Started' },
+  { href: '/case-study', label: 'Case Study' },
+  { href: '/changelog', label: 'Changelog' },
+];
+
+function isActive(href: string): boolean {
+  const clean = currentPath.replace(/\/$/, '') || '/';
+  const cleanHref = href.replace(/\/$/, '') || '/';
+  return clean === cleanHref;
+}
+
+// Prev/next page
+const currentIndex = navItems.findIndex(item => isActive(item.href));
+const prevPage = currentIndex > 0 ? navItems[currentIndex - 1] : null;
+const nextPage = currentIndex < navItems.length - 1 ? navItems[currentIndex + 1] : null;
+
+// Version info
+const versions = [
+  { label: 'v0.1.0', tag: 'latest', current: true },
+  { label: 'v0.0.1', tag: 'alpha', current: false },
+];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title} — Pocket Gull Docs</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><g transform=%22translate(5, 5) scale(0.9)%22><path d=%22M45 30 L25 40 C 35 20, 40 10, 45 0 Z%22 fill=%22%23689F38%22/><path d=%22M45 30 L45 0 L38 30Z%22 fill=%22%23558B2F%22/><path d=%22M55 30 L75 40 C 65 20, 60 10, 55 0 Z%22 fill=%22%23689F38%22/><path d=%22M55 30 L55 0 L62 30Z%22 fill=%22%23558B2F%22/><rect x=%2225%22 y=%2235%22 width=%2250%22 height=%224%22 fill=%22%23689F38%22/></g></svg>" />
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="docs-nav">
+    <div class="nav-inner">
+      <div class="nav-left">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <a href="/" class="nav-brand">
+          <svg width="28" height="28" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="translate(0, -20)">
+              <rect x="166" y="275" width="180" height="10" rx="2" fill="#76B362" />
+              <g>
+                <path d="M251 270 C200 250 155 200 155 145 C155 180 185 240 251 270Z" fill="#76B362" />
+                <path d="M251 270 C240 210 215 155 185 145 C185 145 230 200 251 270Z" fill="#244626" />
+              </g>
+              <g transform="translate(512, 0) scale(-1, 1)">
+                <path d="M251 270 C200 250 155 200 155 145 C155 180 185 240 251 270Z" fill="#76B362" />
+                <path d="M251 270 C240 210 215 155 185 145 C185 145 230 200 251 270Z" fill="#76B362" />
+              </g>
+            </g>
+          </svg>
+          <span class="brand-text">POCKET GULL</span>
+          <span class="brand-divider"></span>
+          <span class="brand-label">DOCS</span>
+        </a>
+        <!-- Version Dropdown -->
+        <div class="version-dropdown" id="versionDropdown">
+          <button class="version-trigger" id="versionTrigger">
+            <span>v0.1.0</span>
+            <svg viewBox="0 -960 960 960" fill="currentColor" width="10" height="10"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg>
+          </button>
+          <div class="version-menu" id="versionMenu">
+            {versions.map(v => (
+              <div class:list={['version-item', { active: v.current }]}>
+                <span class="version-label">{v.label}</span>
+                {v.current && <span class="version-tag">current</span>}
+                {!v.current && <span class="version-tag muted">{v.tag}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="https://pocketgull.app" target="_blank" rel="noopener">Live App ↗</a>
+        <a href="https://github.com/philgear/pocket-gull" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="docs-container">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Documentation</div>
+        {navItems.map((item) => (
+          <a href={item.href} class:list={['sidebar-link', { active: isActive(item.href) }]}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+      <div class="sidebar-footer">
+        <span>v0.1.0</span>
+        <span>·</span>
+        <span>MIT</span>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main class="docs-main">
+      <article class="docs-article">
+        <slot />
+      </article>
+
+      <!-- Prev / Next Navigation -->
+      <nav class="page-nav">
+        {prevPage ? (
+          <a href={prevPage.href} class="page-nav-card page-nav-prev">
+            <span class="page-nav-direction">← Previous</span>
+            <span class="page-nav-label">{prevPage.label}</span>
+          </a>
+        ) : <div></div>}
+        {nextPage ? (
+          <a href={nextPage.href} class="page-nav-card page-nav-next">
+            <span class="page-nav-direction">Next →</span>
+            <span class="page-nav-label">{nextPage.label}</span>
+          </a>
+        ) : <div></div>}
+      </nav>
+
+      <footer class="docs-footer">
+        <p>© 2026 Phil Gear · <a href="https://g.dev/philgear">g.dev/philgear</a> · MIT License</p>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Mobile menu toggle
+    const toggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    toggle?.addEventListener('click', () => {
+      sidebar?.classList.toggle('open');
+    });
+    sidebar?.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => sidebar?.classList.remove('open'));
+    });
+
+    // Version dropdown
+    const versionTrigger = document.getElementById('versionTrigger');
+    const versionMenu = document.getElementById('versionMenu');
+    versionTrigger?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      versionMenu?.classList.toggle('open');
+    });
+    document.addEventListener('click', () => {
+      versionMenu?.classList.remove('open');
+    });
+  </script>
+
+  <!-- DocNode drill-down engine -->
+  <script src="/scripts/doc-drill.js"></script>
+</body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+  @import '../styles/doc-nodes.css';
+</style>
+
+<style>
+  .docs-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 56px;
+    border-bottom: 1px solid var(--pg-border);
+    background: var(--pg-surface);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+  }
+
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--pg-text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--pg-text);
+  }
+
+  .nav-brand:hover { text-decoration: none; }
+
+  .brand-text {
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--pg-text);
+  }
+
+  .brand-divider {
+    width: 1px;
+    height: 16px;
+    background: var(--pg-border);
+  }
+
+  .brand-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--pg-text-muted);
+    text-transform: uppercase;
+  }
+
+  /* Version Dropdown */
+  .version-dropdown {
+    position: relative;
+    margin-left: 0.25rem;
+  }
+
+  .version-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--pg-text-muted);
+    background: var(--pg-bg);
+    border: 1px solid var(--pg-border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .version-trigger:hover {
+    border-color: var(--pg-accent);
+    color: var(--pg-text);
+  }
+
+  .version-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    min-width: 140px;
+    background: var(--pg-surface);
+    border: 1px solid var(--pg-border);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    z-index: 60;
+    display: none;
+    padding: 4px;
+  }
+
+  .version-menu.open { display: block; }
+
+  .version-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+
+  .version-item:hover { background: var(--pg-border); }
+  .version-item.active { font-weight: 600; }
+
+  .version-label { color: var(--pg-text); }
+
+  .version-tag {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #689F38;
+    background: #F0F7E8;
+    border: 1px solid #C8E6C9;
+    border-radius: 8px;
+    padding: 1px 5px;
+  }
+
+  .version-tag.muted {
+    color: #9CA3AF;
+    background: #F3F4F6;
+    border-color: #E5E7EB;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .nav-links a {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pg-text-muted);
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--pg-accent);
+    text-decoration: none;
+  }
+
+  /* Container: sidebar + main */
+  .docs-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* Sidebar */
+  .docs-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--pg-border);
+    padding: 2rem 1.25rem;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .sidebar-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--pg-text-muted);
+    margin-bottom: 1rem;
+    padding-left: 0.75rem;
+  }
+
+  .sidebar-link {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--pg-text-muted);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-link:hover {
+    color: var(--pg-text);
+    background: var(--pg-border);
+    text-decoration: none;
+  }
+
+  .sidebar-link.active {
+    color: var(--pg-accent-dark);
+    background: rgba(65, 107, 31, 0.08);
+    font-weight: 600;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .sidebar-link.active {
+      color: var(--pg-accent-light);
+      background: rgba(118, 179, 98, 0.1);
+    }
+  }
+
+  .sidebar-footer {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--pg-text-muted);
+    padding-left: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--pg-border);
+  }
+
+  /* Main content */
+  .docs-main {
+    flex: 1;
+    min-width: 0;
+    padding: 2.5rem 3rem 4rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .docs-article {
+    max-width: 780px;
+    flex: 1;
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Prev / Next Navigation */
+  .page-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    max-width: 780px;
+  }
+
+  .page-nav-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--pg-border);
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    min-width: 140px;
+  }
+
+  .page-nav-card:hover {
+    border-color: var(--pg-accent);
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  .page-nav-next { align-items: flex-end; margin-left: auto; }
+
+  .page-nav-direction {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--pg-text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .page-nav-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--pg-accent-dark);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .page-nav-label { color: var(--pg-accent-light); }
+  }
+
+  .docs-footer {
+    border-top: 1px solid var(--pg-border);
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+  }
+
+  .docs-footer p {
+    font-size: 0.75rem;
+    color: var(--pg-text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .menu-toggle { display: block; }
+    .brand-text, .brand-divider, .brand-label, .version-dropdown { display: none; }
+
+    .docs-sidebar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      bottom: 0;
+      width: 260px;
+      background: var(--pg-surface);
+      z-index: 40;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border-right: 1px solid var(--pg-border);
+      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+    }
+
+    .docs-sidebar.open {
+      transform: translateX(0);
+    }
+
+    .docs-main {
+      padding: 2rem 1.25rem 3rem;
+    }
+
+    .page-nav {
+      flex-direction: column;
+    }
+
+    .page-nav-next { align-items: flex-start; margin-left: 0; }
+  }
+</style>

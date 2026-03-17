@@ -16,6 +16,7 @@ import { IntelligenceProviderToken } from './services/ai/intelligence.provider.t
 import { GeminiProvider } from './services/ai/gemini.provider';
 import { ClinicalIntelligenceService } from './services/clinical-intelligence.service';
 import { PatientManagementService } from './services/patient-management.service';
+import { NetworkStateService } from './services/network-state.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT } from './demo-data';
 
@@ -128,6 +129,18 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
         </main>
       } @else {
         <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
+        <!-- Offline Banner -->
+        @if (!network.isOnline()) {
+          <div class="bg-red-50 border-b border-red-200 px-4 py-2 flex items-center justify-between gap-4 no-print shrink-0">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-red-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+              <p class="text-xs text-red-800 font-medium">You are currently offline. Certain AI features and cloud sync may be disabled.</p>
+            </div>
+            @if (network.forceOffline()) {
+                <button (click)="network.toggleForceOffline()" class="text-xs font-bold text-red-800 uppercase tracking-widest hover:text-red-900 whitespace-nowrap transition-colors border border-red-300 rounded px-2 py-1 bg-white/50">Reconnect</button>
+            }
+          </div>
+        }
         <!-- Demo Banner -->
         @if (isDemoMode()) {
           <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 flex items-center justify-between gap-4 no-print shrink-0">
@@ -161,12 +174,16 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             <div class="text-xs text-gray-500 font-medium mr-4 hidden sm:block">INTAKE MODULE 01</div>
 
             <!-- System Status Indicator (Hidden on smallest watches) -->
-            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full border border-gray-200 hover:border-gray-300 transition-all cursor-help group relative no-print">
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full border border-gray-200 hover:border-gray-300 transition-all cursor-pointer group relative no-print" 
+                 (click)="network.toggleForceOffline()"
+                 [title]="network.isOnline() ? 'Click to simulate offline' : 'Click to disable offline override'">
             <div class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" style="will-change: transform, opacity;"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              <span class="absolute inline-flex h-full w-full rounded-full opacity-75" 
+                    [class.bg-green-400]="network.isOnline()" [class.bg-red-400]="!network.isOnline()" [class.animate-ping]="network.isOnline()"
+                    style="will-change: transform, opacity;"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2" [class.bg-green-500]="network.isOnline()" [class.bg-red-500]="!network.isOnline()"></span>
             </div>
-            <span class="text-xs font-bold text-gray-600 uppercase tracking-widest">System Ready</span>
+            <span class="text-xs font-bold text-gray-600 uppercase tracking-widest">{{ network.isOnline() ? 'System Ready' : 'System Offline' }}</span>
               
               <!-- Tooltip -->
               <div class="absolute top-full left-0 mt-2 w-64 bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-left">
@@ -192,9 +209,15 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                           <p class="text-xs text-gray-500 font-bold uppercase tracking-tighter">Datastore</p>
                           <p class="text-xs text-white">Healthy</p>
                        </div>
-                    </div>
-                 </div>
-              </div>
+                     </div>
+                     <div class="pt-2 mt-1 border-t border-gray-800">
+                        <a href="/docs/study/" target="_blank" rel="noopener" class="flex items-center justify-between text-xs font-bold text-gray-400 hover:text-green-400 transition-colors pointer-events-auto cursor-pointer">
+                           <span>VIEW DOCS</span>
+                           <span>→</span>
+                        </a>
+                     </div>
+                  </div>
+               </div>
             </div>
           </div>
           
@@ -382,6 +405,7 @@ export class AppComponent implements OnDestroy {
   private ngZone = inject(NgZone);
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
+  network = inject(NetworkStateService);
   today = new Date();
   hasApiKey = signal<boolean>(false);
   isDemoMode = signal<boolean>(false);

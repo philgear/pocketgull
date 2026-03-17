@@ -1,0 +1,40 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Changelog
+---
+
+# Changelog
+
+All notable changes to Pocket Gull are documented here.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+---
+
+## v0.1.0 — 2026-03-16
+
+**Initial Release · Gemini Live Agent Challenge**
+
+### Added
+- **Live AI Clinical Co-Pilot** — Voice-first consult powered by `gemini-2.5-flash` and ADK `InMemoryRunner`
+- **3D Body Viewer** — Procedural skeletal + surface anatomy with severity particles (Three.js v0.183)
+- **Multi-Agent Orchestration** — Specialized `LlmAgent` experts: Overview, Interventions, Monitoring, Education
+- **Interactive Task Bracketing** — Double-click state machine (Normal → Added → Removed) for care plan review
+- **FHIR R4 Export** — Unicode-safe Base64 encoded Bundles for clinical portability
+- **FHIR Import Service** — Ingest Epic/MyChart "Lucy" format payloads
+- **PubMed E-utilities Integration** — Server-side research queries with anonymized PHI
+- **Google CSE Integration** — Differential diagnostic information via Programmable Search
+- **Box Breathing UX** — 16-second guided animation during high-stress intake encounters
+- **Printable Clinical Stationery** — CSS Grid halftone body maps with diagnostic overlays
+- **Responsive Design** — Two-column grid down to **286px** viewport (Pixel Watch 2)
+- **Dark Mode** — WCAG-compliant contrast with automatic detection
+- **Cognition & Child Export** — Dyslexia-friendly typography, carousel informatics PDF
+
+### Infrastructure
+- Express.js backend on **Google Cloud Run** with SSR + hydration
+- Automated deployment via `scripts/deploy.sh`
+- Lighthouse score: **100/100** (Performance, Accessibility, Best Practices, SEO)
+
+### Documentation
+- Astro-powered docs site with 8 pages
+- AI-powered DocNode evidence drill-down (Gemini API)
+- Version selector and prev/next navigation
