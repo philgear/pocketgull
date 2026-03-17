@@ -5,7 +5,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
   selector: 'app-fhir-callback',
   standalone: true,
   template: `
-    <div class="min-h-screen bg-[#EEEEEE] dark:bg-zinc-950 flex flex-col items-center justify-center p-4 font-sans selection:bg-green-100 selection:text-green-900">
+    <div class="min-h-screen bg-[#EEEEEE] dark:bg-zinc-950 flex flex-col items-center justify-center p-4 font-sans selection:bg-brand-green-100 selection:text-brand-green-900">
       
       <!-- Brand Header -->
       <div class="mb-8 flex flex-col items-center">
@@ -20,7 +20,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
       <div class="bg-white dark:bg-[#09090b] shadow-xl rounded-2xl p-8 max-w-md w-full text-center space-y-6 border border-gray-100 dark:border-zinc-800 relative overflow-hidden">
         
         <!-- Top accent line -->
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-400 to-[#558B2F]"></div>
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-green-400 to-[#558B2F]"></div>
 
         @if (isProcessing) {
           <div class="py-4">
@@ -35,10 +35,10 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
           </div>
         } @else if (errorMsg) {
           <div class="py-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div class="w-16 h-16 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 dark:border-red-900/30">
+            <div class="w-16 h-16 bg-brand-red-50 dark:bg-brand-red-900/20 text-brand-red-600 dark:text-brand-red-400 rounded-full flex items-center justify-center mx-auto mb-6 border border-brand-red-100 dark:border-brand-red-900/30">
               <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </div>
-            <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-red-600 dark:text-red-400 mb-2">Connection Failed</h2>
+            <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-brand-red-600 dark:text-brand-red-400 mb-2">Connection Failed</h2>
             <p class="text-sm text-gray-500 dark:text-zinc-400 mb-6">{{errorMsg}}</p>
             <button (click)="returnToApp()" class="w-full uppercase tracking-[0.1em] text-xs font-bold px-6 py-3 bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-lg hover:bg-[#558B2F] dark:hover:bg-[#8bc34a] transition-all duration-200">Return to Summary</button>
           </div>
@@ -46,7 +46,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
           <div class="py-4 animate-in fade-in zoom-in duration-300">
             <div class="relative w-20 h-20 mx-auto mb-6">
               <div class="absolute inset-0 bg-[#558B2F]/20 dark:bg-[#8bc34a]/20 rounded-full animate-ping" style="animation-duration: 2s;"></div>
-              <div class="relative w-full h-full bg-[#558B2F] dark:bg-[#8bc34a] text-white dark:text-zinc-900 rounded-full flex items-center justify-center shadow-lg shadow-green-500/20">
+              <div class="relative w-full h-full bg-[#558B2F] dark:bg-[#8bc34a] text-white dark:text-zinc-900 rounded-full flex items-center justify-center shadow-lg shadow-brand-green-500/20">
                 <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export interface DicomStudy {
+export interface IDicomStudy {
   studyInstanceUid: string;
   patientName?: string;
   patientId?: string;
@@ -9,13 +9,13 @@ export interface DicomStudy {
   modalities?: string[];
 }
 
-export interface DicomSeries {
+export interface IDicomSeries {
   seriesInstanceUid: string;
   modality: string;
   seriesDescription?: string;
 }
 
-export interface DicomInstance {
+export interface IDicomInstance {
   sopInstanceUid: string;
   instanceNumber?: number;
 }
@@ -24,12 +24,12 @@ export interface DicomInstance {
   providedIn: 'root'
 })
 export class DicomService {
-  studies = signal<DicomStudy[]>([]);
+  studies = signal<IDicomStudy[]>([]);
   
   // Selected state
-  selectedStudy = signal<DicomStudy | null>(null);
-  selectedSeries = signal<DicomSeries | null>(null);
-  selectedInstance = signal<DicomInstance | null>(null);
+  selectedStudy = signal<IDicomStudy | null>(null);
+  selectedSeries = signal<IDicomSeries | null>(null);
+  selectedInstance = signal<IDicomInstance | null>(null);
 
   isLoading = signal(false);
   error = signal<string | null>(null);
@@ -62,14 +62,14 @@ export class DicomService {
   /**
    * Parses the DICOMweb JSON responses into friendly TS interfaces.
    */
-  private parseStudies(data: any[]): DicomStudy[] {
+  private parseStudies(data: any[]): IDicomStudy[] {
     if (!Array.isArray(data)) return [];
     
     return data.map(study => {
         // Common DICOM tags
         // 0020000D: Study Instance UID
-        // 00100010: Patient Name
-        // 00100020: Patient ID
+        // 00100010: IPatient Name
+        // 00100020: IPatient ID
         // 00080020: Study Date
         // 00081030: Study Description
         // 00080061: Modalities in Study

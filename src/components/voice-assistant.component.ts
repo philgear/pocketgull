@@ -9,16 +9,16 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { MarkdownService } from '../services/markdown.service';
-import { RichMediaService, RichMediaCard } from '../services/rich-media.service';
+import { RichMediaService, IRichMediaCard } from '../services/rich-media.service';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { AdkLiveService } from '../services/ai/adk-live.service';
 import { inject as baseInject } from '@angular/core';
 
-export interface ChatEntry {
+export interface IChatEntry {
     role: 'user' | 'model';
     text: string;
     htmlContent?: string;
-    richCards?: RichMediaCard[];
+    richCards?: IRichMediaCard[];
     feedback?: 'up' | 'down';
 }
 
@@ -151,8 +151,8 @@ export interface ChatEntry {
                         <div class="relative w-48 h-48 md:w-64 md:h-64 transition-all duration-500" [class.opacity-10]="chatHistory().length > 0" [class.opacity-100]="chatHistory().length === 0">
                             <!-- Glowing Orb -->
                             <div class="absolute inset-0 rounded-full transition-all duration-500" 
-                                 [class.bg-green-400/10]="agentState() === 'idle'"
-                                 [class.bg-blue-400/20]="agentState() === 'listening'"
+                                 [class.bg-brand-green-400/10]="agentState() === 'idle'"
+                                 [class.bg-brand-blue-400/20]="agentState() === 'listening'"
                                  [class.bg-purple-400/20]="agentState() === 'processing'"
                                  [class.blur-2xl]="true"
                                  [class.scale-100]="agentState() === 'idle'"
@@ -201,7 +201,7 @@ export interface ChatEntry {
                                 <div class="group flex gap-3 items-start w-full animate-in fade-in slide-in-from-bottom-3 duration-300" [class.flex-row-reverse]="entry.role === 'user'">
                                     
                                     <!-- Avatar -->
-                                    <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1" [class.bg-gray-700]="entry.role === 'model'" [class.bg-blue-500]="entry.role === 'user'">
+                                    <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1" [class.bg-gray-700]="entry.role === 'model'" [class.bg-brand-blue-500]="entry.role === 'user'">
                                         @if (entry.role === 'model') {
                                             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                                         } @else {
@@ -218,7 +218,7 @@ export interface ChatEntry {
                                              </div>
                                          } @else {
                                             <!-- User Bubble -->
-                                            <div class="prose prose-sm max-w-none text-white bg-blue-500 dark:bg-blue-600 rounded-2xl rounded-tr-sm p-4 w-full break-words">
+                                            <div class="prose prose-sm max-w-none text-white bg-brand-blue-500 dark:bg-brand-blue-600 rounded-2xl rounded-tr-sm p-4 w-full break-words">
                                                 <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
                                             </div>
                                          }
@@ -239,8 +239,8 @@ export interface ChatEntry {
                                             <pocket-gull-button variant="ghost" size="xs" (click)="actionInsert(entry.text)" icon="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" ariaLabel="Insert into Clinical Notes"></pocket-gull-button>
                                             @if (entry.role === 'model') {
                                                 <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 mx-1"></div>
-                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(entry)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-green-600]="entry.feedback === 'up'" [class.dark:text-green-400]="entry.feedback === 'up'"></pocket-gull-button>
-                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(entry)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-red-600]="entry.feedback === 'down'" [class.dark:text-red-400]="entry.feedback === 'down'"></pocket-gull-button>
+                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(entry)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-brand-green-600]="entry.feedback === 'up'" [class.dark:text-brand-green-400]="entry.feedback === 'up'"></pocket-gull-button>
+                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(entry)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-brand-red-600]="entry.feedback === 'down'" [class.dark:text-brand-red-400]="entry.feedback === 'down'"></pocket-gull-button>
                                             }
                                         </div>
                                     </div>
@@ -267,13 +267,13 @@ export interface ChatEntry {
                             <!-- Smart Suggestions -->
                             @if (chatHistory().length === 0 && agentState() === 'idle') {
                               <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-brand-blue-500 dark:hover:text-brand-blue-400 transition-all shadow-sm">
                                      What is the most critical evidence?
                                  </button>
-                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-brand-blue-500 dark:hover:text-brand-blue-400 transition-all shadow-sm">
                                      Alternative interventions?
                                  </button>
-                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-brand-blue-500 dark:hover:text-brand-blue-400 transition-all shadow-sm">
                                      Explain rationale simply
                                  </button>
                               </div>
@@ -285,9 +285,9 @@ export interface ChatEntry {
                                 <button type="button" (click)="toggleListening()" [disabled]="agentState() !== 'idle' || !!permissionError()"
                                         title="Start/Stop Voice Capture"
                                         class="w-12 h-12 flex items-center justify-center rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
-                                        [class.bg-red-500]="live.isListening()" [class.text-white]="live.isListening()"
+                                        [class.bg-brand-red-500]="live.isListening()" [class.text-white]="live.isListening()"
                                         [class.bg-gray-100]="!live.isListening()" [class.dark:bg-zinc-800]="!live.isListening()" [class.text-gray-600]="!live.isListening()" [class.dark:text-zinc-300]="!live.isListening()"
-                                        [class.hover:bg-red-600]="live.isListening()" [class.hover:bg-gray-200]="!live.isListening()" [class.dark:hover:bg-zinc-700]="!live.isListening()">
+                                        [class.hover:bg-brand-red-600]="live.isListening()" [class.hover:bg-gray-200]="!live.isListening()" [class.dark:hover:bg-zinc-700]="!live.isListening()">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
                                 </button>
 
@@ -343,7 +343,7 @@ export class VoiceAssistantComponent implements OnDestroy {
     permissionError = signal<string | null>(null);
     messageText = signal('');
     typingIntroText = signal('');
-    chatHistory = signal<ChatEntry[]>([]);
+    chatHistory = signal<IChatEntry[]>([]);
     selectedFiles = signal<File[]>([]);
 
     protected readonly ClinicalIcons = ClinicalIcons;
@@ -359,12 +359,12 @@ export class VoiceAssistantComponent implements OnDestroy {
         navigator.clipboard.writeText(text);
     }
 
-    actionThumbsUp(entry: ChatEntry) {
+    actionThumbsUp(entry: IChatEntry) {
         entry.feedback = entry.feedback === 'up' ? undefined : 'up';
         this.chatHistory.update(h => [...h]);
     }
 
-    actionThumbsDown(entry: ChatEntry) {
+    actionThumbsDown(entry: IChatEntry) {
         entry.feedback = entry.feedback === 'down' ? undefined : 'down';
         this.chatHistory.update(h => [...h]);
     }
@@ -693,7 +693,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
         return { cleanMd, jsonStr };
     }
 
-    private _parseCards(jsonStr: string): RichMediaCard[] | undefined {
+    private _parseCards(jsonStr: string): IRichMediaCard[] | undefined {
         try {
             const parsed = JSON.parse(jsonStr.trim());
             const rawCards: Array<{ kind: string; query: string; severity?: string; afflictionHighlight?: string; particles?: boolean }> = parsed.cards ?? [];

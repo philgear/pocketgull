@@ -4,17 +4,17 @@ export type AiModelId =
     | 'gemini-2.5-flash'
     | 'gemini-2.5-pro';
 
-export interface AiModelConfig {
+export interface IAiModelConfig {
     modelId: AiModelId;
     temperature?: number;
     topP?: number;
     maxOutputTokens?: number;
 }
 
-export interface AiProviderConfig {
+export interface IAiProviderConfig {
     apiKey: string;
-    defaultModel: AiModelConfig;
-    verificationModel: AiModelConfig;
+    defaultModel: IAiModelConfig;
+    verificationModel: IAiModelConfig;
 }
 
-export const AI_CONFIG = new InjectionToken<AiProviderConfig>('AI_CONFIG');
+export const AI_CONFIG = new InjectionToken<IAiProviderConfig>('AI_CONFIG');

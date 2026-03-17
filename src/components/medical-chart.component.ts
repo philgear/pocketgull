@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, computed, signal, viewChild
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
-import { PatientState, Patient, HistoryEntry } from '../services/patient.types';
+import { IPatientState, IPatient, HistoryEntry } from '../services/patient.types';
 import { BodyViewerComponent } from './body-viewer.component';
 import { PatientHistoryTimelineComponent } from './patient-history-timeline.component';
 import { PatientScansComponent } from './patient-scans.component';
@@ -23,15 +23,15 @@ import { OhifViewerComponent } from './ohif-viewer.component';
  
        <!-- Review Mode Banner -->
       @if(isReviewMode() && state.viewingPastVisit(); as visit) {
-          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700/50 p-4 flex justify-between items-center text-sm rounded-xl shadow-sm mb-2">
+          <div class="bg-brand-amber-50 dark:bg-brand-amber-900/20 border border-brand-amber-200 dark:border-brand-amber-700/50 p-4 flex justify-between items-center text-sm rounded-xl shadow-sm mb-2">
               <div class="flex items-center gap-3">
-                  <div class="p-2 bg-yellow-100 dark:bg-yellow-800/40 rounded-sm text-yellow-700 dark:text-yellow-500">
+                  <div class="p-2 bg-brand-amber-100 dark:bg-brand-amber-800/40 rounded-sm text-brand-amber-700 dark:text-brand-amber-500">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                   </div>
                   @if (visit.type === 'Visit' || visit.type === 'ChartArchived') {
-                    <span class="font-medium text-yellow-900 dark:text-yellow-100">Reviewing past entry from <strong class="font-bold">{{ visit.date }}</strong>. All fields are read-only.</span>
+                    <span class="font-medium text-brand-amber-900 dark:text-brand-amber-100">Reviewing past entry from <strong class="font-bold">{{ visit.date }}</strong>. All fields are read-only.</span>
                   } @else {
-                     <span class="font-medium text-yellow-900 dark:text-yellow-100">Reviewing past AI Analysis from <strong class="font-bold">{{ visit.date }}</strong>.</span>
+                     <span class="font-medium text-brand-amber-900 dark:text-brand-amber-100">Reviewing past AI Analysis from <strong class="font-bold">{{ visit.date }}</strong>.</span>
                   }
               </div>
               <pocket-gull-button 
@@ -87,9 +87,9 @@ import { OhifViewerComponent } from './ohif-viewer.component';
         }
       </pocket-gull-card>
 
-      <!-- Patient History Card -->
+      <!-- IPatient History Card -->
       <pocket-gull-card 
-        title="Patient History" 
+        title="IPatient History" 
         [icon]="historyIcon"
         [noPadding]="true">
         
@@ -143,7 +143,7 @@ import { OhifViewerComponent } from './ohif-viewer.component';
         }
       </pocket-gull-card>
 
-      <!-- Patient Scans Card -->
+      <!-- IPatient Scans Card -->
       <pocket-gull-card 
         title="Scans & Diagnostics" 
         [icon]="scansIcon"

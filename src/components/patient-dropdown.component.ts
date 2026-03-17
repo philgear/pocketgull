@@ -52,7 +52,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 
           <div class="py-1 overflow-y-auto flex-1 group/list">
             @for (patient of filteredPatients(); track patient.id) {
-              <button (click)="selectPatient(patient.id)" class="group w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:bg-[#F8F9FA] dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white flex items-center gap-3 transition-colors relative border-l-4" [class.bg-blue-50]="patient.id === patientManagement.selectedPatientId()" [class.dark:bg-[#689F38]/10]="patient.id === patientManagement.selectedPatientId()" [class.border-[#689F38]]="patient.id === patientManagement.selectedPatientId()" [class.border-transparent]="patient.id !== patientManagement.selectedPatientId()">
+              <button (click)="selectPatient(patient.id)" class="group w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:bg-[#F8F9FA] dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white flex items-center gap-3 transition-colors relative border-l-4" [class.bg-brand-blue-50]="patient.id === patientManagement.selectedPatientId()" [class.dark:bg-[#689F38]/10]="patient.id === patientManagement.selectedPatientId()" [class.border-[#689F38]]="patient.id === patientManagement.selectedPatientId()" [class.border-transparent]="patient.id !== patientManagement.selectedPatientId()">
                 
                 <div class="w-8 h-8 rounded-sm flex items-center justify-center text-xs shrink-0 font-bold shadow-sm"
                      [class.bg-[#689F38]]="patient.id === patientManagement.selectedPatientId()"
@@ -73,9 +73,9 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
                 </div>
 
                 <button (click)="removePatient($event, patient.id)" 
-                        class="opacity-0 group-hover:opacity-100 p-1.5 rounded-sm text-red-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/50 transition-all shrink-0"
-                        aria-label="Remove Patient Record"
-                        title="Remove Patient">
+                        class="opacity-0 group-hover:opacity-100 p-1.5 rounded-sm text-brand-red-400 hover:text-brand-red-600 dark:hover:text-brand-red-400 hover:bg-brand-red-50 dark:hover:bg-brand-red-900/50 transition-all shrink-0"
+                        aria-label="Remove IPatient Record"
+                        title="Remove IPatient">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
@@ -96,7 +96,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
                size="sm" 
                class="w-full"
                icon="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z">
-                New Patient
+                New IPatient
              </pocket-gull-button>
              <pocket-gull-button 
                (click)="triggerImport()" 
@@ -104,7 +104,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
                size="sm" 
                class="w-full"
                icon="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
-                Import Patient
+                Import IPatient
              </pocket-gull-button>
           </div>
         </div>
@@ -116,12 +116,12 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
       <!-- Import status toast -->
       @if (importStatus()) {
         <div class="absolute right-0 mt-2 w-72 p-3 rounded-lg shadow-lg text-sm font-medium z-50 animate-in fade-in slide-in-from-top duration-200"
-             [class.bg-green-50]="importStatus()!.type === 'success'"
-             [class.text-green-800]="importStatus()!.type === 'success'"
-             [class.border-green-200]="importStatus()!.type === 'success'"
-             [class.bg-red-50]="importStatus()!.type === 'error'"
-             [class.text-red-800]="importStatus()!.type === 'error'"
-             [class.border-red-200]="importStatus()!.type === 'error'"
+             [class.bg-brand-green-50]="importStatus()!.type === 'success'"
+             [class.text-brand-green-800]="importStatus()!.type === 'success'"
+             [class.border-brand-green-200]="importStatus()!.type === 'success'"
+             [class.bg-brand-red-50]="importStatus()!.type === 'error'"
+             [class.text-brand-red-800]="importStatus()!.type === 'error'"
+             [class.border-brand-red-200]="importStatus()!.type === 'error'"
              class="border">
           {{ importStatus()!.message }}
         </div>
@@ -149,7 +149,7 @@ export class PatientDropdownComponent {
       p.gender?.toLowerCase().includes(query) ||
       p.age?.toString().includes(query) ||
       // Assuming state might store condition, but we don't have direct access here 
-      // without injecting PatientStateService or adding it to Patient interface.
+      // without injecting PatientStateService or adding it to IPatient interface.
       // Searching by ID as a fallback for advanced users
       p.id.toLowerCase().includes(query)
     );
@@ -157,9 +157,9 @@ export class PatientDropdownComponent {
 
   currentPatientName() {
     const activeId = this.patientManagement.selectedPatientId();
-    if (!activeId) return 'Select Patient';
+    if (!activeId) return 'Select IPatient';
     const patient = this.patientManagement.patients().find(p => p.id === activeId);
-    return patient ? patient.name : 'Select Patient';
+    return patient ? patient.name : 'Select IPatient';
   }
 
   toggleDropdown() {

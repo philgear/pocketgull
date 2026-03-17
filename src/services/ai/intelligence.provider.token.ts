@@ -1,4 +1,4 @@
 import { InjectionToken } from '@angular/core';
-import { IntelligenceProvider } from './intelligence.provider';
+import { IIntelligenceProvider } from './intelligence.provider';
 
-export const IntelligenceProviderToken = new InjectionToken<IntelligenceProvider>('IntelligenceProvider');
+export const IntelligenceProviderToken = new InjectionToken<IIntelligenceProvider>('IIntelligenceProvider');

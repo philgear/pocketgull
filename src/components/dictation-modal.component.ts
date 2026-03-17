@@ -19,8 +19,8 @@ import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
           <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-sm flex items-center justify-center transition-colors"
-                   [class.bg-red-100]="dictation.isListening()"
-                   [class.text-red-600]="dictation.isListening()"
+                   [class.bg-brand-red-100]="dictation.isListening()"
+                   [class.text-brand-red-600]="dictation.isListening()"
                    [class.bg-gray-100]="!dictation.isListening()"
                    [class.text-gray-500]="!dictation.isListening()">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -66,9 +66,9 @@ import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 
             @if (dictation.isListening()) {
               <div class="absolute bottom-8 right-8 flex gap-1">
-                 <span class="w-2 h-2 bg-red-500 rounded-sm animate-bounce" style="animation-delay: 0ms"></span>
-                 <span class="w-2 h-2 bg-red-500 rounded-sm animate-bounce" style="animation-delay: 150ms"></span>
-                 <span class="w-2 h-2 bg-red-500 rounded-sm animate-bounce" style="animation-delay: 300ms"></span>
+                 <span class="w-2 h-2 bg-brand-red-500 rounded-sm animate-bounce" style="animation-delay: 0ms"></span>
+                 <span class="w-2 h-2 bg-brand-red-500 rounded-sm animate-bounce" style="animation-delay: 150ms"></span>
+                 <span class="w-2 h-2 bg-brand-red-500 rounded-sm animate-bounce" style="animation-delay: 300ms"></span>
               </div>
             }
           </div>
@@ -84,7 +84,7 @@ import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
                  {{ dictation.isListening() ? 'Pause' : 'Resume' }}
                </pocket-gull-button>
                @if (dictation.permissionError(); as error) {
-                 <span class="text-xs text-red-600">{{ error }}</span>
+                 <span class="text-xs text-brand-red-600">{{ error }}</span>
                }
             </div>
 

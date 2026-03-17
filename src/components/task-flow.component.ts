@@ -20,9 +20,9 @@ import { RevealDirective } from '../directives/reveal.directive';
           <h2 class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100">Tasks, Notes & Shopping</h2>
         </div>
         <div class="flex flex-col items-end gap-1 sm:gap-2">
-            <div class="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-[#689f38]/10 rounded-full border border-green-100 dark:border-[#689f38]/30">
-              <div class="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-[#689f38] animate-pulse"></div>
-              <span class="text-[10px] sm:text-xs font-medium text-green-700 dark:text-[#689f38] uppercase tracking-wide">Live</span>
+            <div class="flex items-center gap-1.5 px-2 py-1 bg-brand-green-50 dark:bg-[#689f38]/10 rounded-full border border-brand-green-100 dark:border-[#689f38]/30">
+              <div class="w-1.5 h-1.5 rounded-full bg-brand-green-500 dark:bg-[#689f38] animate-pulse"></div>
+              <span class="text-[10px] sm:text-xs font-medium text-brand-green-700 dark:text-[#689f38] uppercase tracking-wide">Live</span>
             </div>
             <div class="text-[10px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest text-right">
                {{ checklist().length }} Tasks • {{ clinicalNotes().length }} Notes • {{ shoppingList().length }} Items
@@ -59,7 +59,7 @@ import { RevealDirective } from '../directives/reveal.directive';
                       <label [for]="'task-' + task.id" class="text-sm text-[#1C1C1C] dark:text-zinc-100 flex-1 cursor-pointer" [class.line-through]="task.completed" [class.opacity-50]="task.completed">
                         {{ task.text }}
                       </label>
-                      <button (click)="removeTask(task.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Task">
+                      <button (click)="removeTask(task.id)" class="text-gray-300 dark:text-zinc-400 hover:text-brand-red-500 dark:hover:text-brand-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Task">
                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                       </button>
                     </div>
@@ -77,7 +77,7 @@ import { RevealDirective } from '../directives/reveal.directive';
                 </h3>
                 <div class="flex flex-col gap-2">
                   @for (item of shoppingList(); track item.id; let i = $index) {
-                    <div appReveal [revealDelay]="i * 75" class="flex items-start gap-3 bg-orange-50/50 dark:bg-orange-900/10 border border-orange-200/50 dark:border-orange-800/30 rounded-lg p-3 shadow-sm group hover:border-[#E3663B]/50 transition-colors">
+                    <div appReveal [revealDelay]="i * 75" class="flex items-start gap-3 bg-brand-amber-50/50 dark:bg-brand-amber-900/10 border border-brand-amber-200/50 dark:border-brand-amber-800/30 rounded-lg p-3 shadow-sm group hover:border-[#E3663B]/50 transition-colors">
                       <input 
                         type="checkbox" 
                         [id]="'shop-' + item.id"
@@ -89,7 +89,7 @@ import { RevealDirective } from '../directives/reveal.directive';
                       <label [for]="'shop-' + item.id" class="text-sm text-[#1C1C1C] dark:text-zinc-100 flex-1 cursor-pointer" [class.line-through]="item.completed" [class.opacity-50]="item.completed">
                         {{ item.name }}
                       </label>
-                      <button (click)="removeShoppingItem(item.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Item">
+                      <button (click)="removeShoppingItem(item.id)" class="text-gray-300 dark:text-zinc-400 hover:text-brand-red-500 dark:hover:text-brand-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Item">
                          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                       </button>
                     </div>
@@ -109,7 +109,7 @@ import { RevealDirective } from '../directives/reveal.directive';
                         <span class="text-xs font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] bg-[#F1F8E9] dark:bg-[#689f38]/10 px-2 py-1 rounded inline-block">
                           {{ note.sourceLens }}
                         </span>
-                        <button (click)="removeNote(note.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove Note">
+                        <button (click)="removeNote(note.id)" class="text-gray-300 dark:text-zinc-400 hover:text-brand-red-500 dark:hover:text-brand-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove Note">
                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                       </div>

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ClinicalIntelligenceService, TranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
+import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { HistoryEntry } from '../services/patient.types';
@@ -9,7 +9,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { DictationService } from '../services/dictation.service';
 
 declare var webkitSpeechRecognition: any;
-import { SummaryNode, SummaryNodeItem, ReportSection, ParsedTranscriptEntry, NodeAnnotation, LensAnnotations, VerificationIssue } from './analysis-report.types';
+import { ISummaryNode, ISummaryNodeItem, IReportSection, IParsedTranscriptEntry, NodeAnnotation, LensAnnotations, IVerificationIssue } from './analysis-report.types';
 import { SummaryNodeComponent } from './summary-node.component';
 import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
@@ -83,14 +83,14 @@ import { RevealDirective } from '../directives/reveal.directive';
             class="rounded-none px-4 -mb-px shadow-none">
             Monitoring
           </pocket-gull-button>
-          <pocket-gull-button (click)="changeLens('Patient Education')"
+          <pocket-gull-button (click)="changeLens('IPatient Education')"
             variant="ghost"
             size="sm"
-            [class.border-b-2]="activeLens() === 'Patient Education'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Patient Education'"
-            [class.dark:border-white]="activeLens() === 'Patient Education'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Patient Education'"
-            [class.dark:text-white]="activeLens() === 'Patient Education'"
+            [class.border-b-2]="activeLens() === 'IPatient Education'"
+            [class.border-[#1C1C1C]]="activeLens() === 'IPatient Education'"
+            [class.dark:border-white]="activeLens() === 'IPatient Education'"
+            [class.text-[#1C1C1C]]="activeLens() === 'IPatient Education'"
+            [class.dark:text-white]="activeLens() === 'IPatient Education'"
             class="rounded-none px-4 -mb-px shadow-none">
             Education
           </pocket-gull-button>
@@ -120,7 +120,7 @@ import { RevealDirective } from '../directives/reveal.directive';
               label="Stability"
               [value]="metrics.stability"
               type="stability"
-              description="Patient physiological and functional compensatory status.">
+              description="IPatient physiological and functional compensatory status.">
             </app-clinical-gauge>
 
             <app-clinical-gauge
@@ -155,7 +155,7 @@ import { RevealDirective } from '../directives/reveal.directive';
           </div>
         }
         @if (intel.error() && !hasAnyReport(); as error) {
-          <div class="p-4 border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 text-xs rounded-lg mb-4">
+          <div class="p-4 border border-brand-red-200 dark:border-brand-red-900/30 bg-brand-red-50 dark:bg-brand-red-900/10 text-brand-red-900 dark:text-brand-red-400 text-xs rounded-lg mb-4">
             <strong class="block uppercase tracking-wider mb-1">System Error</strong>
             {{ error }}
           </div>
@@ -291,7 +291,7 @@ export class AnalysisReportComponent implements OnDestroy {
     'Monitor BP and heart rate twice daily.',
     'Continue current medication as prescribed.',
     'Schedule follow-up with specialist.',
-    'Patient education provided regarding diet.',
+    'IPatient education provided regarding diet.',
     'Increase fluid intake to 2L/day.',
     'Watch for signs of infection.'
   ];
@@ -322,11 +322,11 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   }
 
-  reportSections = computed<ReportSection[] | null>(() => {
+  reportSections = computed<IReportSection[] | null>(() => {
     const raw = this.activeReport();
     if (!raw) return null;
     try {
-      const sections: ReportSection[] = [];
+      const sections: IReportSection[] = [];
       const parts = raw.split(/\n(?=#{1,3}\s)/);
       for (let sIdx = 0; sIdx < parts.length; sIdx++) {
         const part = parts[sIdx];
@@ -351,7 +351,7 @@ export class AnalysisReportComponent implements OnDestroy {
         });
 
         const tokens = parser.lexer(cleanMarkdown);
-        const nodes: SummaryNode[] = [];
+        const nodes: ISummaryNode[] = [];
 
         for (let nIdx = 0; nIdx < tokens.length; nIdx++) {
           const token = tokens[nIdx];
@@ -378,11 +378,11 @@ export class AnalysisReportComponent implements OnDestroy {
             return { suggestions, proposedText, cleanedText };
           };
 
-          const applyHighlights = (html: string, issues: VerificationIssue[]) => {
+          const applyHighlights = (html: string, issues: IVerificationIssue[]) => {
             let highlightedHtml = html;
             for (const issue of issues) {
               if (issue.claim && highlightedHtml.includes(issue.claim)) {
-                const colorClass = issue.severity === 'high' ? 'bg-red-100 border-red-200' : 'bg-amber-100 border-amber-200';
+                const colorClass = issue.severity === 'high' ? 'bg-brand-red-100 border-brand-red-200' : 'bg-amber-100 border-amber-200';
                 const highlightSpan = `< span class= "verification-claim px-0.5 border-b-2 border-dotted cursor-help ${colorClass}" title = "${issue.message}" > ${issue.claim} </span>`;
                 highlightedHtml = highlightedHtml.replace(issue.claim, highlightSpan);
               }
@@ -472,11 +472,11 @@ export class AnalysisReportComponent implements OnDestroy {
     return ClinicalIcons.Assessment;
   }
 
-  parsedTranscript = computed<ParsedTranscriptEntry[]>(() => {
+  parsedTranscript = computed<IParsedTranscriptEntry[]>(() => {
     const transcript = this.intel.transcript();
     try {
       return transcript.map(entry => {
-        const parsed: ParsedTranscriptEntry = { ...entry };
+        const parsed: IParsedTranscriptEntry = { ...entry };
         if (entry.role === 'model') {
           parsed.htmlContent = this.renderInteractiveContent(entry.text);
         }
@@ -583,7 +583,7 @@ export class AnalysisReportComponent implements OnDestroy {
     const historyEntry: HistoryEntry = {
       type: 'FinalizedPatientSummary',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      summary: 'Patient Summary updated (auto-saved).',
+      summary: 'IPatient Summary updated (auto-saved).',
       report: this.intel.analysisResults(),
       annotations: this.lensAnnotations()
     };
@@ -618,7 +618,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return parser ? parser.parse(markdown) as string : '';
   }
 
-  handleNodeUpdate(node: SummaryNode | SummaryNodeItem, event: any) {
+  handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: any) {
     if (event.note !== undefined) {
       this.updateAnnotation(node.key, { note: event.note });
       node.note = event.note; // Update local node state
@@ -641,7 +641,7 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
 
-  private syncNodeToTaskFlow(node: SummaryNode | SummaryNodeItem) {
+  private syncNodeToTaskFlow(node: ISummaryNode | ISummaryNodeItem) {
     const text = node.note || (node as any).rawHtml || (node as any).html;
     if (node.bracketState === 'added' || node.note) {
       this.state.addClinicalNote({
@@ -671,9 +671,9 @@ export class AnalysisReportComponent implements OnDestroy {
     this.triggerAutoSave(key);
   }
 
-  activeDictationNode = signal<SummaryNode | SummaryNodeItem | null>(null);
+  activeDictationNode = signal<ISummaryNode | ISummaryNodeItem | null>(null);
 
-  openNodeDictation(node: SummaryNode | SummaryNodeItem) {
+  openNodeDictation(node: ISummaryNode | ISummaryNodeItem) {
     if (this.dictation.isListening() && this.activeDictationNode() === node) {
       this.dictation.stopRecognition();
       node.isDictating = false;
@@ -739,7 +739,7 @@ export class AnalysisReportComponent implements OnDestroy {
     const historyEntry: HistoryEntry = {
       type: 'FinalizedPatientSummary',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      summary: 'Patient Summary finalized and saved to chart.',
+      summary: 'IPatient Summary finalized and saved to chart.',
       report: this.intel.analysisResults(),
       annotations: this.lensAnnotations()
     };
@@ -748,7 +748,7 @@ export class AnalysisReportComponent implements OnDestroy {
 
     // Briefly change tab to show it's saved? 
     // For now we'll just log and rely on the history update
-    console.log('Patient summary finalized and saved to chart.');
+    console.log('IPatient summary finalized and saved to chart.');
   }
 
   printReport() { window.print(); }

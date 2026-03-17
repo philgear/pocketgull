@@ -77,7 +77,7 @@ export const BODY_PART_MAPPING: Record<string, string> = {
     'bottom': 'glutes'
 };
 
-export interface PatientSymptom {
+export interface IPatientSymptom {
     name: string;
     type?: string;
     verified?: boolean;
@@ -85,17 +85,17 @@ export interface PatientSymptom {
     [key: string]: any;
 }
 
-export interface BodyPartIssue {
+export interface IBodyPartIssue {
     id: string; // body part id
     noteId: string; // unique note id
     name: string;
     painLevel: number; // 1-10
     description: string;
-    symptoms: (string | PatientSymptom)[];
+    symptoms: (string | IPatientSymptom)[];
     recommendation?: string;
 }
 
-export interface PatientVitals {
+export interface IPatientVitals {
     bp: string;      // Blood Pressure
     hr: string;      // Heart Rate
     temp: string;    // Temperature
@@ -110,28 +110,28 @@ export interface PatientVitals {
     b12?: string;
 }
 
-export interface DynamicMarker {
+export interface IDynamicMarker {
     id: string;
     name: string;
     value: string;
 }
 
-export interface BiometricEntry {
+export interface IBiometricEntry {
     timestamp: string; // ISO string
-    type: keyof PatientVitals | 'pain';
+    type: keyof IPatientVitals | 'pain';
     value: string | number;
     unit?: string;
     source?: string;
 }
 
-export interface ClinicalNote {
+export interface IClinicalNote {
     id: string;
     text: string;
     sourceLens: string;
     date: string;
 }
 
-export interface DiagnosticScan {
+export interface IDiagnosticScan {
     id: string;
     type: 'MRI' | 'X-Ray' | 'CT Scan' | 'Ultrasound' | 'Lab Report' | 'Document';
     title: string;
@@ -142,18 +142,18 @@ export interface DiagnosticScan {
     imageUrl?: string;
 }
 
-export interface ChecklistItem {
+export interface IChecklistItem {
     id: string;
     text: string;
     completed: boolean;
 }
 
-export interface DraftSummaryItem {
+export interface IDraftSummaryItem {
     id: string;
     text: string;
 }
 
-export interface ShoppingListItem {
+export interface IShoppingListItem {
     id: string;
     name: string;
     completed: boolean;
@@ -161,22 +161,22 @@ export interface ShoppingListItem {
     referenceNotion?: string;
 }
 
-export interface PatientState {
-    issues: Record<string, BodyPartIssue[]>;
+export interface IPatientState {
+    issues: Record<string, IBodyPartIssue[]>;
     patientGoals: string;
-    vitals: PatientVitals;
-    dynamicNutrients?: DynamicMarker[];
-    oxidativeStressMarkers?: DynamicMarker[];
-    antioxidantSources?: DynamicMarker[];
-    medications?: DynamicMarker[];
-    biometricHistory?: BiometricEntry[];
-    clinicalNotes?: ClinicalNote[];
-    checklist?: ChecklistItem[];
-    shoppingList?: ShoppingListItem[];
-    scans?: DiagnosticScan[];
+    vitals: IPatientVitals;
+    dynamicNutrients?: IDynamicMarker[];
+    oxidativeStressMarkers?: IDynamicMarker[];
+    antioxidantSources?: IDynamicMarker[];
+    medications?: IDynamicMarker[];
+    biometricHistory?: IBiometricEntry[];
+    clinicalNotes?: IClinicalNote[];
+    checklist?: IChecklistItem[];
+    shoppingList?: IShoppingListItem[];
+    scans?: IDiagnosticScan[];
 }
 
-export interface Bookmark {
+export interface IBookmark {
     title: string;
     url: string;
     authors?: string;
@@ -191,12 +191,12 @@ export type HistoryEntry = {
     type: 'Visit';
     date: string;
     summary: string;
-    state: PatientState;
+    state: IPatientState;
 } | {
     type: 'ChartArchived';
     date: string;
     summary: string;
-    state: PatientState;
+    state: IPatientState;
 } | {
     type: 'PatientSummaryUpdate';
     date: string;
@@ -205,7 +205,7 @@ export type HistoryEntry = {
     type: 'BookmarkAdded';
     date: string;
     summary: string;
-    bookmark: Bookmark;
+    bookmark: IBookmark;
 } | {
     type: 'NoteCreated';
     date: string;
@@ -231,7 +231,7 @@ export type HistoryEntry = {
     annotations: Record<string, Record<string, { note: string, bracketState: 'normal' | 'added' | 'removed' }>>;
 };
 
-export interface Patient extends PatientState {
+export interface IPatient extends IPatientState {
     id: string;
     name: string;
     age: number;
@@ -239,5 +239,5 @@ export interface Patient extends PatientState {
     lastVisit: string;
     preexistingConditions: string[];
     history: HistoryEntry[];
-    bookmarks: Bookmark[];
+    bookmarks: IBookmark[];
 }

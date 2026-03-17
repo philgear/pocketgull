@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { PatientStateService } from './patient-state.service';
-import { BiometricEntry, PatientVitals } from './patient.types';
+import { IBiometricEntry, IPatientVitals } from './patient.types';
 
 @Injectable({
     providedIn: 'root'
@@ -24,7 +24,7 @@ export class BiometricImportService {
     private async parseJson(content: string): Promise<void> {
         try {
             const data = JSON.parse(content);
-            const entries: BiometricEntry[] = [];
+            const entries: IBiometricEntry[] = [];
 
             // Handle common Google Fit/Takeout JSON structure (Simplified for MVP)
             // Example target: array of { timestamp, type, value, unit }
@@ -57,14 +57,14 @@ export class BiometricImportService {
             if (lines.length < 2) return;
 
             const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-            const entries: BiometricEntry[] = [];
+            const entries: IBiometricEntry[] = [];
 
             // Simple CSV Parser
             for (let i = 1; i < lines.length; i++) {
                 const row = lines[i].split(',').map(v => v.trim());
                 if (row.length < headers.length) continue;
 
-                const entry: Partial<BiometricEntry> = {};
+                const entry: Partial<IBiometricEntry> = {};
 
                 headers.forEach((header, index) => {
                     if (header.includes('time') || header.includes('date')) {
@@ -92,7 +92,7 @@ export class BiometricImportService {
                         }
                     }
                 } else if (entry.timestamp && entry.type && entry.value) {
-                    entries.push(entry as BiometricEntry);
+                    entries.push(entry as IBiometricEntry);
                 }
             }
 
@@ -105,7 +105,7 @@ export class BiometricImportService {
         }
     }
 
-    private pushEntry(entries: BiometricEntry[], type: keyof PatientVitals | 'pain', value: any, timestamp?: string) {
+    private pushEntry(entries: IBiometricEntry[], type: keyof IPatientVitals | 'pain', value: any, timestamp?: string) {
         entries.push({
             timestamp: timestamp || new Date().toISOString(),
             type,
@@ -114,7 +114,7 @@ export class BiometricImportService {
         });
     }
 
-    private isValidEntry(item: any): item is BiometricEntry {
+    private isValidEntry(item: any): item is IBiometricEntry {
         return !!(item.timestamp && item.type && item.value);
     }
 }

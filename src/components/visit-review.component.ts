@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { PatientStateService } from '../services/patient-state.service';
-import { HistoryEntry, BodyPartIssue } from '../services/patient.types';
+import { HistoryEntry, IBodyPartIssue } from '../services/patient.types';
 
-interface NotesByPart {
+interface INotesByPart {
   partId: string;
   partName: string;
-  notes: BodyPartIssue[];
+  notes: IBodyPartIssue[];
 }
 
 @Component({
@@ -73,12 +73,12 @@ export class VisitReviewComponent {
   state = inject(PatientStateService);
   visit = input.required<HistoryEntry & { type: 'Visit' }>();
 
-  notesByPart = computed<NotesByPart[]>(() => {
+  notesByPart = computed<INotesByPart[]>(() => {
     const issues = this.visit().state?.issues;
     if (!issues) return [];
 
     // Using a map to preserve order and group correctly
-    const grouped = new Map<string, NotesByPart>();
+    const grouped = new Map<string, INotesByPart>();
 
     for (const partId in issues) {
       const notesForPart = issues[partId];
@@ -98,7 +98,7 @@ export class VisitReviewComponent {
     return Array.from(grouped.values());
   });
 
-  selectNote(note: BodyPartIssue) {
+  selectNote(note: IBodyPartIssue) {
     // This will trigger the app component to switch to the intake form
     this.state.selectPart(note.id);
     this.state.selectNote(note.noteId);

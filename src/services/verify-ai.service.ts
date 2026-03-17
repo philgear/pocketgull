@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { VerificationIssue } from '../components/analysis-report.types';
+import { IVerificationIssue } from '../components/analysis-report.types';
 import { AI_CONFIG } from './ai-provider.types';
 import { AiCacheService } from './ai-cache.service';
 
@@ -38,7 +38,7 @@ export class VerifyAiService {
         sectionTitle: string,
         sectionContent: string,
         sourceTranscript: string
-    ): Promise<{ status: 'verified' | 'warning' | 'error', issues: VerificationIssue[] }> {
+    ): Promise<{ status: 'verified' | 'warning' | 'error', issues: IVerificationIssue[] }> {
 
         const prompt = `
       You are a Medical Auditor AI.Your task is to verify an AI - generated clinical report section against the source patient transcript.

@@ -1,24 +1,24 @@
 import { Observable } from 'rxjs';
-import { ClinicalMetrics, TranscriptEntry } from '../clinical-intelligence.service';
-import { VerificationIssue } from '../../components/analysis-report.types';
+import { IClinicalMetrics, ITranscriptEntry } from '../clinical-intelligence.service';
+import { IVerificationIssue } from '../../components/analysis-report.types';
 
-export interface ReportGenerationResult {
+export interface IReportGenerationResult {
     lens: string;
     text: string;
     isComplete: boolean;
 }
 
-export interface IntelligenceProvider {
+export interface IIntelligenceProvider {
     /**
      * Generates a clinical report for a specific lens.
      * Supports streaming via Observable.
      */
-    generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string>;
+    generateReportStream$(patientData: string, lens: string, systemInstruction: string): Observable<string>;
 
     /**
      * Generates clinical metrics (complexity, stability, certainty) for a report.
      */
-    generateMetrics(reportText: string): Promise<ClinicalMetrics>;
+    generateMetrics(reportText: string): Promise<IClinicalMetrics>;
 
     /**
      * Detects if changes between two clinical snapshots are clinically significant.
@@ -28,7 +28,7 @@ export interface IntelligenceProvider {
     /**
      * Clinical verification layer to cross-reference AI output with source data.
      */
-    verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }>;
+    verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }>;
 
     /**
      * Translates clinical text to a specific reading, cognition, or philosophical level.

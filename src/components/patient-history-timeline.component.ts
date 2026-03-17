@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { HistoryEntry, BodyPartIssue } from '../services/patient.types';
+import { HistoryEntry, IBodyPartIssue } from '../services/patient.types';
 
 // --- Icon Definitions ---
 const ICONS: Record<string, string> = {
@@ -49,11 +49,11 @@ const ICONS: Record<string, string> = {
             <span class="inline-flex items-center justify-center w-3.5 h-3.5"
                  [class.text-[#1C1C1C]]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
                  [class.dark:text-zinc-100]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
-                 [class.text-blue-500]="entry.type === 'PatientSummaryUpdate' || entry.type === 'FinalizedPatientSummary'"
-                 [class.text-yellow-500]="entry.type === 'BookmarkAdded'"
+                 [class.text-brand-blue-500]="entry.type === 'PatientSummaryUpdate' || entry.type === 'FinalizedPatientSummary'"
+                 [class.text-brand-amber-500]="entry.type === 'BookmarkAdded'"
                  [class.text-purple-500]="entry.type === 'NoteCreated'"
-                 [class.text-red-500]="entry.type === 'NoteDeleted'"
-                 [class.text-green-500]="entry.type === 'AnalysisRun'"
+                 [class.text-brand-red-500]="entry.type === 'NoteDeleted'"
+                 [class.text-brand-green-500]="entry.type === 'AnalysisRun'"
                  [innerHTML]="getSafeIconHtml(entry)">
             </span>
           </div>
@@ -108,17 +108,17 @@ const ICONS: Record<string, string> = {
                 </button>
               }
               @case ('PatientSummaryUpdate') {
-                <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-blue-400 rounded">
+                <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-brand-blue-400 rounded">
                   <div>
-                    <p class="text-xs font-bold text-blue-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                    <p class="text-xs font-bold text-brand-blue-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     <p class="text-sm text-gray-800 dark:text-zinc-300 mt-1 leading-relaxed whitespace-pre-wrap font-mono text-[11px] opacity-80">{{ entry.summary }}</p>
                   </div>
                 </div>
               }
               @case ('BookmarkAdded') {
-                 <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-yellow-400 rounded flex gap-3 items-start">
+                 <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-brand-amber-400 rounded flex gap-3 items-start">
                   <div class="flex-1">
-                    <p class="text-xs font-bold text-yellow-700 dark:text-yellow-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                    <p class="text-xs font-bold text-brand-amber-700 dark:text-brand-amber-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed truncate font-light">Bookmarked: "{{ entry.summary }}"</p>
                     <button (click)="openBookmark.emit(entry.bookmark.url)" 
                             class="mt-3 text-xs font-bold text-gray-500 dark:text-zinc-400 bg-gray-50 dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-all uppercase tracking-widest">
@@ -134,15 +134,15 @@ const ICONS: Record<string, string> = {
                     <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                   </button>
                   <button (click)="deleteNote.emit(entry)"
-                          class="absolute top-2 right-2 p-1 rounded-full text-gray-300 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                          class="absolute top-2 right-2 p-1 rounded-full text-gray-300 dark:text-zinc-400 hover:text-brand-red-600 dark:hover:text-brand-red-400 transition-colors opacity-0 group-hover:opacity-100"
                           title="Delete this note entry">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.586 16.95 5.636a1 1 0 1 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414L10.586 12 5.636 7.05a1 1 0 0 1 1.414-1.414L12 10.586z"/></svg>
                   </button>
                 </div>
               }
                @case ('NoteDeleted') {
-                <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-red-400 rounded">
-                  <p class="text-xs font-bold text-red-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
+                <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-brand-red-400 rounded">
+                  <p class="text-xs font-bold text-brand-red-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                   <p class="text-sm text-gray-500 dark:text-zinc-400 mt-1 leading-relaxed italic font-light">{{ entry.summary }}</p>
                 </div>
               }
@@ -157,14 +157,14 @@ const ICONS: Record<string, string> = {
                         [class.dark:bg-[#09090b]]="activeVisit() !== entry"
                         [class.hover:bg-gray-50]="activeVisit() !== entry"
                         [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
-                        [class.border-l-green-400]="activeVisit() !== entry"
+                        [class.border-l-brand-green-400]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
                         [class.border-gray-100]="true"
                         [class.dark:border-zinc-800]="true">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 uppercase tracking-[0.1em] border border-green-100 dark:border-green-800/50">AI Report</span>
+                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-green-50 dark:bg-brand-green-900/30 text-brand-green-700 dark:text-brand-green-400 uppercase tracking-[0.1em] border border-brand-green-100 dark:border-brand-green-800/50">AI Report</span>
                         <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
                     <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
@@ -182,14 +182,14 @@ const ICONS: Record<string, string> = {
                         [class.dark:bg-[#09090b]]="activeVisit() !== entry"
                         [class.hover:bg-gray-50]="activeVisit() !== entry"
                         [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
-                        [class.border-l-blue-400]="activeVisit() !== entry"
+                        [class.border-l-brand-blue-400]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
                         [class.border-gray-100]="true"
                         [class.dark:border-zinc-800]="true">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 uppercase tracking-[0.1em] border border-blue-100 dark:border-blue-800/50">Patient Summary</span>
+                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400 uppercase tracking-[0.1em] border border-brand-blue-100 dark:border-brand-blue-800/50">IPatient Summary</span>
                         <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
                     <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-bold">{{ entry.summary }}</p>

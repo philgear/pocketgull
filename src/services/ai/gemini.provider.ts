@@ -1,23 +1,33 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { IntelligenceProvider } from './intelligence.provider';
+import { IIntelligenceProvider } from './intelligence.provider';
 import { AI_CONFIG } from '../ai-provider.types';
-import { ClinicalMetrics } from '../clinical-intelligence.service';
-import { VerificationIssue } from '../../components/analysis-report.types';
+import { IClinicalMetrics } from '../clinical-intelligence.service';
+import { IVerificationIssue } from '../../components/analysis-report.types';
 import { VerifyAiService } from '../verify-ai.service';
 
 
 @Injectable({
     providedIn: 'root'
 })
-export class GeminiProvider implements IntelligenceProvider {
+export class GeminiProvider implements IIntelligenceProvider {
     private config = inject(AI_CONFIG);
     private verifier = inject(VerifyAiService);
 
     // Chat session ID for server-side session management
     private chatSessionId: string | null = null;
 
-    generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string> {
+    /**
+     * Generates a clinical report as an observable stream, reading Server-Sent Events (SSE).
+     * Defensively implements manual chunking and buffer management to protect against network interruptions
+     * or incomplete API payloads common in beta streaming services.
+     *
+     * @param patientData - The comprehensive stringified patient record.
+     * @param lens - The specific clinical lens (e.g., 'Nutrition', 'Summary Overview').
+     * @param systemInstruction - The structural system prompt enforcing formatting and citation rules.
+     * @returns An Observable emitting string chunks of the AI's response as they arrive.
+     */
+    generateReportStream$(patientData: string, lens: string, systemInstruction: string): Observable<string> {
         return new Observable<string>(subscriber => {
             (async () => {
                 try {
@@ -91,7 +101,7 @@ export class GeminiProvider implements IntelligenceProvider {
         });
     }
 
-    async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
+    async generateMetrics(reportText: string): Promise<IClinicalMetrics> {
         const response = await fetch('/api/ai/metrics', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -121,7 +131,7 @@ export class GeminiProvider implements IntelligenceProvider {
         return data.significant;
     }
 
-    async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }> {
+    async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> {
         return await this.verifier.verifyReportSection(lens as any, content, sourceData);
     }
 
@@ -159,6 +169,14 @@ export class GeminiProvider implements IntelligenceProvider {
     }
 
 
+    /**
+     * Initializes a stateful multi-turn chat session with the underlying AI model.
+     * Generates a unique session ID and pushes the foundational patient context.
+     * 
+     * @param patientData - The core patient data to base the chat around.
+     * @param context - The system persona and instructions for the specific chat interaction.
+     * @throws Error if the backend session fails to initialize.
+     */
     async startChat(patientData: string, context: string): Promise<void> {
         const systemInstruction = `${context}\n\nPatient Data:\n${patientData}`;
         this.chatSessionId = `chat_${Date.now()}_${Math.random().toString(36).slice(2)}`;
@@ -179,6 +197,15 @@ export class GeminiProvider implements IntelligenceProvider {
         }
     }
 
+    /**
+     * Appends a user message to the active chat session and awaits the model's full response.
+     * Requires `startChat` to have been called previously.
+     * 
+     * @param message - The user's query or instruction.
+     * @param files - Optional file attachments (implementation dependent).
+     * @returns A Promise resolving to the model's textual response.
+     * @throws Error if the chat has not been started or the API request fails.
+     */
     async sendMessage(message: string, files?: File[]): Promise<string> {
         if (!this.chatSessionId) throw new Error('Chat not started');
 

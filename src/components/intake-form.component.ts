@@ -5,14 +5,14 @@ import { DictationService } from '../services/dictation.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
-import { BodyPartIssue, BODY_PART_NAMES, BODY_PART_MAPPING, HistoryEntry } from '../services/patient.types';
+import { IBodyPartIssue, BODY_PART_NAMES, BODY_PART_MAPPING, HistoryEntry } from '../services/patient.types';
 
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
-interface NoteTimelineItem extends BodyPartIssue {
+interface INoteTimelineItem extends IBodyPartIssue {
   date: string;
   isCurrent: boolean;
 }
@@ -57,7 +57,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                 </div>
                 @if (note.isCurrent) {
                   <pocket-gull-badge label="Live" severity="success" [hasIcon]="true">
-                    <div badge-icon class="w-1.5 h-1.5 rounded-sm bg-green-500 animate-pulse"></div>
+                    <div badge-icon class="w-1.5 h-1.5 rounded-sm bg-brand-green-500 animate-pulse"></div>
                   </pocket-gull-badge>
                 } @else {
                   <pocket-gull-badge [label]="note.date" severity="neutral"></pocket-gull-badge>
@@ -83,10 +83,10 @@ interface NoteTimelineItem extends BodyPartIssue {
                   <div class="relative h-8 flex items-center group">
                     <!-- Track background -->
                     <div class="absolute w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-sm overflow-hidden">
-                        <div class="h-full bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 opacity-30"></div>
+                        <div class="h-full bg-gradient-to-r from-brand-green-400 via-brand-amber-400 to-brand-red-500 opacity-30"></div>
                     </div>
                     <!-- Active fill -->
-                    <div class="absolute h-1.5 bg-gradient-to-r from-green-500 via-yellow-500 to-red-600 rounded-sm transition-all duration-150 ease-out"
+                    <div class="absolute h-1.5 bg-gradient-to-r from-brand-green-500 via-brand-amber-500 to-brand-red-600 rounded-sm transition-all duration-150 ease-out"
                          [style.width.%]="formState().painLevel * 10"></div>
                     
                     <label for="painRange" class="sr-only">Pain Level</label>
@@ -154,7 +154,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                       </div>
                     </pocket-gull-input>
                   @if(dictation.permissionError(); as error) {
-                      <div class="flex items-center gap-2 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-3 py-2 rounded-md border border-red-100 dark:border-red-800/50">
+                      <div class="flex items-center gap-2 text-brand-red-600 dark:text-brand-red-400 bg-brand-red-50 dark:bg-brand-red-900/30 px-3 py-2 rounded-md border border-brand-red-100 dark:border-brand-red-800/50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                         <p class="text-[11px] font-medium">{{ error }}</p>
                       </div>
@@ -174,7 +174,7 @@ interface NoteTimelineItem extends BodyPartIssue {
                         size="xs"
                         (click)="addToPatientSummary()"
                         icon="M12 5v14M5 12h14">
-                        Add to Patient Summary
+                        Add to IPatient Summary
                       </pocket-gull-button>
                     }
                   </div>
@@ -372,7 +372,7 @@ export class IntakeFormComponent implements OnDestroy {
   private localDescription = signal('');
   private localRecommendation = signal('');
 
-  noteTimeline = computed<NoteTimelineItem[]>(() => {
+  noteTimeline = computed<INoteTimelineItem[]>(() => {
     const partId = this.state.selectedPartId();
     if (!partId) return [];
 
@@ -382,7 +382,7 @@ export class IntakeFormComponent implements OnDestroy {
     const notesInScope = this.state.issues()[partId] || [];
     const history = this.selectedPatientHistory();
 
-    const timelineItems: NoteTimelineItem[] = [];
+    const timelineItems: INoteTimelineItem[] = [];
     const processedNoteIds = new Set<string>();
 
     // 1. Add notes from the current scope (which could be the current visit or a reviewed visit)
@@ -425,7 +425,7 @@ export class IntakeFormComponent implements OnDestroy {
     return timelineItems;
   });
 
-  viewedNote = computed<NoteTimelineItem | null>(() => {
+  viewedNote = computed<INoteTimelineItem | null>(() => {
     const selectedNoteId = this.state.selectedNoteId();
     if (!selectedNoteId) return null;
     return this.noteTimeline().find(n => n.noteId === selectedNoteId) || null;
@@ -642,7 +642,7 @@ export class IntakeFormComponent implements OnDestroy {
     const partName = Object.keys(BODY_PART_MAPPING).find(key => BODY_PART_MAPPING[key] === partId)?.toUpperCase() || 'Selection';
 
     const newNoteId = `note_${Date.now()}`;
-    const newNote: BodyPartIssue = {
+    const newNote: IBodyPartIssue = {
       id: partId,
       noteId: newNoteId,
       name: partName, // This might be "right knee" etc.
@@ -707,7 +707,7 @@ export class IntakeFormComponent implements OnDestroy {
     const partName = this.noteTimeline()[0]?.name || this.viewedNote()?.name || 'Selection';
 
     const newNoteId = `note_${Date.now()}`;
-    const newNote: BodyPartIssue = {
+    const newNote: IBodyPartIssue = {
       id: partId,
       noteId: newNoteId,
       name: partName,
@@ -767,7 +767,7 @@ export class IntakeFormComponent implements OnDestroy {
     }
   }
 
-  deleteNote(noteToDelete: NoteTimelineItem) {
+  deleteNote(noteToDelete: INoteTimelineItem) {
     if (!noteToDelete.isCurrent) return;
 
     // 1. Add deletion record to history

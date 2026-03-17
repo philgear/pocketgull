@@ -41,7 +41,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
              <!-- History List -->
              @for (entry of historyEntries(); track entry.key) {
                <div (click)="loadHistory(entry)" 
-                    class="group p-4 rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#09090b] hover:border-blue-200 dark:hover:border-blue-500/50 hover:shadow-sm cursor-pointer transition-all">
+                    class="group p-4 rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#09090b] hover:border-brand-blue-200 dark:hover:border-brand-blue-500/50 hover:shadow-sm cursor-pointer transition-all">
                  <div class="flex justify-between items-start mb-1">
                    <span class="text-xs font-bold text-gray-800 dark:text-zinc-200 bg-gray-200 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
                      SNAPSHOT
@@ -99,7 +99,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
                 variant="primary"
                 size="sm"
                 [icon]="hasReport() ? 'M17.65 6.35A7.95 7.95 0 0 0 12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.66-.67 3.17-1.76 4.24l1.42 1.42A9.92 9.92 0 0 0 22 12c0-2.76-1.12-5.26-2.35-7.65z' : 'M14 5l7 7m0 0l-7 7m7-7H3'">
-                {{ hasReport() ? 'Refresh Analysis' : (hasGeneratedDemo() ? 'Demo Limit Reached' : 'Generate Patient Summary') }}
+                {{ hasReport() ? 'Refresh Analysis' : (hasGeneratedDemo() ? 'Demo Limit Reached' : 'Generate IPatient Summary') }}
               </pocket-gull-button>
             }
           </div>

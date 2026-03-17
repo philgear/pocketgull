@@ -1,21 +1,21 @@
 import { Injectable, signal, computed } from '@angular/core';
 import {
-  BodyPartIssue,
-  PatientVitals,
-  BiometricEntry,
-  ClinicalNote,
-  ChecklistItem,
-  ShoppingListItem,
-  DraftSummaryItem,
-  PatientState,
+  IBodyPartIssue,
+  IPatientVitals,
+  IBiometricEntry,
+  IClinicalNote,
+  IChecklistItem,
+  IShoppingListItem,
+  IDraftSummaryItem,
+  IPatientState,
   HistoryEntry,
-  Bookmark,
+  IBookmark,
   BODY_PART_NAMES,
   BODY_PART_MAPPING
 } from './patient.types';
 
 export { BODY_PART_NAMES, BODY_PART_MAPPING };
-export type { PatientState };
+export type { IPatientState };
 
 
 @Injectable({
@@ -36,13 +36,13 @@ export class PatientStateService {
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
   readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
   readonly activePatientSummary = signal<string | null>(null);
-  readonly draftSummaryItems = signal<DraftSummaryItem[]>([]);
+  readonly draftSummaryItems = signal<IDraftSummaryItem[]>([]);
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
 
-  // --- Patient Data State ---
-  readonly issues = signal<Record<string, BodyPartIssue[]>>({});
+  // --- IPatient Data State ---
+  readonly issues = signal<Record<string, IBodyPartIssue[]>>({});
   readonly patientGoals = signal<string>("");
-  readonly    vitals = signal<PatientVitals>({
+  readonly    vitals = signal<IPatientVitals>({
         bp: '',
         hr: '',
         temp: '',
@@ -56,15 +56,15 @@ export class PatientStateService {
         b12: ''
     });
 
-    readonly dynamicNutrients = signal<import('./patient.types').DynamicMarker[]>([]);
-  readonly oxidativeStressMarkers = signal<import('./patient.types').DynamicMarker[]>([]);
-  readonly antioxidantSources = signal<import('./patient.types').DynamicMarker[]>([]);
-  readonly medications = signal<import('./patient.types').DynamicMarker[]>([]);
+    readonly dynamicNutrients = signal<import('./patient.types').IDynamicMarker[]>([]);
+  readonly oxidativeStressMarkers = signal<import('./patient.types').IDynamicMarker[]>([]);
+  readonly antioxidantSources = signal<import('./patient.types').IDynamicMarker[]>([]);
+  readonly medications = signal<import('./patient.types').IDynamicMarker[]>([]);
   
-  readonly clinicalNotes = signal<ClinicalNote[]>([]);
-  readonly checklist = signal<ChecklistItem[]>([]);
-  readonly shoppingList = signal<ShoppingListItem[]>([]);
-  readonly biometricHistory = signal<BiometricEntry[]>([]);
+  readonly clinicalNotes = signal<IClinicalNote[]>([]);
+  readonly checklist = signal<IChecklistItem[]>([]);
+  readonly shoppingList = signal<IShoppingListItem[]>([]);
+  readonly biometricHistory = signal<IBiometricEntry[]>([]);
 
   // A trigger to force the UI to expand the analysis panel when an item is selected/clicked
   readonly uiExpandTrigger = signal<number>(0);
@@ -123,7 +123,7 @@ export class PatientStateService {
     }
   }
 
-  updateIssue(partId: string, issue: BodyPartIssue) {
+  updateIssue(partId: string, issue: IBodyPartIssue) {
     this.issues.update(current => {
       const issuesForPart = current[partId] ? [...current[partId]] : [];
       const existingIndex = issuesForPart.findIndex(i => i.noteId === issue.noteId);
@@ -160,7 +160,7 @@ export class PatientStateService {
     this.patientGoals.set(goals);
   }
 
-    updateVital(key: keyof PatientVitals, value: string) {
+    updateVital(key: keyof IPatientVitals, value: string) {
         this.vitals.update(vitals => ({ ...vitals, [key]: value }));
     }
 
@@ -239,7 +239,7 @@ export class PatientStateService {
   }
 
   // --- Biometric Data Actions ---
-  addBiometricEntries(entries: BiometricEntry[]) {
+  addBiometricEntries(entries: IBiometricEntry[]) {
     this.biometricHistory.update(history => [...history, ...entries]);
   }
 
@@ -248,7 +248,7 @@ export class PatientStateService {
   }
 
   // --- Care Plan Drafting Actions ---
-  addClinicalNote(note: ClinicalNote) {
+  addClinicalNote(note: IClinicalNote) {
     this.clinicalNotes.update(notes => {
       const existing = notes.findIndex(n => n.id === note.id);
       if (existing > -1) {
@@ -276,7 +276,7 @@ export class PatientStateService {
     });
   }
 
-  addChecklistItem(item: ChecklistItem) {
+  addChecklistItem(item: IChecklistItem) {
     this.checklist.update(items => [...items, item]);
   }
 
@@ -290,7 +290,7 @@ export class PatientStateService {
     this.checklist.update(items => items.filter(item => item.id !== id));
   }
 
-  addShoppingListItem(item: ShoppingListItem) {
+  addShoppingListItem(item: IShoppingListItem) {
     this.shoppingList.update(items => [...items, item]);
   }
 
@@ -333,7 +333,7 @@ export class PatientStateService {
   }
 
 
-  // --- State Management for Multi-Patient ---
+  // --- State Management for Multi-IPatient ---
 
   /** Clears all patient data to represent a clean slate. */
   clearState() {
@@ -374,7 +374,7 @@ export class PatientStateService {
   }
 
   /** Loads the state of a specific patient. */
-  loadState(state: PatientState) {
+  loadState(state: IPatientState) {
     this.clearState(); // Start from a clean slate
     this.issues.set(state.issues);
         if (state.patientGoals) this.patientGoals.set(state.patientGoals);
@@ -390,7 +390,7 @@ export class PatientStateService {
   }
 
   /** Returns the current patient state for saving. */
-  getCurrentState(): PatientState {
+  getCurrentState(): IPatientState {
     return {
             issues: this.issues(),
             patientGoals: this.patientGoals(),
@@ -407,13 +407,13 @@ export class PatientStateService {
 
 
   // --- Data Aggregation ---
-  getAllDataForPrompt(patientHistory: HistoryEntry[] = [], bookmarks: Bookmark[] = []): string {
+  getAllDataForPrompt(patientHistory: HistoryEntry[] = [], bookmarks: IBookmark[] = []): string {
     const issues = this.issues();
     const vitals = this.vitals();
     const carePlan = this.activePatientSummary();
 
     // 1. Current Issues
-    const partsText = Object.values(issues).flat().map((i: BodyPartIssue) =>
+    const partsText = Object.values(issues).flat().map((i: IBodyPartIssue) =>
       `- Body Part: ${i.name}, Pain Level: ${i.painLevel}/10, Description: ${i.description}`
     ).join('\n');
 
@@ -451,7 +451,7 @@ Pain Areas:   `;
       .map(h => {
         if (h.type === 'Visit') return `- Visit (${h.date}): ${h.summary}`;
         if (h.type === 'NoteCreated') return `- Note (${h.date}): ${h.summary}`;
-        if (h.type === 'BookmarkAdded') return `- Bookmark (${h.date}): ${h.summary}`;
+        if (h.type === 'BookmarkAdded') return `- IBookmark (${h.date}): ${h.summary}`;
         return '';
       }).join('\n');
 
@@ -462,7 +462,7 @@ Pain Areas:   `;
     ).join('\n');
 
     let prompt = `
-    Patient Goals/Chief Complaint: ${this.patientGoals()}
+    IPatient Goals/Chief Complaint: ${this.patientGoals()}
     
     Vitals:
     ${vitalsText}

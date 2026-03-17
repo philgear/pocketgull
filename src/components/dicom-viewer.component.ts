@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, computed, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DicomService, DicomStudy } from '../services/dicom.service';
+import { DicomService, IDicomStudy } from '../services/dicom.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 
 @Component({
@@ -28,7 +28,7 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
         <!-- Sidebar: Study List -->
         <div class="w-1/3 border-r border-zinc-200 dark:border-zinc-800 overflow-y-auto bg-zinc-50/50 dark:bg-zinc-900/30">
           @if (dicomService.error()) {
-            <div class="p-4 text-xs text-red-500 bg-red-50 dark:bg-red-900/20 m-4 rounded">
+            <div class="p-4 text-xs text-brand-red-500 bg-brand-red-50 dark:bg-brand-red-900/20 m-4 rounded">
               {{ dicomService.error() }}
             </div>
           }
@@ -43,9 +43,9 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
           <div class="p-2 space-y-2">
             @for (study of studies(); track study.studyInstanceUid) {
               <div class="p-3 rounded-lg border cursor-pointer transition-all active:scale-[0.98]"
-                   [class.border-blue-500]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
-                   [class.bg-blue-50]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
-                   [class.dark:bg-blue-900/20]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
+                   [class.border-brand-blue-500]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
+                   [class.bg-brand-blue-50]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
+                   [class.dark:bg-brand-blue-900/20]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
                    [class.border-zinc-200]="selectedStudy()?.studyInstanceUid !== study.studyInstanceUid"
                    [class.dark:border-zinc-800]="selectedStudy()?.studyInstanceUid !== study.studyInstanceUid"
                    [class.hover:border-zinc-300]="selectedStudy()?.studyInstanceUid !== study.studyInstanceUid"
@@ -98,8 +98,8 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
               <button (click)="analyzeImage()" 
                       [disabled]="isAnalyzing()"
                       class="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-95"
-                      [class.bg-blue-600]="!isAnalyzing()"
-                      [class.hover:bg-blue-500]="!isAnalyzing()"
+                      [class.bg-brand-blue-600]="!isAnalyzing()"
+                      [class.hover:bg-brand-blue-500]="!isAnalyzing()"
                       [class.text-white]="!isAnalyzing()"
                       [class.bg-zinc-800]="isAnalyzing()"
                       [class.text-zinc-400]="isAnalyzing()">
@@ -154,7 +154,7 @@ export class DicomViewerComponent {
     this.dicomService.searchStudies();
   }
 
-  selectStudy(study: DicomStudy) {
+  selectStudy(study: IDicomStudy) {
     this.dicomService.selectedStudy.set(study);
     
     // For MVP demonstration, assume we have these UIDs, or we can use placeholder ones if the backend has test data

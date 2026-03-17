@@ -2,7 +2,29 @@ import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { PatientStateService } from '../services/patient-state.service';
+
+const PART_NAMES: Record<string, string> = {
+    'head': 'Head & Neck',
+    'chest': 'Chest & Upper Torso',
+    'abdomen': 'Abdomen & Stomach',
+    'pelvis': 'Pelvis & Hips',
+    'r_shoulder': 'Right Shoulder',
+    'r_arm': 'Right Arm',
+    'r_hand': 'Right Hand & Wrist',
+    'l_shoulder': 'Left Shoulder',
+    'l_arm': 'Left Arm',
+    'l_hand': 'Left Hand & Wrist',
+    'r_thigh': 'Right Thigh',
+    'r_shin': 'Right Lower Leg',
+    'r_foot': 'Right Foot',
+    'l_thigh': 'Left Thigh',
+    'l_shin': 'Left Lower Leg',
+    'l_foot': 'Left Foot'
+};
 
 @Component({
     selector: 'app-body-3d-viewer',
@@ -51,6 +73,26 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private raycaster = new THREE.Raycaster();
     private mouse = new THREE.Vector2();
     private animationFrameId?: number;
+    private composer!: EffectComposer;
+    private bloomPass!: UnrealBloomPass;
+    private clock = new THREE.Clock();
+
+    private handleResize = () => {
+        const container = this.canvasContainer()?.nativeElement;
+        if (!container) return;
+        const w = container.clientWidth;
+        const h = container.clientHeight;
+        if (this.camera) {
+            this.camera.aspect = w / h;
+            this.camera.updateProjectionMatrix();
+        }
+        if (this.renderer) {
+            this.renderer.setSize(w, h);
+        }
+        if (this.composer) {
+            this.composer.setSize(w, h);
+        }
+    };
 
     constructor() {
         // React to selection changes in the state
@@ -69,6 +111,18 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         effect(() => {
             const mode = this.anatomyViewMode();
             this.updateTransparency(mode);
+            if (this.bloomPass) {
+                this.bloomPass.strength = (mode === 'mind' || mode === 'molecular') ? 1.5 : 0.4;
+            }
+        });
+
+        // React to zoom changes to avoid updating projection matrix every frame
+        effect(() => {
+            const currentZoom = this.zoom();
+            if (this.camera) {
+                this.camera.zoom = currentZoom;
+                this.camera.updateProjectionMatrix();
+            }
         });
     }
 
@@ -90,8 +144,14 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        if (isPlatformBrowser(this.platformId)) {
+            window.removeEventListener('resize', this.handleResize);
+        }
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
+        }
+        if (this.controls) {
+            this.controls.dispose();
         }
         if (this.renderer) {
             this.renderer.dispose();
@@ -132,13 +192,21 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         }
 
         try {
-            this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
         } catch (e) {
             throw new Error('WebGL is not supported in this environment.');
         }
         this.renderer.setSize(width, height);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(this.renderer.domElement);
+
+        // Setup Post-processing (Bloom)
+        const renderScene = new RenderPass(this.scene, this.camera);
+        // Resolution, strength, radius, threshold
+        this.bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 0.8, 0.5, 0.2);
+        this.composer = new EffectComposer(this.renderer);
+        this.composer.addPass(renderScene);
+        this.composer.addPass(this.bloomPass);
 
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
         this.scene.add(ambientLight);
@@ -233,27 +301,36 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.addPartComplex('l_shin', rSkin(0.1, 0.5, 0.1), skinMaterial, { x: 0.18, y: -0.25 }, rSkin(0.09, 0.48, 0.09), muscleMaterial, { x: 0.18, y: -0.25 }, rBone(0.5, 0.03), boneMaterial, { x: 0.18, y: -0.25 }, undefined, undefined, undefined, rSkin(0.11, 0.52, 0.11), molecularMaterial, { x: 0.18, y: -0.25 });
         this.addPartComplex('l_foot', rBox(0.15, 0.08, 0.25), skinMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.14, 0.07, 0.24), muscleMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.12, 0.06, 0.22), boneMaterial, { x: 0.18, y: -0.58, z: 0.05 }, undefined, undefined, undefined, rBox(0.16, 0.09, 0.26), molecularMaterial, { x: 0.18, y: -0.58, z: 0.05 });
 
+        // Add subtle procedural "breathing" and idle materials
+        const mindGeo = new THREE.IcosahedronGeometry(0.5, 2);
+        const mindMesh = new THREE.Mesh(mindGeo, new THREE.MeshStandardMaterial({
+            color: 0x8b5cf6, emissive: 0x8b5cf6, emissiveIntensity: 0.5, wireframe: true, transparent: true, opacity: 0.1
+        }));
+        mindMesh.position.set(0, 1.7, 0);
+        mindMesh.userData['isMindCore'] = true;
+        this.mannequinGroup.add(mindMesh);
+
         this.updatePartColors();
         this.updateTransparency(this.anatomyViewMode());
     }
 
-    private addPartComplex(id: string, 
-                           skinGeo: THREE.BufferGeometry, skinMat: THREE.Material, skinPos: any,
-                           muscleGeo: THREE.BufferGeometry, muscleMat: THREE.Material, musclePos: any,
-                           boneGeo: THREE.BufferGeometry, boneMat: THREE.Material, bonePos: any,
-                           mindGeo?: THREE.BufferGeometry, mindMat?: THREE.Material, mindPos?: any,
-                           molecularGeo?: THREE.BufferGeometry, molecularMat?: THREE.Material, molecularPos?: any) {
-        
+    private addPartComplex(id: string,
+        skinGeo: THREE.BufferGeometry, skinMat: THREE.Material, skinPos: any,
+        muscleGeo: THREE.BufferGeometry, muscleMat: THREE.Material, musclePos: any,
+        boneGeo: THREE.BufferGeometry, boneMat: THREE.Material, bonePos: any,
+        mindGeo?: THREE.BufferGeometry, mindMat?: THREE.Material, mindPos?: any,
+        molecularGeo?: THREE.BufferGeometry, molecularMat?: THREE.Material, molecularPos?: any) {
+
         const group = new THREE.Group();
         group.userData['id'] = id; // Store ID on the parent group for raycasting
-        
+
         // 1. Skin Layer
         const meshSkin = new THREE.Mesh(skinGeo, skinMat.clone());
         this.applyPos(meshSkin, skinPos);
         meshSkin.userData['layer'] = 'skin';
         meshSkin.userData['id'] = id; // So children raycast back to parent logical ID
         group.add(meshSkin);
-        
+
         // 2. Muscle Layer
         const meshMuscle = new THREE.Mesh(muscleGeo, muscleMat.clone());
         this.applyPos(meshMuscle, musclePos);
@@ -305,12 +382,12 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             const isSelected = selectedId === id;
             const issuesForPart = issues[id] || [];
             const maxPain = issuesForPart.reduce((max, issue) => Math.max(max, issue.painLevel), 0);
-            
+
             group.children.forEach(child => {
                 if (!(child instanceof THREE.Mesh)) return;
                 const material = child.material as THREE.MeshStandardMaterial;
                 const layer = child.userData['layer'];
-                
+
                 // Color Logic overrides
                 if (maxPain > 0) {
                     const intensity = maxPain / 10;
@@ -376,7 +453,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 if (mode === 'skin') {
                     if (layer === 'skin') { material.opacity = isSelected ? 0.95 : 0.9; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
-                } 
+                }
                 else if (mode === 'muscle') {
                     if (layer === 'skin') { material.opacity = 0.15; material.depthWrite = false; }
                     else if (layer === 'muscle') { material.opacity = 0.9; material.depthWrite = true; }
@@ -446,44 +523,53 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             }
         });
 
-        window.addEventListener('resize', () => {
-            const container = this.canvasContainer()?.nativeElement;
-            if (!container) return;
-            const w = container.clientWidth;
-            const h = container.clientHeight;
-            this.camera.aspect = w / h;
-            this.camera.updateProjectionMatrix();
-            this.renderer.setSize(w, h);
-        });
+        window.addEventListener('resize', this.handleResize);
     }
 
     private getPartName(id: string): string {
-        const names: Record<string, string> = {
-            'head': 'Head & Neck',
-            'chest': 'Chest & Upper Torso',
-            'abdomen': 'Abdomen & Stomach',
-            'pelvis': 'Pelvis & Hips',
-            'r_shoulder': 'Right Shoulder',
-            'r_arm': 'Right Arm',
-            'r_hand': 'Right Hand & Wrist',
-            'l_shoulder': 'Left Shoulder',
-            'l_arm': 'Left Arm',
-            'l_hand': 'Left Hand & Wrist',
-            'r_thigh': 'Right Thigh',
-            'r_shin': 'Right Lower Leg',
-            'r_foot': 'Right Foot',
-            'l_thigh': 'Left Thigh',
-            'l_shin': 'Left Lower Leg',
-            'l_foot': 'Left Foot'
-        };
-        return names[id] || id;
+        return PART_NAMES[id] || id;
     }
 
     private startAnimation() {
+        if (!isPlatformBrowser(this.platformId)) return;
+        
         const animate = () => {
+            if (!this.renderer || !this.scene || !this.camera) return;
             this.animationFrameId = requestAnimationFrame(animate);
-            this.controls.update();
-            this.renderer.render(this.scene, this.camera);
+
+            if (this.controls) this.controls.update();
+
+            const time = this.clock.getElapsedTime();
+            
+            // Idle Breathing Animation
+            if (this.mannequinGroup) {
+                // Subtle chest heave
+                const chestPart = this.parts.get('chest');
+                if (chestPart) {
+                   chestPart.scale.set(1 + Math.sin(time * 2) * 0.02, 1 + Math.sin(time * 2) * 0.01, 1 + Math.sin(time * 2) * 0.03);
+                }
+                // Gentle floating
+                this.mannequinGroup.position.y = Math.sin(time * 1.5) * 0.02;
+                
+                // Slowly rotate the mind core
+                this.mannequinGroup.children.forEach(child => {
+                    if (child.userData['isMindCore']) {
+                        child.rotation.y += 0.01;
+                        child.rotation.x += 0.005;
+                    }
+                });
+            }
+
+            // Sync external rotation
+            if (this.mannequinGroup) {
+                this.mannequinGroup.rotation.y = this.rotation();
+            }
+
+            if (this.composer) {
+                this.composer.render();
+            } else {
+                this.renderer.render(this.scene, this.camera);
+            }
         };
         animate();
     }

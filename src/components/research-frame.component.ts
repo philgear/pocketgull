@@ -5,11 +5,11 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { fromEvent, Subscription } from 'rxjs';
 import { PatientManagementService } from '../services/patient-management.service';
 import { PatientStateService } from '../services/patient-state.service';
-import { Bookmark } from '../services/patient.types';
+import { IBookmark } from '../services/patient.types';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 
-export interface PubMedSearchResult {
+export interface IPubMedSearchResult {
   id: string;
   title: string;
   authors: string;
@@ -75,7 +75,7 @@ export interface PubMedSearchResult {
           <!-- Actions -->
           <pocket-gull-button variant="ghost" size="sm" (click)="search()" icon="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5A6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14" title="Execute Search" ariaLabel="Execute Search">
           </pocket-gull-button>
-          <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="Bookmark current page" ariaLabel="Bookmark current page">
+          <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="IBookmark current page" ariaLabel="IBookmark current page">
           </pocket-gull-button>
           <pocket-gull-button variant="ghost" size="sm" (click)="showCitationForm.set(!showCitationForm())" [class.text-gray-800]="showCitationForm()" [class.dark:text-white]="showCitationForm()" icon="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" title="Citation Metadata" ariaLabel="Citation Metadata">
           </pocket-gull-button>
@@ -137,7 +137,7 @@ export interface PubMedSearchResult {
                     {{ bookmark.cited ? 'CITED' : 'CITE' }}
                 </button>
                 <button (click)="removeBookmark(bookmark.url)"
-                        class="px-1 py-0.5 text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
+                        class="px-1 py-0.5 text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 hover:bg-brand-red-100 dark:hover:bg-brand-red-900/50 hover:text-brand-red-600 dark:hover:text-brand-red-400 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
                     ×
                 </button>
             </div>
@@ -170,7 +170,7 @@ export interface PubMedSearchResult {
                   </div>
                   <div class="flex items-center gap-2">
                     <pocket-gull-button variant="primary" size="sm" (click)="addPubmedBookmark(res)" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z">
-                      Bookmark & Cite
+                      IBookmark & Cite
                     </pocket-gull-button>
                     <a [href]="'https://pubmed.ncbi.nlm.nih.gov/' + res.id + '/'" target="_blank" class="text-xs font-semibold text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-white transition-colors inline-block px-2 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded">
                       Open in PubMed
@@ -219,7 +219,7 @@ export class ResearchFrameComponent {
   private currentUrl = signal<string | null>(null);
   sanitizedUrl = signal<SafeResourceUrl | null>(null);
 
-  pubmedResults = signal<PubMedSearchResult[] | null>(null);
+  pubmedResults = signal<IPubMedSearchResult[] | null>(null);
   isLoadingPubmed = signal(false);
 
   // --- Citation Signals ---
@@ -430,7 +430,7 @@ export class ResearchFrameComponent {
       const summaryRes = await fetch(eSummaryUrl);
       const summaryData = await summaryRes.json();
 
-      const results: PubMedSearchResult[] = ids.map((id: string) => {
+      const results: IPubMedSearchResult[] = ids.map((id: string) => {
         const item = summaryData.result[id];
         let authorsStr = '';
         if (item.authors && Array.isArray(item.authors)) {
@@ -462,7 +462,7 @@ export class ResearchFrameComponent {
     }
   }
 
-  addPubmedBookmark(result: PubMedSearchResult) {
+  addPubmedBookmark(result: IPubMedSearchResult) {
     const url = `https://pubmed.ncbi.nlm.nih.gov/${result.id}/`;
 
     const existing = this.bookmarks().find(b => b.url === url);
@@ -525,7 +525,7 @@ export class ResearchFrameComponent {
     }
   }
 
-  toggleCite(bookmark: Bookmark) {
+  toggleCite(bookmark: IBookmark) {
     // Note: We need a way to update an existing bookmark.
     // Adding it again with same URL but different 'cited' flag in PatientManagementService
     this.patientManager.updateBookmark(bookmark.url, { cited: !bookmark.cited });

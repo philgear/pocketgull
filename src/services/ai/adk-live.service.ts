@@ -1,6 +1,6 @@
 import { Injectable, signal, NgZone, inject } from '@angular/core';
 
-export interface LiveMessageEvent {
+export interface ILiveMessageEvent {
   text?: string;
   isFinal?: boolean;
 }
@@ -28,11 +28,21 @@ export class AdkLiveService {
   private isPlaying = false;
 
   // Callbacks
-  public onMessage?: (msg: LiveMessageEvent) => void;
+  public onMessage?: (msg: ILiveMessageEvent) => void;
   public onModelTurnComplete?: () => void;
 
   constructor() {}
 
+  /**
+   * Initializes a full-duplex WebSocket connection to the Gemini 2.0 Realtime API.
+   * Establishes a dual-audio graph: 
+   * 1. A `MediaStreamSource` -> `ScriptProcessorNode` to capture, downsample to PCM 16kHz, and base64-encode outbound microphone audio.
+   * 2. An `AudioContext` queue to decode and continuously play inbound base64 PCM 24kHz audio from the model.
+   *
+   * @param apiKey - The Gemini API key.
+   * @param systemInstruction - Persona and behavioral guidelines for the live session.
+   * @throws Error if media device access is denied or the WebSocket connection fails.
+   */
   async connect(apiKey: string, systemInstruction: string) {
     if (this.isConnected()) return;
     this.connectionError.set(null);
@@ -165,6 +175,15 @@ export class AdkLiveService {
     this.processJsonMessage(unparsedData);
   }
 
+  /**
+   * Parses the inbound JSON payloads from the Gemini WebSocket stream.
+   * Responsibilities:
+   * 1. Extracts `text` parts and dispatches them to the `onMessage` callback for transcript rendering.
+   * 2. Extracts `inlineData` (base64 audio) and appends it to the continuous playback queue.
+   * 3. Intercepts 'barge-in' (`interrupted: true`) signals from the server to immediately dump the active audio queue.
+   * 
+   * @param data - The parsed JSON object received from the WebSocket.
+   */
   private processJsonMessage(data: any) {
     if (data.serverContent?.modelTurn?.parts) {
       const parts = data.serverContent.modelTurn.parts;

@@ -1,8 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ElementRef, effect, signal, viewChild, untracked } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { PatientStateService, PatientState } from '../services/patient-state.service';
-import { PatientManagementService, HistoryEntry, Patient } from '../services/patient-management.service';
-import { DraftSummaryItem } from '../services/patient.types';
+import { PatientStateService, IPatientState } from '../services/patient-state.service';
+import { PatientManagementService, HistoryEntry, IPatient } from '../services/patient-management.service';
+import { IDraftSummaryItem } from '../services/patient.types';
 import { ExportService } from '../services/export.service';
 import { ImportService } from '../services/import.service';
 import { FhirIntegrationService } from '../services/fhir-integration.service';
@@ -34,14 +34,14 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
             
             <!-- Transient SMART on FHIR Success Notification -->
             @if (showEpicSuccess()) {
-              <div class="mb-6 bg-green-50/50 dark:bg-green-900/10 border border-green-200 dark:border-green-800/50 rounded-lg p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+              <div class="mb-6 bg-brand-green-50/50 dark:bg-brand-green-900/10 border border-brand-green-200 dark:border-brand-green-800/50 rounded-lg p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
+                  <div class="w-8 h-8 bg-brand-green-100 dark:bg-brand-green-900/30 text-brand-green-600 dark:text-brand-green-400 rounded-full flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                   </div>
                   <div>
-                    <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Epic MyChart Connected</h3>
-                    <p class="text-[11px] text-green-600 dark:text-green-500/80">SMART on FHIR token securely established.</p>
+                    <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-brand-green-800 dark:text-brand-green-300">Epic MyChart Connected</h3>
+                    <p class="text-[11px] text-brand-green-600 dark:text-brand-green-500/80">SMART on FHIR token securely established.</p>
                   </div>
                 </div>
                 <pocket-gull-button variant="ghost" size="xs" (click)="showEpicSuccess.set(false)" icon="M6 18L18 6M6 6l12 12"></pocket-gull-button>
@@ -439,7 +439,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     }
                 </section>
 
-                <!-- Patient Trends Chart -->
+                <!-- IPatient Trends Chart -->
                 @defer (on viewport) {
                   <section>
                       <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-6">Retrospective Data Visualization</h2>
@@ -930,7 +930,7 @@ export class MedicalChartSummaryComponent {
 
 
 
-  removeDraftItem(item: DraftSummaryItem) {
+  removeDraftItem(item: IDraftSummaryItem) {
     this.state.removeDraftSummaryItem(item.id);
   }
 
@@ -939,7 +939,7 @@ export class MedicalChartSummaryComponent {
     return draftItems && draftItems.length > 0;
   }
 
-  updateVital(key: keyof PatientState['vitals'], event: any) {
+  updateVital(key: keyof IPatientState['vitals'], event: any) {
     this.state.updateVital(key, event.target.value);
   }
 
@@ -955,7 +955,7 @@ export class MedicalChartSummaryComponent {
     if (!reason || !patient) return;
 
     // Capture the state at the time of this visit
-    const visitState: PatientState = {
+    const visitState: IPatientState = {
       ...this.state.getCurrentState(),
       patientGoals: reason // The primary goal for this snapshot is the reason for the visit.
     };
@@ -999,7 +999,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
 
     if (draftItems && draftItems.length > 0) {
-      if (confirm('Discard your draft modifications and revert to the saved Patient Summary?')) {
+      if (confirm('Discard your draft modifications and revert to the saved IPatient Summary?')) {
         this.state.clearDraftSummaryItems();
       }
     }
@@ -1010,7 +1010,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
     if (draftItems.length > 0) {
       const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
-      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
+      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### IPatient Summary\n${newContent}`;
       this.state.updateActivePatientSummary(plan);
       this.state.clearDraftSummaryItems();
     }

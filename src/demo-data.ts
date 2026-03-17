@@ -94,10 +94,10 @@ Sarah Jenkins is a 42-year-old female presenting with chronic lower back pain (L
 > - New or worsening bilateral leg weakness or numbness
 > - Bowel or bladder dysfunction (cauda equina syndrome)
 > - Pain VAS 9-10/10 unresponsive to current regimen
-> - Patient reports opioid cravings or use
+> - IPatient reports opioid cravings or use
 > - PHQ-9 >=20 or active suicidal ideation`,
 
-    'Patient Education': `### Understanding Your Condition
+    'IPatient Education': `### Understanding Your Condition
 Your lower back pain is coming from the area between two vertebrae called L4 and L5, where a disc may be pressing on a nerve that runs down into your left leg and buttock. This is common and very manageable with the right combination of movement, mental health support, and non-opioid treatments.
 
 ### What Was Found

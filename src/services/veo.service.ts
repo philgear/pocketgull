@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export interface VeoGenerationState {
+export interface IVeoGenerationState {
   isGenerating: boolean;
   progress: string;
   videoUrl: string | null;
@@ -11,7 +11,7 @@ export interface VeoGenerationState {
   providedIn: 'root'
 })
 export class VeoService {
-  readonly state = signal<VeoGenerationState>({
+  readonly state = signal<IVeoGenerationState>({
     isGenerating: false,
     progress: '',
     videoUrl: null,

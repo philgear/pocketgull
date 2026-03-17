@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed, OnDestroy, effect, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
-import { BodyPartIssue } from '../services/patient.types';
+import { IBodyPartIssue } from '../services/patient.types';
 import { PatientManagementService } from '../services/patient-management.service';
 import { Body3DViewerComponent } from './body-3d-viewer.component';
 
@@ -260,7 +260,7 @@ export class BodyViewerComponent implements OnDestroy {
     } else if (!this.state.viewingPastVisit()) {
       // Create a new note only if we are taking notes for current visit
       const newNoteId = `note_${Date.now()}`;
-      const newNote: BodyPartIssue = {
+      const newNote: IBodyPartIssue = {
         id,
         noteId: newNoteId,
         name,

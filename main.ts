@@ -3,7 +3,7 @@ import { bootstrapApplication, provideClientHydration, withEventReplay } from '@
 import { provideZonelessChangeDetection, isDevMode } from '@angular/core';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppComponent } from './src/app.component';
-import { AI_CONFIG, AiProviderConfig } from './src/services/ai-provider.types';
+import { AI_CONFIG, IAiProviderConfig } from './src/services/ai-provider.types';
 import { IntelligenceProviderToken } from './src/services/ai/intelligence.provider.token';
 import { GeminiProvider } from './src/services/ai/gemini.provider';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -18,7 +18,7 @@ bootstrapApplication(AppComponent, {
         apiKey: (window as any).GEMINI_API_KEY || '',
         defaultModel: { modelId: 'gemini-2.5-flash', temperature: 0.1 },
         verificationModel: { modelId: 'gemini-2.5-flash', temperature: 0.0 }
-      } as AiProviderConfig)
+      } as IAiProviderConfig)
     },
     {
       provide: IntelligenceProviderToken,

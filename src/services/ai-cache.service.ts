@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-interface CacheEntry {
+interface ICacheEntry {
     encryptedData: ArrayBuffer;
     iv: Uint8Array;
     lastUsed: number;
@@ -99,7 +99,7 @@ export class AiCacheService {
         const db = await this.dbPromise;
         if (!db) return null;
 
-        const entry: CacheEntry | null = await new Promise((resolve, reject) => {
+        const entry: ICacheEntry | null = await new Promise((resolve, reject) => {
             const transaction = db.transaction(this.STORE_NAME, 'readonly');
             const store = transaction.objectStore(this.STORE_NAME);
             const request = store.get(key);
@@ -146,7 +146,7 @@ export class AiCacheService {
             data
         );
 
-        const entry: CacheEntry = {
+        const entry: ICacheEntry = {
             encryptedData,
             iv,
             lastUsed: Date.now()
@@ -165,7 +165,7 @@ export class AiCacheService {
         this.vacuum();
     }
 
-    private async updateLastUsed(key: string, entry: CacheEntry) {
+    private async updateLastUsed(key: string, entry: ICacheEntry) {
         const db = await this.dbPromise;
         if (!db) return;
         entry.lastUsed = Date.now();
@@ -219,7 +219,7 @@ export class AiCacheService {
             request.onsuccess = async (event: any) => {
                 const cursor = event.target.result;
                 if (cursor) {
-                    const entry: CacheEntry = cursor.value;
+                    const entry: ICacheEntry = cursor.value;
                     try {
                         const decrypted = await crypto.subtle.decrypt(
                             { name: 'AES-GCM', iv: entry.iv as any },

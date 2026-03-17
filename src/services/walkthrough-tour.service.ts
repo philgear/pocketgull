@@ -1,13 +1,13 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-export interface TourStep {
+export interface ITourStep {
   targetId: string;
   title: string;
   body: string;
   position: 'top' | 'bottom' | 'left' | 'right';
 }
 
-export const TOUR_STEPS: TourStep[] = [
+export const TOUR_STEPS: ITourStep[] = [
   {
     targetId: 'tour-body-chart',
     title: 'Every journey starts with the body.',
@@ -35,7 +35,7 @@ export const TOUR_STEPS: TourStep[] = [
   {
     targetId: 'tour-lens-tabs',
     title: 'See the plan from every angle.',
-    body: 'Each tab is a different clinical lens: Overview, Interventions, Nutrition, Monitoring, Patient Education. The AI crafts each one independently. Explore freely.',
+    body: 'Each tab is a different clinical lens: Overview, Interventions, Nutrition, Monitoring, IPatient Education. The AI crafts each one independently. Explore freely.',
     position: 'bottom',
   },
   {

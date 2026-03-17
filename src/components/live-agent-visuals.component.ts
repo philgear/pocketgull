@@ -10,8 +10,8 @@ import { CommonModule } from '@angular/common';
             <div class="relative w-48 h-48 md:w-64 md:h-64 transition-all duration-500" [class.opacity-10]="hasChatHistory" [class.opacity-100]="!hasChatHistory">
                 <!-- Glowing Orb -->
                 <div class="absolute inset-0 rounded-full transition-all duration-500" 
-                     [class.bg-green-400/10]="agentState === 'idle'"
-                     [class.bg-blue-400/20]="agentState === 'listening'"
+                     [class.bg-brand-green-400/10]="agentState === 'idle'"
+                     [class.bg-brand-blue-400/20]="agentState === 'listening'"
                      [class.bg-purple-400/20]="agentState === 'processing'"
                      [class.blur-2xl]="true"
                      [class.scale-100]="agentState === 'idle'"

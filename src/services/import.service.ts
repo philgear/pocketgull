@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { PatientStateService } from './patient-state.service';
 import { PatientManagementService } from './patient-management.service';
-import { DynamicMarker, DiagnosticScan, PatientVitals } from './patient.types';
+import { IDynamicMarker, IDiagnosticScan, IPatientVitals } from './patient.types';
 
-export interface ParseResult {
+export interface IParseResult {
   success: boolean;
   message: string;
   scansAdded?: number;
@@ -22,7 +22,7 @@ export class ImportService {
    * Process an uploaded File payload.
    * Supports PocketGull Native exports and standard FHIR/Epic Lucy JSON bundles.
    */
-  async processFile(file: File): Promise<ParseResult> {
+  async processFile(file: File): Promise<IParseResult> {
     try {
       let data: any;
       let text = await file.text();
@@ -55,7 +55,7 @@ export class ImportService {
   /**
    * Directly map over PocketGull exports back into the system state.
    */
-  private importNative(data: any): ParseResult {
+  private importNative(data: any): IParseResult {
     const p = data.patient;
     if (!p || !p.name) return { success: false, message: 'Invalid PocketGull export.' };
 
@@ -83,8 +83,8 @@ export class ImportService {
       // Load any vital/state properties from the export if they don't exist
       if (p.vitals) {
         Object.entries(p.vitals).forEach(([key, value]) => {
-           if (!this.patientState.vitals()[key as keyof PatientVitals]) {
-             this.patientState.updateVital(key as keyof PatientVitals, String(value));
+           if (!this.patientState.vitals()[key as keyof IPatientVitals]) {
+             this.patientState.updateVital(key as keyof IPatientVitals, String(value));
            }
         });
       }
@@ -101,7 +101,7 @@ export class ImportService {
    * Parse a FHIR / Epic Lucy JSON bundle. 
    * Maps DiagnosticReport, DocumentReference, Observation, and Condition resources.
    */
-  private importFhirBundle(bundle: any): ParseResult {
+  private importFhirBundle(bundle: any): IParseResult {
     const currentPatient = this.patientManager.selectedPatient();
     if (!currentPatient) {
       return { success: false, message: 'Please select a patient profile first to receive the imported FHIR/Lucy data.' };
@@ -112,7 +112,7 @@ export class ImportService {
     let medsAdded = 0;
 
     const entries = bundle.entry || [];
-    const newScans: DiagnosticScan[] = [];
+    const newScans: IDiagnosticScan[] = [];
 
     entries.forEach((e: any) => {
       const resource = e.resource;
@@ -221,7 +221,7 @@ export class ImportService {
    * Parse a HL7 CCDA XML Document. 
    * This is typically downloaded directly from Share Everywhere.
    */
-  private importCCDAXml(xmlText: string): ParseResult {
+  private importCCDAXml(xmlText: string): IParseResult {
     const currentPatient = this.patientManager.selectedPatient();
     if (!currentPatient) {
       return { success: false, message: 'Please select a patient profile first to receive the imported XML data.' };
@@ -234,7 +234,7 @@ export class ImportService {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlText, "text/xml");
       
-      const newScans: DiagnosticScan[] = [];
+      const newScans: IDiagnosticScan[] = [];
 
       // Look for result/observation sections (Labs/Scans)
       const observationNodes = xmlDoc.getElementsByTagName("observation");

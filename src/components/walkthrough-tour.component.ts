@@ -3,9 +3,9 @@ import {
   effect, ViewEncapsulation, OnDestroy, NgZone, afterNextRender
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WalkthroughTourService, TOUR_STEPS, TourStep } from '../services/walkthrough-tour.service';
+import { WalkthroughTourService, TOUR_STEPS, ITourStep } from '../services/walkthrough-tour.service';
 
-interface Rect { top: number; left: number; width: number; height: number; }
+interface IRect { top: number; left: number; width: number; height: number; }
 
 @Component({
   selector: 'app-walkthrough-tour',
@@ -254,10 +254,10 @@ interface Rect { top: number; left: number; width: number; height: number; }
 export class WalkthroughTourComponent implements OnDestroy {
   protected tour = inject(WalkthroughTourService);
 
-  rect = signal<Rect | null>(null);
+  rect = signal<IRect | null>(null);
   stepsArray = TOUR_STEPS;
 
-  stepDef = computed<TourStep | null>(() => {
+  stepDef = computed<ITourStep | null>(() => {
     const idx = this.tour.currentStep();
     return idx >= 0 && idx < TOUR_STEPS.length ? TOUR_STEPS[idx] : null;
   });

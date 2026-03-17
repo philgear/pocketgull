@@ -12,7 +12,7 @@ import { DictationModalComponent } from './components/dictation-modal.component'
 import { TaskFlowComponent } from './components/task-flow.component';
 import { IntakeFormComponent } from './components/intake-form.component';
 import { VoiceAssistantComponent } from './components/voice-assistant.component';
-import { AI_CONFIG, AiProviderConfig } from './services/ai-provider.types';
+import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { GeminiProvider } from './services/ai/gemini.provider';
 import { ClinicalIntelligenceService } from './services/clinical-intelligence.service';
@@ -52,7 +52,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     @if (showFhirCallback()) {
       <app-fhir-callback></app-fhir-callback>
     } @else {
-    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
+    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 flex flex-col md:overflow-hidden font-sans selection:bg-brand-green-100 selection:text-brand-green-900 group/app">
       
       <app-dictation-modal></app-dictation-modal>
         <app-walkthrough-tour></app-walkthrough-tour>
@@ -81,69 +81,22 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                 <div class="origami-seagull">
                     <!-- Rotation wrapper for mouse tracking -->
                     <div [style.transform]="'rotate(' + seagullAngle() + 'deg)'" class="w-full h-full transition-transform duration-200 ease-out origin-center">
-                    <!-- Mathematical Sierpiński & Golden Ratio Seagull -->
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="text-[#1C1C1C] dark:text-zinc-100">
-                        <!-- Mathematical Construction Framework -->
-                        <g stroke="currentColor" stroke-width="0.1" fill="none" opacity="0.15" stroke-dasharray="1 2">
-                            <!-- Golden Ratio Circles (phi = 1.618) -->
-                            <circle cx="50" cy="50" r="10" />
-                            <circle cx="50" cy="50" r="16.18" />
-                            <circle cx="50" cy="50" r="26.18" />
-                            <circle cx="50" cy="50" r="42.36" />
-                            <!-- Center Axes -->
-                            <line x1="0" y1="50" x2="100" y2="50" />
-                            <line x1="50" y1="0" x2="50" y2="100" />
-                            <!-- Fibonacci Spiral Approximation -->
-                            <path d="M50,40 A10,10 0 0,1 60,50 A16.18,16.18 0 0,1 43.82,66.18 A26.18,26.18 0 0,1 17.64,40 A42.36,42.36 0 0,1 60,-2.36" />
-                        </g>
-
-                        <!-- Sierpiński & Golden Ratio Seagull Geometry -->
-                        <g stroke="currentColor" stroke-width="0.4" fill="none" stroke-linejoin="round">
-                            <!-- Body: Central Golden Triangle (approx) -->
-                            <polygon points="50,20 65,70 35,70" fill="currentColor" fill-opacity="0.03" />
-                            <line x1="50" y1="20" x2="50" y2="70" stroke-width="0.2" opacity="0.5" />
-                            <line x1="35" y1="45" x2="65" y2="45" stroke-width="0.2" opacity="0.5" />
-
-                            <!-- Left Wing (Sierpiński Depth 3) -->
-                            <polygon points="50,20 5,40 40,75" />
-                            <!-- Depth 1 Cutout -->
-                            <polygon points="27.5,30 22.5,57.5 45,47.5" fill="currentColor" fill-opacity="0.05" />
-                            <line x1="50" y1="20" x2="22.5" y2="57.5" stroke-width="0.15" />
-                            <line x1="5" y1="40" x2="45" y2="47.5" stroke-width="0.15" />
-                            <!-- Depth 2 Cutouts -->
-                            <polygon points="38.75,25 36.25,38.75 47.5,33.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="16.25,35 25,43.75 13.75,48.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="31.25,66.25 33.75,52.5 42.5,61.25" fill="currentColor" fill-opacity="0.08" />
-
-                            <!-- Right Wing (Sierpiński Depth 3) -->
-                            <polygon points="50,20 95,40 60,75" />
-                            <!-- Depth 1 Cutout -->
-                            <polygon points="72.5,30 77.5,57.5 55,47.5" fill="currentColor" fill-opacity="0.05" />
-                            <line x1="50" y1="20" x2="77.5" y2="57.5" stroke-width="0.15" />
-                            <line x1="95" y1="40" x2="55" y2="47.5" stroke-width="0.15" />
-                            <!-- Depth 2 Cutouts -->
-                            <polygon points="61.25,25 63.75,38.75 52.5,33.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="83.75,35 75,43.75 86.25,48.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="68.75,66.25 66.25,52.5 57.5,61.25" fill="currentColor" fill-opacity="0.08" />
-
-                            <!-- Tail Geometry -->
-                            <polygon points="35,70 65,70 50,90" />
-                            <polygon points="42.5,70 57.5,70 50,80" fill="currentColor" fill-opacity="0.05" />
-
-                            <!-- Head & Beak Array (Angular extension) -->
-                            <polygon points="50,20 45,10 55,10" />
-                            <!-- Functional Braun Orange Accent Beak -->
-                            <polygon points="55,10 70,5 50,5" stroke="#ff4500" fill="#ff4500" fill-opacity="0.8" stroke-width="0.3" />
-                            <line x1="50" y1="20" x2="70" y2="5" stroke-width="0.2" opacity="0.3" />
-                        </g>
-
-                        <!-- Mathematical Annotations (Tiny text) -->
-                        <g fill="currentColor" opacity="0.4" font-family="monospace" font-size="2.5" transform="scale(0.8) translate(10, 15)">
-                            <text x="50" y="20">φ = 1.618</text>
-                            <text x="5" y="45">f(x) = x² + y²</text>
-                            <text x="80" y="45">S_n = 3^n</text>
-                            <text x="50" y="95">lim_{n→∞}</text>
-                        </g>
+                    <!-- Origami SVG Seagull shape - Braun minimalist palette -->
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Far Wing -->
+                        <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round" />
+                        <!-- Tail -->
+                        <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round" />
+                        <!-- Body Base -->
+                        <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
+                        <!-- Near Wing (Upper) -->
+                        <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
+                        <!-- Near Wing (Fold) -->
+                        <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
+                        <!-- Neck/Head -->
+                        <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
+                        <!-- Beak - Functional Braun Orange Accent -->
+                        <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
                     </svg>
                     </div>
                 </div>
@@ -173,7 +126,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                 </button>
               </div>
               @if (apiKeyError()) {
-                <p class="text-red-500 text-xs mb-3">{{ apiKeyError() }}</p>
+                <p class="text-brand-red-500 text-xs mb-3">{{ apiKeyError() }}</p>
               }
               <button (click)="submitApiKey()" [disabled]="!apiKeyInput().trim()"
                 class="w-full py-3 bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-[#09090b] text-xs font-bold uppercase tracking-widest hover:bg-black dark:hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed mb-3">
@@ -251,8 +204,8 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             <!-- System Status Indicator (Hidden on smallest watches) -->
             <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-full border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-help group relative no-print">
             <div class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" style="will-change: transform, opacity;"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-green-400 opacity-75" style="will-change: transform, opacity;"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-green-500"></span>
             </div>
             <span class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-widest">System Ready</span>
               
@@ -261,7 +214,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  <div class="space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-gray-800">
                        <span class="text-xs font-bold text-gray-300">CORE STATUS</span>
-                       <span class="text-xs font-bold text-green-500 uppercase">Active</span>
+                       <span class="text-xs font-bold text-brand-green-500 uppercase">Active</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                        <div class="space-y-1">
@@ -357,7 +310,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           </div>
         </nav>
 
-        <!-- New Patient Navigation Bar -->
+        <!-- New IPatient Navigation Bar -->
         <nav class="h-12 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center px-3 sm:px-6 shrink-0 bg-gray-50 dark:bg-[#09090b] z-40 no-print gap-4">
            <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:block">INTAKE MODULE 01</div>
            <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
@@ -431,7 +384,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
 
           
-          <!-- Column 1: Patient Medical Chart -->
+          <!-- Column 1: IPatient Medical Chart -->
            <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                 id="tour-body-chart"
                [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined"
@@ -699,7 +652,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  </div>
                }
                @if (translationError()) {
-                  <div class="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest animate-in fade-in duration-300">
+                  <div class="mt-2 text-[10px] font-bold text-brand-red-500 uppercase tracking-widest animate-in fade-in duration-300">
                     ⚠️ {{ translationError() }}
                   </div>
                }
@@ -1078,7 +1031,7 @@ export class AppComponent implements OnDestroy {
       plan = plan ? `${plan}\n\n### ${ClinicalIcons.Medication} Medications\n${medsContent}` : `### ${ClinicalIcons.Medication} Medications\n${medsContent}`;
     }
     
-    const finalText = plan || 'No Active Patient Summary recorded for this visit.';
+    const finalText = plan || 'No Active IPatient Summary recorded for this visit.';
     this.previewText.set(finalText);
     this.originalPreviewText.set(finalText);
     this.selectedReadingLevel.set('standard');
@@ -1181,7 +1134,7 @@ export class AppComponent implements OnDestroy {
 
     this.export.downloadCarePlanPdf(
       textToPrint,
-      p?.name ?? 'Patient',
+      p?.name ?? 'IPatient',
       {
         bp: vitals.bp || undefined,
         hr: vitals.hr || undefined,
