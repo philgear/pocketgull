@@ -6,13 +6,14 @@ import { AiCacheService } from '../services/ai-cache.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { ExportService } from '../services/export.service';
 import { ClinicalTrendComponent } from './clinical-trend.component';
+import { PatientVitalsChartComponent } from './patient-vitals-chart.component';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PatientManagementService } from '../services/patient-management.service';
 
 @Component({
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, ClinicalTrendComponent, PocketGullButtonComponent],
+  imports: [CommonModule, AnalysisReportComponent, ClinicalTrendComponent, PatientVitalsChartComponent, PocketGullButtonComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6]">
       
@@ -30,11 +31,16 @@ import { PatientManagementService } from '../services/patient-management.service
              <!-- Trends Section -->
              @if (historicalMetrics().length > 1) {
                <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4">Longitudinal Trends</h3>
+                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-tighter mb-4">AI Confidence Metrics</h3>
                  <app-clinical-trend label="Complexity" [values]="getHistoryValues('complexity')" type="complexity"></app-clinical-trend>
                  <app-clinical-trend label="Stability" [values]="getHistoryValues('stability')" type="stability"></app-clinical-trend>
                  <app-clinical-trend label="Certainty" [values]="getHistoryValues('certainty')" type="certainty"></app-clinical-trend>
                </div>
+             }
+
+             <!-- Vitals Chart -->
+             @if (patientMgmt.selectedPatient()?.history; as history) {
+                 <app-patient-vitals-chart [history]="history"></app-patient-vitals-chart>
              }
 
              <!-- History List -->

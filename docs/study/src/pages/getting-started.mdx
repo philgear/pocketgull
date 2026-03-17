@@ -1,0 +1,113 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Getting Started
+description: "How to clone, install, run, and deploy Pocket Gull."
+---
+import DocNode from '../components/DocNode.astro';
+
+# Getting Started
+
+**Developer Profile:** [g.dev/philgear](https://g.dev/philgear)
+**Repository:** [github.com/philgear/pocket-gull](https://github.com/philgear/pocket-gull)
+
+---
+
+## Prerequisites
+
+- <DocNode term="Node.js" category="OpenJS Foundation" hint="JavaScript runtime built on Chrome's V8 engine. Originally created by Ryan Dahl in 2009. Pocket Gull requires v20+." link="https://nodejs.org/en/docs" linkLabel="nodejs.org →" icon="https://nodejs.org/favicon.ico">Node.js</DocNode> ≥ 20.0.0
+- npm
+- A <DocNode term="Gemini API Key" category="Google DeepMind" hint="Personal API key from Google AI Studio. Required for live AI consult, multi-agent analysis, and chat features." link="https://aistudio.google.com/apikey" linkLabel="Get API Key →" icon="https://ai.google.dev/favicon.ico">Gemini API key</DocNode> (for live AI features)
+
+---
+
+## Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/philgear/pocket-gull.git
+cd pocket-gull
+
+# Install dependencies
+npm install
+```
+
+---
+
+## Development
+
+```bash
+# Start the development server
+npm run dev
+```
+
+The application will be available at `http://localhost:4200`. Enter your Gemini API key on the splash screen, or press **Try Demo** to load a pre-sampled patient with example AI analysis outputs.
+
+---
+
+## Production Build
+
+```bash
+# Build for production
+npm run build
+
+# Preview the production build locally
+npm run preview
+```
+
+The production build outputs to `dist/` with full <DocNode term="Angular SSR" category="Google · Angular Team" hint="Server-Side Rendering — Angular renders the initial page on the Express.js server, then hydrates client-side. Faster first paint and SEO." link="https://angular.dev/guide/ssr" linkLabel="SSR Guide →" icon="https://angular.dev/favicon.ico">SSR</DocNode> support.
+
+---
+
+## Deployment
+
+Pocket Gull is architecturally designed to deploy to <DocNode term="Google Cloud Run" category="Google Cloud" hint="Fully managed serverless container platform. Auto-scales from zero. Pocket Gull deploys as a Docker container with Express.js + Angular SSR." link="https://cloud.google.com/run/docs" linkLabel="Cloud Run Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">**Google Cloud Run**</DocNode>.
+
+### Live Deployment
+
+- **Primary URL:** [pocketgull.app](https://pocketgull.app)
+- **Cloud Run URL:** [understory-315235665910.us-west1.run.app](https://understory-315235665910.us-west1.run.app)
+
+### Automated Deployment Script
+
+The repository includes a one-click deployment script at `scripts/deploy.sh`:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+gcloud builds submit --tag gcr.io/$PROJECT_ID/pocket-gull
+gcloud run deploy pocket-gull \
+  --image gcr.io/$PROJECT_ID/pocket-gull \
+  --platform managed \
+  --region us-west1 \
+  --allow-unauthenticated
+```
+
+### Key Infrastructure Files
+
+| File | Purpose |
+|---|---|
+| <DocNode term="Dockerfile" category="Docker · Solomon Hykes" hint="Container build configuration. Docker was created by Solomon Hykes at dotCloud (now Docker, Inc.)." link="https://docs.docker.com/reference/dockerfile/" linkLabel="Dockerfile Reference →" icon="https://www.docker.com/favicon.ico">`Dockerfile`</DocNode> | Container build — Node.js production image |
+| `server.js` | <DocNode term="Express.js" category="OpenJS Foundation" hint="Minimal Node.js web framework by TJ Holowaychuk. Handles SSR, API proxy, and static serving." link="https://expressjs.com/" linkLabel="expressjs.com →" icon="https://expressjs.com/images/favicon.png">Express.js</DocNode> backend — SSR, API proxy, static serving |
+| `scripts/deploy.sh` | Automated Cloud Run rollout |
+| `Procfile` | Process declaration for the container |
+
+---
+
+## Project Structure
+
+```
+pocket-gull/
+├── src/
+│   ├── app.component.ts          # Root component, MCP tools
+│   ├── components/               # UI components
+│   ├── services/                 # State, AI, patient management
+│   └── directives/               # Animation directives
+├── docs/
+│   ├── images/                   # Product screenshots
+│   └── study/                    # This documentation site
+├── server.js                     # Express.js backend
+├── Dockerfile                    # Container config
+├── scripts/deploy.sh             # Cloud Run deployment
+└── package.json
+```

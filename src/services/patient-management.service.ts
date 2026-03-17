@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { PatientStateService } from './patient-state.service';
 import { ClinicalIntelligenceService, AnalysisLens } from './clinical-intelligence.service';
+import { NetworkStateService } from './network-state.service';
 import {
   Bookmark,
   HistoryEntry,
@@ -500,6 +501,7 @@ const MOCK_PATIENTS: Patient[] = [
 export class PatientManagementService {
   private patientState = inject(PatientStateService);
   private geminiService = inject(ClinicalIntelligenceService);
+  private network = inject(NetworkStateService);
   private http = inject(HttpClient);
 
   readonly patients = signal<Patient[]>(MOCK_PATIENTS);
@@ -510,6 +512,38 @@ export class PatientManagementService {
   });
 
   constructor() {
+    // Attempt to load from localStorage first for true local-first persistence
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('pocket_gull_patients');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Need to skip over the default MOCK_PATIENTS and use what was saved
+            // We use setTimeout to safely set signsal outside constructor
+             setTimeout(() => {
+               this.patients.set(parsed);
+               this.selectedPatientId.set(parsed[0]?.id || null);
+             }, 0);
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse patient data from localStorage', e);
+      }
+    }
+
+    // Persist to localStorage whenever patients change
+    effect(() => {
+        const currentData = this.patients();
+        if (typeof localStorage !== 'undefined') {
+            try {
+                localStorage.setItem('pocket_gull_patients', JSON.stringify(currentData));
+            } catch (e) {
+                console.warn('Failed to save patient data to localStorage', e);
+            }
+        }
+    });
+
     // This effect runs whenever the selected patient changes.
     // It's the central point for orchestrating app state updates.
     effect(() => {
@@ -808,6 +842,11 @@ export class PatientManagementService {
 
   /** Synchronizes the current patient list with the Node.js backend. */
   async syncToCloud(): Promise<boolean> {
+    if (!this.network.isOnline()) {
+        console.warn('[PatientManagementService] Cannot sync to cloud while offline. State is safely stored locally.');
+        return false;
+    }
+
     this.saveCurrentPatientState(); // Ensure the latest state is saved
     try {
       const patientsToSync = this.patients();

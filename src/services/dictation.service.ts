@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { PatientStateService, BODY_PART_NAMES } from './patient-state.service';
+import { PatientManagementService } from './patient-management.service';
 
 declare var webkitSpeechRecognition: any;
 
@@ -6,10 +8,14 @@ declare var webkitSpeechRecognition: any;
   providedIn: 'root'
 })
 export class DictationService {
+  private state = inject(PatientStateService);
+  private patientMgmt = inject(PatientManagementService);
+
   readonly isListening = signal(false);
   readonly isModalOpen = signal(false);
   readonly permissionError = signal<string | null>(null);
   readonly initialText = signal('');
+  readonly lastCommand = signal<string | null>(null);
 
   private recognition: any;
   private onAcceptCallback: ((text: string) => void) | null = null;
@@ -56,6 +62,9 @@ export class DictationService {
       this.isListening.set(false);
     };
 
+    // Helper map to normalize spoken body parts to keys
+    const bodyPartMap = new Map(Object.entries(BODY_PART_NAMES).map(([k, v]) => [v.toLowerCase(), k]));
+
     this.recognition.onresult = (event: any) => {
       let interim = '';
       let final = '';
@@ -67,6 +76,37 @@ export class DictationService {
         }
       }
 
+      // --- COMMAND ROUTER (Intercept Voice Commands) ---
+      if (final) {
+        const lowerFinal = final.toLowerCase().trim();
+        // Look for the wake word "gull" (or common mishearings like "goal", "go")
+        if (lowerFinal.startsWith('gull') || lowerFinal.startsWith('goal') || lowerFinal.startsWith('go ') || lowerFinal.startsWith('girl')) {
+            if (lowerFinal.includes('sync') || lowerFinal.includes('save')) {
+                console.log("[Voice Command] Triggering Sync...");
+                this.lastCommand.set("Data Synced");
+                this.patientMgmt.syncToCloud();
+                
+                // Clear the feedback after 2s
+                setTimeout(() => this.lastCommand.set(null), 2000);
+                return; // Consume the command, don't pass to dictation
+            }
+
+            if (lowerFinal.includes('highlight') || lowerFinal.includes('select') || lowerFinal.includes('isolate')) {
+                const words = lowerFinal.split(' ');
+                for (const [partName, partKey] of bodyPartMap.entries()) {
+                    if (lowerFinal.includes(partName)) {
+                        console.log(`[Voice Command] Highlighting ${partName} (${partKey})`);
+                        this.lastCommand.set(`Highlighted ${partName}`);
+                        this.state.selectPart(partKey);
+                        setTimeout(() => this.lastCommand.set(null), 2000);
+                        return; // Consume
+                    }
+                }
+            }
+        }
+      }
+
+      // Regular dictation pass-through
       if (this.resultCallback) {
         if (final) this.resultCallback(final, true);
         if (interim) this.resultCallback(interim, false);

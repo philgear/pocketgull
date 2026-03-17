@@ -73,6 +73,20 @@ Reflecting on the development of Pocket Gull, my commitment is to continuously e
 
 ---
 
+## 📚 Documentation
+
+Full engineering documentation is available in the [`docs/study/`](./docs/study/) directory, built with [Astro](https://astro.build).
+
+- **[Overview](./docs/study/src/pages/index.astro)** — Product introduction, screenshots, and key metrics
+- **[Architecture](./docs/study/src/pages/architecture.mdx)** — System diagram, data flow, and technology stack
+- **[Features](./docs/study/src/pages/features.mdx)** — Complete feature reference by category
+- **[Data & Privacy](./docs/study/src/pages/data.mdx)** — Storage model, PHI handling, and FHIR portability
+- **[Responsible AI](./docs/study/src/pages/responsible-ai.mdx)** — Core principles and societal impact
+- **[Getting Started](./docs/study/src/pages/getting-started.mdx)** — Installation, development, and deployment
+- **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
+
+---
+
 ## 👨‍💻 Public Code Repository & Spin-Up Instructions
 
 **Developer Profile:** [g.dev/philgear](https://g.dev/philgear)  

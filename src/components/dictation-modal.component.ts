@@ -64,6 +64,13 @@ import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
               </div>
             }
 
+            @if (dictation.lastCommand(); as cmd) {
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 bg-green-900/90 backdrop-blur-md rounded-full text-green-100 font-bold text-sm tracking-wide shadow-xl flex items-center gap-2 animate-in slide-in-from-bottom-2 fade-in duration-300">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                 {{ cmd }}
+              </div>
+            }
+
             @if (dictation.isListening()) {
               <div class="absolute bottom-8 right-8 flex gap-1">
                  <span class="w-2 h-2 bg-red-500 rounded-sm animate-bounce" style="animation-delay: 0ms"></span>

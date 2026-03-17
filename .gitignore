@@ -41,3 +41,6 @@ dist_*.json
 
 # Sandbox environment
 sandbox/
+
+# Agent Rules
+rules.yaml
