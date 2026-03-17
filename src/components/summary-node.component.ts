@@ -17,6 +17,7 @@ import { MarkdownService } from '../services/markdown.service';
 import { RichMediaService, RichMediaCard } from '../services/rich-media.service';
 import { Medical3DViewerComponent } from './medical-3d-viewer.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
+import { PatientStateService } from '../services/patient-state.service';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ interface InlineChatEntry {
   html?: string;
   claims?: ClaimUnit[];    // parsed claim units for model messages
   richCards?: RichMediaCard[]; // resolved rich media cards
+  feedback?: 'up' | 'down';
 }
 
 interface BracketedClaim {
@@ -97,17 +99,21 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 
         /* ─── Evidence Popover ─────────────────── */
         .evidence-popover {
-            position: absolute; left: 0; top: calc(100% + 5px); z-index: 40;
-            width: 260px; background: #1C1C1C; color: #F9FAFB;
-            border-radius: 10px; padding: 11px 13px;
-            box-shadow: 0 12px 28px rgba(0,0,0,.2), 0 0 0 1px rgba(255,255,255,.06);
+            position: absolute; left: 0; top: calc(100% + 8px); z-index: 40;
+            width: 280px; background: #1C1C1C; color: #FFFFFF;
+            border-radius: 4px; padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #333;
             pointer-events: none; opacity: 0; transform: translateY(4px);
-            transition: opacity .13s, transform .13s;
+            transition: all .2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: top left;
         }
         .evidence-popover::before {
             content:''; position:absolute; top:-5px; left:22px;
-            width:10px; height:10px; background:#1C1C1C;
-            transform:rotate(45deg); border-radius:2px 0 0 0;
+            width:10px; height:10px; background: #1C1C1C;
+            transform:rotate(45deg); border-radius: 1px 0 0 0;
+            border-top: 1px solid #333;
+            border-left: 1px solid #333;
         }
         .node-wrapper:hover .evidence-popover { opacity:1; pointer-events:auto; transform:translateY(0); }
         .node-wrapper.has-inline-chat .evidence-popover { display:none; }
@@ -124,7 +130,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         /* ─── Hover Toolbar ─────────────────────── */
         .node-toolbar {
             opacity:0;
-            display:flex; flex-direction:row; gap:6px; z-index:20;
+            display:flex; flex-direction:row; gap:6px; z-index:50;
             padding: 0;
             max-height: 0;
             overflow: hidden;
@@ -132,9 +138,18 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         }
         .node-wrapper:hover .node-toolbar {
             opacity:1;
-            max-height: 40px;
-            padding: 6px 0;
+            max-height: 70px;
+            padding: 10px 0;
             transition-delay: 0s;
+            overflow: visible;
+            position: relative;
+            z-index: 60;
+        }
+
+        .node-toolbar ::ng-deep .btn-base.size-sm.icon-only {
+            height: 50px !important;
+            width: 81px !important; /* Golden ratio: 50 * 1.618 = ~81 */
+            border-radius: 8px !important;
         }
 
         /* ─── Inline Chat ────────────────────────── */
@@ -183,14 +198,15 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             display:flex; align-items:center; justify-content:center; margin-top:1px;
         }
         .inline-bubble {
-            font-size:11.5px; line-height:1.6; color:#374151;
-            background:#FFFFFF; border:1px solid #E5E7EB;
-            border-radius:8px 8px 8px 2px; padding:6px 10px; width: 100%;
+            font-size:12.5px; line-height:1.65; color:#111827;
+            background:#F9FAFB; border:1px solid transparent;
+            box-shadow:0 1px 2px rgba(0,0,0,0.05);
+            border-radius:10px 10px 10px 2px; padding:10px 14px; width: 100%;
             max-width:calc(100% - 30px);
         }
         .inline-msg--user .inline-bubble {
-            background:#1C1C1C; color:#FFFFFF; border-color:transparent;
-            border-radius:8px 8px 2px 8px;
+            background:#1C1C1C; color:#FFFFFF; border-color:transparent; box-shadow:none;
+            border-radius:10px 10px 2px 10px;
         }
 
         /* ─── Claim Units (AI response parsing) ──── */
@@ -223,6 +239,34 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         .claim-action--drill   { color:#3B82F6; }
         .claim-action--drill:hover   { background:#EFF6FF; }
         .claim-action--bracketed { color:#FFFFFF !important; background:#689F38 !important; cursor:default; }
+
+        /* Tooltips for claim actions */
+        .claim-action[data-tooltip]::before,
+        .claim-action[data-tooltip]::after {
+            position: absolute; opacity: 0; pointer-events: none;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 50; font-family: inherit; font-size: 10px;
+        }
+        .claim-action[data-tooltip]::after {
+            content: attr(data-tooltip);
+            bottom: calc(100% + 6px); left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: #1C1C1C; color: #FFFFFF;
+            padding: 4px 8px; border-radius: 2px; font-weight: 500;
+            white-space: nowrap; letter-spacing: 0.05em;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid #333;
+        }
+        .claim-action[data-tooltip]::before {
+            content: ''; bottom: calc(100% + 2px); left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            border-width: 4px 4px 0; border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+        .claim-action[data-tooltip]:hover::after,
+        .claim-action[data-tooltip]:hover::before {
+            opacity: 1; transform: translateX(-50%) translateY(0);
+        }
 
         /* Claim unit content padding when toolbar is shown */
         .claim-unit:hover .claim-content { padding-right:46px; }
@@ -304,18 +348,90 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         .inline-send:disabled { opacity:.35; cursor:not-allowed; }
 
         /* ─── Markdown in bubbles ────────────────── */
-        .inline-bubble h2,.inline-bubble h3,.inline-bubble h4 { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin:8px 0 3px; color:#1C1C1C; }
+        .inline-bubble h2,.inline-bubble h3,.inline-bubble h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin:8px 0 3px; color:#111827; }
         .inline-bubble h2:first-child,.inline-bubble h3:first-child,.inline-bubble h4:first-child { margin-top:0; }
-        .inline-bubble p { margin-bottom:4px; }
-        .inline-bubble ul,.inline-bubble ol { padding-left:14px; margin-bottom:4px; }
+        .inline-bubble p { margin-bottom:8px; }
+        .inline-bubble ul,.inline-bubble ol { padding-left:14px; margin-bottom:8px; }
         .inline-bubble li { margin-bottom:2px; }
-        .inline-bubble strong { font-weight:700; color:#1C1C1C; }
+        .inline-bubble strong { font-weight:700; color:#111827; }
         .inline-msg--user .inline-bubble strong { color:#FFFFFF; }
+
+        /* ─── Dark Mode Overrides ────────────────── */
+        .dark .inline-chat { border-color: #27272a; background: #09090b; }
+        .dark .inline-chat-header { background: #18181b; border-bottom-color: #27272a; }
+        .dark .inline-chat-title { color: #a1a1aa; }
+        .dark .inline-chat-section { color: #8bc34a; background: #1a2e0530; border-color: #416b1f; }
+        .dark .breadcrumb-bar { background: #000000; border-bottom-color: #27272a; }
+        .dark .breadcrumb-item { color: #71717a; }
+        .dark .breadcrumb-item:hover { color: #e4e4e7; }
+        .dark .breadcrumb-item.active { color: #8bc34a; }
+        .dark .inline-bubble { background: #18181b; border-color: transparent; color: #F3F4F6; }
+        .dark .inline-msg--user .inline-bubble { background: #fafafa; color: #18181b; }
+        .dark .claim-unit:hover { background: #1a2e0530; border-left-color: #8bc34a; }
+        .dark .claim-unit--heading { color: #e4e4e7; }
+        .dark .claim-action { background: rgba(24, 24, 27, 0.9); }
+        .dark .bracketed-panel { background: #1a2e0530; border-top-color: #416b1f; }
+        .dark .bracketed-claim-text { color: #e4e4e7; }
+        .dark .drill-banner { background: #1e3a8a30; border-color: #1e3a8a; color: #e4e4e7; }
+        .dark .inline-pills { border-top-color: #27272a; }
+        .dark .inline-pill { color: #e4e4e7; border-color: #52525b; }
+        .dark .inline-pill:hover { background: #e4e4e7; color: #18181b; }
+        .dark .inline-input-container { border-top-color: #27272a; background: #09090b; }
+        .dark .inline-input { background: #18181b; border-color: #27272a; color: #e4e4e7; }
+        .dark .inline-file-chip { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
+        .dark .inline-bubble h2, .dark .inline-bubble h3, .dark .inline-bubble h4, .dark .inline-bubble strong { color: #F3F4F6; }
+        .dark .inline-msg--user .inline-bubble strong { color: #18181b; }
+
+        /* Dark mode overrides for new tooltips and popover */
+        .dark .evidence-popover {
+            background: #FAFAFA; color: #18181b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            border-color: #E5E7EB;
+        }
+        .dark .evidence-popover::before {
+            background: #FAFAFA;
+            border-top: 1px solid #E5E7EB;
+            border-left: 1px solid #E5E7EB;
+        }
+        .dark .evidence-label {
+            color: #52525b; border-bottom-color: #E5E7EB;
+        }
+        .dark .evidence-popover a { color: #8B5CF6; }
+        .dark .evidence-popover a:hover { color: #7C3AED; }
+
+        .dark .claim-action[data-tooltip]::after {
+            background: #FAFAFA; color: #1C1C1C;
+            border-color: #E5E7EB;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        .dark .claim-action[data-tooltip]::before {
+            border-color: #E5E7EB transparent transparent transparent;
+        }
+
+        /* ─── Alternate Nostril Breathing Animation ─ */
+        @keyframes nostril-breathing {
+            0%, 100% { box-shadow: -4px 0 10px -2px rgba(104, 159, 56, 0.4), 4px 0 10px -2px rgba(104, 159, 56, 0); }
+            50% { box-shadow: -4px 0 10px -2px rgba(104, 159, 56, 0), 4px 0 10px -2px rgba(104, 159, 56, 0.4); }
+        }
+        @keyframes dark-nostril-breathing {
+            0%, 100% { box-shadow: -4px 0 10px -2px rgba(139, 195, 74, 0.4), 4px 0 10px -2px rgba(139, 195, 74, 0); }
+            50% { box-shadow: -4px 0 10px -2px rgba(139, 195, 74, 0), 4px 0 10px -2px rgba(139, 195, 74, 0.4); }
+        }
+        .active-breathing {
+            animation: nostril-breathing 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+            border-color: rgba(104, 159, 56, 0.3) !important;
+        }
+        .dark .active-breathing {
+            animation: dark-nostril-breathing 5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+            border-color: rgba(139, 195, 74, 0.3) !important;
+        }
     `],
   template: `
     <div class="relative node-wrapper group/node mb-4"
          [class.has-inline-chat]="showChat()"
-         [class.mb-2]="type() === 'list-item'">
+         [class.mb-2]="type() === 'list-item'"
+         [class.opacity-50]="isRejected()"
+         [class.grayscale]="isRejected()">
 
       <!-- ─── Main Node Content ──────────────── -->
       @if (type() === 'paragraph') {
@@ -333,14 +449,11 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 
       <!-- ─── Evidence Popover ───────────────── -->
       <div class="evidence-popover no-print">
-        <div class="evidence-label">Clinical Evidence</div>
-        <div class="evidence-hint">
-          @if (node().verificationIssues?.length) {
+        @if (node().verificationIssues?.length) {
+          <div class="evidence-hint">
             {{ node().verificationIssues![0].message }}
-          } @else {
-            Hover to inspect · Click <strong style="color:#fff">Ask Agent</strong> to explore evidence inline.
-          }
-        </div>
+          </div>
+        }
         @if (node().verificationStatus) {
           <div class="evidence-status-row">
             <span class="evidence-status-dot"
@@ -361,17 +474,32 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 
       <!-- ─── Hover Toolbar ─────────────────── -->
       <div class="node-toolbar no-print">
+        <pocket-gull-button (click)="rejectNode()" variant="ghost" size="sm"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Flag Issue"
+          [class.text-red-600]="isRejected()"
+          [icon]="ClinicalIcons.Flag">
+        </pocket-gull-button>
         <pocket-gull-button (click)="toggleBracket()" variant="ghost" size="sm"
-          class="bg-white shadow-sm border border-gray-200" ariaLabel="Finalize"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Finalize"
           [icon]="ClinicalIcons.Verified">
         </pocket-gull-button>
         <pocket-gull-button (click)="onDoubleClick()" variant="ghost" size="sm"
-          class="bg-white shadow-sm border border-gray-200" ariaLabel="Add Note"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Add Note"
           [icon]="ClinicalIcons.Assessment">
         </pocket-gull-button>
+        <pocket-gull-button (click)="searchPubMed()" variant="ghost" size="sm"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Search PubMed"
+          [icon]="ClinicalIcons.PubMed">
+        </pocket-gull-button>
+        <pocket-gull-button (click)="searchGoogle()" variant="ghost" size="sm"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Search Google"
+          [icon]="ClinicalIcons.Google">
+        </pocket-gull-button>
         <pocket-gull-button (click)="toggleChat()" variant="ghost" size="sm"
-          class="bg-white shadow-sm border border-gray-200"
-          [class.text-green-600]="!showChat()" [class.text-gray-400]="showChat()"
+          class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800"
+          [class.active-breathing]="!hasDiscoveredEvidenceFocus()"
+          [class.text-green-600]="!showChat()" [class.text-gray-500]="showChat()"
+          [class.dark:text-[#8bc34a]]="!showChat()" [class.dark:text-zinc-400]="showChat()"
           [ariaLabel]="showChat() ? 'Close Agent' : 'Ask Agent'"
           [icon]="showChat() ? ClinicalIcons.Clear : ClinicalIcons.EvidenceFocus">
         </pocket-gull-button>
@@ -382,7 +510,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         <div class="mt-2 flex flex-col gap-2 no-print">
           @if (node().suggestions?.length) {
             <div class="flex flex-wrap gap-1.5 align-center">
-              <span class="text-xs font-bold text-gray-400 uppercase tracking-widest mr-1 mt-1">Suggestions:</span>
+              <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mr-1 mt-1">Suggestions:</span>
               @for (sugg of node().suggestions; track sugg) {
                 <pocket-gull-badge [label]="sugg" severity="info" [hasIcon]="true"
                   class="cursor-pointer hover:scale-105 transition-transform"
@@ -393,15 +521,15 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             </div>
           }
           @if (node().proposedText && !proposalAccepted()) {
-            <div class="bg-amber-50 border border-amber-100 rounded-sm p-3 text-sm">
+            <div class="bg-amber-50 dark:bg-amber-950/50 border border-amber-100 dark:border-amber-900 rounded-sm p-3 text-sm">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-bold text-amber-700 uppercase tracking-widest">Proposed Improvement:</span>
+                <span class="text-xs font-bold text-amber-700 dark:text-amber-500 uppercase tracking-widest">Proposed Improvement:</span>
                 <pocket-gull-button (click)="acceptProposal()" variant="primary" size="sm"
                   icon="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z">
                   Accept Change
                 </pocket-gull-button>
               </div>
-              <p class="text-amber-900 italic">"{{ node().proposedText }}"</p>
+              <p class="text-amber-900 dark:text-amber-200 italic">"{{ node().proposedText }}"</p>
             </div>
           }
         </div>
@@ -410,24 +538,30 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
       <!-- ─── Verification Issues ───────────── -->
       @if (node().verificationStatus !== 'verified' && node().verificationIssues?.length) {
         <div class="mt-2 p-3 rounded-sm border flex flex-col gap-2 no-print"
-             [class.bg-red-50/50]="node().verificationStatus === 'error'"
+             [class.bg-red-50]="node().verificationStatus === 'error'"
+             [class.dark:bg-red-950]="node().verificationStatus === 'error'"
              [class.border-red-100]="node().verificationStatus === 'error'"
-             [class.bg-amber-50/50]="node().verificationStatus === 'warning'"
-             [class.border-amber-100]="node().verificationStatus === 'warning'">
+             [class.dark:border-red-900]="node().verificationStatus === 'error'"
+             [class.bg-amber-50]="node().verificationStatus === 'warning'"
+             [class.dark:bg-amber-950]="node().verificationStatus === 'warning'"
+             [class.border-amber-100]="node().verificationStatus === 'warning'"
+             [class.dark:border-amber-900]="node().verificationStatus === 'warning'">
           <div class="flex items-center gap-2">
             <pocket-gull-badge
               [label]="node().verificationStatus === 'error' ? 'Critical Accuracy Error' : 'Accuracy Warning'"
               [severity]="node().verificationStatus === 'error' ? 'error' : 'warning'" [hasIcon]="true">
               <div badge-icon [innerHTML]="ClinicalIcons.Risk | safeHtml"></div>
             </pocket-gull-badge>
-            <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Medical Audit Result</span>
+            <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Medical Audit Result</span>
           </div>
           <div class="pl-1 flex flex-col gap-1">
             @for (issue of node().verificationIssues; track issue.message) {
               <div class="flex items-start gap-2 text-xs">
                 <span [class.text-red-600]="node().verificationStatus === 'error'"
-                      [class.text-amber-600]="node().verificationStatus === 'warning'">•</span>
-                <span class="text-gray-700 leading-relaxed">{{ issue.message }}</span>
+                      [class.dark:text-red-400]="node().verificationStatus === 'error'"
+                      [class.text-amber-600]="node().verificationStatus === 'warning'"
+                      [class.dark:text-amber-400]="node().verificationStatus === 'warning'">•</span>
+                <span class="text-gray-700 dark:text-zinc-300 leading-relaxed">{{ issue.message }}</span>
               </div>
             }
           </div>
@@ -436,7 +570,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 
       <!-- ─── Note Editor ────────────────────── -->
       @if (node().showNote) {
-        <div class="mt-2 ml-4 p-3 bg-[#f9fbf7] border-l-2 border-[#416B1F] rounded-r-sm">
+        <div class="mt-2 ml-4 p-3 bg-[#f9fbf7] dark:bg-[#1a2e05]/30 border-l-2 border-[#416B1F] dark:border-[#8bc34a] rounded-r-sm">
           <pocket-gull-input type="textarea" [rows]="2" [placeholder]="'Add medical rationale...'"
             [value]="node().note || ''" (valueChange)="updateNote($event)">
           </pocket-gull-input>
@@ -530,7 +664,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                             <div class="claim-toolbar">
                               <!-- Bracket / extract button -->
                               @if (isBracketed(claim.id)) {
-                                <button class="claim-action claim-action--bracketed" title="Bracketed into plan">
+                                <button class="claim-action claim-action--bracketed" title="Bracketed into plan" data-tooltip="Bracketed into plan">
                                   <svg viewBox="0 -960 960 960" fill="currentColor" width="8" height="8">
                                     <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z"/>
                                   </svg>
@@ -538,6 +672,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                               } @else {
                                 <button class="claim-action claim-action--bracket"
                                         title="Bracket this claim into care plan"
+                                        data-tooltip="Bracket this claim into care plan"
                                         (click)="bracketClaim(claim)">
                                   <svg viewBox="0 -960 960 960" fill="currentColor" width="9" height="9">
                                     <path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Z"/>
@@ -547,6 +682,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                               <!-- Drill deeper button -->
                               <button class="claim-action claim-action--drill"
                                       title="Drill deeper into this claim"
+                                      data-tooltip="Drill deeper into this claim"
                                       [disabled]="chatIsLoading()"
                                       (click)="drillInto(claim)">
                                 <svg viewBox="0 -960 960 960" fill="currentColor" width="9" height="9">
@@ -574,17 +710,17 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                                 <span class="rm-card-title">{{ card.models[0].name }}</span>
                                 <span class="rm-card-badge">3D Model</span>
                               </div>
-                              <div class="rm-model-frame-wrap">
+                              <div class="rm-model-frame-wrap aspect-[1.618/1] w-full relative overflow-hidden rounded-sm">
                                 @defer (on viewport; prefetch on idle) {
                                   <app-medical-3d-viewer 
                                     [threejsId]="card.models[0].threejsId"
                                     [severity]="card.severity"
                                     [afflictionHighlight]="card.afflictionHighlight"
                                     [particles]="card.particles"
-                                    class="rm-model-frame">
+                                    class="rm-model-frame absolute inset-0 w-full h-full">
                                   </app-medical-3d-viewer>
                                 } @placeholder {
-                                  <div class="h-[200px] w-full flex items-center justify-center bg-[#FDFDFD] border border-[#EEEEEE] rounded-sm">
+                                  <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-[#FDFDFD] border border-[#EEEEEE]">
                                     <div class="w-6 h-6 rounded-sm border-2 border-gray-300 border-t-black animate-spin"></div>
                                   </div>
                                 }
@@ -615,7 +751,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                               } @else {
                                 <div class="rm-empty">No illustrations found for "{{ card.query }}"</div>
                               }
-                              <div class="rm-card-footer">Public domain · <a [href]="'https://commons.wikimedia.org/w/index.php?search=' + card.query + '&title=Special:MediaSearch&go=Go&type=image'" target="_blank" rel="noopener" class="hover:underline hover:text-purple-600 transition-colors">Wikimedia Commons</a></div>
+                              <div class="rm-card-footer">Public domain · <a [href]="getWikimediaSearchUrl(card.query)" target="_blank" rel="noopener" class="hover:underline hover:text-purple-600 transition-colors">Wikimedia Commons</a></div>
                             </div>
                           }
 
@@ -670,6 +806,13 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                         }
                       </div>
                     }
+
+                    <!-- Feedback Actions -->
+                    <div class="mt-2 flex items-center justify-end gap-2 border-t border-black/5 dark:border-white/5 pt-2">
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(msg)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-green-600]="msg.feedback === 'up'" [class.dark:text-green-400]="msg.feedback === 'up'"></pocket-gull-button>
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(msg)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-red-600]="msg.feedback === 'down'" [class.dark:text-red-400]="msg.feedback === 'down'"></pocket-gull-button>
+                    </div>
+
                   </div>
                 </div>
               }
@@ -782,7 +925,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   type = input<'paragraph' | 'list-item'>('paragraph');
   sectionTitle = input<string>('');
 
-  update = output<{ key: string; note?: string; bracketState?: 'normal' | 'added' | 'removed'; acceptedProposal?: string }>();
+  update = output<{ key: string; note?: string; showNote?: boolean; bracketState?: 'normal' | 'added' | 'removed'; acceptedProposal?: string }>();
   dictationToggle = output<void>();
   askAgent = output<{ nodeKey: string; nodeText: string; sectionTitle: string }>();
 
@@ -796,12 +939,14 @@ export class SummaryNodeComponent implements AfterViewChecked {
   private dictation = inject(DictationService);
   private richMedia = inject(RichMediaService);
   private sanitizer = inject(DomSanitizer);
+  private patientState = inject(PatientStateService);
 
   safeEmbedUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   proposalAccepted = signal(false);
+  isRejected = signal(false);
   listItemHtml = computed(() => this.node().rawHtml || (this.node() as any).html || '');
 
   // ─── Inline chat ─────────────────────────────
@@ -811,6 +956,14 @@ export class SummaryNodeComponent implements AfterViewChecked {
   showSuggestions = signal(true);
   selectedFiles = signal<File[]>([]);
   chatInputText = '';
+  hasDiscoveredEvidenceFocus = signal(true);
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const discovered = localStorage.getItem('pocketgull_evidence_focus_discovered');
+      this.hasDiscoveredEvidenceFocus.set(discovered === 'true');
+    }
+  }
 
   // ─── Claim bracketing ────────────────────────
   bracketedClaims = signal<BracketedClaim[]>([]);
@@ -841,6 +994,21 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   ngAfterViewChecked() {
     if (this.needsScroll) { this.scrollBottom(); this.needsScroll = false; }
+  }
+
+  // ─── Feedback Actions ─────────────────────────
+  rejectNode() {
+    this.isRejected.set(!this.isRejected());
+  }
+
+  actionThumbsUp(entry: InlineChatEntry) {
+    entry.feedback = entry.feedback === 'up' ? undefined : 'up';
+    this.chatHistory.update(h => [...h]);
+  }
+
+  actionThumbsDown(entry: InlineChatEntry) {
+    entry.feedback = entry.feedback === 'down' ? undefined : 'down';
+    this.chatHistory.update(h => [...h]);
   }
 
   // ─── isBracketed ─────────────────────────────
@@ -884,11 +1052,36 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   // ─── Toggle chat open/closed ──────────────────
   toggleChat() {
+    if (!this.hasDiscoveredEvidenceFocus()) {
+      this.hasDiscoveredEvidenceFocus.set(true);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pocketgull_evidence_focus_discovered', 'true');
+      }
+    }
+
     if (this.showChat()) {
       this.showChat.set(false);
     } else {
       this.showChat.set(true);
       if (!this.sessionStarted) { this.sessionStarted = true; this.startInlineSession(); }
+    }
+  }
+
+  // --- External Research Integration ---
+  searchPubMed() {
+    this.executeSearch('pubmed');
+  }
+
+  searchGoogle() {
+    this.executeSearch('google');
+  }
+
+  private executeSearch(engine: 'google' | 'pubmed') {
+    const rawContent = this.type() === 'list-item' ? this.listItemHtml() : this.node().rawHtml;
+    // Strip HTML to get queryable text
+    const textContent = rawContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (textContent) {
+      this.patientState.requestResearchSearch(textContent, engine);
     }
   }
 
@@ -1081,7 +1274,10 @@ Only include a rich-media block when the user explicitly requests visual or rese
   }
 
   // ─── Existing node interactions ───────────────
-  onDoubleClick() { this.update.emit({ key: this.node().key, note: this.node().note || '' }); }
+  onDoubleClick() { this.update.emit({ key: this.node().key, note: this.node().note || '', showNote: true }); }
+  getWikimediaSearchUrl(query: string): string {
+    return `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(query)}&title=Special:MediaSearch&go=Go&type=image`;
+  }
 
   toggleBracket() {
     let next: 'normal' | 'added' | 'removed' = 'added';

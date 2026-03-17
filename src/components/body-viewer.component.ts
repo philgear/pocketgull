@@ -29,37 +29,37 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
         <!-- 2D/3D & Anatomy Layer Toggles (Top Right) -->
         <div class="absolute top-4 right-4 flex flex-col gap-2 z-20 no-print">
           <!-- View Modes -->
-          <div class="flex flex-col gap-1 bg-white p-1 rounded-sm shadow-sm border border-[#EEEEEE]">
-            <button (click)="state.bodyViewerMode.set('3d')" [class.bg-black]="state.bodyViewerMode() === '3d'" [class.text-white]="state.bodyViewerMode() === '3d'"
-                    title="3D View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black">
+          <div class="flex flex-col gap-1 bg-white dark:bg-zinc-800 p-1 rounded-sm shadow-sm border border-[#EEEEEE] dark:border-zinc-700">
+            <button (click)="state.bodyViewerMode.set('3d')" [class.bg-black]="state.bodyViewerMode() === '3d'" [class.dark:bg-white]="state.bodyViewerMode() === '3d'" [class.text-white]="state.bodyViewerMode() === '3d'" [class.dark:text-black]="state.bodyViewerMode() === '3d'"
+                    title="3D View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </button>
-            <button (click)="state.bodyViewerMode.set('2d')" [class.bg-black]="state.bodyViewerMode() === '2d'" [class.text-white]="state.bodyViewerMode() === '2d'"
-                    title="2D View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black">
+            <button (click)="state.bodyViewerMode.set('2d')" [class.bg-black]="state.bodyViewerMode() === '2d'" [class.dark:bg-white]="state.bodyViewerMode() === '2d'" [class.text-white]="state.bodyViewerMode() === '2d'" [class.dark:text-black]="state.bodyViewerMode() === '2d'"
+                    title="2D View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
             </button>
           </div>
 
           <!-- Anatomy Layers -->
-          <div class="flex flex-col gap-1 bg-white p-1 rounded-sm shadow-sm border border-[#EEEEEE]">
-            <button (click)="state.anatomyViewMode.set('skin')" [class.bg-black]="state.anatomyViewMode() === 'skin'" [class.text-white]="state.anatomyViewMode() === 'skin'"
-                    title="Skin View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+          <div class="flex flex-col gap-1 bg-white dark:bg-zinc-800 p-1 rounded-sm shadow-sm border border-[#EEEEEE] dark:border-zinc-700">
+            <button (click)="state.anatomyViewMode.set('skin')" [class.bg-black]="state.anatomyViewMode() === 'skin'" [class.dark:bg-white]="state.anatomyViewMode() === 'skin'" [class.text-white]="state.anatomyViewMode() === 'skin'" [class.dark:text-black]="state.anatomyViewMode() === 'skin'"
+                    title="Skin View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-black]="state.anatomyViewMode() === 'muscle'" [class.text-white]="state.anatomyViewMode() === 'muscle'"
-                    title="Muscle View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+            <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-black]="state.anatomyViewMode() === 'muscle'" [class.dark:bg-white]="state.anatomyViewMode() === 'muscle'" [class.text-white]="state.anatomyViewMode() === 'muscle'" [class.dark:text-black]="state.anatomyViewMode() === 'muscle'"
+                    title="Muscle View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="6.5"></line></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-black]="state.anatomyViewMode() === 'skeleton'" [class.text-white]="state.anatomyViewMode() === 'skeleton'"
-                    title="Skeletal View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+            <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-black]="state.anatomyViewMode() === 'skeleton'" [class.dark:bg-white]="state.anatomyViewMode() === 'skeleton'" [class.text-white]="state.anatomyViewMode() === 'skeleton'" [class.dark:text-black]="state.anatomyViewMode() === 'skeleton'"
+                    title="Skeletal View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 2v20"></path><path d="M7 7h10"></path><path d="M5 12h14"></path><path d="M7 17h10"></path></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('mind')" [class.bg-black]="state.anatomyViewMode() === 'mind'" [class.text-white]="state.anatomyViewMode() === 'mind'"
-                    title="Mind View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+            <button (click)="state.anatomyViewMode.set('mind')" [class.bg-black]="state.anatomyViewMode() === 'mind'" [class.dark:bg-white]="state.anatomyViewMode() === 'mind'" [class.text-white]="state.anatomyViewMode() === 'mind'" [class.dark:text-black]="state.anatomyViewMode() === 'mind'"
+                    title="Mind View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('molecular')" [class.bg-black]="state.anatomyViewMode() === 'molecular'" [class.text-white]="state.anatomyViewMode() === 'molecular'"
-                    title="Molecular View" class="p-2 rounded-sm hover:bg-gray-100 transition-all flex items-center justify-center text-gray-600 hover:text-black dark:hover:text-white">
+            <button (click)="state.anatomyViewMode.set('molecular')" [class.bg-black]="state.anatomyViewMode() === 'molecular'" [class.dark:bg-white]="state.anatomyViewMode() === 'molecular'" [class.text-white]="state.anatomyViewMode() === 'molecular'" [class.dark:text-black]="state.anatomyViewMode() === 'molecular'"
+                    title="Molecular View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="3"></circle><path d="m14 14 6 6"></path><circle cx="20" cy="20" r="3"></circle><path d="m14 10 6-6"></path><circle cx="20" cy="4" r="3"></circle><path d="m10 14-6 6"></path><circle cx="4" cy="20" r="3"></circle><path d="m10 10-6-6"></path><circle cx="4" cy="4" r="3"></circle></svg>
             </button>
           </div>
@@ -73,7 +73,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
               (partSelected)="onPartSelected($event)">
             </app-body-3d-viewer>
           } @placeholder {
-            <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-4">
+            <div class="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-4">
               <div class="w-8 h-8 rounded-sm border-2 border-gray-300 border-t-black animate-spin"></div>
               <p class="text-sm font-medium uppercase tracking-widest text-[#1c1c1c] opacity-50">Loading 3D Engine...</p>
             </div>

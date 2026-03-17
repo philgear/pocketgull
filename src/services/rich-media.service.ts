@@ -124,19 +124,19 @@ const THREEJS_REGISTRY: Record<string, ThreeJsModel[]> = {
 
 const PHIL_REGISTRY: Record<string, PhilImage[]> = {
     'spine': [
-        { id: 9501, url: 'https://phil.cdc.gov/PHIL_Images/9501/9501.jpg', thumbUrl: 'https://phil.cdc.gov/PHIL_Images/9501/9501_lores.jpg', title: 'Spinal anatomy diagram', credit: 'CDC/PHIL' },
+        { id: 9501, url: 'https://wwwn.cdc.gov/phil/PHIL_Images/9501/9501.jpg', thumbUrl: 'https://wwwn.cdc.gov/phil/PHIL_Images/9501/9501_lores.jpg', title: 'Spinal anatomy diagram', credit: 'CDC/PHIL' },
     ],
     'pain': [
-        { id: 23258, url: 'https://phil.cdc.gov/PHIL_Images/23258/23258.jpg', thumbUrl: 'https://phil.cdc.gov/PHIL_Images/23258/23258_lores.jpg', title: 'Chronic pain clinical assessment', credit: 'CDC/PHIL' },
+        { id: 23258, url: 'https://wwwn.cdc.gov/phil/PHIL_Images/23258/23258.jpg', thumbUrl: 'https://wwwn.cdc.gov/phil/PHIL_Images/23258/23258_lores.jpg', title: 'Chronic pain clinical assessment', credit: 'CDC/PHIL' },
     ],
     'opioid': [
-        { id: 22940, url: 'https://phil.cdc.gov/PHIL_Images/22940/22940.jpg', thumbUrl: 'https://phil.cdc.gov/PHIL_Images/22940/22940_lores.jpg', title: 'Opioid prescribing awareness', credit: 'CDC/PHIL' },
+        { id: 22940, url: 'https://wwwn.cdc.gov/phil/PHIL_Images/22940/22940.jpg', thumbUrl: 'https://wwwn.cdc.gov/phil/PHIL_Images/22940/22940_lores.jpg', title: 'Opioid prescribing awareness', credit: 'CDC/PHIL' },
     ],
     'depression': [
-        { id: 23095, url: 'https://phil.cdc.gov/PHIL_Images/23095/23095.jpg', thumbUrl: 'https://phil.cdc.gov/PHIL_Images/23095/23095_lores.jpg', title: 'Mental health and depression', credit: 'CDC/PHIL' },
+        { id: 23095, url: 'https://wwwn.cdc.gov/phil/PHIL_Images/23095/23095.jpg', thumbUrl: 'https://wwwn.cdc.gov/phil/PHIL_Images/23095/23095_lores.jpg', title: 'Mental health and depression', credit: 'CDC/PHIL' },
     ],
     'default': [
-        { id: 11162, url: 'https://phil.cdc.gov/PHIL_Images/11162/11162.jpg', thumbUrl: 'https://phil.cdc.gov/PHIL_Images/11162/11162_lores.jpg', title: 'Clinical care setting', credit: 'CDC/PHIL' },
+        { id: 11162, url: 'https://wwwn.cdc.gov/phil/PHIL_Images/11162/11162.jpg', thumbUrl: 'https://wwwn.cdc.gov/phil/PHIL_Images/11162/11162_lores.jpg', title: 'Clinical care setting', credit: 'CDC/PHIL' },
     ]
 };
 
@@ -185,9 +185,9 @@ export class RichMediaService {
                     const meta = ii.extmetadata ?? {};
                     return {
                         title: p.title?.replace('File:', '') ?? '',
-                        url: ii.url,
-                        thumbUrl: ii.thumburl ?? ii.url,
-                        descriptionUrl: ii.descriptionurl ?? '',
+                        url: encodeURI(ii.url ?? ''),
+                        thumbUrl: encodeURI(ii.thumburl ?? ii.url ?? ''),
+                        descriptionUrl: encodeURI(ii.descriptionurl ?? ''),
                         credit: meta.Credit?.value?.replace(/<[^>]+>/g, '') ?? 'Wikimedia Commons',
                         license: meta.LicenseShortName?.value ?? 'See source'
                     } as WikimediaImage;

@@ -3,7 +3,52 @@
  * Based on the Constructive Cost Model II (Reference Manual 2000.0)
  */
 
-const KSLOC = 7.025; // Determined from previous analysis
+import sloc from 'sloc';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Dynamically calculate KSLOC
+function getDynamicKsloc() {
+    let totalSloc = 0;
+    const srcDir = path.join(__dirname, '..', 'src');
+    
+    function walk(dir) {
+        let results = [];
+        const list = fs.readdirSync(dir);
+        list.forEach(function(file) {
+            file = path.join(dir, file);
+            const stat = fs.statSync(file);
+            if (stat && stat.isDirectory()) { 
+                results = results.concat(walk(file));
+            } else { 
+                if (file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.html') || file.endsWith('.css')) {
+                   results.push(file);
+                }
+            }
+        });
+        return results;
+    }
+
+    const files = walk(srcDir);
+    files.forEach(file => {
+        const code = fs.readFileSync(file, 'utf8');
+        const ext = path.extname(file).substring(1);
+        try {
+            const stats = sloc(code, ext);
+            if (stats && stats.source) {
+                totalSloc += stats.source;
+            }
+        } catch(e) { /* ignore files sloc can't parse */ }
+    });
+
+    return totalSloc / 1000;
+}
+
+const KSLOC = getDynamicKsloc();
 
 // Post-Architecture Scale Factors (SF)
 // Range: Very Low (6.2) to Extra High (0.0) - simplified for this project

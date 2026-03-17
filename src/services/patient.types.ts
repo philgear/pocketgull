@@ -153,6 +153,14 @@ export interface DraftSummaryItem {
     text: string;
 }
 
+export interface ShoppingListItem {
+    id: string;
+    name: string;
+    completed: boolean;
+    category?: string;
+    referenceNotion?: string;
+}
+
 export interface PatientState {
     issues: Record<string, BodyPartIssue[]>;
     patientGoals: string;
@@ -164,6 +172,7 @@ export interface PatientState {
     biometricHistory?: BiometricEntry[];
     clinicalNotes?: ClinicalNote[];
     checklist?: ChecklistItem[];
+    shoppingList?: ShoppingListItem[];
     scans?: DiagnosticScan[];
 }
 

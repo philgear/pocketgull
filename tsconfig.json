@@ -11,7 +11,8 @@
     ],
     "skipLibCheck": true,
     "types": [
-      "node"
+      "node",
+      "jasmine"
     ],
     "moduleResolution": "bundler",
     "isolatedModules": true,

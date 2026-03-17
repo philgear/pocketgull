@@ -1,7 +1,10 @@
-import { Component, ChangeDetectionStrategy, ElementRef, OnDestroy, AfterViewInit, input, viewChild, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, ElementRef, OnDestroy, AfterViewInit, input, viewChild, effect, signal, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 @Component({
     selector: 'app-medical-3d-viewer',
@@ -9,7 +12,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div #canvasContainer class="w-full h-full relative cursor-grab active:cursor-grabbing"></div>
+        <div #canvasContainer class="w-full h-full relative" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+            @if (!webglSupported()) {
+                <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-zinc-100 dark:bg-zinc-800/50 rounded-lg">
+                    <svg class="w-10 h-10 text-zinc-400 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">3D view unavailable on this device</span>
+                </div>
+            }
+        </div>
     `,
     styles: [`
         :host { display: block; height: 100%; width: 100%; }
@@ -17,6 +29,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
     `]
 })
 export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
+    private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
     threejsId = input.required<string>();
@@ -28,8 +41,11 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
     private scene!: THREE.Scene;
     private camera!: THREE.PerspectiveCamera;
     private controls!: OrbitControls;
+    private composer!: EffectComposer;
     private currentModelGroup!: THREE.Group;
     private animationFrameId?: number;
+
+    readonly webglSupported = signal<boolean>(true);
 
     // Industrial Grace palette + Kaizen Severity
     private readonly PALETTE = {
@@ -57,20 +73,46 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        this.initScene();
-        this.startAnimation();
-        // Load initial model after slight delay to ensure container is ready
-        setTimeout(() => {
-            this.handleResize();
-            this.loadModel(this.threejsId());
-        }, 0);
+        if (!isPlatformBrowser(this.platformId)) {
+            return;
+        }
+
+        try {
+            this.initScene();
+            this.startAnimation();
+            // Load initial model after slight delay to ensure container is ready
+            setTimeout(() => {
+                if (this.webglSupported()) {
+                    this.handleResize();
+                    this.loadModel(this.threejsId());
+                }
+            }, 0);
+        } catch (e) {
+            console.warn("Failed to initialize Medical 3D Viewer:", e);
+            this.webglSupported.set(false);
+        }
     }
 
     ngOnDestroy() {
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
-        this.renderer?.dispose();
+        if (this.renderer) {
+            this.renderer.dispose();
+            this.renderer.forceContextLoss();
+            this.renderer.domElement?.remove();
+        }
+    }
+
+    private isWebGLAvailable(): boolean {
+        try {
+            if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+            const canvas = document.createElement('canvas');
+            return !!(window.WebGLRenderingContext && 
+                (canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+        } catch (e) {
+            return false;
+        }
     }
 
     private initScene() {
@@ -82,6 +124,10 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
         this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
         this.camera.position.set(0, 0, 10);
+
+        if (!this.isWebGLAvailable()) {
+            throw new Error('WebGL is not supported in this environment.');
+        }
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         this.renderer.setSize(container.clientWidth, container.clientHeight);
@@ -105,8 +151,17 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.05;
         this.controls.autoRotate = true;
-        this.controls.autoRotateSpeed = 2.0;
+        this.controls.autoRotateSpeed = 1.0; // Slower, more premium idle rotation
         this.controls.enablePan = false;
+        
+        // Post-Processing (Bloom)
+        const renderScene = new RenderPass(this.scene, this.camera);
+        // Resolution, strength, radius, threshold
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 1.2, 0.5, 0.2);
+        
+        this.composer = new EffectComposer(this.renderer);
+        this.composer.addPass(renderScene);
+        this.composer.addPass(bloomPass);
 
         // Handle resize
         const resizeObserver = new ResizeObserver(() => this.handleResize());
@@ -123,6 +178,9 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+        if (this.composer) {
+            this.composer.setSize(width, height);
+        }
     }
 
     private loadModel(id: string) {
@@ -155,6 +213,8 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
                 break;
         }
 
+        // Intro animation starting scale
+        this.currentModelGroup.scale.set(0.01, 0.01, 0.01);
         this.scene.add(this.currentModelGroup);
     }
 
@@ -177,7 +237,19 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
             transparent: true,
             opacity: 0.8,
             emissive: color,
-            emissiveIntensity: 0.2
+            emissiveIntensity: 0.5 // Boosted for bloom
+        });
+    }
+    
+    // Solid, dark, glass-like inner core for holographic depth
+    private createCoreMaterial() {
+        return new THREE.MeshPhysicalMaterial({
+            color: 0x050505,
+            metalness: 0.9,
+            roughness: 0.1,
+            transparent: true,
+            opacity: 0.85,
+            envMapIntensity: 1.0
         });
     }
 
@@ -265,12 +337,22 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         // Main body - strict Box geometry (Dieter Rams philosophy)
         const geo = new THREE.BoxGeometry(2.2, 2.2, 2.2);
         const mat = this.createBaseMaterial();
+        const coreMat = this.createCoreMaterial();
+        
         const mesh = new THREE.Mesh(geo, mat);
+        const core = new THREE.Mesh(geo, coreMat);
+        core.scale.set(0.95, 0.95, 0.95);
+        mesh.add(core); // add core inside wireframe
+        
         this.addHighlight(mesh, 'heart');
 
         // Add vessels (strict cylinders, perpendicular/aligned)
         const aortaGeo = new THREE.CylinderGeometry(0.5, 0.5, 1.5, 16);
         const aorta = new THREE.Mesh(aortaGeo, mat);
+        const aortaCore = new THREE.Mesh(aortaGeo, coreMat);
+        aortaCore.scale.set(0.95, 0.95, 0.95);
+        aorta.add(aortaCore);
+        
         aorta.position.set(0.6, 1.5, 0);
         this.addHighlight(aorta, 'aorta');
 
@@ -284,22 +366,32 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
     private generateLungs() {
         const mat = this.createBaseMaterial();
+        const coreMat = this.createCoreMaterial();
 
         // Left lung - strict box
         const leftGeo = new THREE.BoxGeometry(1.5, 3.5, 1.5);
         const left = new THREE.Mesh(leftGeo, mat);
+        const leftCore = new THREE.Mesh(leftGeo, coreMat);
+        leftCore.scale.setScalar(0.95);
+        left.add(leftCore);
         left.position.set(-1.2, 0, 0);
         this.addHighlight(left, 'left');
 
         // Right lung - strict box
         const rightGeo = new THREE.BoxGeometry(1.5, 3.5, 1.5);
         const right = new THREE.Mesh(rightGeo, mat);
+        const rightCore = new THREE.Mesh(rightGeo, coreMat);
+        rightCore.scale.setScalar(0.95);
+        right.add(rightCore);
         right.position.set(1.2, 0, 0);
         this.addHighlight(right, 'right');
 
         // Trachea
         const tracheaGeo = new THREE.CylinderGeometry(0.4, 0.4, 2, 16);
         const trachea = new THREE.Mesh(tracheaGeo, mat);
+        const tracheaCore = new THREE.Mesh(tracheaGeo, coreMat);
+        tracheaCore.scale.setScalar(0.95);
+        trachea.add(tracheaCore);
         trachea.position.set(0, 2.5, 0);
         this.addHighlight(trachea, 'trachea');
 
@@ -311,18 +403,19 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
     private generateBrain() {
         const mat = this.createBaseMaterial();
+        const coreMat = this.createCoreMaterial();
         // Strict box representation of the brain
         const geo = new THREE.BoxGeometry(3, 2.4, 3.2);
         const mesh = new THREE.Mesh(geo, mat);
         this.addHighlight(mesh, 'brain');
 
-        // Add inner core as a smaller wireframe box
-        const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 });
-        const coreGeo = new THREE.BoxGeometry(1.5, 1.2, 1.6);
+        // Add inner core as a smaller solid box (dual layer)
+        const coreGeo = new THREE.BoxGeometry(3, 2.4, 3.2);
         const core = new THREE.Mesh(coreGeo, coreMat);
-        this.addHighlight(core, 'core');
+        core.scale.setScalar(0.95);
+        mesh.add(core);
 
-        this.currentModelGroup.add(mesh, core);
+        this.currentModelGroup.add(mesh);
 
         // Neural network particles flowing downwards towards spine
         const particles = this.addParticles(500, 5, new THREE.Vector3(0, -1, 0));
@@ -332,6 +425,7 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
     private generateSpine() {
         const mat = this.createBaseMaterial();
+        const coreMat = this.createCoreMaterial();
 
         // Add vertebrae
         for (let i = 0; i < 11; i++) {
@@ -341,6 +435,9 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
             // Vertebral body (anterior cylinder)
             const bodyGeo = new THREE.CylinderGeometry(0.65, 0.65, 0.45, 16);
             const bodyMesh = new THREE.Mesh(bodyGeo, mat);
+            const bodyCore = new THREE.Mesh(bodyGeo, coreMat);
+            bodyCore.scale.setScalar(0.95);
+            bodyMesh.add(bodyCore);
             bodyMesh.position.set(0, 0, 0.4);
             this.addHighlight(bodyMesh, `vertebra-${i}`);
             this.addHighlight(bodyMesh, 'spine');
@@ -349,6 +446,9 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
             // Spinous process (posterior projection)
             const spinousGeo = new THREE.BoxGeometry(0.2, 0.25, 0.9);
             const spinousMesh = new THREE.Mesh(spinousGeo, mat);
+            const spinousCore = new THREE.Mesh(spinousGeo, coreMat);
+            spinousCore.scale.setScalar(0.95);
+            spinousMesh.add(spinousCore);
             spinousMesh.position.set(0, 0, -0.45);
             this.addHighlight(spinousMesh, `vertebra-${i}`);
             this.addHighlight(spinousMesh, 'spine');
@@ -357,6 +457,9 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
             // Transverse processes (lateral projections)
             const transverseGeo = new THREE.BoxGeometry(2.0, 0.2, 0.25);
             const transverseMesh = new THREE.Mesh(transverseGeo, mat);
+            const transverseCore = new THREE.Mesh(transverseGeo, coreMat);
+            transverseCore.scale.setScalar(0.95);
+            transverseMesh.add(transverseCore);
             transverseMesh.position.set(0, 0, -0.1);
             this.addHighlight(transverseMesh, `vertebra-${i}`);
             this.addHighlight(transverseMesh, 'spine');
@@ -372,7 +475,13 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
     private generateGenericOrgan() {
         const geo = new THREE.BoxGeometry(2, 2, 2);
         const mat = this.createBaseMaterial();
+        const coreMat = this.createCoreMaterial();
+        
         const mesh = new THREE.Mesh(geo, mat);
+        const core = new THREE.Mesh(geo, coreMat);
+        core.scale.setScalar(0.95);
+        mesh.add(core);
+
         this.addHighlight(mesh, 'organ');
         this.addHighlight(mesh, 'all');
         this.currentModelGroup.add(mesh);
@@ -425,23 +534,40 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
                     }
                 });
 
+                // Intro scale animation
+                const currentScale = this.currentModelGroup.scale.x;
                 const data = this.currentModelGroup.userData;
+                const baseScale = data.baseScale || 1;
+                
+                if (currentScale < baseScale - 0.01) {
+                    this.currentModelGroup.scale.lerp(new THREE.Vector3(baseScale, baseScale, baseScale), 0.1);
+                }
+
                 if (data.type === 'heart') {
                     data.tick += 0.05;
                     // Heartbeat pulse
-                    const scale = 1 + Math.sin(data.tick * Math.PI * 2) * 0.05 * (Math.sin(data.tick * Math.PI) > 0 ? 1 : 0.2);
+                    const pulseOffset = Math.sin(data.tick * Math.PI * 2) * 0.05 * (Math.sin(data.tick * Math.PI) > 0 ? 1 : 0.2);
+                    const scale = baseScale + pulseOffset;
                     this.currentModelGroup.scale.set(scale, scale, scale);
                 }
                 else if (data.type === 'lungs') {
                     data.tick += 0.02;
                     // Breathing pulse
-                    const scaleY = 1 + Math.sin(data.tick) * 0.05;
-                    const scaleXZ = 1 + Math.sin(data.tick) * 0.08;
+                    const scaleY = baseScale + Math.sin(data.tick) * 0.05;
+                    const scaleXZ = baseScale + Math.sin(data.tick) * 0.08;
                     this.currentModelGroup.scale.set(scaleXZ, scaleY, scaleXZ);
+                }
+                else if (data.type === 'spine' || data.type === 'brain' || data.type === 'generic') {
+                    // Gentle ambient float/breathing for other organs
+                    data.tick = (data.tick || 0) + 0.01;
+                    const scale = baseScale + Math.sin(data.tick) * 0.02;
+                    this.currentModelGroup.scale.set(scale, scale, scale);
                 }
             }
 
-            if (this.renderer && this.scene && this.camera) {
+            if (this.composer && this.scene && this.camera) {
+                this.composer.render();
+            } else if (this.renderer && this.scene && this.camera) {
                 this.renderer.render(this.scene, this.camera);
             }
         };

@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PatientStateService } from '../services/patient-state.service';
@@ -10,8 +10,14 @@ import { PatientStateService } from '../services/patient-state.service';
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-    <div #canvasContainer class="w-full h-full relative cursor-grab active:cursor-grabbing">
-      <div class="absolute bottom-2 left-2 flex flex-col gap-1 pointer-events-none">
+    <div #canvasContainer class="w-full h-full relative" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+      <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-zinc-100 dark:bg-zinc-800/50 rounded-lg">
+        <svg class="w-10 h-10 text-zinc-400 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">3D view unavailable on this device</span>
+      </div>
+      <div *ngIf="webglSupported()" class="absolute bottom-2 left-2 flex flex-col gap-1 pointer-events-none">
         <span class="text-[8px] font-bold text-gray-500 uppercase tracking-tighter">Left Click: Select Part</span>
         <span class="text-[8px] font-bold text-gray-500 uppercase tracking-tighter">Right Click: Orbit</span>
       </div>
@@ -24,6 +30,7 @@ import { PatientStateService } from '../services/patient-state.service';
 })
 export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private readonly state = inject(PatientStateService);
+    private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
     @Output() partSelected = new EventEmitter<{ id: string, name: string }>();
@@ -32,6 +39,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     rotation = input<number>(0);
     zoom = input<number>(1);
     anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
+
+    readonly webglSupported = signal<boolean>(true);
 
     private renderer!: THREE.WebGLRenderer;
     private scene!: THREE.Scene;
@@ -64,17 +73,47 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        this.initScene();
-        this.createMannequin();
-        this.startAnimation();
-        this.setupInteractions();
+        if (!isPlatformBrowser(this.platformId)) {
+            this.webglSupported.set(false);
+            return;
+        }
+
+        try {
+            this.initScene();
+            this.createMannequin();
+            this.startAnimation();
+            this.setupInteractions();
+        } catch (e) {
+            console.warn("3D Viewer disabled: WebGL not supported on this device.", e);
+            this.webglSupported.set(false);
+        }
     }
 
     ngOnDestroy() {
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
-        this.renderer.dispose();
+        if (this.renderer) {
+            this.renderer.dispose();
+            this.renderer.forceContextLoss();
+            this.renderer.domElement?.remove();
+        }
+    }
+
+    private isWebGLAvailable(): boolean {
+        try {
+            // Guard against SSR / non-browser environments
+            if (typeof window === 'undefined' || typeof document === 'undefined') {
+                return false;
+            }
+            const canvas = document.createElement('canvas');
+            return !!(
+                window.WebGLRenderingContext &&
+                (canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+            );
+        } catch (e) {
+            return false;
+        }
     }
 
     private initScene() {
@@ -87,7 +126,16 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
         this.camera.position.set(0, 1.2, 5);
 
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // Check for WebGL support before attempting to create the renderer
+        if (!this.isWebGLAvailable()) {
+            throw new Error('WebGL is not supported in this environment.');
+        }
+
+        try {
+            this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        } catch (e) {
+            throw new Error('WebGL is not supported in this environment.');
+        }
         this.renderer.setSize(width, height);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(this.renderer.domElement);
@@ -109,6 +157,11 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.controls.minDistance = 2;
         this.controls.maxDistance = 10;
         this.controls.target.set(0, 1, 0);
+        this.controls.mouseButtons = {
+            LEFT: null as any,
+            MIDDLE: THREE.MOUSE.DOLLY,
+            RIGHT: THREE.MOUSE.ROTATE
+        };
     }
 
     private createMannequin() {
@@ -117,13 +170,13 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         // Define our three fundamental material layers
         const skinMaterial = new THREE.MeshStandardMaterial({
-            color: 0xfdfdfd, roughness: 0.6, metalness: 0.1, transparent: true, opacity: 0.9, depthWrite: true
+            color: 0xffe0bd, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.9, depthWrite: true
         });
         const muscleMaterial = new THREE.MeshStandardMaterial({
-            color: 0xc95353, roughness: 0.8, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0x8a1c1c, roughness: 0.7, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
         const boneMaterial = new THREE.MeshStandardMaterial({
-            color: 0xe0e0e0, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xf5f5dc, roughness: 0.5, metalness: 0.05, transparent: true, opacity: 0.0, depthWrite: false
         });
         const mindMaterial = new THREE.MeshStandardMaterial({
             color: 0x8b5cf6, roughness: 0.2, metalness: 0.4, transparent: true, emissive: 0x8b5cf6, emissiveIntensity: 0.2, opacity: 0.0, depthWrite: false

@@ -10,11 +10,13 @@ import { DictationService } from '../services/dictation.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
 import { MedicalChartSummaryComponent } from './medical-summary.component';
+import { DicomViewerComponent } from './dicom-viewer.component';
+import { OhifViewerComponent } from './ohif-viewer.component';
 
 @Component({
   selector: 'app-medical-chart',
   standalone: true,
-  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent],
+  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent, DicomViewerComponent, OhifViewerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full min-h-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#F9FAFB] dark:bg-transparent">
@@ -53,7 +55,7 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
         </div>
 
         @if(isViewerExpanded()) {
-          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-transparent shrink-0">
+          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-black/20 shrink-0">
             @defer (on viewport) {
               <app-body-viewer></app-body-viewer>
             } @placeholder {
@@ -152,7 +154,23 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
         </div>
 
         @if(isScansExpanded()) {
-          <div class="p-6 bg-[#F9FAFB]/50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 last:border-0 min-h-0">
+          <div class="p-6 bg-[#F9FAFB]/50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 last:border-0 min-h-0 flex flex-col gap-6">
+             
+             <!-- DICOM & Visualizer Section -->
+             <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                 <!-- Keep the simple JPEG DICOM Viewer and AI analysis on the left -->
+                 <div class="flex flex-col gap-2">
+                    <app-dicom-viewer class="shrink-0"></app-dicom-viewer>
+                 </div>
+                 
+                 <!-- Put the OHIF Viewer on the right -->
+                 <div class="flex flex-col gap-2">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-400 mb-2 border-b border-gray-200 dark:border-zinc-800 pb-2">Advanced OHIF Viewer</h3>
+                    <app-ohif-viewer></app-ohif-viewer>
+                 </div>
+             </div>
+
+             <hr class="border-gray-200 dark:border-zinc-800 my-2" />
              <app-patient-scans [scans]="patientScans()"></app-patient-scans>
           </div>
         }

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, inject, ElementRef, ViewChild, AfterContentChecked, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -15,20 +15,21 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       [disabled]="disabled() || loading()"
       [class]="buttonClasses()"
       [attr.aria-label]="ariaLabel() || null"
+      [attr.data-tooltip]="ariaLabel() || null"
       (click)="onClick($event)"
     >
       @if (loading()) {
-        <div class="w-3 h-3 border-2 border-current border-t-transparent rounded-sm animate-spin mr-2"></div>
+        <div class="w-3 h-3 border-2 border-current border-t-transparent rounded-sm animate-spin" [class.mr-2]="hasContent()"></div>
       } @else if (icon()) {
-        <div class="mr-2 flex items-center justify-center h-full" [innerHTML]="iconHtml()"></div>
+        <div class="flex items-center justify-center h-full" [class.mr-2]="hasContent()" [innerHTML]="iconHtml()"></div>
       }
       
-      <span class="flex-grow text-center">
+      <span class="text-center shrink-0" [ngClass]="hasContent() ? 'flex-grow' : 'hidden'" #contentWrapper>
         <ng-content></ng-content>
       </span>
       
       @if (trailingIcon() && !loading()) {
-        <div class="ml-2 flex items-center justify-center h-full" [innerHTML]="trailingIconHtml()"></div>
+        <div class="flex items-center justify-center h-full" [class.ml-2]="hasContent()" [innerHTML]="trailingIconHtml()"></div>
       }
     </button>
   `,
@@ -46,7 +47,6 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       letter-spacing: 0.1em;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-      overflow: hidden;
       white-space: nowrap;
       cursor: pointer;
     }
@@ -54,6 +54,51 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
     .btn-base:disabled {
       cursor: not-allowed;
       opacity: 0.5;
+    }
+
+    /* Tooltips */
+    .btn-base[data-tooltip]::before,
+    .btn-base[data-tooltip]::after {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 50;
+      font-family: inherit;
+    }
+
+    .btn-base[data-tooltip]::after {
+      content: attr(data-tooltip);
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #1C1C1C;
+      color: #FFFFFF;
+      padding: 4px 8px;
+      border-radius: 2px;
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+      text-transform: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: 1px solid #333;
+    }
+    
+    .btn-base[data-tooltip]::before {
+      content: '';
+      bottom: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border-width: 4px 4px 0;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+
+    .btn-base[data-tooltip]:hover:not(:disabled)::after,
+    .btn-base[data-tooltip]:hover:not(:disabled)::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
     /* Primary */
@@ -132,6 +177,12 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       font-size: 14px;
     }
     
+    /* Icon Only Aspect Ratio Overrides - Touch Friendly Sizes */
+    .icon-only.size-xs { padding: 0.5rem; width: 36px; height: 36px; }
+    .icon-only.size-sm { padding: 0.625rem; width: 44px; height: 44px; }
+    .icon-only.size-md { padding: 0.75rem; width: 52px; height: 52px; }
+    .icon-only.size-lg { padding: 1rem; width: 60px; height: 60px; }
+    
     /* Dark Mode Defaults */
     :host-context(.dark) .btn-primary,
     :host-context(html.dark) .btn-primary {
@@ -187,10 +238,23 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       background: #fafafa;
       color: #09090b;
     }
+
+    /* Dark Mode Tooltips */
+    :host-context(.dark) .btn-base[data-tooltip]::after,
+    :host-context(html.dark) .btn-base[data-tooltip]::after {
+      background: #FAFAFA;
+      color: #1C1C1C;
+      border-color: #E5E7EB;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+    :host-context(.dark) .btn-base[data-tooltip]::before,
+    :host-context(html.dark) .btn-base[data-tooltip]::before {
+      border-color: #E5E7EB transparent transparent transparent;
+    }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PocketGullButtonComponent {
+export class PocketGullButtonComponent implements AfterContentChecked {
   private sanitizer = inject(DomSanitizer);
 
   variant = input<ButtonVariant>('primary');
@@ -203,6 +267,18 @@ export class PocketGullButtonComponent {
   ariaLabel = input<string>('');
 
   clicked = output<MouseEvent>();
+
+  @ViewChild('contentWrapper') contentWrapper?: ElementRef<HTMLElement>;
+  hasContent = signal<boolean>(false);
+
+  ngAfterContentChecked() {
+    if (this.contentWrapper?.nativeElement) {
+      const content = this.contentWrapper.nativeElement.textContent?.trim() || '';
+      if (this.hasContent() !== (content.length > 0)) {
+        this.hasContent.set(content.length > 0);
+      }
+    }
+  }
 
   private wrapSvgPath(raw: string) {
     if (!raw) return '';
@@ -223,8 +299,9 @@ export class PocketGullButtonComponent {
       'btn-base',
       `btn-${this.variant()}`,
       `size-${this.size()}`,
+      !this.hasContent() ? 'icon-only' : '',
       this.disabled() ? 'disabled' : ''
-    ].join(' ');
+    ].filter(Boolean).join(' ');
   }
 
   onClick(event: MouseEvent) {

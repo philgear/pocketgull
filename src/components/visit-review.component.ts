@@ -22,7 +22,7 @@ interface NotesByPart {
       <div class="h-14 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-[#09090b] shrink-0">
         <div class="flex flex-col">
            <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Visit Review</span>
-           <span class="text-xs text-gray-500 dark:text-zinc-500">Read-only view of notes from {{ visit().date }}</span>
+           <span class="text-xs text-gray-500 dark:text-zinc-400">Read-only view of notes from {{ visit().date }}</span>
         </div>
         <pocket-gull-button 
            (click)="close()" 

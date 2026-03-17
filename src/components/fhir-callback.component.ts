@@ -53,7 +53,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
             <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[#1C1C1C] dark:text-zinc-100 mb-2">Connected Successfully!</h2>
             <p class="text-sm text-gray-500 dark:text-zinc-400 mb-6">Your Epic MyChart data is securely linked.</p>
             
-            <div class="flex items-center justify-center gap-2 text-xs text-gray-400 dark:text-zinc-500">
+            <div class="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-zinc-400">
               <div class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
               Redirecting automatically...
             </div>
@@ -62,7 +62,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
       </div>
       
       <!-- Footer Note -->
-      <div class="mt-8 text-center text-xs text-gray-400 dark:text-zinc-600 max-w-sm">
+      <div class="mt-8 text-center text-xs text-gray-500 dark:text-zinc-400 max-w-sm">
         <p>Secured via SMART on FHIR&reg; OAuth 2.0</p>
       </div>
     </div>

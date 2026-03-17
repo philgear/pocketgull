@@ -1,4 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
+import { scan, tap } from 'rxjs/operators';
 import { IntelligenceProvider } from './ai/intelligence.provider';
 import { AiCacheService } from './ai-cache.service';
 import { VerificationIssue } from '../components/analysis-report.types';
@@ -18,7 +20,7 @@ export interface NodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Orthomolecular Nutrition' | 'Monitoring & Follow-up' | 'Patient Education';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education';
 
 export interface ClinicalMetrics {
     complexity: number; // 0-10
@@ -97,41 +99,41 @@ Actionable treatment steps organized by priority. Use sub-bullets for specifics 
 ### Goals
 Short-term (2 weeks) and long-term (3 months) measurable clinical goals as bullet points.
 
-### References (UKRIO Compliant)
+### References
 A structured list of all sources cited in this report. Format: **Author(s)** (Year). *Title*. Publisher/Journal. DOI (as a clickable link if available). Indicate if Peer-Reviewed.
 ` + this.FORMATTING_RULES,
 
-        'Functional Protocols': `You are an expert functional and integrative medicine strategist for a clinical decision-support tool.
+        'Functional Protocols': `You are an expert functional medicine strategist for a clinical decision-support tool, deeply inspired by the work of Linus Pauling (providing the right molecules in the right amounts).
 
-Analyze the patient overview and recommend specific, evidence-based interventions structured as follows:
+Analyze the patient overview and recommend specific, evidence-based biochemical pathways and interventions structured as follows. CRITICAL: For pediatric patients, avoid generic "exercise" or exhaustive "supplement" routines. Instead, focus on parent-guided therapeutic environments, targeted food-as-medicine, and gentle metabolic support pathways.
 
 ### Immediate Actions (To start within 72 hours)
-(List critical interventions to initiate immediately.)
+(List critical interventions to initiate immediately, focusing on environmental or dietary modifications first.)
 
-### Foundation (Diet & Lifestyle)
-(Provide recommendations focusing on sleep, nutrition, and movement.)
+### Functional Foundation (Diet, Environment & Lifestyle)
+(Provide recommendations focusing on optimizing the cellular environment, nutrient-dense whole foods, sleep architecture, and toxin reduction.)
 
-### Supplementation
-(Generate a Markdown table with columns: Intervention | Dose | Timing | Rationale. Ensure the table is properly formatted.)
+### Targeted Biochemical Support
+(Generate a Markdown table with columns: Intervention/Molecule | Form/Dose | Delivery/Timing | Targeted Pathway. Use clinical precision rather than generic supplements.)
 
-### Functional Protocols
-(Describe any specific therapeutic protocols like "5R Gut Protocol", "HPA Axis Support".)` + this.FORMATTING_RULES,
+### Functional & Environmental Protocols
+(Describe specific therapeutic protocols like "HPA Axis Support", "Histamine Reduction", or "Circadian Alignment" tailored appropriately, especially for children.)` + this.FORMATTING_RULES,
 
-        'Orthomolecular Nutrition': `You are an expert in orthomolecular medicine and clinical nutrition for a clinical decision-support tool.
+        'Nutrition': `You are an expert in clinical nutrition for a clinical decision-support tool.
 
 Analyze the patient overview and telemetry with a strict focus on biochemical pathways, micronutrient deficiencies, and cellular health. Structure as follows:
 
 ### Biochemical Assessment
 (2-3 sentences analyzing the patient's oxidative stress, antioxidant status, and micronutrient panel findings.)
 
-### Orthomolecular Targets
+### Nutrition Targets
 (Bullet list of specific metabolic pathways or nutrient deficiencies to target, e.g., "**Vitamin C Deficit**: high oxidative load requires replenishment.")
 
 ### Nutritional Interventions
 (Generate a Markdown table with columns: Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway. Focus on high-dose or targeted nutrient therapies.)
 
 ### Dietary Adjustments
-(Crucial whole-food or specific dietary modifications to support the orthomolecular strategy.)` + this.FORMATTING_RULES,
+(Crucial whole-food or specific dietary modifications to support the functional strategy.)` + this.FORMATTING_RULES,
 
         'Monitoring & Follow-up': `You are a care coordination AI for a clinical decision-support tool.
 
@@ -183,7 +185,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
     }
 
     private async generateVisualMetrics(report: Record<string, string>): Promise<void> {
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Orthomolecular Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
         const reportText = lenses.map(lens => report[lens]).filter(Boolean).join('\n\n');
         const cacheKey = await this.cache.generateKey([reportText, 'visual-metrics-v2']);
 
@@ -219,7 +221,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
 
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Orthomolecular Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
         const newReport: Partial<Record<AnalysisLens, string>> = {};
 
         if (this.lastPatientData()) {
@@ -260,18 +262,15 @@ If a section has no relevant source data, output the heading followed by: "*No s
                         this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
                     } else {
                         // Stream-based generation using browser-compatible genai
-                        responseText = await new Promise<string>((resolve, reject) => {
-                            let accumulated = '';
-                            this.ai.generateReportStream(patientData, lens, sysInstruction).subscribe({
-                                next: (chunk: string) => {
-                                    accumulated += chunk;
+                        responseText = await lastValueFrom(
+                            this.ai.generateReportStream(patientData, lens, sysInstruction).pipe(
+                                scan((acc, chunk) => acc + chunk, ''),
+                                tap(accumulated => {
                                     newReport[lens] = accumulated;
                                     this.analysisResults.update(all => ({ ...all, [lens]: accumulated }));
-                                },
-                                error: reject,
-                                complete: () => resolve(accumulated)
-                            });
-                        });
+                                })
+                            )
+                        );
                         await this.cache.set(cacheKey, responseText);
                     }
 
@@ -284,6 +283,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
                 } catch (e: any) {
                     console.error(`Error in lens ${lens}`, e);
                     newReport[lens] = `### Error\nAn error occurred in this section: ${e?.message ?? e}`;
+                    this.verificationResults.update(all => ({ ...all, [lens]: undefined }));
                 }
             });
 
@@ -320,7 +320,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
         }
 
         this.transcript.set([]);
-        const context = `You are a collaborative care plan co-pilot named "Cerebella". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient's data. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.`;
+        const context = `You are a collaborative care plan co-pilot named "Pocket Gull". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient's data. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.`;
         await this.ai.startChat(patientData, context);
     }
 
@@ -393,6 +393,34 @@ If a section has no relevant source data, output the heading followed by: "*No s
             const errorMsg = String(e?.message ?? e);
             this.error.set(errorMsg);
             throw new Error(`Translation failed: ${errorMsg}`);
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
+    async analyzeTranslation(original: string, translated: string): Promise<string> {
+        this.isLoading.set(true);
+        this.error.set(null);
+        try {
+            return await this.ai.analyzeTranslation(original, translated);
+        } catch (e: any) {
+            const errorMsg = String(e?.message ?? e);
+            this.error.set(errorMsg);
+            throw new Error(`Analysis failed: ${errorMsg}`);
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
+    async analyzeRadiologyImage(base64Image: string, context?: string): Promise<string> {
+        this.isLoading.set(true);
+        this.error.set(null);
+        try {
+            return await this.ai.analyzeImage(base64Image, context);
+        } catch (e: any) {
+            const errorMsg = String(e?.message ?? e);
+            this.error.set(errorMsg);
+            throw new Error(`Image analysis failed: ${errorMsg}`);
         } finally {
             this.isLoading.set(false);
         }

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked, afterNextRender, Renderer2, AfterViewInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClinicalIntelligenceService, TranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
@@ -7,7 +7,6 @@ import { HistoryEntry } from '../services/patient.types';
 import { MarkdownService } from '../services/markdown.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { DictationService } from '../services/dictation.service';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 declare var webkitSpeechRecognition: any;
 import { SummaryNode, SummaryNodeItem, ReportSection, ParsedTranscriptEntry, NodeAnnotation, LensAnnotations, VerificationIssue } from './analysis-report.types';
@@ -34,54 +33,20 @@ import { RevealDirective } from '../directives/reveal.directive';
     /* Typography is now handled globally in styles.css */
   `],
   template: `
-    <!--Report Header-->
-    <div class="p-4 sm:p-8 pb-4 flex justify-between items-end bg-white shrink-0 z-10 border-b border-[#EEEEEE] no-print overflow-x-auto">
-      <div class="flex-1"></div>
 
-      <div class="flex items-center gap-2">
-        <!--Voice Assistant — Always Visible-->
-        @if (state.isLiveAgentActive()) {
-          <pocket-gull-button variant="danger" size="sm" (click)="endLiveConsult()">
-            Close Assistant
-          </pocket-gull-button>
-        } @else {
-          <pocket-gull-button
-            (click)="openVoicePanel()"
-            variant="secondary"
-            size="sm"
-            icon="M12 14q-1.25 0-2.125-.875T9 11V5q0-1.25.875-2.125T12 2q1.25 0 2.125.875T15 5v6q0 1.25-.875 2.125T12 14m-1 7v-3.075q-2.6-.35-4.3-2.325T5 11h2q0 2.075 1.463 3.537T12 16q2.075 0 3.538-1.463T17 11h2q0 2.225-1.7 4.2T13 17.925V21z">
-            Voice Assistant
-          </pocket-gull-button>
-        }
-
-        <!--Actions gated on loading state-->
-        @if (!intel.isLoading()) {
-          <pocket-gull-button (click)="intel.clearCache()"
-            variant="ghost"
-            size="sm"
-            ariaLabel="Clear AI Cache"
-            [icon]="ClinicalIcons.Clear">
-          </pocket-gull-button>
-          <pocket-gull-button (click)="generate()" [disabled]="!state.hasIssues()"
-            variant="primary"
-            size="sm"
-            [icon]="hasAnyReport() ? 'M17.65 6.35A7.95 7.95 0 0 0 12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.66-.67 3.17-1.76 4.24l1.42 1.42A9.92 9.92 0 0 0 22 12c0-2.76-1.12-5.26-2.35-7.65z' : 'M14 5l7 7m0 0l-7 7m7-7H3'">
-            {{ hasAnyReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}
-          </pocket-gull-button>
-        }
-      </div>
-    </div>
 
     <!--Analysis Tabs-->
     @if (hasAnyReport()) {
-      <div class="px-4 sm:px-8 py-2 sm:py-3 border-b border-[#EEEEEE] no-print bg-white/50 backdrop-blur-sm overflow-x-auto">
-        <div class="flex items-center gap-1 border-b border-gray-200 min-w-max">
+      <div class="px-4 sm:px-8 py-2 sm:py-3 border-b border-[#EEEEEE] dark:border-zinc-800 no-print bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-sm overflow-x-auto">
+        <div id="tour-lens-tabs" class="flex items-center gap-1 border-b border-gray-200 dark:border-zinc-800 min-w-max">
           <pocket-gull-button (click)="changeLens('Summary Overview')"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Summary Overview'"
             [class.border-[#1C1C1C]]="activeLens() === 'Summary Overview'"
+            [class.dark:border-white]="activeLens() === 'Summary Overview'"
             [class.text-[#1C1C1C]]="activeLens() === 'Summary Overview'"
+            [class.dark:text-white]="activeLens() === 'Summary Overview'"
             class="rounded-none px-4 -mb-px shadow-none">
             Overview
           </pocket-gull-button>
@@ -90,25 +55,31 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'Functional Protocols'"
             [class.border-[#1C1C1C]]="activeLens() === 'Functional Protocols'"
+            [class.dark:border-white]="activeLens() === 'Functional Protocols'"
             [class.text-[#1C1C1C]]="activeLens() === 'Functional Protocols'"
+            [class.dark:text-white]="activeLens() === 'Functional Protocols'"
             class="rounded-none px-4 -mb-px shadow-none">
             Interventions
           </pocket-gull-button>
-          <pocket-gull-button (click)="changeLens('Orthomolecular Nutrition')"
+          <pocket-gull-button (click)="changeLens('Nutrition')"
             variant="ghost"
             size="sm"
-            [class.border-b-2]="activeLens() === 'Orthomolecular Nutrition'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Orthomolecular Nutrition'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Orthomolecular Nutrition'"
+            [class.border-b-2]="activeLens() === 'Nutrition'"
+            [class.border-[#1C1C1C]]="activeLens() === 'Nutrition'"
+            [class.dark:border-white]="activeLens() === 'Nutrition'"
+            [class.text-[#1C1C1C]]="activeLens() === 'Nutrition'"
+            [class.dark:text-white]="activeLens() === 'Nutrition'"
             class="rounded-none px-4 -mb-px shadow-none">
-            Orthomolecular
+            Nutrition
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Monitoring & Follow-up')"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Monitoring & Follow-up'"
             [class.border-[#1C1C1C]]="activeLens() === 'Monitoring & Follow-up'"
+            [class.dark:border-white]="activeLens() === 'Monitoring & Follow-up'"
             [class.text-[#1C1C1C]]="activeLens() === 'Monitoring & Follow-up'"
+            [class.dark:text-white]="activeLens() === 'Monitoring & Follow-up'"
             class="rounded-none px-4 -mb-px shadow-none">
             Monitoring
           </pocket-gull-button>
@@ -117,7 +88,9 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'Patient Education'"
             [class.border-[#1C1C1C]]="activeLens() === 'Patient Education'"
+            [class.dark:border-white]="activeLens() === 'Patient Education'"
             [class.text-[#1C1C1C]]="activeLens() === 'Patient Education'"
+            [class.dark:text-white]="activeLens() === 'Patient Education'"
             class="rounded-none px-4 -mb-px shadow-none">
             Education
           </pocket-gull-button>
@@ -126,14 +99,14 @@ import { RevealDirective } from '../directives/reveal.directive';
     }
 
     <!--Content Area-->
-    <div #contentArea class="flex-1 overflow-y-auto overflow-x-hidden px-2 sm:px-8 pt-4 sm:pt-8 min-h-0 bg-[#F9FAFB]">
+    <div #contentArea class="flex-1 overflow-y-auto overflow-x-hidden px-2 sm:px-8 pt-4 sm:pt-8 min-h-0 bg-[#F9FAFB] dark:bg-zinc-950">
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-2 sm:px-6 py-4 sm:py-6 pb-24 min-w-0">
         <!--Clinical Overview Dashboard-->
         @if (intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
             <div class="col-span-full mb-2">
-              <h2 class="text-xs font-bold text-[#1C1C1C] uppercase tracking-widest border-b border-gray-100 pb-2"> Clinical Overview Dashboard </h2>
+              <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
             </div>
 
             <app-clinical-gauge
@@ -159,7 +132,7 @@ import { RevealDirective } from '../directives/reveal.directive';
 
             <!--Trend Sparklines-->
             @if (historicalMetrics().length > 1) {
-              <div class="col-span-full mt-4 p-4 sm:p-6 bg-gray-50/50 rounded-2xl border border-gray-100 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
+              <div class="col-span-full mt-4 p-4 sm:p-6 bg-gray-50/50 dark:bg-zinc-900/50 rounded-2xl border border-gray-100 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8">
                 <app-clinical-trend label="Complexity Trend" [values]="getHistoryValues('complexity')" type="complexity"></app-clinical-trend>
                 <app-clinical-trend label="Stability Trend" [values]="getHistoryValues('stability')" type="stability"></app-clinical-trend>
                 <app-clinical-trend label="Certainty Trend" [values]="getHistoryValues('certainty')" type="certainty"></app-clinical-trend>
@@ -170,19 +143,19 @@ import { RevealDirective } from '../directives/reveal.directive';
 
         @if (intel.isLoading() && !hasAnyReport()) {
           <div class="h-64 flex flex-col items-center justify-center opacity-50 no-print">
-            <div class="w-8 h-8 border-2 border-[#EEEEEE] border-t-[#1C1C1C] rounded-full animate-spin mb-4"></div>
+            <div class="w-8 h-8 border-2 border-[#EEEEEE] dark:border-zinc-800 border-t-[#1C1C1C] dark:border-t-zinc-100 rounded-full animate-spin mb-4"></div>
             <div class="flex items-center gap-2">
-              <span class="text-xs uppercase tracking-widest text-[#689F38] font-bold">{{ activeLens() }}</span>
+              <span class="text-xs uppercase tracking-widest text-[#689F38] dark:text-[#8bc34a] font-bold">{{ activeLens() }}</span>
               @if (intel.isLoading() && isTextEmpty(activeReport())) {
-                <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] animate-pulse"></span>
-                <span class="text-[8px] uppercase tracking-tighter text-gray-400">Generating...</span>
+                <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
+                <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">Generating...</span>
               }
             </div>
-            <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C]">Processing Comprehensive Analysis</p>
+            <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-200">Processing Comprehensive Analysis</p>
           </div>
         }
         @if (intel.error() && !hasAnyReport(); as error) {
-          <div class="p-4 border border-red-200 bg-red-50 text-red-900 text-xs rounded-lg mb-4">
+          <div class="p-4 border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 text-xs rounded-lg mb-4">
             <strong class="block uppercase tracking-wider mb-1">System Error</strong>
             {{ error }}
           </div>
@@ -191,14 +164,14 @@ import { RevealDirective } from '../directives/reveal.directive';
         <!--AI Report Section-->
         @if (reportSections(); as sections) {
           <div class="flex flex-col gap-4 sm:gap-6 pb-4 w-full min-w-0">
-            @for (section of sections; track $index; let i = $index) {
-              <div appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
+            @for (section of sections; track section.title; let i = $index) {
+              <div [id]="i === 0 ? 'tour-report-node' : null" appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
                 <pocket-gull-card [title]="section.title" [icon]="section.icon" class="flex-1 min-w-0 overflow-hidden">
                   <div right-action class="flex items-center gap-2">
                     @if (intel.isLoading() && !verificationStatus(section.title)) {
                       <div class="flex items-center gap-1.5 mr-2">
-                        <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] animate-pulse"></span>
-                        <span class="text-[8px] uppercase tracking-tighter text-gray-400">Streaming Section...</span>
+                        <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
+                        <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">Streaming Section...</span>
                       </div>
                     }
                     @if (verificationStatus(section.title); as status) {
@@ -267,15 +240,15 @@ import { RevealDirective } from '../directives/reveal.directive';
             }
           </div>
         } @else if (!intel.isLoading() && !hasAnyReport()) {
-          <div class="h-64 border border-dashed border-gray-200 rounded-lg flex items-center justify-center no-print">
-            <p class="text-xs text-gray-500 font-medium uppercase tracking-widest">Waiting for input data...</p>
+          <div class="h-64 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg flex items-center justify-center no-print">
+            <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-widest">Waiting for input data...</p>
           </div>
         }
       </div>
     </div>
   `
 })
-export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
+export class AnalysisReportComponent implements OnDestroy {
   protected readonly intel = inject(ClinicalIntelligenceService);
   protected readonly state = inject(PatientStateService);
   protected readonly patientManager = inject(PatientManagementService);
@@ -303,29 +276,7 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
     this.historyEntries.set(entries.filter(e => e.value?._isSnapshot));
   }
 
-  private resizeObserver: ResizeObserver | null = null;
-  private carePlanObserver: MutationObserver | null = null;
 
-  ngAfterViewInit() {
-    this.setupSummaryObserver();
-  }
-
-  private setupSummaryObserver() {
-    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') return;
-    const el = this.contentArea()?.nativeElement;
-    if (!el) return;
-
-    this.carePlanObserver = new MutationObserver(() => {
-      // Only auto-scroll if we are generating
-      if (this.intel.isLoading()) {
-        el.scrollTo({ top: el.scrollHeight, behavior: 'auto' });
-      }
-    });
-
-    this.carePlanObserver.observe(el, { childList: true, subtree: true, characterData: true });
-  }
-
-  // --- Analysis State ---
   activeLens = signal<AnalysisLens>('Summary Overview');
 
   // --- Hover Toolbar State ---
@@ -514,7 +465,7 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
 
   private getIconForSection(title: string): string {
     const lower = title.toLowerCase();
-    if (lower.includes('assessment') || lower.includes('overview') || lower.includes('orthomolecular')) return ClinicalIcons.Assessment;
+    if (lower.includes('assessment') || lower.includes('overview') || lower.includes('nutrition')) return ClinicalIcons.Assessment;
     if (lower.includes('protocol') || lower.includes('intervention') || lower.includes('nutrition')) return ClinicalIcons.Medication;
     if (lower.includes('monitor') || lower.includes('cadence')) return ClinicalIcons.FollowUp;
     if (lower.includes('education') || lower.includes('resource')) return ClinicalIcons.Education;
@@ -537,12 +488,12 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
     }
   });
 
-  readonly lensAnnotations = signal<LensAnnotations>({});
-
-  // Track save status per node
+  get lensAnnotations() { return this.state.lensAnnotations; }  // Track save status per node
   readonly nodeSaveStatuses = signal<Record<string, 'idle' | 'saving' | 'saved'>>({});
 
-  private autoSaveSubject = new Subject<void>();
+  // Track save version — incrementing this kicks off the debounced auto-save effect
+  private readonly _saveVersion = signal(0);
+  private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     // Auto-scroll effect for transcript
@@ -569,11 +520,11 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
         const latestFinalized = patient.history.find(e => e.type === 'FinalizedPatientSummary');
         if (latestFinalized && latestFinalized.type === 'FinalizedPatientSummary') {
           untracked(() => {
-            this.lensAnnotations.set(latestFinalized.annotations || {});
+            this.state.lensAnnotations.set(latestFinalized.annotations || {});
           });
         } else {
           untracked(() => {
-            this.lensAnnotations.set({});
+            this.state.lensAnnotations.set({});
           });
         }
       }
@@ -592,27 +543,36 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
 
     this.loadHistory();
 
-    // Auto-save debouncing
-    this.autoSaveSubject.pipe(
-      debounceTime(1000)
-    ).subscribe(() => {
-      this.persistToHistory();
+    // Auto-scroll during streaming: react to reportSections() changes while loading
+    effect(() => {
+      this.reportSections();
+      if (!this.intel.isLoading()) return;
+      untracked(() => {
+        const el = this.contentArea()?.nativeElement;
+        el?.scrollTo({ top: el.scrollHeight, behavior: 'auto' });
+      });
+    });
+
+    // Debounced auto-save: effect fires on every _saveVersion tick
+    effect(() => {
+      this._saveVersion(); // subscribe
+      if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
+      this._autoSaveTimer = setTimeout(() => untracked(() => this.persistToHistory()), 1000);
     });
   }
 
   ngOnDestroy() {
-    this.carePlanObserver?.disconnect();
+    if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
     this.flushAutoSave();
   }
 
   private triggerAutoSave(nodeKey: string) {
-    // Set individual node to saving
     this.nodeSaveStatuses.update(prev => ({ ...prev, [nodeKey]: 'saving' }));
-    this.autoSaveSubject.next();
+    this._saveVersion.update(v => v + 1);
   }
 
   private flushAutoSave() {
-    this.autoSaveSubject.next();
+    if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
     this.persistToHistory();
   }
 
@@ -662,7 +622,8 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
     if (event.note !== undefined) {
       this.updateAnnotation(node.key, { note: event.note });
       node.note = event.note; // Update local node state
-      node.showNote = !!event.note; // Update local node state
+      // Honor explicit showNote intent (e.g. from double-click); only hide if neither showNote nor note content present
+      node.showNote = event.showNote === true ? true : !!event.note;
     }
     if (event.bracketState !== undefined) {
       this.updateAnnotation(node.key, { bracketState: event.bracketState });
@@ -701,7 +662,7 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
 
 
   private updateAnnotation(key: string, data: Partial<NodeAnnotation>) {
-    this.lensAnnotations.update(all => {
+    this.state.lensAnnotations.update(all => {
       const currentLens = this.activeLens();
       const lensData = { ...(all[currentLens] || {}) };
       lensData[key] = { ...(lensData[key] || { note: '', bracketState: 'normal' }), ...data };
@@ -794,13 +755,7 @@ export class AnalysisReportComponent implements OnDestroy, AfterViewInit {
 
   // --- Live Consult Actions ---
 
-  openVoicePanel() {
-    this.state.toggleLiveAgent(true);
-  }
 
-  endLiveConsult() {
-    this.state.toggleLiveAgent(false);
-  }
 
   insertSectionIntoChat(sectionMarkdown: string) {
     this.state.toggleLiveAgent(true); // Ensure panel is open

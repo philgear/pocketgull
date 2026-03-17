@@ -7,7 +7,7 @@ Pocket Gull is an Angular v21.1 progressive web application deployed on Google C
 This application was built for the Gemini Live Agent Challenge hackathon (Category: Live Agents — Real-time Voice & Visual UI).
 
 - Live URL: https://pocket-gall-444980566010.us-west1.run.app
-- Repository: https://github.com/philgear/pocket-gull
+- Repository: https://github.com/philgear/pocketall
 - Developer: https://g.dev/philgear
 
 ## Key Capabilities

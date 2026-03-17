@@ -5,6 +5,7 @@ import {
   BiometricEntry,
   ClinicalNote,
   ChecklistItem,
+  ShoppingListItem,
   DraftSummaryItem,
   PatientState,
   HistoryEntry,
@@ -30,11 +31,13 @@ export class PatientStateService {
   readonly analysisUpdateRequest = signal(0);
   readonly requestedResearchUrl = signal<string | null>(null);
   readonly requestedResearchQuery = signal<string | null>(null);
+  readonly requestedSearchEngine = signal<'google' | 'pubmed' | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
   readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<DraftSummaryItem[]>([]);
+  readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
 
   // --- Patient Data State ---
   readonly issues = signal<Record<string, BodyPartIssue[]>>({});
@@ -60,6 +63,7 @@ export class PatientStateService {
   
   readonly clinicalNotes = signal<ClinicalNote[]>([]);
   readonly checklist = signal<ChecklistItem[]>([]);
+  readonly shoppingList = signal<ShoppingListItem[]>([]);
   readonly biometricHistory = signal<BiometricEntry[]>([]);
 
   // A trigger to force the UI to expand the analysis panel when an item is selected/clicked
@@ -286,6 +290,20 @@ export class PatientStateService {
     this.checklist.update(items => items.filter(item => item.id !== id));
   }
 
+  addShoppingListItem(item: ShoppingListItem) {
+    this.shoppingList.update(items => [...items, item]);
+  }
+
+  toggleShoppingListItem(id: string) {
+    this.shoppingList.update(items => items.map(item =>
+      item.id === id ? { ...item, completed: !item.completed } : item
+    ));
+  }
+
+  removeShoppingListItem(id: string) {
+    this.shoppingList.update(items => items.filter(item => item.id !== id));
+  }
+
   removeDraftSummaryItem(id: string) {
     this.draftSummaryItems.update(items => items.filter(item => item.id !== id));
   }
@@ -302,7 +320,10 @@ export class PatientStateService {
     this.requestedResearchUrl.set(url);
   }
 
-  requestResearchSearch(query: string) {
+  requestResearchSearch(query: string, engine?: 'google' | 'pubmed') {
+    if (engine) {
+      this.requestedSearchEngine.set(engine);
+    }
     this.requestedResearchQuery.set(query);
     this.toggleResearchFrame(true);
   }
@@ -332,11 +353,13 @@ export class PatientStateService {
         this.medications.set([]);
     this.clinicalNotes.set([]);
     this.checklist.set([]);
+    this.shoppingList.set([]);
     this.activePatientSummary.set(null);
     this.draftSummaryItems.set([]);
     this.biometricHistory.set([]);
     this.requestedResearchUrl.set(null);
     this.requestedResearchQuery.set(null);
+    this.requestedSearchEngine.set(null);
     this.viewingPastVisit.set(null);
   }
 
@@ -362,6 +385,7 @@ export class PatientStateService {
         if (state.medications) this.medications.set(state.medications);
     this.clinicalNotes.set(state.clinicalNotes || []);
     this.checklist.set(state.checklist || []);
+    this.shoppingList.set(state.shoppingList || []);
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
   }
 
@@ -377,6 +401,7 @@ export class PatientStateService {
             medications: this.medications(),
             clinicalNotes: this.clinicalNotes(),
             checklist: this.checklist(),
+            shoppingList: this.shoppingList(),
         };
   }
 

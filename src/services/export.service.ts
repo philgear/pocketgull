@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { MarkdownService } from './markdown.service';
 
 import { Patient, HistoryEntry, PatientVitals, BodyPartIssue } from './patient.types';
+import { ClinicalIcons } from '../assets/clinical-icons';
 
 /** Shape of the native JSON export file. */
 export interface NativePatientExport {
@@ -74,10 +75,10 @@ export class ExportService {
     };
 
     const lensIcons: Record<string, string> = {
-      'Summary Overview': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-800v560q0 33-23.5 56.5T760-120H200zm80-160h320v-80H280v80zm0-160h400v-80H280v80zm0-160h400v-80H280v80z"/></svg>`,
-      'Functional Protocols': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm200 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H520Z"/></svg>`,
-      'Monitoring & Follow-up': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80Z"/></svg>`,
-      'Patient Education': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960"><path d="M480-120 200-272v-240L40-600l440-240 440 240v320h-80v-276l-80 44v240L480-120Zm0-332 274-148-274-148-274 148 274 148Zm0 210 200-108v-132L480-360 280-470v132l200 108Zm0-210Zm0 90Zm0 0Z"/></svg>`,
+      'Summary Overview': ClinicalIcons.Assessment,
+      'Functional Protocols': ClinicalIcons.Medication,
+      'Monitoring & Follow-up': ClinicalIcons.FollowUp,
+      'Patient Education': ClinicalIcons.Education,
     };
 
     const lensColors: Record<string, string> = {
@@ -491,7 +492,7 @@ export class ExportService {
 
       <!-- Footer -->
       <footer class="report-footer">
-        <div class="footer-brand">Pocket Gull &mdash; pocket-gull.app</div>
+        <div class="footer-brand">Pocket Gull &bull; pocketgull.app</div>
         <div class="footer-disclaimer">
           AI-generated content. For clinical reference only. Verify all recommendations with qualified clinical staff prior to implementation.
         </div>
@@ -810,10 +811,17 @@ export class ExportService {
       border-bottom: 1px solid var(--border-green);
     }
     .care-plan-header-icon {
-      width: 18px;
-      height: 18px;
-      fill: var(--brand);
+      width: 20px;
+      height: 20px;
+      color: var(--brand);
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .care-plan-header-icon svg {
+      width: 100%;
+      height: 100%;
     }
     .care-plan-title {
       font-size: 10pt;
@@ -1054,16 +1062,16 @@ export class ExportService {
           <div class="patient-field-value">Pocket Gull AI</div>
         </div>
       </div>
-
+      
       ${vitalsHtml}
       ${conditionsHtml}
 
       <!-- Care Plan Section -->
       <div class="care-plan-section">
         <div class="care-plan-header">
-          <svg class="care-plan-header-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960">
-            <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Zm0-84q97-30 162-118.5T718-480H480v-315l-240 90v185h240v316Z"/>
-          </svg>
+          <div class="care-plan-header-icon">
+            ${ClinicalIcons.Verified}
+          </div>
           <div class="care-plan-title">Active Care Plan</div>
         </div>
         <div class="care-plan-body">
@@ -1085,7 +1093,7 @@ export class ExportService {
 
       <!-- Footer -->
       <footer class="report-footer">
-        <div class="footer-brand">Pocket Gull &mdash; pocket-gull.app</div>
+        <div class="footer-brand">Pocket Gull &bull; pocketgull.app</div>
         <div class="footer-disclaimer">
           This care plan was generated with AI assistance. Review and approval by a licensed clinician is required before implementation.
         </div>
@@ -1231,7 +1239,7 @@ export class ExportService {
           birthDate: this._estimateBirthYear(patient.age),
           extension: [
             {
-              url: 'http://pocket-gull.app/fhir/StructureDefinition/last-visit',
+              url: 'http://pocketgull.app/fhir/StructureDefinition/last-visit',
               valueString: patient.lastVisit,
             }
           ]
@@ -1299,11 +1307,11 @@ export class ExportService {
               valueString: issue.description,
               extension: [
                 {
-                  url: 'http://pocket-gull.app/fhir/StructureDefinition/pain-level',
+                  url: 'http://pocketgull.app/fhir/StructureDefinition/pain-level',
                   valueInteger: issue.painLevel,
                 },
                 {
-                  url: 'http://pocket-gull.app/fhir/StructureDefinition/note-id',
+                  url: 'http://pocketgull.app/fhir/StructureDefinition/note-id',
                   valueString: issue.noteId,
                 },
               ]
@@ -1355,7 +1363,7 @@ export class ExportService {
         timestamp: new Date().toISOString(),
         meta: {
           tag: [{
-            system: 'http://pocket-gull.app/fhir',
+            system: 'http://pocketgull.app/fhir',
             code: 'pocket-gull-export',
             display: 'Pocket Gull Patient Export',
           }]

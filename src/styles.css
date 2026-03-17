@@ -211,6 +211,7 @@
     padding-bottom: 1rem;
     letter-spacing: -0.025em;
 }
+.dark .rams-typography h1 { color: #f3f4f6; border-bottom-color: #3f3f46; }
 
 .rams-typography h2 {
     font-family: 'Inter', sans-serif;
@@ -223,6 +224,7 @@
     padding-bottom: 0.75rem;
     letter-spacing: -0.02em;
 }
+.dark .rams-typography h2 { color: #e5e7eb; border-bottom-color: #27272a; }
 
 .rams-typography h3 {
     font-family: 'Inter', sans-serif;
@@ -235,6 +237,7 @@
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
 }
+.dark .rams-typography h3 { color: #a1a1aa; }
 
 .rams-typography h4,
 .rams-typography h5,
@@ -246,6 +249,7 @@
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
 }
+.dark .rams-typography h4, .dark .rams-typography h5, .dark .rams-typography h6 { color: #f3f4f6; }
 
 .rams-typography p,
 .rams-typography li,
@@ -257,11 +261,13 @@
     line-height: 1.6;
     color: #374151;
 }
+.dark .rams-typography p, .dark .rams-typography li, .dark .rams-typography td, .dark .rams-typography th { color: #d1d5db; }
 
 .rams-typography strong {
     font-weight: 800;
     color: #111827;
 }
+.dark .rams-typography strong { color: #f9fafb; }
 
 .rams-typography ul {
     list-style: none;
@@ -285,6 +291,7 @@
     left: 0.75rem;
     top: 1.15em;
 }
+.dark .rams-typography li::before { background: #52525b; }
 
 .rams-typography blockquote {
     border-left: 4px solid #689F38;
@@ -296,6 +303,7 @@
     margin: 2rem 0;
     border-radius: 0 8px 8px 0;
 }
+.dark .rams-typography blockquote { background-color: #18181b; color: #a1a1aa; border-left-color: #8bc34a; }
 
 /* Tables — AI-generated tables for labs, medication, and monitoring */
 .rams-typography table {
@@ -307,10 +315,12 @@
     overflow: hidden;
     border: 1px solid #E5E7EB;
 }
+.dark .rams-typography table { border-color: #27272a; }
 
 .rams-typography thead {
     background: #F3F4F6;
 }
+.dark .rams-typography thead { background: #18181b; }
 
 .rams-typography th {
     text-align: left;
@@ -322,20 +332,24 @@
     color: #6B7280;
     border-bottom: 2px solid #E5E7EB;
 }
+.dark .rams-typography th { color: #a1a1aa; border-bottom-color: #27272a; }
 
 .rams-typography td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid #F3F4F6;
     vertical-align: top;
 }
+.dark .rams-typography td { border-bottom-color: #27272a; }
 
 .rams-typography tbody tr:nth-child(even) {
     background: #FAFBFC;
 }
+.dark .rams-typography tbody tr:nth-child(even) { background: #09090b; }
 
 .rams-typography tbody tr:hover {
     background: #F0FDF4;
 }
+.dark .rams-typography tbody tr:hover { background: #14532d; }
 
 /* Responsive table wrapper */
 .rams-typography .table-wrapper {
@@ -516,8 +530,8 @@
 }
 
 .rm-gallery-img {
-    width: 80px;
-    height: 60px;
+    width: 89px;
+    height: 55px;
     object-fit: cover;
     border-radius: 3px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -642,44 +656,91 @@
     animation: flightHover 4s ease-in-out infinite alternate;
 }
 
+/* Frightened state interrupts animation and uses dynamic variables */
+.origami-seagull-container.frightened {
+    animation: none !important;
+    transform: translate(var(--fly-x, 0), var(--fly-y, -200px)) scale(0.4) rotate(45deg) !important;
+    opacity: 0 !important;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease-out;
+}
+
 /* Initial enter animation for the container */
 .origami-seagull-enter {
     animation: flightEnter 4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
-/* The Paper */
-.origami-paper {
+/* The 3D Folding Paper Container */
+.origami-paper-3d {
     position: absolute;
     left: -50px;
     bottom: 0;
     width: 100px;
-    height: 120px;
+    height: 100px;
+    perspective: 800px;
+    transform-style: preserve-3d;
+    z-index: 5;
+    animation: fadeOutPaper 2.8s ease-in forwards;
+}
+
+/* Base Panel Styles */
+.paper-panel {
+    position: absolute;
+    width: 50%;
+    height: 50%;
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-    animation: foldPaper 2.4s ease-in forwards;
-    transform-origin: center;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
-/* Paper creases */
-.origami-paper::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 1px;
-    height: 100%;
-    background: #f3f4f6;
+/* The Fixed Center/Bottom-Right Panel */
+.panel-base {
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
 }
 
-.origami-paper::before {
-    content: '';
-    position: absolute;
-    top: 50%;
+/* Left Panel folds over Base */
+.panel-left {
+    bottom: 0;
     left: 0;
-    width: 100%;
-    height: 1px;
-    background: #f3f4f6;
+    width: 50px;
+    height: 50px;
+    transform-origin: right center;
+    animation: foldLeft 2.4s ease-in-out forwards;
+}
+
+/* Right Panel (Top Right) folds down */
+.panel-right {
+    top: 0;
+    right: 0;
+    width: 50px;
+    height: 50px;
+    transform-origin: bottom center;
+    animation: foldDown 2.4s ease-in-out forwards;
+    animation-delay: 0.2s; /* Staggered fold */
+}
+
+/* Top Left Panel folds diagonally */
+.panel-top {
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    transform-origin: bottom right;
+    animation: foldDiagonal 2.4s ease-in-out forwards;
+    animation-delay: 0.4s;
+}
+
+/* The Final Package rotates */
+.origami-paper-3d::after {
+   content: '';
+   position: absolute;
+   inset: 0;
+   transform-style: preserve-3d;
+   animation: spinPackage 2.8s ease-in forwards;
 }
 
 .origami-seagull {
@@ -690,9 +751,9 @@
     height: 240px;
     opacity: 0;
     transform: scale(0.1);
-    animation: unfoldBird 2.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    animation-delay: 0.4s;
-    /* Start unfolding slightly after paper folds */
+    z-index: 10;
+    animation: unfoldBird 2.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.8s; /* Wait for folds */
 }
 
 .origami-seagull svg {
@@ -726,26 +787,26 @@
     }
 }
 
-@keyframes foldPaper {
-    0% {
-        transform: scale(1) rotate(0deg);
-        opacity: 1;
-    }
+/* 3D Folding Keyframes */
+@keyframes foldLeft {
+    0%, 10% { transform: rotateY(0deg); }
+    40%, 100% { transform: rotateY(178deg); background: #f9fafb; }
+}
 
-    40% {
-        transform: scale(0.8) rotate(15deg);
-        opacity: 1;
-    }
+@keyframes foldDown {
+    0%, 20% { transform: rotateX(0deg); }
+    50%, 100% { transform: rotateX(-178deg); background: #f3f4f6; }
+}
 
-    80% {
-        transform: scale(0.3) rotate(180deg) rotateX(70deg);
-        opacity: 0.8;
-    }
+@keyframes foldDiagonal {
+    0%, 30% { transform: rotate3d(1, -1, 0, 0deg); }
+    60%, 100% { transform: rotate3d(1, -1, 0, 178deg); background: #e5e7eb; }
+}
 
-    100% {
-        transform: scale(0) rotate(360deg);
-        opacity: 0;
-    }
+@keyframes fadeOutPaper {
+    0%, 60% { opacity: 1; transform: scale(1) rotate(0deg); }
+    80% { opacity: 0.5; transform: scale(0.5) rotate(45deg); }
+    100% { opacity: 0; transform: scale(0) rotate(90deg); }
 }
 
 @keyframes unfoldBird {

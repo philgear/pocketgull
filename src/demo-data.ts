@@ -33,7 +33,7 @@ Sarah Jenkins is a 42-year-old female presenting with chronic lower back pain (L
 - **Short-term (2 weeks)**: Pain VAS score reduction from 7/10 to <=5/10. PT program initiated.
 - **Long-term (3 months)**: Functional ADL capacity restored to baseline. Sustained opioid abstinence maintained. PHQ-9 score reduced by >=5 points.
 
-### References (UKRIO Compliant)
+### References
 - **Dowell, D. et al.** (2022). *CDC Clinical Practice Guideline for Prescribing Opioids for Pain*. MMWR, 71(3), 1-95. DOI: [10.15585/mmwr.rr7103a1](https://doi.org/10.15585/mmwr.rr7103a1). Peer-Reviewed.`,
 
     'Functional Protocols': `### Diagnostic Workup

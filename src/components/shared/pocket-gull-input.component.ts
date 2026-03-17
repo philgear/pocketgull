@@ -17,7 +17,7 @@ import { FormsModule } from '@angular/forms';
       
       <div class="relative group">
         @if (icon()) {
-          <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-500 group-focus-within:text-[#689F38] dark:group-focus-within:text-[#8bc34a] transition-colors h-4 w-4 flex items-center justify-center" [innerHTML]="iconHtml()"></div>
+          <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-zinc-400 group-focus-within:text-[#689F38] dark:group-focus-within:text-[#8bc34a] transition-colors h-4 w-4 flex items-center justify-center" [innerHTML]="iconHtml()"></div>
         }
         
         @if (type() === 'textarea') {
@@ -55,7 +55,7 @@ import { FormsModule } from '@angular/forms';
       </div>
       
       @if (error() || hint()) {
-        <p [class]="error() ? 'text-red-500 dark:text-red-400' : 'text-gray-400 dark:text-zinc-500'" class="text-xs font-medium tracking-wide ml-1">
+        <p [class]="error() ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-zinc-400'" class="text-xs font-medium tracking-wide ml-1">
           {{ error() || hint() }}
         </p>
       }

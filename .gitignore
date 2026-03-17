@@ -44,3 +44,6 @@ sandbox/
 
 # Agent Rules
 rules.yaml
+
+# Companion apps
+companion-apps/

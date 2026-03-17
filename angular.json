@@ -71,7 +71,10 @@
               "compression",
               "@google-cloud/secret-manager",
               "@google/generative-ai",
-              "swagger-ui-express"
+              "swagger-ui-express",
+              "genkit",
+              "@genkit-ai/googleai",
+              "zod"
             ],
             "security": {
               "allowedHosts": [
@@ -79,13 +82,16 @@
                 "pocket-gall-444980566010.us-west1.run.app",
                 "understory-315235665910.us-west1.run.app",
                 "pocket-gall-315235665910.us-west1.run.app",
+                "pocket-gull-793190615625.us-west1.run.app",
                 "pocketgull.app",
                 "pocketgull.com",
-                "pocketgall.app"
+                "pocketgall.app",
+                "pocketgall.com",
+                "pocketgal.app",
+                "pocketgal.ai"
               ]
             },
             "server": "src/main.server.ts",
-            "prerender": false,
             "outputMode": "server",
             "ssr": {
               "entry": "src/server.ts"
@@ -109,7 +115,8 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "port": 4200
+            "port": 4200,
+            "proxyConfig": "proxy.conf.mjs"
           },
           "configurations": {
             "production": {
