@@ -6,6 +6,7 @@ import { AiCacheService } from '../services/ai-cache.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { ExportService } from '../services/export.service';
 import { ClinicalTrendComponent } from './clinical-trend.component';
+import { PatientVitalsChartComponent } from './patient-vitals-chart.component';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -13,7 +14,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
 @Component({
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, ClinicalTrendComponent, PocketGullButtonComponent],
+  imports: [CommonModule, AnalysisReportComponent, ClinicalTrendComponent, PatientVitalsChartComponent, PocketGullButtonComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -36,6 +37,11 @@ import { ClinicalIcons } from '../assets/clinical-icons';
                  <app-clinical-trend label="Stability" [values]="getHistoryValues('stability')" type="stability"></app-clinical-trend>
                  <app-clinical-trend label="Certainty" [values]="getHistoryValues('certainty')" type="certainty"></app-clinical-trend>
                </div>
+             }
+
+             <!-- Vitals Chart -->
+             @if (patientMgmt.selectedPatient()?.history; as history) {
+                 <app-patient-vitals-chart [history]="history"></app-patient-vitals-chart>
              }
 
              <!-- History List -->

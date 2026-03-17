@@ -1,0 +1,68 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Responsible AI
+description: "Responsible AI principles and societal impact statement for Pocket Gull."
+---
+import DocNode from '../components/DocNode.astro';
+
+# Responsible AI
+
+Pocket Gull is built with a firm commitment to the responsible development and deployment of AI in clinical settings. The following principles guide every design and engineering decision.
+
+---
+
+## Core Principles
+
+### Human-in-the-Loop Oversight
+
+Pocket Gull is a clinical **co-pilot**, not an autonomous decision-maker. Every AI-generated insight, care plan recommendation, or synthesized summary is explicitly presented as a **draft for physician review**.
+
+The interactive Task Bracketing system ensures that no recommendation can be acted upon without deliberate, manual clinician validation — a double-click state machine (Normal → Added → Removed) gates every output.
+
+### Transparency & Explainability
+
+The application clearly surfaces which data points — vitals, chief complaint, annotated body regions, medical history — were used to construct each recommendation. Clinicians are never presented with a "black box" output.
+
+The reasoning lens is visible and categorized (Overview, Interventions, Monitoring, Education), and the source data is always traceable.
+
+### Privacy by Design
+
+Patient data is processed transiently. No personally identifiable clinical information is persisted to a remote database. All session state is stored locally within the clinician's browser.
+
+Data transmitted to the <DocNode term="Gemini API" category="Google DeepMind" hint="Google's generative AI API. Patient context is used for immediate inference only — no data retained." link="https://ai.google.dev/gemini-api/docs" linkLabel="ai.google.dev →" icon="https://ai.google.dev/favicon.ico">Gemini API</DocNode> for inference is used solely for generating the immediate clinical response and is not retained for model training by this application.
+
+### Limitation Awareness
+
+Pocket Gull is **not a medical device** and is not a substitute for professional clinical judgment, licensure, or established diagnostic procedures. It is a productivity and synthesis tool.
+
+Users are expected to apply their clinical expertise when interpreting and acting upon any AI-generated content.
+
+### Fairness & Bias Mitigation
+
+Clinical inputs are structured and physician-directed, reducing the risk of biased outputs driven by incomplete demographic proxies. The platform is designed to **augment — not replace** — the human clinical assessment, ensuring the physician's direct observation remains the primary diagnostic instrument.
+
+---
+
+## Societal Impact
+
+### Overview
+
+Pocket Gull is designed to transform the initial clinical encounter by shifting the burden of data synthesis from the physician to an AI-augmented workflow. By evolving generic medical analysis into a Care Plan Recommendation Engine, the platform aims to **reclaim clinical time** for direct patient interaction — strengthening the doctor-patient relationship through increased presence and empathy.
+
+### Autonomy and Dignity
+
+The platform prioritizes **physician autonomy** by acting as a "Live Consult" co-pilot rather than an automated decision-maker. Interactive Task Bracketing ensures that every medical recommendation is manually vetted and adjusted by a human clinician.
+
+### Fairness and Community Well-being
+
+By streamlining complex data ingestion — vitals, history, chief complaint — Pocket Gull **reduces cognitive load** on healthcare providers, mitigating physician burnout. Faster, more accurate intake frees time for the human elements of care.
+
+### Data Integrity
+
+The commitment to <DocNode term="FHIR Standards" category="HL7 International" hint="Fast Healthcare Interoperability Resources — ensuring patient data remains portable, interoperable, and institution-owned." link="https://hl7.org/fhir/R4/" linkLabel="HL7 FHIR R4 →" icon="https://hl7.org/favicon.ico">**FHIR standards**</DocNode> ensures that patient data remains portable, interoperable, and owned by the clinical institution — preventing proprietary data silos.
+
+---
+
+## Environmental Impact
+
+By facilitating rapid, data-driven synthesis in a paperless environment, Pocket Gull promotes resource efficiency within clinics. The use of efficient models (<DocNode term="Gemini Flash" category="Google DeepMind" hint="Google's fast, cost-efficient model variant. Lower computational footprint while maintaining clinical-grade synthesis quality." link="https://ai.google.dev/gemini-api/docs/models#gemini-2.5-flash" linkLabel="Model Reference →" icon="https://ai.google.dev/favicon.ico">Gemini Flash</DocNode>) ensures that the computational footprint remains optimized for sustainable growth.

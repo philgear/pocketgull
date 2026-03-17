@@ -39,6 +39,11 @@
                 "glob": "**/*",
                 "input": "src/assets/icons",
                 "output": "/icons"
+              },
+              {
+                "glob": "**/*",
+                "input": "docs/study/dist",
+                "output": "/docs/study"
               }
             ],
             "styles": [

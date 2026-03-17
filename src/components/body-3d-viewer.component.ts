@@ -38,6 +38,7 @@ const PART_NAMES: Record<string, string> = {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">3D view unavailable on this device</span>
+        <span *ngIf="webglError()" class="text-[10px] text-red-500 mt-2 max-w-xs break-words">{{ webglError() }}</span>
       </div>
       <div *ngIf="webglSupported()" class="absolute bottom-2 left-2 flex flex-col gap-1 pointer-events-none">
         <span class="text-[8px] font-bold text-gray-500 uppercase tracking-tighter">Left Click: Select Part</span>
@@ -63,6 +64,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
 
     readonly webglSupported = signal<boolean>(true);
+    readonly webglError = signal<string>('');
 
     private renderer!: THREE.WebGLRenderer;
     private scene!: THREE.Scene;
@@ -137,9 +139,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.createMannequin();
             this.startAnimation();
             this.setupInteractions();
-        } catch (e) {
+        } catch (e: any) {
             console.warn("3D Viewer disabled: WebGL not supported on this device.", e);
             this.webglSupported.set(false);
+            this.webglError.set(e?.message || String(e));
         }
     }
 

@@ -6,6 +6,7 @@ import { AiCacheService } from './ai-cache.service';
 import { IVerificationIssue } from '../components/analysis-report.types';
 import { AI_CONFIG } from './ai-provider.types';
 import { IntelligenceProviderToken } from './ai/intelligence.provider.token';
+import { NetworkStateService } from './network-state.service';
 
 export interface ITranscriptEntry {
     role: 'user' | 'model';
@@ -33,6 +34,7 @@ export interface IClinicalMetrics {
 export class ClinicalIntelligenceService {
     readonly ai = inject(IntelligenceProviderToken);
     private cache = inject(AiCacheService);
+    private network = inject(NetworkStateService);
 
     readonly isLoading = signal<boolean>(false);
     readonly error = signal<string | null>(null);
@@ -219,6 +221,11 @@ If a section has no relevant source data, output the heading followed by: "*No s
      * @returns A Promise resolving to the multi-lens report map once all sections are generated.
      */
     async generateComprehensiveReport(patientData: string): Promise<Partial<Record<AnalysisLens, string>>> {
+        if (!this.network.isOnline()) {
+            this.error.set("You are currently offline. Please reconnect to consult the AI.");
+            return {};
+        }
+
         this.isLoading.set(true);
         this.error.set(null);
         this.analysisResults.set({});
@@ -324,12 +331,24 @@ If a section has no relevant source data, output the heading followed by: "*No s
      * @param patientData - The current patient state passed to the AI to establish context.
      */
     async startChatSession(patientData: string) {
+        if (!this.network.isOnline()) {
+            this.error.set("You are currently offline. Please reconnect to start the chat session.");
+            return;
+        }
+
         this.transcript.set([]);
         const context = `You are a collaborative care plan co-pilot named "Pocket Gull". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient's data. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.`;
         await this.ai.startChat(patientData, context);
     }
 
     async getInitialGreeting(): Promise<string> {
+        if (!this.network.isOnline()) {
+            const errorMsg = "You are currently offline. Please reconnect to consult the AI.";
+            this.error.set(errorMsg);
+            this.transcript.set([{ role: 'model', text: errorMsg }]);
+            return errorMsg;
+        }
+
         this.isLoading.set(true);
         try {
             const response = await this.ai.getInitialGreeting("Start the conversation with a friendly and professional tone. Greet the doctor and confirm you have reviewed the patient's file and are ready for questions.");
@@ -346,9 +365,17 @@ If a section has no relevant source data, output the heading followed by: "*No s
     }
 
     async sendChatMessage(message: string): Promise<string> {
+        this.transcript.update(t => [...t, { role: 'user', text: message }]);
+
+        if (!this.network.isOnline()) {
+            const errorMsg = "You are currently offline. Please reconnect to consult the AI.";
+            this.error.set(errorMsg);
+            this.transcript.update(t => [...t, { role: 'model', text: errorMsg }]);
+            return errorMsg;
+        }
+
         this.isLoading.set(true);
         this.error.set(null);
-        this.transcript.update(t => [...t, { role: 'user', text: message }]);
 
         try {
             const response = await this.ai.sendMessage(message);
@@ -369,6 +396,12 @@ If a section has no relevant source data, output the heading followed by: "*No s
     }
 
     async translateReadingLevel(text: string, targetLevel: 'simplified' | 'dyslexia' | 'child'): Promise<string> {
+        if (!this.network.isOnline()) {
+            const errorMsg = "You are currently offline. Please reconnect to translate text.";
+            this.error.set(errorMsg);
+            throw new Error(errorMsg);
+        }
+
         this.isLoading.set(true);
         this.error.set(null);
         try {
