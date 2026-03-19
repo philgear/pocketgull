@@ -25,7 +25,8 @@ import { DEMO_ANALYSIS_REPORT } from './demo-data';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
 import { WalkthroughTourService } from './services/walkthrough-tour.service';
-
+import { AuthGateComponent } from './components/auth-gate.component';
+import { SessionStateService } from './services/session-state.service';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
@@ -44,8 +45,8 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     IntakeFormComponent,
     VoiceAssistantComponent,
     RevealDirective,
-    FhirCallbackComponent,
-    WalkthroughTourComponent
+    WalkthroughTourComponent,
+    AuthGateComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,7 +57,11 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
       
       <app-dictation-modal></app-dictation-modal>
-        <app-walkthrough-tour></app-walkthrough-tour>
+      <app-walkthrough-tour></app-walkthrough-tour>
+      
+      @if (session.isLocked()) {
+        <app-auth-gate></app-auth-gate>
+      }
 
       @if (!hasApiKey()) {
         <main class="fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center justify-center p-6 text-center landmark-main">
@@ -143,7 +148,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                             <text x="50" y="20">φ = 1.618</text>
                             <text x="5" y="45">f(x) = x² + y²</text>
                             <text x="80" y="45">S_n = 3^n</text>
-                            <text x="50" y="95">lim_{n→∞}</text>
+                            <text x="50" y="95">lim_{{ '{' }}n→∞{{ '}' }}</text>
                         </g>
                     </svg>
                     </div>
@@ -1310,6 +1315,18 @@ export class AppComponent implements OnDestroy {
 
   private boundDoVoiceColDrag = this.doVoiceColDrag.bind(this);
   private boundStopVoiceColDrag = this.stopVoiceColDrag.bind(this);
+
+  readonly session = inject(SessionStateService);
+
+  @HostListener('document:mousemove')
+  @HostListener('document:keydown')
+  @HostListener('document:touchstart')
+  @HostListener('document:wheel')
+  onUserInteraction() {
+    if (!this.session.isLocked()) {
+       this.session.resetIdleTimer();
+    }
+  }
 
   constructor() {
     afterNextRender(async () => {

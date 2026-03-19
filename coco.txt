@@ -1,0 +1,7 @@
+﻿--- COCOMO II Estimation Results ---
+Project Size: 19.264 KSLOC
+Exponent B: 1.0887
+Effort Adjustment Factor (EAF): 0.4033
+Estimated Effort: 29.69 Person-Months
+Estimated Schedule: 10.08 Calendar Months
+-----------------------------------

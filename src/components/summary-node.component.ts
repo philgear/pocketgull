@@ -189,8 +189,13 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         /* Chat body: no internal scroll — parent right-panel handles all scrolling */
         .inline-chat-body { padding:10px 12px; display:flex; flex-direction:column; gap:8px; }
 
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* ─── Messages ───────────────────────────── */
-        .inline-msg { display:flex; gap:7px; align-items:flex-start; }
+        .inline-msg { display:flex; gap:7px; align-items:flex-start; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
         .inline-msg--user { flex-direction:row-reverse; }
         .inline-avatar {
             flex-shrink:0; width:20px; height:20px; border-radius:50%;
@@ -203,11 +208,18 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             box-shadow:0 1px 2px rgba(0,0,0,0.05);
             border-radius:10px 10px 10px 2px; padding:10px 14px; width: 100%;
             max-width:calc(100% - 30px);
+            display: flex; flex-direction: column; gap: 8px; /* added gap for generic content */
         }
         .inline-msg--user .inline-bubble {
             background:#1C1C1C; color:#FFFFFF; border-color:transparent; box-shadow:none;
             border-radius:10px 10px 2px 10px;
         }
+
+        /* Tighter margin collapsing inside chat bubbles to prevent padding blowouts */
+        .inline-bubble :where(p):first-child { margin-top: 0; }
+        .inline-bubble :where(p):last-child { margin-bottom: 0; }
+        .inline-bubble :where(ul):last-child { margin-bottom: 0; }
+        .inline-bubble :where(h2, h3):first-child { margin-top: 0; }
 
         /* ─── Claim Units (AI response parsing) ──── */
         .claim-unit {
@@ -215,7 +227,15 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             padding:4px 6px 4px 8px; margin:2px 0;
             transition:background .12s;
             border-left:2px solid transparent;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+        .claim-unit:nth-child(1) { animation-delay: 0.05s; }
+        .claim-unit:nth-child(2) { animation-delay: 0.1s; }
+        .claim-unit:nth-child(3) { animation-delay: 0.15s; }
+        .claim-unit:nth-child(4) { animation-delay: 0.2s; }
+        .claim-unit:nth-child(5) { animation-delay: 0.25s; }
+        .claim-unit:nth-child(n+6) { animation-delay: 0.3s; }
+        
         .claim-unit:hover { background:#F0F7E8; border-left-color:#C8E6C9; }
         .claim-unit--heading { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#1C1C1C; border-left:none; background:transparent !important; padding-top:8px; }
 
@@ -249,8 +269,8 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         }
         .claim-action[data-tooltip]::after {
             content: attr(data-tooltip);
-            bottom: calc(100% + 6px); left: 50%;
-            transform: translateX(-50%) translateY(4px);
+            bottom: calc(100% + 6px); right: 0;
+            transform: translateY(4px);
             background: #1C1C1C; color: #FFFFFF;
             padding: 4px 8px; border-radius: 2px; font-weight: 500;
             white-space: nowrap; letter-spacing: 0.05em;
@@ -263,7 +283,9 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             border-width: 4px 4px 0; border-style: solid;
             border-color: #333 transparent transparent transparent;
         }
-        .claim-action[data-tooltip]:hover::after,
+        .claim-action[data-tooltip]:hover::after {
+            opacity: 1; transform: translateY(0);
+        }
         .claim-action[data-tooltip]:hover::before {
             opacity: 1; transform: translateX(-50%) translateY(0);
         }
@@ -348,13 +370,15 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
         .inline-send:disabled { opacity:.35; cursor:not-allowed; }
 
         /* ─── Markdown in bubbles ────────────────── */
-        .inline-bubble h2,.inline-bubble h3,.inline-bubble h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin:8px 0 3px; color:#111827; }
+        .inline-bubble h2,.inline-bubble h3,.inline-bubble h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin:12px 0 4px; color:#111827; line-height: 1.4; }
         .inline-bubble h2:first-child,.inline-bubble h3:first-child,.inline-bubble h4:first-child { margin-top:0; }
-        .inline-bubble p { margin-bottom:8px; }
-        .inline-bubble ul,.inline-bubble ol { padding-left:14px; margin-bottom:8px; }
-        .inline-bubble li { margin-bottom:2px; }
+        .inline-bubble p { margin-top:0; margin-bottom:0; line-height:1.65; }
+        .inline-bubble ul,.inline-bubble ol { padding-left:18px; margin-top:0; margin-bottom:0; }
+        .inline-bubble li { margin-bottom:4px; }
+        .inline-bubble li:last-child { margin-bottom:0; }
         .inline-bubble strong { font-weight:700; color:#111827; }
         .inline-msg--user .inline-bubble strong { color:#FFFFFF; }
+
 
         /* ─── Dark Mode Overrides ────────────────── */
         .dark .inline-chat { border-color: #27272a; background: #09090b; }
@@ -653,7 +677,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                       <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Z"/>
                     </svg>
                   </div>
-                  <div class="inline-bubble" style="padding: 2px 8px;">
+                  <div class="inline-bubble claim-bubble" style="padding: 6px 8px;">
                     @if (msg.claims && msg.claims.length > 0) {
                       @for (claim of msg.claims; track claim.id) {
                         <div class="claim-unit" [class.claim-unit--heading]="claim.type === 'heading'">
@@ -832,24 +856,28 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
             }
           </div>
 
-          <!-- Suggestion pills (shown once after first response) -->
-          @if (showSuggestions() && !chatIsLoading() && chatHistory().length > 0 && drillStack().length === 0) {
-            <div class="inline-pills">
+          <!-- Suggestion pills (persist while idle) -->
+          @if (showSuggestions() && !chatIsLoading() && drillStack().length === 0) {
+            <div class="flex flex-wrap items-center justify-center gap-2 mt-4 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
               @for (s of suggestionPills(); track s) {
-                <pocket-gull-button variant="outline" size="xs" [icon]="ClinicalIcons.Suggestion" (clicked)="sendPill(s)">
-                  {{ s }}
-                </pocket-gull-button>
+                <button type="button" (click)="sendPill(s)" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-[#689F38] dark:hover:text-[#8bc34a] transition-all shadow-sm flex items-center gap-1.5">
+                   <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
+                   {{ s }}
+                </button>
               }
               <!-- Rich media action pills -->
-              <pocket-gull-button variant="secondary" size="xs" [icon]="ClinicalIcons.Image" (clicked)="requestImage()">
+              <button type="button" (click)="requestImage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-purple-600 dark:hover:text-purple-400 transition-all shadow-sm flex items-center gap-1.5">
+                <div [innerHTML]="ClinicalIcons.Image | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 Request Image
-              </pocket-gull-button>
-              <pocket-gull-button variant="secondary" size="xs" [icon]="ClinicalIcons.Model3D" (clicked)="request3DModel()">
+              </button>
+              <button type="button" (click)="request3DModel()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm flex items-center gap-1.5">
+                <div [innerHTML]="ClinicalIcons.Model3D | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 3D Model
-              </pocket-gull-button>
-              <pocket-gull-button variant="secondary" size="xs" [icon]="ClinicalIcons.Research" (clicked)="requestResearch()">
+              </button>
+              <button type="button" (click)="requestResearch()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-amber-600 dark:hover:text-amber-400 transition-all shadow-sm flex items-center gap-1.5">
+                <div [innerHTML]="ClinicalIcons.Research | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 Research
-              </pocket-gull-button>
+              </button>
             </div>
           }
 
@@ -898,8 +926,10 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
               <button class="inline-attach" (click)="triggerFileInput()" [disabled]="chatIsLoading()">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
               </button>
-              <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*,video/*" class="hidden" style="display: none;">
+              <input type="file" #fileInput [name]="'fileInput-' + node().key" [id]="'fileInput-' + node().key" (change)="onFileSelected($event)" multiple accept="image/*,video/*" class="hidden" style="display: none;">
               <input #chatInput class="inline-input" type="text"
+                [name]="'chatInput-' + node().key"
+                [id]="'chatInput-' + node().key"
                 [(ngModel)]="chatInputText"
                 [placeholder]="drillStack().length > 0 ? 'Ask about this specific claim…' : 'Ask a follow-up…'"
                 (keydown.enter)="sendMessage()"
@@ -1017,15 +1047,38 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   // ─── Bracket a claim ─────────────────────────
+  // ─── Bracket a claim ─────────────────────────
   bracketClaim(claim: ClaimUnit) {
     if (this.isBracketed(claim.id)) return;
     const drill = this.activeDrillText();
-    const newClaim: BracketedClaim = { id: claim.id, text: claim.text, drillContext: drill ?? undefined };
+    
+    const decodeHtml = (html: string) => {
+      if (typeof document !== 'undefined') {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = html;
+        return txt.value;
+      }
+      return html.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    };
+
+    const cleanText = decodeHtml(claim.text);
+    const newClaim: BracketedClaim = { id: claim.id, text: cleanText, drillContext: drill ?? undefined };
+    
     this.bracketedClaims.update(c => [...c, newClaim]);
     this.bracketedIds.update(s => new Set([...s, claim.id]));
+    
+    // Formulate the contextual breadcrumbs [Category][Subcomponent]
+    const section = this.sectionTitle();
+    const cat = section ? `[${section}]` : '';
+    // Use the root of the drill stack or the current node's active html header to infer the subcategory
+    const rootDrill = this.drillStack().length > 0 ? this.drillStack()[0] : '';
+    const subCatRaw = rootDrill || this.listItemHtml().replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    const subCat = subCatRaw ? `[${decodeHtml(subCatRaw).slice(0, 35).trim()}]` : '';
+    const prefix = (cat || subCat) ? `${cat}${subCat}` : `[Bracketed claim]`;
+
     // Push to node notes as well
     const existingNote = this.node().note || '';
-    const noteAddition = `[Bracketed claim] ${claim.text}`;
+    const noteAddition = `${prefix} ${cleanText}`;
     this.update.emit({ key: this.node().key, note: existingNote ? `${existingNote}\n${noteAddition}` : noteAddition });
   }
 
@@ -1276,7 +1329,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
   // ─── Existing node interactions ───────────────
   onDoubleClick() { this.update.emit({ key: this.node().key, note: this.node().note || '', showNote: true }); }
   getWikimediaSearchUrl(query: string): string {
-    return `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(query)}&title=Special:MediaSearch&go=Go&type=image`;
+    return `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(query + ' anatomy medical')}&title=Special:MediaSearch&go=Go&type=image`;
   }
 
   toggleBracket() {

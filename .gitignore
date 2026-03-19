@@ -47,3 +47,9 @@ rules.yaml
 
 # Companion apps
 companion-apps/
+
+# Temp logs and generated reports
+.tmp_*.txt
+branches.txt
+audit.json
+chromewebdata_*.report.html

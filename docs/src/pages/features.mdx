@@ -1,0 +1,114 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Features
+description: "Complete feature reference for Pocket Gull — a voice-first clinical co-pilot."
+---
+import DocNode from '../components/DocNode.astro';
+
+# Features
+
+Every feature in Pocket Gull serves a clinical purpose. Nothing decorative, nothing superfluous.
+
+---
+
+## AI & Voice
+
+### Live AI Consult & Multi-Agent Orchestration
+
+Powered by <DocNode term="@google/adk" category="Google · Agent Development Kit" hint="Open-source TypeScript/Python framework for building multi-agent AI systems. Supports LlmAgent, SequentialAgent, and LoopAgent patterns with tool management." link="https://google.github.io/adk-docs/" linkLabel="ADK Docs →" icon="https://ai.google.dev/favicon.ico">`@google/adk`</DocNode> and the <DocNode term="Web Speech API" category="W3C · Web Platform" hint="W3C specification for speech recognition and synthesis in browsers. Chrome implementation by Google." link="https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API" linkLabel="MDN Reference →" icon="https://developer.mozilla.org/favicon-48x48.png">Web Speech API</DocNode>. Specialized <DocNode term="LlmAgent" category="Google · Agent Development Kit" hint="Core agent class from @google/adk. Configured with a Gemini model, system prompt, and optional tools. Each focuses on a diagnostic lens." link="https://google.github.io/adk-docs/agents/" linkLabel="Agent Reference →" icon="https://ai.google.dev/favicon.ico">`LlmAgent`</DocNode> experts — each focused on a diagnostic lens (Overview, Interventions, Monitoring, Education) — synthesize clinical data into actionable insights through an interruptible, natural conversational UI.
+
+The system maintains **context-aware memory** of recently discussed report nodes, enabling inline follow-up queries without re-stating context.
+
+### Care Plan Recommendation Engine
+
+A professional clinical analysis engine that synthesizes structured strategies for patient care. Output is organized by diagnostic lens, and each report node supports **inline agent queries** — click any recommendation to ask the AI directly about it.
+
+### Voice-Driven Clinical Controls
+
+Speak the wake word **"Gull"** followed by actions (e.g., *"Gull, highlight head"*, *"Gull, sync data"*) during active dictation. The application intelligently intercepts these commands without modifying the transcript, mapping them directly to UI actions to maintain a hands-free workflow for practitioners.
+
+### Cognitive Localization (COLO) Engine
+
+Moving beyond simple translation, the **COLO Engine** adjusts the "Clinical Strategy" to the patient's cognitive state (Standard, Dyslexia-Friendly, Pediatric) without losing clinical accuracy. It translates Care Plans into tailored formats, outputted to PDF using <DocNode term="jsPDF" category="James Hall · Parallax" hint="Client-side PDF generation library for JavaScript." link="https://github.com/parallax/jsPDF" linkLabel="GitHub →" icon="https://github.com/favicon.ico">jsPDF</DocNode> with refined Dieter Rams "carousel informatics" typography, ensuring **Informed Consent** is truly inclusive.
+
+---
+
+## Visualization
+
+### 3D Medical Imagery
+
+Precise anatomical selection using a <DocNode term="Three.js" category="Ricardo Cabello (mrdoob)" hint="JavaScript 3D library built on WebGL. Created by Ricardo Cabello. v0.183 powers the procedural skeletal/surface anatomy with severity particles." link="https://threejs.org/docs/" linkLabel="threejs.org →" icon="https://threejs.org/favicon.ico">Three.js</DocNode>-powered skeletal and surface model, including detailed **procedural spine geometry**. Dynamic particle systems highlight diagnostic severity in real-time, giving clinicians an immediate visual read on patient condition.
+
+### Scans & Diagnostics Library
+
+An integrated visual gallery within the patient profile for organizing and analyzing medical imagery (MRI, X-Rays). Includes **dynamic Wikimedia Commons linking** for reference anatomy.
+
+### Printable Clinical Stationery
+
+CSS Grid-optimized, multi-page physical printouts featuring **Halftone body maps** for visual pain hotspot diagnosis. User-selectable toggles control which sections appear: clinical summaries, history, or full records.
+
+### Longitudinal Vitals Timelines
+
+Embedded directly within the AI Assessment panel, historical patient vitals (Weight, Systolic BP, Diastolic BP) are dynamically graphed over time using <DocNode term="Chart.js" category="Chart.js contributors" hint="Simple yet flexible JavaScript charting libraries for designers & developers." link="https://www.chartjs.org/" linkLabel="Chart.js Docs →" icon="https://www.chartjs.org/favicon.ico">Chart.js</DocNode>. This provides practitioners with immediate longitudinal context without navigating away from the active Care Plan.
+
+---
+
+## Data & Export
+
+### FHIR-Standard Data Portability
+
+Real-time persistence with visual "Saving…" / "Saved ✔" indicators. Patient data is exported via <DocNode term="FHIR R4 Bundles" category="HL7 International" hint="Fast Healthcare Interoperability Resources Release 4 — the international standard for electronic health data exchange. Bundles atomically group Patient, Condition, and Observation resources." link="https://hl7.org/fhir/R4/bundle.html" linkLabel="HL7 FHIR R4 →" icon="https://hl7.org/favicon.ico">**Unicode-safe Base64 encoded FHIR Bundles**</DocNode>, ensuring interoperability with compliant healthcare systems.
+
+### Immutable Audit Trails
+
+Every clinical interaction — from updating patient state to generating an AI care plan — triggers asynchronous telemetry to an immutable <DocNode term="Google Cloud BigQuery" category="Google Cloud" hint="Serverless, highly scalable enterprise data warehouse." link="https://cloud.google.com/bigquery/docs" linkLabel="BigQuery Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">BigQuery</DocNode> ledger. This `AuditService` ensures absolute accountability by logging practitioner IDs, actions, and timestamped payloads for HIPAA compliance review.
+
+### Patient Management System
+
+Full CRUD capabilities for patient records, including historical visit review, permanent record removal, and multi-patient switching via a dropdown selector.
+
+### Local-First PWA Architecture
+
+Pocket Gull operates natively as a Progressive Web App (PWA). Under poor or completely offline connectivity, the system automatically degrades gracefully — persisting data flawlessly via `localStorage` and preserving access to historical records, while providing clear status indicators for temporarily unavailable AI cloud features.
+
+### FHIR Import Service
+
+Ingest external healthcare payloads — including **Epic/MyChart "Lucy" format** — mapping `DiagnosticReport`, `Observation`, and `Condition` FHIR resources into Pocket Gull's native data models.
+
+---
+
+## UX & Accessibility
+
+### Minimalist Dieter Rams Design
+
+A premium, minimalist UI prioritizing **clarity, neutrality, and functional excellence**. Seamless mobile responsive layouts using `100dvh`. Dark-mode agent conversations provide comfortable extended-use scenarios.
+
+### Smartwatch & Mobile Optimization
+
+Responsive Two-Column Grid UI scaling down to extremely constrained viewports — as small as **286px width** (Pixel Watch 2) — for ultra-portable clinical referencing.
+
+### Box Breathing UX
+
+Focused 16-second box breathing visual animations integrated into primary intake text areas. Promotes **practitioner mindfulness** during high-stress clinical encounters.
+
+### Interactive Task Bracketing
+
+Rapidly mark up generated care plans using a **double-click state machine**: Normal → Added → Removed. This is the core human-in-the-loop control mechanism — no AI recommendation proceeds without clinician vetting.
+
+### Evidence-Focus Iconography
+
+Custom medical iconography enhances the interactive Task Bracketing and inline chat systems, providing immediate visual context for clinical categories.
+
+---
+
+## Research Integration
+
+### PubMed E-utilities
+
+Direct integration with <DocNode term="NCBI PubMed" category="NIH · National Library of Medicine" hint="The world's largest biomedical literature database. E-utilities provide programmatic access for querying abstracts and metadata." link="https://www.ncbi.nlm.nih.gov/books/NBK25501/" linkLabel="E-utilities Docs →" icon="https://www.ncbi.nlm.nih.gov/favicon.ico">NCBI PubMed</DocNode> for querying peer-reviewed medical literature and abstracts. XML responses are parsed server-side and returned as structured JSON.
+
+### Google Programmable Search Engine
+
+Surfaces relevant differential diagnostic information and treatment pathways from indexed medical domains via <DocNode term="Google CSE" category="Google" hint="Google Programmable Search Engine — a customizable search engine for specific domains. Renders results in a sandboxed Research Frame." link="https://programmablesearchengine.google.com/" linkLabel="CSE Console →" icon="https://www.google.com/favicon.ico">Google CSE</DocNode>. Rendered in a dedicated Research Frame within the application.
+
+> All queries sent to external research sources are anonymized and stripped of protected health information (PHI) prior to transmission.

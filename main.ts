@@ -5,7 +5,9 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppComponent } from './src/app.component';
 import { AI_CONFIG, AiProviderConfig } from './src/services/ai-provider.types';
 import { IntelligenceProviderToken } from './src/services/ai/intelligence.provider.token';
-import { GeminiProvider } from './src/services/ai/gemini.provider';
+import { PubGemmaProvider } from './src/services/ai/pubgemma.provider';
+import { NanoProvider } from './src/services/ai/nano.provider';
+import { HybridProvider } from './src/services/ai/hybrid.provider';
 import { provideServiceWorker } from '@angular/service-worker';
 
 bootstrapApplication(AppComponent, {
@@ -22,7 +24,7 @@ bootstrapApplication(AppComponent, {
     },
     {
       provide: IntelligenceProviderToken,
-      useClass: GeminiProvider
+      useClass: HybridProvider
     }, provideClientHydration(withEventReplay()), provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'

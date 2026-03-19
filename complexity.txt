@@ -1,0 +1,21 @@
+﻿===== CYCLOMATIC COMPLEXITY AUDIT =====
+Functions with Complexity > 5:
+
+[Score: 37] services/import.service.ts -> importFhirBundle()
+[Score: 33] services/import.service.ts -> Anonymous/Callback()
+[Score: 31] components/analysis-report.component.ts -> Anonymous/Callback()
+[Score: 30] components/medical-3d-viewer.component.ts -> startAnimation()
+[Score: 30] components/medical-3d-viewer.component.ts -> animate()
+[Score: 28] services/patient-state.service.ts -> getAllDataForPrompt()
+[Score: 24] components/medical-summary.component.ts -> renderChart()
+[Score: 24] components/patient-history-timeline.component.ts -> getIconSvgPath()
+[Score: 24] services/export.service.ts -> importFromFhirBundle()
+[Score: 23] services/biometric-import.service.ts -> parseCsv()
+[Score: 23] services/dictation.service.ts -> initializeSpeechRecognition()
+[Score: 22] app.component.ts -> Anonymous/Callback()
+[Score: 22] components/body-3d-viewer.component.ts -> updatePartColors()
+[Score: 22] components/body-3d-viewer.component.ts -> Anonymous/Callback()
+[Score: 21] app.component.ts -> openFinalizePreview()
+
+(Score 1-5: Simple | Score 6-10: Moderate | Score 11+: High Complexity)
+=========================================

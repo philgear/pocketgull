@@ -5,7 +5,9 @@ import { provideServerRendering } from '@angular/platform-server';
 import { provideZonelessChangeDetection, ApplicationConfig } from '@angular/core';
 import { AI_CONFIG, AiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
-import { GeminiProvider } from './services/ai/gemini.provider';
+import { PubGemmaProvider } from './services/ai/pubgemma.provider';
+import { NanoProvider } from './services/ai/nano.provider';
+import { HybridProvider } from './services/ai/hybrid.provider';
 
 const serverConfig: ApplicationConfig = {
     providers: [
@@ -24,7 +26,7 @@ const serverConfig: ApplicationConfig = {
         },
         {
             provide: IntelligenceProviderToken,
-            useClass: GeminiProvider
+            useClass: HybridProvider
         },
         provideClientHydration(withEventReplay())
     ]

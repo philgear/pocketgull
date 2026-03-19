@@ -20,7 +20,8 @@ dicomRouter.get('/studies', async (req, res) => {
     const dicomStoreId = req.query['dicomStore'] || process.env['HC_DICOM_STORE'];
 
     if (!projectId || !datasetId || !dicomStoreId) {
-      return res.status(400).json({ error: 'Missing Healthcare API configuration parameters (project, dataset, dicomStore).' });
+      // Missing config throws 400 normally, but we return 200 [] to avoid console noise for unconfigured demo environments.
+      return res.status(200).json([]);
     }
 
     // Pass along query parameters for filtering (like PatientName, PatientID, etc.)

@@ -495,34 +495,35 @@ interface ChatEntry {
         .node-agent-send:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* --- Dark Mode Overrides --- */
-        .dark .node-agent-dialog { background: #09090b; border-color: #27272a; }
+        .dark .node-agent-dialog { background: #09090b; border-color: #27272a; box-shadow: 0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05); }
         .dark .node-agent-header { background: #18181b; border-color: #27272a; }
         .dark .node-agent-title { color: #f4f4f5; }
-        .dark .node-agent-section-chip { background: #1f2937; border-color: #374151; color: #8bc34a; }
+        .dark .node-agent-section-chip { background: #052e16; border-color: #14532d; color: #a3e635; }
         .dark .node-agent-context { background: #18181b; border-color: #27272a; }
-        .dark .node-agent-context-text { color: #d4d4d8; }
+        .dark .node-agent-context-text { color: #e4e4e7; }
         .dark .node-agent-context-text strong { color: #f4f4f5; }
         .dark .node-agent-avatar { background: #f4f4f5; color: #18181b; }
-        .dark .node-agent-bubble { background: #27272a; color: #d4d4d8; }
+        .dark .node-agent-bubble { background: #27272a; color: #e4e4e7; }
         
         .dark .node-agent-bubble.rams-typography h1, 
         .dark .node-agent-bubble.rams-typography h2, 
         .dark .node-agent-bubble.rams-typography h3, 
         .dark .node-agent-bubble.rams-typography strong { color: #f4f4f5; }
-        .dark .node-agent-bubble.rams-typography th { background: #3f3f46; border-color: #52525b; color: #f4f4f5; }
-        .dark .node-agent-bubble.rams-typography td { border-color: #52525b; }
+        .dark .node-agent-bubble.rams-typography th { background: #27272a; border-color: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-bubble.rams-typography td { border-color: #3f3f46; }
         
-        .dark .node-agent-message--model .node-agent-bubble { background: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-message--model .node-agent-bubble { background: #18181b; border: 1px solid #27272a; color: #f4f4f5; }
         .dark .node-agent-message--user .node-agent-avatar { background: #3f3f46; color: #f4f4f5; }
         .dark .node-agent-message--user .node-agent-bubble { background: #f4f4f5; color: #18181b; }
         
-        .dark .node-agent-message--system .node-agent-bubble { background: #1f2937; border-color: #374151; color: #d4d4d8; }
+        .dark .node-agent-message--system .node-agent-bubble { background: #052e16; border: 1px solid #166534; color: #d1fae5; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
         
         .dark .node-agent-input-container { background: #09090b; border-top-color: #27272a; }
-        .dark .node-agent-file-chip { background: #27272a; border-color: #3f3f46; color: #d4d4d8; }
+        .dark .node-agent-file-chip { background: #18181b; border-color: #27272a; color: #e4e4e7; }
         .dark .node-agent-file-remove:hover { color: #f4f4f5; }
         .dark .node-agent-attach:hover:not(:disabled) { color: #f4f4f5; background: #27272a; }
-        .dark .node-agent-input { background: #18181b; border-color: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-input { background: #18181b; border-color: #27272a; color: #f4f4f5; }
+        .dark .node-agent-input:focus { border-color: #689F38; background: #27272a; }
         .dark .node-agent-send { background: #f4f4f5; color: #18181b; }
         .dark .node-agent-send:hover:not(:disabled) { background: #d4d4d8; }
     `]

@@ -81,7 +81,20 @@ export interface ChatEntry {
 
         .prose.prose-sm :where(h3):not(:where([class~="not-prose"] *)) {
             font-size: 0.9em;
-.foo {}
+        }
+
+        /* Tighter margin collapsing inside chat bubbles to prevent padding blowouts */
+        .prose :where(p):first-child { margin-top: 0; }
+        .prose :where(p):last-child { margin-bottom: 0; }
+        .prose :where(ul):last-child { margin-bottom: 0; }
+        .prose :where(h2, h3):first-child { margin-top: 0; }
+
+        @keyframes fadeUpRams {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-entry {
+            animation: fadeUpRams 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
     `],
     template: `
@@ -198,10 +211,10 @@ export interface ChatEntry {
                         <div class="max-w-3xl mx-auto space-y-12">
                             <!-- Regular Transcript -->
                             @for (entry of parsedTranscript(); track $index) {
-                                <div class="group flex gap-3 items-start w-full animate-in fade-in slide-in-from-bottom-3 duration-300" [class.flex-row-reverse]="entry.role === 'user'">
+                                <div class="group flex gap-3 items-start w-full chat-entry" [class.flex-row-reverse]="entry.role === 'user'">
                                     
                                     <!-- Avatar -->
-                                    <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1" [class.bg-gray-700]="entry.role === 'model'" [class.bg-blue-500]="entry.role === 'user'">
+                                    <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1" [class.bg-gray-700]="entry.role === 'model'" [class.bg-[#1C1C1C]]="entry.role === 'user'">
                                         @if (entry.role === 'model') {
                                             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
                                         } @else {
@@ -218,7 +231,7 @@ export interface ChatEntry {
                                              </div>
                                          } @else {
                                             <!-- User Bubble -->
-                                            <div class="prose prose-sm max-w-none text-white bg-blue-500 dark:bg-blue-600 rounded-2xl rounded-tr-sm p-4 w-full break-words">
+                                            <div class="prose prose-sm max-w-none text-white bg-[#1C1C1C] dark:bg-[#1C1C1C] rounded-2xl rounded-tr-sm p-4 w-full break-words">
                                                 <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
                                             </div>
                                          }
@@ -249,7 +262,7 @@ export interface ChatEntry {
 
                             <!-- Thinking Indicator -->
                             @if (agentState() === 'processing') {
-                                <div class="flex gap-3 items-start w-full animate-in fade-in">
+                                <div class="flex gap-3 items-start w-full chat-entry">
                                     <div class="shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mt-1">
                                         <svg class="w-5 h-5 text-white animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
                                     </div>
@@ -265,7 +278,7 @@ export interface ChatEntry {
                     <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#09090b] dark:via-[#09090b]/90 dark:to-transparent flex justify-center z-20">
                          <div class="w-full max-w-3xl flex flex-col gap-3 relative">
                             <!-- Smart Suggestions -->
-                            @if (chatHistory().length === 0 && agentState() === 'idle') {
+                            @if (agentState() === 'idle') {
                               <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
                                  <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
                                      What is the most critical evidence?
@@ -399,7 +412,7 @@ export class VoiceAssistantComponent implements OnDestroy {
                     setTimeout(() => this.sendMessage(), 50);
                 });
             }
-        }, { allowSignalWrites: true });
+        });
 
         // Ensure we always scroll to bottom when transcript updates
         effect(() => {
@@ -417,7 +430,7 @@ export class VoiceAssistantComponent implements OnDestroy {
                     this.panelMode.set('selection');
                 }
             });
-        }, { allowSignalWrites: true });
+        });
 
         // Only init if in browser
         if (typeof window !== 'undefined') {
@@ -774,7 +787,9 @@ Only include a rich-media block when the user explicitly requests visual or rese
             this._accumulateModelText(`Error: ${e?.message ?? e}`);
             this._finalizeModelTurn();
         } finally {
-            if (this.agentState() === 'processing') {
+            // For live WebSockets, the loading state clears asynchronously on `turnComplete`.
+            // Only manually reset if we used the REST API fallback.
+            if (this.agentState() === 'processing' && !this.live.isConnected()) {
                 this.agentState.set('idle');
             }
             this.scrollToBottom();

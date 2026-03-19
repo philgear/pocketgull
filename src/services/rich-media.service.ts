@@ -185,9 +185,9 @@ export class RichMediaService {
                     const meta = ii.extmetadata ?? {};
                     return {
                         title: p.title?.replace('File:', '') ?? '',
-                        url: encodeURI(ii.url ?? ''),
-                        thumbUrl: encodeURI(ii.thumburl ?? ii.url ?? ''),
-                        descriptionUrl: encodeURI(ii.descriptionurl ?? ''),
+                        url: ii.url ?? '',
+                        thumbUrl: ii.thumburl ?? ii.url ?? '',
+                        descriptionUrl: ii.descriptionurl ?? '',
                         credit: meta.Credit?.value?.replace(/<[^>]+>/g, '') ?? 'Wikimedia Commons',
                         license: meta.LicenseShortName?.value ?? 'See source'
                     } as WikimediaImage;

@@ -146,6 +146,13 @@ export class ExportService {
       --font: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
+    /* Provide missing tailwind dimensions for inline icons */
+    .w-4 { width: 16px; }
+    .h-4 { height: 16px; }
+    .w-3\\.5 { width: 14px; }
+    .h-3\\.5 { height: 14px; }
+    svg { display: inline-block; vertical-align: middle; }
+
     html { font-size: 10pt; }
     body {
       font-family: var(--font);
@@ -604,6 +611,13 @@ export class ExportService {
       --radius: 10px;
       --font: 'Inter', system-ui, -apple-system, sans-serif;
     }
+
+    /* Provide missing tailwind dimensions for inline icons */
+    .w-4 { width: 16px; }
+    .h-4 { height: 16px; }
+    .w-3\\.5 { width: 14px; }
+    .h-3\\.5 { height: 14px; }
+    svg { display: inline-block; vertical-align: middle; }
 
     html { font-size: 10pt; }
     body {
@@ -1503,6 +1517,57 @@ export class ExportService {
       return this.importFromFhirBundle(syntheticFile);
     } else {
       throw new Error('Unrecognized file format. Expected PocketGull native JSON or FHIR R4 Bundle.');
+    }
+  }
+
+  // ─── BigQuery Export ──────────────────────────────────────
+  
+  /**
+   * Publishes the patient record to the BigQuery data warehouse.
+   */
+  async exportToBigQuery(patient: Patient): Promise<void> {
+    console.log('[ExportService] Initiating BigQuery export sequence for:', patient.id);
+    
+    // Transform to standard JSON payload mapping strictly to the BigQuery DDL
+    const payload = {
+      patient_id: patient.id,
+      encounter_timestamp: new Date().toISOString(),
+      gender: patient.gender,
+      age_years: patient.age,
+      active_diagnoses: patient.preexistingConditions,
+      vitals: (() => {
+          const v = patient.vitals;
+          const [sys, dia] = v.bp ? v.bp.split('/') : [null, null];
+          return [{
+            recorded_at: patient.lastVisit ? new Date(patient.lastVisit).toISOString() : new Date().toISOString(),
+            heart_rate_bpm: v.hr ? parseInt(v.hr, 10) : null,
+            systolic_bp: sys ? parseInt(sys, 10) : null,
+            diastolic_bp: dia ? parseInt(dia, 10) : null,
+            temperature_celsius: v.temp ? parseFloat(v.temp) : null,
+            weight_kg: v.weight ? parseFloat(v.weight) : null,
+            clinical_notes: null
+          }];
+      })()
+    };
+
+    try {
+      // Stream directly to the BigQuery relay
+      const response = await fetch('/api/export/bigquery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        const errJson = await response.json();
+        throw new Error(errJson.error || 'Unknown Server Error');
+      }
+      
+      alert("✅ Patient record successfully streamed into BigQuery Data Canvas.");
+      
+    } catch (error) {
+      console.error('[ExportService] BigQuery pipeline failure:', error);
+      alert("BigQuery Export Failed: " + (error as Error).message);
     }
   }
 

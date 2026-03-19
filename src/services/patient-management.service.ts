@@ -22,6 +22,9 @@ import {
   PatientState,
   BodyPartIssue,
 } from "./patient.types";
+import * as CryptoJS from 'crypto-js';
+
+const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 
 // Re-export for use in other components
 export type { BodyPartIssue, HistoryEntry, Patient };
@@ -1301,18 +1304,24 @@ export class PatientManagementService {
       try {
         const saved = localStorage.getItem('pocket_gull_patients');
         if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            // Need to skip over the default MOCK_PATIENTS and use what was saved
-            // We use setTimeout to safely set signsal outside constructor
-             setTimeout(() => {
-               this.patients.set(parsed);
-               this.selectedPatientId.set(parsed[0]?.id || null);
-             }, 0);
+          // Attempt to decrypt the payload
+          const decryptedBytes = CryptoJS.AES.decrypt(saved, ENCRYPTION_KEY);
+          const decryptedStr = decryptedBytes.toString(CryptoJS.enc.Utf8);
+          
+          if (decryptedStr) {
+            const parsed = JSON.parse(decryptedStr);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              // Need to skip over the default MOCK_PATIENTS and use what was saved
+              // We use setTimeout to safely set signsal outside constructor
+               setTimeout(() => {
+                 this.patients.set(parsed);
+                 this.selectedPatientId.set(parsed[0]?.id || null);
+               }, 0);
+            }
           }
         }
       } catch (e) {
-        console.warn('Failed to parse patient data from localStorage', e);
+        console.warn('Failed to parse (or decrypt) patient data from localStorage. Proceeding with mock data.', e);
       }
     }
 
@@ -1321,9 +1330,11 @@ export class PatientManagementService {
         const currentData = this.patients();
         if (typeof localStorage !== 'undefined') {
             try {
-                localStorage.setItem('pocket_gull_patients', JSON.stringify(currentData));
+                const jsonStr = JSON.stringify(currentData);
+                const encrypted = CryptoJS.AES.encrypt(jsonStr, ENCRYPTION_KEY).toString();
+                localStorage.setItem('pocket_gull_patients', encrypted);
             } catch (e) {
-                console.warn('Failed to save patient data to localStorage', e);
+                console.warn('Failed to save encrypted patient data to localStorage', e);
             }
         }
     });

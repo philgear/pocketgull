@@ -4,6 +4,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
+import os from 'node:os';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -140,6 +141,18 @@ app.use(express.json({ limit: '50mb' }));
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
+});
+
+// OS Native Diagnostic Endpoints
+app.get('/api/system/stats', (req, res) => {
+  res.json({
+    platform: os.platform(),
+    totalMemMB: Math.round(os.totalmem() / 1024 / 1024),
+    freeMemMB: Math.round(os.freemem() / 1024 / 1024),
+    uptime: os.uptime(),
+    cpus: os.cpus().length,
+    loadAvg: os.loadavg()[0]?.toFixed(2) || '0.00'
+  });
 });
 
 // JSON File Database Configuration

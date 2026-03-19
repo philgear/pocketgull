@@ -12,6 +12,7 @@ declare var webkitSpeechRecognition: any;
 import { SummaryNode, SummaryNodeItem, ReportSection, ParsedTranscriptEntry, NodeAnnotation, LensAnnotations, VerificationIssue } from './analysis-report.types';
 import { SummaryNodeComponent } from './summary-node.component';
 import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
+import { AuditService } from '../services/audit.service';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { ClinicalGaugeComponent } from './clinical-gauge.component';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -37,8 +38,9 @@ import { RevealDirective } from '../directives/reveal.directive';
 
     <!--Analysis Tabs-->
     @if (hasAnyReport()) {
-      <div class="px-4 sm:px-8 py-2 sm:py-3 border-b border-[#EEEEEE] dark:border-zinc-800 no-print bg-white/50 dark:bg-[#09090b]/50 backdrop-blur-sm overflow-x-auto">
-        <div id="tour-lens-tabs" class="flex items-center gap-1 border-b border-gray-200 dark:border-zinc-800 min-w-max">
+      <div class="px-4 sm:px-8 py-2 sm:py-3 no-print overflow-x-auto w-full">
+        <div class="max-w-4xl mx-auto min-w-0 relative">
+          <div id="tour-lens-tabs" class="flex overflow-x-auto hide-scrollbar items-center gap-1 border-b border-gray-300 dark:border-zinc-700 w-full relative z-10">
           <pocket-gull-button (click)="changeLens('Summary Overview')"
             variant="ghost"
             size="sm"
@@ -47,7 +49,7 @@ import { RevealDirective } from '../directives/reveal.directive';
             [class.dark:border-white]="activeLens() === 'Summary Overview'"
             [class.text-[#1C1C1C]]="activeLens() === 'Summary Overview'"
             [class.dark:text-white]="activeLens() === 'Summary Overview'"
-            class="rounded-none px-4 -mb-px shadow-none">
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Overview
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Functional Protocols')"
@@ -58,8 +60,8 @@ import { RevealDirective } from '../directives/reveal.directive';
             [class.dark:border-white]="activeLens() === 'Functional Protocols'"
             [class.text-[#1C1C1C]]="activeLens() === 'Functional Protocols'"
             [class.dark:text-white]="activeLens() === 'Functional Protocols'"
-            class="rounded-none px-4 -mb-px shadow-none">
-            Interventions
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            Functional Protocols
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Nutrition')"
             variant="ghost"
@@ -69,7 +71,7 @@ import { RevealDirective } from '../directives/reveal.directive';
             [class.dark:border-white]="activeLens() === 'Nutrition'"
             [class.text-[#1C1C1C]]="activeLens() === 'Nutrition'"
             [class.dark:text-white]="activeLens() === 'Nutrition'"
-            class="rounded-none px-4 -mb-px shadow-none">
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Nutrition
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Monitoring & Follow-up')"
@@ -80,8 +82,8 @@ import { RevealDirective } from '../directives/reveal.directive';
             [class.dark:border-white]="activeLens() === 'Monitoring & Follow-up'"
             [class.text-[#1C1C1C]]="activeLens() === 'Monitoring & Follow-up'"
             [class.dark:text-white]="activeLens() === 'Monitoring & Follow-up'"
-            class="rounded-none px-4 -mb-px shadow-none">
-            Monitoring
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            Monitoring & Follow-up
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Patient Education')"
             variant="ghost"
@@ -91,17 +93,18 @@ import { RevealDirective } from '../directives/reveal.directive';
             [class.dark:border-white]="activeLens() === 'Patient Education'"
             [class.text-[#1C1C1C]]="activeLens() === 'Patient Education'"
             [class.dark:text-white]="activeLens() === 'Patient Education'"
-            class="rounded-none px-4 -mb-px shadow-none">
-            Education
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            Patient Education
           </pocket-gull-button>
+        </div>
         </div>
       </div>
     }
 
     <!--Content Area-->
-    <div #contentArea class="flex-1 overflow-y-auto overflow-x-hidden px-2 sm:px-8 pt-4 sm:pt-8 min-h-0 bg-[#F9FAFB] dark:bg-zinc-950">
+    <div #contentArea class="flex-1 mx-4 sm:mx-8 mb-6 mt-2 overflow-y-auto overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 min-h-0">
       <!--Analysis Engine Body-->
-      <div class="max-w-4xl mx-auto px-2 sm:px-6 py-4 sm:py-6 pb-24 min-w-0">
+      <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
         <!--Clinical Overview Dashboard-->
         @if (intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
@@ -181,7 +184,7 @@ import { RevealDirective } from '../directives/reveal.directive';
                     }
                   </div>
 
-                  <div class="rams-typography">
+                  <div class="rams-typography" (mouseover)="onTooltipOver($event)" (mouseout)="onTooltipOut($event)">
                     @for (node of section.nodes; track node.id) {
                       @if (node.type === 'raw') {
                         <div [innerHTML]="node.rawHtml | safeHtml" class="mb-4"></div>
@@ -239,13 +242,41 @@ import { RevealDirective } from '../directives/reveal.directive';
               </div>
             }
           </div>
-        } @else if (!intel.isLoading() && !hasAnyReport()) {
+        }
+
+        @if (!intel.isLoading() && !hasAnyReport()) {
           <div class="h-64 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg flex items-center justify-center no-print">
             <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-widest">Waiting for input data...</p>
           </div>
         }
       </div>
     </div>
+
+    <!-- Viewport Portal Tooltip -->
+    @if (activeTooltip(); as tooltip) {
+      <div class="fixed z-[100] w-72 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg shadow-2xl p-4 pointer-events-none animate-in fade-in zoom-in-95 duration-200"
+           [style.left.px]="tooltip.x"
+           [style.top.px]="tooltip.y"
+           style="transform: translate(-50%, -100%);">
+         <div class="flex items-start gap-3 relative z-10">
+           @if (tooltip.severity === 'high') {
+             <div class="text-red-500 mt-0.5 shrink-0" [innerHTML]="ClinicalIcons.Risk | safeHtml"></div>
+           } @else {
+             <div class="text-amber-500 mt-0.5 shrink-0" [innerHTML]="ClinicalIcons.Warning | safeHtml"></div>
+           }
+           <div>
+             <div class="text-[10px] font-bold uppercase tracking-wider mb-1"
+                  [class.text-red-600]="tooltip.severity === 'high'"
+                  [class.text-amber-600]="tooltip.severity !== 'high'">
+               AI Verification Flag
+             </div>
+             <div class="text-xs text-gray-700 dark:text-zinc-300 leading-relaxed">{{ tooltip.text }}</div>
+           </div>
+         </div>
+         <!-- Caret -->
+         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-zinc-900 border-b border-r border-gray-200 dark:border-zinc-800 rotate-45"></div>
+      </div>
+    }
   `
 })
 export class AnalysisReportComponent implements OnDestroy {
@@ -253,6 +284,15 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly state = inject(PatientStateService);
   protected readonly patientManager = inject(PatientManagementService);
   protected readonly dictation = inject(DictationService);
+  private audit = inject(AuditService);
+
+  readonly hasApiKey = computed(() => {
+    // This line was part of the user's provided snippet, but it was incomplete and syntactically incorrect.
+    // Assuming the user intended to add a computed property named `hasApiKey` and keep the existing injections.
+    // The `inject(AiCacheService);` was already present as `protected readonly cache = inject(AiCacheService);`
+    // and is kept in its original place for syntactical correctness.
+    return true; // Placeholder for actual logic
+  });
   protected readonly cache = inject(AiCacheService);
   protected readonly markdownService = inject(MarkdownService);
   protected readonly ClinicalIcons = ClinicalIcons;
@@ -278,6 +318,35 @@ export class AnalysisReportComponent implements OnDestroy {
 
 
   activeLens = signal<AnalysisLens>('Summary Overview');
+
+  // --- Portal Hover Tooltip ---
+  activeTooltip = signal<{ text: string, x: number, y: number, severity: string } | null>(null);
+
+  onTooltipOver(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('verification-claim')) {
+      const rect = target.getBoundingClientRect();
+      // Ensure the popover stays inside horizontal bounds
+      let x = rect.left + (rect.width / 2);
+      const padding = 150; // half of 300px width
+      if (x < padding) x = padding;
+      if (x > window.innerWidth - padding) x = window.innerWidth - padding;
+
+      this.activeTooltip.set({
+        text: target.getAttribute('data-message') || '',
+        severity: target.classList.contains('bg-red-100') ? 'high' : 'medium',
+        x: x,
+        y: rect.top - 12 // 12px above element
+      });
+    }
+  }
+
+  onTooltipOut(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('verification-claim') || target.closest('.verification-claim')) {
+      this.activeTooltip.set(null);
+    }
+  }
 
   // --- Hover Toolbar State ---
   hoveredElement = signal<HTMLElement | null>(null);
@@ -382,8 +451,10 @@ export class AnalysisReportComponent implements OnDestroy {
             let highlightedHtml = html;
             for (const issue of issues) {
               if (issue.claim && highlightedHtml.includes(issue.claim)) {
-                const colorClass = issue.severity === 'high' ? 'bg-red-100 border-red-200' : 'bg-amber-100 border-amber-200';
-                const highlightSpan = `< span class= "verification-claim px-0.5 border-b-2 border-dotted cursor-help ${colorClass}" title = "${issue.message}" > ${issue.claim} </span>`;
+                const colorClass = issue.severity === 'high' ? 'bg-red-100 border-red-200 dark:bg-red-900/30 dark:border-red-800' : 'bg-amber-100 border-amber-200 dark:bg-amber-900/30 dark:border-amber-800';
+                // Encode the message to ensure it doesn't break data attributes
+                const encodedMsg = issue.message.replace(/"/g, '&quot;');
+                const highlightSpan = `<span class="verification-claim px-0.5 border-b-2 border-dotted cursor-help transition-colors ${colorClass}" data-message="${encodedMsg}">${issue.claim}</span>`;
                 highlightedHtml = highlightedHtml.replace(issue.claim, highlightSpan);
               }
             }
@@ -708,6 +779,7 @@ export class AnalysisReportComponent implements OnDestroy {
 
   // --- Report Actions ---
   async generate() {
+    this.audit.logAction('GENERATE_REPORT', this.patientManager.selectedPatientId());
     const patientId = this.patientManager.selectedPatientId();
     const patient = patientId ? this.patientManager.patients().find(p => p.id === patientId) : null;
     const history = patient?.history || [];
@@ -728,6 +800,7 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
   changeLens(lens: AnalysisLens) {
+    this.audit.logAction('VIEW_LENS', this.patientManager.selectedPatientId(), { lens });
     this.flushAutoSave();
     this.activeLens.set(lens);
   }

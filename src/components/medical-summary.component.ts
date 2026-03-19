@@ -19,6 +19,13 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
   standalone: true,
   imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    /* Tighter margin collapsing inside strategy prose to prevent padding blowouts */
+    .prose :where(p):first-child { margin-top: 0; }
+    .prose :where(p):last-child { margin-bottom: 0; }
+    .prose :where(ul):last-child { margin-bottom: 0; }
+    .prose :where(h2, h3):first-child { margin-top: 0; }
+  `],
   template: `
     @if (patient(); as p) {
       <div class="p-4 sm:p-8 font-sans text-gray-800 dark:text-zinc-200 h-full flex flex-col bg-white dark:bg-[#09090b]">
@@ -29,7 +36,16 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 <h1 class="text-3xl font-light text-[#1C1C1C] dark:text-zinc-100 tracking-tight">{{ p.name }}</h1>
                 <p class="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 dark:text-zinc-400 mt-2">{{ today | date:'fullDate' }}</p>
               </div>
-
+              <div class="flex items-center gap-2">
+                <pocket-gull-button 
+                  (click)="exportToBigQuery()" 
+                  [disabled]="isExporting()"
+                  variant="secondary" 
+                  size="sm"
+                  icon="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
+                  {{ isExporting() ? 'Extracting...' : 'Export to Data Canvas' }}
+                </pocket-gull-button>
+              </div>
             </div>
             
             <!-- Transient SMART on FHIR Success Notification -->
@@ -574,6 +590,23 @@ export class MedicalChartSummaryComponent {
   newVisitReason = signal('');
   showExportMenu = signal(false);
   showEpicSuccess = signal(false);
+  isExporting = signal(false);
+
+  async exportToBigQuery() {
+    const p = this.patient();
+    if (!p) return;
+    this.isExporting.set(true);
+    try {
+      await this.exportService.exportToBigQuery(p);
+      this.showEpicSuccess.set(true); // Reusing the success toast to signal export completion as a generic notification for now
+      setTimeout(() => this.showEpicSuccess.set(false), 3000);
+    } catch (e) {
+      console.error('Failed to export to BigQuery', e);
+      alert('BigQuery export failed. Please check the console.');
+    } finally {
+      this.isExporting.set(false);
+    }
+  }
 
 
 

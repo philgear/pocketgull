@@ -1,5 +1,5 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, untracked, HostListener, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, untracked, HostListener, ViewChild, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { fromEvent, Subscription } from 'rxjs';
@@ -24,14 +24,20 @@ export interface PubMedSearchResult {
   imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="absolute flex flex-col bg-white dark:bg-[#09090b] shadow-2xl border border-gray-300 dark:border-zinc-800 rounded-lg overflow-hidden z-40"
-         [style.left.px]="position().x"
-         [style.top.px]="position().y"
-         [style.width.px]="size().width"
-         [style.height.px]="size().height">
+    <div class="flex flex-col bg-white dark:bg-[#09090b] shadow-2xl border border-gray-300 dark:border-zinc-800 rounded-none md:rounded-lg overflow-hidden z-40 transition-all"
+         [class.fixed]="isMobile()"
+         [class.inset-0]="isMobile()"
+         [class.absolute]="!isMobile()"
+         [style.left.px]="isMobile() ? null : position().x"
+         [style.top.px]="isMobile() ? null : position().y"
+         [style.width.px]="isMobile() ? null : size().width"
+         [style.height.px]="isMobile() ? null : size().height"
+         [style.max-height]="isMobile() ? '100dvh' : 'none'">
       
       <!-- Header / Drag Handle -->
-      <div (mousedown)="startDrag($event)" class="h-10 px-4 flex items-center justify-between bg-gray-100 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shrink-0 cursor-move select-none">
+      <div (mousedown)="isMobile() ? null : startDrag($event)" 
+           [class.cursor-move]="!isMobile()"
+           class="h-10 px-4 flex items-center justify-between bg-gray-100 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shrink-0 select-none">
         <h3 class="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-zinc-400">Research Frame</h3>
         <pocket-gull-button variant="ghost" size="sm" (click)="close()" icon="M12 10.586 16.95 5.636a1 1 0 1 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414L10.586 12 5.636 7.05a1 1 0 0 1 1.414-1.414L12 10.586z" title="Close Research Window" ariaLabel="Close Research Window">
         </pocket-gull-button>
@@ -39,7 +45,7 @@ export interface PubMedSearchResult {
 
       <!-- Toolbar -->
       <div class="p-3 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 shrink-0">
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2 md:flex-nowrap">
           <!-- Search Engine Toggle -->
           <div class="flex items-center bg-gray-200 dark:bg-zinc-800 rounded-md p-0.5">
             <button (click)="searchEngine.set('google')"
@@ -64,7 +70,7 @@ export interface PubMedSearchResult {
             </button>
           </div>
           <!-- Search Input -->
-          <div class="flex-1">
+          <div class="w-full md:flex-1 order-last md:order-none mt-2 md:mt-0">
               <pocket-gull-input 
                 [value]="searchText()"
                 (valueChange)="searchText.set($event)"
@@ -83,9 +89,9 @@ export interface PubMedSearchResult {
 
         <!-- Citation Metadata Form -->
         @if (showCitationForm()) {
-          <div class="mt-3 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-inner space-y-2 animate-in fade-in slide-in-from-top-1">
+          <div class="mt-3 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-inner space-y-2 animate-in fade-in slide-in-from-top-1 w-full order-last">
             <h4 class="text-[10px] font-bold text-gray-800 dark:text-zinc-100 uppercase tracking-tighter mb-1">Citation Metadata (UKRIO Style)</h4>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <pocket-gull-input [value]="authors()" (valueChange)="authors.set($event)" placeholder="Authors (e.g. Smith et al.)" size="sm"></pocket-gull-input>
               <pocket-gull-input [value]="doi()" (valueChange)="doi.set($event)" placeholder="DOI (e.g. 10.1038/s41586-021-03503-x)" size="sm"></pocket-gull-input>
             </div>
@@ -190,11 +196,13 @@ export interface PubMedSearchResult {
       </div>
 
       <!-- Resize Handle -->
-      <div (mousedown)="startResize($event)" class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize text-gray-300 hover:text-gray-600 transition-colors flex items-end justify-end p-0.5">
-          <svg width="100%" height="100%" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 0 L10 10 L0 10" stroke="currentColor" stroke-width="2"/>
-          </svg>
-      </div>
+      @if (!isMobile()) {
+        <div (mousedown)="startResize($event)" class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize text-gray-300 hover:text-gray-600 transition-colors flex items-end justify-end p-0.5">
+            <svg width="100%" height="100%" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 0 L10 10 L0 10" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </div>
+      }
     </div>
   `
 })
@@ -210,9 +218,11 @@ export class ResearchFrameComponent {
     }
   }
   private sanitizer: DomSanitizer = inject(DomSanitizer);
+  private platformId = inject(PLATFORM_ID);
   patientManager = inject(PatientManagementService);
   patientState = inject(PatientStateService);
 
+  isMobile = signal(false);
   searchEngine = signal<'google' | 'pubmed'>('google');
   searchText = signal<string>('');
 
@@ -254,10 +264,14 @@ export class ResearchFrameComponent {
 
   constructor() {
     // Update size based on window
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       const w = window.innerWidth;
       const h = window.innerHeight;
       this.position.set({ x: w * 0.45, y: 100 });
+      
+      const checkMobile = () => this.isMobile.set(window.innerWidth < 768);
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
     }
 
     // --- Special Reference Trigger ---

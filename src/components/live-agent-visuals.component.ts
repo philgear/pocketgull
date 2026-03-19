@@ -11,8 +11,11 @@ import { CommonModule } from '@angular/common';
                 <!-- Glowing Orb -->
                 <div class="absolute inset-0 rounded-full transition-all duration-500" 
                      [class.bg-green-400/10]="agentState === 'idle'"
+                     [class.dark:bg-green-400/20]="agentState === 'idle'"
                      [class.bg-blue-400/20]="agentState === 'listening'"
+                     [class.dark:bg-blue-400/30]="agentState === 'listening'"
                      [class.bg-purple-400/20]="agentState === 'processing'"
+                     [class.dark:bg-purple-400/30]="agentState === 'processing'"
                      [class.blur-2xl]="true"
                      [class.scale-100]="agentState === 'idle'"
                      [class.scale-125]="agentState !== 'idle'">
@@ -21,25 +24,25 @@ import { CommonModule } from '@angular/common';
                 <!-- Animated SVG Avatar -->
                 <svg class="w-full h-full" viewBox="0 0 100 100">
                     <!-- Base Circle -->
-                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#E5E7EB" stroke-width="0.5"/>
+                    <circle cx="50" cy="50" r="40" fill="transparent" class="stroke-gray-200 dark:stroke-zinc-800" stroke-width="0.5"/>
 
                     <!-- Listening Waveform -->
                     @if (agentState === 'listening') {
-                        <path d="M 20 50 Q 35 40, 50 50 T 80 50" fill="none" stroke="#60A5FA" stroke-width="1.5" stroke-linecap="round">
+                        <path d="M 20 50 Q 35 40, 50 50 T 80 50" fill="none" class="stroke-blue-400 dark:stroke-blue-500" stroke-width="1.5" stroke-linecap="round">
                             <animate attributeName="d" dur="1.5s" repeatCount="indefinite" values="M 20 50 Q 35 40, 50 50 T 80 50; M 20 50 Q 35 60, 50 50 T 80 50; M 20 50 Q 35 40, 50 50 T 80 50" />
                         </path>
                     }
 
                     <!-- Processing Spinner -->
                     @if (agentState === 'processing') {
-                        <circle cx="50" cy="50" r="30" fill="none" stroke="#C084FC" stroke-width="2" stroke-dasharray="15 10" stroke-linecap="round">
+                        <circle cx="50" cy="50" r="30" fill="none" class="stroke-purple-400 dark:stroke-purple-500" stroke-width="2" stroke-dasharray="15 10" stroke-linecap="round">
                             <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="1s" repeatCount="indefinite" />
                         </circle>
                     }
 
                     <!-- Idle Pulsing Core -->
                     @if (agentState === 'idle') {
-                        <circle cx="50" cy="50" r="10" fill="#34D399" >
+                        <circle cx="50" cy="50" r="10" class="fill-green-400 dark:fill-green-500" >
                             <animate attributeName="r" dur="2s" repeatCount="indefinite" values="10;12;10" />
                             <animate attributeName="opacity" dur="2s" repeatCount="indefinite" values="1;0.7;1" />
                         </circle>
@@ -47,8 +50,8 @@ import { CommonModule } from '@angular/common';
                 </svg>
             </div>
             <div class="text-center -mt-8 md:-mt-16 transition-all duration-300" [class.opacity-0]="hasChatHistory">
-                <h2 class="text-lg font-bold text-gray-800 dark:text-gray-200">Pocket Gull AI</h2>
-                <p class="text-sm text-gray-500">Live Clinical Co-Pilot</p>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-widest text-[11px]">Pocket Gull AI</h2>
+                <p class="text-[10px] text-gray-500 dark:text-zinc-400 font-medium tracking-wide">Live Clinical Co-Pilot</p>
             </div>
         </div>
     `,

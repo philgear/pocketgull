@@ -5,19 +5,19 @@ import { Component } from '@angular/core';
   standalone: true,
   imports: [],
   template: `
-    <div class="flex flex-col h-full bg-gray-100 dark:bg-gray-800 rounded-lg shadow-md">
-      <div class="flex items-center justify-between p-4 bg-gray-200 dark:bg-gray-700 rounded-t-lg">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Live AI Agent</h2>
-        <span class="px-2 py-1 text-xs font-semibold text-white bg-green-500 rounded-full">Online</span>
+    <div class="flex flex-col h-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg shadow-sm transition-all hover:shadow-md">
+      <div class="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-zinc-800/50 border-b border-gray-100 dark:border-zinc-800 rounded-t-lg">
+        <h2 class="text-sm font-semibold text-gray-800 dark:text-zinc-200 uppercase tracking-widest">Live AI Agent</h2>
+        <span class="px-2 py-0.5 text-[10px] font-semibold text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/50 rounded-full border border-green-200 dark:border-green-800">Online</span>
       </div>
-      <div class="flex-1 p-4 overflow-y-auto">
+      <div class="flex-1 p-4 overflow-y-auto w-full">
         <!-- Chat messages will go here -->
       </div>
-      <div class="p-4 bg-gray-200 dark:bg-gray-700 rounded-b-lg">
+      <div class="p-4 bg-gray-50/50 dark:bg-zinc-800/50 border-t border-gray-100 dark:border-zinc-800 rounded-b-lg">
         <input
           type="text"
           placeholder="Type your message..."
-          class="w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          class="w-full px-4 py-2 text-sm text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 dark:focus:ring-green-600/50 transition-all placeholder:text-gray-400 dark:placeholder:text-zinc-500"
         />
       </div>
     </div>

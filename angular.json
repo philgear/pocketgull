@@ -21,6 +21,11 @@
             "tsConfig": "tsconfig.json",
             "assets": [
               {
+                "glob": "**/*",
+                "input": "public/docs",
+                "output": "/docs"
+              },
+              {
                 "glob": "robots.txt",
                 "input": "src",
                 "output": "/"
@@ -74,7 +79,12 @@
               "swagger-ui-express",
               "genkit",
               "@genkit-ai/googleai",
-              "zod"
+              "zod",
+              "@google-cloud/vertexai",
+              "@google-cloud/logging",
+              "@google-cloud/bigquery",
+              "@google-cloud/dlp",
+              "http-proxy-middleware"
             ],
             "security": {
               "allowedHosts": [
@@ -83,6 +93,7 @@
                 "understory-315235665910.us-west1.run.app",
                 "pocket-gall-315235665910.us-west1.run.app",
                 "pocket-gull-793190615625.us-west1.run.app",
+                "pocket-gull-v2-793190615625.us-west1.run.app",
                 "pocketgull.app",
                 "pocketgull.com",
                 "pocketgall.app",
@@ -101,7 +112,16 @@
             "production": {
               "outputHashing": "all",
               "sourceMap": true,
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "fonts": {
+                  "inline": false
+                }
+              },
               "serviceWorker": "ngsw-config.json"
             },
             "development": {
@@ -115,8 +135,7 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-            "port": 4200,
-            "proxyConfig": "proxy.conf.mjs"
+            "port": 4200
           },
           "configurations": {
             "production": {

@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  pubgemma:
+    image: ollama/ollama:latest
+    container_name: pubgemma-local
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_ORIGINS="*"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Setup Note: After spinning up the container, execute the following to pull the weights:
+    # docker exec pubgemma-local ollama run gemma:2b
+
+volumes:
+  ollama_data:

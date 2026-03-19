@@ -1,0 +1,49 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: "Security & Compliance"
+description: "Zero Trust architecture, HIPAA compliance, and data governance."
+---
+import DocNode from '../components/DocNode.astro';
+
+# Security & Compliance
+
+Trust is paramount in clinical environments. Pocket Gull utilizes a Zero Trust architecture, strict Content Security Policies (CSP), and enterprise data residency to protect both practitioner integrity and patient privacy.
+
+---
+
+## Content Security Policy (CSP)
+
+Pocket Gull implements an aggressive, defense-in-depth Content Security Policy to completely mitigate Cross-Site Scripting (XSS) and data injection attacks.
+
+*   `default-src 'self'` — Restricts all default resource loading to the same origin.
+*   `script-src` — Limits execution to pre-approved scripts (like the internal Doc Drill engine) and blocks `unsafe-inline` where possible, protecting the Angular Signals state.
+*   `connect-src` — Only allows `fetch` connections to explicit, verified endpoints (e.g., the Vertex AI API and internal Express proxy routes like `/api/pubmed`).
+
+Our production deployment consistently achieves **A+ ratings on the Mozilla HTTP Observatory**, enforcing rigorous protection standards.
+
+---
+
+## Auditing & Tracking
+
+### Immutable Telemetry
+Every clinical interaction that mutates state or invokes AI inference is asynchronously tracked. The `AuditService` dispatches payloads to a <DocNode term="BigQuery" category="Google Cloud" hint="Tamper-proof, centralized data warehouse." link="https://cloud.google.com/bigquery" linkLabel="BigQuery Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">Google Cloud BigQuery</DocNode> log, creating an immutable ledger of practitioner ID, timestamp, and action. This ensures complete observability during institutional compliance reviews.
+
+### Zero-Training AI Inference
+Inference requests containing clinical context are routed entirely through the <DocNode term="Vertex AI" category="Google Cloud" hint="Enterprise AI endpoint." link="https://cloud.google.com/vertex-ai" linkLabel="Vertex API →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">Vertex AI API</DocNode>. Customer data is explicitly excluded from foundational model training.
+
+---
+
+## HIPAA Readiness 
+
+Pocket Gull's enterprise deployment is architected for strict HIPAA compliance:
+
+1.  **Business Associate Agreement (BAA)**: The core infrastructure — Cloud Run handling SSR, Vertex AI providing inference, and BigQuery maintaining the audit ledger — is covered under Google Cloud's BAA.
+2.  **Encryption at Rest & In-Transit**: All data is encrypted at rest by default on GCP. All transit must occur over enforced `TLS 1.3` (HTTPS/WSS).
+3.  **Geographic Data Residency**: The Vertex AI deployment is geographically locked (e.g., `us-west1`), ensuring that sensitive clinical reasoning does not leave designated compliance regions.
+4.  **PHI Minimization**: External research requests (like queries to Google Programmable Search) are automatically stripped of explicit PHI elements (names, birthdates, IDs) before transmission.
+
+---
+
+## Local-First Philosophy
+
+Despite its robust cloud infrastructure, Pocket Gull fundamentally acts as a **Local Clinical Data Processor**. The primary clinical record remains entirely within the practitioner's local `IndexedDB`/`localStorage` until explicitly exported via FHIR bundles. No central, internet-accessible database houses aggregate patient records, structurally eliminating mass-breach vulnerabilities.

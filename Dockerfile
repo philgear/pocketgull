@@ -10,6 +10,9 @@ RUN npm install --legacy-peer-deps
 # Bundle app source
 COPY . .
 
+# Install secondary docs-portal dependencies (bypassed by root install)
+RUN npm install --prefix docs --legacy-peer-deps
+
 # Build the Angular application
 RUN npm run build
 

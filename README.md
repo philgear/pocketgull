@@ -22,8 +22,6 @@ Like its namesake, the agent is **agile**, **interruptible**, and **highly obser
 
 > **Industrial Grace:** We believe medical tools should be as beautiful as they are functional. Our design language combines the clinical precision of a laboratory with the "Less, but better" philosophy of Dieter Rams.
 
-![Pocket Gull Dashboard](./docs/images/pocket-gull_dashboard.png)
-
 ---
 
 ## 🛠️ SCIENTIFIC RIGOR & CORE CAPABILITIES
@@ -42,7 +40,18 @@ Moving beyond simple translation, the **COLO Engine** adjusts the "Clinical Stra
 
 ---
 
-## 🧩 TECHNICAL ARCHITECTURE
+## 🧩 TECHNICAL ARCHITECTURE (Time, Scale, and Trade-offs)
+
+Built on Google's definition of software engineering through the lenses of **"Time and Change," "Scale and Efficiency," and "Trade-offs and Costs."**
+
+### Scale & Efficiency
+The application demonstrates alignment through **Smartwatch & Mobile Optimization**, scaling the UI down to extremely constrained viewports (e.g., 286px for Pixel Watch 2), while leveraging **Google Cloud Run** for infinitely scalable backend compute.
+
+### Trade-offs & Costs
+Architectural trade-offs explicitly favor **Local Persistence and FHIR-Standard Data Portability** over a centralized remote database, ensuring maximum privacy, zero PII footprint, and robust offline capabilities.
+
+### Hybrid AI Orchestration (PubGemma Integration)
+While the default agent operates on Google's cloud-based Gemini Flash, the architecture structurally supports **Local Open-Weights Inference**. By leveraging the included `PubGemmaProvider` and the local `docker-compose.yml` Ollama infrastructure, the application can route specific biomedical synthesis tasks directly to a local **PubGemma** instance. This eliminates external transit of patient data, fulfilling absolute Zero-PII requirements while maintaining clinical rigor.
 
 A highly interactive, aesthetically minimal user interface (Industrial Grace) designed for immediate clinical insight.
 *For a full demonstration, press the `Demo` button in the top-right of the application to load the patient simulation.*
@@ -64,7 +73,9 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 
 **Core Features:**
 - **Live AI Consult & Multi-Agent Orchestration:** Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts synthesize clinical data into actionable insights through an interruptible, natural conversational UI with **context-aware memory** of recently discussed report nodes.
+- **Immutable Audit Trails (HIPAA Readiness):** Every clinical intervention is securely processed through **Google Vertex AI** and asynchronously logged to a discrete **Google Cloud BigQuery** telemetry warehouse, establishing a tamper-proof chain of custody without relying on persistent patient record databases.
 - **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
+- **Interactive Astro Documentation Portal:** Comprehensive, SSG-powered developer portal featuring Cmd+K local search (Pagefind), semantic AI hover-drilldowns, and interactive Mermaid.js topological diagrams exploring the codebase architecture.
 - **Cognition & Child Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly or pediatric formats, outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
 - **Printable Clinical Stationery:** CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis, with user-selectable toggles for clinical summaries and history.
 - **Minimalist Dieter Rams Design:** A premium, minimalist UI prioritizing clarity, neutrality, functional excellence, and seamless mobile responsive layouts (`100dvh`). Includes dark-mode agent conversations.
@@ -79,13 +90,14 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 
 **Technologies Used:**
 - **Framework:** Angular v21.1 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
+- **Documentation Engine:** Astro (`docs` portal), Pagefind (Local Search), and Mermaid.js
 - **Visualization:** Three.js (3D Anatomical Modeling)
-- **Intelligence:** Google GenAI SDK (`gemini-2.5-flash`) & Google Agent Development Kit (`@google/adk`)
+- **Intelligence:** Google Vertex AI (`gemini-2.5-flash`), Google GenAI SDK & Google Agent Development Kit (`@google/adk`)
 - **Research Integrations:** Google Programmable Search Engine (CSE) & NIH PubMed E-utilities
 - **Export Engine:** jsPDF & FHIR Bundle standard
 - **Styling:** Tailwind CSS & Dieter Rams Design System
 - **Speech Control:** Web Speech API (Bi-directional voice interaction)
-- **Deployment & Infrastructure:** Google Cloud Run, Express.js Backend
+- **Deployment & Infrastructure:** Google Cloud Run, Express.js Backend, and Google Cloud BigQuery
 
 **Data Sources:**
 Primary inputs consist of manual demographics, biometric body map interaction, and voice-to-text dictation. Auxiliary real-time clinical context is gathered securely without persistent DB tracking using Google Programmable Search Engine API and NCBI PubMed E-utilities XML parsing algorithms. Patient state data is strictly locally persisted between active sessions.
@@ -97,14 +109,15 @@ Reflecting on the development of Pocket Gull, my commitment is to continuously e
 
 ## 📚 Documentation
 
-Full engineering documentation is available in the [`docs/study/`](./docs/study/) directory, built with [Astro](https://astro.build).
+Full engineering documentation is available in the [`docs/`](./docs/) directory, built with [Astro](https://astro.build) and equipped with Cmd+K local search.
 
-- **[Overview](./docs/study/src/pages/index.astro)** — Product introduction, screenshots, and key metrics
-- **[Architecture](./docs/study/src/pages/architecture.mdx)** — System diagram, data flow, and technology stack
-- **[Features](./docs/study/src/pages/features.mdx)** — Complete feature reference by category
-- **[Data & Privacy](./docs/study/src/pages/data.mdx)** — Storage model, PHI handling, and FHIR portability
-- **[Responsible AI](./docs/study/src/pages/responsible-ai.mdx)** — Core principles and societal impact
-- **[Getting Started](./docs/study/src/pages/getting-started.mdx)** — Installation, development, and deployment
+- **[Overview](./docs/src/pages/index.astro)** — Product introduction, screenshots, and key metrics
+- **[Architecture](./docs/src/pages/architecture.mdx)** — Interactive system diagrams, data flow, and technology stack
+- **[Security & Compliance](./docs/src/pages/security.mdx)** — Zero Trust, CSP, HIPAA readiness, and auditing
+- **[Features](./docs/src/pages/features.mdx)** — Complete feature reference by category
+- **[Data & Privacy](./docs/src/pages/data.mdx)** — Storage model, PHI handling, and FHIR portability
+- **[Responsible AI](./docs/src/pages/responsible-ai.mdx)** — Core principles and societal impact
+- **[Getting Started](./docs/src/pages/getting-started.mdx)** — Installation, development, and deployment
 - **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
 
 ---
@@ -156,57 +169,76 @@ The application leverages a modern, reactive architecture utilizing Angular Sign
 
 ```mermaid
 graph TD
-    User[Practitioner] -->|Multimodal Input| UI[Pocket Gull UI]
-    UI -->|Signals-First State| State[PatientState Service]
+    classDef practitioner fill:#2A3423,stroke:#244626,stroke-width:2px,color:#fff,rx:8px,ry:8px;
+    classDef cloudRun fill:#F0F7E8,stroke:#76B362,stroke-width:2px,color:#2A3423,rx:4px,ry:4px;
+    classDef external fill:#ffffff,stroke:#A1A1AA,stroke-width:1px,color:#18181B,rx:4px,ry:4px;
+    classDef db fill:#F9FAFB,stroke:#A1A1AA,stroke-width:1.5px,color:#18181B;
+
+    User("Practitioner<br>(HTTPS / Web Speech)"):::practitioner
     
-    subgraph "INTELLIGENCE LAYER"
-        State -->|Context Injection| Adk[ADK InMemoryRunner]
-        Adk -->|Orchestrates| Agents[Specialized Agents]
-        Agents -->|REST/SSE| Gemini[Gemini 2.5 Flash]
+    subgraph CR [Google Cloud Run Instances]
+        UI("Angular v21 UI<br>(Signals, SSR)"):::cloudRun
+        Backend("Express.js Backend<br>(API & Audit Proxy)"):::cloudRun
     end
-
-    subgraph "EVIDENCE FOUNDATION"
-        Adk -->|Parallel Query| PubMed[NCBI PubMed E-Utilities]
-        Adk -->|Semantic Search| GSearch[Google Search API]
-        PubMed -->|Citations| UI
-        GSearch -->|Evidence Trail| UI
+    
+    User -->|Secure Web Traffic| UI
+    UI <-->|API Polling| Backend
+    
+    Backend -->|Literature Query| PubMed("NCBI PubMed"):::external
+    Backend -->|DICOM Proxy| Dicom("GCP DICOM"):::external
+    Backend -.->|Audit Telemetry| BQ[("Google BigQuery<br>(Audit Log)")]:::db
+    
+    UI -->|Realtime Tree| State("PatientStateService"):::cloudRun
+    State -->|Triggers| ADK("ADK InMemoryRunner"):::cloudRun
+    
+    subgraph Agents [Multi-Agent System]
+        O("Overview Agent"):::cloudRun
+        I("Intervention Ag."):::cloudRun
+        M("Monitor Agent"):::cloudRun
+        E("Education Agent"):::cloudRun
     end
-
-    subgraph "OUTPUT & EXPORT"
-        UI -->|COLO Engine| Translation[Cognitive Adaptation]
-        Translation -->|Dieter Rams Style| PDF[Clinical Stationary PDF]
-        State -->|Standardization| FHIR[FHIR Bundle JSON]
-    end
+    
+    ADK --- Agents
+    Agents <-->|Streaming JSON| Vertex("Google Vertex AI<br>(Gemini 2.5 Flash)"):::external
 ```
 
 ---
 
-## 🚀 INFRASTRUCTURE & DEPLOYMENT
+## 🚀 INFRASTRUCTURE, CI/CD & TESTING
 
-#### 1. REPRODUCIBILITY
-```bash
-git clone https://github.com/philgear/pocket-gull.git
-npm install
-npm run dev
-```
+#### 1. KAIZEN PHILOSOPHY & CONTINUOUS DELIVERY
+Our Kaizen principle of continuous, incremental improvement maps directly to Google's methodologies for **Continuous Integration and Continuous Delivery (CI/CD)**. "Iterative Design" and "Incremental Intelligence" translate into maintaining fast feedback loops and automation. Deployment pipelines (like `./scripts/deploy.sh`) break up releases into manageable pieces, shifting data-driven decisions earlier in the process.
 
-#### 2. CLOUD ORCHESTRATION
-The project is built for **Google Cloud Run**. Our `deploy.sh` script automates the build-and-release pipeline, including Google Cloud Secret Manager integration for `GEMINI_API_KEY`.
+#### 2. RIGOROUS AUTOMATED TESTING
+Mirroring Google's heavy dedication to testing infrastructure, the repository formalizes:
+- **Unit Testing:** For individual state management and utility functions.
+- **Test Doubles:** Faking and Stubbing for AI agents (`LlmAgent`) and external APIs to ensure reliability without rate-limit flakiness.
+- **Larger Testing:** Comprehensive browser, device, and performance testing using Puppeteer scripts (`puppeteer-test.js`, `test-mobile-scroll.js`) and Lighthouse checks to guarantee 100/100 performance scores.
+
+#### 3. CLOUD ORCHESTRATION
+The project is built for **Google Cloud Run** to ensure reproducible, scalable compute. Our deployment scripts automate the build-and-release pipeline, including Google Cloud Secret Manager integration for `GEMINI_API_KEY`.
 
 ---
 
-## 📜 RESPONSIBLE AI & ETHICS
+## 📜 RESPONSIBLE AI & ENGINEERING FOR EQUITY
 
-Pocket Gull adheres to the **Human-in-the-Loop** (HITL) principle. 
-- **Task Bracketing:** Clinicians must manually "bracket" (validate/edit) AI suggestions before they are archived.
-- **Explainability:** The agent surfaces its reasoning lens (Intervention, Monitoring, Education) for every output.
+Pocket Gull prioritizes **Engineering for Equity**, recognizing that "Bias Is the Default." We actively strive to understand diversity and challenge established processes to ensure fair AI outputs.
+
+- **Fairness & Bias Mitigation:** The architecture relies on structured, physician-directed inputs to significantly reduce the risk of biased AI generations.
+- **Human-in-the-Loop (HITL) Oversight:** Clinicians must manually "bracket" (validate/edit) AI suggestions before they are archived. By preventing "black box" decisions, we perfectly align with building safe, equitable software.
+- **Explainability:** The agent surfaces its reasoning lens (Intervention, Monitoring, Education) for every output and cites real-world evidence.
 - **Privacy Core:** Zero PII persistence. All patient state is transient or locally-stored.
 
 ---
 
-## 👨‍💻 THE CRAFT
+## 👨‍💻 THE CRAFT & STANDARDIZED ENGINEERING
+
 **Phil Gear** / [g.dev/philgear](https://g.dev/philgear)  
 Engineering with **Kaizen**—the belief that clinical excellence is a journey of continuous refinement.
+
+To mirror Google's internal engineering culture, the project relies heavily on internal processes for **Knowledge Sharing, Style Guides, Code Review, and Documentation**:
+- **Code Correctness & Consistency:** Strict Angular/TypeScript formatters (Zoneless, Signals-first) combined with a highly curated Tailwind Dieter Rams style guide.
+- **Readability Standard:** Maintaining rigorous documentation regarding data flow, architecture (`docs/study/`), and deployment. Practicing "blameless" code reviews and consistent styling ensures long-term system maintainability.
 
 ---
 
