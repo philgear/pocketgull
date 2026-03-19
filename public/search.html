@@ -131,33 +131,40 @@
             }
         });
 
-        // Inject Bookmark buttons when search results load
-        // Using a simple MutationObserver to detect inserted result blocks
+        // Catch inserted Search Results and broadcast to parent window
         const observer = new MutationObserver((mutations) => {
+            let newResults = [];
             mutations.forEach((mutation) => {
                 if (mutation.addedNodes) {
                     mutation.addedNodes.forEach((node) => {
                         if (node.nodeType === 1 && node.classList) { // ELEMENT_NODE
-                            if (node.classList.contains('gsc-webResult') && !node.querySelector('.pocket-gull-btn')) {
-                                const btn = document.createElement('button');
-                                btn.className = 'pocket-gull-btn';
-                                btn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-                    </svg>
-                    Bookmark
-                  `;
+                            if (node.classList.contains('gsc-webResult') && !node.dataset.extracted) {
+                                node.dataset.extracted = "true";
 
-                                // gsc-thumbnail-inside tends to be the text container
-                                let container = node.querySelector('.gsc-thumbnail-inside') || node.querySelector('.gs-result');
-                                if (container) {
-                                    container.appendChild(btn);
+                                const titleEl = node.querySelector('a.gs-title');
+                                const snippetEl = node.querySelector('.gs-snippet');
+                                const urlEl = node.querySelector('.gsc-url-top');
+
+                                if (titleEl) {
+                                    newResults.push({
+                                        title: titleEl.innerText,
+                                        url: titleEl.href,
+                                        snippet: snippetEl ? snippetEl.innerText : '',
+                                        displayUrl: urlEl ? urlEl.innerText : ''
+                                    });
                                 }
                             }
                         }
                     });
                 }
             });
+
+            if (newResults.length > 0) {
+                window.parent.postMessage({
+                    type: 'GOOGLE_SEARCH_RESULTS',
+                    results: newResults
+                }, '*');
+            }
         });
 
         // Start observing once the container exists

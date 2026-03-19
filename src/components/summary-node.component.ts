@@ -1,6 +1,6 @@
 import {
   Component, ChangeDetectionStrategy, inject, signal, input, output,
-  computed, OnDestroy, ViewChild, ElementRef, AfterViewChecked,
+  computed, OnDestroy, ViewChild, ElementRef, AfterViewChecked, HostListener, effect,
   ViewEncapsulation
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -1154,7 +1154,7 @@ ${nodeText.slice(0, 400)}${nodeText.length > 400 ? '...' : ''}
 
 Patient context is available. Your role:
 1. Briefly explain the clinical rationale (2-3 sentences).
-2. Cite supporting evidence or guidelines if applicable.
+2. Cite supporting evidence or guidelines if applicable using strict UKRIO-compliant scientific reference formats. You MUST hyperlink DOI or PubMed URLs directly within your markdown (e.g. \`[Author et al. (2024)](https://pubmed.ncbi.nlm.nih.gov/...)\`).
 3. Answer follow-up questions about alternatives, risks, or nuances.
 Keep responses concise and clinically precise. Use short paragraphs and bullet lists for structure.
 
@@ -1344,6 +1344,26 @@ Only include a rich-media block when the user explicitly requests visual or rese
   insertSuggestion(sugg: string) {
     const note = this.node().note ? `${this.node().note}\n${sugg}` : sugg;
     this.update.emit({ key: this.node().key, note });
+  }
+
+  @HostListener('click', ['$event'])
+  onGlobalClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const anchor = target.closest('a');
+    if (anchor && anchor.href && anchor.href.startsWith('http')) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Native Publishers like PubMed set X-Frame-Options: SAMEORIGIN which block classic iframing.
+      // So, extract the PMID from the URL and route it natively through our PocketGull JSON Research Proxy!
+      const pubmedMatch = anchor.href.match(/pubmed\.ncbi\.nlm\.nih\.gov\/(\d+)/i);
+      if (pubmedMatch && pubmedMatch[1]) {
+        this.patientState.requestResearchSearch(pubmedMatch[1], 'pubmed');
+        return;
+      }
+
+      this.patientState.requestResearchUrl(anchor.href);
+    }
   }
 
   acceptProposal() {

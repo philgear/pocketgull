@@ -25,7 +25,7 @@ import { DEMO_ANALYSIS_REPORT } from './demo-data';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
 import { WalkthroughTourService } from './services/walkthrough-tour.service';
-import { AuthGateComponent } from './components/auth-gate.component';
+import { SecureSplashComponent } from './components/secure-splash.component';
 import { SessionStateService } from './services/session-state.service';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
@@ -46,7 +46,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     VoiceAssistantComponent,
     RevealDirective,
     WalkthroughTourComponent,
-    AuthGateComponent
+    SecureSplashComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,162 +59,13 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
       <app-dictation-modal></app-dictation-modal>
       <app-walkthrough-tour></app-walkthrough-tour>
       
-      @if (session.isLocked()) {
-        <app-auth-gate></app-auth-gate>
-      }
-
-      @if (!hasApiKey()) {
-        <main class="fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center justify-center p-6 text-center landmark-main">
-          <!-- Origami Pocket Splash -->
-          <div class="mb-10 relative w-full h-56 max-w-sm mx-auto flex items-end justify-center">
-             <!-- The Pocket -->
-            <div class="origami-pocket"></div>
-            
-            <!-- The Seagull -->
-            <div class="origami-seagull-container origami-seagull-enter"
-                 [class.frightened]="isSeagullFrightened()"
-                 [style.--fly-x.px]="seagullFlyAwayX()"
-                 [style.--fly-y.px]="seagullFlyAwayY()">
-                
-                <!-- 3D Folding Paper -->
-                <div class="origami-paper-3d">
-                    <div class="paper-panel panel-base"></div>
-                    <div class="paper-panel panel-left text-[8px] text-gray-300 font-mono p-1 opacity-50">CLINICAL DATA</div>
-                    <div class="paper-panel panel-right text-[8px] text-gray-300 font-mono p-1 opacity-50 text-right">ASSESSMENT</div>
-                    <div class="paper-panel panel-top"></div>
-                 </div>
-
-                <div class="origami-seagull">
-                    <!-- Rotation wrapper for mouse tracking -->
-                    <div [style.transform]="'rotate(' + seagullAngle() + 'deg)'" class="w-full h-full transition-transform duration-200 ease-out origin-center">
-                    <!-- Mathematical Sierpiński & Golden Ratio Seagull -->
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="text-[#1C1C1C] dark:text-zinc-100">
-                        <!-- Mathematical Construction Framework -->
-                        <g stroke="currentColor" stroke-width="0.1" fill="none" opacity="0.15" stroke-dasharray="1 2">
-                            <!-- Golden Ratio Circles (phi = 1.618) -->
-                            <circle cx="50" cy="50" r="10" />
-                            <circle cx="50" cy="50" r="16.18" />
-                            <circle cx="50" cy="50" r="26.18" />
-                            <circle cx="50" cy="50" r="42.36" />
-                            <!-- Center Axes -->
-                            <line x1="0" y1="50" x2="100" y2="50" />
-                            <line x1="50" y1="0" x2="50" y2="100" />
-                            <!-- Fibonacci Spiral Approximation -->
-                            <path d="M50,40 A10,10 0 0,1 60,50 A16.18,16.18 0 0,1 43.82,66.18 A26.18,26.18 0 0,1 17.64,40 A42.36,42.36 0 0,1 60,-2.36" />
-                        </g>
-
-                        <!-- Sierpiński & Golden Ratio Seagull Geometry -->
-                        <g stroke="currentColor" stroke-width="0.4" fill="none" stroke-linejoin="round">
-                            <!-- Body: Central Golden Triangle (approx) -->
-                            <polygon points="50,20 65,70 35,70" fill="currentColor" fill-opacity="0.03" />
-                            <line x1="50" y1="20" x2="50" y2="70" stroke-width="0.2" opacity="0.5" />
-                            <line x1="35" y1="45" x2="65" y2="45" stroke-width="0.2" opacity="0.5" />
-
-                            <!-- Left Wing (Sierpiński Depth 3) -->
-                            <polygon points="50,20 5,40 40,75" />
-                            <!-- Depth 1 Cutout -->
-                            <polygon points="27.5,30 22.5,57.5 45,47.5" fill="currentColor" fill-opacity="0.05" />
-                            <line x1="50" y1="20" x2="22.5" y2="57.5" stroke-width="0.15" />
-                            <line x1="5" y1="40" x2="45" y2="47.5" stroke-width="0.15" />
-                            <!-- Depth 2 Cutouts -->
-                            <polygon points="38.75,25 36.25,38.75 47.5,33.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="16.25,35 25,43.75 13.75,48.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="31.25,66.25 33.75,52.5 42.5,61.25" fill="currentColor" fill-opacity="0.08" />
-
-                            <!-- Right Wing (Sierpiński Depth 3) -->
-                            <polygon points="50,20 95,40 60,75" />
-                            <!-- Depth 1 Cutout -->
-                            <polygon points="72.5,30 77.5,57.5 55,47.5" fill="currentColor" fill-opacity="0.05" />
-                            <line x1="50" y1="20" x2="77.5" y2="57.5" stroke-width="0.15" />
-                            <line x1="95" y1="40" x2="55" y2="47.5" stroke-width="0.15" />
-                            <!-- Depth 2 Cutouts -->
-                            <polygon points="61.25,25 63.75,38.75 52.5,33.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="83.75,35 75,43.75 86.25,48.75" fill="currentColor" fill-opacity="0.08" />
-                            <polygon points="68.75,66.25 66.25,52.5 57.5,61.25" fill="currentColor" fill-opacity="0.08" />
-
-                            <!-- Tail Geometry -->
-                            <polygon points="35,70 65,70 50,90" />
-                            <polygon points="42.5,70 57.5,70 50,80" fill="currentColor" fill-opacity="0.05" />
-
-                            <!-- Head & Beak Array (Angular extension) -->
-                            <polygon points="50,20 45,10 55,10" />
-                            <!-- Functional Braun Orange Accent Beak -->
-                            <polygon points="55,10 70,5 50,5" stroke="#ff4500" fill="#ff4500" fill-opacity="0.8" stroke-width="0.3" />
-                            <line x1="50" y1="20" x2="70" y2="5" stroke-width="0.2" opacity="0.3" />
-                        </g>
-
-                        <!-- Mathematical Annotations (Tiny text) -->
-                        <g fill="currentColor" opacity="0.4" font-family="monospace" font-size="2.5" transform="scale(0.8) translate(10, 15)">
-                            <text x="50" y="20">φ = 1.618</text>
-                            <text x="5" y="45">f(x) = x² + y²</text>
-                            <text x="80" y="45">S_n = 3^n</text>
-                            <text x="50" y="95">lim_{{ '{' }}n→∞{{ '}' }}</text>
-                        </g>
-                    </svg>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <h1 class="text-xl font-bold mb-1 uppercase tracking-[0.2em] text-[#1C1C1C] dark:text-zinc-100">Pocket Gull</h1>
-          <p class="text-gray-500 dark:text-zinc-400 mb-8 text-xs uppercase tracking-widest">Clinical Intelligence Platform</p>
-
-            <!-- API Key Input -->
-            <div class="w-full max-w-sm relative z-40" id="seagull-safe-zone">
-              <p class="text-gray-500 dark:text-zinc-400 mb-4 text-sm">Enter your Gemini API key to access the live practitioner dashboard.</p>
-              <div class="relative flex items-center border border-gray-200 dark:border-zinc-800 rounded focus-within:border-gray-400 dark:focus-within:border-zinc-600 transition-colors mb-2">
-                <input
-                  id="api-key-input"
-                  [(ngModel)]="apiKeyInput"
-                  [type]="showPassword() ? 'text' : 'password'"
-                  placeholder="Paste your Gemini API key here"
-                  class="flex-1 px-4 py-3 text-sm bg-transparent outline-none font-mono text-gray-800 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600"
-                  (keydown.enter)="submitApiKey()"
-                />
-                <button (click)="showPassword.update(v => !v)" class="px-3 text-gray-500 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors" [attr.aria-label]="showPassword() ? 'Hide key' : 'Show key'">
-                  @if (showPassword()) {
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  } @else {
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  }
-                </button>
-              </div>
-              @if (apiKeyError()) {
-                <p class="text-red-500 text-xs mb-3">{{ apiKeyError() }}</p>
-              }
-              <button (click)="submitApiKey()" [disabled]="!apiKeyInput().trim()"
-                class="w-full py-3 bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-[#09090b] text-xs font-bold uppercase tracking-widest hover:bg-black dark:hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed mb-3">
-                Enter Dashboard
-              </button>
-            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"
-              class="block text-xs text-[#416B1F] dark:text-[#689f38] hover:text-[#244626] dark:hover:text-[#8bc34a] transition-colors mb-8">
-              Get an API key at <span class="font-bold">ai.dev</span> →
-            </a>
-
-            <!-- Divider -->
-            <div class="relative flex items-center gap-4 mb-8">
-              <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
-              <span class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-widest">or</span>
-              <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
-            </div>
-
-            <!-- Demo Mode -->
-            <button (click)="loadDemoMode()"
-              class="w-full py-3 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 transition-all">
-              Try Demo — No Key Required
-            </button>
-            <p class="text-gray-500 dark:text-zinc-400 text-xs mt-2">Loads a pre-sampled patient with example AI analysis outputs.</p>
-          </div>
-
-          <!-- Legal & Medical Disclaimer -->
-          <div class="absolute bottom-6 left-6 right-6 text-center max-w-3xl mx-auto no-print">
-            <p class="text-[10px] text-gray-500 dark:text-zinc-400 leading-relaxed uppercase tracking-widest font-medium">
-              Important Legal / Liability Disclaimer
-            </p>
-            <p class="text-[10px] text-gray-500 dark:text-zinc-400 leading-relaxed mt-1">
-              The software provided by Pocket Gull acts as a clinical support and administrative tool to aggregate and analyze explicitly provided medical data. It is not intended to independently diagnose, treat, or cure any disease, and final clinical judgments remain solely the responsibility of the licensed healthcare provider.
-            </p>
-          </div>
-        </main>
+      @if (session.isLocked() || !hasApiKey()) {
+        <app-secure-splash
+          [apiKeyError]="apiKeyError()"
+          (submitKey)="apiKeyInput.set($event); submitApiKey()"
+          (loadDemo)="loadDemoMode()"
+          (selectAiStudio)="selectKey()">
+        </app-secure-splash>
       } @else {
         <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
         <!-- Offline Banner -->
@@ -348,6 +199,16 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
               <span class="hidden sm:inline">Research</span>
             </button>
             
+            <a href="/docs/" target="_blank" rel="noopener"
+               aria-label="Open Documentation"
+               class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+              <span class="hidden sm:inline">Docs</span>
+            </a>
+
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
                     aria-label="Start Tour Guide"
@@ -480,32 +341,47 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             </div>
 
             <!-- RESIZER V -->
-            <div title="Drag to resize, Double-click to maximize chart" class="hidden md:flex w-2 shrink-0 items-center justify-center cursor-col-resize z-20 no-print group relative"
-                 [class.md:hidden]="isChartCollapsed() || isAnalysisCollapsed()"
+            <div title="Drag to resize, Double-click to maximize chart" class="hidden md:flex w-2 shrink-0 items-center justify-center cursor-col-resize z-20 no-print group"
+                 [class.relative]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                 [class.absolute]="isChartCollapsed() || isAnalysisCollapsed()"
+                 [class.h-full]="isChartCollapsed() || isAnalysisCollapsed()"
+                 [class.left-0]="isChartCollapsed()"
+                 [class.right-0]="isAnalysisCollapsed()"
+                 [class.top-0]="isChartCollapsed() || isAnalysisCollapsed()"
                  (mousedown)="startColumnDrag($event)"
                  (dblclick)="maximizeChart()">
                 
                 <!-- Full-width background bar -->
-                <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-4 bg-transparent group-hover:bg-gray-100/50 dark:group-hover:bg-zinc-800/50 transition-colors rounded-full z-0"></div>
+                <div class="absolute inset-y-0 w-4 bg-transparent group-hover:bg-gray-100/50 dark:group-hover:bg-zinc-800/50 transition-colors rounded-full z-0"
+                     [class.left-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.-translate-x-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.left-0]="isChartCollapsed()"
+                     [class.right-0]="isAnalysisCollapsed()"></div>
                 <div class="absolute inset-0 bg-gray-100/50 dark:bg-zinc-800/50 group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors rounded"></div>
                 <!-- Handle -->
                 <div class="h-12 w-1.5 rounded-full bg-gray-200 dark:bg-zinc-700 group-hover:bg-gray-300 dark:group-hover:bg-zinc-600 transition-colors relative z-10"></div>
 
                 <!-- Quick Actions (V4) -->
-                <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white dark:bg-zinc-900 shadow-xl border border-gray-200 dark:border-zinc-800 rounded-full p-1.5 z-30">
+                <div class="absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white dark:bg-zinc-900 shadow-xl border border-gray-200 dark:border-zinc-800 rounded-full p-1.5 z-30"
+                     [class.left-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.-translate-x-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.left-0]="isChartCollapsed()"
+                     [class.translate-x-2]="isChartCollapsed()"
+                     [class.right-0]="isAnalysisCollapsed()"
+                     [class.-translate-x-2]="isAnalysisCollapsed()">
                    
                    <!-- Panel Management -->
                    <div class="flex flex-col gap-1 border-b border-gray-100 dark:border-zinc-800 pb-1.5 mb-0.5">
-                      <button (click)="$event.stopPropagation(); toggleChart()" [class.bg-black]="!isChartCollapsed()" [class.dark:bg-white]="!isChartCollapsed()" [class.text-white]="!isChartCollapsed()" [class.dark:text-black]="!isChartCollapsed()"
-                              title="Toggle Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
+                      <button (click)="$event.stopPropagation(); maximizeChart()" [class.bg-black]="!isChartCollapsed() && isAnalysisCollapsed()" [class.dark:bg-white]="!isChartCollapsed() && isAnalysisCollapsed()" [class.text-white]="!isChartCollapsed() && isAnalysisCollapsed()" [class.dark:text-black]="!isChartCollapsed() && isAnalysisCollapsed()"
+                              title="Maximize Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); toggleAnalysis()" [class.bg-black]="!isAnalysisCollapsed()" [class.dark:bg-white]="!isAnalysisCollapsed()" [class.text-white]="!isAnalysisCollapsed()" [class.dark:text-black]="!isAnalysisCollapsed()"
-                              title="Toggle Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
+                      <button (click)="$event.stopPropagation(); maximizeAnalysis()" [class.bg-black]="isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:bg-white]="isChartCollapsed() && !isAnalysisCollapsed()" [class.text-white]="isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:text-black]="isChartCollapsed() && !isAnalysisCollapsed()"
+                              title="Maximize Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); maximizeChart()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors" title="Maximize Chart">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="m15 18-6-6 6-6"></path></svg>
+                      <button (click)="$event.stopPropagation(); showSplitView()" [class.bg-black]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:bg-white]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.text-white]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:text-black]="!isChartCollapsed() && !isAnalysisCollapsed()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors" title="Split View">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="2" y="3" width="20" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
                       </button>
                    </div>
 
@@ -566,7 +442,13 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
                  <!-- Section 1: Analysis Intake Container -->
-                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]">
+                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]"
+                      [class.rounded-none]="isChartCollapsed()"
+                      [class.border-y-0]="isChartCollapsed()"
+                      [class.border-r-0]="isChartCollapsed()"
+                      [class.shadow-none]="isChartCollapsed()"
+                      [class.bg-[#F9FAFB]]="isChartCollapsed()"
+                      [class.dark:bg-[#09090b]]="isChartCollapsed()">
                      @defer (on viewport) {
                        <app-analysis-container class="block h-full min-h-0 min-w-0" appReveal [revealDelay]="100"></app-analysis-container>
                      } @placeholder {
@@ -575,11 +457,76 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  </div>
             </div>
 
-            <!-- Overlay: Full Screen Voice Assistant -->
+            <!-- Pocket: Floating Voice Assistant -->
             @if (state.isLiveAgentActive()) {
-              <div class="fixed inset-0 z-[100] bg-white dark:bg-[#111111] flex flex-col transition-all duration-700 animate-in fade-in"
-                   style="animation: intro-fullscreen 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
-                  <app-voice-assistant class="block h-full w-full"></app-voice-assistant>
+              <!-- Background backdrop blur -->
+              <div class="fixed inset-0 z-[99] bg-black/10 dark:bg-black/30 backdrop-blur-[2px] animate-in fade-in" (click)="state.toggleLiveAgent(false)"></div>
+              
+              <!-- Animation Styles for Folding -->
+              <style>
+                @keyframes origami-unfold {
+                    0% { transform: scaleY(0.1) rotateX(80deg) rotateZ(-10deg); opacity: 0; }
+                    60% { transform: scaleY(1.1) rotateX(-15deg) rotateZ(5deg); opacity: 1; }
+                    100% { transform: scaleY(1) rotateX(0deg) rotateZ(0deg); opacity: 1; }
+                }
+                @keyframes fly-out-pocket {
+                    0% { transform: translateY(100px) scale(0.2) rotate(-20deg); opacity: 0; }
+                    60% { transform: translateY(-15px) scale(1.1) rotate(10deg); opacity: 1; }
+                    100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+                }
+                .origami-fold {
+                    animation: origami-unfold 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                    transform-style: preserve-3d;
+                }
+                .fly-out {
+                    animation: fly-out-pocket 1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                }
+                .fold-1 { animation-delay: 150ms; }
+                .fold-2 { animation-delay: 300ms; }
+                .fold-3 { animation-delay: 450ms; }
+                .fold-4 { animation-delay: 600ms; }
+              </style>
+
+              <!-- The Pocket Container -->
+              <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100%-2rem)] sm:w-[420px] h-[650px] max-h-[calc(100dvh-4rem)] z-[100] flex flex-col transition-all duration-500 animate-in slide-in-from-bottom-10 fade-in pointer-events-none">
+                 
+                 <!-- Perched Origami Seagull -->
+                 <div class="relative w-full h-24 pointer-events-auto flex justify-center items-end pb-0 translate-y-[4px] z-[101]" style="perspective: 1000px;">
+                    <svg class="w-28 h-28 drop-shadow-[0_10px_10px_rgba(20,50,90,0.3)] fly-out" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <g fill-rule="evenodd" stroke="#1E3A5F" stroke-width="2.5" stroke-linejoin="round">
+                            <!-- Right Wing (Back) -->
+                            <polygon points="107,95 140,50 115,85" fill="#C5D9ED" class="origami-fold fold-4 origin-[60%_45%]" />
+                            <polygon points="140,50 115,85 130,100" fill="#E6F0FA" class="origami-fold fold-3 origin-[60%_45%]" />
+
+                            <!-- Left Wing (Front raised) -->
+                            <polygon points="40,35 60,65 30,55" fill="#FFFFFF" class="origami-fold fold-4 origin-[35%_35%]" />
+                            <polygon points="40,35 85,60 60,65" fill="#FFFFFF" class="origami-fold fold-3 origin-[40%_35%]" />
+                            <polygon points="85,60 107,95 60,65" fill="#DAE8F5" class="origami-fold fold-2 origin-[40%_35%]" />
+                            <polygon points="60,65 107,95 90,115" fill="#FFFFFF" class="origami-fold fold-1 origin-[50%_50%]" />
+
+                            <!-- Tail -->
+                            <polygon points="45,130 65,110 55,145" fill="#FFFFFF" class="origami-fold fold-4 origin-[30%_65%]" />
+                            <polygon points="65,110 55,145 90,115" fill="#E6F0FA" class="origami-fold fold-3 origin-[35%_65%]" />
+
+                            <!-- Body -->
+                            <polygon points="65,110 90,115 107,95" fill="#FFFFFF" class="origami-fold origin-[50%_60%]" />
+                            <polygon points="90,115 107,95 125,105" fill="#FFFFFF" class="origami-fold origin-[50%_60%]" />
+                            <polygon points="90,115 125,105 120,130" fill="#C5D9ED" class="origami-fold origin-[55%_60%]" />
+
+                            <!-- Head/Beak -->
+                            <polygon points="107,95 122,90 125,105" fill="#FFFFFF" class="origami-fold fold-1 origin-[60%_50%]" />
+                            <polygon points="122,90 135,93 125,105" fill="#FFFFFF" class="origami-fold fold-2 origin-[60%_50%]" />
+                            <polygon points="125,105 135,93 140,110" fill="#E6F0FA" class="origami-fold fold-2 origin-[60%_50%]" />
+                            <polygon points="135,93 150,100 133,102" fill="#E6F0FA" class="origami-fold fold-3 origin-[65%_50%]" />
+                        </g>
+                    </svg>
+                 </div>
+                 
+                 <!-- The Pocket Window styled like the Origami Theme -->
+                 <div class="flex-1 w-full bg-gradient-to-br from-[#E1EAF4] to-[#C9DEEE] dark:from-[#0F172A] dark:to-[#1E293B] rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(30,58,95,0.4)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] border-[3px] border-white dark:border-[#334155] overflow-hidden pointer-events-auto flex flex-col relative ring-1 ring-[#1E3A5F]/10 dark:ring-black/50">
+                    <!-- Embedded Voice Assistant logic takes over inner bounds transparently -->
+                    <app-voice-assistant class="block h-full w-full mix-blend-normal bg-white/70 dark:bg-black/50 backdrop-blur-md"></app-voice-assistant>
+                 </div>
               </div>
             }
 
@@ -591,218 +538,204 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             }
         }
 
-    <!-- Preview & Print Modal -->
+    <!-- Preview & Print Modal (Dieter Rams Style) -->
     @if (showPreviewModal()) {
-      <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 no-print">
-        <div class="bg-white dark:bg-[#09090b] w-full max-w-4xl max-h-[85dvh] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-[#F9FAFB] dark:bg-zinc-900">
-            <div>
-              <h2 class="text-lg font-bold text-[#1C1C1C] dark:text-zinc-100">Preview & Print Care Plan</h2>
-              <p class="text-xs uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-wider mt-1">Review and edit finalized text before archiving</p>
-            </div>
-            <pocket-gull-button 
-              variant="ghost" 
-              size="sm" 
-              (click)="closePreview()" 
-              ariaLabel="Close Preview Modal"
-              icon="M18 6L6 18M6 6l12 12">
-            </pocket-gull-button>
+      <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 no-print">
+        <div class="bg-[#f9f9f9] dark:bg-[#111111] w-full max-w-5xl max-h-[90dvh] rounded-[2px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-[0.98] duration-300 border border-gray-300 dark:border-zinc-800 relative">
+          
+          <!-- Classic Dieter Rams Grill -->
+          <div class="absolute top-0 left-0 right-0 h-1 flex gap-0.5 px-6 opacity-40">
+             <div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div><div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div><div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div><div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div>
           </div>
-          <div class="flex-1 overflow-y-auto p-6 bg-white dark:bg-[#09090b] relative">
-              <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex flex-col gap-1">
-                  <h3 class="block text-[10px] font-bold text-[#689F38] uppercase tracking-[0.2em]">Care Plan Finalization</h3>
-                  <p class="text-[10px] text-gray-500 lowercase font-medium italic">Adjust cognition level for patient understanding</p>
+
+          <!-- Header -->
+          <div class="px-8 pt-6 pb-4 border-b border-gray-200 dark:border-zinc-800 flex justify-between items-start bg-transparent">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                 <div class="w-2 h-2 rounded-full bg-[#ff4500] animate-pulse shadow-[0_0_8px_rgba(255,69,0,0.6)]"></div>
+                 <h2 class="text-[11px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.2em] font-mono">Care Plan Archiver</h2>
+              </div>
+              <p class="text-[9px] uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-[0.2em] ml-5">Review • Adjust • Finalize</p>
+            </div>
+            <button 
+              (click)="closePreview()" 
+              class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors text-gray-500"
+              aria-label="Close">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Content Body -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-transparent relative">
+              <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 border-b border-gray-300 dark:border-zinc-700 pb-4">
+                <div class="flex flex-col gap-1.5">
+                  <h3 class="text-[10px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.3em]">Cognitive Output Level</h3>
+                  <p class="text-[9px] text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">Select target patient comprehension</p>
                 </div>
                 
-                <div class="flex flex-col gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                  <div class="flex p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-inner w-full sm:w-fit">
-                    <button 
-                      (click)="changeReadingLevel('standard')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'standard' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Standard
-                    </button>
-                    <button 
-                      (click)="changeReadingLevel('simplified')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'simplified' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Simplified
-                    </button>
-                    <button 
-                      (click)="changeReadingLevel('dyslexia')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'dyslexia' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Cognition
-                    </button>
-                    <button 
-                      (click)="changeReadingLevel('child')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'child' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Pediatric
-                    </button>
-                  </div>
+                <div class="flex flex-wrap gap-1">
+                  <!-- Dieter Rams Tabs -->
+                  <button (click)="changeReadingLevel('standard')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'standard' ? 'bg-[#1C1C1C] text-white dark:bg-white dark:text-[#111111] border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Standard
+                  </button>
+                  <button (click)="changeReadingLevel('simplified')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'simplified' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Simplified
+                  </button>
+                  <button (click)="changeReadingLevel('dyslexia')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'dyslexia' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Cognition
+                  </button>
+                  <button (click)="changeReadingLevel('child')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'child' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Pediatric
+                  </button>
                 </div>
               </div>
 
               <!-- PRINT STRATEGY OPTIONS -->
               @if (selectedReadingLevel() !== 'standard') {
-                <div class="mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <div class="flex flex-wrap items-center gap-6 p-4 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
+                <div class="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <div class="flex flex-wrap items-center gap-6 p-4 bg-white/50 dark:bg-[#1C1C1C]/50 border border-gray-300 dark:border-zinc-700 rounded-[2px]">
                     <div class="flex items-center gap-3">
-                      <div class="relative inline-flex items-center cursor-pointer">
+                      <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" [checked]="includeAnalysisInPrint()" (change)="toggleAnalysisInPrint()" class="sr-only peer">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-[#689F38]"></div>
-                      </div>
-                      <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Include AI Analysis</span>
+                        <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-none peer dark:bg-zinc-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-400 after:border after:rounded-none after:h-3 after:w-3.5 after:transition-all dark:border-zinc-600 peer-checked:bg-[#1C1C1C] dark:peer-checked:bg-white"></div>
+                      </label>
+                      <span class="text-[9px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include AI Analysis</span>
                     </div>
 
                     <div class="flex items-center gap-3">
-                      <div class="relative inline-flex items-center cursor-pointer">
+                      <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" [checked]="includeOriginalInPrint()" (change)="toggleOriginalInPrint()" class="sr-only peer">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-[#689F38]"></div>
-                      </div>
-                      <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Include Original</span>
-                    </div>
-                    
-                    <div class="ml-auto text-[9px] text-[#689F38] font-mono uppercase tracking-tighter opacity-60">
-                      Strategy: {{ includeAnalysisInPrint() && includeOriginalInPrint() ? 'Full Composite' : 'Selective' }}
+                        <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-none peer dark:bg-zinc-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-400 after:border after:rounded-none after:h-3 after:w-3.5 after:transition-all dark:border-zinc-600 peer-checked:bg-[#1C1C1C] dark:peer-checked:bg-white"></div>
+                      </label>
+                      <span class="text-[9px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include Original</span>
                     </div>
                   </div>
                 </div>
               }
              
-              <div class="relative grid gap-4 transition-all duration-300" [class.grid-cols-1]="selectedReadingLevel() === 'standard'" [class.sm:grid-cols-2]="selectedReadingLevel() !== 'standard'">
+              <div class="relative grid gap-8 transition-all duration-300" [class.grid-cols-1]="selectedReadingLevel() === 'standard'" [class.sm:grid-cols-2]="selectedReadingLevel() !== 'standard'">
                
+               <!-- Original English -->
                @if (selectedReadingLevel() !== 'standard') {
-                 <div class="flex flex-col gap-1.5 animate-in fade-in slide-in-from-left-4 duration-300">
-                    <label class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest ml-1">Original (English)</label>
+                 <div class="flex flex-col gap-2 animate-in fade-in slide-in-from-left-4 duration-300">
+                    <label class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Plan</label>
                     <pocket-gull-input
                       type="textarea"
-                      [rows]="16"
+                      [rows]="20"
                       [value]="originalPreviewText()"
                       (valueChange)="originalPreviewText.set($event)"
                       [disabled]="isTranslating()"
                       placeholder="No Active Care Plan recorded for this visit."
-                      class="w-full">
+                      class="w-full shadow-inner opacity-70 hover:opacity-100 transition-opacity">
                     </pocket-gull-input>
                  </div>
                } @else {
-                 <div class="flex flex-col gap-1.5 opacity-50">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Original Active Care Plan</label>
+                 <div class="flex flex-col gap-2 relative">
+                    <label class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Care Plan</label>
                     <pocket-gull-input
                       type="textarea"
-                      [rows]="8"
+                      [rows]="20"
                       [value]="originalPreviewText()"
                       [disabled]="true"
                       placeholder="No Active Care Plan recorded for this visit."
-                      class="w-full h-full">
+                      class="w-full h-full opacity-60 pointer-events-none">
                     </pocket-gull-input>
                  </div>
                }
 
-               <div class="flex flex-col gap-1.5">
+               <!-- Translated Plan -->
+               <div class="flex flex-col gap-2 relative">
                   @if (selectedReadingLevel() !== 'standard') {
-                     <label class="text-[10px] font-bold text-[#689F38] uppercase tracking-widest ml-1 animate-in fade-in duration-300">Translated / Adjusted Plan</label>
+                     <label class="text-[9px] font-bold text-[#ff4500] uppercase tracking-[0.2em] font-mono border-b border-[#ff4500] pb-1 animate-in fade-in duration-300 flex justify-between items-center">
+                       <span>Translated / Adjusted Plan</span>
+                       <span class="w-1.5 h-1.5 bg-[#ff4500] rounded-full inline-block animate-pulse"></span>
+                     </label>
                   }
                   <pocket-gull-input
                     type="textarea"
-                    [rows]="16"
+                    [rows]="20"
                     [value]="previewText()"
                     (valueChange)="previewText.set($event)"
                     [disabled]="isTranslating()"
                     placeholder="No Active Care Plan recorded for this visit."
-                    class="w-full">
+                    class="w-full bg-white dark:bg-[#09090b] shadow-lg">
                   </pocket-gull-input>
                </div>
                
                @if (isTranslating()) {
-                 <div class="absolute inset-0 bg-white/70 dark:bg-[#09090b]/70 backdrop-blur-[1px] flex flex-col items-center justify-center z-10 rounded">
-                    <div class="w-6 h-6 border-2 border-[#689F38] border-t-transparent rounded-full animate-spin"></div>
-                    <p class="mt-2 text-xs font-bold text-[#689F38] uppercase tracking-wider animate-pulse">Translating...</p>
+                 <div class="absolute inset-x-0 inset-y-8 bg-white/80 dark:bg-[#111111]/80 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 rounded-sm">
+                    <div class="w-8 h-8 border-[3px] border-gray-200 border-t-[#ff4500] rounded-full animate-spin shadow-lg"></div>
+                    <p class="mt-4 text-[10px] font-bold text-[#ff4500] uppercase tracking-[0.3em] font-mono animate-pulse">Processing Translation</p>
                  </div>
                }
                @if (translationError()) {
-                  <div class="mt-2 text-[10px] font-bold text-red-500 uppercase tracking-widest animate-in fade-in duration-300">
-                    ⚠️ {{ translationError() }}
+                  <div class="absolute bottom-4 left-4 right-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-[0.1em] font-mono shadow-md flex items-center gap-2 z-20">
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
+                    System Error: {{ translationError() }}
                   </div>
                }
              </div>
              
-             <!-- NEW TRANSLATION ANALYSIS UI -->
+             <!-- TRANSLATION ANALYSIS UI -->
              @if (selectedReadingLevel() !== 'standard') {
-               <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 animate-in fade-in duration-300">
-                  <div class="flex flex-col gap-2 mb-2">
-                    <div class="flex justify-between items-center">
-                      <h4 class="text-[10px] font-bold text-[#689F38] uppercase tracking-widest">AI Translation Analysis</h4>
-                      <pocket-gull-button 
+               <div class="mt-8 pt-6 border-t border-gray-300 dark:border-zinc-700 animate-in fade-in duration-500">
+                  <div class="flex flex-col gap-3 mb-2">
+                    <div class="flex justify-between items-end border-b border-gray-200 dark:border-zinc-800 pb-2">
+                      <h4 class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.3em] font-mono">Structural Analysis</h4>
+                      <button 
                         (click)="analyzeCurrentTranslation()" 
                         [disabled]="isAnalyzingTranslation() || isTranslating()"
-                        variant="secondary" 
-                        size="sm" 
-                        icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                        class="px-4 py-1.5 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all text-[#1C1C1C] dark:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
                         @if (isAnalyzingTranslation()) {
+                          <div class="w-2.5 h-2.5 border-2 border-gray-400 border-t-[#1C1C1C] rounded-full animate-spin"></div>
                           Analyzing...
                         } @else {
-                          Analyze Translation
+                          Analyze Translation Matrix
                         }
-                      </pocket-gull-button>
+                      </button>
                     </div>
                     @if (translationAnalysis()) {
-                      <div class="p-3 bg-gray-50 dark:bg-zinc-900 rounded border border-gray-200 dark:border-zinc-800 text-sm text-gray-700 dark:text-zinc-300 animate-in slide-in-from-top-2 duration-300 whitespace-pre-wrap">
+                      <div class="p-4 sm:p-6 bg-white dark:bg-[#09090b] shadow-inner border border-gray-200 dark:border-zinc-800 text-[11px] leading-relaxed text-gray-800 dark:text-zinc-300 font-mono animate-in slide-in-from-top-4 duration-500 whitespace-pre-wrap">
                          {{ translationAnalysis() }}
                       </div>
                     }
                   </div>
-                  
-                  <!-- PRINT STRATEGY TOGGLES -->
-                  <div class="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer group">
-                      <input type="checkbox" 
-                             [checked]="includeAnalysisInPrint()" 
-                             (change)="includeAnalysisInPrint.set(!includeAnalysisInPrint())"
-                             class="w-4 h-4 text-[#689F38] rounded border-gray-300 focus:ring-[#689F38] dark:border-zinc-700 dark:bg-zinc-900" />
-                      <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-zinc-100 transition-colors">Include AI Translation Analysis in Print</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer group">
-                      <input type="checkbox" 
-                             [checked]="includeOriginalInPrint()" 
-                             (change)="includeOriginalInPrint.set(!includeOriginalInPrint())"
-                             class="w-4 h-4 text-[#689F38] rounded border-gray-300 focus:ring-[#689F38] dark:border-zinc-700 dark:bg-zinc-900" />
-                      <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-zinc-100 transition-colors">Include Original Clinical Plan in Print</span>
-                    </label>
-                  </div>
                </div>
              }
              
-             <p class="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wider mt-3 pl-1">This text will be archived in the patient's chart as the final Care Plan for this visit.</p>
+             <div class="mt-8 flex justify-center opacity-40">
+                <p class="text-[8px] font-mono uppercase tracking-[0.4em]">Final Output Target: Medical Chart Archive</p>
+             </div>
           </div>
-          <div class="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 bg-[#F9FAFB] dark:bg-zinc-900 flex justify-between items-center">
-            <pocket-gull-button 
+          
+          <!-- Footer -->
+          <div class="px-8 py-5 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 flex justify-between items-center mt-auto">
+            <button 
               (click)="printReport()" 
-              variant="secondary" 
-              size="sm" 
-              icon="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z">
-              Print Plan
-            </pocket-gull-button>
-            <div class="flex items-center gap-3">
-              <pocket-gull-button 
+              class="px-5 py-2.5 border border-[#1C1C1C] dark:border-zinc-600 text-[#1C1C1C] dark:text-zinc-100 bg-transparent text-[9px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-2 rounded-[2px]">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+              Print Document
+            </button>
+            <div class="flex items-center gap-4">
+              <button 
                 (click)="closePreview()" 
-                variant="ghost" 
-                size="sm">
+                class="px-4 py-2 text-gray-500 hover:text-[#1C1C1C] dark:hover:text-white text-[9px] font-bold uppercase tracking-[0.2em] transition-colors">
                 Cancel
-              </pocket-gull-button>
-              <pocket-gull-button 
+              </button>
+              <button 
                 (click)="confirmFinalize()" 
-                variant="primary" 
-                size="sm" 
-                trailingIcon="M20 6L9 17l-5-5">
+                class="px-8 py-3 bg-[#1C1C1C] dark:bg-white text-white dark:text-[#111111] text-[10px] font-bold uppercase tracking-[0.3em] font-mono hover:bg-black dark:hover:bg-gray-200 transition-all flex items-center gap-2 rounded-[2px] shadow-md active:translate-y-[1px]">
                 Commit to Chart
-              </pocket-gull-button>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -858,12 +791,6 @@ export class AppComponent implements OnDestroy {
   translationError = signal<string | null>(null);
   includeAnalysisInPrint = signal<boolean>(true);
   includeOriginalInPrint = signal<boolean>(true);
-
-  // Seagull Interactivity State
-  seagullAngle = signal<number>(0);
-  isSeagullFrightened = signal<boolean>(false);
-  seagullFlyAwayX = signal<number>(0);
-  seagullFlyAwayY = signal<number>(0);
 
   // Navbar Dropdown States
   exportMenuOpen = signal(false);
@@ -968,81 +895,6 @@ export class AppComponent implements OnDestroy {
   uploadData() {
     // Usually this triggers file upload dialog from patient-dropdown, but for now we'll trigger an alert or sync.
     alert("Upload data modal placeholder");
-  }
-
-  // Window/Event listeners for Seagull interactivity
-  @HostListener('window:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent) {
-    if (this.hasApiKey() || this.isSeagullFrightened() || typeof window === 'undefined') return;
-
-    // Approximate center of the seagull based on layout (adjust if needed)
-    const birdElement = document.querySelector('.origami-seagull-container');
-    if (!birdElement) return;
-    const birdRect = birdElement.getBoundingClientRect();
-
-    const birdCenterX = birdRect.left + (birdRect.width / 2);
-    const birdCenterY = birdRect.top + (birdRect.height / 2);
-
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
-
-    // Calculate angle towards mouse
-    const deltaX = mouseX - birdCenterX;
-    const deltaY = mouseY - birdCenterY;
-    
-    // Angle in degrees
-    let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-    // Add offset so the beak points toward the cursor instead of the top wing
-    this.seagullAngle.set(angle + 45); 
-
-    // Distance to trigger fly away
-    const distance = Math.hypot(deltaX, deltaY);
-    
-    // Check if mouse is over safe zone (API key input box)
-    const safeZone = document.getElementById('seagull-safe-zone');
-    let isSafe = false;
-    if (safeZone) {
-      const safeRect = safeZone.getBoundingClientRect();
-      isSafe = (mouseX >= safeRect.left - 50 && mouseX <= safeRect.right + 50 &&
-                mouseY >= safeRect.top - 50 && mouseY <= safeRect.bottom + 50);
-    }
-
-    if (distance < 120 && !isSafe) {
-      this.triggerFrightenedFlight(mouseX, mouseY);
-    }
-  }
-
-  // Touch support for interactivity
-  @HostListener('window:touchmove', ['$event'])
-  onTouchMove(event: TouchEvent) {
-    if (event.touches.length > 0) {
-      this.onMouseMove(event.touches[0] as unknown as MouseEvent);
-    }
-  }
-
-  private triggerFrightenedFlight(mouseX: number, mouseY: number) {
-     this.isSeagullFrightened.set(true);
-     // Fly away in opposite direction of mouse
-     const birdElement = document.querySelector('.origami-seagull-container');
-     if (birdElement) {
-         const birdRect = birdElement.getBoundingClientRect();
-         const dx = birdRect.left - mouseX;
-         const dy = birdRect.top - mouseY;
-         
-         // Normalize and scale up for fly-away distance
-         const mag = Math.hypot(dx, dy) || 1;
-         // Send bird flying rapidly off screen
-         this.seagullFlyAwayX.set((dx / mag) * window.innerWidth * 1.5);
-         this.seagullFlyAwayY.set((dy / mag) * window.innerHeight * 1.5 - 500); // go upward usually
-     }
-     
-     // Optionally reset after 5 seconds to try again
-     setTimeout(() => {
-        this.isSeagullFrightened.set(false);
-        this.seagullFlyAwayX.set(0);
-        this.seagullFlyAwayY.set(0);
-        this.seagullAngle.set(0);
-     }, 4000);
   }
 
   openFinalizePreview() {
@@ -1708,6 +1560,12 @@ export class AppComponent implements OnDestroy {
     this.isAnalysisCollapsed.set(false);
   }
 
+  showSplitView() {
+    this.isChartCollapsed.set(false);
+    this.isAnalysisCollapsed.set(false);
+    this.inputPanelWidth.set(window.innerWidth / 2);
+  }
+
   // --- Column Resizing Logic ---
   startColumnDrag(event: MouseEvent): void {
     event.preventDefault();
@@ -1715,9 +1573,15 @@ export class AppComponent implements OnDestroy {
     this.initialColumnDragX = event.clientX;
 
     if (this.inputPanelWidth() === undefined) {
-      const panelEl = (event.target as HTMLElement).previousElementSibling as HTMLElement;
-      this.initialInputPanelWidth = panelEl.offsetWidth;
-      this.inputPanelWidth.set(this.initialInputPanelWidth);
+      const handleEl = event.currentTarget as HTMLElement;
+      const panelEl = handleEl?.previousElementSibling as HTMLElement;
+      if (panelEl) {
+        this.initialInputPanelWidth = panelEl.offsetWidth;
+        this.inputPanelWidth.set(this.initialInputPanelWidth);
+      } else {
+        this.initialInputPanelWidth = window.innerWidth / 2;
+        this.inputPanelWidth.set(this.initialInputPanelWidth);
+      }
     } else {
       this.initialInputPanelWidth = this.inputPanelWidth()!;
     }

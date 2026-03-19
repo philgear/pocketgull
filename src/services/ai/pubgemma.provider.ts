@@ -12,11 +12,27 @@ export class PubGemmaProvider implements IntelligenceProvider {
   private readonly MODEL_NAME = 'gemma:2b'; // Scaffold targeting local PubGemma instances
   private chatContext = '';
 
+  private async isOllamaAvailable(): Promise<boolean> {
+      try {
+          // Preflight ping with 1.5 second timeout ensures failure is fast if daemon is offline
+          await fetch('http://127.0.0.1:11434/api/tags', { signal: AbortSignal.timeout(1500) });
+          return true;
+      } catch {
+          return false;
+      }
+  }
+
   generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string> {
     return new Observable<string>(observer => {
-      const prompt = `System: ${systemInstruction}\nPatient Data: ${patientData}\nGenerate clinical report for ${lens}:`;
-      
-      fetch(this.OLLAMA_URL, {
+      this.isOllamaAvailable().then(isAvailable => {
+        if (!isAvailable) {
+          observer.error(new Error("Local Ollama endpoint unreachable."));
+          return;
+        }
+
+        const prompt = `System: ${systemInstruction}\nPatient Data: ${patientData}\nGenerate clinical report for ${lens}:`;
+        
+        fetch(this.OLLAMA_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -47,6 +63,8 @@ export class PubGemmaProvider implements IntelligenceProvider {
         }
         observer.complete();
       }).catch(err => observer.error(err));
+
+      }); // End of isOllamaAvailable
     });
   }
 
@@ -81,6 +99,9 @@ export class PubGemmaProvider implements IntelligenceProvider {
   }
 
   async sendMessage(message: string, files?: File[]): Promise<string> {
+    if (!(await this.isOllamaAvailable())) {
+      throw new Error("Local Ollama endpoint unreachable.");
+    }
     const prompt = `${this.chatContext}\n\nUser: ${message}\n\nPlease fulfill the request efficiently. If asked for practical items like a shopping list, grocery list, or daily itinerary based on clinical recommendations, you MUST provide them directly. Response:`;
     
     try {

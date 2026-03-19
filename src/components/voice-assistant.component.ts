@@ -100,51 +100,31 @@ export interface ChatEntry {
     template: `
         <div class="h-full bg-white dark:bg-[#09090b] z-10 flex flex-col no-print w-full">
             
-            <!-- Panel Header -->
-            <div class="flex items-center justify-between px-4 sm:px-6 py-4 lg:px-12 h-16 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800">
-                <div class="flex items-center gap-2 sm:gap-4 min-w-0">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-6 h-6 shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Far Wing -->
-                            <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Tail -->
-                            <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Body Base -->
-                            <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Near Wing (Upper) -->
-                            <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Near Wing (Fold) -->
-                            <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Neck/Head -->
-                            <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Beak - Functional Braun Orange Accent -->
-                            <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
-                        </svg>
-                        <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.1em] sm:tracking-[0.15em] text-[10px] sm:text-sm uppercase truncate">Pocket Gull Intelligence</span>
-                    </div>
+            <!-- Minimal Pocket Header -->
+            <div class="flex items-center justify-between px-4 py-2 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800/50">
+                <div class="flex items-center pointer-events-none pl-2">
+                    <span class="font-bold text-gray-400 dark:text-zinc-500 tracking-[0.2em] text-[9px] uppercase">Live Session</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button
                         (click)="isMuted.set(!isMuted())"
-                        class="text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
+                        class="text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-2 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                         title="Toggle Sound">
                         @if (isMuted()) {
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                               <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                             </svg>
                         } @else {
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                             </svg>
                         }
                     </button>
                     <button
                         (click)="endLiveConsult()"
-                        class="text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center gap-1 sm:gap-2 transition-colors uppercase text-[10px] sm:text-xs font-bold tracking-wider sm:tracking-widest px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 shrink-0"
-                        title="Close Voice Assistant">
-                        <span class="hidden sm:inline">Close Session</span>
-                        <span class="sm:hidden">Close</span>
+                        class="text-gray-400 dark:text-zinc-500 hover:text-red-500 flex items-center justify-center transition-colors px-2 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30"
+                        title="Close Session">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>

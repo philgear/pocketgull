@@ -594,22 +594,22 @@ export class ExportService {
   <title>Pocket Gull Care Plan — ${patientName}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand: #689F38;
-      --brand-dark: #4a7428;
-      --ink: #1C1C1C;
-      --ink-muted: #6B7280;
-      --surface: #FFFFFF;
-      --surface-subtle: #F9FAFB;
-      --surface-green: #F0F7E8;
-      --border: #E5E7EB;
-      --border-green: #C8E6C9;
-      --radius: 10px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --brand: #FF6600; /* Braun Orange Accent */
+      --brand-dark: #CC5200;
+      --ink: #111111;
+      --ink-muted: #555555;
+      --surface: #F9F9F9; /* Off-white Dieter Rams style */
+      --surface-subtle: #EBEBEB;
+      --surface-accent: #FFF5EE;
+      --border: #CCCCCC;
+      --border-accent: #FFCCAA;
+      --radius: 2px;
+      --font-body: 'Space Mono', 'Fira Code', monospace;
     }
 
     /* Provide missing tailwind dimensions for inline icons */
@@ -621,7 +621,7 @@ export class ExportService {
 
     html { font-size: 10pt; }
     body {
-      font-family: var(--font);
+      font-family: var(--font-body);
       color: var(--ink);
       background: var(--surface);
       line-height: 1.65;
@@ -630,30 +630,17 @@ export class ExportService {
       position: relative;
     }
 
-    /* ─── Halftone background decoration ───────────── */
+    /* ─── Structural background decoration ───────────── */
     body::before {
       content: '';
       position: fixed;
-      top: -60px;
-      right: -60px;
-      width: 340px;
-      height: 340px;
-      background-image: radial-gradient(circle, #689F38 1.5px, transparent 1.5px);
-      background-size: 16px 16px;
-      opacity: 0.08;
-      pointer-events: none;
-      z-index: 0;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      bottom: -80px;
-      left: -80px;
-      width: 280px;
-      height: 280px;
-      background-image: radial-gradient(circle, #689F38 1.5px, transparent 1.5px);
-      background-size: 18px 18px;
-      opacity: 0.055;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.15;
       pointer-events: none;
       z-index: 0;
     }
@@ -703,15 +690,15 @@ export class ExportService {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--surface-green);
-      border: 1px solid var(--border-green);
+      background: var(--surface-accent);
+      border: 1px solid var(--border-accent);
       color: var(--brand-dark);
       font-size: 7.5pt;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       padding: 5px 12px;
-      border-radius: 20px;
+      border-radius: var(--radius);
       margin-bottom: 20px;
     }
     .doc-type-badge::before {
@@ -719,7 +706,7 @@ export class ExportService {
       width: 6px;
       height: 6px;
       background: var(--brand);
-      border-radius: 50%;
+      border-radius: 0;
     }
 
     /* ─── Patient Banner ────────────────────────────── */
@@ -811,7 +798,7 @@ export class ExportService {
 
     /* ─── Care Plan Section ──────────────────────────── */
     .care-plan-section {
-      border: 1px solid var(--border-green);
+      border: 1px solid var(--border-accent);
       border-radius: var(--radius);
       overflow: hidden;
       margin-bottom: 28px;
@@ -821,8 +808,8 @@ export class ExportService {
       align-items: center;
       gap: 10px;
       padding: 13px 18px;
-      background: var(--surface-green);
-      border-bottom: 1px solid var(--border-green);
+      background: var(--surface-accent);
+      border-bottom: 1px solid var(--border-accent);
     }
     .care-plan-header-icon {
       width: 20px;
@@ -898,29 +885,29 @@ export class ExportService {
       margin: 10px 0 14px;
     }
     .care-plan-body th {
-      background: var(--surface-green);
+      background: var(--surface-accent);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-size: 7.5pt;
       padding: 7px 10px;
       text-align: left;
-      border: 1px solid var(--border-green);
+      border: 1px solid var(--border-accent);
       color: var(--brand-dark);
     }
     .care-plan-body td {
       padding: 6px 10px;
       border: 1px solid var(--border);
       vertical-align: top;
-      color: #374151;
+      color: var(--ink-muted);
     }
-    .care-plan-body tr:nth-child(even) td { background: #F9FBF5; }
+    .care-plan-body tr:nth-child(even) td { background: var(--surface-subtle); }
     .care-plan-body blockquote {
       border-left: 3px solid var(--brand);
-      background: var(--surface-green);
+      background: var(--surface-accent);
       padding: 10px 14px;
       margin: 10px 0;
-      border-radius: 0 6px 6px 0;
+      border-radius: 0;
     }
     .care-plan-body blockquote p { margin: 0; font-size: 9pt; color: #374151; }
 

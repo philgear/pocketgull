@@ -1,12 +1,13 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { RevealDirective } from '../directives/reveal.directive';
+import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
 @Component({
   selector: 'app-task-flow',
   standalone: true,
-  imports: [CommonModule, RevealDirective],
+  imports: [CommonModule, RevealDirective, SafeHtmlPipe],
   providers: [DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -40,92 +41,121 @@ import { RevealDirective } from '../directives/reveal.directive';
             </p>
           </div>
         } @else {
-          <div class="flex flex-col gap-4">
-            <!-- Checklist Section -->
-            @if (checklist().length > 0) {
-              <div class="mb-4">
-                <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-3 px-1">Tasks</h3>
-                <div class="flex flex-col gap-2">
-                  @for (task of checklist(); track task.id; let i = $index) {
-                    <div appReveal [revealDelay]="i * 75" class="flex items-start gap-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-3 shadow-sm group hover:border-gray-300 dark:hover:border-zinc-700 transition-colors">
-                      <input 
-                        type="checkbox" 
-                        [id]="'task-' + task.id"
-                        [name]="'task-' + task.id"
-                        [checked]="task.completed"
-                        (change)="toggleTask(task.id)"
-                        class="mt-1 w-4 h-4 text-[#416B1F] bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 rounded focus:ring-[#416B1F] flex-shrink-0 cursor-pointer"
-                      >
-                      <label [for]="'task-' + task.id" class="text-sm text-[#1C1C1C] dark:text-zinc-100 flex-1 cursor-pointer" [class.line-through]="task.completed" [class.opacity-50]="task.completed">
-                        {{ task.text }}
-                      </label>
-                      <button (click)="removeTask(task.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Task">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                      </button>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
+          <div class="relative pl-2 mt-4 ml-2">
+            <!-- Vertical Timeline Line -->
+            <div class="absolute left-[11px] top-2 bottom-2 w-px bg-gray-200 dark:bg-zinc-800"></div>
 
-            <!-- Shopping List Section -->
-            @if (shoppingList().length > 0) {
-              <div class="mb-4">
-                <h3 class="flex items-center gap-2 text-xs font-bold text-[#E3663B] dark:text-[#ff8a65] uppercase tracking-widest mb-3 px-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                  Shopping List
-                </h3>
-                <div class="flex flex-col gap-2">
-                  @for (item of shoppingList(); track item.id; let i = $index) {
-                    <div appReveal [revealDelay]="i * 75" class="flex items-start gap-3 bg-orange-50/50 dark:bg-orange-900/10 border border-orange-200/50 dark:border-orange-800/30 rounded-lg p-3 shadow-sm group hover:border-[#E3663B]/50 transition-colors">
-                      <input 
-                        type="checkbox" 
-                        [id]="'shop-' + item.id"
-                        [name]="'shop-' + item.id"
-                        [checked]="item.completed"
-                        (change)="toggleShoppingItem(item.id)"
-                        class="mt-1 w-4 h-4 text-[#E3663B] bg-white border-gray-300 rounded focus:ring-[#E3663B] flex-shrink-0 cursor-pointer"
-                      >
-                      <label [for]="'shop-' + item.id" class="text-sm text-[#1C1C1C] dark:text-zinc-100 flex-1 cursor-pointer" [class.line-through]="item.completed" [class.opacity-50]="item.completed">
-                        {{ item.name }}
-                      </label>
-                      <button (click)="removeShoppingItem(item.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Item">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                      </button>
-                    </div>
-                  }
+            <div class="flex flex-col">
+              <!-- Checklist Section -->
+              @if (enhancedChecklist().length > 0) {
+                <div class="mb-2">
+                  <div class="flex items-center justify-between pl-8 mb-4">
+                    <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">Tasks</h3>
+                    <select name="taskSortOrderCtrl" id="taskSortOrderCtrl" [value]="taskSortOrder()" (change)="taskSortOrder.set($any($event.target).value)" class="text-[10px] uppercase font-bold text-gray-500 bg-transparent border-none cursor-pointer hover:text-[#1C1C1C] dark:hover:text-zinc-300 focus:ring-0">
+                      <option value="default">Sort: Default</option>
+                      <option value="pain">Sort: Severity (Pain)</option>
+                      <option value="status">Sort: Open</option>
+                    </select>
+                  </div>
+                  <div class="flex flex-col">
+                    @for (task of enhancedChecklist(); track task.id; let i = $index) {
+                      <div appReveal [revealDelay]="i * 75" class="relative pl-8 pb-4 group">
+                        <!-- Node on the timeline -->
+                        <div [class]="'absolute left-[7px] top-3 w-2.5 h-2.5 rounded-sm border-2 z-10 shadow-sm transition-colors ' + task.colorClass" [class.opacity-50]="task.completed"></div>
+                        
+                        <!-- Data Card -->
+                        <div class="flex items-start gap-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg p-3 shadow-sm transition-all duration-200 hover:shadow-md group-hover:border-gray-300 dark:group-hover:border-zinc-600">
+                          <input 
+                            type="checkbox" 
+                            [id]="'task-' + task.id"
+                            [name]="'task-' + task.id"
+                            [checked]="task.completed"
+                            (change)="toggleTask(task.id)"
+                            class="mt-1 w-4 h-4 text-[#1C1C1C] dark:text-zinc-100 bg-gray-100 dark:bg-zinc-800 border-gray-300 dark:border-zinc-700 rounded focus:ring-[#1C1C1C] dark:focus:ring-zinc-600 flex-shrink-0 cursor-pointer"
+                          >
+                          <label [for]="'task-' + task.id" class="text-sm text-[#1C1C1C] dark:text-zinc-100 flex-1 cursor-pointer" [class.line-through]="task.completed" [class.opacity-50]="task.completed" [innerHTML]="task.formattedText | safeHtml">
+                          </label>
+                          <button (click)="removeTask(task.id)" class="text-gray-300 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Task">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  </div>
                 </div>
-              </div>
-            }
+              }
 
-            <!-- Clinical Notes Section -->
-            @if (clinicalNotes().length > 0) {
-              <div>
-                <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-3 px-1">Notes</h3>
-                <div class="flex flex-col gap-4">
-                  @for (note of clinicalNotes(); track note.id; let i = $index) {
-                    <div appReveal [revealDelay]="i * 75" class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-5 shadow-sm group hover:border-[#689F38] dark:hover:border-[#689F38] transition-colors relative">
-                      <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] bg-[#F1F8E9] dark:bg-[#689f38]/10 px-2 py-1 rounded inline-block">
-                          {{ note.sourceLens }}
-                        </span>
-                        <button (click)="removeNote(note.id)" class="text-gray-300 dark:text-zinc-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove Note">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                        </button>
+              <!-- Shopping List Section -->
+              @if (shoppingList().length > 0) {
+                <div class="mb-2">
+                  <h3 class="flex items-center gap-1.5 text-[10px] font-bold text-[#E3663B] dark:text-[#ff8a65] uppercase tracking-widest mb-4 pl-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                    Shopping List
+                  </h3>
+                  <div class="flex flex-col">
+                    @for (item of shoppingList(); track item.id; let i = $index) {
+                      <div appReveal [revealDelay]="i * 75" class="relative pl-8 pb-4 group">
+                        <!-- Node on the timeline -->
+                        <div class="absolute left-[7px] top-3 w-2.5 h-2.5 rounded-sm border-2 bg-white dark:bg-zinc-950 z-10 border-[#E3663B] dark:border-[#ff8a65] shadow-sm" [class.opacity-50]="item.completed"></div>
+                        
+                        <!-- Data Card -->
+                        <div class="flex items-start gap-3 bg-orange-50/30 dark:bg-orange-900/10 border border-orange-100/50 dark:border-orange-800/30 rounded-lg p-3 shadow-sm transition-all duration-200 hover:shadow-md group-hover:border-orange-300 dark:group-hover:border-orange-600">
+                          <input 
+                            type="checkbox" 
+                            [id]="'shop-' + item.id"
+                            [name]="'shop-' + item.id"
+                            [checked]="item.completed"
+                            (change)="toggleShoppingItem(item.id)"
+                            class="mt-1 w-4 h-4 text-[#E3663B] bg-white border-gray-300 rounded focus:ring-[#E3663B] flex-shrink-0 cursor-pointer"
+                          >
+                          <label [for]="'shop-' + item.id" class="text-sm text-[#1C1C1C] dark:text-zinc-100 flex-1 cursor-pointer" [class.line-through]="item.completed" [class.opacity-50]="item.completed">
+                            {{ item.name }}
+                          </label>
+                          <button (click)="removeShoppingItem(item.id)" class="text-gray-300 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" title="Remove Item">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                          </button>
+                        </div>
                       </div>
-                      <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 font-medium leading-relaxed mb-4 whitespace-pre-wrap">{{ note.text }}</p>
-                      <div class="flex justify-between items-center text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-widest pt-3 border-t border-gray-100 dark:border-zinc-800">
-                        <span>{{ note.date | date:'MMM d, y, h:mm a' }}</span>
-                        <span class="text-[#1C1C1C] dark:text-zinc-100 flex items-center gap-1">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                           LOGGED
-                        </span>
-                      </div>
-                    </div>
-                  }
+                    }
+                  </div>
                 </div>
-              </div>
-            }
+              }
+
+              <!-- Clinical Notes Section -->
+              @if (clinicalNotes().length > 0) {
+                <div class="mb-2">
+                  <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-4 pl-8">Notes</h3>
+                  <div class="flex flex-col">
+                    @for (note of enhancedClinicalNotes(); track note.id; let i = $index) {
+                      <div appReveal [revealDelay]="i * 75" class="relative pl-8 pb-6 group">
+                        <!-- Node on the timeline -->
+                        <div [class]="'absolute left-[7px] top-3.5 w-2.5 h-2.5 rounded-sm border-2 z-10 shadow-sm transition-colors ' + note.colorClass"></div>
+                        
+                        <!-- Data Card -->
+                        <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md group-hover:border-gray-300 dark:group-hover:border-zinc-600 relative">
+                          <div class="flex justify-between items-start mb-3">
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] bg-[#F1F8E9] dark:bg-[#689f38]/10 px-2 py-1 rounded inline-block">
+                              {{ note.sourceLens }}
+                            </span>
+                            <button (click)="removeNote(note.id)" class="text-gray-300 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove Note">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </button>
+                          </div>
+                          <p class="text-sm text-gray-700 dark:text-zinc-300 font-medium leading-relaxed mb-3 whitespace-pre-wrap" [innerHTML]="note.formattedText | safeHtml"></p>
+                          <div class="flex justify-between items-center text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest pt-2.5 border-t border-gray-50 dark:border-zinc-800/50 mt-1">
+                            <span>{{ note.date | date:'MMM d, y, h:mm a' }}</span>
+                            <span class="text-gray-400 flex items-center gap-1">
+                               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-400 disabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                               LOGGED
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
           </div>
         }
       </div>
@@ -167,6 +197,91 @@ export class TaskFlowComponent {
   clinicalNotes = computed(() => this.state.clinicalNotes() || []);
   checklist = computed(() => this.state.checklist() || []);
   shoppingList = computed(() => this.state.shoppingList() || []);
+
+  taskSortOrder = signal<'default' | 'pain' | 'status'>('default');
+
+  enhancedChecklist = computed(() => {
+    let tasks = this.checklist();
+    let enhanced = tasks.map(task => {
+      let painScore: number | null = null;
+      const painMatch = task.text.match(/\[(?:Pain|Severity):?\s*(\d+)\]?/i) || task.text.match(/\[(\d+)\/10\]/i);
+      if (painMatch) {
+        painScore = parseInt(painMatch[1], 10);
+      }
+
+      let colorClass = 'border-[#1C1C1C] dark:border-zinc-300 bg-white dark:bg-zinc-950'; // default node
+      if (painScore !== null) {
+        if (painScore >= 7) colorClass = 'border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-950/20';
+        else if (painScore >= 4) colorClass = 'border-amber-500 dark:border-amber-400 bg-amber-50 dark:bg-amber-950/20';
+        else if (painScore > 0) colorClass = 'border-green-500 dark:border-green-400 bg-green-50 dark:bg-green-950/20';
+      } else {
+        if (task.text.includes('[Orthopedics]')) colorClass = 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/20';
+        else if (task.text.includes('[Cardiology]')) colorClass = 'border-rose-500 dark:border-rose-400 bg-rose-50 dark:bg-rose-950/20';
+        else if (task.text.includes('[Neurology]')) colorClass = 'border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-950/20';
+      }
+
+      let formattedText = task.text.replace(/\[(.*?)\]/g, (match, inner) => {
+        let badgeStyle = 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700';
+        if (colorClass.includes('red')) badgeStyle = 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800';
+        else if (colorClass.includes('amber')) badgeStyle = 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+        else if (colorClass.includes('green')) badgeStyle = 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800';
+        else if (colorClass.includes('blue')) badgeStyle = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
+        else if (colorClass.includes('rose')) badgeStyle = 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800';
+        else if (colorClass.includes('indigo')) badgeStyle = 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800';
+        return `<span class="text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeStyle} mx-1">${inner}</span>`;
+      });
+
+      return { ...task, painScore, colorClass, formattedText };
+    });
+
+    if (this.taskSortOrder() === 'pain') {
+      enhanced.sort((a, b) => (b.painScore || 0) - (a.painScore || 0));
+    } else if (this.taskSortOrder() === 'status') {
+      enhanced.sort((a, b) => (a.completed === b.completed ? 0 : a.completed ? 1 : -1));
+    }
+    return enhanced;
+  });
+
+  enhancedClinicalNotes = computed(() => {
+    let notes = this.clinicalNotes();
+    return notes.map(note => {
+      let colorClass = 'border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-950'; // default class
+
+      const lowerText = note.text.toLowerCase();
+      if (lowerText.includes('[plan of care]') || lowerText.includes('[treatment]')) {
+        colorClass = 'border-[#416B1F] dark:border-[#689f38] bg-[#F1F8E9] dark:bg-[#689f38]/20';
+      } else if (lowerText.includes('[alert]') || lowerText.includes('[critical]')) {
+        colorClass = 'border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-950/20';
+      } else if (lowerText.includes('[assessment]') || lowerText.includes('[assessmen]')) {
+        colorClass = 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-950/20';
+      } else if (lowerText.includes('[observation]')) {
+        colorClass = 'border-amber-500 dark:border-amber-400 bg-amber-50 dark:bg-amber-950/20';
+      }
+
+      let formattedText = note.text.replace(/\[(.*?)\]/g, (match, inner) => {
+        let badgeStyle = 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-700';
+        const lInner = inner.toLowerCase();
+        // Content-aware badge coloring
+        if (lInner.includes('plan of care') || lInner.includes('treatment')) {
+          badgeStyle = 'bg-[#F1F8E9] dark:bg-[#689f38]/30 text-[#416B1F] dark:text-[#689f38] border border-[#416B1F]/30 dark:border-[#689f38]/50';
+        } else if (lInner.includes('alert') || lInner.includes('critical')) {
+          badgeStyle = 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800';
+        } else if (lInner.includes('assessment') || lInner.includes('assessmen')) {
+          badgeStyle = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
+        } else {
+          // Inherit node vibe
+          if (colorClass.includes('red')) badgeStyle = 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800';
+          else if (colorClass.includes('amber')) badgeStyle = 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800';
+          else if (colorClass.includes('blue')) badgeStyle = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
+          else if (colorClass.includes('416B1F')) badgeStyle = 'bg-[#F1F8E9] dark:bg-[#689f38]/30 text-[#416B1F] dark:text-[#689f38] border border-[#416B1F]/30 dark:border-[#689f38]/50';
+        }
+
+        return `<span class="text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeStyle} mx-1 mb-1 inline-block">${inner}</span>`;
+      });
+
+      return { ...note, colorClass, formattedText };
+    });
+  });
 
   removeNote(id: string) {
     this.state.removeClinicalNote(id);

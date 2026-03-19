@@ -13,17 +13,20 @@ import os from 'node:os';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
-import { BigQuery } from '@google-cloud/bigquery';
 import { Logging } from '@google-cloud/logging';
-import { DlpServiceClient } from '@google-cloud/dlp';
 import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleAuth } from 'google-auth-library';
+
+const vertexAuth = new GoogleAuth({
+  scopes: ['https://www.googleapis.com/auth/cloud-platform']
+});
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const execPromise = promisify(exec);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const browserDistFolder = join(__dirname, '..').replace(/\\/g, '/'); // root dir of dist when built
+const _filename = fileURLToPath(import.meta.url);
+const _dirname = dirname(_filename);
+const browserDistFolder = join(_dirname, '..', 'browser').replace(/\\/g, '/'); // root dir of dist when built
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -155,8 +158,8 @@ await getApiKey().catch(console.error);
 app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   
   const csp = [
@@ -168,7 +171,7 @@ app.use((req, res, next) => {
     "connect-src 'self' https://generativelanguage.googleapis.com wss://generativelanguage.googleapis.com https://eutils.ncbi.nlm.nih.gov http://127.0.0.1:11434",
     "media-src 'self' blob:",
     "worker-src 'self' blob:",
-    "frame-src 'self' https://viewer.ohif.org"
+    "frame-src 'self' https://viewer.ohif.org https://spark.philgear.dev https://www.google.com https://pubmed.ncbi.nlm.nih.gov https: http://localhost:*"
   ].join('; ');
 
   res.setHeader('Content-Security-Policy', csp);
@@ -176,6 +179,18 @@ app.use((req, res, next) => {
 });
 
 import { dicomRouter } from './server/dicom';
+import { healthcareRouter, ensureHealthcareStoresExist } from './server/healthcare.js';
+
+app.use('/api/dicom', dicomRouter);
+
+let hcProvisioned = false;
+app.use('/api/healthcare', async (req, res, next) => {
+    if (!hcProvisioned) {
+        hcProvisioned = true;
+        await ensureHealthcareStoresExist();
+    }
+    next();
+}, healthcareRouter);
 
 // PubMed Proxy 
 app.get('/api/pubmed/search', async (req, res) => {
@@ -183,7 +198,7 @@ app.get('/api/pubmed/search', async (req, res) => {
     const term = req.query['term'] as string;
     if (!term) return res.status(400).json({ error: 'Term is required' });
     const eSearchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(term)}&retmode=json&retmax=15`;
-    const response = await fetch(eSearchUrl);
+    const response = await fetch(eSearchUrl, { headers: { 'User-Agent': 'PocketGull/1.0 (mailto:admin@pocketgull.app)' } });
     const data = await response.json();
     res.json(data);
   } catch (err: any) {
@@ -192,20 +207,29 @@ app.get('/api/pubmed/search', async (req, res) => {
   }
 });
 
-app.use('/api/dicom', dicomRouter);
-
 app.get('/api/pubmed/summary', async (req, res) => {
   try {
     const id = req.query['id'] as string;
     if (!id) return res.status(400).json({ error: 'ID is required' });
     const eSummaryUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${id}&retmode=json`;
-    const response = await fetch(eSummaryUrl);
+    const response = await fetch(eSummaryUrl, { headers: { 'User-Agent': 'PocketGull/1.0 (mailto:admin@pocketgull.app)' } });
     const data = await response.json();
     res.json(data);
   } catch (err: any) {
     console.error('PubMed Summary Proxy Error:', err);
     res.status(500).json({ error: err.message });
   }
+});
+
+import { fetchWorldHealthBaselines } from './server/world-health.js';
+
+app.get('/api/health/baselines', async (req, res) => {
+    try {
+        const data = await fetchWorldHealthBaselines();
+        res.json(data || {});
+    } catch (e: any) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 app.get('/health', (req, res) => {
@@ -405,7 +429,7 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     const rawModel = session.model.replace(/^models\//, '');
     
     // Vertex AI BAA-Compliant Inference
-    const projectId = await dlpClient.getProjectId();
+    const projectId = await vertexAuth.getProjectId();
     const vertexAI = new VertexAI({ project: projectId, location: 'us-central1' });
     const generativeModel = vertexAI.getGenerativeModel({
       model: rawModel,
@@ -428,130 +452,22 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
   }
 });
 
-// BigQuery Integration
-const bigquery = new BigQuery();
-const datasetId = 'pocket_gull_clinical';
-const tableId = 'patient_records';
 
-async function ensureBigQueryTableExists() {
-  try {
-    const [datasetExists] = await bigquery.dataset(datasetId).exists();
-    if (!datasetExists) {
-      console.log(`[BigQuery] Dataset ${datasetId} not found, creating...`);
-      await bigquery.createDataset(datasetId);
-    }
-    const [tableExists] = await bigquery.dataset(datasetId).table(tableId).exists();
-    if (!tableExists) {
-      console.log(`[BigQuery] Table ${tableId} not found, creating schema...`);
-      const schema = [
-        { name: 'patient_id', type: 'STRING', mode: 'REQUIRED' },
-        { name: 'encounter_timestamp', type: 'TIMESTAMP' },
-        { name: 'gender', type: 'STRING' },
-        { name: 'age_years', type: 'INT64' },
-        { name: 'active_diagnoses', type: 'STRING', mode: 'REPEATED' },
-        { 
-          name: 'vitals', 
-          type: 'RECORD', 
-          mode: 'REPEATED',
-          fields: [
-            { name: 'recorded_at', type: 'TIMESTAMP' },
-            { name: 'heart_rate_bpm', type: 'INT64' },
-            { name: 'systolic_bp', type: 'INT64' },
-            { name: 'diastolic_bp', type: 'INT64' },
-            { name: 'temperature_celsius', type: 'FLOAT64' },
-            { name: 'weight_kg', type: 'FLOAT64' },
-            { name: 'clinical_notes', type: 'STRING' }
-          ]
-        }
-      ];
-      await bigquery.dataset(datasetId).createTable(tableId, { schema });
-    }
-  } catch (error) {
-    console.warn(`[BigQuery Setup Warning] Failed to verify/create tables. Is billing configured?`, (error as Error).message);
-  }
-}
-
-let tableVerified = false;
-const dlpClient = new DlpServiceClient();
-
-app.post('/api/export/bigquery', express.json(), async (req, res) => {
-  try {
-    if (!tableVerified) {
-      await ensureBigQueryTableExists();
-      tableVerified = true;
-    }
-    const payload = req.body.patientPayload || req.body;
-    
-    // --- HIPAA Compliance: De-identify strings using Cloud DLP ---
-    try {
-      const projectId = await dlpClient.getProjectId();
-      const parent = `projects/${projectId}/locations/global`;
-
-      const redactText = async (text: string) => {
-        if (!text) return text;
-        const [response] = await dlpClient.deidentifyContent({
-            parent,
-            deidentifyConfig: {
-                infoTypeTransformations: {
-                    transformations: [{
-                        infoTypes: [
-                            { name: 'PERSON_NAME' }, { name: 'PHONE_NUMBER' }, 
-                            { name: 'EMAIL_ADDRESS' }, { name: 'US_SOCIAL_SECURITY_NUMBER' },
-                            { name: 'DATE_OF_BIRTH' }, { name: 'LOCATION' }
-                        ],
-                        primitiveTransformation: {
-                            replaceWithInfoTypeConfig: {} // Replaces "John" with "[PERSON_NAME]"
-                        }
-                    }]
-                }
-            },
-            item: { value: text }
-        });
-        return response.item?.value || text;
-      };
-
-      if (payload.active_diagnoses && Array.isArray(payload.active_diagnoses)) {
-          payload.active_diagnoses = await Promise.all(
-              payload.active_diagnoses.map((d: string) => redactText(String(d)))
-          );
-      }
-
-      if (payload.vitals && Array.isArray(payload.vitals)) {
-          for (const v of payload.vitals) {
-              if (v.clinical_notes) v.clinical_notes = await redactText(v.clinical_notes);
-          }
-      }
-    } catch (dlpErr: any) {
-        console.warn('[DLP Warning] Could not redact clinical text before export:', dlpErr.message);
-        throw new Error('HIPAA DLP Redaction Failed: Please ensure Data Loss Prevention API is enabled on your GCP project.');
-    }
-    // -------------------------------------------------------------
-
-    // Ensure nested structs are formed correctly (null out undefined)
-    const formattedVitals = (payload.vitals || []).map((v: any) => ({
-      ...v,
-      recorded_at: v.recorded_at ? new Date(v.recorded_at).toISOString() : null
-    }));
-    
-    payload.vitals = formattedVitals;
-
-    await bigquery
-      .dataset(datasetId)
-      .table(tableId)
-      .insert([payload]);
-      
-    console.log(`[BigQuery] Successfully streamed record for patient ${payload.patient_id}`);
-    res.status(200).json({ success: true });
-  } catch (e: any) {
-    console.error(`[BigQuery Insert Error]`, JSON.stringify(e.errors || e));
-    // Return 500 downstream so the frontend catches it properly if BigQuery is misconfigured
-    res.status(500).json({ error: e.message || e.toString(), details: e.errors });
-  }
-});
 
 // ------------- CLOUD AUDIT LOGGING -------------
-const gcpLogging = new Logging();
-const auditLog = gcpLogging.log('pocket-gull-audit');
+let gcpLogging: any = null;
+let auditLog: any = null;
+
+if (process.env['NODE_ENV'] === 'production' || process.env['K_SERVICE']) {
+  try {
+    gcpLogging = new Logging();
+    auditLog = gcpLogging.log('pocket-gull-audit');
+  } catch (e) {
+    console.warn('[Audit Warning] GCP Logging init failed. Logs will route to stdout.');
+  }
+} else {
+  console.log('[Audit] Local environment detected. Bypassing GCP Logging authentication.');
+}
 
 /**
  * Endpoint for UI components to stream immutable telemetry regarding PHI access.
@@ -560,33 +476,35 @@ app.post('/api/audit', express.json(), async (req, res) => {
   try {
     const { action, userId, patientId, originalActionSource } = req.body;
     
-    // Hardened log schema for tracking clinical data interactions
-    const entry = auditLog.entry(
-      { resource: { type: 'global' } },
-      {
-        message: `AUDIT: User [${userId || 'ANONYMOUS_SESSION'}] performed [${action}] on Patient [${patientId || 'N/A'}]`,
-        action,
-        userId: userId || 'ANONYMOUS_SESSION',
-        patientId: patientId || 'N/A',
-        originalActionSource,
-        timestamp: new Date().toISOString()
-      }
-    );
-    
-    await auditLog.write(entry);
-    console.log(`[Audit DB] Wrote telemetry metric for [${action}]`);
-    res.json({ success: true });
-  } catch (error: any) {
-    console.error(`[Audit Insert Error]`, error);
-    res.status(500).json({ error: error.message });
+    if (auditLog) {
+      // Hardened log schema for tracking clinical data interactions
+      const entry = auditLog.entry(
+        { resource: { type: 'global' } },
+        {
+          message: `AUDIT: User [${userId || 'ANONYMOUS_SESSION'}] performed [${action}] on Patient [${patientId || 'N/A'}]`,
+          action,
+          userId: userId || 'ANONYMOUS_SESSION',
+          patientId: patientId || 'N/A',
+          originalActionSource,
+          timestamp: new Date().toISOString()
+        }
+      );
+      
+      await auditLog.write(entry);
+    } else {
+      // Local fallback
+      console.log(`[LOCAL AUDIT]: User [${userId || 'ANONYMOUS_SESSION'}] performed [${action}] on Patient [${patientId || 'N/A'}]`);
+    }
+
+    res.status(200).json({ status: 'tracked' });
+  } catch (e: any) {
+    console.error('Audit telemetry failed to log:', e.message);
+    res.status(500).json({ error: 'Audit failure' });
   }
 });
 
 // ------------- GOOGLE AUTH FOR VERTEX AI WEBSOCKETS -------------
-import { GoogleAuth } from 'google-auth-library';
-const vertexAuth = new GoogleAuth({
-  scopes: ['https://www.googleapis.com/auth/cloud-platform']
-});
+// (GoogleAuth imported at top level)
 
 /**
  * Proxy Gemini Live WebSockets to Vertex AI Bidi API for BAA Compliance.

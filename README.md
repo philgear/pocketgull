@@ -125,13 +125,13 @@ Full engineering documentation is available in the [`docs/`](./docs/) directory,
 ## 👨‍💻 Public Code Repository & Spin-Up Instructions
 
 **Developer Profile:** [g.dev/philgear](https://g.dev/philgear)  
-**Repository:** [github.com/philgear/pocket-gull](https://github.com/philgear/pocket-gull)
+**Repository:** [github.com/philgear/pocketgull](https://github.com/philgear/pocketgull)
 
 To run this project in a local development environment:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/philgear/pocket-gull.git
+    git clone https://github.com/philgear/pocketgull.git
     cd pocket-gull
     ```
 

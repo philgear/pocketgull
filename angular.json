@@ -50,6 +50,7 @@
               "src/styles.css"
             ],
             "allowedCommonJsDependencies": [
+              "crypto-js",
               "p-retry",
               "core-js",
               "raf",

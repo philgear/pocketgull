@@ -165,8 +165,13 @@ export class DicomViewerComponent {
     const seriesUid = 'mock-series-uid'; // TODO: fetch actual series
     const instanceUid = 'mock-instance-uid'; // TODO: fetch actual instances
     
-    // This allows the proxy to attempt to fetch. If it 404s, it will show a broken image unless caught.
-    const src = this.dicomService.getRenderedImageUrl(studyUid, seriesUid, instanceUid);
+    // Prevent 404 broken images on the frontend during MVP by intercepting mock UIDs
+    // and injecting a valid high-resolution sample image for AI analysis testing.
+    const isMock = seriesUid.includes('mock');
+    const src = isMock 
+       ? 'https://upload.wikimedia.org/wikipedia/commons/6/62/CT_scan_of_the_brain.jpg'
+       : this.dicomService.getRenderedImageUrl(studyUid, seriesUid, instanceUid);
+       
     this.currentImageSrc.set(src);
   }
 

@@ -38,7 +38,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     // Inputs for external control
     rotation = input<number>(0);
     zoom = input<number>(1);
-    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
+    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
 
     readonly webglSupported = signal<boolean>(true);
 
@@ -178,8 +178,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         const boneMaterial = new THREE.MeshStandardMaterial({
             color: 0xf5f5dc, roughness: 0.5, metalness: 0.05, transparent: true, opacity: 0.0, depthWrite: false
         });
-        const mindMaterial = new THREE.MeshStandardMaterial({
-            color: 0x8b5cf6, roughness: 0.2, metalness: 0.4, transparent: true, emissive: 0x8b5cf6, emissiveIntensity: 0.2, opacity: 0.0, depthWrite: false
+        const organMaterial = new THREE.MeshPhysicalMaterial({
+            color: 0xcc4444, roughness: 0.2, metalness: 0.1, transmission: 0.3, thickness: 0.5, clearcoat: 1.0, transparent: true, opacity: 0.0, depthWrite: false
         });
         const molecularMaterial = new THREE.MeshStandardMaterial({
             color: 0x00ffff, wireframe: true, transparent: true, emissive: 0x008888, emissiveIntensity: 0.5, opacity: 0.0, depthWrite: false
@@ -197,41 +197,64 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             rSphere(0.25), skinMaterial, { y: 1.75 },
             rSphere(0.24), muscleMaterial, { y: 1.75 },
             rSphere(0.22), boneMaterial, { y: 1.75 },
-            rSphere(0.20), mindMaterial, { y: 1.75 },
             rSphere(0.26), molecularMaterial, { y: 1.75 }
         );
 
         // Neck
-        this.addPartComplex('neck', rSkin(0.12, 0.15, 0.12), skinMaterial, { y: 1.55 }, rSkin(0.11, 0.14, 0.11), muscleMaterial, { y: 1.55 }, rBone(0.15, 0.04), boneMaterial, { y: 1.55 }, undefined, undefined, undefined, rSkin(0.13, 0.16, 0.13), molecularMaterial, { y: 1.55 });
+        this.addPartComplex('neck', rSkin(0.12, 0.15, 0.12), skinMaterial, { y: 1.55 }, rSkin(0.11, 0.14, 0.11), muscleMaterial, { y: 1.55 }, rBone(0.15, 0.04), boneMaterial, { y: 1.55 }, rSkin(0.13, 0.16, 0.13), molecularMaterial, { y: 1.55 });
 
         // Torso (Upper/Chest)
-        this.addPartComplex('chest', rBox(0.5, 0.45, 0.3), skinMaterial, { y: 1.3 }, rBox(0.48, 0.43, 0.28), muscleMaterial, { y: 1.3 }, rBox(0.45, 0.4, 0.25), boneMaterial, { y: 1.3 }, undefined, undefined, undefined, rBox(0.52, 0.47, 0.32), molecularMaterial, { y: 1.3 });
+        this.addPartComplex('chest', rBox(0.5, 0.45, 0.3), skinMaterial, { y: 1.3 }, rBox(0.48, 0.43, 0.28), muscleMaterial, { y: 1.3 }, rBox(0.45, 0.4, 0.25), boneMaterial, { y: 1.3 }, rBox(0.52, 0.47, 0.32), molecularMaterial, { y: 1.3 });
 
         // Abdomen
-        this.addPartComplex('abdomen', rBox(0.45, 0.3, 0.28), skinMaterial, { y: 0.95 }, rBox(0.43, 0.28, 0.26), muscleMaterial, { y: 0.95 }, rBone(0.3, 0.05), boneMaterial, { y: 0.95 }, undefined, undefined, undefined, rBox(0.47, 0.32, 0.30), molecularMaterial, { y: 0.95 });
+        this.addPartComplex('abdomen', rBox(0.45, 0.3, 0.28), skinMaterial, { y: 0.95 }, rBox(0.43, 0.28, 0.26), muscleMaterial, { y: 0.95 }, rBone(0.3, 0.05), boneMaterial, { y: 0.95 }, rBox(0.47, 0.32, 0.30), molecularMaterial, { y: 0.95 });
 
         // Pelvis
-        this.addPartComplex('pelvis', rBox(0.48, 0.25, 0.3), skinMaterial, { y: 0.7 }, rBox(0.46, 0.23, 0.28), muscleMaterial, { y: 0.7 }, rBox(0.4, 0.2, 0.2), boneMaterial, { y: 0.7 }, undefined, undefined, undefined, rBox(0.50, 0.27, 0.32), molecularMaterial, { y: 0.7 });
+        this.addPartComplex('pelvis', rBox(0.48, 0.25, 0.3), skinMaterial, { y: 0.7 }, rBox(0.46, 0.23, 0.28), muscleMaterial, { y: 0.7 }, rBox(0.4, 0.2, 0.2), boneMaterial, { y: 0.7 }, rBox(0.50, 0.27, 0.32), molecularMaterial, { y: 0.7 });
 
-        // Arms (Right)
-        this.addPartComplex('r_shoulder', rJoint(0.12), skinMaterial, { x: -0.32, y: 1.45 }, rJoint(0.11), muscleMaterial, { x: -0.32, y: 1.45 }, rJoint(0.06), boneMaterial, { x: -0.32, y: 1.45 }, undefined, undefined, undefined, rJoint(0.13), molecularMaterial, { x: -0.32, y: 1.45 });
-        this.addPartComplex('r_arm', rSkin(0.08, 0.4, 0.08), skinMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.07, 0.38, 0.07), muscleMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rBone(0.4), boneMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, undefined, undefined, undefined, rSkin(0.09, 0.42, 0.09), molecularMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 });
-        this.addPartComplex('r_hand', rBox(0.08, 0.15, 0.05), skinMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, rBox(0.07, 0.14, 0.04), muscleMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, rBox(0.06, 0.12, 0.03), boneMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, undefined, undefined, undefined, rBox(0.09, 0.16, 0.06), molecularMaterial, { x: -0.5, y: 0.82, rx: 0.2 });
+        // Arms & Legs omitted from replacing individually, let's keep addPartComplex mapping but just shift the last molecular argument.
+        this.addPartComplex('r_shoulder', rJoint(0.12), skinMaterial, { x: -0.32, y: 1.45 }, rJoint(0.11), muscleMaterial, { x: -0.32, y: 1.45 }, rJoint(0.06), boneMaterial, { x: -0.32, y: 1.45 }, rJoint(0.13), molecularMaterial, { x: -0.32, y: 1.45 });
+        this.addPartComplex('r_arm', rSkin(0.08, 0.4, 0.08), skinMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.07, 0.38, 0.07), muscleMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rBone(0.4), boneMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.09, 0.42, 0.09), molecularMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 });
+        this.addPartComplex('r_hand', rBox(0.08, 0.15, 0.05), skinMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, rBox(0.07, 0.14, 0.04), muscleMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, rBox(0.06, 0.12, 0.03), boneMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, rBox(0.09, 0.16, 0.06), molecularMaterial, { x: -0.5, y: 0.82, rx: 0.2 });
 
-        // Arms (Left)
-        this.addPartComplex('l_shoulder', rJoint(0.12), skinMaterial, { x: 0.32, y: 1.45 }, rJoint(0.11), muscleMaterial, { x: 0.32, y: 1.45 }, rJoint(0.06), boneMaterial, { x: 0.32, y: 1.45 }, undefined, undefined, undefined, rJoint(0.13), molecularMaterial, { x: 0.32, y: 1.45 });
-        this.addPartComplex('l_arm', rSkin(0.08, 0.4, 0.08), skinMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.07, 0.38, 0.07), muscleMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, rBone(0.4), boneMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, undefined, undefined, undefined, rSkin(0.09, 0.42, 0.09), molecularMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 });
-        this.addPartComplex('l_hand', rBox(0.08, 0.15, 0.05), skinMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, rBox(0.07, 0.14, 0.04), muscleMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, rBox(0.06, 0.12, 0.03), boneMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, undefined, undefined, undefined, rBox(0.09, 0.16, 0.06), molecularMaterial, { x: 0.5, y: 0.82, rx: 0.2 });
+        this.addPartComplex('l_shoulder', rJoint(0.12), skinMaterial, { x: 0.32, y: 1.45 }, rJoint(0.11), muscleMaterial, { x: 0.32, y: 1.45 }, rJoint(0.06), boneMaterial, { x: 0.32, y: 1.45 }, rJoint(0.13), molecularMaterial, { x: 0.32, y: 1.45 });
+        this.addPartComplex('l_arm', rSkin(0.08, 0.4, 0.08), skinMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.07, 0.38, 0.07), muscleMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, rBone(0.4), boneMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.09, 0.42, 0.09), molecularMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 });
+        this.addPartComplex('l_hand', rBox(0.08, 0.15, 0.05), skinMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, rBox(0.07, 0.14, 0.04), muscleMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, rBox(0.06, 0.12, 0.03), boneMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, rBox(0.09, 0.16, 0.06), molecularMaterial, { x: 0.5, y: 0.82, rx: 0.2 });
 
-        // Legs (Right)
-        this.addPartComplex('r_thigh', rSkin(0.12, 0.5, 0.12), skinMaterial, { x: -0.18, y: 0.35 }, rSkin(0.11, 0.48, 0.11), muscleMaterial, { x: -0.18, y: 0.35 }, rBone(0.5, 0.04), boneMaterial, { x: -0.18, y: 0.35 }, undefined, undefined, undefined, rSkin(0.13, 0.52, 0.13), molecularMaterial, { x: -0.18, y: 0.35 });
-        this.addPartComplex('r_shin', rSkin(0.1, 0.5, 0.1), skinMaterial, { x: -0.18, y: -0.25 }, rSkin(0.09, 0.48, 0.09), muscleMaterial, { x: -0.18, y: -0.25 }, rBone(0.5, 0.03), boneMaterial, { x: -0.18, y: -0.25 }, undefined, undefined, undefined, rSkin(0.11, 0.52, 0.11), molecularMaterial, { x: -0.18, y: -0.25 });
-        this.addPartComplex('r_foot', rBox(0.15, 0.08, 0.25), skinMaterial, { x: -0.18, y: -0.58, z: 0.05 }, rBox(0.14, 0.07, 0.24), muscleMaterial, { x: -0.18, y: -0.58, z: 0.05 }, rBox(0.12, 0.06, 0.22), boneMaterial, { x: -0.18, y: -0.58, z: 0.05 }, undefined, undefined, undefined, rBox(0.16, 0.09, 0.26), molecularMaterial, { x: -0.18, y: -0.58, z: 0.05 });
+        this.addPartComplex('r_thigh', rSkin(0.12, 0.5, 0.12), skinMaterial, { x: -0.18, y: 0.35 }, rSkin(0.11, 0.48, 0.11), muscleMaterial, { x: -0.18, y: 0.35 }, rBone(0.5, 0.04), boneMaterial, { x: -0.18, y: 0.35 }, rSkin(0.13, 0.52, 0.13), molecularMaterial, { x: -0.18, y: 0.35 });
+        this.addPartComplex('r_shin', rSkin(0.1, 0.5, 0.1), skinMaterial, { x: -0.18, y: -0.25 }, rSkin(0.09, 0.48, 0.09), muscleMaterial, { x: -0.18, y: -0.25 }, rBone(0.5, 0.03), boneMaterial, { x: -0.18, y: -0.25 }, rSkin(0.11, 0.52, 0.11), molecularMaterial, { x: -0.18, y: -0.25 });
+        this.addPartComplex('r_foot', rBox(0.15, 0.08, 0.25), skinMaterial, { x: -0.18, y: -0.58, z: 0.05 }, rBox(0.14, 0.07, 0.24), muscleMaterial, { x: -0.18, y: -0.58, z: 0.05 }, rBox(0.12, 0.06, 0.22), boneMaterial, { x: -0.18, y: -0.58, z: 0.05 }, rBox(0.16, 0.09, 0.26), molecularMaterial, { x: -0.18, y: -0.58, z: 0.05 });
 
-        // Legs (Left)
-        this.addPartComplex('l_thigh', rSkin(0.12, 0.5, 0.12), skinMaterial, { x: 0.18, y: 0.35 }, rSkin(0.11, 0.48, 0.11), muscleMaterial, { x: 0.18, y: 0.35 }, rBone(0.5, 0.04), boneMaterial, { x: 0.18, y: 0.35 }, undefined, undefined, undefined, rSkin(0.13, 0.52, 0.13), molecularMaterial, { x: 0.18, y: 0.35 });
-        this.addPartComplex('l_shin', rSkin(0.1, 0.5, 0.1), skinMaterial, { x: 0.18, y: -0.25 }, rSkin(0.09, 0.48, 0.09), muscleMaterial, { x: 0.18, y: -0.25 }, rBone(0.5, 0.03), boneMaterial, { x: 0.18, y: -0.25 }, undefined, undefined, undefined, rSkin(0.11, 0.52, 0.11), molecularMaterial, { x: 0.18, y: -0.25 });
-        this.addPartComplex('l_foot', rBox(0.15, 0.08, 0.25), skinMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.14, 0.07, 0.24), muscleMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.12, 0.06, 0.22), boneMaterial, { x: 0.18, y: -0.58, z: 0.05 }, undefined, undefined, undefined, rBox(0.16, 0.09, 0.26), molecularMaterial, { x: 0.18, y: -0.58, z: 0.05 });
+        this.addPartComplex('l_thigh', rSkin(0.12, 0.5, 0.12), skinMaterial, { x: 0.18, y: 0.35 }, rSkin(0.11, 0.48, 0.11), muscleMaterial, { x: 0.18, y: 0.35 }, rBone(0.5, 0.04), boneMaterial, { x: 0.18, y: 0.35 }, rSkin(0.13, 0.52, 0.13), molecularMaterial, { x: 0.18, y: 0.35 });
+        this.addPartComplex('l_shin', rSkin(0.1, 0.5, 0.1), skinMaterial, { x: 0.18, y: -0.25 }, rSkin(0.09, 0.48, 0.09), muscleMaterial, { x: 0.18, y: -0.25 }, rBone(0.5, 0.03), boneMaterial, { x: 0.18, y: -0.25 }, rSkin(0.11, 0.52, 0.11), molecularMaterial, { x: 0.18, y: -0.25 });
+        this.addPartComplex('l_foot', rBox(0.15, 0.08, 0.25), skinMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.14, 0.07, 0.24), muscleMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.12, 0.06, 0.22), boneMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.16, 0.09, 0.26), molecularMaterial, { x: 0.18, y: -0.58, z: 0.05 });
+
+        // Build the Procedural Organs manually and attach them directly to their relative zones
+        const createOrgan = (name: string, pId: string, geo: THREE.BufferGeometry, pos: any, col: number) => {
+            const mat = organMaterial.clone();
+            mat.color.setHex(col);
+            const mesh = new THREE.Mesh(geo, mat);
+            this.applyPos(mesh, pos);
+            mesh.userData['layer'] = 'organs';
+            mesh.userData['id'] = pId; // Fallback to chest/abdomen for selection logic 
+            mesh.userData['organName'] = name;
+            
+            const parentGroup = this.parts.get(pId);
+            if (parentGroup) {
+                parentGroup.add(mesh);
+            }
+        };
+        
+        createOrgan('Brain', 'head', rSphere(0.16), { y: 1.76 }, 0xddaabb);
+        createOrgan('Heart', 'chest', rSphere(0.09), { x: -0.05, y: 1.40, z: 0.08 }, 0xcc2222);
+        createOrgan('Right Lung', 'chest', rSkin(0.12, 0.28, 0.10), { x: -0.15, y: 1.35, z: 0.02, rx: 0.1, rz: -0.1 }, 0xcc5566);
+        createOrgan('Left Lung', 'chest', rSkin(0.12, 0.28, 0.10), { x: 0.15, y: 1.35, z: 0.02, rx: 0.1, rz: 0.1 }, 0xcc5566);
+        createOrgan('Liver', 'abdomen', rBox(0.24, 0.14, 0.16), { x: -0.1, y: 1.05, z: 0.05, rz: 0.15 }, 0x772222);
+        createOrgan('Stomach', 'abdomen', rSphere(0.11), { x: 0.12, y: 1.00, z: 0.08 }, 0xddaacc);
+        createOrgan('Left Kidney', 'abdomen', rSphere(0.06), { x: 0.12, y: 0.95, z: -0.08 }, 0x551111);
+        createOrgan('Right Kidney', 'abdomen', rSphere(0.06), { x: -0.12, y: 0.95, z: -0.08 }, 0x551111);
+        // Using box to approximate intestine bundle footprint
+        createOrgan('Intestines', 'abdomen', rBox(0.32, 0.18, 0.18), { x: 0, y: 0.82, z: 0.05 }, 0xcc7777);
 
         this.updatePartColors();
         this.updateTransparency(this.anatomyViewMode());
@@ -241,7 +264,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                            skinGeo: THREE.BufferGeometry, skinMat: THREE.Material, skinPos: any,
                            muscleGeo: THREE.BufferGeometry, muscleMat: THREE.Material, musclePos: any,
                            boneGeo: THREE.BufferGeometry, boneMat: THREE.Material, bonePos: any,
-                           mindGeo?: THREE.BufferGeometry, mindMat?: THREE.Material, mindPos?: any,
                            molecularGeo?: THREE.BufferGeometry, molecularMat?: THREE.Material, molecularPos?: any) {
         
         const group = new THREE.Group();
@@ -268,16 +290,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         meshBone.userData['id'] = id;
         group.add(meshBone);
 
-        // 4. Mind Layer (Optional)
-        if (mindGeo && mindMat && mindPos) {
-            const meshMind = new THREE.Mesh(mindGeo, mindMat.clone());
-            this.applyPos(meshMind, mindPos);
-            meshMind.userData['layer'] = 'mind';
-            meshMind.userData['id'] = id;
-            group.add(meshMind);
-        }
-
-        // 5. Molecular Layer (Optional)
+        // 4. Molecular Layer (Optional)
         if (molecularGeo && molecularMat && molecularPos) {
             const meshMolecular = new THREE.Mesh(molecularGeo, molecularMat.clone());
             this.applyPos(meshMolecular, molecularPos);
@@ -327,7 +340,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     if (layer === 'skin') material.color.setHex(0xfdfdfd);
                     if (layer === 'muscle') material.color.setHex(0xc95353);
                     if (layer === 'bone') material.color.setHex(0xe0e0e0);
-                    if (layer === 'mind') material.color.setHex(0x8b5cf6);
+                    if (layer === 'organs') material.color.setHex(0xcc4444);
                     if (layer === 'molecular') {
                         material.color.setHex(0x00ffff);
                         material.emissive.setHex(0x008888);
@@ -347,8 +360,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                         material.emissiveIntensity = 0.6;
                     }
                 } else {
-                    if (layer === 'mind') {
-                        material.emissive.setHex(0x8b5cf6);
+                    if (layer === 'organs') {
+                        material.emissive.setHex(0xaa3333);
                         material.emissiveIntensity = 0.2;
                     } else if (layer === 'molecular' && maxPain === 0) {
                         material.emissive.setHex(0x008888);
@@ -365,7 +378,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         });
     }
 
-    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular') {
+    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular') {
         this.parts.forEach((group) => {
             const isSelected = this.state.selectedPartId() === group.userData['id'];
             group.children.forEach(child => {
@@ -388,9 +401,9 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     else if (layer === 'bone') { material.opacity = 1.0; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
-                else if (mode === 'mind') {
-                    if (layer === 'skin') { material.opacity = 0.10; material.depthWrite = false; }
-                    else if (layer === 'mind') { material.opacity = 0.9; material.depthWrite = true; }
+                else if (mode === 'organs') {
+                    if (layer === 'skin') { material.opacity = 0.15; material.depthWrite = true; material.transparent = true; }
+                    else if (layer === 'organs') { material.opacity = 0.95; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
                 else if (mode === 'molecular') {
