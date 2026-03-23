@@ -9,7 +9,7 @@ import { VerificationIssue } from '../../components/analysis-report.types';
 })
 export class PubGemmaProvider implements IntelligenceProvider {
   private readonly OLLAMA_URL = 'http://127.0.0.1:11434/api/generate';
-  private readonly MODEL_NAME = 'gemma:2b'; // Scaffold targeting local PubGemma instances
+  private readonly MODEL_NAME = 'gemma:2b'; // Scaffold targeting local NVIDIA instances
   private chatContext = '';
 
   private async isOllamaAvailable(): Promise<boolean> {
@@ -22,50 +22,44 @@ export class PubGemmaProvider implements IntelligenceProvider {
       }
   }
 
-  generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string> {
-    return new Observable<string>(observer => {
-      this.isOllamaAvailable().then(isAvailable => {
-        if (!isAvailable) {
-          observer.error(new Error("Local Ollama endpoint unreachable."));
-          return;
-        }
+  async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+    const isAvailable = await this.isOllamaAvailable();
+    if (!isAvailable) {
+      throw new Error("Local Ollama endpoint unreachable.");
+    }
 
-        const prompt = `System: ${systemInstruction}\nPatient Data: ${patientData}\nGenerate clinical report for ${lens}:`;
-        
-        fetch(this.OLLAMA_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: this.MODEL_NAME,
-          prompt: prompt,
-          stream: true
-        })
-      }).then(async response => {
-        if (!response.body) throw new Error("No response body from local inference engine");
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n').filter(line => line.trim() !== '');
-          for (const line of lines) {
-            try {
-              const parsed = JSON.parse(line);
-              if (parsed.response) {
-                observer.next(parsed.response);
-              }
-            } catch (e) {
-              console.warn("Failed to parse Ollama chunk", e);
-            }
-          }
-        }
-        observer.complete();
-      }).catch(err => observer.error(err));
-
-      }); // End of isOllamaAvailable
+    const prompt = `System: ${systemInstruction}\nPatient Data: ${patientData}\nGenerate clinical report for ${lens}:`;
+    
+    const response = await fetch(this.OLLAMA_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: this.MODEL_NAME,
+        prompt: prompt,
+        stream: true
+      })
     });
+
+    if (!response.body) throw new Error("No response body from local inference engine");
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split('\n').filter(line => line.trim() !== '');
+      for (const line of lines) {
+        try {
+          const parsed = JSON.parse(line);
+          if (parsed.response) {
+            yield parsed.response;
+          }
+        } catch (e) {
+          console.warn("Failed to parse Ollama chunk", e);
+        }
+      }
+    }
   }
 
   async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
@@ -78,7 +72,7 @@ export class PubGemmaProvider implements IntelligenceProvider {
   }
 
   async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }> {
-    return { status: 'Verified by Local Open Weights (PubGemma)', issues: [] };
+    return { status: 'Verified by Local Open Weights (NVIDIA)', issues: [] };
   }
 
   async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child'): Promise<string> {
@@ -91,7 +85,7 @@ export class PubGemmaProvider implements IntelligenceProvider {
 
   async analyzeImage(base64Image: string, context?: string): Promise<string> {
     // Explicitly handing multimodal tasks back to the Generalist engine
-    throw new Error("PubGemma integration limits visual analysis to the multimodal gemini engine. Please route image dependencies accordingly.");
+    throw new Error("NVIDIA integration limits visual analysis to the multimodal gemini engine. Please route image dependencies accordingly.");
   }
 
   async startChat(patientData: string, context: string): Promise<void> {
@@ -122,12 +116,12 @@ export class PubGemmaProvider implements IntelligenceProvider {
       const data = await response.json();
       return data.response;
     } catch (error) {
-      console.error("PubGemma Error:", error);
-      return "Local PubGemma inference engine could not be reached.";
+      console.error("NVIDIA Error:", error);
+      return "Local NVIDIA inference engine could not be reached.";
     }
   }
 
   async getInitialGreeting(prompt: string): Promise<string> {
-    return "Hello, I am the local open-weights instance (PubGemma). How can I assist with this diagnosis?";
+    return "Hello, I am the local open-weights instance (NVIDIA). How can I assist with this diagnosis?";
   }
 }

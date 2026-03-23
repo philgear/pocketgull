@@ -38,39 +38,23 @@ export class NanoProvider implements IntelligenceProvider {
     }
   }
 
-  generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string> {
-    return new Observable<string>(observer => {
-      this.ensureAiAvailable().then(async () => {
-        try {
-          // Note: using ai.languageModel.create which is the most modern Chrome API for this
-          const session = await window.ai!.languageModel!.create({
-            systemPrompt: systemInstruction
-          });
-
-          const prompt = `Patient Data:\n${patientData}\n\nTask: Generate a highly clinical report specifically for the following scope: [${lens}]. Formulate it purely as markdown.`;
-          
-          let previousChunk = '';
-          const stream = await session.promptStreaming(prompt);
-          for await (const chunk of stream) {
-            // The promptStreaming API often yields the cumulative string so far.
-            // We need to diff it if it's cumulative, but usually for standard iterators it returns new tokens.
-            // Assuming it yields cumulative strings (like some early Chrome betas did), we emit the diff.
-            // Actually, newer versions of promptStreaming yield just the new chunk.
-            // We will just pass it down and let the consumer handle the concatenation if it's streaming.
-            // But wait, the pubgemma provider yielded full new strings or delta? 
-            // In pubgemma it yielded deltas. Let's send the plain chunk depending on how it behaves.
-            // Safe fallback:
-            const newText = chunk.startsWith(previousChunk) ? chunk.substring(previousChunk.length) : chunk;
-            previousChunk = chunk;
-            observer.next(newText);
-          }
-          
-          observer.complete();
-        } catch (e: any) {
-          observer.error(e);
-        }
-      }).catch(err => observer.error(err));
+  async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+    await this.ensureAiAvailable();
+    // Note: using ai.languageModel.create which is the most modern Chrome API for this
+    const session = await window.ai!.languageModel!.create({
+      systemPrompt: systemInstruction
     });
+
+    const prompt = `Patient Data:\n${patientData}\n\nTask: Generate a highly clinical report specifically for the following scope: [${lens}]. Formulate it purely as markdown.`;
+    
+    let previousChunk = '';
+    const stream = await session.promptStreaming(prompt);
+    for await (const chunk of stream) {
+      // Safe fallback:
+      const newText = chunk.startsWith(previousChunk) ? chunk.substring(previousChunk.length) : chunk;
+      previousChunk = chunk;
+      yield newText;
+    }
   }
 
   async generateMetrics(reportText: string): Promise<ClinicalMetrics> {

@@ -13,12 +13,13 @@ import { marked } from 'marked';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
+import { MetricCardComponent } from './shared/metric-card.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
 @Component({
   selector: 'app-medical-summary',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, SafeHtmlPipe],
+  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, MetricCardComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`
     /* Tighter margin collapsing inside strategy prose to prevent padding blowouts */
@@ -91,6 +92,45 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </pocket-gull-button>
                   </div>
                 </div>
+
+                <!-- Live Biometric Telemetry Dashboard (Display Only) -->
+                <section class="mb-8">
+                  <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-4">Live Biometric Telemetry</h2>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <app-metric-card
+                      title="Blood Pressure"
+                      [value]="state.vitals().bp || '--'"
+                      unit="mmHg"
+                      [status]="state.vitals().bp === '120/80' ? 'normal' : 'warning'"
+                      trendDirection="stable"
+                    ></app-metric-card>
+                    
+                    <app-metric-card
+                      title="Heart Rate"
+                      [value]="state.vitals().hr || '--'"
+                      unit="bpm"
+                      [status]="(state.vitals().hr | number) > 100 ? 'warning' : 'normal'"
+                      trendDirection="up"
+                      trendText="+2.5%"
+                    ></app-metric-card>
+                    
+                    <app-metric-card
+                      title="SpO2"
+                      [value]="state.vitals().spO2 || '--'"
+                      unit="%"
+                      [status]="(state.vitals().spO2 | number) < 95 ? 'critical' : 'normal'"
+                      trendDirection="stable"
+                    ></app-metric-card>
+                    
+                    <app-metric-card
+                      title="Temperature"
+                      [value]="state.vitals().temp || '--'"
+                      unit="°F"
+                      status="normal"
+                      trendDirection="stable"
+                    ></app-metric-card>
+                  </div>
+                </section>
 
                 <!-- Vitals Grid -->
                 <!-- Vitals & Biometrics -->

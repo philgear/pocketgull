@@ -838,3 +838,60 @@
         transform: rotate(2deg) scaleY(0.9);
     }
 }
+
+/* Carbon Copy Medical Print Styling */
+@media print {
+  @page {
+    margin: 1.5cm;
+    size: portrait;
+  }
+  
+  body {
+    background: white;
+    font-family: 'Inter', 'Courier New', monospace !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide all non-printable UI elements (sidebars, toolbars, buttons) */
+  .no-print, header, nav, .header-shadow, button, .hover\\:-translate-y-1 {
+    display: none !important;
+  }
+
+  /* Core Medical Chart Layout adjustments */
+  .print-medical-chart {
+    display: block !important;
+    font-size: 10pt !important;
+  }
+
+  .print-medical-chart h1, .print-medical-chart h2, .print-medical-chart h3 {
+    font-family: 'Inter', sans-serif !important;
+    color: black !important;
+    page-break-after: avoid;
+    border-bottom: 2px solid black;
+    padding-bottom: 4px;
+    margin-top: 1.5em;
+  }
+
+  /* Tactile Dot-Matrix "Carbon Copy" specific styles */
+  .print-medical-chart * {
+    overflow: visible !important;
+  }
+
+  /* Flatten all cards into stark letterhead blocks */
+  .print-medical-chart .bg-white, .print-medical-chart .dark\\:bg-zinc-900 {
+    background: transparent !important;
+    border: 1px dotted #333 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin-bottom: 1cm;
+    page-break-inside: avoid;
+  }
+
+  /* Enforce black and white charts */
+  canvas {
+    filter: grayscale(100%) contrast(1.5);
+    max-width: 100% !important;
+  }
+}

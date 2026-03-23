@@ -1,0 +1,117 @@
+﻿{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "Service",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/build-enable-automatic-updates": "false",
+      "run.googleapis.com/build-id": "02c5b788-3331-4144-a278-997a44ea7d54",
+      "run.googleapis.com/build-image-uri": "us-west1-docker.pkg.dev/gen-lang-client-0540208645/cloud-run-source-deploy/understory",
+      "run.googleapis.com/build-name": "projects/793190615625/locations/us-west1/builds/02c5b788-3331-4144-a278-997a44ea7d54",
+      "run.googleapis.com/build-source-location": "gs://run-sources-gen-lang-client-0540208645-us-west1/services/understory/1773077082.137738-13a5622801744c0eb256573434ab5a2e.zip#1773076974916172",
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "560.0.0",
+      "run.googleapis.com/ingress": "all",
+      "run.googleapis.com/ingress-status": "all",
+      "run.googleapis.com/maxScale": "20",
+      "run.googleapis.com/operation-id": "9e1b40c0-ba93-4623-a72b-2de7f17a4894",
+      "run.googleapis.com/urls": "[\"https://understory-793190615625.us-west1.run.app\",\"https://understory-no4o7fq6xa-uw.a.run.app\"]",
+      "serving.knative.dev/creator": "philgear@gmail.com",
+      "serving.knative.dev/lastModifier": "philgear@gmail.com"
+    },
+    "creationTimestamp": "2026-03-09T17:11:51.894172Z",
+    "generation": 8,
+    "labels": {
+      "cloud.googleapis.com/location": "us-west1"
+    },
+    "name": "understory",
+    "namespace": "793190615625",
+    "resourceVersion": "AAZM1jYC0Fc",
+    "selfLink": "/apis/serving.knative.dev/v1/namespaces/793190615625/services/understory",
+    "uid": "54c1e21d-ac30-4d2c-862d-04ff1ca08dff"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "autoscaling.knative.dev/maxScale": "5",
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "560.0.0",
+          "run.googleapis.com/startup-cpu-boost": "true"
+        },
+        "labels": {
+          "client.knative.dev/nonce": "zqnwzrscnu",
+          "run.googleapis.com/startupProbeType": "Default"
+        }
+      },
+      "spec": {
+        "containerConcurrency": 80,
+        "containers": [
+          {
+            "image": "gcr.io/gen-lang-client-0540208645/understory:latest",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "name": "http1"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1Gi"
+              }
+            },
+            "startupProbe": {
+              "failureThreshold": 1,
+              "periodSeconds": 240,
+              "tcpSocket": {
+                "port": 8080
+              },
+              "timeoutSeconds": 240
+            }
+          }
+        ],
+        "serviceAccountName": "793190615625-compute@developer.gserviceaccount.com",
+        "timeoutSeconds": 300
+      }
+    },
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100
+      }
+    ]
+  },
+  "status": {
+    "address": {
+      "url": "https://understory-no4o7fq6xa-uw.a.run.app"
+    },
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-03-12T16:26:13.130327Z",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2026-03-12T16:26:07.572437Z",
+        "status": "True",
+        "type": "ConfigurationsReady"
+      },
+      {
+        "lastTransitionTime": "2026-03-12T16:26:13.098619Z",
+        "status": "True",
+        "type": "RoutesReady"
+      }
+    ],
+    "latestCreatedRevisionName": "understory-00008-8zl",
+    "latestReadyRevisionName": "understory-00008-8zl",
+    "observedGeneration": 8,
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100,
+        "revisionName": "understory-00008-8zl"
+      }
+    ],
+    "url": "https://understory-no4o7fq6xa-uw.a.run.app"
+  }
+}

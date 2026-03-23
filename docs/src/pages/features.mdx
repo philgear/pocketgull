@@ -31,6 +31,9 @@ Speak the wake word **"Gull"** followed by actions (e.g., *"Gull, highlight head
 
 Moving beyond simple translation, the **COLO Engine** adjusts the "Clinical Strategy" to the patient's cognitive state (Standard, Dyslexia-Friendly, Pediatric) without losing clinical accuracy. It translates Care Plans into tailored formats, outputted to PDF using <DocNode term="jsPDF" category="James Hall · Parallax" hint="Client-side PDF generation library for JavaScript." link="https://github.com/parallax/jsPDF" linkLabel="GitHub →" icon="https://github.com/favicon.ico">jsPDF</DocNode> with refined Dieter Rams "carousel informatics" typography, ensuring **Informed Consent** is truly inclusive.
 
+### Multimodal Document Pipelines
+Seamlessly drag-and-drop or select Medical Lab Reports (PDFs, Images) directly into the Pocket Gull chat interface. The application securely packages these items into base64 payloads and pipes them directly to **Gemini Vision models** via Vertex AI, explicitly instructing the AI to natively map and extract patient vitals longitudinally into the state engine.
+
 ---
 
 ## Visualization
@@ -65,7 +68,7 @@ Every clinical interaction — from updating patient state to generating an AI c
 
 ### Patient Management System
 
-Full CRUD capabilities for patient records, including historical visit review, permanent record removal, and multi-patient switching via a dropdown selector.
+Full CRUD capabilities for patient records, including historical visit review, permanent record removal, and multi-patient switching via a dropdown selector. The entire roster persists instantly and locally through the `StorageService` invoking a native, fast **IndexedDB** database.
 
 ### Local-First PWA Architecture
 

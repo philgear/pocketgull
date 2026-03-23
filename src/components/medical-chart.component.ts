@@ -12,11 +12,12 @@ import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
 import { MedicalChartSummaryComponent } from './medical-summary.component';
 import { DicomViewerComponent } from './dicom-viewer.component';
 import { OhifViewerComponent } from './ohif-viewer.component';
+import { BiometricHistoryChartComponent } from './biometric-history-chart.component';
 
 @Component({
   selector: 'app-medical-chart',
   standalone: true,
-  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent, DicomViewerComponent, OhifViewerComponent],
+  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent, DicomViewerComponent, OhifViewerComponent, BiometricHistoryChartComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full min-h-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#F9FAFB] dark:bg-transparent">
@@ -66,6 +67,23 @@ import { OhifViewerComponent } from './ohif-viewer.component';
                 </div>
               </div>
             }
+          </div>
+        }
+      </pocket-gull-card>
+
+      <!-- Biometric Trends Card -->
+      <pocket-gull-card 
+        title="Biometric Trends" 
+        [icon]="biometricIcon"
+        [noPadding]="true">
+        
+        <div right-action (click)="isBiometricExpanded.set(!isBiometricExpanded())" class="cursor-pointer hover:bg-black/5 p-1 rounded-md transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500 transition-transform duration-200" [class.rotate-180]="!isBiometricExpanded()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        </div>
+
+        @if(isBiometricExpanded()) {
+          <div class="h-[250px] overflow-hidden bg-white dark:bg-black/20 shrink-0 p-4">
+             <app-biometric-history-chart></app-biometric-history-chart>
           </div>
         }
       </pocket-gull-card>

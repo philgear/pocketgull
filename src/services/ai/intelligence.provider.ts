@@ -11,9 +11,9 @@ export interface ReportGenerationResult {
 export interface IntelligenceProvider {
     /**
      * Generates a clinical report for a specific lens.
-     * Supports streaming via Observable.
+     * Supports streaming via AsyncIterable.
      */
-    generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string>;
+    generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string>;
 
     /**
      * Generates clinical metrics (complexity, stability, certainty) for a report.
@@ -50,6 +50,6 @@ export interface IntelligenceProvider {
      * Chat Session Management
      */
     startChat(patientData: string, context: string): Promise<void>;
-    sendMessage(message: string, files?: File[]): Promise<string>;
+    sendMessage(message: string, files?: File[], enableGrounding?: boolean): Promise<string>;
     getInitialGreeting(prompt: string): Promise<string>;
 }

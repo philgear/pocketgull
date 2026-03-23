@@ -1,0 +1,42 @@
+﻿{
+  "affinityCookieTtlSec": 0,
+  "backends": [
+    {
+      "balancingMode": "UTILIZATION",
+      "capacityScaler": 1.0,
+      "group": "https://www.googleapis.com/compute/v1/projects/gen-lang-client-0540208645/regions/us-west1/networkEndpointGroups/pocket-gull-neg"
+    }
+  ],
+  "connectionDraining": {
+    "drainingTimeoutSec": 0
+  },
+  "creationTimestamp": "2026-03-19T09:11:12.387-07:00",
+  "description": "",
+  "enableCDN": false,
+  "fingerprint": "08nS9hAJfhY=",
+  "iap": {
+    "enabled": true,
+    "oauth2ClientId": "793190615625-2hndi5seo2j04rltvthfb3kj1dn7h5v1.apps.googleusercontent.com",
+    "oauth2ClientSecretSha256": "c967259982df8f0b89d9cc14ccb4973e87eed059cb6aa89ac24ce14e492e00e5"
+  },
+  "id": "2487933223155375823",
+  "kind": "compute#backendService",
+  "loadBalancingScheme": "EXTERNAL_MANAGED",
+  "logConfig": {
+    "enable": true,
+    "optionalMode": "EXCLUDE_ALL_OPTIONAL",
+    "sampleRate": 1.0
+  },
+  "name": "pocket-gull-backend",
+  "port": 80,
+  "portName": "http",
+  "protocol": "HTTP",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/gen-lang-client-0540208645/global/backendServices/pocket-gull-backend",
+  "sessionAffinity": "NONE",
+  "timeoutSec": 30,
+  "usedBy": [
+    {
+      "reference": "https://www.googleapis.com/compute/v1/projects/gen-lang-client-0540208645/global/urlMaps/pocket-gull-url-map"
+    }
+  ]
+}

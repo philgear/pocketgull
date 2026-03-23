@@ -93,3 +93,4 @@ While the default agent topology safely operates on Google's cloud-based Gemini 
 | `/api/dicom/studies` | Reads populated `.env` GCP credentials to query healthcare datasets securely without leaking project IDs to the client. |
 | `/api/pubmed` | Executes robust HTTP GET calls to NIH's E-utilities and transpiles the complex XML response into manageable JSON entries. |
 | `/api/audit` | Proxies clinical telemetry from the `AuditService` directly into BigQuery `pocket_gull_clinical.patient_records` for compliance. |
+| `/api/ai/chat/message` | Handles multimodal arrays, lifting standard limits to `50mb` to decode Base64 Image/PDF lab reports into `inlineData` for native Vertex AI Vision processing. |

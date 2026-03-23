@@ -22,6 +22,7 @@ import { NetworkStateService } from './services/network-state.service';
 import { ExportService } from './services/export.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT } from './demo-data';
+import { PatientDirectoryComponent } from './components/patient-directory.component';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
 import { WalkthroughTourService } from './services/walkthrough-tour.service';
@@ -46,7 +47,8 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     VoiceAssistantComponent,
     RevealDirective,
     WalkthroughTourComponent,
-    SecureSplashComponent
+    SecureSplashComponent,
+    PatientDirectoryComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,6 +58,10 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     } @else {
     <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
       
+      @if (isDirectoryOpen() || !patientMgmt.selectedPatientId()) {
+         <app-patient-directory></app-patient-directory>
+      }
+
       <app-dictation-modal></app-dictation-modal>
       <app-walkthrough-tour></app-walkthrough-tour>
       
@@ -139,7 +145,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                     <div class="grid grid-cols-2 gap-4">
                        <div class="space-y-1">
                           <p class="text-xs text-gray-500 font-bold uppercase tracking-tighter">AI Node</p>
-                          <p class="text-xs text-white">Stable</p>
+                           <p class="text-xs text-white">{{ network.isOnline() ? 'Gemini Cloud' : 'NVIDIA Local' }}</p>
                        </div>
                        <div class="space-y-1">
                           <p class="text-xs text-gray-500 font-bold uppercase tracking-tighter">Relay</p>
@@ -166,6 +172,33 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           </div>
           
           <div class="flex items-center gap-2">
+            <button (click)="isDirectoryOpen.set(!isDirectoryOpen())"
+                    aria-label="Toggle Patient Directory"
+                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
+                    [class.bg-gray-800]="isDirectoryOpen()"
+                    [class.dark:bg-white]="isDirectoryOpen()"
+                    [class.border-gray-800]="isDirectoryOpen()"
+                    [class.dark:border-white]="isDirectoryOpen()"
+                    [class.text-white]="isDirectoryOpen()"
+                    [class.dark:text-[#111111]]="isDirectoryOpen()"
+                    [class.bg-transparent]="!isDirectoryOpen()"
+                    [class.border-gray-300]="!isDirectoryOpen()"
+                    [class.dark:border-zinc-700]="!isDirectoryOpen()"
+                    [class.text-gray-700]="!isDirectoryOpen()"
+                    [class.dark:text-zinc-300]="!isDirectoryOpen()"
+                    [class.hover:bg-[#EEEEEE]]="!isDirectoryOpen()"
+                    [class.dark:hover:bg-zinc-800]="!isDirectoryOpen()"
+                    [class.hover:border-gray-400]="!isDirectoryOpen()"
+                    [class.dark:hover:border-zinc-500]="!isDirectoryOpen()">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                 <circle cx="9" cy="7" r="4"></circle>
+                 <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+               </svg>
+               <span class="hidden sm:inline">Roster</span>
+            </button>
+
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
@@ -541,7 +574,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     <!-- Preview & Print Modal (Dieter Rams Style) -->
     @if (showPreviewModal()) {
       <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 no-print">
-        <div class="bg-[#f9f9f9] dark:bg-[#111111] w-full max-w-5xl max-h-[90dvh] rounded-[2px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-[0.98] duration-300 border border-gray-300 dark:border-zinc-800 relative">
+        <div class="bg-[#f9f9f9] dark:bg-[#111111] w-full max-w-5xl max-h-[90dvh] rounded-[2px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-[0.98] duration-300 border border-gray-300 dark:border-zinc-800 relative print-medical-chart">
           
           <!-- Classic Dieter Rams Grill -->
           <div class="absolute top-0 left-0 right-0 h-1 flex gap-0.5 px-6 opacity-40">
@@ -719,7 +752,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           <!-- Footer -->
           <div class="px-8 py-5 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 flex justify-between items-center mt-auto">
             <button 
-              (click)="printReport()" 
+              (click)="nativePrint()" 
               class="px-5 py-2.5 border border-[#1C1C1C] dark:border-zinc-600 text-[#1C1C1C] dark:text-zinc-100 bg-transparent text-[9px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-2 rounded-[2px]">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
               Print Document
@@ -795,6 +828,7 @@ export class AppComponent implements OnDestroy {
   // Navbar Dropdown States
   exportMenuOpen = signal(false);
   connectMenuOpen = signal(false);
+  isDirectoryOpen = signal(false);
 
   hasReport = computed(() => Object.keys(this.clinicalIntelligence.analysisResults()).length > 0);
 
@@ -1027,6 +1061,10 @@ export class AppComponent implements OnDestroy {
     } finally {
       this.isAnalyzingTranslation.set(false);
     }
+  }
+
+  nativePrint() {
+    window.print();
   }
 
   printReport() {

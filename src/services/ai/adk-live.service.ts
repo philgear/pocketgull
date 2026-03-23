@@ -20,12 +20,16 @@ export class AdkLiveService {
   private audioContext: AudioContext | null = null;
   private mediaStream: MediaStream | null = null;
   private audioWorkletNode: AudioWorkletNode | null = null;
+  private analyserNode: AnalyserNode | null = null;
+  private volumeAnimationFrame: number | null = null;
   private liveClient: any = null; // The Gemini Live WS connection
   
+  public volumeLevel = signal(0); // 0-100 scale output
   // Audio playback queue
   private playbackContext: AudioContext | null = null;
   private audioQueue: ArrayBuffer[] = [];
   private isPlaying = false;
+  private activeSource: AudioBufferSourceNode | null = null;
 
   // Callbacks
   public onMessage?: (msg: LiveMessageEvent) => void;
@@ -110,8 +114,28 @@ export class AdkLiveService {
         }));
       };
 
-      source.connect(this.audioWorkletNode);
+      this.analyserNode = this.audioContext.createAnalyser();
+      this.analyserNode.fftSize = 256;
+      this.analyserNode.smoothingTimeConstant = 0.5;
+
+      source.connect(this.analyserNode);
+      this.analyserNode.connect(this.audioWorkletNode);
       this.audioWorkletNode.connect(this.audioContext.destination);
+
+      const updateVolume = () => {
+        if (!this.analyserNode || !this.isListening()) return;
+        const dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+        this.analyserNode.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+        }
+        const average = sum / dataArray.length;
+        // Map 0-100 range logically for UI reaction (0-255 is byte limit, clipping around 128 usually for normal speech)
+        const vol = Math.min(100, Math.round((average / 128) * 100));
+        this.ngZone.run(() => this.volumeLevel.set(vol));
+        this.volumeAnimationFrame = requestAnimationFrame(updateVolume);
+      };
 
       await new Promise<void>((resolve, reject) => {
         this.liveClient = new WebSocket(url);
@@ -133,6 +157,7 @@ export class AdkLiveService {
              this.isConnected.set(true);
              this.isListening.set(true);
           });
+          updateVolume(); // Start the VU loop
           console.log('[AdkLiveService] Connected to Gemini Live API');
           resolve();
         };
@@ -270,9 +295,11 @@ export class AdkLiveService {
       }
       
       const source = this.playbackContext.createBufferSource();
+      this.activeSource = source;
       source.buffer = audioBuffer;
       source.connect(this.playbackContext.destination);
       source.onended = () => {
+        if (this.activeSource === source) this.activeSource = null;
         this.playNextAudio();
       };
       source.start(0);
@@ -286,8 +313,11 @@ export class AdkLiveService {
     this.audioQueue = [];
     this.isPlaying = false;
     this.ngZone.run(() => this.isSpeaking.set(false));
-    // Unfortunately BufferSource nodes cannot be easily stopped if already started without keeping a reference.
-    // Given the short chunks, just letting it finish or doing a suspend/resume on context is an option.
+    
+    if (this.activeSource) {
+        try { this.activeSource.stop(); } catch (e) {}
+        this.activeSource = null;
+    }
   }
 
   startListening() {
@@ -316,6 +346,12 @@ export class AdkLiveService {
       this.isSpeaking.set(false);
     });
     
+    if (this.volumeAnimationFrame) {
+      cancelAnimationFrame(this.volumeAnimationFrame);
+      this.volumeAnimationFrame = null;
+    }
+    this.ngZone.run(() => this.volumeLevel.set(0));
+
     if (this.liveClient) {
       try { this.liveClient.close(); } catch(e){}
       this.liveClient = null;
@@ -328,6 +364,10 @@ export class AdkLiveService {
     if (this.audioWorkletNode) {
       this.audioWorkletNode.disconnect();
       this.audioWorkletNode = null;
+    }
+    if (this.analyserNode) {
+      this.analyserNode.disconnect();
+      this.analyserNode = null;
     }
     if (this.audioContext) {
       this.audioContext.close();

@@ -1,0 +1,62 @@
+﻿
+Running 3 tests using 3 workers
+
+[1A[2K[1/3] [chromium] › e2e\layout.spec.ts:43:3 › Layout Integrity Verification › Interactive Mapping updates Chief Complaint
+[1A[2K[2/3] [chromium] › e2e\layout.spec.ts:21:3 › Layout Integrity Verification › Column Resizer constraints and reset
+[1A[2K[3/3] [chromium] › e2e\layout.spec.ts:54:3 › Layout Integrity Verification › System Readiness Status Indicator
+[1A[2K  1) [chromium] › e2e\layout.spec.ts:21:3 › Layout Integrity Verification › Column Resizer constraints and reset 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('.cursor-col-resize').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('.cursor-col-resize').first()[22m
+
+
+      22 |     // 2. Column Resizer Test
+      23 |     const resizer = page.locator('.cursor-col-resize').first();
+    > 24 |     await expect(resizer).toBeVisible();
+         |                           ^
+      25 |
+      26 |     // Drag Left
+      27 |     const box = await resizer.boundingBox();
+        at C:\Users\philg\OneDrive\Documents\Coding\pocketgall\e2e\layout.spec.ts:24:27
+
+    Error Context: test-results\layout-Layout-Integrity-Ve-63b57-sizer-constraints-and-reset-chromium\error-context.md
+
+
+[1A[2K  2) [chromium] › e2e\layout.spec.ts:54:3 › Layout Integrity Verification › System Readiness Status Indicator 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=System Ready').first().or(locator('.bg-green-500').first())
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=System Ready').first().or(locator('.bg-green-500').first())[22m
+
+
+      57 |     
+      58 |     // Wait for the indicator to appear (may take a moment for the WebWorker/MCP backend)
+    > 59 |     await expect(statusIndicator).toBeVisible({ timeout: 10000 });
+         |                                   ^
+      60 |     
+      61 |     // Hover to trigger tooltip
+      62 |     await statusIndicator.hover();
+        at C:\Users\philg\OneDrive\Documents\Coding\pocketgall\e2e\layout.spec.ts:59:35
+
+    Error Context: test-results\layout-Layout-Integrity-Ve-20952--Readiness-Status-Indicator-chromium\error-context.md
+
+
+[1A[2K  2 failed
+    [chromium] › e2e\layout.spec.ts:21:3 › Layout Integrity Verification › Column Resizer constraints and reset 
+    [chromium] › e2e\layout.spec.ts:54:3 › Layout Integrity Verification › System Readiness Status Indicator 
+  1 passed (21.9s)

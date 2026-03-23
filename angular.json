@@ -41,6 +41,11 @@
                 "output": "/"
               },
               {
+                "glob": "search.html",
+                "input": "public",
+                "output": "/"
+              },
+              {
                 "glob": "**/*",
                 "input": "src/assets/icons",
                 "output": "/icons"

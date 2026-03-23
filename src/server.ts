@@ -26,7 +26,7 @@ const execPromise = promisify(exec);
 
 const _filename = fileURLToPath(import.meta.url);
 const _dirname = dirname(_filename);
-const browserDistFolder = join(_dirname, '..', 'browser').replace(/\\/g, '/'); // root dir of dist when built
+const browserDistFolder = join(_dirname, '..').replace(/\\/g, '/'); // root dir of dist when built
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -55,7 +55,7 @@ app.use((req, res, next) => {
   // Overrides the request host to bypass Angular SSR's rigid `allowedHosts` array if the domain 
   // matches our environment variables or is a native Cloud Run deployment URL.
   const envHosts = process.env['ALLOWED_HOSTS'] ? process.env['ALLOWED_HOSTS'].split(',').map(h => h.trim()) : [];
-  if (host.endsWith('.run.app') || envHosts.includes(host)) {
+  if (host.endsWith('.run.app') || envHosts.includes(host) || host === 'secure.pocketgull.app') {
     req.headers['x-forwarded-host'] = targetDomain;
     req.headers.host = targetDomain;
   }
@@ -168,7 +168,7 @@ app.use((req, res, next) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' data: blob: https:",
-    "connect-src 'self' https://generativelanguage.googleapis.com wss://generativelanguage.googleapis.com https://eutils.ncbi.nlm.nih.gov http://127.0.0.1:11434",
+    "connect-src 'self' https://generativelanguage.googleapis.com wss://generativelanguage.googleapis.com https://eutils.ncbi.nlm.nih.gov http://127.0.0.1:11434 https://fonts.googleapis.com https://fonts.gstatic.com https://upload.wikimedia.org",
     "media-src 'self' blob:",
     "worker-src 'self' blob:",
     "frame-src 'self' https://viewer.ohif.org https://spark.philgear.dev https://www.google.com https://pubmed.ncbi.nlm.nih.gov https: http://localhost:*"
@@ -440,25 +440,64 @@ app.post('/api/ai/chat/start', express.json(), async (req, res) => {
   }
 });
 
-app.post('/api/ai/chat/message', express.json(), async (req, res) => {
+app.post('/api/ai/chat/message', express.json({ limit: '50mb' }), async (req, res) => {
   try {
-    const { sessionId, message } = req.body;
+    const { sessionId, message, files, enableGrounding } = req.body;
     const session = chatSessions.get(sessionId);
     if (!session) throw new Error('Chat session not found. Please refresh and try again.');
     
-    // Append user message
-    session.history.push({ role: 'user', parts: [{ text: message }] });
+    // Build user message
+    const userParts: any[] = [];
+    if (message) userParts.push({ text: message });
+    // Vertex AI BAA-Compliant Inference Config
+    const projectId = await vertexAuth.getProjectId();
+    const vertexAI = new VertexAI({ project: projectId, location: 'us-central1' });
+
+    let radiologySynthesis = '';
+    if (files && Array.isArray(files) && files.length > 0) {
+      // Dynamic Sub-Agent Router: Radiology & Dermatology ADK Injection
+      try {
+          const { RadiologyAgent } = await import('./services/ai/agents/radiology.agent.js');
+          const radioModel = vertexAI.getGenerativeModel({
+             model: 'gemini-2.5-flash',
+             systemInstruction: { role: 'system', parts: [{ text: String(RadiologyAgent.instruction) }] }
+          });
+          
+          const radioParts: any[] = [{ text: "Please meticulously analyze the attached medical imaging/telemetry." }];
+          for (const file of files) {
+             radioParts.push({ inlineData: { data: file.data, mimeType: file.type } });
+          }
+          
+          const radioResp = await radioModel.generateContent({ contents: [{ role: 'user', parts: radioParts }] });
+          radiologySynthesis = radioResp.response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          
+          // Inject the agent's explicit findings into the prompt context silently
+          userParts.push({ text: `\n\n[SYSTEM SUB-AGENT MULTIMODAL INGESTION]:\nThe attached medical files were routed through the specialized Radiology/Dermatology Agent. Its raw findings are as follows:\n\n${radiologySynthesis}\n\nPlease synthesize these insights natively into your response to the user.` });
+      } catch (err) {
+          console.error('Radiology Agent routing failed', err);
+          // Fallback: pass raw files to main agent
+          for (const file of files) {
+            userParts.push({ inlineData: { data: file.data, mimeType: file.type } });
+          }
+      }
+    }
+    
+    // Append standard user context
+    session.history.push({ role: 'user', parts: userParts });
 
     const rawModel = session.model.replace(/^models\//, '');
     
-    // Vertex AI BAA-Compliant Inference
-    const projectId = await vertexAuth.getProjectId();
-    const vertexAI = new VertexAI({ project: projectId, location: 'us-central1' });
-    const generativeModel = vertexAI.getGenerativeModel({
+    const vertexOptions: any = {
       model: rawModel,
       systemInstruction: { role: 'system', parts: [{ text: session.systemInstruction }] },
       generationConfig: { temperature: session.temperature }
-    });
+    };
+    
+    if (enableGrounding) {
+        vertexOptions.tools = [{ googleSearchRetrieval: { disableAttribution: false } }];
+    }
+    
+    const generativeModel = vertexAI.getGenerativeModel(vertexOptions);
 
     const resp = await generativeModel.generateContent({
       contents: session.history

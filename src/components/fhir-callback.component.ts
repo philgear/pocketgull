@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { FhirIntegrationService } from '../services/fhir-integration.service';
+import { PatientManagementService } from '../services/patient-management.service';
 
 @Component({
   selector: 'app-fhir-callback',
@@ -70,6 +71,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
 })
 export class FhirCallbackComponent {
   private fhirService = inject(FhirIntegrationService);
+  private patientMgmt = inject(PatientManagementService);
 
   isProcessing = true;
   errorMsg = '';
@@ -94,8 +96,17 @@ export class FhirCallbackComponent {
     }
 
     // Exchange code for token
-    this.fhirService.handleCallback(code).then(success => {
+    this.fhirService.handleCallback(code).then(async success => {
       if (success) {
+         try {
+           const fhirBundle = await this.fhirService.fetchPatientProfile();
+           if (fhirBundle) {
+               this.patientMgmt.ingestFhirBundle(fhirBundle);
+           }
+         } catch (err) {
+           console.error('Failed to ingest FHIR payload during redirect', err);
+         }
+
          this.isProcessing = false;
          // Automatically redirect back to main app after a moment
          setTimeout(() => {

@@ -1,0 +1,117 @@
+﻿[
+  {
+    "insertId": "69bcd940000b5208ad0b9421",
+    "labels": {
+      "instanceId": "00da6cd2c4191c604b80914cfd2636234920959bebbd63d84e2c5c8846f07b6f2eeb608a3757f304b9432491242ee6a828fa84ad6ceaa87a985ac24114f41ffa9e1355ec938f151e46cc68ac7bba"
+    },
+    "logName": "projects/gen-lang-client-0540208645/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-20T05:21:04.816996203Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "pocket-gull-secure",
+        "location": "us-west1",
+        "project_id": "gen-lang-client-0540208645",
+        "revision_name": "pocket-gull-secure-00002-6n7",
+        "service_name": "pocket-gull-secure"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "For more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf",
+    "timestamp": "2026-03-20T05:21:04.741896Z"
+  },
+  {
+    "insertId": "69bcd940000b51f2f083e4e2",
+    "labels": {
+      "instanceId": "00da6cd2c4191c604b80914cfd2636234920959bebbd63d84e2c5c8846f07b6f2eeb608a3757f304b9432491242ee6a828fa84ad6ceaa87a985ac24114f41ffa9e1355ec938f151e46cc68ac7bba"
+    },
+    "logName": "projects/gen-lang-client-0540208645/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-20T05:21:04.816996203Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "pocket-gull-secure",
+        "location": "us-west1",
+        "project_id": "gen-lang-client-0540208645",
+        "revision_name": "pocket-gull-secure-00002-6n7",
+        "service_name": "pocket-gull-secure"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "URL with hostname \"secure.pocketgull.app\" is not allowed.",
+    "timestamp": "2026-03-20T05:21:04.741874Z"
+  },
+  {
+    "insertId": "69bcd940000b51e4ef21f822",
+    "labels": {
+      "instanceId": "00da6cd2c4191c604b80914cfd2636234920959bebbd63d84e2c5c8846f07b6f2eeb608a3757f304b9432491242ee6a828fa84ad6ceaa87a985ac24114f41ffa9e1355ec938f151e46cc68ac7bba"
+    },
+    "logName": "projects/gen-lang-client-0540208645/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-20T05:21:04.816996203Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "pocket-gull-secure",
+        "location": "us-west1",
+        "project_id": "gen-lang-client-0540208645",
+        "revision_name": "pocket-gull-secure-00002-6n7",
+        "service_name": "pocket-gull-secure"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "ERROR: Bad Request (\"https://secure.pocketgull.app/favicon.ico\").",
+    "timestamp": "2026-03-20T05:21:04.741860Z"
+  },
+  {
+    "httpRequest": {
+      "latency": "0.004299900s",
+      "protocol": "HTTP/1.1",
+      "referer": "https://secure.pocketgull.app/",
+      "remoteIp": "104.28.165.116",
+      "requestMethod": "GET",
+      "requestSize": "2202",
+      "requestUrl": "https://secure.pocketgull.app/favicon.ico",
+      "responseSize": "1013",
+      "serverIp": "35.186.221.122",
+      "status": 400,
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
+    },
+    "insertId": "69bcd940000b59730079a336",
+    "labels": {
+      "instanceId": "00da6cd2c4191c604b80914cfd2636234920959bebbd63d84e2c5c8846f07b6f2eeb608a3757f304b9432491242ee6a828fa84ad6ceaa87a985ac24114f41ffa9e1355ec938f151e46cc68ac7bba"
+    },
+    "logName": "projects/gen-lang-client-0540208645/logs/run.googleapis.com%2Frequests",
+    "receiveTimestamp": "2026-03-20T05:21:04.824841986Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "pocket-gull-secure",
+        "location": "us-west1",
+        "project_id": "gen-lang-client-0540208645",
+        "revision_name": "pocket-gull-secure-00002-6n7",
+        "service_name": "pocket-gull-secure"
+      },
+      "type": "cloud_run_revision"
+    },
+    "severity": "WARNING",
+    "spanId": "bda754fcdf3e755c",
+    "timestamp": "2026-03-20T05:21:04.738239Z",
+    "trace": "projects/gen-lang-client-0540208645/traces/00df0924c410b5dd15663602035fb2ec"
+  },
+  {
+    "insertId": "69bcd94000084b28254a2b21",
+    "labels": {
+      "instanceId": "00da6cd2c4191c604b80914cfd2636234920959bebbd63d84e2c5c8846f07b6f2eeb608a3757f304b9432491242ee6a828fa84ad6ceaa87a985ac24114f41ffa9e1355ec938f151e46cc68ac7bba"
+    },
+    "logName": "projects/gen-lang-client-0540208645/logs/run.googleapis.com%2Fstderr",
+    "receiveTimestamp": "2026-03-20T05:21:04.816996203Z",
+    "resource": {
+      "labels": {
+        "configuration_name": "pocket-gull-secure",
+        "location": "us-west1",
+        "project_id": "gen-lang-client-0540208645",
+        "revision_name": "pocket-gull-secure-00002-6n7",
+        "service_name": "pocket-gull-secure"
+      },
+      "type": "cloud_run_revision"
+    },
+    "textPayload": "For more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf",
+    "timestamp": "2026-03-20T05:21:04.543528Z"
+  }
+]

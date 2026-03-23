@@ -1,0 +1,19 @@
+affinityCookieTtlSec: 0
+connectionDraining:
+  drainingTimeoutSec: 0
+description: ''
+enableCDN: false
+fingerprint: 5uH5E8-nKKs=
+iap:
+  enabled: true
+  oauth2ClientId: 793190615625-2hndi5seo2j04rltvthfb3kj1dn7h5v1.apps.googleusercontent.com
+loadBalancingScheme: EXTERNAL_MANAGED
+logConfig:
+  enable: true
+  optionalMode: EXCLUDE_ALL_OPTIONAL
+  sampleRate: 1.0
+name: pocket-gull-backend
+portName: ''
+protocol: HTTPS
+sessionAffinity: NONE
+timeoutSec: 30

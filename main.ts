@@ -9,9 +9,16 @@ import { PubGemmaProvider } from './src/services/ai/pubgemma.provider';
 import { NanoProvider } from './src/services/ai/nano.provider';
 import { HybridProvider } from './src/services/ai/hybrid.provider';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { environment } from './src/environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
     provideHttpClient(withFetch()),
     provideZonelessChangeDetection(),
     {

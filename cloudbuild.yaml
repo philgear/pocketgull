@@ -1,0 +1,36 @@
+steps:
+  # 1. Install root dependencies cleanly
+  - name: 'node:22'
+    entrypoint: 'npm'
+    args: ['ci']
+
+  # 2. Run determinisitic UI tests (Playwright intercepts AI endpoints)
+  - name: 'mcr.microsoft.com/playwright:v1.49.1-jammy'
+    entrypoint: 'sh'
+    args:
+      - '-c'
+      - 'npm run build && npx playwright install --with-deps chromium chromium-headless-shell && npx playwright test e2e/ai-integration.spec.ts'
+
+  # 3. Explicit Docker Build (Bypasses Google Cloud Buildpack sidecar corruption)
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/understory:$COMMIT_SHA', '.']
+
+  # 4. Push Container to GCR
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/understory:$COMMIT_SHA']
+
+  # 5. Deploy to Cloud Run (Targeting the primary understory microservice)
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'understory'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/understory:$COMMIT_SHA'
+      - '--region'
+      - 'us-west1'
+      - '--allow-unauthenticated'
+
+images:
+  - 'gcr.io/$PROJECT_ID/understory:$COMMIT_SHA'

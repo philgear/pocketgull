@@ -33,32 +33,28 @@ export class WebLLMProvider implements IntelligenceProvider {
       console.log('[WebLLM] Engine Ready.');
   }
 
-  generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string> {
-    return new Observable<string>(observer => {
-        this.loadEngine().then(async () => {
-            if (!this.engine) throw new Error("WebLLM Engine failed to initialize required hardware context.");
-            
-            const messages: import('@mlc-ai/web-llm').ChatCompletionMessageParam[] = [
-                { role: "system", content: systemInstruction },
-                { role: "user", content: `Patient Data:\n${patientData}\n\nLens:\n${lens}` }
-            ];
-            
-            const requestTemp = Number(localStorage.getItem('preferredModelTemperature')) || 0.5;
+  async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+    await this.loadEngine();
+    if (!this.engine) throw new Error("WebLLM Engine failed to initialize required hardware context.");
+    
+    const messages: import('@mlc-ai/web-llm').ChatCompletionMessageParam[] = [
+        { role: "system", content: systemInstruction },
+        { role: "user", content: `Patient Data:\n${patientData}\n\nLens:\n${lens}` }
+    ];
+    
+    const requestTemp = Number(localStorage.getItem('preferredModelTemperature')) || 0.5;
 
-            const chunks = await this.engine.chat.completions.create({ 
-                messages, 
-                stream: true,
-                temperature: requestTemp || 0.2
-            });
-            
-            for await (const chunk of chunks) {
-                if (chunk.choices[0]?.delta?.content) {
-                    observer.next(chunk.choices[0].delta.content);
-                }
-            }
-            observer.complete();
-        }).catch(err => observer.error(err));
+    const chunks = await this.engine.chat.completions.create({ 
+        messages, 
+        stream: true,
+        temperature: requestTemp || 0.2
     });
+    
+    for await (const chunk of chunks) {
+        if (chunk.choices[0]?.delta?.content) {
+            yield chunk.choices[0].delta.content;
+        }
+    }
   }
 
   async generateMetrics(reportText: string): Promise<ClinicalMetrics> {

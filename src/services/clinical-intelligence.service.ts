@@ -1,6 +1,4 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
-import { scan, tap } from 'rxjs/operators';
 import { IntelligenceProvider } from './ai/intelligence.provider';
 import { AiCacheService } from './ai-cache.service';
 import { VerificationIssue } from '../components/analysis-report.types';
@@ -261,16 +259,12 @@ If a section has no relevant source data, output the heading followed by: "*No s
                         newReport[lens] = responseText;
                         this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
                     } else {
-                        // Stream-based generation using browser-compatible genai
-                        responseText = await lastValueFrom(
-                            this.ai.generateReportStream(patientData, lens, sysInstruction).pipe(
-                                scan((acc, chunk) => acc + chunk, ''),
-                                tap(accumulated => {
-                                    newReport[lens] = accumulated;
-                                    this.analysisResults.update(all => ({ ...all, [lens]: accumulated }));
-                                })
-                            )
-                        );
+                        // Stream-based generation using native AsyncIterables
+                        for await (const chunk of this.ai.generateReportStream(patientData, lens, sysInstruction)) {
+                            responseText += chunk;
+                            newReport[lens] = responseText;
+                            this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
+                        }
                         await this.cache.set(cacheKey, responseText);
                     }
 

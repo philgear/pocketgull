@@ -95,7 +95,7 @@ export class FhirIntegrationService {
       if (!token || !patientId) return null;
 
       try {
-        const response = await fetch(`https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4/Patient/${patientId}`, {
+        const response = await fetch(`https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4/Patient/${patientId}/$everything`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'

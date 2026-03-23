@@ -10,6 +10,7 @@ import {
 import { HttpClient } from "@angular/common/http";
 import { firstValueFrom } from "rxjs";
 import { PatientStateService } from "./patient-state.service";
+import { StorageService } from "./storage.service";
 import {
   ClinicalIntelligenceService,
   AnalysisLens,
@@ -94,6 +95,26 @@ const MOCK_PATIENTS: Patient[] = [
         name: "Atorvastatin",
         value: "40mg Daily",
       },
+    ],
+    biometricHistory: [
+      { timestamp: "2023-10-01T09:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "hr", value: "92" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "hr", value: "78" },
+      { timestamp: "2023-10-01T09:00:00Z", type: "spO2", value: "92" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "spO2", value: "93" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "spO2", value: "95" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2023-10-01T09:00:00Z", type: "bp", value: "150/95" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "bp", value: "145/90" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "bp", value: "138/85" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "bp", value: "120/80" }
     ],
     issues: {
       chest: [
@@ -254,6 +275,26 @@ const MOCK_PATIENTS: Patient[] = [
         name: "Ibuprofen",
         value: "600mg PRN MSK Pain",
       },
+    ],
+    biometricHistory: [
+      { timestamp: "2023-10-01T09:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "hr", value: "92" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "hr", value: "78" },
+      { timestamp: "2023-10-01T09:00:00Z", type: "spO2", value: "92" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "spO2", value: "93" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "spO2", value: "95" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2023-10-01T09:00:00Z", type: "bp", value: "150/95" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "bp", value: "145/90" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "bp", value: "138/85" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "bp", value: "120/80" }
     ],
     issues: {
       mid_back: [
@@ -427,6 +468,26 @@ const MOCK_PATIENTS: Patient[] = [
         name: "Acetaminophen",
         value: "500mg PRN OA Pain",
       },
+    ],
+    biometricHistory: [
+      { timestamp: "2023-10-01T09:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "hr", value: "92" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "hr", value: "78" },
+      { timestamp: "2023-10-01T09:00:00Z", type: "spO2", value: "92" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "spO2", value: "93" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "spO2", value: "95" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2023-10-01T09:00:00Z", type: "bp", value: "150/95" },
+      { timestamp: "2023-11-15T09:00:00Z", type: "bp", value: "145/90" },
+      { timestamp: "2023-12-20T09:00:00Z", type: "bp", value: "138/85" },
+      { timestamp: "2024-01-25T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2024-02-28T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2024-03-30T09:00:00Z", type: "bp", value: "120/80" }
     ],
     issues: {
       head: [
@@ -1288,6 +1349,7 @@ export class PatientManagementService {
   private geminiService = inject(ClinicalIntelligenceService);
   private network = inject(NetworkStateService);
   private http = inject(HttpClient);
+  public storage = inject(StorageService);
 
   readonly patients = signal<Patient[]>(MOCK_PATIENTS);
   readonly selectedPatientId: WritableSignal<string | null> = signal(
@@ -1298,46 +1360,31 @@ export class PatientManagementService {
     return id ? this.patients().find((p) => p.id === id) : null;
   });
 
-  constructor() {
-    // Attempt to load from localStorage first for true local-first persistence
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('pocket_gull_patients');
-        if (saved) {
-          // Attempt to decrypt the payload
-          const decryptedBytes = CryptoJS.AES.decrypt(saved, ENCRYPTION_KEY);
-          const decryptedStr = decryptedBytes.toString(CryptoJS.enc.Utf8);
-          
-          if (decryptedStr) {
-            const parsed = JSON.parse(decryptedStr);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              // Need to skip over the default MOCK_PATIENTS and use what was saved
-              // We use setTimeout to safely set signsal outside constructor
-               setTimeout(() => {
-                 this.patients.set(parsed);
-                 this.selectedPatientId.set(parsed[0]?.id || null);
-               }, 0);
+  private async initRoster() {
+    if (typeof window !== 'undefined') {
+        const loaded = await this.storage.loadPatients();
+        if (loaded && loaded.length > 0) {
+            this.patients.set(loaded);
+            this.selectedPatientId.set(loaded[0]?.id || null);
+        } else {
+            // Seed DB on first run
+            for (const p of MOCK_PATIENTS) {
+                await this.storage.savePatient(p);
             }
-          }
         }
-      } catch (e) {
-        console.warn('Failed to parse (or decrypt) patient data from localStorage. Proceeding with mock data.', e);
-      }
     }
 
-    // Persist to localStorage whenever patients change
+    // Persist to IndexedDB whenever patients array changes
     effect(() => {
         const currentData = this.patients();
-        if (typeof localStorage !== 'undefined') {
-            try {
-                const jsonStr = JSON.stringify(currentData);
-                const encrypted = CryptoJS.AES.encrypt(jsonStr, ENCRYPTION_KEY).toString();
-                localStorage.setItem('pocket_gull_patients', encrypted);
-            } catch (e) {
-                console.warn('Failed to save encrypted patient data to localStorage', e);
-            }
-        }
+        untracked(() => {
+            currentData.forEach(p => this.storage.savePatient(p));
+        });
     });
+  }
+
+  constructor() {
+    this.initRoster();
 
     // This effect runs whenever the selected patient changes.
     // It's the central point for orchestrating app state updates.
@@ -1449,6 +1496,7 @@ export class PatientManagementService {
 
   /** Removes a patient record. */
   removePatient(id: string) {
+    this.storage.deletePatient(id);
     const isActive = this.selectedPatientId() === id;
 
     this.patients.update((patients) => {
@@ -1573,6 +1621,20 @@ export class PatientManagementService {
     );
   }
 
+  /** Injects a new rasterized diagnostic scan (like 3D markup) into the Vault */
+  addScan(scan: DiagnosticScan) {
+    const patientId = this.selectedPatientId();
+    if (!patientId) return;
+
+    this.patients.update((patients) =>
+      patients.map((p) =>
+        p.id === patientId
+          ? { ...p, scans: p.scans ? [scan, ...p.scans] : [scan] }
+          : p,
+      ),
+    );
+  }
+
   /** Updates an existing bookmark's metadata. */
   updateBookmark(url: string, updates: Partial<Bookmark>) {
     const patientId = this.selectedPatientId();
@@ -1678,6 +1740,111 @@ export class PatientManagementService {
     this.patientState.clearIssuesAndGoalsForReview();
     this.geminiService.loadArchivedAnalysis(analysis.report);
     this.patientState.setViewingPastVisit(analysis);
+  }
+
+  /** Ingests a standard SMART on FHIR R4 Bundle and maps it to the internal Patient list */
+  ingestFhirBundle(bundle: any) {
+    if (!bundle || bundle.resourceType !== 'Bundle' || !bundle.entry) return;
+
+    let fhirPatientId = '';
+    let fhirName = 'Epic Patient';
+    let fhirAge = 0;
+    let fhirGender = 'Unknown';
+
+    // 1. Extract base demographics
+    const patientResource = bundle.entry.find((e: any) => e.resource?.resourceType === 'Patient')?.resource;
+    if (patientResource) {
+        fhirPatientId = patientResource.id;
+        if (patientResource.name?.[0]) {
+            fhirName = `${patientResource.name[0].given?.join(' ') || ''} ${patientResource.name[0].family || ''}`.trim();
+        }
+        if (patientResource.birthDate) {
+            const birthDate = new Date(patientResource.birthDate);
+            const ageDifMs = Date.now() - birthDate.getTime();
+            const ageDate = new Date(ageDifMs); 
+            fhirAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+        }
+        fhirGender = patientResource.gender ? patientResource.gender.charAt(0).toUpperCase() + patientResource.gender.slice(1) : 'Unknown';
+    }
+
+    const conditions: string[] = [];
+    const vitals: any = { bp: '', hr: '', temp: '', spO2: '', weight: '', height: '' };
+    const scans: any[] = [];
+    const medications: any[] = [];
+
+    bundle.entry.forEach((entry: any) => {
+        const resource = entry.resource;
+        if (!resource) return;
+
+        // Conditions
+        if (resource.resourceType === 'Condition' && resource.code?.text) {
+           if (!conditions.includes(resource.code.text)) {
+               conditions.push(resource.code.text);
+           }
+        }
+
+        // Medications
+        if (resource.resourceType === 'MedicationRequest' && resource.medicationCodeableConcept?.text) {
+            medications.push({
+                id: resource.id || `med_${Date.now()}_${Math.random()}`,
+                name: resource.medicationCodeableConcept.text,
+                value: 'Prescribed'
+            });
+        }
+
+        // Vitals
+        if (resource.resourceType === 'Observation' && resource.category?.[0]?.coding?.[0]?.code === 'vital-signs') {
+            const value = resource.valueQuantity ? `${resource.valueQuantity.value} ${resource.valueQuantity.unit || ''}` : '';
+            if (resource.code?.coding?.[0]?.code === '8310-5') vitals.temp = value; 
+            if (resource.code?.coding?.[0]?.code === '8867-4') vitals.hr = value;   
+            if (resource.code?.coding?.[0]?.code === '2708-6') vitals.spO2 = value; 
+            
+            if (resource.code?.coding?.[0]?.code === '85354-9' && resource.component) {
+                const systolic = resource.component.find((c: any) => c.code?.coding?.[0]?.code === '8480-6')?.valueQuantity?.value;
+                const diastolic = resource.component.find((c: any) => c.code?.coding?.[0]?.code === '8462-4')?.valueQuantity?.value;
+                if (systolic && diastolic) vitals.bp = `${systolic}/${diastolic}`;
+            }
+        }
+
+        // Diagnostic Reports
+        if (resource.resourceType === 'DiagnosticReport') {
+            scans.push({
+                id: resource.id || `scan_${Math.random()}`,
+                type: 'External FHIR Report',
+                title: resource.code?.text || 'Diagnostic Report',
+                date: resource.effectiveDateTime ? resource.effectiveDateTime.split('T')[0].replace(/-/g, '.') : new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+                bodyPartId: 'unknown',
+                description: resource.presentedForm?.[0]?.data ? atob(resource.presentedForm[0].data) : 'Imported via SMART on FHIR',
+                status: 'Reviewed'
+            });
+        }
+    });
+
+    const newPatient: Patient = {
+        id: `epic_${fhirPatientId || Date.now()}`,
+        name: fhirName,
+        age: fhirAge,
+        gender: fhirGender as "Male" | "Female" | "Non-binary" | "Other",
+        lastVisit: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+        preexistingConditions: conditions,
+        patientGoals: "Imported via Epic MyChart Integration",
+        vitals: vitals,
+        oxidativeStressMarkers: [],
+        antioxidantSources: [],
+        medications: medications,
+        issues: {},
+        history: [{
+           type: "Visit",
+           date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+           summary: "SMART on FHIR Data Import",
+           state: {} as any
+        }],
+        bookmarks: [],
+        scans: scans
+    };
+
+    this.patients.update(list => [newPatient, ...list]);
+    this.selectPatient(newPatient.id);
   }
 
   /** Synchronizes the current patient list with the Node.js backend. */

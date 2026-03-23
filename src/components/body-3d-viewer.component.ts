@@ -2,7 +2,10 @@ import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PatientStateService } from '../services/patient-state.service';
+import { PatientManagementService } from '../services/patient-management.service';
+import { DiagnosticScan } from '../services/patient.types';
 
 @Component({
     selector: 'app-body-3d-viewer',
@@ -21,6 +24,32 @@ import { PatientStateService } from '../services/patient-state.service';
         <span class="text-[8px] font-bold text-gray-500 uppercase tracking-tighter">Left Click: Select Part</span>
         <span class="text-[8px] font-bold text-gray-500 uppercase tracking-tighter">Right Click: Orbit</span>
       </div>
+
+      <!-- Pathology Paint Toolbar -->
+      <div *ngIf="webglSupported()" class="absolute top-2 left-2 z-20 flex flex-col gap-2 no-print">
+         <button (click)="togglePaintMode()" 
+                 class="p-2 border border-[#EEEEEE] dark:border-zinc-700 rounded-sm shadow-sm transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                 [class.bg-[#EF4444]]="isPaintingMode()"
+                 [class.text-white]="isPaintingMode()"
+                 [class.bg-white]="!isPaintingMode()"
+                 [class.dark:bg-zinc-800]="!isPaintingMode()"
+                 [class.text-gray-600]="!isPaintingMode()"
+                 [class.dark:text-zinc-400]="!isPaintingMode()">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="m2 2 7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+            {{ isPaintingMode() ? 'Painting Active' : 'Markup Lesion' }}
+         </button>
+         
+         <button *ngIf="paintedStrokes().length > 0" (click)="submitPainting()"
+                 class="p-2 bg-black dark:bg-white text-white dark:text-black border border-transparent rounded-sm shadow-sm transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Save Markup to Chart
+         </button>
+
+         <button *ngIf="paintedStrokes().length > 0" (click)="clearPainting()"
+                 class="p-2 bg-red-50 dark:bg-red-950/30 text-red-500 border border-red-200 dark:border-red-900/50 rounded-sm shadow-sm transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-red-100 dark:hover:bg-red-900/50">
+            Clear
+         </button>
+      </div>
     </div>
   `,
     styles: [`
@@ -30,6 +59,7 @@ import { PatientStateService } from '../services/patient-state.service';
 })
 export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private readonly state = inject(PatientStateService);
+    private readonly patientManager = inject(PatientManagementService);
     private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
@@ -41,6 +71,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
 
     readonly webglSupported = signal<boolean>(true);
+    readonly isPaintingMode = signal<boolean>(false);
+    readonly paintedStrokes = signal<THREE.Mesh[]>([]);
 
     private renderer!: THREE.WebGLRenderer;
     private scene!: THREE.Scene;
@@ -132,7 +164,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         }
 
         try {
-            this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); // Must preserve for canvas.toDataURL extraction
         } catch (e) {
             throw new Error('WebGL is not supported in this environment.');
         }
@@ -420,16 +452,30 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         let startX = 0;
         let startY = 0;
+        let isPointerDown = false;
 
         canvas.addEventListener('pointerdown', (event: PointerEvent) => {
             if (event.button !== 0) return;
+            isPointerDown = true;
             startX = event.clientX;
             startY = event.clientY;
-            console.log('Body3DViewer: pointerdown', { startX, startY });
+            
+            if (this.isPaintingMode()) {
+                this.paintAtCursor(event.clientX, event.clientY);
+            }
+        });
+
+        canvas.addEventListener('pointermove', (event: PointerEvent) => {
+            if (isPointerDown && this.isPaintingMode()) {
+                this.paintAtCursor(event.clientX, event.clientY);
+            }
         });
 
         canvas.addEventListener('pointerup', (event: PointerEvent) => {
             if (event.button !== 0) return;
+            isPointerDown = false;
+            
+            if (this.isPaintingMode()) return;
 
             const deltaX = Math.abs(event.clientX - startX);
             const deltaY = Math.abs(event.clientY - startY);
@@ -490,6 +536,58 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             'l_foot': 'Left Foot'
         };
         return names[id] || id;
+    }
+
+    togglePaintMode() {
+        this.isPaintingMode.set(!this.isPaintingMode());
+        this.controls.enabled = !this.isPaintingMode();
+    }
+
+    private paintAtCursor(clientX: number, clientY: number) {
+        const rect = this.canvasContainer()!.nativeElement.getBoundingClientRect();
+        this.mouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+        this.mouse.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+        const intersects = this.raycaster.intersectObjects(this.mannequinGroup.children, true);
+        
+        if (intersects.length > 0) {
+            const hit = intersects[0];
+            if (hit.object.userData['layer']) {
+                const geo = new THREE.SphereGeometry(0.015, 8, 8);
+                const mat = new THREE.MeshBasicMaterial({ color: 0xef4444, depthTest: false });
+                const splat = new THREE.Mesh(geo, mat);
+                splat.position.copy(hit.point);
+                this.scene.add(splat);
+                this.paintedStrokes.update(strokes => [...strokes, splat]);
+            }
+        }
+    }
+
+    clearPainting() {
+        const strokes = this.paintedStrokes();
+        strokes.forEach(s => this.scene.remove(s));
+        this.paintedStrokes.set([]);
+    }
+
+    submitPainting() {
+        this.renderer.render(this.scene, this.camera);
+        const dataUrl = this.renderer.domElement.toDataURL('image/jpeg', 0.85);
+
+        const scanId = `markup_${Date.now()}`;
+        const newScan: DiagnosticScan = {
+            id: scanId,
+            type: 'Document',
+            title: '3D Pathology Markup Canvas',
+            date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+            description: 'Clinician explicitly painted anatomical anomalies directly onto the 3D projection model. Base64 graphic appended for AI contextual analysis.',
+            status: 'Reviewed',
+            imageUrl: dataUrl
+        };
+        
+        this.patientManager.addScan(newScan);
+        this.clearPainting();
+        this.togglePaintMode();
     }
 
     private startAnimation() {

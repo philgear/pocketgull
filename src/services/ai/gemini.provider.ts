@@ -17,78 +17,64 @@ export class GeminiProvider implements IntelligenceProvider {
     // Chat session ID for server-side session management
     private chatSessionId: string | null = null;
 
-    generateReportStream(patientData: string, lens: string, systemInstruction: string): Observable<string> {
-        return new Observable<string>(subscriber => {
-            (async () => {
-                try {
-                    const response = await fetch('/api/ai/stream', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            patientData,
-                            systemInstruction,
-                            model: this.config.defaultModel.modelId,
-                            temperature: this.config.defaultModel.temperature
-                        })
-                    });
-
-                    if (!response.ok || !response.body) {
-                        const err = await response.text();
-                        throw new Error(err || 'Stream request failed');
-                    }
-
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder();
-                    let buffer = '';
-
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-
-                        buffer += decoder.decode(value, { stream: true });
-                        const lines = buffer.split('\n');
-                        buffer = lines.pop() ?? '';
-
-                        for (const line of lines) {
-                            const trimmedLine = line.trim();
-                            if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue;
-                            
-                            const data = trimmedLine.slice(6).trim();
-                            if (data === '[DONE]') {
-                                subscriber.complete();
-                                return;
-                            }
-                            
-                            try {
-                                const parsed = JSON.parse(data);
-                                if (parsed.error) {
-                                    throw new Error(typeof parsed.error === 'string' ? parsed.error : JSON.stringify(parsed.error));
-                                }
-                                
-                                // Standard Gemini REST API shape
-                                const geminiText = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
-                                if (geminiText) {
-                                    subscriber.next(geminiText);
-                                } else if (parsed.text) {
-                                    // Custom/Legacy wrapper shape
-                                    subscriber.next(parsed.text);
-                                }
-                            } catch (e: any) {
-                                // If it's a JSON parse error but we have multiple data: lines merged (should be fixed by split('\n'))
-                                // or if there's trailing garbage, we catch it here to prevent stream death.
-                                console.error("GeminiProvider: Error parsing SSE chunk", e, data);
-                                // Don't throw if we can't parse one chunk, just log it. 
-                                // Unless it's a real error object from the API.
-                                if (data.includes('"error"')) throw e;
-                            }
-                        }
-                    }
-                    subscriber.complete();
-                } catch (e) {
-                    subscriber.error(e);
-                }
-            })();
+    async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+        const response = await fetch('/api/ai/stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                patientData,
+                systemInstruction,
+                model: this.config.defaultModel.modelId,
+                temperature: this.config.defaultModel.temperature
+            })
         });
+
+        if (!response.ok || !response.body) {
+            const err = await response.text();
+            throw new Error(err || 'Stream request failed');
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() ?? '';
+
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue;
+                
+                const data = trimmedLine.slice(6).trim();
+                if (data === '[DONE]') {
+                    return;
+                }
+                
+                try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.error) {
+                        throw new Error(typeof parsed.error === 'string' ? parsed.error : JSON.stringify(parsed.error));
+                    }
+                    
+                    // Standard Gemini REST API shape
+                    const geminiText = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (geminiText) {
+                        yield geminiText;
+                    } else if (parsed.text) {
+                        // Custom/Legacy wrapper shape
+                        yield parsed.text;
+                    }
+                } catch (e: any) {
+                    console.error("GeminiProvider: Error parsing SSE chunk", e, data);
+                    if (data.includes('"error"')) throw e;
+                }
+            }
+        }
     }
 
     async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
@@ -179,15 +165,25 @@ export class GeminiProvider implements IntelligenceProvider {
         }
     }
 
-    async sendMessage(message: string, files?: File[]): Promise<string> {
+    async sendMessage(message: string, files?: File[], enableGrounding?: boolean): Promise<string> {
         if (!this.chatSessionId) throw new Error('Chat not started');
+
+        const encodedFiles = await Promise.all((files || []).map(async f => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve({ name: f.name, type: f.type, data: (e.target?.result as string).split(',')[1] });
+                reader.readAsDataURL(f);
+            });
+        }));
 
         const response = await fetch('/api/ai/chat/message', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 sessionId: this.chatSessionId,
-                message
+                message,
+                files: encodedFiles,
+                enableGrounding
             })
         });
         if (!response.ok) {

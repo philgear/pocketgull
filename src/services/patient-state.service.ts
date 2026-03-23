@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect, inject, untracked } from '@angular/core';
 import {
   BodyPartIssue,
   PatientVitals,
@@ -14,8 +14,9 @@ import {
   BODY_PART_MAPPING
 } from './patient.types';
 
-export { BODY_PART_NAMES, BODY_PART_MAPPING };
 export type { PatientState };
+export { BODY_PART_NAMES };
+import { StorageService } from './storage.service';
 
 
 @Injectable({
@@ -69,7 +70,28 @@ export class PatientStateService {
   // A trigger to force the UI to expand the analysis panel when an item is selected/clicked
   readonly uiExpandTrigger = signal<number>(0);
 
-  constructor() { }
+  private storage = inject(StorageService);
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      // 1. Hydrate state asynchronously on app load
+      this.storage.loadState('current_patient').then(data => {
+        if (data && data.state) {
+          // Temporarily disable the effect by untracking the init load (if needed), 
+          // but loadState() mutations will just trigger a re-save, which is safe.
+          this.loadState(data.state);
+        }
+      });
+
+      // 2. Persist state on any signal mutation
+      effect(() => {
+        const currentState = this.getCurrentState();
+        untracked(() => {
+          this.storage.saveState('current_patient', currentState);
+        });
+      });
+    }
+  }
 
   // --- Computed State ---
   readonly hasIssues = computed(() =>

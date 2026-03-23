@@ -1,0 +1,13 @@
+﻿{
+  "cloudRun": {
+    "service": "pocket-gull-secure"
+  },
+  "creationTimestamp": "2026-03-19T11:23:39.102-07:00",
+  "id": "2121836344057627076",
+  "kind": "compute#networkEndpointGroup",
+  "name": "pocket-gull-neg",
+  "networkEndpointType": "SERVERLESS",
+  "region": "https://www.googleapis.com/compute/v1/projects/gen-lang-client-0540208645/regions/us-west1",
+  "selfLink": "https://www.googleapis.com/compute/v1/projects/gen-lang-client-0540208645/regions/us-west1/networkEndpointGroups/pocket-gull-neg",
+  "size": 0
+}

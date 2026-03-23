@@ -1,0 +1,33 @@
+﻿python.exe : ERROR: (gcloud
+.compute.backend-services.a
+dd-backend) Could not 
+fetch resource:
+At C:\Users\philg\AppData\L
+ocal\Google\Cloud SDK\googl
+e-cloud-sdk\bin\gcloud.ps1:
+114 char:3
++   & "$cloudsdk_python" 
+$run_args_array
++   ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (ERR  
+  OR: (gcloud....fetch r   
+ esource::String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+ - Invalid value for field 
+'resource.backends[1].group
+': 'https://compute.googlea
+pis.com/compute/v1/projects
+/gen-lang-client-0540208645
+/regions/us-west1/networkEn
+dpointGroups/understory-neg
+'. A backend service may 
+only contain one 
+Serverless NEG per region. 
+Multiple Serverless NEGs 
+appear in region us-west1.
+
