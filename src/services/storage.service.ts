@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { PatientState } from './patient.types';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
+
   private readonly DB_NAME = 'PocketGullDB';
   private readonly STORE_NAME = 'patients';
   private readonly VERSION = 2;
@@ -29,6 +33,7 @@ export class StorageService {
   }
 
   async saveState(id: string, state: PatientState): Promise<void> {
+    if (!this.isBrowser) return;
     try {
       const db = await this.initDB();
       return new Promise<void>((resolve, reject) => {
@@ -51,6 +56,7 @@ export class StorageService {
   }
 
   async saveChatHistory(id: string, chatHistory: any[]): Promise<void> {
+    if (!this.isBrowser) return;
     try {
       const db = await this.initDB();
       return new Promise<void>((resolve, reject) => {
@@ -73,6 +79,7 @@ export class StorageService {
   }
 
   async loadState(id: string): Promise<{ state: PatientState, chatHistory: any[] } | null> {
+    if (!this.isBrowser) return null;
     try {
       const db = await this.initDB();
       return new Promise((resolve, reject) => {
@@ -90,6 +97,7 @@ export class StorageService {
 
   // --- Patient Roster Operations ---
   async loadPatients(): Promise<any[]> {
+    if (!this.isBrowser) return [];
     try {
       const db = await this.initDB();
       return new Promise((resolve, reject) => {
@@ -106,6 +114,7 @@ export class StorageService {
   }
 
   async savePatient(patient: any): Promise<void> {
+    if (!this.isBrowser) return;
     try {
       const db = await this.initDB();
       return new Promise((resolve, reject) => {
@@ -121,6 +130,7 @@ export class StorageService {
   }
 
   async deletePatient(id: string): Promise<void> {
+    if (!this.isBrowser) return;
     try {
       const db = await this.initDB();
       return new Promise((resolve, reject) => {

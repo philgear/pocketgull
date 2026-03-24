@@ -3,7 +3,7 @@ import {
   computed, OnDestroy, ViewChild, ElementRef, AfterViewChecked, HostListener, effect,
   ViewEncapsulation
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SummaryNode, SummaryNodeItem } from './analysis-report.types';
@@ -89,7 +89,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
 @Component({
   selector: 'app-summary-node',
   standalone: true,
-  imports: [CommonModule, FormsModule, PocketGullBadgeComponent, PocketGullButtonComponent, PocketGullInputComponent, Medical3DViewerComponent, SafeHtmlPipe],
+  imports: [CommonModule, FormsModule, PocketGullBadgeComponent, PocketGullButtonComponent, PocketGullInputComponent, Medical3DViewerComponent, SafeHtmlPipe, NgOptimizedImage],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   styles: [`
@@ -766,8 +766,8 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
                               } @else if (card.images?.length) {
                                 <div class="rm-gallery-strip">
                                   @for (img of card.images; track img.url) {
-                                    <a [href]="img.descriptionUrl" target="_blank" rel="noopener" class="rm-gallery-item">
-                                      <img [src]="img.thumbUrl" [alt]="img.title" class="rm-gallery-img" loading="lazy">
+                                    <a [href]="img.descriptionUrl" target="_blank" rel="noopener" class="rm-gallery-item relative block overflow-hidden">
+                                      <img [ngSrc]="img.thumbUrl" fill [alt]="img.title" class="rm-gallery-img">
                                       <span class="rm-gallery-caption">{{ img.title | slice:0:40 }}</span>
                                     </a>
                                   }

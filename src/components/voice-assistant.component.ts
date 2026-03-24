@@ -6,7 +6,6 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
 import { DictationService } from '../services/dictation.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
-import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { MarkdownService } from '../services/markdown.service';
 import { RichMediaService, RichMediaCard } from '../services/rich-media.service';
@@ -25,7 +24,7 @@ export interface ChatEntry {
 
 @Component({
     selector: 'app-voice-assistant',
-    imports: [CommonModule, FormsModule, PocketGullButtonComponent, PocketGullInputComponent, SafeHtmlPipe],
+    imports: [CommonModule, FormsModule, PocketGullInputComponent, SafeHtmlPipe],
     changeDetection: ChangeDetectionStrategy.OnPush,
     styles: [`
         .prose {

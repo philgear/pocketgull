@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject , ChangeDetectionStrategy} from '@angular/core';
 import { FhirIntegrationService } from '../services/fhir-integration.service';
 import { PatientManagementService } from '../services/patient-management.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-fhir-callback',
   standalone: true,
   template: `

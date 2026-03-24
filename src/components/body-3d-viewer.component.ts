@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, 
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { DiagnosticScan } from '../services/patient.types';

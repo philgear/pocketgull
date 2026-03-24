@@ -1,8 +1,9 @@
-import { Component, input, inject } from '@angular/core';
+import { Component, input, inject , ChangeDetectionStrategy} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DicomService } from '../services/dicom.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-ohif-viewer',
   standalone: true,
   imports: [CommonModule],

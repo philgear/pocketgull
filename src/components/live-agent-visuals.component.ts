@@ -2,7 +2,8 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'app-live-agent-visuals',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-live-agent-visuals',
     standalone: true,
     imports: [CommonModule],
     template: `

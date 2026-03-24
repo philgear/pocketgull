@@ -5,19 +5,17 @@ import { PatientManagementService } from '../services/patient-management.service
 import { PatientState, Patient, HistoryEntry } from '../services/patient.types';
 import { BodyViewerComponent } from './body-viewer.component';
 import { PatientHistoryTimelineComponent } from './patient-history-timeline.component';
-import { PatientScansComponent } from './patient-scans.component';
 import { DictationService } from '../services/dictation.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
 import { MedicalChartSummaryComponent } from './medical-summary.component';
 import { DicomViewerComponent } from './dicom-viewer.component';
-import { OhifViewerComponent } from './ohif-viewer.component';
 import { BiometricHistoryChartComponent } from './biometric-history-chart.component';
 
 @Component({
   selector: 'app-medical-chart',
   standalone: true,
-  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PatientScansComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent, DicomViewerComponent, OhifViewerComponent, BiometricHistoryChartComponent],
+  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent, DicomViewerComponent, BiometricHistoryChartComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full min-h-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#F9FAFB] dark:bg-transparent">
@@ -163,7 +161,7 @@ import { BiometricHistoryChartComponent } from './biometric-history-chart.compon
 
       <!-- Patient Scans Card -->
       <pocket-gull-card 
-        title="Scans & Diagnostics" 
+        title="DICOM Viewer" 
         [icon]="scansIcon"
         [noPadding]="true">
         
@@ -172,24 +170,8 @@ import { BiometricHistoryChartComponent } from './biometric-history-chart.compon
         </div>
 
         @if(isScansExpanded()) {
-          <div class="p-6 bg-[#F9FAFB]/50 dark:bg-zinc-900/50 border-b border-gray-100 dark:border-zinc-800 last:border-0 min-h-0 flex flex-col gap-6">
-             
-             <!-- DICOM & Visualizer Section -->
-             <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                 <!-- Keep the simple JPEG DICOM Viewer and AI analysis on the left -->
-                 <div class="flex flex-col gap-2">
-                    <app-dicom-viewer class="shrink-0"></app-dicom-viewer>
-                 </div>
-                 
-                 <!-- Put the OHIF Viewer on the right -->
-                 <div class="flex flex-col gap-2">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-400 mb-2 border-b border-gray-200 dark:border-zinc-800 pb-2">Advanced OHIF Viewer</h3>
-                    <app-ohif-viewer></app-ohif-viewer>
-                 </div>
-             </div>
-
-             <hr class="border-gray-200 dark:border-zinc-800 my-2" />
-             <app-patient-scans [scans]="patientScans()"></app-patient-scans>
+          <div class="p-6 bg-[#F9FAFB]/50 dark:bg-zinc-900/50 min-h-0">
+            <app-dicom-viewer class="shrink-0"></app-dicom-viewer>
           </div>
         }
       </pocket-gull-card>
@@ -220,6 +202,11 @@ export class MedicalChartComponent {
       <path stroke-linecap="round" stroke-linejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-5.25v9" />
     </svg>
   `;
+  biometricIcon = `
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h2l2-7 3 14 3-10 2 3h6" />
+    </svg>
+  `;
   historyIcon = `
     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -238,6 +225,7 @@ export class MedicalChartComponent {
 
   // --- Accordion State ---
   isViewerExpanded = signal(true);
+  isBiometricExpanded = signal(true);
   isSummaryExpanded = signal(true);
   isHistoryExpanded = signal(true);
   isScansExpanded = signal(true);

@@ -109,7 +109,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                       title="Heart Rate"
                       [value]="state.vitals().hr || '--'"
                       unit="bpm"
-                      [status]="(state.vitals().hr | number) > 100 ? 'warning' : 'normal'"
+                      [status]="parseVitalNum(state.vitals().hr) > 100 ? 'warning' : 'normal'"
                       trendDirection="up"
                       trendText="+2.5%"
                     ></app-metric-card>
@@ -118,7 +118,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                       title="SpO2"
                       [value]="state.vitals().spO2 || '--'"
                       unit="%"
-                      [status]="(state.vitals().spO2 | number) < 95 ? 'critical' : 'normal'"
+                      [status]="parseVitalNum(state.vitals().spO2) < 95 ? 'critical' : 'normal'"
                       trendDirection="stable"
                     ></app-metric-card>
                     
@@ -674,6 +674,12 @@ export class MedicalChartSummaryComponent {
   baselines = signal<any>(null);
   showCDCBaseline = signal(false);
   showWHOBaseline = signal(false);
+
+  parseVitalNum(val: string | undefined): number {
+    if (!val) return 0;
+    const num = parseFloat(val);
+    return isNaN(num) ? 0 : num;
+  }
 
   ngOnInit() {
     // Fetch aggregated baselines from server

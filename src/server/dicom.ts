@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import express from 'express';
 import { GoogleAuth } from 'google-auth-library';
+import { Readable } from 'stream';
+import { ReadableStream } from 'stream/web';
 
 export const dicomRouter = Router();
 
@@ -92,10 +94,14 @@ dicomRouter.get('/rendered', async (req, res) => {
         throw new Error(`Healthcare API Error: ${response.status} ${response.statusText} - ${await response.text()}`);
     }
     
-    const buffer = await response.arrayBuffer();
     res.setHeader('Content-Type', 'image/jpeg');
     res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache JPEGs for 24 hours
-    res.send(Buffer.from(buffer));
+    
+    if (response.body) {
+      Readable.fromWeb(response.body as ReadableStream).pipe(res);
+    } else {
+      res.end();
+    }
   } catch (error: any) {
     console.error('[DICOM] Proxy Error (Rendered):', error);
     res.status(500).json({ error: error.message });
@@ -178,9 +184,13 @@ dicomRouter.get('/raw', async (req, res) => {
         throw new Error(`Healthcare API Error: ${response.status} ${response.statusText} - ${await response.text()}`);
     }
     
-    const buffer = await response.arrayBuffer();
     res.setHeader('Content-Type', 'application/dicom');
-    res.send(Buffer.from(buffer));
+    
+    if (response.body) {
+      Readable.fromWeb(response.body as ReadableStream).pipe(res);
+    } else {
+      res.end();
+    }
   } catch (error: any) {
     console.error('[DICOM] Proxy Error (Raw):', error);
     res.status(500).json({ error: error.message });

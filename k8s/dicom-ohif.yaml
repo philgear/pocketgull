@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pocketgull-dicom-ohif
+  namespace: medical-imaging
+  labels:
+    app: pocketgull
+    component: dicom-ohif
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pocketgull
+      component: dicom-ohif
+  template:
+    metadata:
+      labels:
+        app: pocketgull
+        component: dicom-ohif
+    spec:
+      containers:
+      - name: dicom-ohif-viewer
+        image: gcr.io/gen-lang-client-0540208645/pocketgull-ohif:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        env:
+        - name: DICOM_WADO_URI
+          value: "https://dicom-wado.pocketgull.app"
+        - name: NODE_ENV
+          value: "production"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 20
+          periodSeconds: 30
+      nodeSelector:
+        cloud.google.com/gke-accelerator: nvidia-tesla-t4 # Optional hardware acceleration
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pocketgull-dicom-ohif-svc
+  namespace: medical-imaging
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: pocketgull
+    component: dicom-ohif

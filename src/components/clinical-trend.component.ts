@@ -1,8 +1,9 @@
-import { Component, Input, computed } from '@angular/core';
+import { Component, Input, computed , ChangeDetectionStrategy} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'app-clinical-trend',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-clinical-trend',
     standalone: true,
     imports: [CommonModule],
     template: `

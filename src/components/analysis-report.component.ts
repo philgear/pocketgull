@@ -157,10 +157,10 @@ import { RevealDirective } from '../directives/reveal.directive';
             <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-200">Processing Comprehensive Analysis</p>
           </div>
         }
-        @if (intel.error() && !hasAnyReport(); as error) {
+        @if (intel.error() && !hasAnyReport()) {
           <div class="p-4 border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 text-xs rounded-lg mb-4">
             <strong class="block uppercase tracking-wider mb-1">System Error</strong>
-            {{ error }}
+            {{ intel.error() }}
           </div>
         }
 

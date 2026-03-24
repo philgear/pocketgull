@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, signal, computed, afterNextRender } from '@angular/core';
+import { Component, inject, signal, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DicomService, DicomStudy } from '../services/dicom.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-dicom-viewer',
   standalone: true,
   imports: [CommonModule, FormsModule],
@@ -17,7 +18,7 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
           </svg>
           Medical Imaging Suite
         </h3>
-        <button (click)="loadStudies()" 
+        <button (click)="loadStudies()"
                 class="text-xs px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded-md transition-colors"
                 [disabled]="dicomService.isLoading()">
           {{ dicomService.isLoading() ? 'Loading...' : 'Refresh Studies' }}
@@ -70,32 +71,19 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
           </div>
         </div>
 
-        <!-- Main Content: Viewer -->
-        <div class="w-2/3 bg-black flex flex-col relative">
+        <!-- Main viewer panel -->
+        <div class="flex-1 flex flex-col bg-black relative group overflow-hidden">
           @if (currentImageSrc()) {
-            <!-- Image Area -->
-            <div class="flex-1 flex items-center justify-center p-4 relative group">
-              <img [src]="currentImageSrc()" 
-                   class="max-w-full max-h-full object-contain"
-                   alt="DICOM Frame" />
-                   
-              <!-- Overlay information -->
-              <div class="absolute top-4 left-4 text-white/70 text-xs font-mono drop-shadow-md pointer-events-none">
-                <div>{{ selectedStudy()?.patientName }}</div>
-                <div>{{ selectedStudy()?.patientId }}</div>
-              </div>
-              
-              <div class="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <!-- Controls -->
-              </div>
+            <div class="flex-1 flex items-center justify-center overflow-hidden">
+              <img [src]="currentImageSrc()" alt="DICOM study image" class="max-h-full max-w-full object-contain" />
             </div>
-            
+
             <!-- Analysis Bar -->
             <div class="p-3 bg-zinc-900 border-t border-zinc-800 flex justify-between items-center">
               <div class="text-xs text-zinc-400 font-mono truncate max-w-[50%]">
                  Study: {{ selectedStudy()?.studyInstanceUid?.substring(0,20) }}...
               </div>
-              <button (click)="analyzeImage()" 
+              <button (click)="analyzeImage()"
                       [disabled]="isAnalyzing()"
                       class="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-95"
                       [class.bg-blue-600]="!isAnalyzing()"
@@ -136,7 +124,7 @@ export class DicomViewerComponent {
 
   studies = this.dicomService.studies;
   selectedStudy = this.dicomService.selectedStudy;
-  
+
   currentImageSrc = signal<string | null>(null);
   isAnalyzing = signal(false);
 
@@ -146,67 +134,57 @@ export class DicomViewerComponent {
     });
   }
 
-  ngOnInit() {
-    // Moved to afterNextRender for browser-only execution
-  }
-
   loadStudies() {
     this.dicomService.searchStudies();
   }
 
   selectStudy(study: DicomStudy) {
     this.dicomService.selectedStudy.set(study);
-    
-    // For MVP demonstration, assume we have these UIDs, or we can use placeholder ones if the backend has test data
-    // In a real application, clicking a study would load its Series, then its Instances, and we would view those.
-    
-    // To show something, we're using mock Series and Instance UIDs as placeholders for test data
+
     const studyUid = study.studyInstanceUid;
-    const seriesUid = 'mock-series-uid'; // TODO: fetch actual series
-    const instanceUid = 'mock-instance-uid'; // TODO: fetch actual instances
-    
-    // Prevent 404 broken images on the frontend during MVP by intercepting mock UIDs
-    // and injecting a valid high-resolution sample image for AI analysis testing.
+    const seriesUid = 'mock-series-uid';
+    const instanceUid = 'mock-instance-uid';
+
     const isMock = seriesUid.includes('mock');
-    const src = isMock 
+    const src = isMock
        ? 'https://upload.wikimedia.org/wikipedia/commons/6/62/CT_scan_of_the_brain.jpg'
        : this.dicomService.getRenderedImageUrl(studyUid, seriesUid, instanceUid);
-       
+
     this.currentImageSrc.set(src);
   }
 
   formatDate(dateStr?: string): string {
     if (!dateStr || dateStr.length !== 8) return dateStr || 'Unknown Date';
-    // DICOM Date DA is YYYYMMDD
     return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
   }
 
   async analyzeImage() {
     if (!this.currentImageSrc()) return;
-    
+
     this.isAnalyzing.set(true);
     try {
       const response = await fetch(this.currentImageSrc()!);
       const blob = await response.blob();
-      
+
       const reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onloadend = async () => {
         const base64data = reader.result as string;
-        
-        // Multi-modal Analysis
+
         const analysis = await this.intelligenceService.analyzeRadiologyImage(base64data, this.selectedStudy()?.studyDescription || '');
-        
+
         this.intelligenceService.transcript.update(t => [...t, {
             role: 'model',
-            text: `**Radiology Analysis Complete:**\n\n${analysis}`
+            text: `**Radiology Analysis Complete:**
+
+${analysis}`
         }]);
-        
-        console.log("DICOM Analysis Response:", analysis);
+
+        console.log('DICOM Analysis Response:', analysis);
       };
-      
+
     } catch (e: any) {
-      console.error("DICOM Analysis Failed", e);
+      console.error('DICOM Analysis Failed', e);
     } finally {
       this.isAnalyzing.set(false);
     }

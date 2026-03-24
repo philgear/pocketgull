@@ -10,6 +10,7 @@ import { PatientManagementService } from '../services/patient-management.service
 import { ClinicalIcons } from '../assets/clinical-icons';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
   imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent],
@@ -38,11 +39,11 @@ import { ClinicalIcons } from '../assets/clinical-icons';
                 ariaLabel="Clear AI Cache"
                 [icon]="ClinicalIcons.Clear">
               </pocket-gull-button>
-              <pocket-gull-button id="tour-generate-btn" (click)="triggerAnalysisGenerate()" [disabled]="!state.hasIssues() || hasGeneratedDemo()"
+              <pocket-gull-button id="tour-generate-btn" (click)="triggerAnalysisGenerate()" [disabled]="!state.hasIssues()"
                 variant="primary"
                 size="sm"
                 [icon]="hasReport() ? 'M17.65 6.35A7.95 7.95 0 0 0 12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.66-.67 3.17-1.76 4.24l1.42 1.42A9.92 9.92 0 0 0 22 12c0-2.76-1.12-5.26-2.35-7.65z' : 'M14 5l7 7m0 0l-7 7m7-7H3'">
-                {{ hasReport() ? 'Refresh Analysis' : (hasGeneratedDemo() ? 'Demo Limit Reached' : 'Generate Patient Summary') }}
+                {{ hasReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}
               </pocket-gull-button>
             }
           </div>
@@ -92,20 +93,10 @@ export class AnalysisContainerComponent {
   intelligence = inject(ClinicalIntelligenceService);
   ClinicalIcons = ClinicalIcons;
 
-  hasGeneratedDemo = signal(false);
   justGenerated = signal(false);
 
   triggerAnalysisGenerate() {
     this.justGenerated.set(true);
-    if (typeof localStorage !== 'undefined') {
-      const generations = parseInt(localStorage.getItem('pg_generations') || '0', 10);
-      if (generations >= 1) {
-        this.hasGeneratedDemo.set(true);
-        return; // Prevent generation
-      }
-      localStorage.setItem('pg_generations', (generations + 1).toString());
-      this.hasGeneratedDemo.set(true);
-    }
 
     if (this.reportComp) {
       this.reportComp.generate();

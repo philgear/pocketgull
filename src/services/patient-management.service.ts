@@ -22,6 +22,7 @@ import {
   Patient,
   PatientState,
   BodyPartIssue,
+  DiagnosticScan
 } from "./patient.types";
 import * as CryptoJS from 'crypto-js';
 
@@ -1340,6 +1341,534 @@ const MOCK_PATIENTS: Patient[] = [
     bookmarks: [],
     scans: [],
   },
+  {
+    id: "p009",
+    name: "Maya Chen",
+    age: 34,
+    gender: "Female",
+    lastVisit: "2026.03.18",
+    preexistingConditions: [
+      "Hashimoto's Thyroiditis",
+      "Systemic Lupus Erythematosus (SLE)",
+      "Iron-Deficiency Anemia",
+      "Raynaud's Phenomenon",
+    ],
+    patientGoals:
+      "Seeking a functional medicine approach to reduce SLE flare frequency and improve energy levels without increasing immunosuppressant dosing.",
+    vitals: {
+      bp: "108/68",
+      hr: "82",
+      temp: "99.1°F",
+      spO2: "98%",
+      weight: "128 lbs",
+      height: "5'4\"",
+      vitD3: "22",
+      magnesium: "3.8",
+      b12: "310",
+    },
+    oxidativeStressMarkers: [
+      { id: "1", name: "8-OHdG", value: "18 ng/mg creatinine" },
+      { id: "2", name: "Malondialdehyde (MDA)", value: "4.2 μmol/L" },
+      { id: "3", name: "Anti-dsDNA Antibodies", value: "85 IU/mL (High)" },
+    ],
+    antioxidantSources: [
+      { id: "1", name: "Glutathione (GSH)", value: "0.8 μmol/g Hb (Low)" },
+      { id: "2", name: "Vitamin D3 (25-OH)", value: "22 ng/mL (Deficient)" },
+      { id: "3", name: "Ferritin", value: "8 ng/mL (Low)" },
+    ],
+    medications: [
+      { id: "1", name: "Hydroxychloroquine", value: "200mg BID" },
+      { id: "2", name: "Levothyroxine", value: "75mcg Daily (AM, fasting)" },
+      { id: "3", name: "Ferrous Sulfate", value: "325mg Daily" },
+      { id: "4", name: "Prednisone", value: "5mg Daily (taper in progress)" },
+    ],
+    biometricHistory: [
+      { timestamp: "2025-09-01T08:00:00Z", type: "hr", value: "94" },
+      { timestamp: "2025-10-15T08:00:00Z", type: "hr", value: "91" },
+      { timestamp: "2025-11-01T08:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2025-12-01T08:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2026-01-15T08:00:00Z", type: "hr", value: "84" },
+      { timestamp: "2026-03-18T08:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2025-09-01T08:00:00Z", type: "spO2", value: "97" },
+      { timestamp: "2025-10-15T08:00:00Z", type: "spO2", value: "97" },
+      { timestamp: "2025-12-01T08:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-03-18T08:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2025-09-01T08:00:00Z", type: "bp", value: "112/70" },
+      { timestamp: "2025-11-01T08:00:00Z", type: "bp", value: "110/68" },
+      { timestamp: "2026-01-15T08:00:00Z", type: "bp", value: "108/68" },
+      { timestamp: "2026-03-18T08:00:00Z", type: "bp", value: "108/68" },
+    ],
+    issues: {
+      head: [
+        {
+          id: "head",
+          noteId: "note_p009_head_1",
+          name: "Cognitive & Neurological",
+          painLevel: 3,
+          description:
+            "Reports persistent 'brain fog,' difficulty concentrating at work, and word-finding lapses. TSH most recently 3.8 mIU/L — suboptimally controlled on current Levothyroxine dose.",
+          symptoms: [],
+        },
+      ],
+      chest: [
+        {
+          id: "chest",
+          noteId: "note_p009_chest_1",
+          name: "Chest & Lungs",
+          painLevel: 2,
+          description:
+            "Intermittent pleuritic chest pain consistent with serositis during SLE flares. Echo showed trace pericardial effusion 4 months ago. Currently resolved.",
+          symptoms: [],
+        },
+      ],
+      r_hand: [
+        {
+          id: "r_hand",
+          noteId: "note_p009_rhand_1",
+          name: "Right Hand & Wrist — Raynaud's",
+          painLevel: 4,
+          description:
+            "Raynaud's attacks are triggered by cold and stress, averaging 3–4 episodes/week in winter. Fingers blanch, then turn blue, then red upon rewarming. Causes significant functional limitation during flares.",
+          symptoms: [],
+        },
+      ],
+    },
+    history: [
+      {
+        type: "Visit",
+        date: "2026.03.18",
+        summary:
+          "Functional medicine intake. Discussed SLE flare triggers, thyroid optimization, and iron repletion.",
+        state: {
+          patientGoals:
+            "Reduce SLE flares and improve energy. Explore non-pharmacologic immune modulation.",
+          vitals: {
+            bp: "108/68",
+            hr: "82",
+            temp: "99.1°F",
+            spO2: "98%",
+            weight: "128 lbs",
+            height: "5'4\"",
+            vitD3: "22",
+            magnesium: "3.8",
+            b12: "310",
+          },
+          oxidativeStressMarkers: [
+            { id: "1", name: "8-OHdG", value: "18 ng/mg creatinine" },
+            { id: "2", name: "Anti-dsDNA Antibodies", value: "85 IU/mL (High)" },
+          ],
+          antioxidantSources: [
+            { id: "1", name: "Glutathione (GSH)", value: "0.8 μmol/g Hb (Low)" },
+            { id: "2", name: "Ferritin", value: "8 ng/mL (Low)" },
+          ],
+          medications: [
+            { id: "1", name: "Hydroxychloroquine", value: "200mg BID" },
+            { id: "2", name: "Levothyroxine", value: "75mcg Daily" },
+            { id: "3", name: "Prednisone", value: "10mg Daily" },
+          ],
+          issues: {
+            head: [
+              {
+                id: "head",
+                noteId: "note_p009_head_hist1",
+                name: "Cognitive & Neurological",
+                painLevel: 5,
+                description: "Severe brain fog during active flare. Unable to complete work tasks.",
+                symptoms: [],
+              },
+            ],
+          },
+        },
+      },
+    ],
+    bookmarks: [],
+    scans: [
+      {
+        id: "scan_p009_001",
+        type: "Lab Report",
+        title: "Comprehensive Autoimmune Panel",
+        date: "2026.03.10",
+        bodyPartId: "chest",
+        description:
+          "ANA titer: 1:320 (speckled pattern). Anti-dsDNA: 85 IU/mL. C3: 68 mg/dL (Low). C4: 9 mg/dL (Low). TSH: 3.8 mIU/mL. Free T4: 0.9 ng/dL. Ferritin: 8 ng/mL. Suggests active SLE with complement consumption.",
+        status: "Abnormal",
+      },
+    ],
+  },
+  {
+    id: "p010",
+    name: "Marcus Thompson",
+    age: 51,
+    gender: "Male",
+    lastVisit: "2026.03.20",
+    preexistingConditions: [
+      "Coronary Artery Disease (post-stent, 2023)",
+      "Type 2 Diabetes Mellitus (A1c improving)",
+      "Hypertriglyceridemia",
+      "Non-Alcoholic Fatty Liver Disease (NAFLD)",
+      "Former Smoker (quit 2023)",
+    ],
+    patientGoals:
+      "Aggressively reduce cardiovascular risk after 2023 NSTEMI. Aiming for metabolic reversal of T2DM via lifestyle intervention. Current A1c: 6.4% (down from 9.1%).",
+    vitals: {
+      bp: "126/78",
+      hr: "62",
+      temp: "98.3°F",
+      spO2: "99%",
+      weight: "218 lbs",
+      height: "6'1\"",
+    },
+    oxidativeStressMarkers: [
+      { id: "1", name: "hsCRP", value: "2.1 mg/L (Elevated)" },
+      { id: "2", name: "Lipoprotein(a)", value: "65 mg/dL (Elevated)" },
+      { id: "3", name: "Malondialdehyde (MDA)", value: "2.8 μmol/L" },
+    ],
+    antioxidantSources: [
+      { id: "1", name: "CoQ10", value: "0.38 μg/mL (Low — statin-related)" },
+      { id: "2", name: "Omega-3 Index", value: "4.2% (Target >8%)" },
+    ],
+    medications: [
+      { id: "1", name: "Rosuvastatin", value: "40mg Daily" },
+      { id: "2", name: "Aspirin", value: "81mg Daily" },
+      { id: "3", name: "Clopidogrel", value: "75mg Daily" },
+      { id: "4", name: "Metformin", value: "500mg BID (reduced from 1000mg BID)" },
+      { id: "5", name: "Empagliflozin", value: "10mg Daily" },
+      { id: "6", name: "Ramipril", value: "5mg Daily" },
+    ],
+    biometricHistory: [
+      { timestamp: "2023-06-15T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2023-09-01T09:00:00Z", type: "hr", value: "80" },
+      { timestamp: "2023-12-01T09:00:00Z", type: "hr", value: "74" },
+      { timestamp: "2024-03-01T09:00:00Z", type: "hr", value: "70" },
+      { timestamp: "2024-09-01T09:00:00Z", type: "hr", value: "66" },
+      { timestamp: "2026-03-20T09:00:00Z", type: "hr", value: "62" },
+      { timestamp: "2023-06-15T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2024-03-01T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-03-20T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2023-06-15T09:00:00Z", type: "bp", value: "148/94" },
+      { timestamp: "2023-09-01T09:00:00Z", type: "bp", value: "140/88" },
+      { timestamp: "2023-12-01T09:00:00Z", type: "bp", value: "134/84" },
+      { timestamp: "2024-03-01T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2024-09-01T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2026-03-20T09:00:00Z", type: "bp", value: "126/78" },
+    ],
+    issues: {
+      chest: [
+        {
+          id: "chest",
+          noteId: "note_p010_chest_1",
+          name: "Cardiovascular",
+          painLevel: 1,
+          description:
+            "Post-NSTEMI (LAD stent placed June 2023). Currently asymptomatic on dual antiplatelet therapy. Recent nuclear stress test negative for ischemia. Echo EF: 52% (up from 44% at discharge).",
+          symptoms: [],
+        },
+      ],
+      abdomen: [
+        {
+          id: "abdomen",
+          noteId: "note_p010_abd_1",
+          name: "Liver & GI — NAFLD",
+          painLevel: 0,
+          description:
+            "NAFLD confirmed by FibroScan (CAP 285 dB/m, E: 6.2 kPa — steatosis grade S2, no significant fibrosis). AST/ALT normalizing as weight decreases. Diet adherence is strong.",
+          symptoms: [],
+        },
+      ],
+    },
+    history: [
+      {
+        type: "Visit",
+        date: "2026.03.20",
+        summary: "6-month cardiology & functional medicine follow-up. Trending well across all CVD risk factors.",
+        state: {
+          patientGoals: "Achieve metabolic reversal of T2DM. Target A1c < 6.0% within 6 months.",
+          vitals: {
+            bp: "126/78",
+            hr: "62",
+            temp: "98.3°F",
+            spO2: "99%",
+            weight: "218 lbs",
+            height: "6'1\"",
+          },
+          oxidativeStressMarkers: [
+            { id: "1", name: "hsCRP", value: "2.1 mg/L" },
+            { id: "2", name: "Lipoprotein(a)", value: "65 mg/dL" },
+          ],
+          antioxidantSources: [
+            { id: "1", name: "CoQ10", value: "0.38 μg/mL (Low)" },
+          ],
+          medications: [
+            { id: "1", name: "Rosuvastatin", value: "40mg Daily" },
+            { id: "2", name: "Aspirin", value: "81mg Daily" },
+            { id: "3", name: "Clopidogrel", value: "75mg Daily" },
+            { id: "4", name: "Metformin", value: "500mg BID" },
+            { id: "5", name: "Empagliflozin", value: "10mg Daily" },
+            { id: "6", name: "Ramipril", value: "5mg Daily" },
+          ],
+          issues: {
+            chest: [
+              {
+                id: "chest",
+                noteId: "note_p010_chest_hist1",
+                name: "Cardiovascular",
+                painLevel: 1,
+                description: "Asymptomatic. EF improved to 52%. All vitals trending towards target.",
+                symptoms: [],
+              },
+            ],
+          },
+        },
+      },
+      {
+        type: "Visit",
+        date: "2023.06.28",
+        summary: "Post-discharge follow-up. 2 weeks after NSTEMI and LAD stent placement.",
+        state: {
+          patientGoals: "Recover from cardiac event. Understand medications and lifestyle changes required.",
+          vitals: {
+            bp: "148/94",
+            hr: "88",
+            temp: "98.7°F",
+            spO2: "96%",
+            weight: "254 lbs",
+            height: "6'1\"",
+          },
+          oxidativeStressMarkers: [],
+          antioxidantSources: [],
+          medications: [
+            { id: "1", name: "Rosuvastatin", value: "40mg Daily" },
+            { id: "2", name: "Aspirin", value: "81mg Daily" },
+            { id: "3", name: "Clopidogrel", value: "75mg Daily" },
+            { id: "4", name: "Metformin", value: "1000mg BID" },
+            { id: "5", name: "Ramipril", value: "2.5mg Daily" },
+          ],
+          issues: {
+            chest: [
+              {
+                id: "chest",
+                noteId: "note_p010_chest_hist2",
+                name: "Cardiovascular — Post NSTEMI",
+                painLevel: 5,
+                description: "Post-stent. Residual exertional angina on stairs. EF 44% on echo. A1c: 9.1%. Active smoker until event date.",
+                symptoms: [],
+              },
+            ],
+          },
+        },
+      },
+    ],
+    bookmarks: [],
+    scans: [
+      {
+        id: "scan_p010_001",
+        type: "Lab Report",
+        title: "Cardiometabolic Panel — March 2026",
+        date: "2026.03.15",
+        bodyPartId: "chest",
+        description:
+          "LDL-C: 58 mg/dL (at goal). HDL: 42 mg/dL. Triglycerides: 185 mg/dL (improved from 420). A1c: 6.4%. Fasting glucose: 98 mg/dL. hsCRP: 2.1 mg/dL. Lp(a): 65 mg/dL. ALT: 32 U/L (improving). AST: 28 U/L.",
+        status: "Reviewed",
+      },
+    ],
+  },
+  {
+    id: "p011",
+    name: "Elena Vasquez",
+    age: 35,
+    gender: "Female",
+    lastVisit: "2026.03.22",
+    preexistingConditions: [
+      "Crohn's Disease (Ileocolonic, moderate-severity)",
+      "Major Depressive Disorder (recurrent)",
+      "Generalized Anxiety Disorder",
+      "Small Intestinal Bacterial Overgrowth (SIBO)",
+      "Vitamin B12 Deficiency (malabsorption)",
+    ],
+    patientGoals:
+      "Achieve clinical and endoscopic remission in Crohn's. Improve mood stability. Explore the gut-brain axis connection to reduce anxiety and depression severity.",
+    vitals: {
+      bp: "112/72",
+      hr: "78",
+      temp: "98.6°F",
+      spO2: "99%",
+      weight: "120 lbs",
+      height: "5'4\"",
+      vitD3: "18",
+      b12: "195",
+      magnesium: "3.5",
+    },
+    oxidativeStressMarkers: [
+      { id: "1", name: "Fecal Calprotectin", value: "320 μg/g (High)" },
+      { id: "2", name: "hsCRP", value: "4.8 mg/L (Elevated)" },
+      { id: "3", name: "Lactulose/Mannitol Ratio", value: "0.045 (Elevated — Leaky Gut)" },
+    ],
+    antioxidantSources: [
+      { id: "1", name: "Vitamin B12 (serum)", value: "195 pg/mL (Deficient)" },
+      { id: "2", name: "Vitamin D3 (25-OH)", value: "18 ng/mL (Deficient)" },
+      { id: "3", name: "Zinc", value: "62 μg/dL (Low-normal)" },
+    ],
+    medications: [
+      { id: "1", name: "Vedolizumab", value: "300mg IV q8 weeks" },
+      { id: "2", name: "Budesonide", value: "9mg Daily (induction, tapering)" },
+      { id: "3", name: "Escitalopram", value: "10mg Daily" },
+      { id: "4", name: "Vitamin B12 (Methylcobalamin)", value: "1000mcg IM Monthly" },
+      { id: "5", name: "Rifaximin", value: "550mg TID x 14 days (SIBO treatment)" },
+    ],
+    biometricHistory: [
+      { timestamp: "2025-07-01T08:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2025-09-15T08:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2025-11-01T08:00:00Z", type: "hr", value: "84" },
+      { timestamp: "2026-01-15T08:00:00Z", type: "hr", value: "81" },
+      { timestamp: "2026-03-22T08:00:00Z", type: "hr", value: "78" },
+      { timestamp: "2025-07-01T08:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-03-22T08:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2025-07-01T08:00:00Z", type: "bp", value: "118/74" },
+      { timestamp: "2025-11-01T08:00:00Z", type: "bp", value: "114/72" },
+      { timestamp: "2026-03-22T08:00:00Z", type: "bp", value: "112/72" },
+    ],
+    issues: {
+      abdomen: [
+        {
+          id: "abdomen",
+          noteId: "note_p011_abd_1",
+          name: "Abdomen — Crohn's & SIBO",
+          painLevel: 6,
+          description:
+            "Reporting 4–6 loose stools/day with cramping. SIBO confirmed by lactulose breath test (peak CH4: 22 ppm). Crohn's activity index (CDAI): 240 (moderate). Colonoscopy 3 months ago showed active ileitis with skip lesions. Currently initiating Vedolizumab.",
+          symptoms: [],
+        },
+      ],
+      head: [
+        {
+          id: "head",
+          noteId: "note_p011_head_1",
+          name: "Mental Health — MDD & GAD",
+          painLevel: 5,
+          description:
+            "PHQ-9: 14 (moderate depression). GAD-7: 12 (moderate anxiety). Reports sleep onset insomnia and early-morning awakening. Flare-related stress significantly worsens psychiatric symptoms. Exploring correlation between gut inflammation (calprotectin) and mood state.",
+          symptoms: [],
+        },
+      ],
+    },
+    history: [
+      {
+        type: "Visit",
+        date: "2026.03.22",
+        summary:
+          "Integrative GI/psychiatry intake. Discussed gut-brain axis, microbiome restoration, and B12 repletion urgency.",
+        state: {
+          patientGoals:
+            "Achieve Crohn's remission and improve baseline mood. Restore gut microbiome. Correct nutritional deficiencies.",
+          vitals: {
+            bp: "112/72",
+            hr: "78",
+            temp: "98.6°F",
+            spO2: "99%",
+            weight: "120 lbs",
+            height: "5'4\"",
+            vitD3: "18",
+            b12: "195",
+          },
+          oxidativeStressMarkers: [
+            { id: "1", name: "Fecal Calprotectin", value: "320 μg/g (High)" },
+            { id: "2", name: "hsCRP", value: "4.8 mg/L" },
+          ],
+          antioxidantSources: [
+            { id: "1", name: "Vitamin B12 (serum)", value: "195 pg/mL (Deficient)" },
+            { id: "2", name: "Vitamin D3 (25-OH)", value: "18 ng/mL" },
+          ],
+          medications: [
+            { id: "1", name: "Vedolizumab", value: "300mg IV q8 weeks" },
+            { id: "2", name: "Budesonide", value: "9mg Daily" },
+            { id: "3", name: "Escitalopram", value: "10mg Daily" },
+            { id: "4", name: "Rifaximin", value: "550mg TID x 14 days" },
+          ],
+          issues: {
+            abdomen: [
+              {
+                id: "abdomen",
+                noteId: "note_p011_abd_hist1",
+                name: "Abdomen — Crohn's Active Flare",
+                painLevel: 7,
+                description: "Active flare. 6+ loose stools/day. Cramping 8/10. Weight down 8 lbs from baseline.",
+                symptoms: [],
+              },
+            ],
+          },
+        },
+      },
+    ],
+    bookmarks: [],
+    scans: [
+      {
+        id: "scan_p011_001",
+        type: "Lab Report",
+        title: "GI Biomarker & Nutritional Panel",
+        date: "2026.03.18",
+        bodyPartId: "abdomen",
+        description:
+          "Fecal calprotectin: 320 μg/g. hsCRP: 4.8 mg/L. ESR: 42 mm/hr. B12: 195 pg/mL. Folate: 4.2 ng/mL. Vitamin D: 18 ng/mL. Zinc: 62 μg/dL. Lactulose breath test positive for SIBO (CH4-dominant). CBC: Mild normocytic anemia (Hgb 10.8 g/dL).",
+        status: "Abnormal",
+      },
+    ],
+  },
+  {
+    id: "p012",
+    name: "Emma Clark",
+    age: 28,
+    gender: "Female",
+    lastVisit: "2026.03.24",
+    preexistingConditions: [],
+    patientGoals: "Establish baseline health metrics and maintain annual wellness routine.",
+    vitals: {
+      bp: "116/74",
+      hr: "68",
+      temp: "98.4°F",
+      spO2: "99%",
+      weight: "135 lbs",
+      height: "5'6\"",
+      vitD3: "45",
+      b12: "650",
+      magnesium: "6.2",
+    },
+    oxidativeStressMarkers: [],
+    antioxidantSources: [],
+    medications: [],
+    biometricHistory: [
+      { timestamp: "2025-06-15T09:00:00Z", type: "hr", value: "70" },
+      { timestamp: "2026-03-24T09:00:00Z", type: "hr", value: "68" },
+      { timestamp: "2025-06-15T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2026-03-24T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2025-06-15T09:00:00Z", type: "bp", value: "115/75" },
+      { timestamp: "2026-03-24T09:00:00Z", type: "bp", value: "116/74" },
+    ],
+    issues: {},
+    history: [
+      {
+        type: "Visit",
+        date: "2026.03.24",
+        summary: "Annual wellness exam. Patient is healthy and active. Discussed continuing current lifestyle.",
+        state: {
+          patientGoals: "Maintain current health status.",
+          vitals: {
+            bp: "116/74",
+            hr: "68",
+            temp: "98.4°F",
+            spO2: "99%",
+            weight: "135 lbs",
+            height: "5'6\"",
+          },
+          oxidativeStressMarkers: [],
+          antioxidantSources: [],
+          medications: [],
+          issues: {}
+        }
+      }
+    ],
+    bookmarks: [],
+    scans: []
+  }
 ];
 @Injectable({
   providedIn: "root",
@@ -1353,7 +1882,7 @@ export class PatientManagementService {
 
   readonly patients = signal<Patient[]>(MOCK_PATIENTS);
   readonly selectedPatientId: WritableSignal<string | null> = signal(
-    MOCK_PATIENTS[0]?.id || null,
+    MOCK_PATIENTS.find(p => p.id === 'p012')?.id || MOCK_PATIENTS[0]?.id || null,
   );
   readonly selectedPatient = computed(() => {
     const id = this.selectedPatientId();
@@ -1373,6 +1902,10 @@ export class PatientManagementService {
             }
         }
     }
+  }
+
+  constructor() {
+    this.initRoster();
 
     // Persist to IndexedDB whenever patients array changes
     effect(() => {
@@ -1381,10 +1914,6 @@ export class PatientManagementService {
             currentData.forEach(p => this.storage.savePatient(p));
         });
     });
-  }
-
-  constructor() {
-    this.initRoster();
 
     // This effect runs whenever the selected patient changes.
     // It's the central point for orchestrating app state updates.
