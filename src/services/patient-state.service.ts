@@ -38,6 +38,10 @@ export class PatientStateService {
   readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<DraftSummaryItem[]>([]);
+  /** AI-derived anatomical findings mapped to severity tier for 3D overlay. */
+  readonly aiAnomalyHighlights = signal<Record<string, 'critical' | 'moderate' | 'mild'>>({});
+  /** Toggle the semi-transparent reference mannequin ghost overlay. */
+  readonly showGhostOverlay = signal<boolean>(false);
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
 
   // --- Patient Data State ---
@@ -363,6 +367,8 @@ export class PatientStateService {
     this.selectedNoteId.set(null);
     this.isLiveAgentActive.set(false); // also end any active consult
     this.isResearchFrameVisible.set(false);
+    this.aiAnomalyHighlights.set({});
+    this.showGhostOverlay.set(false);
     this.issues.set({});
     this.patientGoals.set('');
         this.vitals.set({
@@ -383,6 +389,16 @@ export class PatientStateService {
     this.requestedResearchQuery.set(null);
     this.requestedSearchEngine.set(null);
     this.viewingPastVisit.set(null);
+  }
+
+  /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
+  setAiAnomalyHighlights(highlights: Record<string, 'critical' | 'moderate' | 'mild'>) {
+    this.aiAnomalyHighlights.set(highlights);
+  }
+
+  /** Remove all AI anomaly overlay markers from the 3D viewer. */
+  clearAiAnomalyHighlights() {
+    this.aiAnomalyHighlights.set({});
   }
 
   /** Clears only patient data, leaving UI state intact, for review mode */

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -37,6 +37,26 @@ import { DiagnosticScan } from '../services/patient.types';
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="m2 2 7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
             {{ isPaintingMode() ? 'Painting Active' : 'Markup Lesion' }}
          </button>
+
+         <!-- Blood Flow Simulation Toggle -->
+         <button (click)="toggleBloodFlow()"
+                 class="p-2 border border-[#EEEEEE] dark:border-zinc-700 rounded-sm shadow-sm transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                 [class.bg-red-600]="showBloodFlow()"
+                 [class.text-white]="showBloodFlow()"
+                 [class.bg-white]="!showBloodFlow()"
+                 [class.dark:bg-zinc-800]="!showBloodFlow()"
+                 [class.text-gray-600]="!showBloodFlow()"
+                 title="Toggle blood flow particle simulation (driven by HR vital)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            {{ showBloodFlow() ? 'Circulation On' : 'Circulation' }}
+         </button>
+
+         <!-- AI Anomaly Clear -->
+         <button *ngIf="hasAiHighlights()" (click)="state.clearAiAnomalyHighlights()"
+                 class="p-2 bg-amber-50 dark:bg-amber-950/30 text-amber-700 border border-amber-200 dark:border-amber-800/50 rounded-sm shadow-sm transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Clear AI Scan
+         </button>
          
          <button *ngIf="paintedStrokes().length > 0" (click)="submitPainting()"
                  class="p-2 bg-black dark:bg-white text-white dark:text-black border border-transparent rounded-sm shadow-sm transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-200">
@@ -48,6 +68,22 @@ import { DiagnosticScan } from '../services/patient.types';
                  class="p-2 bg-red-50 dark:bg-red-950/30 text-red-500 border border-red-200 dark:border-red-900/50 rounded-sm shadow-sm transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-red-100 dark:hover:bg-red-900/50">
             Clear
          </button>
+      </div>
+
+      <!-- MPR Scan Panel: appears when a part with saved scans is selected -->
+      <div *ngIf="selectedPartScans().length > 0"
+           class="absolute bottom-2 right-2 z-20 w-48 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-gray-200 dark:border-zinc-700 rounded-sm shadow-lg flex flex-col gap-1 p-2 no-print">
+        <p class="text-[9px] font-bold uppercase tracking-widest text-gray-400 dark:text-zinc-500">Imaging — {{ state.selectedPartName() }}</p>
+        <div class="flex flex-col gap-1 max-h-36 overflow-y-auto">
+          <div *ngFor="let scan of selectedPartScans()" class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 rounded px-1 py-0.5"
+               (click)="openScan(scan)">
+            <img *ngIf="scan.imageUrl" [src]="scan.imageUrl" class="w-8 h-8 object-cover rounded shrink-0" alt="scan"/>
+            <div *ngIf="!scan.imageUrl" class="w-8 h-8 bg-gray-100 dark:bg-zinc-800 rounded shrink-0 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+            </div>
+            <p class="text-[9px] font-medium text-gray-600 dark:text-zinc-400 leading-tight truncate">{{ scan.title }}</p>
+          </div>
+        </div>
       </div>
     </div>
   `,
@@ -72,6 +108,28 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly webglSupported = signal<boolean>(true);
     readonly isPaintingMode = signal<boolean>(false);
     readonly paintedStrokes = signal<THREE.Mesh[]>([]);
+    readonly showBloodFlow = signal<boolean>(false);
+
+    /** Computed: true when PatientStateService has AI anomaly highlights to render. */
+    readonly hasAiHighlights = computed(() => Object.keys(this.state.aiAnomalyHighlights()).length > 0);
+
+    /** Computed: diagnostic scans that are plausibly linked to the currently selected body part. */
+    readonly selectedPartScans = computed(() => {
+        const partId = this.state.selectedPartId();
+        if (!partId) return [];
+        const partName = this.getPartName(partId).toLowerCase();
+        const patient = this.patientManager.patients().find(
+            p => p.id === this.patientManager.selectedPatientId()
+        );
+        if (!patient?.scans) return [];
+        return patient.scans.filter(s =>
+            s.bodyPartId === partId ||
+            s.title?.toLowerCase().includes(partName.split(' ')[0]) ||
+            s.description?.toLowerCase().includes(partName.split(' ')[0]) ||
+            s.title?.toLowerCase().includes('markup') ||
+            s.title?.toLowerCase().includes('3d pathology')
+        ).slice(0, 5);
+    });
 
     private renderer!: THREE.WebGLRenderer;
     private scene!: THREE.Scene;
@@ -82,6 +140,60 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private raycaster = new THREE.Raycaster();
     private mouse = new THREE.Vector2();
     private animationFrameId?: number;
+
+    // --- Feature: AI Anomaly Overlay ---
+    private aiMarkers = new Map<string, THREE.Mesh>();
+    private anomalyPulseT = 0;
+
+    // --- Feature: Ghost Reference Overlay ---
+    private ghostGroup: THREE.Group | null = null;
+
+    // --- Feature: Blood Flow Particle System ---
+    private particles: THREE.Points | null = null;
+    private particlePositions: Float32Array | null = null;
+    private particleOffsets: Float32Array | null = null;
+    private particleT = 0;
+    private readonly PARTICLE_COUNT = 280;
+    // Simplified major arterial path: head → neck → chest → abdomen → pelvis → legs, plus arms
+    private readonly CIRCULATION_PATH: THREE.Vector3[] = [
+        new THREE.Vector3(0, 1.75, 0),    // head
+        new THREE.Vector3(0, 1.55, 0),    // neck
+        new THREE.Vector3(-0.05, 1.40, 0.05), // heart
+        new THREE.Vector3(-0.15, 1.30, 0), // left chest
+        new THREE.Vector3(0.15, 1.30, 0),  // right chest
+        new THREE.Vector3(0, 1.30, 0),     // chest center
+        new THREE.Vector3(-0.42, 1.15, 0), // l_arm
+        new THREE.Vector3(-0.50, 0.82, 0), // l_hand
+        new THREE.Vector3(-0.42, 1.15, 0), // back up
+        new THREE.Vector3(0, 1.30, 0),
+        new THREE.Vector3(0.42, 1.15, 0),  // r_arm
+        new THREE.Vector3(0.50, 0.82, 0),  // r_hand
+        new THREE.Vector3(0.42, 1.15, 0),
+        new THREE.Vector3(0, 1.30, 0),
+        new THREE.Vector3(0, 0.95, 0.05),  // abdomen
+        new THREE.Vector3(0, 0.70, 0),     // pelvis
+        new THREE.Vector3(-0.18, 0.35, 0), // l_thigh
+        new THREE.Vector3(-0.18, -0.25, 0),// l_shin
+        new THREE.Vector3(-0.18, -0.58, 0),// l_foot
+        new THREE.Vector3(-0.18, -0.25, 0),
+        new THREE.Vector3(-0.18, 0.35, 0),
+        new THREE.Vector3(0, 0.70, 0),
+        new THREE.Vector3(0.18, 0.35, 0),  // r_thigh
+        new THREE.Vector3(0.18, -0.25, 0), // r_shin
+        new THREE.Vector3(0.18, -0.58, 0), // r_foot
+        new THREE.Vector3(0.18, -0.25, 0),
+        new THREE.Vector3(0.18, 0.35, 0),
+        new THREE.Vector3(0, 0.70, 0),
+        new THREE.Vector3(0, 0.95, 0.05),
+        new THREE.Vector3(-0.05, 1.40, 0.05), // back to heart
+        new THREE.Vector3(0, 1.55, 0),     // neck
+        new THREE.Vector3(0, 1.75, 0),     // head
+    ];
+
+    // --- Feature: LOD Zoom Chain ---
+    private lodZoomTarget: { pos: THREE.Vector3; dist: number } | null = null;
+    private readonly LOD_DEFAULT_POS = new THREE.Vector3(0, 1.2, 5);
+    private readonly LOD_DEFAULT_TARGET = new THREE.Vector3(0, 1, 0);
 
     constructor() {
         // React to selection changes in the state
@@ -100,6 +212,25 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         effect(() => {
             const mode = this.anatomyViewMode();
             this.updateTransparency(mode);
+        });
+
+        // Feature 1: React to AI anomaly highlights
+        effect(() => {
+            const highlights = this.state.aiAnomalyHighlights();
+            this.updateAiAnomalyOverlay(highlights);
+        });
+
+        // Feature 3: React to ghost overlay toggle
+        effect(() => {
+            const show = this.state.showGhostOverlay();
+            this.updateGhostOverlay(show);
+        });
+
+        // Feature 5: React to blood flow toggle
+        effect(() => {
+            const active = this.showBloodFlow();
+            if (active) this.initBloodFlowParticles();
+            else this.destroyBloodFlowParticles();
         });
     }
 
@@ -498,8 +629,18 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     if (object && object.userData['id']) {
                         const id = object.userData['id'];
                         const name = this.getPartName(id);
-                        this.partSelected.emit({ id, name });
+                        // Feature 2 — LOD Zoom: second click on same part zooms in
+                        if (this.state.selectedPartId() === id) {
+                            this.triggerLodZoom(id);
+                        } else {
+                            // New part selected — reset zoom
+                            this.lodZoomTarget = null;
+                            this.partSelected.emit({ id, name });
+                        }
                     }
+                } else {
+                    // Clicked empty space — reset LOD zoom
+                    this.lodZoomTarget = null;
                 }
             }
         });
@@ -589,10 +730,179 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.togglePaintMode();
     }
 
+    /** Feature 1: AI Anomaly Overlay — create/update pulsing beacon spheres per highlighted part. */
+    private updateAiAnomalyOverlay(highlights: Record<string, 'critical' | 'moderate' | 'mild'>) {
+        if (!this.scene) return;
+        // Remove stale markers
+        this.aiMarkers.forEach((mesh, id) => {
+            if (!highlights[id]) {
+                this.scene.remove(mesh);
+                this.aiMarkers.delete(id);
+            }
+        });
+        // Add/update markers
+        Object.entries(highlights).forEach(([partId, severity]) => {
+            const group = this.parts.get(partId);
+            if (!group) return;
+            const color = severity === 'critical' ? 0xff2222 : severity === 'moderate' ? 0xff8800 : 0xffdd00;
+            if (!this.aiMarkers.has(partId)) {
+                const geo = new THREE.SphereGeometry(0.07, 12, 12);
+                const mat = new THREE.MeshStandardMaterial({
+                    color, emissive: new THREE.Color(color), emissiveIntensity: 1.5,
+                    transparent: true, opacity: 0.85, depthTest: false
+                });
+                const marker = new THREE.Mesh(geo, mat);
+                // Position above the part's world center
+                const box = new THREE.Box3().setFromObject(group);
+                const center = box.getCenter(new THREE.Vector3());
+                marker.position.copy(center).add(new THREE.Vector3(0, 0.12, 0.12));
+                marker.renderOrder = 999;
+                this.scene.add(marker);
+                this.aiMarkers.set(partId, marker);
+            } else {
+                (this.aiMarkers.get(partId)!.material as THREE.MeshStandardMaterial).color.setHex(color);
+                (this.aiMarkers.get(partId)!.material as THREE.MeshStandardMaterial).emissive.setHex(color);
+            }
+        });
+    }
+
+    /** Feature 3: Ghost Reference Overlay — build/remove semi-transparent reference mannequin. */
+    private updateGhostOverlay(show: boolean) {
+        if (!this.scene) return;
+        if (!show) {
+            if (this.ghostGroup) { this.scene.remove(this.ghostGroup); this.ghostGroup = null; }
+            return;
+        }
+        if (this.ghostGroup) return; // already built
+        const ghostMat = new THREE.MeshStandardMaterial({
+            color: 0x99aaff, transparent: true, opacity: 0.10, depthWrite: false, side: THREE.FrontSide
+        });
+        this.ghostGroup = new THREE.Group();
+        this.ghostGroup.scale.set(1.04, 1.02, 1.04); // slight aura offset
+        // Clone each skin mesh from the mannequin group
+        this.parts.forEach((group) => {
+            group.children.forEach(child => {
+                if (child instanceof THREE.Mesh && child.userData['layer'] === 'skin') {
+                    const clone = new THREE.Mesh(child.geometry, ghostMat.clone());
+                    clone.position.copy(child.getWorldPosition(new THREE.Vector3()));
+                    clone.rotation.copy(child.rotation);
+                    this.ghostGroup!.add(clone);
+                }
+            });
+        });
+        this.scene.add(this.ghostGroup);
+    }
+
+    /** Feature 5: Initialize blood flow particle system. */
+    private initBloodFlowParticles() {
+        if (!this.scene || this.particles) return;
+        const geo = new THREE.BufferGeometry();
+        const positions = new Float32Array(this.PARTICLE_COUNT * 3);
+        const offsets = new Float32Array(this.PARTICLE_COUNT); // each particle's [0,1) position along the path
+        const pathLen = this.CIRCULATION_PATH.length;
+        for (let i = 0; i < this.PARTICLE_COUNT; i++) {
+            offsets[i] = (i / this.PARTICLE_COUNT);
+            const t = offsets[i] * (pathLen - 1);
+            const segIdx = Math.floor(t);
+            const frac = t - segIdx;
+            const a = this.CIRCULATION_PATH[Math.min(segIdx, pathLen - 1)];
+            const b = this.CIRCULATION_PATH[Math.min(segIdx + 1, pathLen - 1)];
+            positions[i * 3]     = a.x + (b.x - a.x) * frac;
+            positions[i * 3 + 1] = a.y + (b.y - a.y) * frac;
+            positions[i * 3 + 2] = a.z + (b.z - a.z) * frac;
+        }
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const mat = new THREE.PointsMaterial({ color: 0xff3333, size: 0.018, transparent: true, opacity: 0.82, sizeAttenuation: true });
+        this.particles = new THREE.Points(geo, mat);
+        this.particlePositions = positions;
+        this.particleOffsets = offsets;
+        this.scene.add(this.particles);
+    }
+
+    /** Feature 5: Remove blood flow particle system. */
+    private destroyBloodFlowParticles() {
+        if (this.particles && this.scene) {
+            this.scene.remove(this.particles);
+            this.particles.geometry.dispose();
+            this.particles = null;
+            this.particlePositions = null;
+            this.particleOffsets = null;
+        }
+    }
+
+    /** Feature 5: Advance particles along the circulation path each frame. */
+    private tickBloodFlowParticles(hrBpm: number) {
+        if (!this.particles || !this.particlePositions || !this.particleOffsets) return;
+        const speed = (hrBpm > 0 ? hrBpm : 72) / 72 * 0.0008; // normalised to 72 bpm
+        const pathLen = this.CIRCULATION_PATH.length;
+        for (let i = 0; i < this.PARTICLE_COUNT; i++) {
+            this.particleOffsets[i] = (this.particleOffsets[i] + speed) % 1;
+            const t = this.particleOffsets[i] * (pathLen - 1);
+            const segIdx = Math.floor(t);
+            const frac = t - segIdx;
+            const a = this.CIRCULATION_PATH[Math.min(segIdx, pathLen - 1)];
+            const b = this.CIRCULATION_PATH[Math.min(segIdx + 1, pathLen - 1)];
+            this.particlePositions[i * 3]     = a.x + (b.x - a.x) * frac;
+            this.particlePositions[i * 3 + 1] = a.y + (b.y - a.y) * frac;
+            this.particlePositions[i * 3 + 2] = a.z + (b.z - a.z) * frac;
+        }
+        (this.particles.geometry.attributes['position'] as THREE.BufferAttribute).needsUpdate = true;
+    }
+
+    /** Feature 2: LOD Zoom — trigger camera tween toward a part. */
+    private triggerLodZoom(partId: string) {
+        const group = this.parts.get(partId);
+        if (!group) return;
+        const box = new THREE.Box3().setFromObject(group);
+        const center = box.getCenter(new THREE.Vector3());
+        this.lodZoomTarget = { pos: center, dist: 1.5 };
+    }
+
+    /** Feature 2/5 public toggles */
+    toggleBloodFlow() { this.showBloodFlow.update(v => !v); }
+
+    /** Feature 6: Open a diagnostic scan — requests research frame with image or OHIF. */
+    openScan(scan: DiagnosticScan) {
+        if (scan.imageUrl) {
+            this.state.requestResearchUrl(scan.imageUrl);
+        }
+    }
+
     private startAnimation() {
         const animate = () => {
             this.animationFrameId = requestAnimationFrame(animate);
             this.controls.update();
+
+            // Feature 1: Pulse AI anomaly markers
+            this.anomalyPulseT += 0.04;
+            this.aiMarkers.forEach(mesh => {
+                const mat = mesh.material as THREE.MeshStandardMaterial;
+                mat.emissiveIntensity = 1.0 + 0.7 * Math.sin(this.anomalyPulseT);
+                mat.opacity = 0.6 + 0.25 * Math.abs(Math.sin(this.anomalyPulseT * 0.7));
+            });
+
+            // Feature 2: LOD camera lerp
+            if (this.lodZoomTarget) {
+                const { pos, dist } = this.lodZoomTarget;
+                const targetCamPos = pos.clone().add(new THREE.Vector3(0, 0, dist));
+                this.camera.position.lerp(targetCamPos, 0.06);
+                this.controls.target.lerp(pos, 0.06);
+            } else {
+                // Gradually reset to default if no target
+                const distFromDefault = this.camera.position.distanceTo(this.LOD_DEFAULT_POS);
+                if (distFromDefault > 0.3) {
+                    this.camera.position.lerp(this.LOD_DEFAULT_POS, 0.02);
+                    this.controls.target.lerp(this.LOD_DEFAULT_TARGET, 0.02);
+                }
+            }
+
+            // Feature 5: Blood flow particles
+            if (this.showBloodFlow()) {
+                const hrStr = this.state.vitals().hr || '72';
+                const hrBpm = parseFloat(hrStr.replace(/[^0-9.]/g, '')) || 72;
+                this.tickBloodFlowParticles(hrBpm);
+            }
+
             this.renderer.render(this.scene, this.camera);
         };
         animate();

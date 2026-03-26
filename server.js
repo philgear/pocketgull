@@ -177,6 +177,7 @@ app.use(express.json({ limit: '1mb' }));
 const ALLOWED_CONFIG_ORIGINS = [
   'https://pocketgull.app',
   'https://www.pocketgull.app',
+  'https://secure.pocketgull.app',
   'http://localhost:4200',
   'http://localhost:8080',
 ];

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const testsDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: '.',
   outputDir: path.join(testsDir, 'test-results'),
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
