@@ -1781,6 +1781,8 @@ export class AppComponent implements OnDestroy {
     }
   }
 
+  private mcpControllers: { name: string, controller: AbortController }[] = [];
+
   constructor() {
     const swUpdate = inject(SwUpdate, { optional: true });
     if (swUpdate && swUpdate.isEnabled) {
@@ -1835,11 +1837,14 @@ export class AppComponent implements OnDestroy {
       window.addEventListener('resize', this.boundOnWindowResize);
 
       // Initialize WebMCP Polyfill
-      initializeWebMCPPolyfill();
+      if (!navigator.modelContext) {
+        initializeWebMCPPolyfill();
+      }
 
       if (navigator.modelContext) {
         // Register generate_medical_summary
-        navigator.modelContext.registerTool({
+        const sumCtrl = new AbortController();
+        const sumTool = {
           name: 'generate_medical_summary',
           description: 'Generates a medical summary for the current patient based on the provided clinical notes and current patient data.',
           inputSchema: {
@@ -1860,10 +1865,13 @@ export class AppComponent implements OnDestroy {
               };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(sumTool, { signal: sumCtrl.signal });
+        this.mcpControllers.push({ name: sumTool.name, controller: sumCtrl });
 
         // Register translate_clinical_text
-        navigator.modelContext.registerTool({
+        const transCtrl = new AbortController();
+        const transTool = {
           name: 'translate_clinical_text',
           description: 'Translates a clinical text to a specific reading level (e.g. simplified, child, dyslexia).',
           inputSchema: {
@@ -1891,10 +1899,13 @@ export class AppComponent implements OnDestroy {
               };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(transTool, { signal: transCtrl.signal });
+        this.mcpControllers.push({ name: transTool.name, controller: transCtrl });
 
         // Register get_current_patient_data
-        navigator.modelContext.registerTool({
+        const pdataCtrl = new AbortController();
+        const pdataTool = {
           name: 'get_current_patient_data',
           description: 'Retrieves the current patient data context being viewed in the application.',
           inputSchema: {
@@ -1907,10 +1918,13 @@ export class AppComponent implements OnDestroy {
               content: [{ type: 'text', text: JSON.stringify(patientData, null, 2) }]
             };
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(pdataTool, { signal: pdataCtrl.signal });
+        this.mcpControllers.push({ name: pdataTool.name, controller: pdataCtrl });
 
         // Register navigate_to_body_part
-        navigator.modelContext.registerTool({
+        const navCtrl = new AbortController();
+        const navTool = {
           name: 'navigate_to_body_part',
           description: 'Navigates the UI to focus on a specific body part and opens the analysis tab.',
           inputSchema: {
@@ -1935,10 +1949,13 @@ export class AppComponent implements OnDestroy {
               return { content: [{ type: 'text', text: `Failed to navigate: ${e.message}` }], isError: true };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(navTool, { signal: navCtrl.signal });
+        this.mcpControllers.push({ name: navTool.name, controller: navCtrl });
 
         // Register inject_clinical_note
-        navigator.modelContext.registerTool({
+        const injectCtrl = new AbortController();
+        const injectTool = {
           name: 'inject_clinical_note',
           description: 'Injects structured clinical data (a note) for a specific body part.',
           inputSchema: {
@@ -1975,10 +1992,13 @@ export class AppComponent implements OnDestroy {
               return { content: [{ type: 'text', text: `Failed to inject note: ${e.message}` }], isError: true };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(injectTool, { signal: injectCtrl.signal });
+        this.mcpControllers.push({ name: injectTool.name, controller: injectCtrl });
 
         // Register trigger_sync
-        navigator.modelContext.registerTool({
+        const syncCtrl = new AbortController();
+        const syncTool = {
           name: 'trigger_sync',
           description: 'Triggers a data sync to the mobile application cloud backend.',
           inputSchema: { type: 'object', properties: {} },
@@ -1992,10 +2012,13 @@ export class AppComponent implements OnDestroy {
               return { content: [{ type: 'text', text: `Failed to initiate sync: ${e.message}` }], isError: true };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(syncTool, { signal: syncCtrl.signal });
+        this.mcpControllers.push({ name: syncTool.name, controller: syncCtrl });
 
         // Register research_clinical_term
-        navigator.modelContext.registerTool({
+        const researchCtrl = new AbortController();
+        const researchTool = {
           name: 'research_clinical_term',
           description: 'Initiates a deep search for a clinical term or question in the Research Frame.',
           inputSchema: {
@@ -2015,10 +2038,13 @@ export class AppComponent implements OnDestroy {
               return { content: [{ type: 'text', text: `Failed to initiate research: ${e.message}` }], isError: true };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(researchTool, { signal: researchCtrl.signal });
+        this.mcpControllers.push({ name: researchTool.name, controller: researchCtrl });
 
         // Register load_research_url
-        navigator.modelContext.registerTool({
+        const loadUrlCtrl = new AbortController();
+        const loadUrlTool = {
           name: 'load_research_url',
           description: 'Loads a specific URL into the Research Frame (e.g., from a previous search result).',
           inputSchema: {
@@ -2039,10 +2065,13 @@ export class AppComponent implements OnDestroy {
               return { content: [{ type: 'text', text: `Failed to load URL: ${e.message}` }], isError: true };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(loadUrlTool, { signal: loadUrlCtrl.signal });
+        this.mcpControllers.push({ name: loadUrlTool.name, controller: loadUrlCtrl });
 
         // Register add_research_bookmark
-        navigator.modelContext.registerTool({
+        const bmkCtrl = new AbortController();
+        const bmkTool = {
           name: 'add_research_bookmark',
           description: "Pre-stages a relevant literature link in the patient's bookmarks.",
           inputSchema: {
@@ -2074,7 +2103,9 @@ export class AppComponent implements OnDestroy {
               return { content: [{ type: 'text', text: `Failed to add bookmark: ${e.message}` }], isError: true };
             }
           }
-        });
+        };
+        (navigator.modelContext as any).registerTool(bmkTool, { signal: bmkCtrl.signal });
+        this.mcpControllers.push({ name: bmkTool.name, controller: bmkCtrl });
       }
     });
 
@@ -2092,6 +2123,14 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (navigator.modelContext) {
+      this.mcpControllers.forEach(item => {
+        (navigator.modelContext as any).unregisterTool?.(item.name);
+        item.controller.abort();
+      });
+      this.mcpControllers = [];
+    }
+
     if (this.boundOnWindowResize) {
       window.removeEventListener('resize', this.boundOnWindowResize);
     }
