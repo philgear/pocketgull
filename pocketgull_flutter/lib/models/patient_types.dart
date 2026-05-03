@@ -92,12 +92,54 @@ class DiagnosticScan extends Equatable {
   List<Object?> get props => [id, type, title, date, bodyPartId, description, status, imageUrl];
 }
 
+class ClinicalNote extends Equatable {
+  final String id;
+  final String text;
+  final String sourceLens;
+  final String date;
+
+  const ClinicalNote({
+    required this.id,
+    required this.text,
+    required this.sourceLens,
+    required this.date,
+  });
+
+  @override
+  List<Object?> get props => [id, text, sourceLens, date];
+}
+
+class ChecklistItem extends Equatable {
+  final String id;
+  final String text;
+  final bool completed;
+
+  const ChecklistItem({
+    required this.id,
+    required this.text,
+    required this.completed,
+  });
+
+  ChecklistItem copyWith({String? text, bool? completed}) {
+    return ChecklistItem(
+      id: id,
+      text: text ?? this.text,
+      completed: completed ?? this.completed,
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, text, completed];
+}
+
 class PatientState extends Equatable {
   final Map<String, List<BodyPartIssue>> issues;
   final String patientGoals;
   final PatientVitals vitals;
   final List<DiagnosticScan> scans;
   final String? selectedPartId;
+  final List<ClinicalNote>? clinicalNotes;
+  final List<ChecklistItem>? checklist;
 
   const PatientState({
     required this.issues,
@@ -105,10 +147,12 @@ class PatientState extends Equatable {
     required this.vitals,
     this.scans = const [],
     this.selectedPartId,
+    this.clinicalNotes = const [],
+    this.checklist = const [],
   });
 
   @override
-  List<Object?> get props => [issues, patientGoals, vitals, scans, selectedPartId];
+  List<Object?> get props => [issues, patientGoals, vitals, scans, selectedPartId, clinicalNotes, checklist];
 
   PatientState copyWith({
     Map<String, List<BodyPartIssue>>? issues,
@@ -116,6 +160,8 @@ class PatientState extends Equatable {
     PatientVitals? vitals,
     List<DiagnosticScan>? scans,
     String? selectedPartId,
+    List<ClinicalNote>? clinicalNotes,
+    List<ChecklistItem>? checklist,
   }) {
     return PatientState(
       issues: issues ?? this.issues,
@@ -123,8 +169,154 @@ class PatientState extends Equatable {
       vitals: vitals ?? this.vitals,
       scans: scans ?? this.scans,
       selectedPartId: selectedPartId ?? this.selectedPartId,
+      clinicalNotes: clinicalNotes ?? this.clinicalNotes,
+      checklist: checklist ?? this.checklist,
     );
   }
+}
+
+class Bookmark extends Equatable {
+  final String title;
+  final String url;
+  final String? authors;
+  final String? doi;
+  final String? publicationDate;
+  final String? publisher;
+  final bool? isPeerReviewed;
+  final bool? cited;
+
+  const Bookmark({
+    required this.title,
+    required this.url,
+    this.authors,
+    this.doi,
+    this.publicationDate,
+    this.publisher,
+    this.isPeerReviewed,
+    this.cited,
+  });
+
+  @override
+  List<Object?> get props => [title, url, authors, doi, publicationDate, publisher, isPeerReviewed, cited];
+}
+
+sealed class HistoryEntry extends Equatable {
+  final String type;
+  final String date;
+  final String summary;
+
+  const HistoryEntry({
+    required this.type,
+    required this.date,
+    required this.summary,
+  });
+
+  @override
+  List<Object?> get props => [type, date, summary];
+}
+
+class VisitHistoryEntry extends HistoryEntry {
+  final PatientState state;
+
+  const VisitHistoryEntry({
+    required super.date,
+    required super.summary,
+    required this.state,
+  }) : super(type: 'Visit');
+
+  @override
+  List<Object?> get props => [...super.props, state];
+}
+
+class ChartArchivedHistoryEntry extends HistoryEntry {
+  final PatientState state;
+
+  const ChartArchivedHistoryEntry({
+    required super.date,
+    required super.summary,
+    required this.state,
+  }) : super(type: 'ChartArchived');
+
+  @override
+  List<Object?> get props => [...super.props, state];
+}
+
+class PatientSummaryUpdateHistoryEntry extends HistoryEntry {
+  const PatientSummaryUpdateHistoryEntry({
+    required super.date,
+    required super.summary,
+  }) : super(type: 'PatientSummaryUpdate');
+}
+
+class BookmarkAddedHistoryEntry extends HistoryEntry {
+  final Bookmark bookmark;
+
+  const BookmarkAddedHistoryEntry({
+    required super.date,
+    required super.summary,
+    required this.bookmark,
+  }) : super(type: 'BookmarkAdded');
+
+  @override
+  List<Object?> get props => [...super.props, bookmark];
+}
+
+class NoteCreatedHistoryEntry extends HistoryEntry {
+  final String partId;
+  final String noteId;
+
+  const NoteCreatedHistoryEntry({
+    required super.date,
+    required super.summary,
+    required this.partId,
+    required this.noteId,
+  }) : super(type: 'NoteCreated');
+
+  @override
+  List<Object?> get props => [...super.props, partId, noteId];
+}
+
+class NoteDeletedHistoryEntry extends HistoryEntry {
+  final String partId;
+  final String noteId;
+
+  const NoteDeletedHistoryEntry({
+    required super.date,
+    required super.summary,
+    required this.partId,
+    required this.noteId,
+  }) : super(type: 'NoteDeleted');
+
+  @override
+  List<Object?> get props => [...super.props, partId, noteId];
+}
+
+class AnalysisRunHistoryEntry extends HistoryEntry {
+  final Map<String, String> report;
+
+  const AnalysisRunHistoryEntry({
+    required super.date,
+    required super.summary,
+    required this.report,
+  }) : super(type: 'AnalysisRun');
+
+  @override
+  List<Object?> get props => [...super.props, report];
+}
+
+class FinalizedPatientSummaryHistoryEntry extends HistoryEntry {
+  final Map<String, String> report;
+  final Map<String, dynamic> annotations;
+
+  const FinalizedPatientSummaryHistoryEntry({
+    required super.date,
+    required super.summary,
+    required this.report,
+    required this.annotations,
+  }) : super(type: 'FinalizedPatientSummary');
+
+  @override
+  List<Object?> get props => [...super.props, report, annotations];
 }
 
 class Patient extends PatientState {
@@ -134,8 +326,8 @@ class Patient extends PatientState {
   final String gender;
   final String lastVisit;
   final List<String> preexistingConditions;
-  final List<dynamic> history;
-  final List<dynamic> bookmarks;
+  final List<HistoryEntry> history;
+  final List<Bookmark> bookmarks;
 
   const Patient({
     required this.id,
@@ -160,6 +352,8 @@ class Patient extends PatientState {
         gender,
         lastVisit,
         preexistingConditions,
+        history,
+        bookmarks,
         ...super.props,
       ];
 }

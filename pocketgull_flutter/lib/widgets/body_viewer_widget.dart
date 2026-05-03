@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/patient/patient_bloc.dart';
 import '../blocs/patient/patient_event.dart';
 import '../models/patient_types.dart';
+import '../utils/web_message_handler.dart';
 
 class BodyViewerWidget extends StatefulWidget {
   const BodyViewerWidget({super.key});
@@ -21,10 +23,11 @@ class _BodyViewerWidgetState extends State<BodyViewerWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..setNavigationDelegate(
+    _controller = WebViewController();
+    if (!kIsWeb) {
+      _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+      _controller.setBackgroundColor(const Color(0x00000000));
+      _controller.setNavigationDelegate(
         NavigationDelegate(
           onPageFinished: (String url) {
             setState(() {
@@ -33,8 +36,8 @@ class _BodyViewerWidgetState extends State<BodyViewerWidget> {
             _syncViewerState(context.read<PatientBloc>().state);
           },
         ),
-      )
-      ..addJavaScriptChannel(
+      );
+      _controller.addJavaScriptChannel(
         'PocketGullChannel',
         onMessageReceived: (JavaScriptMessage message) {
           try {
@@ -47,6 +50,20 @@ class _BodyViewerWidgetState extends State<BodyViewerWidget> {
           }
         },
       );
+    } else {
+      // Web fallback: assume ready
+      _isWebViewReady = true;
+      setupWebMessageListener((String message) {
+        try {
+          final data = jsonDecode(message);
+          if (data['id'] != null) {
+            context.read<PatientBloc>().add(SelectPartEvent(data['id']));
+          }
+        } catch (e) {
+          // ignore parsing errors from non-json messages
+        }
+      });
+    }
 
     _loadHtmlAsset();
   }

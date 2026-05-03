@@ -210,8 +210,11 @@
                             const name = getPartName(id);
                             
                             // Send message to Flutter using the registered channel
+                            const msgStr = JSON.stringify({ id: id, name: name });
                             if (window.PocketGullChannel) {
-                                window.PocketGullChannel.postMessage(JSON.stringify({ id: id, name: name }));
+                                window.PocketGullChannel.postMessage(msgStr);
+                            } else {
+                                window.parent.postMessage(msgStr, '*');
                             }
                         }
                     }
