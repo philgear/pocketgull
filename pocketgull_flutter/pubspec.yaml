@@ -48,6 +48,9 @@ dependencies:
   crypto: ^3.0.7
   ditredi: ^2.0.2
   webview_flutter_web: ^0.2.3+4
+  mediapipe_genai: ^0.0.1-dev.2
+  path_provider: ^2.1.5
+  flutter_markdown: ^0.7.3+1
 
 dev_dependencies:
   flutter_test:
@@ -73,7 +76,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/3d_viewer/
+    - assets/models/
+    - assets/docs/
+    - assets/docs/images/
+    - assets/images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

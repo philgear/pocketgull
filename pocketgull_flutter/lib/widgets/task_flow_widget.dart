@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/patient/patient_bloc.dart';
+import '../blocs/patient/patient_event.dart';
 import '../models/patient_types.dart';
 
 class TaskFlowWidget extends StatefulWidget {
@@ -16,7 +18,7 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
   void _submitNote() {
     final text = _inputController.text.trim();
     if (text.isEmpty) return;
-    
+
     // In a real app, dispatch an AddClinicalNote event to PatientBloc
     // For now, we'll just clear the text to simulate
     _inputController.clear();
@@ -61,11 +63,18 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade50.withOpacity(0.5),
-                  border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade100),
+                  ),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(12),
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,12 +84,21 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                       children: [
                         const Text(
                           'ACTIVE TASK',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF416B1F), letterSpacing: 2.0),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF416B1F),
+                            letterSpacing: 2.0,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         const Text(
                           'Clinical Tasks & Notes',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500, color: Color(0xFF1C1C1C)),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF1C1C1C),
+                          ),
                         ),
                       ],
                     ),
@@ -88,7 +106,10 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(16),
@@ -100,7 +121,12 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                               SizedBox(width: 4),
                               Text(
                                 'LIVE',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green, letterSpacing: 1.0),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                  letterSpacing: 1.0,
+                                ),
                               ),
                             ],
                           ),
@@ -108,7 +134,12 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                         const SizedBox(height: 8),
                         Text(
                           '${notes.length} Notes • ${tasks.length} Tasks',
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.5),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                            letterSpacing: 1.5,
+                          ),
                         ),
                       ],
                     ),
@@ -117,45 +148,72 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
               ),
 
               // Content List
-              Expanded(
-                child: Container(
-                  color: const Color(0xFFF9FAFB),
-                  padding: const EdgeInsets.all(24),
-                  child: notes.isEmpty && tasks.isEmpty
-                      ? const Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.assignment_outlined, size: 48, color: Colors.grey),
-                              SizedBox(height: 16),
-                              Text(
-                                'No notes or tasks yet.\nAdd items using the input below.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: 1.5, height: 1.5),
-                              ),
-                            ],
-                          ),
-                        )
-                      : ListView(
+              Container(
+                color: const Color(0xFFF9FAFB),
+                padding: const EdgeInsets.all(24),
+                child: notes.isEmpty && tasks.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 48),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            if (tasks.isNotEmpty) ...[
-                              const Padding(
-                                padding: EdgeInsets.only(bottom: 12.0, left: 4),
-                                child: Text('TASKS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 2.0)),
+                            Icon(
+                              Icons.assignment_outlined,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'No notes or tasks yet.\nAdd items using the input below.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                                letterSpacing: 1.5,
+                                height: 1.5,
                               ),
-                              ...tasks.map((task) => _buildTaskItem(task)),
-                              const SizedBox(height: 24),
-                            ],
-                            if (notes.isNotEmpty) ...[
-                              const Padding(
-                                padding: EdgeInsets.only(bottom: 12.0, left: 4),
-                                child: Text('NOTES', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 2.0)),
-                              ),
-                              ...notes.map((note) => _buildNoteItem(note)),
-                            ],
+                            ),
                           ],
                         ),
-                ),
+                      )
+                    : ListView(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          if (tasks.isNotEmpty) ...[
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 12.0, left: 4),
+                              child: Text(
+                                'TASKS',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                  letterSpacing: 2.0,
+                                ),
+                              ),
+                            ),
+                            ...tasks.map((task) => _buildTaskItem(context, task)),
+                            const SizedBox(height: 24),
+                          ],
+                          if (notes.isNotEmpty) ...[
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 12.0, left: 4),
+                              child: Text(
+                                'NOTES',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                  letterSpacing: 2.0,
+                                ),
+                              ),
+                            ),
+                            ...notes.map((note) => _buildNoteItem(note)),
+                          ],
+                        ],
+                      ),
               ),
 
               // Input Area
@@ -164,7 +222,9 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border(top: BorderSide(color: Colors.grey.shade100)),
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(12),
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -174,7 +234,10 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                       minLines: 1,
                       decoration: InputDecoration(
                         hintText: 'Type a clinical note or task...',
-                        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                        hintStyle: TextStyle(
+                          color: Colors.grey.shade400,
+                          fontSize: 14,
+                        ),
                         filled: true,
                         fillColor: Colors.grey.shade50,
                         border: OutlineInputBorder(
@@ -187,9 +250,14 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(color: Color(0xFF416B1F)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF416B1F),
+                          ),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                       onSubmitted: (_) => _submitTask(),
                     ),
@@ -205,20 +273,37 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                             foregroundColor: Colors.grey.shade700,
                             side: BorderSide(color: Colors.grey.shade200),
                             backgroundColor: Colors.grey.shade100,
-                            textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            textStyle: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
                           onPressed: _submitTask,
-                          icon: const Icon(Icons.check_circle_outline, size: 16),
+                          icon: const Icon(
+                            Icons.check_circle_outline,
+                            size: 16,
+                          ),
                           label: const Text('ADD TASK'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1C1C1C),
                             foregroundColor: Colors.white,
-                            textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            textStyle: const TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ],
@@ -233,42 +318,110 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
     );
   }
 
-  Widget _buildTaskItem(ChecklistItem task) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Checkbox(
-            value: task.completed,
-            onChanged: (val) {},
-            activeColor: const Color(0xFF416B1F),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+  Widget _buildTaskItem(BuildContext context, ChecklistItem task) {
+    final bool isAdded = task.status == BracketingState.added;
+    final bool isRemoved = task.status == BracketingState.removed;
+
+    return GestureDetector(
+      onDoubleTap: () {
+        HapticFeedback.lightImpact();
+        context.read<PatientBloc>().add(ToggleChecklistStatusEvent(task.id));
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isAdded 
+              ? const Color(0xFFF1F8E9) 
+              : (isRemoved ? Colors.grey.shade50 : Colors.white),
+          border: Border.all(
+            color: isAdded 
+                ? const Color(0xFF76B362) 
+                : (isRemoved ? Colors.grey.shade300 : Colors.grey.shade200),
+            width: isAdded ? 2 : 1,
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 12.0),
-              child: Text(
-                task.text,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: task.completed ? Colors.grey : const Color(0xFF1C1C1C),
-                  decoration: task.completed ? TextDecoration.lineThrough : null,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isAdded ? [
+            BoxShadow(
+              color: const Color(0xFF76B362).withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            )
+          ] : null,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Status Indicator
+            Container(
+              margin: const EdgeInsets.only(top: 2),
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: isAdded 
+                    ? const Color(0xFF76B362) 
+                    : (isRemoved ? Colors.grey.shade300 : Colors.white),
+                border: Border.all(
+                  color: isAdded 
+                      ? const Color(0xFF76B362) 
+                      : (isRemoved ? Colors.grey.shade300 : Colors.grey.shade300),
                 ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isAdded ? Icons.check : (isRemoved ? Icons.close : null),
+                size: 14,
+                color: Colors.white,
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.close, size: 16, color: Colors.grey),
-            onPressed: () {}, // Remove task
-          ),
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    task.text,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isAdded ? FontWeight.bold : FontWeight.normal,
+                      color: isRemoved ? Colors.grey : const Color(0xFF1C1C1C),
+                      decoration: isRemoved ? TextDecoration.lineThrough : null,
+                      height: 1.4,
+                    ),
+                  ),
+                  if (isAdded) ...[
+                    const SizedBox(height: 8),
+                    const Row(
+                      children: [
+                        Text(
+                          'ADDED TO PLAN',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF416B1F),
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else if (isRemoved) ...[
+                    const SizedBox(height: 8),
+                    const Text(
+                      'DISMISSED',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -296,7 +449,12 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                 ),
                 child: Text(
                   note.sourceLens.toUpperCase(),
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF416B1F), letterSpacing: 1.5),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF416B1F),
+                    letterSpacing: 1.5,
+                  ),
                 ),
               ),
               IconButton(
@@ -310,7 +468,12 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
           const SizedBox(height: 12),
           Text(
             note.text,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF1C1C1C), height: 1.5, fontWeight: FontWeight.w500),
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF1C1C1C),
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: 16),
           const Divider(height: 1, color: Color(0xFFEEEEEE)),
@@ -320,13 +483,26 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
             children: [
               Text(
                 note.date, // In a real app format Date
-                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.5),
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                  letterSpacing: 1.5,
+                ),
               ),
               const Row(
                 children: [
                   Icon(Icons.check, size: 12, color: Colors.teal),
                   SizedBox(width: 4),
-                  Text('LOGGED', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF1C1C1C), letterSpacing: 1.5)),
+                  Text(
+                    'LOGGED',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1C1C1C),
+                      letterSpacing: 1.5,
+                    ),
+                  ),
                 ],
               ),
             ],

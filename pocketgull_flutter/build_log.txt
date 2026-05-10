@@ -1,0 +1,330 @@
+[  +37 ms] Unable to locate an Android SDK.
+[   +4 ms] executing: uname -m
+[   +3 ms] Exit code 0 from: uname -m
+[        ] x86_64
+[   +9 ms] Artifact Instance of 'MaterialFonts' is not required, skipping update.
+[        ] Artifact Instance of 'GradleWrapper' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterSdk' is not required, skipping update.
+[        ] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FontSubsetArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'PubDependencies' is not required, skipping update.
+[   +1 ms] executing: [/home/phil/snap/flutter/common/flutter/] git -c log.showSignature=false log HEAD -n 1 --pretty=format:%ad --date=iso
+[   +4 ms] Exit code 0 from: git -c log.showSignature=false log HEAD -n 1 --pretty=format:%ad --date=iso
+[        ] 2026-04-29 10:03:19 -0700
+[  +17 ms] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterWebSdk' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterEngineStamp' is not required, skipping update.
+[        ] Artifact Instance of 'LegacyCanvasKitRemover' is not required, skipping update.
+[   +1 ms] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[  +38 ms] Artifact Instance of 'MaterialFonts' is not required, skipping update.
+[        ] Artifact Instance of 'GradleWrapper' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidGenSnapshotArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'AndroidInternalBuildArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterEngineStamp' is not required, skipping update.
+[   +1 ms] Artifact Instance of 'FlutterSdk' is not required, skipping update.
+[        ] Artifact Instance of 'WindowsEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxEngineArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'LinuxFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'MacOSFuchsiaSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerSDKArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FlutterRunnerDebugSymbols' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'IosUsbArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'FontSubsetArtifacts' is not required, skipping update.
+[        ] Artifact Instance of 'PubDependencies' is not required, skipping update.
+[  +41 ms] executing: [/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/] /home/phil/snap/flutter/common/flutter/bin/cache/dart-sdk/bin/dart pub --suppress-analytics --directory . get --example
+Resolving dependencies...
+Downloading packages...
+  cli_config 0.1.2 (0.2.0 available)
+  flutter_markdown 0.7.7+1 (discontinued replaced by flutter_markdown_plus)
+  matcher 0.12.19 (0.12.20 available)
+  meta 1.17.0 (1.18.2 available)
+  native_assets_cli 0.3.2 (0.18.0 available)
+  native_toolchain_c 0.3.3 (0.18.0 available)
+  path_provider_foundation 2.5.1 (2.6.0 available)
+  test_api 0.7.10 (0.7.12 available)
+  vector_math 2.2.0 (2.3.0 available)
+  xml 6.6.1 (7.0.1 available)
+Got dependencies!
+1 package is discontinued.
+9 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+[+1412 ms] Found plugin webview_flutter_web at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_web-0.2.3+4/
+[  +10 ms] Found plugin webview_flutter at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter-4.13.1/
+[   +2 ms] Found plugin webview_flutter_wkwebview at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-3.25.1/
+[   +3 ms] Found plugin webview_flutter_android at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_android-4.12.0/
+[   +2 ms] Found plugin speech_to_text at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text-7.3.0/
+[   +3 ms] Found plugin speech_to_text_windows at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text_windows-1.0.0+beta.8/
+[   +5 ms] Found plugin shared_preferences at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences-2.5.5/
+[   +1 ms] Found plugin shared_preferences_windows at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1/
+[   +2 ms] Found plugin path_provider_windows at /home/phil/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +5 ms] Found plugin shared_preferences_web at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3/
+[   +1 ms] Found plugin shared_preferences_linux at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1/
+[   +2 ms] Found plugin path_provider_linux at /home/phil/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +4 ms] Found plugin shared_preferences_foundation at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6/
+[   +1 ms] Found plugin shared_preferences_android at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.23/
+[   +2 ms] Found plugin printing at /home/phil/.pub-cache/hosted/pub.dev/printing-5.14.3/
+[  +16 ms] Found plugin path_provider at /home/phil/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[   +1 ms] Found plugin path_provider_foundation at /home/phil/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/
+[   +1 ms] Found plugin path_provider_android at /home/phil/.pub-cache/hosted/pub.dev/path_provider_android-2.3.1/
+[   +2 ms] Found plugin jni_flutter at /home/phil/.pub-cache/hosted/pub.dev/jni_flutter-1.0.1/
+[   +1 ms] Found plugin jni at /home/phil/.pub-cache/hosted/pub.dev/jni-1.0.0/
+[  +15 ms] Found plugin flutter_tts at /home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/
+[   +7 ms] Found plugin flutter_inappwebview at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview-6.1.5/
+[   +1 ms] Found plugin flutter_inappwebview_windows at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_windows-0.6.0/
+[   +2 ms] Found plugin flutter_inappwebview_web at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_web-1.1.2/
+[   +1 ms] Found plugin flutter_inappwebview_macos at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_macos-1.1.2/
+[   +1 ms] Found plugin flutter_inappwebview_ios at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/
+[   +1 ms] Found plugin flutter_inappwebview_android at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_android-1.1.3/
+[  +45 ms] Found plugin webview_flutter_web at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_web-0.2.3+4/
+[   +3 ms] Found plugin webview_flutter at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter-4.13.1/
+[   +1 ms] Found plugin webview_flutter_wkwebview at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-3.25.1/
+[   +1 ms] Found plugin webview_flutter_android at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_android-4.12.0/
+[   +1 ms] Found plugin speech_to_text at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text-7.3.0/
+[        ] Found plugin speech_to_text_windows at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text_windows-1.0.0+beta.8/
+[   +2 ms] Found plugin shared_preferences at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences-2.5.5/
+[   +1 ms] Found plugin shared_preferences_windows at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1/
+[   +1 ms] Found plugin path_provider_windows at /home/phil/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +2 ms] Found plugin shared_preferences_web at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3/
+[        ] Found plugin shared_preferences_linux at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1/
+[        ] Found plugin path_provider_linux at /home/phil/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +1 ms] Found plugin shared_preferences_foundation at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6/
+[        ] Found plugin shared_preferences_android at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.23/
+[   +1 ms] Found plugin printing at /home/phil/.pub-cache/hosted/pub.dev/printing-5.14.3/
+[   +8 ms] Found plugin path_provider at /home/phil/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[        ] Found plugin path_provider_foundation at /home/phil/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/
+[        ] Found plugin path_provider_android at /home/phil/.pub-cache/hosted/pub.dev/path_provider_android-2.3.1/
+[        ] Found plugin jni_flutter at /home/phil/.pub-cache/hosted/pub.dev/jni_flutter-1.0.1/
+[        ] Found plugin jni at /home/phil/.pub-cache/hosted/pub.dev/jni-1.0.0/
+[  +11 ms] Found plugin flutter_tts at /home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/
+[   +4 ms] Found plugin flutter_inappwebview at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview-6.1.5/
+[        ] Found plugin flutter_inappwebview_windows at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_windows-0.6.0/
+[   +1 ms] Found plugin flutter_inappwebview_web at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_web-1.1.2/
+[        ] Found plugin flutter_inappwebview_macos at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_macos-1.1.2/
+[        ] Found plugin flutter_inappwebview_ios at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/
+[        ] Found plugin flutter_inappwebview_android at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_android-1.1.3/
+[  +14 ms] Skipping generating web_plugin_registrant.dart because it is up-to-date.
+[  +18 ms] Found plugin webview_flutter_web at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_web-0.2.3+4/
+[   +2 ms] Found plugin webview_flutter at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter-4.13.1/
+[        ] Found plugin webview_flutter_wkwebview at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-3.25.1/
+[   +1 ms] Found plugin webview_flutter_android at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_android-4.12.0/
+[   +1 ms] Found plugin speech_to_text at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text-7.3.0/
+[        ] Found plugin speech_to_text_windows at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text_windows-1.0.0+beta.8/
+[   +2 ms] Found plugin shared_preferences at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences-2.5.5/
+[        ] Found plugin shared_preferences_windows at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1/
+[   +1 ms] Found plugin path_provider_windows at /home/phil/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +2 ms] Found plugin shared_preferences_web at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3/
+[        ] Found plugin shared_preferences_linux at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1/
+[        ] Found plugin path_provider_linux at /home/phil/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +1 ms] Found plugin shared_preferences_foundation at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6/
+[        ] Found plugin shared_preferences_android at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.23/
+[        ] Found plugin printing at /home/phil/.pub-cache/hosted/pub.dev/printing-5.14.3/
+[   +6 ms] Found plugin path_provider at /home/phil/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[        ] Found plugin path_provider_foundation at /home/phil/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/
+[        ] Found plugin path_provider_android at /home/phil/.pub-cache/hosted/pub.dev/path_provider_android-2.3.1/
+[        ] Found plugin jni_flutter at /home/phil/.pub-cache/hosted/pub.dev/jni_flutter-1.0.1/
+[        ] Found plugin jni at /home/phil/.pub-cache/hosted/pub.dev/jni-1.0.0/
+[   +6 ms] Found plugin flutter_tts at /home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/
+[   +3 ms] Found plugin flutter_inappwebview at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview-6.1.5/
+[        ] Found plugin flutter_inappwebview_windows at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_windows-0.6.0/
+[   +2 ms] Found plugin flutter_inappwebview_web at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_web-1.1.2/
+[        ] Found plugin flutter_inappwebview_macos at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_macos-1.1.2/
+[        ] Found plugin flutter_inappwebview_ios at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/
+[        ] Found plugin flutter_inappwebview_android at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_android-1.1.3/
+[   +7 ms] Generating /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+[   +1 ms] Skipping generating GeneratedPluginRegistrant.java because it is up-to-date.
+[   +3 ms] Skipping generating generated_plugin_registrant.h because it is up-to-date.
+[        ] Skipping generating generated_plugin_registrant.cc because it is up-to-date.
+[   +1 ms] Skipping generating generated_plugins.cmake because it is up-to-date.
+[   +1 ms] Skipping generating generated_plugin_registrant.h because it is up-to-date.
+[        ] Skipping generating generated_plugin_registrant.cc because it is up-to-date.
+[   +1 ms] Skipping generating generated_plugins.cmake because it is up-to-date.
+[   +2 ms] Skipping generating GeneratedPluginRegistrant.h because it is up-to-date.
+[   +1 ms] Skipping generating GeneratedPluginRegistrant.m because it is up-to-date.
+[   +1 ms] Skipping generating GeneratedPluginRegistrant.swift because it is up-to-date.
+[  +83 ms] Found plugin webview_flutter_web at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_web-0.2.3+4/
+[   +3 ms] Found plugin webview_flutter at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter-4.13.1/
+[        ] Found plugin webview_flutter_wkwebview at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_wkwebview-3.25.1/
+[        ] Found plugin webview_flutter_android at /home/phil/.pub-cache/hosted/pub.dev/webview_flutter_android-4.12.0/
+[        ] Found plugin speech_to_text at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text-7.3.0/
+[        ] Found plugin speech_to_text_windows at /home/phil/.pub-cache/hosted/pub.dev/speech_to_text_windows-1.0.0+beta.8/
+[   +2 ms] Found plugin shared_preferences at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences-2.5.5/
+[        ] Found plugin shared_preferences_windows at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_windows-2.4.1/
+[   +1 ms] Found plugin path_provider_windows at /home/phil/.pub-cache/hosted/pub.dev/path_provider_windows-2.3.0/
+[   +2 ms] Found plugin shared_preferences_web at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_web-2.4.3/
+[        ] Found plugin shared_preferences_linux at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_linux-2.4.1/
+[        ] Found plugin path_provider_linux at /home/phil/.pub-cache/hosted/pub.dev/path_provider_linux-2.2.1/
+[   +1 ms] Found plugin shared_preferences_foundation at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.5.6/
+[        ] Found plugin shared_preferences_android at /home/phil/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.23/
+[        ] Found plugin printing at /home/phil/.pub-cache/hosted/pub.dev/printing-5.14.3/
+[   +9 ms] Found plugin path_provider at /home/phil/.pub-cache/hosted/pub.dev/path_provider-2.1.5/
+[   +9 ms] Found plugin path_provider_foundation at /home/phil/.pub-cache/hosted/pub.dev/path_provider_foundation-2.5.1/
+[        ] Found plugin path_provider_android at /home/phil/.pub-cache/hosted/pub.dev/path_provider_android-2.3.1/
+[        ] Found plugin jni_flutter at /home/phil/.pub-cache/hosted/pub.dev/jni_flutter-1.0.1/
+[        ] Found plugin jni at /home/phil/.pub-cache/hosted/pub.dev/jni-1.0.0/
+[   +7 ms] Found plugin flutter_tts at /home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/
+[   +4 ms] Found plugin flutter_inappwebview at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview-6.1.5/
+[        ] Found plugin flutter_inappwebview_windows at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_windows-0.6.0/
+[   +1 ms] Found plugin flutter_inappwebview_web at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_web-1.1.2/
+[        ] Found plugin flutter_inappwebview_macos at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_macos-1.1.2/
+[        ] Found plugin flutter_inappwebview_ios at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_ios-1.1.2/
+[        ] Found plugin flutter_inappwebview_android at /home/phil/.pub-cache/hosted/pub.dev/flutter_inappwebview_android-1.1.3/
+[   +6 ms] generated_plugin_registrant.dart not found. Skipping.
+[   +1 ms] Compiling lib/main.dart for the Web...
+[   +5 ms] Initializing file store
+[   +7 ms] Done initializing file store
+[  +63 ms] Skipping target: web_entrypoint
+[   +2 ms] invalidated build due to missing files: /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/web/*/index.html, /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/web/flutter_bootstrap.js
+[        ] Skipping target: dart_build
+[        ] Skipping target: gen_localizations
+[   +2 ms] web_templated_files: Starting due to {InvalidatedReasonKind.outputMissing: The following outputs were missing: /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/build/web/*/index.html, InvalidatedReasonKind.inputMissing: The following inputs were missing: /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/web/*/index.html,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/web/flutter_bootstrap.js}
+[   +1 ms] web_static_assets: Starting due to {InvalidatedReasonKind.outputMissing: The following outputs were missing: /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/flutter.js,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/skwasm.js.symbols,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/canvaskit.wasm,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/chromium/canvaskit.wasm,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/chromium/canvaskit.js,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/chromium/canvaskit.js.symbols,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/wimp.js,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/canvaskit.js,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/skwasm_heavy.wasm,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/wimp.js.symbols,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/skwasm_heavy.js,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/canvaskit.js.symbols,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/skwasm.wasm,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/skwasm.js,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/wimp.wasm,/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/canvaskit/skwasm_heavy.js.symbols}
+[+1621 ms] web_static_assets: Complete
+[  +16 ms] dart2js: Starting due to {InvalidatedReasonKind.buildKeyChanged: The target build key changed., InvalidatedReasonKind.outputSetAddition: The following outputs were added to the output set: /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/main.dart.js}
+[   +8 ms] executing: /home/phil/snap/flutter/common/flutter/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/home/phil/snap/flutter/common/flutter/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DGEMINI_API_KEY=YOUR_API_KEY_HERE -DFLUTTER_VERSION=3.41.9 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=00b0c91f06 -DFLUTTER_ENGINE_REVISION=42d3d75a56 -DFLUTTER_DART_VERSION=3.11.5 -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/42d3d75a56efe1a2e9902f52dc8006099c45d937/ --native-null-assertions --no-source-maps -O4 --minify -o /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/app.dill --packages=/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/package_config.json --cfe-only /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/main.dart
+[   +1 ms] dart2wasm: Starting due to {}
+[   +1 ms] executing: /home/phil/snap/flutter/common/flutter/bin/cache/dart-sdk/bin/dart compile wasm --packages=/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/package_config.json --extra-compiler-option=--platform=/home/phil/snap/flutter/common/flutter/bin/cache/flutter_web_sdk/kernel/dart2wasm_platform.dill -Ddart.vm.profile=false -Ddart.vm.product=true --extra-compiler-option=--delete-tostring-package-uri=dart:ui --extra-compiler-option=--delete-tostring-package-uri=package:flutter --extra-compiler-option=--import-shared-memory --extra-compiler-option=--shared-memory-max-pages=32768 -DGEMINI_API_KEY=YOUR_API_KEY_HERE -DFLUTTER_VERSION=3.41.9 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=00b0c91f06 -DFLUTTER_ENGINE_REVISION=42d3d75a56 -DFLUTTER_DART_VERSION=3.11.5 -DFLUTTER_WEB_USE_SKIA=false -DFLUTTER_WEB_USE_SKWASM=true -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/42d3d75a56efe1a2e9902f52dc8006099c45d937/ --extra-compiler-option=--depfile=/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/dart2wasm.d -O2 --strip-wasm --no-source-maps --minify --extra-compiler-option=--dry-run -o /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/main.dart.wasm /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/main.dart
+[  +36 ms] web_templated_files: Complete
+[+11918 ms] lib/blocs/patient/patient_bloc.dart:196:25:
+            Error: The argument type 'PatientState' can't be assigned to the parameter type 'Patient'.
+             - 'PatientState' is from 'package:pocketgull_flutter/models/patient_types.dart' ('lib/models/patient_types.dart').
+             - 'Patient' is from 'package:pocketgull_flutter/models/patient_types.dart' ('lib/models/patient_types.dart').
+                    add(LoadPatient(loadedState));
+                                    ^
+            Error: Compilation failed.
+[+33381 ms] Found incompatibilities with WebAssembly.
+
+            package:pocketgull_flutter/services/export_service.dart 5:1 - dart:html unsupported (0)
+            file:///home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/lib/flutter_tts_web.dart 104:23 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'JSAny?' to 'int' casts a JS interop value to a Dart type, which might not be platform-consistent. (8)
+            file:///home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/lib/flutter_tts_web.dart 105:21 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'JSAny?' to 'String' casts a JS interop value to a Dart type, which might not be platform-consistent. (8)
+            file:///home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/lib/flutter_tts_web.dart 107:21 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'JSAny?' to 'String' casts a JS interop value to a Dart type, which might not be platform-consistent. (8)
+[   +1 ms] Wasm dry run findings:
+[   +1 ms] Found incompatibilities with WebAssembly.
+
+           package:pocketgull_flutter/services/export_service.dart 5:1 - dart:html unsupported (0)
+           file:///home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/lib/flutter_tts_web.dart 104:23 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'JSAny?' to 'int' casts a JS interop value to a Dart type, which might not be platform-consistent. (8)
+           file:///home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/lib/flutter_tts_web.dart 105:21 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'JSAny?' to 'String' casts a JS interop value to a Dart type, which might not be platform-consistent. (8)
+           file:///home/phil/.pub-cache/hosted/pub.dev/flutter_tts-4.2.5/lib/flutter_tts_web.dart 107:21 - invalid_runtime_check_with_js_interop_types lint violation: Cast from 'JSAny?' to 'String' casts a JS interop value to a Dart type, which might not be platform-consistent. (8)
+
+[        ] Consider addressing these issues to enable wasm builds. See docs for more info: https://docs.flutter.dev/platform-integration/web/wasm
+
+[   +9 ms] Use --no-wasm-dry-run to disable these warnings.
+[   +2 ms] dart2wasm: Complete
+[   +1 ms] Persisting file store
+[  +19 ms] Done persisting file store
+[   +5 ms] Target dart2js failed: ProcessException: Process exited abnormally with exit code 1:
+           lib/blocs/patient/patient_bloc.dart:196:25:
+           Error: The argument type 'PatientState' can't be assigned to the parameter type 'Patient'.
+            - 'PatientState' is from 'package:pocketgull_flutter/models/patient_types.dart' ('lib/models/patient_types.dart').
+            - 'Patient' is from 'package:pocketgull_flutter/models/patient_types.dart' ('lib/models/patient_types.dart').
+                   add(LoadPatient(loadedState));
+                                   ^
+           Error: Compilation failed.
+             Command: /home/phil/snap/flutter/common/flutter/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/home/phil/snap/flutter/common/flutter/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DGEMINI_API_KEY=YOUR_API_KEY_HERE -DFLUTTER_VERSION=3.41.9 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=00b0c91f06 -DFLUTTER_ENGINE_REVISION=42d3d75a56 -DFLUTTER_DART_VERSION=3.11.5 -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/42d3d75a56efe1a2e9902f52dc8006099c45d937/ --native-null-assertions --no-source-maps -O4 --minify -o /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/app.dill --packages=/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/package_config.json --cfe-only /home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/.dart_tool/flutter_build/50077983cb24b40ce9fe31cecc0a58c6/main.dart
+           #0      RunResult.throwException (package:flutter_tools/src/base/process.dart:153:5)
+           #1      _DefaultProcessUtils.run (package:flutter_tools/src/base/process.dart:379:19)
+           <asynchronous suspension>
+           #2      Dart2JSTarget.build (package:flutter_tools/src/build_system/targets/web.dart:208:5)
+           <asynchronous suspension>
+           #3      _BuildInstance._invokeInternal (package:flutter_tools/src/build_system/build_system.dart:937:9)
+           <asynchronous suspension>
+           #4      Future.wait.<anonymous closure> (dart:async/future.dart:546:21)
+           <asynchronous suspension>
+           #5      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+           <asynchronous suspension>
+           #6      Future.wait.<anonymous closure> (dart:async/future.dart:546:21)
+           <asynchronous suspension>
+           #7      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+           <asynchronous suspension>
+           #8      FlutterBuildSystem.build (package:flutter_tools/src/build_system/build_system.dart:684:16)
+           <asynchronous suspension>
+           #9      WebBuilder.buildWeb (package:flutter_tools/src/web/compile.dart:107:34)
+           <asynchronous suspension>
+           #10     BuildWebCommand.runCommand (package:flutter_tools/src/commands/build_web.dart:300:5)
+           <asynchronous suspension>
+           #11     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1590:27)
+           <asynchronous suspension>
+           #12     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #13     CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+           <asynchronous suspension>
+           #14     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:496:9)
+           <asynchronous suspension>
+           #15     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #16     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:431:5)
+           <asynchronous suspension>
+           #17     FlutterCommandRunner.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:307:33)
+           <asynchronous suspension>
+           #18     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:104:11)
+           <asynchronous suspension>
+           #19     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #20     main (package:flutter_tools/executable.dart:103:3)
+           <asynchronous suspension>
+
+[   +2 ms] Compiling lib/main.dart for the Web... (completed in 47.1s)
+[        ] "flutter web" took 49,073ms.
+[  +21 ms] Error: Failed to compile application for the Web.
+[        ] 
+           #0      throwToolExit (package:flutter_tools/src/base/common.dart:34:3)
+           #1      WebBuilder.buildWeb (package:flutter_tools/src/web/compile.dart:152:7)
+           <asynchronous suspension>
+           #2      BuildWebCommand.runCommand (package:flutter_tools/src/commands/build_web.dart:300:5)
+           <asynchronous suspension>
+           #3      FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1590:27)
+           <asynchronous suspension>
+           #4      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #5      CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+           <asynchronous suspension>
+           #6      FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:496:9)
+           <asynchronous suspension>
+           #7      AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #8      FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:431:5)
+           <asynchronous suspension>
+           #9      FlutterCommandRunner.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:307:33)
+           <asynchronous suspension>
+           #10     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:104:11)
+           <asynchronous suspension>
+           #11     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+           <asynchronous suspension>
+           #12     main (package:flutter_tools/executable.dart:103:3)
+           <asynchronous suspension>
+
+
+[        ] Running 1 shutdown hook
+[   +1 ms] Shutdown hooks complete
+[  +87 ms] exiting with code 1

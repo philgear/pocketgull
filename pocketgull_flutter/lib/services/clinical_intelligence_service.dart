@@ -92,9 +92,24 @@ $_formattingRules''';
     }
   }
 
+  bool get _isMockMode => true; // Forced for demonstration
+
   Stream<String> generateReportStream(String patientData, AnalysisLens lens) async* {
+    if (_isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 10));
+      yield '### [Mock Report] ${lens.title}\n\n';
+      yield 'This is a **simulated clinical report** because no valid Gemini API key was detected.\n\n';
+      yield '#### Clinical Findings\n';
+      yield '- Patient exhibits normal vital signs for their age group.\n';
+      yield '- Recommended follow-up in 2 weeks.\n\n';
+      yield '#### Protocols\n';
+      yield '- **Standard hydration** and rest.\n';
+      yield '- Monitor symptoms for any significant changes.\n';
+      return;
+    }
+
     final prompt = [
-      Content.text('SYSTEM INSTRUCTIONS:\\n${_getSystemInstruction(lens)}\\n\\nPATIENT DATA:\\n$patientData')
+      Content.text('SYSTEM INSTRUCTIONS:\n${_getSystemInstruction(lens)}\n\nPATIENT DATA:\n$patientData')
     ];
     
     final responseStream = _model.generateContentStream(prompt);
@@ -107,6 +122,10 @@ $_formattingRules''';
   }
 
   Future<void> startChatSession(String patientData) async {
+    if (_isMockMode) {
+      _chatSession = null; // We'll handle mock chat separately
+      return;
+    }
     final context = '''You are a collaborative care plan co-pilot named "Cerebella". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient's data. Keep your answers brief, actionable, and focused on strategic holistic care.
     
 PATIENT DATA CONTEXT:
@@ -122,6 +141,10 @@ $patientData
   }
 
   Future<String> sendChatMessage(String message) async {
+    if (_isMockMode) {
+      await Future.delayed(const Duration(seconds: 1));
+      return 'This is a **simulated response** from Cerebella. I am here to help you iterate on the patient strategy. Since no API key is set, I am currently in demonstration mode.';
+    }
     if (_chatSession == null) {
       throw Exception('Chat session not initialized. Call startChatSession first.');
     }
@@ -138,5 +161,26 @@ $patientData
       Content.text("Start the conversation with a friendly and professional tone. Greet the doctor and confirm you have reviewed the patient's file and are ready for questions.")
     );
     return response.text ?? 'Hello Doctor, I have reviewed the patient file and am ready to assist.';
+  }
+
+  Future<String> translateReadingLevel(String text, String level) async {
+    if (_isMockMode) {
+      await Future.delayed(const Duration(milliseconds: 10));
+      return '### [Mock Translated] ($level)\n\n$text\n\n*Note: This is a simulated translation for demonstration purposes.*';
+    }
+    String systemInstruction = '';
+    if (level == 'simplified') {
+      systemInstruction = 'You are an expert clinical copywriter. Rewrite the provided medical text to be Grade 6-8 level. Preserve all clinical facts.';
+    } else if (level == 'dyslexia') {
+      systemInstruction = 'Rewrite the provided medical text to be Dyslexia-friendly. Use frequent line breaks, short paragraphs, and bold text for key points.';
+    } else if (level == 'child') {
+      systemInstruction = 'Rewrite the provided medical text for an 8-12 year old child. Use simple analogies and a warm, encouraging tone.';
+    } else {
+      return text;
+    }
+
+    final prompt = 'REWRITE RULES:\n$systemInstruction\n\nTEXT TO REWRITE:\n$text';
+    final response = await _model.generateContent([Content.text(prompt)]);
+    return response.text ?? text;
   }
 }

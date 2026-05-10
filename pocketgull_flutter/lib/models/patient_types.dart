@@ -27,6 +27,7 @@ class BodyPartIssue extends Equatable {
   final String description;
   final List<dynamic> symptoms; // Can be String or PatientSymptom
   final String? recommendation;
+  final String? date;
 
   const BodyPartIssue({
     required this.id,
@@ -36,10 +37,11 @@ class BodyPartIssue extends Equatable {
     required this.description,
     required this.symptoms,
     this.recommendation,
+    this.date,
   });
 
   @override
-  List<Object?> get props => [id, noteId, name, painLevel, description, symptoms, recommendation];
+  List<Object?> get props => [id, noteId, name, painLevel, description, symptoms, recommendation, date];
 }
 
 class PatientVitals extends Equatable {
@@ -109,27 +111,29 @@ class ClinicalNote extends Equatable {
   List<Object?> get props => [id, text, sourceLens, date];
 }
 
+enum BracketingState { normal, added, removed }
+
 class ChecklistItem extends Equatable {
   final String id;
   final String text;
-  final bool completed;
+  final BracketingState status;
 
   const ChecklistItem({
     required this.id,
     required this.text,
-    required this.completed,
+    this.status = BracketingState.normal,
   });
 
-  ChecklistItem copyWith({String? text, bool? completed}) {
+  ChecklistItem copyWith({String? text, BracketingState? status}) {
     return ChecklistItem(
       id: id,
       text: text ?? this.text,
-      completed: completed ?? this.completed,
+      status: status ?? this.status,
     );
   }
 
   @override
-  List<Object?> get props => [id, text, completed];
+  List<Object?> get props => [id, text, status];
 }
 
 class PatientState extends Equatable {
@@ -138,8 +142,12 @@ class PatientState extends Equatable {
   final PatientVitals vitals;
   final List<DiagnosticScan> scans;
   final String? selectedPartId;
+  final String? selectedNoteId;
+  final String? viewingPastVisitDate;
   final List<ClinicalNote>? clinicalNotes;
   final List<ChecklistItem>? checklist;
+  final bool isLiveAgentActive;
+  final bool isResearchFrameVisible;
 
   const PatientState({
     required this.issues,
@@ -147,12 +155,28 @@ class PatientState extends Equatable {
     required this.vitals,
     this.scans = const [],
     this.selectedPartId,
+    this.selectedNoteId,
+    this.viewingPastVisitDate,
     this.clinicalNotes = const [],
     this.checklist = const [],
+    this.isLiveAgentActive = false,
+    this.isResearchFrameVisible = false,
   });
 
   @override
-  List<Object?> get props => [issues, patientGoals, vitals, scans, selectedPartId, clinicalNotes, checklist];
+  List<Object?> get props => [
+        issues,
+        patientGoals,
+        vitals,
+        scans,
+        selectedPartId,
+        selectedNoteId,
+        viewingPastVisitDate,
+        clinicalNotes,
+        checklist,
+        isLiveAgentActive,
+        isResearchFrameVisible,
+      ];
 
   PatientState copyWith({
     Map<String, List<BodyPartIssue>>? issues,
@@ -160,8 +184,12 @@ class PatientState extends Equatable {
     PatientVitals? vitals,
     List<DiagnosticScan>? scans,
     String? selectedPartId,
+    String? selectedNoteId,
+    String? viewingPastVisitDate,
     List<ClinicalNote>? clinicalNotes,
     List<ChecklistItem>? checklist,
+    bool? isLiveAgentActive,
+    bool? isResearchFrameVisible,
   }) {
     return PatientState(
       issues: issues ?? this.issues,
@@ -169,8 +197,12 @@ class PatientState extends Equatable {
       vitals: vitals ?? this.vitals,
       scans: scans ?? this.scans,
       selectedPartId: selectedPartId ?? this.selectedPartId,
+      selectedNoteId: selectedNoteId ?? this.selectedNoteId,
+      viewingPastVisitDate: viewingPastVisitDate ?? this.viewingPastVisitDate,
       clinicalNotes: clinicalNotes ?? this.clinicalNotes,
       checklist: checklist ?? this.checklist,
+      isLiveAgentActive: isLiveAgentActive ?? this.isLiveAgentActive,
+      isResearchFrameVisible: isResearchFrameVisible ?? this.isResearchFrameVisible,
     );
   }
 }

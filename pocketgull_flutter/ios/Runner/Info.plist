@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Pocket Gull requires speech recognition for hands-free clinical documentation.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Pocket Gull requires microphone access for clinical voice-first intake.</string>
 </dict>
 </plist>

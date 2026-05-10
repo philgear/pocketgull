@@ -9,7 +9,7 @@ abstract class PatientEvent extends Equatable {
 }
 
 class LoadPatient extends PatientEvent {
-  final Patient patient;
+  final PatientState patient;
   const LoadPatient(this.patient);
 
   @override
@@ -42,9 +42,67 @@ class UpdateGoals extends PatientEvent {
 }
 
 class SelectPartEvent extends PatientEvent {
-  final String partId;
+  final String? partId;
   const SelectPartEvent(this.partId);
 
   @override
-  List<Object> get props => [partId];
+  List<Object> get props => [partId ?? 'null'];
+}
+
+class ToggleLiveAgent extends PatientEvent {
+  final bool isActive;
+  const ToggleLiveAgent(this.isActive);
+
+  @override
+  List<Object> get props => [isActive];
+}
+
+class ToggleResearchFrame extends PatientEvent {
+  final bool isVisible;
+  const ToggleResearchFrame(this.isVisible);
+
+  @override
+  List<Object> get props => [isVisible];
+}
+
+class SelectNoteEvent extends PatientEvent {
+  final String? noteId;
+  const SelectNoteEvent(this.noteId);
+
+  @override
+  List<Object> get props => [noteId ?? 'null'];
+}
+
+class UpdateIssueEvent extends PatientEvent {
+  final String partId;
+  final BodyPartIssue issue;
+  const UpdateIssueEvent(this.partId, this.issue);
+
+  @override
+  List<Object> get props => [partId, issue];
+}
+
+class DeleteNoteEvent extends PatientEvent {
+  final String partId;
+  final String noteId;
+  const DeleteNoteEvent(this.partId, this.noteId);
+
+  @override
+  List<Object> get props => [partId, noteId];
+}
+
+class SetViewingPastVisitDateEvent extends PatientEvent {
+  final String? date;
+  const SetViewingPastVisitDateEvent(this.date);
+
+  @override
+  List<Object> get props => [date ?? 'null'];
+}
+
+class ToggleChecklistStatusEvent extends PatientEvent {
+  final String itemId;
+  const ToggleChecklistStatusEvent(this.itemId);
+
+  @override
+  List<Object> get props => [itemId];
 }

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/patient/patient_bloc.dart';
+import '../blocs/patient/patient_event.dart';
+import '../screens/documentation_screen.dart';
+
 class VoiceAssistantWidget extends StatefulWidget {
   const VoiceAssistantWidget({super.key});
 
@@ -66,36 +71,164 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+        color: const Color(0xFF1C1C1C).withOpacity(0.95),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 20,
+            spreadRadius: 5,
+          )
+        ],
       ),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          FloatingActionButton(
-            mini: true,
-            onPressed: _speechEnabled ? _toggleListening : null,
-            backgroundColor: _isListening ? Colors.red : Theme.of(context).primaryColor,
-            child: Icon(_isListening ? Icons.mic_off : Icons.mic, color: Colors.white),
+          // Handle
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 24),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-          const SizedBox(width: 16),
-          Expanded(
+          
+          Row(
+            children: [
+              _buildCompactMic(),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _isListening ? 'LISTENING...' : 'READY',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2.0,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _lastWords.isEmpty ? 'Tap mic to dictate...' : _lastWords,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white54, size: 24),
+                onPressed: () {
+                  context.read<PatientBloc>().add(const ToggleLiveAgent(false));
+                },
+              ),
+            ],
+          ),
+          
+          if (_lastWords.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // logic to send to chart
+                },
+                icon: const Icon(Icons.add_chart),
+                label: const Text('ADD TO CLINICAL CHART'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF416B1F),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          
+          const SizedBox(height: 16),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DocumentationScreen(initialDoc: 'ai_policy.md')),
+              );
+            },
             child: Text(
-              _speechToText.isListening
-                  ? _lastWords.isEmpty
-                      ? 'Listening...'
-                      : _lastWords
-                  : _speechEnabled
-                      ? (_lastWords.isNotEmpty ? 'Dictated: $_lastWords' : 'Tap the microphone to start dictating...')
-                      : 'Speech recognition not available on this device.',
+              'By using this AI assistant, you agree to the Generative AI Prohibited Use Policy.',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontStyle: _speechToText.isListening || _lastWords.isEmpty ? FontStyle.italic : FontStyle.normal,
-                color: _speechToText.isListening ? Colors.blue : null,
+                color: Colors.white.withOpacity(0.4),
+                fontSize: 9,
+                decoration: TextDecoration.underline,
+                decorationColor: Colors.white.withOpacity(0.4),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCompactMic() {
+    return GestureDetector(
+      onTap: _speechEnabled ? _toggleListening : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: _isListening ? Colors.red : Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: (_isListening ? Colors.red : Colors.white).withOpacity(0.3),
+              blurRadius: 12,
+            )
+          ],
+        ),
+        child: Icon(
+          _isListening ? Icons.mic_off : Icons.mic,
+          color: _isListening ? Colors.white : Colors.black,
+          size: 24,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRippleAnimation() {
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.white.withValues(alpha: _isListening ? 0.5 : 0.1),
+          width: 2,
+        ),
+      ),
+      child: Center(
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withValues(alpha: _isListening ? 0.2 : 0.05),
+          ),
+        ),
       ),
     );
   }
