@@ -1,0 +1,9 @@
+node_modules/
+dist/
+src/
+apigee/
+openapi.yaml
+.gitignore
+deploy.sh
+npm-debug.log
+.DS_Store

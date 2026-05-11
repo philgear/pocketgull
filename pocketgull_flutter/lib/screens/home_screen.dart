@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 import '../widgets/intake_form_widget.dart';
 import '../widgets/analysis_report_widget.dart';
 import '../widgets/voice_assistant_widget.dart';
@@ -89,6 +92,52 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(width: 8),
               if (!isMobile) ...[
+                SizedBox(
+                  height: 32,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.workspace_premium, size: 14),
+                    label: const Text('UPGRADE'),
+                    onPressed: () async {
+                      try {
+                        final response = await http.post(
+                          Uri.parse('http://localhost:8080/api/billing/checkout'),
+                          headers: {'Content-Type': 'application/json'},
+                          body: jsonEncode({'userId': 'user_123'}),
+                        );
+                        if (response.statusCode == 200) {
+                          final data = jsonDecode(response.body);
+                          if (data['url'] != null) {
+                            final uri = Uri.parse(data['url']);
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri);
+                            }
+                          }
+                        } else {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Billing service is currently unavailable.')),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        debugPrint('Error launching checkout: $e');
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Checkout API is not implemented or unreachable.')),
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFF6366F1), // Indigo/Premium color
+                      textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 SizedBox(
                   height: 32,
                   child: OutlinedButton.icon(

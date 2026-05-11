@@ -25,6 +25,16 @@ class ClinicalMetrics {
 class ClinicalIntelligenceService {
   final GenerativeModel _model;
   ChatSession? _chatSession;
+  Map<String, String>? _archivedReport;
+
+  void resetAIState() {
+    _chatSession = null;
+    _archivedReport = null;
+  }
+
+  void loadArchivedAnalysis(Map<String, String> report) {
+    _archivedReport = report;
+  }
 
   ClinicalIntelligenceService({required String apiKey}) 
       : _model = GenerativeModel(

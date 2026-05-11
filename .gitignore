@@ -38,3 +38,24 @@ lighthouse-*.html
 bundle-*.json
 dist_*.json
 .lighthouseci/
+
+# --- Apigee & GCP Security ---
+# Apigee proxy deployment bundles
+*.zip
+# Local Service Accounts, Credentials, and Keys (Prevent accidental leaks)
+*service-account*.json
+*credentials*.json
+gcp-*.json
+*.pem
+*.key
+
+# --- Local Databases ---
+*.sqlite
+*.db
+
+# --- Mobile/Native Build Overrides (Safety Net) ---
+.dart_tool/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/

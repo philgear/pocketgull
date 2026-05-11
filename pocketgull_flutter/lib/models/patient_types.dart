@@ -228,6 +228,32 @@ class Bookmark extends Equatable {
     this.cited,
   });
 
+  factory Bookmark.fromJson(Map<String, dynamic> json) {
+    return Bookmark(
+      title: json['title'] ?? '',
+      url: json['url'] ?? '',
+      authors: json['authors'],
+      doi: json['doi'],
+      publicationDate: json['publicationDate'],
+      publisher: json['publisher'],
+      isPeerReviewed: json['isPeerReviewed'],
+      cited: json['cited'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'url': url,
+      if (authors != null) 'authors': authors,
+      if (doi != null) 'doi': doi,
+      if (publicationDate != null) 'publicationDate': publicationDate,
+      if (publisher != null) 'publisher': publisher,
+      if (isPeerReviewed != null) 'isPeerReviewed': isPeerReviewed,
+      if (cited != null) 'cited': cited,
+    };
+  }
+
   @override
   List<Object?> get props => [title, url, authors, doi, publicationDate, publisher, isPeerReviewed, cited];
 }
@@ -243,8 +269,67 @@ sealed class HistoryEntry extends Equatable {
     required this.summary,
   });
 
+  factory HistoryEntry.fromJson(Map<String, dynamic> json) {
+    final type = json['type'] as String;
+    switch (type) {
+      case 'BookmarkAdded':
+        return BookmarkAddedHistoryEntry(
+          date: json['date'] ?? '',
+          summary: json['summary'] ?? '',
+          bookmark: Bookmark.fromJson(json['bookmark'] ?? {}),
+        );
+      case 'NoteCreated':
+        return NoteCreatedHistoryEntry(
+          date: json['date'] ?? '',
+          summary: json['summary'] ?? '',
+          partId: json['partId'] ?? '',
+          noteId: json['noteId'] ?? '',
+        );
+      case 'NoteDeleted':
+        return NoteDeletedHistoryEntry(
+          date: json['date'] ?? '',
+          summary: json['summary'] ?? '',
+          partId: json['partId'] ?? '',
+          noteId: json['noteId'] ?? '',
+        );
+      // We are leaving the complex state-bearing history entries (VisitHistoryEntry, AnalysisRunHistoryEntry) 
+      // without deep deserialization for this scope as they require deep PatientState deserialization.
+      // We will fallback to a base parsing for unimplemented types if needed.
+      default:
+        return _GenericHistoryEntry(
+          type: type,
+          date: json['date'] ?? '',
+          summary: json['summary'] ?? '',
+        );
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {
+      'type': type,
+      'date': date,
+      'summary': summary,
+    };
+    
+    if (this is BookmarkAddedHistoryEntry) {
+      data['bookmark'] = (this as BookmarkAddedHistoryEntry).bookmark.toJson();
+    } else if (this is NoteCreatedHistoryEntry) {
+      data['partId'] = (this as NoteCreatedHistoryEntry).partId;
+      data['noteId'] = (this as NoteCreatedHistoryEntry).noteId;
+    } else if (this is NoteDeletedHistoryEntry) {
+      data['partId'] = (this as NoteDeletedHistoryEntry).partId;
+      data['noteId'] = (this as NoteDeletedHistoryEntry).noteId;
+    }
+    // We can add the state serialization later if required for the full app.
+    return data;
+  }
+
   @override
   List<Object?> get props => [type, date, summary];
+}
+
+class _GenericHistoryEntry extends HistoryEntry {
+  const _GenericHistoryEntry({required super.type, required super.date, required super.summary});
 }
 
 class VisitHistoryEntry extends HistoryEntry {

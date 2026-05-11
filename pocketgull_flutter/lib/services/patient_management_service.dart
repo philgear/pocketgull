@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import '../models/patient_types.dart';
 
 class PatientManagementService {
@@ -48,6 +49,82 @@ class PatientManagementService {
     await prefs.setString(_storageKey, jsonEncode(jsonList));
   }
 
+  Future<bool> syncToCloud(List<Patient> patients) async {
+    try {
+      final jsonList = patients.map((p) => _patientToJson(p)).toList();
+      final response = await http.post(
+        Uri.parse('/api/patients'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(jsonList),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('[PatientManagementService] Successfully synced to cloud');
+        return true;
+      } else {
+        print('[PatientManagementService] Failed to sync. Status: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('[PatientManagementService] Error syncing to cloud: $e');
+      return false;
+    }
+  }
+
+  Patient addHistoryEntry(Patient patient, HistoryEntry entry) {
+    final updatedHistory = [entry, ...patient.history];
+    if (entry is VisitHistoryEntry) {
+      return _copyWith(patient, history: updatedHistory, lastVisit: entry.date);
+    }
+    return _copyWith(patient, history: updatedHistory);
+  }
+
+  Patient updateHistoryEntry(Patient patient, HistoryEntry entry, bool Function(HistoryEntry) matchFn) {
+    final index = patient.history.indexWhere(matchFn);
+    if (index == -1) {
+      return addHistoryEntry(patient, entry);
+    }
+    final updatedHistory = List<HistoryEntry>.from(patient.history);
+    updatedHistory[index] = entry;
+    return _copyWith(patient, history: updatedHistory);
+  }
+
+  Patient addBookmark(Patient patient, Bookmark bookmark) {
+    final updatedBookmarks = [...patient.bookmarks, bookmark];
+    final historyEntry = BookmarkAddedHistoryEntry(
+      date: DateTime.now().toIso8601String().split('T')[0].replaceAll('-', '.'),
+      summary: bookmark.title,
+      bookmark: bookmark,
+    );
+    return addHistoryEntry(
+      _copyWith(patient, bookmarks: updatedBookmarks),
+      historyEntry,
+    );
+  }
+
+  Patient removeBookmark(Patient patient, String url) {
+    return _copyWith(
+      patient,
+      bookmarks: patient.bookmarks.where((b) => b.url != url).toList(),
+    );
+  }
+
+  Patient _copyWith(Patient p, {List<HistoryEntry>? history, List<Bookmark>? bookmarks, String? lastVisit}) {
+    return Patient(
+      id: p.id,
+      name: p.name,
+      age: p.age,
+      gender: p.gender,
+      lastVisit: lastVisit ?? p.lastVisit,
+      preexistingConditions: p.preexistingConditions,
+      history: history ?? p.history,
+      bookmarks: bookmarks ?? p.bookmarks,
+      issues: p.issues,
+      patientGoals: p.patientGoals,
+      vitals: p.vitals,
+      scans: p.scans,
+    );
+  }
+
   // Temporary serialization helpers since patient_types.dart didn't have full JSON logic
   Map<String, dynamic> _patientToJson(Patient p) {
     return {
@@ -66,8 +143,8 @@ class PatientManagementService {
         'weight': p.vitals.weight,
         'height': p.vitals.height,
       },
-      'history': p.history,
-      'bookmarks': p.bookmarks,
+      'history': p.history.map((h) => h.toJson()).toList(),
+      'bookmarks': p.bookmarks.map((b) => b.toJson()).toList(),
       'scans': p.scans,
     };
   }
@@ -90,8 +167,8 @@ class PatientManagementService {
         height: json['vitals']?['height'] ?? '',
       ),
       issues: const {}, // Ignoring complex nested mapping for now in this skeleton
-      history: json['history'] ?? [],
-      bookmarks: json['bookmarks'] ?? [],
+      history: (json['history'] as List?)?.map((j) => HistoryEntry.fromJson(j)).toList() ?? [],
+      bookmarks: (json['bookmarks'] as List?)?.map((j) => Bookmark.fromJson(j)).toList() ?? [],
       scans: json['scans'] ?? [],
     );
   }

@@ -43,3 +43,42 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# --- Custom Additions for Project Security & Tools ---
+# Environment variables
+.env*
+
+# Missing from default Flutter generator
+.flutter-plugins
+
+# Flutter Version Management (if used)
+.fvm/flutter_sdk
+
+# Firebase/GCP Auto-generated files (Keeping keys out of repo)
+firebase_app_id_file.json
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+
+# --- Strict Security: Code Signing & Certificates ---
+*.jks
+*.keystore
+key.properties
+*.pem
+*.p12
+*.cer
+*.cert
+*.mobileprovision
+
+# --- Strict CI/CD & Fastlane ---
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+*.dSYM/
+*.dSYM.zip
+
+# --- Local Config & Secrets ---
+*secret*.json
+*config*.json
+stripe*.json

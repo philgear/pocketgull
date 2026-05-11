@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Quota async="false" continueOnError="false" enabled="true" name="Quota-Dynamic">
+    <DisplayName>Quota Dynamic by Product</DisplayName>
+    <Properties/>
+    <!-- 
+      This allows the Free Tier product to set an allowed quota of "10", 
+      while the Premium Clinical product sets "100",
+      and the Institutional product sets "5000".
+      These variables are automatically populated by the VerifyAPIKey policy.
+    -->
+    <Allow countRef="verifyapikey.Verify-API-Key.apiproduct.developer.quota.limit"/>
+    <Interval ref="verifyapikey.Verify-API-Key.apiproduct.developer.quota.interval">1</Interval>
+    <TimeUnit ref="verifyapikey.Verify-API-Key.apiproduct.developer.quota.timeunit">day</TimeUnit>
+    
+    <!-- Quota applies per developer app -->
+    <Identifier ref="verifyapikey.Verify-API-Key.client_id"/>
+    <Distributed>true</Distributed>
+    <Synchronous>false</Synchronous>
+</Quota>
