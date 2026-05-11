@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'blocs/patient/patient_bloc.dart';
@@ -6,12 +9,42 @@ import 'blocs/analysis/analysis_cubit.dart';
 import 'services/clinical_intelligence_service.dart';
 import 'services/local_intelligence_service.dart';
 import 'services/export_service.dart';
-import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+  print("Handling a background message: ${message.messageId}");
+}
 
 void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+
+    try {
+      await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      
+      final messaging = FirebaseMessaging.instance;
+      await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      
+      final token = await messaging.getToken();
+      print("FCM Token: $token");
+    } catch (e) {
+      print("Firebase Initialization Error: $e");
+      print("Note: You must run 'flutterfire configure' to generate native config files.");
+    }
+    
+    // Initialize Hive local offline database
+    await Hive.initFlutter();
+    await Hive.openBox('pocket_gull_db');
+
     final localAI = LocalIntelligenceService();
     
     try {

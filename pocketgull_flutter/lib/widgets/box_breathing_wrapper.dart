@@ -98,7 +98,7 @@ class _BoxBreathingWrapperState extends State<BoxBreathingWrapper>
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF689F38).withOpacity(0.2 * _shadowAnimation.value),
+                color: const Color(0xFF689F38).withValues(alpha: 0.2 * _shadowAnimation.value),
                 blurRadius: 4.0 * _shadowAnimation.value,
                 spreadRadius: 2.0 * _shadowAnimation.value,
               ),

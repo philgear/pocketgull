@@ -53,7 +53,7 @@ class VisitReviewWidget extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: const Text(
@@ -92,7 +92,7 @@ class VisitReviewWidget extends StatelessWidget {
               child: Text('No clinical notes documented during this visit.', style: TextStyle(color: Colors.grey)),
             ),
           ),
-        ...allIssues.map((issue) => _buildIssueCard(issue)).toList(),
+        ...allIssues.map((issue) => _buildIssueCard(issue)),
       ],
     );
   }
@@ -119,7 +119,7 @@ class VisitReviewWidget extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getPainColor(issue.painLevel).withOpacity(0.1),
+                  color: _getPainColor(issue.painLevel).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(

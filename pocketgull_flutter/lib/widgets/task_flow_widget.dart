@@ -52,7 +52,7 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 4,
                 offset: const Offset(0, 2),
               ),
@@ -68,7 +68,7 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
                   vertical: 16,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade50.withOpacity(0.5),
+                  color: Colors.grey.shade50.withValues(alpha: 0.5),
                   border: Border(
                     bottom: BorderSide(color: Colors.grey.shade100),
                   ),
@@ -344,7 +344,7 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
           borderRadius: BorderRadius.circular(12),
           boxShadow: isAdded ? [
             BoxShadow(
-              color: const Color(0xFF76B362).withOpacity(0.1),
+              color: const Color(0xFF76B362).withValues(alpha: 0.1),
               blurRadius: 8,
               offset: const Offset(0, 4),
             )

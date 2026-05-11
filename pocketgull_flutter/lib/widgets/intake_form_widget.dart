@@ -115,7 +115,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -159,7 +159,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
                   Switch(
                     value: _isBreathingEnabled,
                     onChanged: (val) => setState(() => _isBreathingEnabled = val),
-                    activeColor: const Color(0xFF689F38),
+                    activeThumbColor: const Color(0xFF689F38),
                   ),
                 ],
               ),
@@ -361,7 +361,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
             activeTrackColor: _getPainColor(note.painLevel),
             inactiveTrackColor: Colors.grey.shade100,
             thumbColor: Colors.white,
-            overlayColor: _getPainColor(note.painLevel).withOpacity(0.2),
+            overlayColor: _getPainColor(note.painLevel).withValues(alpha: 0.2),
             valueIndicatorColor: _getPainColor(note.painLevel),
             valueIndicatorTextStyle: const TextStyle(color: Colors.white),
           ),

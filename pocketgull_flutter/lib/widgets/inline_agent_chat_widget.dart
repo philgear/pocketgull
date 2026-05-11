@@ -217,7 +217,7 @@ class _InlineAgentChatWidgetState extends State<InlineAgentChatWidget> {
             backgroundColor: Color(0xFF1C1C1C),
             child: Icon(Icons.shield, size: 10, color: Colors.white),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
           Text(
             'thinking...',
             style: TextStyle(

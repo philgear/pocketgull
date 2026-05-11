@@ -45,7 +45,7 @@ class _DraggableWindowState extends State<DraggableWindow> {
           border: Border.all(color: Colors.grey.shade300),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 30,
               offset: const Offset(0, 10),
             ),

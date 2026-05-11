@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SpikeArrest async="false" continueOnError="false" enabled="true" name="Spike-Arrest-Global">
+    <DisplayName>Spike Arrest Global</DisplayName>
+    <Properties/>
+    <!-- Identifier ensures rate limiting is applied per API Key (from Verify-API-Key policy) -->
+    <Identifier ref="request.header.X-API-Key"/>
+    <!-- Allow 30 requests per minute per API Key to prevent DDoS and backend overload -->
+    <Rate>30pm</Rate>
+</SpikeArrest>

@@ -5,7 +5,7 @@ export const billingRouter = Router();
 
 // Initialize Stripe (requires STRIPE_SECRET_KEY in environment)
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_mock', {
-  apiVersion: '2024-11-20.acacia',
+  apiVersion: '2023-10-16',
 });
 
 // Mock database to link Apigee Developer Apps with Stripe Customers

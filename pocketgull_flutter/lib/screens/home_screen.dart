@@ -16,6 +16,7 @@ import '../models/patient_types.dart';
 import '../blocs/patient/patient_event.dart';
 import '../widgets/visit_review_widget.dart';
 import 'documentation_screen.dart';
+import 'triage_board_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -172,6 +173,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFF1C1C1C),
                       side: const BorderSide(color: Color(0xFFE5E7EB)),
+                      textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  height: 32,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.local_hospital_outlined, size: 14),
+                    label: const Text('TRIAGE'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const TriageBoardScreen()),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFE53935),
+                      side: const BorderSide(color: Color(0xFFE53935)),
                       textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                     ),

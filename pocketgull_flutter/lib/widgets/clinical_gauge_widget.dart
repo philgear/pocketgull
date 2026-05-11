@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 
 enum GaugeType { complexity, stability, certainty }
 
@@ -68,12 +67,12 @@ class _ClinicalGaugeWidgetState extends State<ClinicalGaugeWidget> with SingleTi
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.5)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -135,9 +134,9 @@ class _ClinicalGaugeWidgetState extends State<ClinicalGaugeWidget> with SingleTi
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.white.withOpacity(0),
-                                    Colors.white.withOpacity(0.3),
-                                    Colors.white.withOpacity(0),
+                                    Colors.white.withValues(alpha: 0),
+                                    Colors.white.withValues(alpha: 0.3),
+                                    Colors.white.withValues(alpha: 0),
                                   ],
                                 ),
                               ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import '../models/patient_types.dart';
 
@@ -7,46 +8,90 @@ class PatientManagementService {
   static const String _storageKey = 'pocket_gull_patients';
 
   Future<List<Patient>> loadPatients() async {
+    final box = Hive.box('pocket_gull_db');
+    
+    // Check if Hive has patients
+    if (box.containsKey('patients')) {
+      try {
+        final List<dynamic> decodedList = jsonDecode(box.get('patients') as String);
+        return decodedList.map((json) => _patientFromJson(json)).toList();
+      } catch (e) {
+        print('Failed to parse patients from Hive: $e');
+        return _getDefaultPatients();
+      }
+    }
+
+    // Fallback/Migration from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_storageKey);
     
-    if (jsonString == null) {
-      // Return a default mock patient if empty
-      return [
-        Patient(
-          id: 'p001',
-          name: 'Robert Davis',
-          age: 58,
-          gender: 'Male',
-          lastVisit: '2024.11.20',
-          preexistingConditions: ['Essential Hypertension'],
-          patientGoals: 'Discuss CPAP compliance issues.',
-          vitals: const PatientVitals(bp: '152/95', hr: '88', temp: '98.4F', weight: '295 lbs', spO2: '', height: ''),
-          issues: const {},
-          history: const [],
-          bookmarks: const [],
-          scans: const [],
-        )
-      ];
+    if (jsonString != null) {
+      print('[Hive Migration] Migrating existing patients from SharedPreferences to Hive...');
+      await box.put('patients', jsonString);
+      try {
+        final List<dynamic> decodedList = jsonDecode(jsonString);
+        return decodedList.map((json) => _patientFromJson(json)).toList();
+      } catch (e) {
+        print('Failed to parse migrated patients: $e');
+        return _getDefaultPatients();
+      }
     }
 
-    try {
-      final List<dynamic> decodedList = jsonDecode(jsonString);
-      // Depending on how Patient.fromJson is implemented, map it
-      // For now, we will assume a generic conversion if needed, 
-      // but since we haven't written the full fromJson for Patient in models,
-      // we'll leave this generic.
-      return decodedList.map((json) => _patientFromJson(json)).toList();
-    } catch (e) {
-      print('Failed to parse patients: $e');
-      return [];
-    }
+    return _getDefaultPatients();
+  }
+
+  List<Patient> _getDefaultPatients() {
+    return [
+      Patient(
+        id: 'p001',
+        name: 'Robert Davis',
+        age: 58,
+        gender: 'Male',
+        lastVisit: '2024.11.20',
+        preexistingConditions: ['Essential Hypertension'],
+        patientGoals: 'Discuss CPAP compliance issues.',
+        vitals: const PatientVitals(bp: '152/95', hr: '88', temp: '98.4F', weight: '295 lbs', spO2: '', height: ''),
+        issues: const {},
+        history: const [],
+        bookmarks: const [],
+        scans: const [],
+        triageScore: 0,
+        kaizenColor: 'green',
+        activeTimerSeconds: null,
+        recommendedGuidelines: const [],
+      ),
+      Patient(
+        id: 'p002',
+        name: 'Sarah Jenkins',
+        age: 42,
+        gender: 'Female',
+        lastVisit: '2024.11.20',
+        preexistingConditions: ['Asthma', 'Heart Failure'],
+        patientGoals: 'Manage recent shortness of breath.',
+        vitals: const PatientVitals(bp: '95/60', hr: '145', temp: '101.2F', weight: '165 lbs', spO2: '89', height: '5\'4"'),
+        issues: const {
+          'chest': [
+            BodyPartIssue(id: 'chest', noteId: 'n1', name: 'Severe Angina', description: 'Crushing chest pain', painLevel: 9, recommendation: 'Immediate ECG', date: '2024.11.20', symptoms: []),
+          ]
+        },
+        history: const [],
+        bookmarks: const [],
+        scans: const [],
+        triageScore: 12,
+        kaizenColor: 'red',
+        activeTimerSeconds: 3600,
+        recommendedGuidelines: const [
+          {'id': '18893435', 'title': 'The heart in bronchial asthma.'},
+          {'id': '20241492', 'title': 'Cardiac complications and deaths in asthmatic patients.'}
+        ],
+      )
+    ];
   }
 
   Future<void> savePatients(List<Patient> patients) async {
-    final prefs = await SharedPreferences.getInstance();
+    final box = Hive.box('pocket_gull_db');
     final jsonList = patients.map((p) => _patientToJson(p)).toList();
-    await prefs.setString(_storageKey, jsonEncode(jsonList));
+    await box.put('patients', jsonEncode(jsonList));
   }
 
   Future<bool> syncToCloud(List<Patient> patients) async {
@@ -108,7 +153,7 @@ class PatientManagementService {
     );
   }
 
-  Patient _copyWith(Patient p, {List<HistoryEntry>? history, List<Bookmark>? bookmarks, String? lastVisit}) {
+  Patient _copyWith(Patient p, {List<HistoryEntry>? history, List<Bookmark>? bookmarks, String? lastVisit, int? triageScore, String? kaizenColor, int? activeTimerSeconds, List<Map<String, String>>? recommendedGuidelines}) {
     return Patient(
       id: p.id,
       name: p.name,
@@ -122,6 +167,10 @@ class PatientManagementService {
       patientGoals: p.patientGoals,
       vitals: p.vitals,
       scans: p.scans,
+      triageScore: triageScore ?? p.triageScore,
+      kaizenColor: kaizenColor ?? p.kaizenColor,
+      activeTimerSeconds: activeTimerSeconds ?? p.activeTimerSeconds,
+      recommendedGuidelines: recommendedGuidelines ?? p.recommendedGuidelines,
     );
   }
 
@@ -146,6 +195,10 @@ class PatientManagementService {
       'history': p.history.map((h) => h.toJson()).toList(),
       'bookmarks': p.bookmarks.map((b) => b.toJson()).toList(),
       'scans': p.scans,
+      'triageScore': p.triageScore,
+      'kaizenColor': p.kaizenColor,
+      'activeTimerSeconds': p.activeTimerSeconds,
+      'recommendedGuidelines': p.recommendedGuidelines,
     };
   }
 
@@ -170,6 +223,10 @@ class PatientManagementService {
       history: (json['history'] as List?)?.map((j) => HistoryEntry.fromJson(j)).toList() ?? [],
       bookmarks: (json['bookmarks'] as List?)?.map((j) => Bookmark.fromJson(j)).toList() ?? [],
       scans: json['scans'] ?? [],
+      triageScore: json['triageScore'] ?? 0,
+      kaizenColor: json['kaizenColor'] ?? 'green',
+      activeTimerSeconds: json['activeTimerSeconds'],
+      recommendedGuidelines: (json['recommendedGuidelines'] as List?)?.map((g) => Map<String, String>.from(g)).toList() ?? [],
     );
   }
 }

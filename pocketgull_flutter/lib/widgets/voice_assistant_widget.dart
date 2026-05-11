@@ -73,11 +73,11 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1C).withOpacity(0.95),
+        color: const Color(0xFF1C1C1C).withValues(alpha: 0.95),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 20,
             spreadRadius: 5,
           )
@@ -92,7 +92,7 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
             height: 4,
             margin: const EdgeInsets.only(bottom: 24),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -120,7 +120,7 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 15,
                         fontStyle: FontStyle.italic,
                       ),
@@ -171,10 +171,10 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
               'By using this AI assistant, you agree to the Generative AI Prohibited Use Policy.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.4),
+                color: Colors.white.withValues(alpha: 0.4),
                 fontSize: 9,
                 decoration: TextDecoration.underline,
-                decorationColor: Colors.white.withOpacity(0.4),
+                decorationColor: Colors.white.withValues(alpha: 0.4),
               ),
             ),
           ),
@@ -195,7 +195,7 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: (_isListening ? Colors.red : Colors.white).withOpacity(0.3),
+              color: (_isListening ? Colors.red : Colors.white).withValues(alpha: 0.3),
               blurRadius: 12,
             )
           ],

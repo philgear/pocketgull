@@ -21,7 +21,7 @@ class DictationModalWidget extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -149,16 +149,15 @@ class DictationModalWidget extends StatelessWidget {
                 children: [
                   TextButton(
                     onPressed: onCancel,
-                    child: const Text('CANCEL'),
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.grey.shade600,
                       textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                     ),
+                    child: const Text('CANCEL'),
                   ),
                   const SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: () => onAccept(dictationService.interimText.value),
-                    child: const Text('INSERT TEXT'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black87,
                       foregroundColor: Colors.white,
@@ -167,6 +166,7 @@ class DictationModalWidget extends StatelessWidget {
                       textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
+                    child: const Text('INSERT TEXT'),
                   ),
                 ],
               ),

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { GenerativeModel, GoogleGenerativeAI } from '@google/generative-ai';
+import { sendPushNotification } from '../services/notification';
 
 export const intelligenceRouter = Router();
 
@@ -40,7 +41,7 @@ async function fetchGeminiApiKey() {
 
 intelligenceRouter.post('/chat', async (req, res) => {
   try {
-    const { message, context, history } = req.body;
+    const { message, context, history, fcmToken } = req.body;
     
     if (!message) {
       res.status(400).json({ error: 'Message is required' });
@@ -68,6 +69,16 @@ intelligenceRouter.post('/chat', async (req, res) => {
 
     const result = await chat.sendMessage(message);
     const responseText = result.response.text();
+
+    if (fcmToken) {
+      // Dispatch notification asynchronously
+      sendPushNotification(
+        fcmToken,
+        'Clinical Intelligence',
+        'Your AI analysis is complete and ready for review.',
+        { type: 'ai_chat_response' }
+      ).catch(err => console.error('[Intelligence API] Failed to send push notification', err));
+    }
 
     res.status(200).json({ response: responseText });
   } catch (error: any) {

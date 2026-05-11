@@ -15,7 +15,7 @@ class _ResearchFrameWidgetState extends State<ResearchFrameWidget> {
   late final WebViewController _controller;
   final TextEditingController _searchController = TextEditingController();
   String _currentEngine = 'google';
-  bool _isLoading = false;
+  final bool _isLoading = false;
 
   @override
   void initState() {
@@ -120,7 +120,7 @@ class _ResearchFrameWidgetState extends State<ResearchFrameWidget> {
           color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(4),
           boxShadow: isSelected ? [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2)
+            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 2)
           ] : null,
         ),
         child: Text(

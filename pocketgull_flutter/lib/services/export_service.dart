@@ -127,7 +127,7 @@ class ExportService {
                   pw.SizedBox(height: 20),
                 ]
               );
-            }).toList(),
+            }),
           ];
         },
         footer: (pw.Context context) {
@@ -221,7 +221,7 @@ class ExportService {
     vitalMappings.forEach((code, data) {
       if (data['value'] != null && data['value']!.toString().isNotEmpty) {
         entries.add({
-          'fullUrl': 'urn:uuid:obs-${code}',
+          'fullUrl': 'urn:uuid:obs-$code',
           'resource': {
             'resourceType': 'Observation',
             'status': 'final',
@@ -244,7 +244,7 @@ class ExportService {
       for (var i = 0; i < issues.length; i++) {
         final issue = issues[i];
         entries.add({
-          'fullUrl': 'urn:uuid:cond-${partId}-$i',
+          'fullUrl': 'urn:uuid:cond-$partId-$i',
           'resource': {
             'resourceType': 'Condition',
             'clinicalStatus': {

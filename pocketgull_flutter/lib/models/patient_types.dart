@@ -445,6 +445,10 @@ class Patient extends PatientState {
   final List<String> preexistingConditions;
   final List<HistoryEntry> history;
   final List<Bookmark> bookmarks;
+  final int triageScore;
+  final String kaizenColor;
+  final int? activeTimerSeconds;
+  final List<Map<String, String>> recommendedGuidelines;
 
   const Patient({
     required this.id,
@@ -455,6 +459,10 @@ class Patient extends PatientState {
     required this.preexistingConditions,
     this.history = const [],
     this.bookmarks = const [],
+    this.triageScore = 0,
+    this.kaizenColor = 'green',
+    this.activeTimerSeconds,
+    this.recommendedGuidelines = const [],
     required super.issues,
     required super.patientGoals,
     required super.vitals,
@@ -471,6 +479,10 @@ class Patient extends PatientState {
         preexistingConditions,
         history,
         bookmarks,
+        triageScore,
+        kaizenColor,
+        activeTimerSeconds,
+        recommendedGuidelines,
         ...super.props,
       ];
 }

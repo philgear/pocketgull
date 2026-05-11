@@ -5,6 +5,7 @@ import { pubmedRouter } from './routes/pubmed.js';
 import { patientsRouter } from './routes/patients.js';
 import { intelligenceRouter } from './routes/intelligence.js';
 import { billingRouter } from './routes/billing.js';
+import { triageRouter } from './routes/triage.js';
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -21,6 +22,7 @@ app.use('/api/pubmed', pubmedRouter);
 app.use('/api/patients', patientsRouter);
 app.use('/api/intelligence', intelligenceRouter);
 app.use('/api/billing', billingRouter);
+app.use('/api/triage', triageRouter);
 
 // Health check
 app.get('/health', (req, res) => {

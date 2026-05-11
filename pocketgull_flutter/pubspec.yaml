@@ -54,6 +54,11 @@ dependencies:
   http: ^1.2.0
   url_launcher: ^6.3.0
 
+  vector_math: any
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  firebase_core: ^4.7.0
+  firebase_messaging: ^16.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

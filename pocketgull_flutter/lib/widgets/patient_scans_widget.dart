@@ -66,9 +66,9 @@ class PatientScansWidget extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _getStatusColor(scan.status).withOpacity(0.1),
+                          color: _getStatusColor(scan.status).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: _getStatusColor(scan.status).withOpacity(0.3)),
+                          border: Border.all(color: _getStatusColor(scan.status).withValues(alpha: 0.3)),
                         ),
                         child: Text(
                           scan.status.toUpperCase(),

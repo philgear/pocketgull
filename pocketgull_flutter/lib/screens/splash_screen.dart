@@ -44,8 +44,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
         if (mounted) {
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const HomeScreen(),
-              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+              pageBuilder: (_, _, _) => const HomeScreen(),
+              transitionsBuilder: (_, a, _, c) => FadeTransition(opacity: a, child: c),
               transitionDuration: const Duration(milliseconds: 800),
             ),
           );
@@ -84,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.03),
+                          color: Colors.black.withValues(alpha: 0.03),
                           blurRadius: 15,
                           offset: const Offset(0, -6),
                         )
@@ -122,7 +122,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                   border: Border.all(color: const Color(0xFFE5E7EB)),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.05),
+                                      color: Colors.black.withValues(alpha: 0.05),
                                       blurRadius: 16,
                                       offset: const Offset(0, 6),
                                     )

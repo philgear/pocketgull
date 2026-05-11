@@ -177,7 +177,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
           issues: (data['issues'] as Map).map((key, value) => MapEntry(
             key as String,
             (value as List).map((i) => BodyPartIssue(
-              id: key as String,
+              id: key,
               noteId: i['noteId'],
               name: i['name'],
               description: i['description'],
