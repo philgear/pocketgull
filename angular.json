@@ -105,12 +105,7 @@
           "configurations": {
             "production": {
               "outputHashing": "all",
-              "sourceMap": {
-                "scripts": true,
-                "styles": true,
-                "vendor": false,
-                "server": false
-              },
+              "sourceMap": false,
               "optimization": true,
               "serviceWorker": "ngsw-config.json"
             },

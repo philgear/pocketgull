@@ -60,15 +60,24 @@ async function fetchGeminiApiKey() {
     return process.env['GEMINI_API_KEY'];
   }
 
-  for (const envFile of ['.env.local', '.env']) {
+  // Search the Angular project root first, then fall back to sibling pocketgull_api dir
+  // so a single .env in either location satisfies all services in the monorepo.
+  const envSearchPaths = [
+    join(rootDir, '.env.local'),
+    join(rootDir, '.env'),
+    join(rootDir, 'pocketgull_api', '.env.local'),
+    join(rootDir, 'pocketgull_api', '.env'),
+  ];
+
+  for (const envPath of envSearchPaths) {
     try {
-      const localEnv = fs.readFileSync(join(rootDir, envFile), 'utf8');
+      const localEnv = fs.readFileSync(envPath, 'utf8');
       const match = localEnv.match(/GEMINI_API_KEY=["']?([^"'\n]+)["']?/);
       if (match) {
-        console.log(`[Secrets] Manual load success: ${envFile}`);
+        console.log(`[Secrets] Manual load success: ${envPath}`);
         return match[1].trim();
       }
-    } catch (e) { }
+    } catch (e) { /* file not found, try next */ }
   }
 
   try {

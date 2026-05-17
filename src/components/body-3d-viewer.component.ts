@@ -77,7 +77,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private animationFrameId?: number;
     private composer!: EffectComposer;
     private bloomPass!: UnrealBloomPass;
-    private clock = new THREE.Clock();
+    private timer = new THREE.Timer();
 
     private handleResize = () => {
         const container = this.canvasContainer()?.nativeElement;
@@ -492,7 +492,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             if (event.button !== 0) return;
             startX = event.clientX;
             startY = event.clientY;
-            console.log('Body3DViewer: pointerdown', { startX, startY });
         });
 
         canvas.addEventListener('pointerup', (event: PointerEvent) => {
@@ -500,7 +499,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
             const deltaX = Math.abs(event.clientX - startX);
             const deltaY = Math.abs(event.clientY - startY);
-            console.log('Body3DViewer: pointerup', { deltaX, deltaY, clientX: event.clientX, clientY: event.clientY });
 
             // Increase threshold to 10px to be more forgiving of slight movements
             if (deltaX < 10 && deltaY < 10) {
@@ -542,7 +540,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
             if (this.controls) this.controls.update();
 
-            const time = this.clock.getElapsedTime();
+            this.timer.update();
+            const time = this.timer.getElapsed();
             
             // Idle Breathing Animation
             if (this.mannequinGroup) {

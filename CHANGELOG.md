@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-05-17
+
+### Added
+- **[2026-05-17] Monorepo Env Fallback**: Server-side `fetchGeminiApiKey()` now searches `pocketgull_api/.env.local` and `pocketgull_api/.env` as fallback sources, eliminating the need for a separate `.env.local` in the Angular root during local development.
+
+### Changed
+- **[2026-05-17] THREE.Clock → THREE.Timer**: Migrated `Body3DViewerComponent` from deprecated `THREE.Clock` to `THREE.Timer` (`timer.update()` + `timer.getElapsed()`), resolving the Three.js r183 deprecation warning.
+- **[2026-05-17] OHIF Viewer**: Replaced non-functional OHIF iframe (blocked by `X-Frame-Options: DENY` on `viewer.ohif.org`) with a polished launch card that opens OHIF in a new tab, preserving the `StudyInstanceUIDs` deep-link query param.
+- **[2026-05-17] Production Source Maps**: Set `sourceMap: false` in the `production` Angular build config to eliminate build-time warnings caused by malformed control characters in `@angular/platform-server`'s `init.mjs.map` (upstream Angular packaging bug).
+
+### Fixed
+- **[2026-05-17] Schema Validation**: Removed unsupported `server` property from `angular.json` `sourceMap` object, resolving `SchemaValidationException` on `npm run build`.
+- **[2026-05-17] Debug Log Noise**: Removed verbose `console.log` pointerdown/pointerup events from `Body3DViewerComponent` interaction handlers.
+
 ## [0.5.0] - 2026-03-16
 
 ### Added
