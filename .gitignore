@@ -47,3 +47,8 @@ rules.yaml
 
 # Companion apps
 companion-apps/
+
+# Legacy API artifact - no active source project
+pocketgull_api/package-lock.json
+pocketgull_api/node_modules/
+pocketgull_api/dist/
