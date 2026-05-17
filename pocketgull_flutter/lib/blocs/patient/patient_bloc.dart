@@ -59,17 +59,24 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
 
     on<UpdateIssueEvent>((event, emit) {
       final updatedIssues = Map<String, List<BodyPartIssue>>.from(state.issues);
-      if (updatedIssues.containsKey(event.partId)) {
+      if (!updatedIssues.containsKey(event.partId)) {
+        updatedIssues[event.partId] = [event.issue];
+      } else {
         final list = List<BodyPartIssue>.from(updatedIssues[event.partId]!);
         final index = list.indexWhere((i) => i.noteId == event.issue.noteId);
         if (index != -1) {
           list[index] = event.issue;
-          updatedIssues[event.partId] = list;
-          final newState = state.copyWith(issues: updatedIssues);
-          emit(newState);
-          _saveToPrefs(newState);
+        } else {
+          list.add(event.issue);
         }
+        updatedIssues[event.partId] = list;
       }
+      final newState = state.copyWith(
+          issues: updatedIssues,
+          selectedNoteId: state.selectedNoteId ?? event.issue.noteId,
+      );
+      emit(newState);
+      _saveToPrefs(newState);
     });
 
     on<DeleteNoteEvent>((event, emit) {
@@ -115,6 +122,12 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
       _saveToPrefs(newState);
     });
 
+    on<ChangeAnatomicalViewModeEvent>((event, emit) {
+      final newState = state.copyWith(viewMode: event.viewMode);
+      emit(newState);
+      _saveToPrefs(newState);
+    });
+
     _loadFromPrefs();
   }
 
@@ -148,6 +161,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
           'text': i.text,
           'status': i.status.index,
         }).toList(),
+        'viewMode': state.viewMode.index,
       };
       
       await prefs.setString(_storageKey, jsonEncode(data));
@@ -192,6 +206,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
             text: i['text'],
             status: BracketingState.values[i['status'] ?? 0],
           )).toList() ?? [],
+          viewMode: AnatomicalViewMode.values[data['viewMode'] ?? 0],
         );
         add(LoadPatient(loadedState));
       }

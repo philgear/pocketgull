@@ -1,255 +1,144 @@
-# Pocket Gull
-
-> Insight beneath the surface.
-
-![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)
-![Angular](https://img.shields.io/badge/Angular-v21.1-DD0031?logo=angular)
-![Three.js](https://img.shields.io/badge/Three.js-v0.183-000000?logo=three.js)
-![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
-![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
-
-> **Note:** This application was created for the purposes of entering the Gemini Live Agent Challenge hackathon.
-> **Category:** Live Agents 🗣️ (Real-time Interaction Voice & Visual UI)
-
-![Pocket Gull Dashboard](./docs/images/pocket-gull_dashboard.png)
-
-Pocket Gull streamlines patient intake with an interactive 3D body map and AI-powered clinical intelligence. It empowers practitioners with rapid data visualization and strategy synthesis for proactive care decisions, acting as an interruptible voice-first clinical co-pilot.
-
-**#GeminiLiveAgentChallenge**
+# 🕊️ POCKET GULL (Flutter Edition)
+**Aerial Perspective for the Clinical Ocean**
 
 ---
 
-## Real-Time Clinical Experience
+### PREPARED FOR
+**Google Gemini Live Agent Challenge** / 2026
 
-A highly interactive, aesthetically minimal user interface (Industrial Grace) designed for immediate clinical insight.
-*For a full demonstration, press the `Demo` button in the top-right of the application to load the patient simulation.*
+### CATEGORY
+**Live Agents 🗣️** (Multimodal Synthesis & Agent Orchestration)
 
-### Product Highlights
-
-![Dashboard Snapshot](./docs/images/dashboard.png)
-
-![3D Body Viewer](./docs/images/body_viewer.png)
-
-![Inline Agent Chat](./docs/images/inline_chat.webp)
+### VISION
+*"To provide practitioners with the 'Gull's Eye View'—the ability to rise above the turbulent sea of medical data and see the clear, actionable patterns beneath."*
 
 ---
 
-## 📃 Text Description
+## 📋 THE STORY OF THE SEAGULL
+
+In modern medicine, practitioners are often drowning in a "Sea of Information"—fragmented vitals, sprawling patient histories, and an ever-shifting tide of clinical literature. **Pocket Gull** was conceived as an aerial navigator. 
+
+Like its namesake, the agent is **agile**, **interruptible**, and **highly observant**. It doesn't just process data; it provides **Uplift**. By synthesizing multimodal inputs (3D spatial data, voice dictation, and biometric telemetry) into a singular, high-integrity strategy, it allows the clinician to maintain perspective without losing sight of the patient.
+
+> **Industrial Grace:** We believe medical tools should be as beautiful as they are functional. Our design language combines the clinical precision of a laboratory with the "Less, but better" philosophy of Dieter Rams.
+
+![Dashboard Snapshot](../images/dashboard.png)
+---
+
+## 🛠️ SCIENTIFIC RIGOR & CORE CAPABILITIES
+
+#### 🧠 EVIDENCE-GROUNDED REASONING (EGR)
+Pocket Gull eliminates "Black Box" AI anxiety. Every recommendation is anchored by an **Evidence Trail** generated through real-time integration with local PubGemma and Gemini models. The agent doesn't just suggest; it cites.
+
+#### 🎙️ MULTIMODAL SYNTHESIS & CONTEXTUAL ORCHESTRATION
+Powered by Native Flutter Speech-to-Text and contextual pop-out dictation windows. Specialized experts operate in a "Patient BLoC" environment, maintaining **context-aware memory** of report nodes, allowing for fluid, multi-turn reasoning across voice and visual UI.
+
+#### 📐 PRECISION 3D ANATOMICAL MODELING (DRILL-DOWN)
+Using `flutter_3d_controller`, we provide a procedurally detailed skeletal and surface model. The new **2D coordinate-based hit detection** allows for micro-level anatomical drill-downs. Severity is visualized through dynamic mesh layers (Orthomolecular, Muscular, Vascular), translating abstract pain descriptions into **spatial clinical data**.
+
+#### 📄 COGNITIVE LOCALIZATION (COLO)
+Moving beyond simple translation, the **COLO Engine** adjusts the "Clinical Strategy" to the patient's cognitive state (Standard, Dyslexia-Friendly, Pediatric) without losing clinical accuracy, ensuring **Informed Consent** is truly inclusive.
+
+---
+
+## 🧩 TECHNICAL ARCHITECTURE & FEATURES
 
 **What it does:**
-Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-time human-in-the-loop web speech interaction with a diagnostic 3D surface model and Gemini's deep reasoning (`gemini-2.5-flash` natively and via `@google/adk`), it processes a patient's multimodal symptom data to instantly produce synthesized, actionable clinical strategies.
+Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-time human-in-the-loop web speech interaction with a diagnostic 3D surface model and deep reasoning (`gemini-2.5-flash` natively or local PubGemma), it processes a patient's multimodal symptom data to instantly produce synthesized, actionable clinical strategies.
 
-**Core Features:**
-- **Live AI Consult & Multi-Agent Orchestration:** Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts synthesize clinical data into actionable insights through an interruptible, natural conversational UI with **context-aware memory** of recently discussed report nodes.
-- **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
-- **Cognition & Child Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly or pediatric formats, outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
-- **Printable Clinical Stationery:** CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis, with user-selectable toggles for clinical summaries and history.
-- **Minimalist Dieter Rams Design:** A premium, minimalist UI prioritizing clarity, neutrality, functional excellence, and seamless mobile responsive layouts (`100dvh`). Includes dark-mode agent conversations.
-- **Detailed 3D Medical Imagery:** Precise anatomical selection using a Three.js-powered skeletal and surface model (including detailed procedural spine geometry) with dynamic particle systems highlighting diagnostic severity.
-- **Smartwatch & Mobile Optimization:** Responsive Two-Column Grid UI scaling down to extremely constrained viewports (e.g., Pixel Watch 2 at 286px width) for ultra-portable clinical referencing.
-- **Scans & Diagnostics Library:** Integrated visual gallery within the patient profile for organizing and analyzing medical imagery (e.g., MRI, X-Rays), complete with dynamic Wikimedia Commons linking.
-- **Evidence Focus Iconography:** Custom medical iconography enhancing the interactive Task Bracketing and inline chat systems.
-- **Box Breathing UX:** Focused 16-second box breathing visual animations integrated into primary intake text areas to promote practitioner mindfulness.
-- **Interactive Task Bracketing:** Rapidly markup generated care plans using a double-click state machine (Normal, Added, Removed) to vet and customize AI recommendations.
-- **FHIR-Standard Data Portability & Localized Auto-Save:** Real-time persistence with visual "Saving..." / "Saved ✔" indicators, exported via Unicode-safe Base64 encoded FHIR Bundles.
-- **Patient Management System:** Full CRUD capabilities for patient records, including historical visit review and permanent record removal.
+**Core Features (Flutter Migration):**
+- **Secure Authentication Gateway:** A secure Splash Screen gateway requiring Biometric (FaceID/Fingerprint) or PIN code unlock, along with secure configuration of API keys and AI models.
+- **Triage Dashboard (Macro Drill-Down):** A grid view of all active patients with global 'CLINICAL MESH LAYER' toggles to instantly survey hotspots across the ward.
+- **Precise 3D Body Mapping (Micro Drill-Down):** Advanced hit detection on the `NativeBodyViewer` filters clinical intake notes dynamically based on the exact limb or region tapped.
+- **Contextual Pop-Out Voice Dictation:** Floating, absolute-positioned voice dictation UI that tracks with the user's cursor for frictionless charting.
+- **Patient Management & Local Persistence:** Full CRUD capabilities managed securely via `Hive` NoSQL local storage, ensuring zero PII leakage.
+- **Care Plan Recommendation Engine:** Synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education).
 
 **Technologies Used:**
-- **Framework:** Angular v21.1 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
-- **Visualization:** Three.js (3D Anatomical Modeling)
-- **Intelligence:** Google GenAI SDK (`gemini-2.5-flash`) & Google Agent Development Kit (`@google/adk`)
-- **Research Integrations:** Google Programmable Search Engine (CSE) & NIH PubMed E-utilities
-- **Export Engine:** jsPDF & FHIR Bundle standard
-- **Styling:** Tailwind CSS & Dieter Rams Design System
-- **Speech Control:** Web Speech API (Bi-directional voice interaction)
-- **Deployment & Infrastructure:** Google Cloud Run, Express.js Backend
-
-**Data Sources:**
-Primary inputs consist of manual demographics, biometric body map interaction, and voice-to-text dictation. Auxiliary real-time clinical context is gathered securely without persistent DB tracking using Google Programmable Search Engine API and NCBI PubMed E-utilities XML parsing algorithms. Patient state data is strictly locally persisted between active sessions.
-
-**Findings and Learnings:**
-Reflecting on the development of Pocket Gull, my commitment is to continuously embrace the complexity of multi-agent architectures and rigorous frontend performance optimization. Building this platform taught me the profound importance of balancing bleeding-edge AI orchestration—like implementing `@google/adk`'s `InMemoryRunner` to stabilize clinical generations—with the strict UX demands of a modern progressive web application. I commit to changing how I approach state management in future projects by prioritizing granular, reactive UI signals from day one, and to never settle for "good enough" when a top-tier mobile performance score (100/100 Lighthouse) is attainable through diligent layout unblocking and dynamic asset loading. Further, this project deepened my respect for CSS—from mastering viewport units (`100dvh`) to restore native scrolling on complex mobile constraints, to implementing robust `@media print` rules for structured offline clinical stationery.
+- **Framework:** Flutter & Dart
+- **State Management:** `flutter_bloc`
+- **Visualization:** `flutter_3d_controller`
+- **Local Database:** `Hive` NoSQL
+- **Intelligence:** Google GenAI SDK (`gemini-2.5-flash`) & PubGemma
 
 ---
 
-## 👨‍💻 Public Code Repository & Spin-Up Instructions
+## 📚 Documentation
+
+Full engineering documentation is available in the [`docs/study/`](./study/) directory.
+
+- **[Overview](./study/src/pages/index.mdx)** — Product introduction, screenshots, and key metrics
+- **[Architecture](./study/src/pages/architecture.mdx)** — System diagram, data flow, and technology stack
+- **[Features](./study/src/pages/features.mdx)** — Complete feature reference by category
+- **[Data & Privacy](./study/src/pages/data.mdx)** — Storage model, PHI handling, and FHIR portability
+- **[Responsible AI](./study/src/pages/responsible-ai.mdx)** — Core principles and societal impact
+- **[Getting Started](./study/src/pages/getting-started.mdx)** — Installation, development, and deployment
+- **[Case Study](../case_study.md)** — Professional engineering case study with benchmark results
+
+---
+
+## 👨💻 Public Code Repository & Spin-Up Instructions
 
 **Developer Profile:** [g.dev/philgear](https://g.dev/philgear)  
-**Repository:** [github.com/philgear/pocket-gull](https://github.com/philgear/pocket-gull)
 
 To run this project in a local development environment:
 
-1.  **Clone the repository:**
+1.  **Navigate to flutter app:**
     ```bash
-    git clone https://github.com/philgear/pocket-gull.git
-    cd pocket-gull
+    cd pocketgull_flutter
     ```
 
-2.  **Install dependencies:**
+2.  **Fetch dependencies:**
     ```bash
-    npm install
+    flutter pub get
     ```
 
 3.  **Run the development server:**
     ```bash
-    npm run dev
+    flutter run -d chrome
     ```
-
-4.  **Preview Production Build:**
-    ```bash
-    npm run build
-    npm run preview
-    ```
-
----
-
-## 🖥️ Proof of Google Cloud Deployment
-
-Pocket Gull's backend service and Express proxy layer is architecturally designed to deploy directly to **Google Cloud Run**.
-
-- **Proof of Action:** Successfully deployed to Google Cloud Run! The live application is available at: [https://pocketgall.app](https://pocketgall.app) (and [https://understory-315235665910.us-west1.run.app](https://understory-315235665910.us-west1.run.app))
-- **Repository Proof:** See `./server.js` and `./src/services/clinical-intelligence.service.ts` for Google Cloud infrastructure integrations.
 
 ---
 
 ## 🏗️ Architecture Diagram
 
-The application leverages a modern, reactive architecture utilizing Angular Signals, Cloud Run orchestration, and the Google GenAI API stack. *(Note: This conceptual map is available in high resolution within the hackathon image carousel.)*
+Built with a **BLoC Pattern** architecture in Flutter for high performance and deterministic state management.
 
 ```mermaid
 graph TD
-    User[Doctor/User] -->|HTTPS| CloudRun[Google Cloud Run Hosting]
-    CloudRun -->|Serves| UI[Angular Frontend]
-    CloudRun -->|Hosts| Backend[Express.js Server]
+    User[Practitioner] -->|Multimodal Input| UI[Pocket Gull Flutter UI]
+    UI -->|Events| State[Patient BLoC]
     
-    subgraph "Clinical Data Layer"
-        UI -->|Selects Body Part| BodyMap[BodyViewer Component]
-        UI -->|Enters Data| Intake[IntakeForm Component]
-        UI -->|Requests Analysis| Analysis[Analysis Component]
-        UI -->|Dictates Notes| Dictation[Dictation Service]
-        
-        BodyMap -->|Updates| State[PatientState Service]
-        Intake -->|Updates| State
-        Dictation -->|Updates| Intake
-        
-        State -->|Uses Centralized Types| Types[patient.types.ts]
-        Analysis -->|Reads| State
-        Analysis -->|Invokes| AdkRunner[ADK InMemoryRunner]
+    subgraph "INTELLIGENCE LAYER"
+        State -->|Context Injection| Analysis[Clinical Engine]
+        Analysis -->|Orchestrates| Agents[Specialized Agents]
+        Agents -->|REST| Gemini[Gemini 2.5 Flash / PubGemma]
     end
 
-    subgraph "Persistence & Portability"
-        State -->|Persists| PM[Patient Management]
-        PM -->|Exports/Imports| FHIR[FHIR Bundle / PDF]
+    subgraph "EVIDENCE FOUNDATION"
+        Analysis -->|Query| MedicalAPI[Medical Literature DB]
+        MedicalAPI -->|Citations| UI
     end
-    
-    subgraph "AI Core & Integrations"
-        AdkRunner -->|Orchestrates| Agents[Specialized LlmAgents]
-        Agents -->|Generate Content| Flash[Gemini 2.5 Flash]
-        Backend -->|Proxy Request| PubMedProxy["/api/pubmed Endpoint"]
-        Backend -->|Static Serve| GoogleSearch["search.html"]
-        PubMedProxy -->|E-utilities API| NCBI[NCBI PubMed]
-        GoogleSearch -->|CSE API| Google[Google Programmable Search]
+
+    subgraph "OUTPUT & EXPORT"
+        UI -->|COLO Engine| Translation[Cognitive Adaptation]
+        State -->|Secure Persistence| Hive[Hive Local Storage]
     end
-    
-    UI -->|Iframe Message| GoogleSearch
-    UI -->|API Call| PubMedProxy
-    Flash -->|Returns Partial JSON| Agents
-    Agents -->|Streams JSON| AdkRunner
-    AdkRunner -->|Yields Chunks| Analysis
-    NCBI -->|XML to JSON| PubMedProxy
-    PubMedProxy -->|Search Results| UI
-    Google -->|Search Results| GoogleSearch
-    GoogleSearch -->|postMessage| UI
 ```
 
 ---
 
-## 📹 Demonstration Video
+## 📜 RESPONSIBLE AI & ETHICS
+
+Pocket Gull adheres to the **Human-in-the-Loop** (HITL) principle. 
+- **Task Bracketing:** Clinicians must manually "bracket" (validate/edit) AI suggestions before they are archived.
+- **Explainability:** The agent surfaces its reasoning lens (Intervention, Monitoring, Education) for every output.
+- **Privacy Core:** Zero PII persistence to remote databases. All patient state is transient or locally-stored via Hive.
 
 ---
 
-## 🌱 Kaizen Philosophy
+## 👨💻 THE CRAFT
+**Phil Gear** / [g.dev/philgear](https://g.dev/philgear)  
+Engineering with **Kaizen**—the belief that clinical excellence is a journey of continuous refinement.
 
-Pocket Gull is built on the **Kaizen** principle of *continuous, incremental improvement*. We believe that clinical tools should never be "finished," but rather evolve alongside the practitioners who use them.
-
-- **Incremental Intelligence**: Every clinical analysis is a baseline for refinement. We use interactive bracketing to allow doctors to continuously improve the AI's output.
-- **Iterative Design**: Our UI is constantly polished to reduce cognitive load, ensuring that every pixel serves a clinical purpose.
-- **Evolving Integration**: We prioritize high-integrity manual data handling today while continuously building the bridges for automated, high-privacy biometric telemetry tomorrow.
-
----
-
-## 🗂️ Data Card
-
-Understanding how clinical information flows through Pocket Gull is critical for building practitioner trust.
-
-**Data Type & Processing:**
-Pocket Gull operates as a localized Clinical Data processor. It does not train core foundation models on user data. The primary data inputs include:
-- **Patient Intake:** Demographics, chief complaints, and historical medical notes entered manually or via Web Speech recognition.
-- **Biometric Selection:** Anatomical regions pinpointed interactively via the 3D body map viewer.
-- **Vitals & Telemetry:** Standard health metrics (Heart rate, Blood pressure, SpO2).
-
-**Medical Data Sources:**
-To augment clinical reasoning without compromising patient privacy, Pocket Gull integrates with external authoritative semantic data sources:
-- **NCBI PubMed E-utilities:** Queries peer-reviewed medical literature and abstracts for evidence-based context.
-- **Google Programmable Search Engine API:** Surfaces relevant differential diagnostic information and treatment pathways from indexed medical domains.
-*(Note: Queries sent to these external sources are anonymized and stripped of protected health information [PHI] prior to transmission.)*
-
-**Data Storage & Privacy:**
-- **Local Persistence:** All patient states, clinical brackets, and historical visit notes are stored strictly within the client's local session.
-- **No Remote Database:** There is no centralized remote database storing persistent patient records.
-- **AI Processing:** Selected clinical context is transmitted securely to the Gemini API (`gemini-2.5-flash`) and specialized `@google/adk` agent orchestrators via transient inference requests. Data is used solely for immediate generation of the clinical summary and is not retained by the application backend for training.
-
-**Data Export & Portability:**
-- **FHIR Bundles:** Users can export explicit JSON blobs representing standard FHIR patient state formats, encouraging open data portability.
-- **Printable Stationery:** Generated insights can be physically printed via CSS-optimized layouts featuring Halftone diagnostic maps, ensuring sensitive records can be kept strictly on offline paper when required.
-
----
-
-## 🌍 Impact Statement
-
-### Societal Impact Statement: Pocket Gull & AI-Augmented Clinical Strategy
-
-**Overview**  
-Pocket Gull is designed to transform the initial clinical encounter by shifting the burden of data synthesis from the physician to an AI-augmented workflow. By evolving generic medical analysis into a "Care Plan Recommendation Engine," the platform aims to reclaim clinical time for direct patient interaction, ultimately strengthening the doctor-patient relationship through increased presence and empathy.
-
-**Societal and Ethical Implications**
-- **Autonomy and Dignity**: The platform prioritizes physician autonomy by acting as a "Live Consult" co-pilot rather than an automated decision-maker. Interactive "Task Bracketing" ensures that every medical recommendation is manually vetted and adjusted by a human clinician.
-- **Fairness and Community Well-being**: By streamlining complex data ingestion—vitals, history, and chief complaint—Pocket Gull reduces the cognitive load on healthcare providers, mitigating physician burnout.
-- **Data Integrity**: The commitment to FHIR standards ensures that patient data remains portable, interoperable, and owned by the clinical institution, preventing proprietary data silos.
-
-**Environmental Impact**  
-By facilitating rapid, data-driven synthesis in a paperless environment, Pocket Gull promotes resource efficiency within clinics. The use of efficient models (Gemini Flash) ensures that the computational footprint remains optimized for sustainable growth.
-
----
-
-## 🤖 Responsible AI Statement
-
-Pocket Gull is built with a firm commitment to the responsible development and deployment of AI in clinical settings. The following principles guide every design and engineering decision on this platform:
-
-**Human-in-the-Loop Oversight**  
-Pocket Gull is a clinical *co-pilot*, not an autonomous decision-maker. Every AI-generated insight, care plan recommendation, or synthesized summary is explicitly presented as a draft for physician review. The interactive "Task Bracketing" system ensures that no recommendation can be acted upon without deliberate, manual clinician validation.
-
-**Transparency & Explainability**  
-The application clearly surfaces which data points (vitals, chief complaint, annotated body regions, medical history) were used to construct each recommendation. Clinicians are never presented with a "black box" output — the reasoning lens is visible (Overview, Interventions, Monitoring, Education), and the source data is always traceable.
-
-**Privacy by Design**  
-Patient data is processed transiently. No personally identifiable clinical information is persisted to a remote database. All session state is stored locally within the clinician's browser. Data transmitted to the Gemini API for inference is used solely for generating the immediate clinical response and is not retained for model training by this application.
-
-**Limitation Awareness**  
-Pocket Gull is not a medical device and is not a substitute for professional clinical judgment, licensure, or established diagnostic procedures. It is a productivity and synthesis tool. Users are expected to apply their clinical expertise when interpreting and acting upon any AI-generated content.
-
-**Fairness & Bias Mitigation**  
-Clinical inputs are structured and physician-directed, reducing the risk of biased outputs driven by incomplete demographic proxies. The platform is designed to augment — not replace — the human clinical assessment, ensuring the physician's direct observation remains the primary diagnostic instrument.
-
----
-
-## 🎉 Bonus Content
-
-- **Automated Cloud Deployment:** Cloud deployment provisioning has been scripted through Google Cloud's CLI (`gcloud`). See the automated deployment script located at [`./scripts/deploy.sh`](scripts/deploy.sh) within the codebase.
-
----
-
-## License
-
-This project is licensed under the MIT License.
+*© 2026 Pocket Gull. Industrial Grace & Clinical Intelligence.*

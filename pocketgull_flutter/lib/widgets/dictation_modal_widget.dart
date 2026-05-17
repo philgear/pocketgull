@@ -1,29 +1,97 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/dictation_service.dart';
+import '../services/clinical_intelligence_service.dart';
 
-class DictationModalWidget extends StatelessWidget {
+class DictationModalWidget extends StatefulWidget {
   final DictationService dictationService;
+  final String partId;
+  final String historicalContext;
   final VoidCallback onCancel;
-  final Function(String) onAccept;
+  final Function(String, ClinicalIntelligenceResult?) onAccept;
 
   const DictationModalWidget({
     super.key,
     required this.dictationService,
+    required this.partId,
+    required this.historicalContext,
     required this.onCancel,
     required this.onAccept,
   });
+
+  @override
+  State<DictationModalWidget> createState() => _DictationModalWidgetState();
+}
+
+class _DictationModalWidgetState extends State<DictationModalWidget> {
+  late ClinicalIntelligenceService _aiService;
+  bool _isSynthesizing = false;
+  String? _clarificationQuestion;
+  ClinicalIntelligenceResult? _latestResult;
+
+  @override
+  void initState() {
+    super.initState();
+    _aiService = context.read<ClinicalIntelligenceService>();
+  }
+
+  Future<void> _handleSynthesize() async {
+    final text = widget.dictationService.interimText.value;
+    if (text.isEmpty) {
+      widget.onAccept(text, null);
+      return;
+    }
+
+    setState(() {
+      _isSynthesizing = true;
+      _clarificationQuestion = null;
+    });
+
+    final result = await _aiService.analyzeDictation(text, widget.partId, historicalContext: widget.historicalContext);
+
+    if (mounted) {
+      setState(() {
+        _isSynthesizing = false;
+        _latestResult = result;
+        _clarificationQuestion = result.clarificationQuestion;
+      });
+
+      // If no clarification needed, auto-accept
+      if (_clarificationQuestion == null) {
+        widget.onAccept(result.symptoms ?? text, result);
+      }
+    }
+  }
+
+  void _handleFinalAccept() {
+    // Merge latest transcription with previous symptoms if any
+    final currentText = widget.dictationService.interimText.value;
+    final finalSymptoms = _latestResult != null 
+        ? "${_latestResult!.symptoms} $currentText".trim()
+        : currentText;
+        
+    final finalResult = ClinicalIntelligenceResult(
+      painLevel: _latestResult?.painLevel,
+      symptoms: finalSymptoms,
+      recommendations: _latestResult?.recommendations,
+    );
+    
+    widget.onAccept(finalSymptoms, finalResult);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: _isSynthesizing ? const Color(0xFF689F38) : Colors.grey.withValues(alpha: 0.1), width: _isSynthesizing ? 2 : 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
+            color: _isSynthesizing ? const Color(0xFF689F38).withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.15),
+            blurRadius: 30,
+            spreadRadius: _isSynthesizing ? 5 : 0,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -31,35 +99,52 @@ class DictationModalWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  ValueListenableBuilder<bool>(
-                    valueListenable: dictationService.isListeningNotifier,
-                    builder: (context, isListening, child) {
-                      return Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: isListening ? Colors.red.shade50 : Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(10),
+                  if (_isSynthesizing)
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF689F38).withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Center(
+                        child: SizedBox(
+                          width: 20, height: 20,
+                          child: CircularProgressIndicator(color: Color(0xFF689F38), strokeWidth: 2),
                         ),
-                        child: Icon(
-                          Icons.mic,
-                          color: isListening ? Colors.red : Colors.grey,
-                          size: 20,
-                        ),
-                      );
-                    },
-                  ),
+                      ),
+                    )
+                  else
+                    ValueListenableBuilder<bool>(
+                      valueListenable: widget.dictationService.isListeningNotifier,
+                      builder: (context, isListening, child) {
+                        return Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: isListening ? Colors.red.shade50 : Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.mic,
+                            color: isListening ? Colors.red : Colors.grey,
+                            size: 20,
+                          ),
+                        );
+                      },
+                    ),
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'VOICE DICTATION',
+                        'CLINICAL AI ORCHESTRATION',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -67,30 +152,60 @@ class DictationModalWidget extends StatelessWidget {
                           letterSpacing: 1.2,
                         ),
                       ),
-                      ValueListenableBuilder<bool>(
-                        valueListenable: dictationService.isListeningNotifier,
-                        builder: (context, isListening, child) {
-                          return Text(
-                            isListening ? 'Listening... Speak clearly.' : 'Paused. Review your text.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isListening ? Colors.red.shade700 : Colors.grey,
-                            ),
-                          );
-                        },
-                      ),
+                      if (_isSynthesizing)
+                        const Text('Synthesizing multimodal context...', style: TextStyle(fontSize: 12, color: Color(0xFF689F38)))
+                      else
+                        ValueListenableBuilder<bool>(
+                          valueListenable: widget.dictationService.isListeningNotifier,
+                          builder: (context, isListening, child) {
+                            return Text(
+                              isListening ? 'Listening... Speak clearly.' : 'Paused. Review your text.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isListening ? Colors.red.shade700 : Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
                     ],
                   ),
                 ],
               ),
               IconButton(
-                onPressed: onCancel,
+                onPressed: widget.onCancel,
                 icon: const Icon(Icons.close, color: Colors.grey),
                 visualDensity: VisualDensity.compact,
               ),
             ],
           ),
           const SizedBox(height: 24),
+
+          // Clarification Bubble
+          if (_clarificationQuestion != null) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0FDF4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFBBF7D0)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.auto_awesome, color: Color(0xFF16A34A), size: 20),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _clarificationQuestion!,
+                      style: const TextStyle(color: Color(0xFF166534), fontWeight: FontWeight.w600, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Text Area
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -99,13 +214,13 @@ class DictationModalWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.grey.shade100),
             ),
-            constraints: const BoxConstraints(minHeight: 120, maxHeight: 200),
+            constraints: const BoxConstraints(minHeight: 100, maxHeight: 180),
             child: ValueListenableBuilder<String>(
-              valueListenable: dictationService.interimText,
+              valueListenable: widget.dictationService.interimText,
               builder: (context, text, child) {
                 return SingleChildScrollView(
                   child: Text(
-                    text.isEmpty ? 'Start speaking or type here...' : text,
+                    text.isEmpty ? 'Start speaking to extract pain, symptoms, and context...' : text,
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.5,
@@ -118,22 +233,28 @@ class DictationModalWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
+
+          // Actions
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ValueListenableBuilder<bool>(
-                valueListenable: dictationService.isListeningNotifier,
+                valueListenable: widget.dictationService.isListeningNotifier,
                 builder: (context, isListening, child) {
                   return ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: _isSynthesizing ? null : () {
                       if (isListening) {
-                        dictationService.stopListening();
+                        widget.dictationService.stopListening();
                       } else {
-                        dictationService.startListening((text, isFinal) {});
+                        // Clear text if answering clarification
+                        if (_clarificationQuestion != null) {
+                           widget.dictationService.interimText.value = '';
+                        }
+                        widget.dictationService.startListening((text, isFinal) {});
                       }
                     },
                     icon: Icon(isListening ? Icons.pause : Icons.play_arrow, size: 18),
-                    label: Text(isListening ? 'PAUSE' : 'RESUME'),
+                    label: Text(isListening ? 'PAUSE' : 'SPEAK'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isListening ? Colors.grey.shade200 : Colors.red,
                       foregroundColor: isListening ? Colors.black87 : Colors.white,
@@ -147,26 +268,27 @@ class DictationModalWidget extends StatelessWidget {
               ),
               Row(
                 children: [
-                  TextButton(
-                    onPressed: onCancel,
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.grey.shade600,
-                      textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                  if (_clarificationQuestion != null)
+                    TextButton(
+                      onPressed: _handleFinalAccept, // Skip clarification
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.grey.shade600,
+                        textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                      ),
+                      child: const Text('SKIP & INSERT'),
                     ),
-                    child: const Text('CANCEL'),
-                  ),
                   const SizedBox(width: 12),
                   ElevatedButton(
-                    onPressed: () => onAccept(dictationService.interimText.value),
+                    onPressed: _isSynthesizing ? null : (_clarificationQuestion != null ? _handleFinalAccept : _handleSynthesize),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
+                      backgroundColor: const Color(0xFF111827),
                       foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text('INSERT TEXT'),
+                    child: Text(_clarificationQuestion != null ? 'ACCEPT' : 'SYNTHESIZE'),
                   ),
                 ],
               ),

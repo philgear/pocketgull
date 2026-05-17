@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 enum AnalysisLens {
@@ -192,5 +193,102 @@ $patientData
     final prompt = 'REWRITE RULES:\n$systemInstruction\n\nTEXT TO REWRITE:\n$text';
     final response = await _model.generateContent([Content.text(prompt)]);
     return response.text ?? text;
+  }
+
+  Future<ClinicalIntelligenceResult> analyzeDictation(String transcription, String partId, {String historicalContext = ""}) async {
+    if (_isMockMode) {
+      // MOCK MODE: Simulate AI processing
+      await Future.delayed(const Duration(seconds: 2));
+      
+      int? mockPain;
+      String? mockQuestion;
+      String? mockTrajectory;
+      bool mockEscalation = false;
+      
+      if (transcription.toLowerCase().contains('pain') && !transcription.contains(RegExp(r'\d'))) {
+        mockQuestion = 'What is the pain severity on a scale of 1-10?';
+      } else if (transcription.contains(RegExp(r'\d'))) {
+        final match = RegExp(r'\d').firstMatch(transcription);
+        if (match != null) mockPain = int.parse(match.group(0)!);
+      }
+
+      if (transcription.toLowerCase().contains('worse') || transcription.toLowerCase().contains('escalating')) {
+         mockTrajectory = 'rapidly_escalating';
+         mockEscalation = true;
+      }
+
+      return ClinicalIntelligenceResult(
+        painLevel: mockPain,
+        symptoms: transcription,
+        clarificationQuestion: mockQuestion,
+        trajectory: mockTrajectory,
+        escalationFlag: mockEscalation,
+      );
+    }
+
+    // REAL MODE
+    final prompt = '''
+    You are a clinical intelligence agent. The user is dictating notes for the anatomical region: "$partId".
+    Transcription: "$transcription"
+    
+    Historical Context for this region: 
+    $historicalContext
+
+    Task:
+    1. Extract the pain severity (0-10 integer). If not mentioned, return null.
+    2. Extract a summary of symptoms.
+    3. Extract any recommendations.
+    4. If the pain level or key context is missing but the user implies a problem, provide a short follow-up clarificationQuestion (e.g., "What is the pain severity?"). If all is clear, return null.
+    5. Compare the transcription to the historical context. Determine the severity trajectory ("improving", "stable", "gradually_worsening", "rapidly_escalating", or null if unknown).
+    6. Provide a brief deltaSummary (1 sentence) explaining the change compared to history.
+    7. Set escalationFlag to true if the trajectory is rapidly escalating and warrants immediate clinical intervention.
+
+    Output as JSON with keys: "painLevel" (int|null), "symptoms" (string|null), "recommendations" (string|null), "clarificationQuestion" (string|null), "trajectory" (string|null), "deltaSummary" (string|null), "escalationFlag" (boolean|null).
+    ''';
+
+    try {
+      final response = await _model.generateContent([Content.text(prompt)]);
+      final responseText = response.text;
+      if (responseText != null) {
+        final decoded = jsonDecode(responseText);
+        return ClinicalIntelligenceResult.fromJson(decoded);
+      }
+    } catch (e) {
+      print('Gemini API Error: $e');
+    }
+
+    return ClinicalIntelligenceResult(symptoms: transcription);
+  }
+}
+
+class ClinicalIntelligenceResult {
+  final int? painLevel;
+  final String? symptoms;
+  final String? recommendations;
+  final String? clarificationQuestion;
+  final String? trajectory;
+  final String? deltaSummary;
+  final bool? escalationFlag;
+
+  ClinicalIntelligenceResult({
+    this.painLevel,
+    this.symptoms,
+    this.recommendations,
+    this.clarificationQuestion,
+    this.trajectory,
+    this.deltaSummary,
+    this.escalationFlag,
+  });
+
+  factory ClinicalIntelligenceResult.fromJson(Map<String, dynamic> json) {
+    return ClinicalIntelligenceResult(
+      painLevel: json['painLevel'],
+      symptoms: json['symptoms'],
+      recommendations: json['recommendations'],
+      clarificationQuestion: json['clarificationQuestion'],
+      trajectory: json['trajectory'],
+      deltaSummary: json['deltaSummary'],
+      escalationFlag: json['escalationFlag'],
+    );
   }
 }

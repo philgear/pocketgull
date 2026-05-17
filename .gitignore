@@ -59,3 +59,12 @@ gcp-*.json
 .flutter-plugins
 .flutter-plugins-dependencies
 build/
+
+# --- Local PHI & Hive Database Security ---
+*.hive
+*.hivec
+*.lock
+
+# --- Agent & Build Logs ---
+*_log*.txt
+deploy_log.txt

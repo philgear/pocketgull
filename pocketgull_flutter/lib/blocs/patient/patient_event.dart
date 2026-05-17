@@ -106,3 +106,11 @@ class ToggleChecklistStatusEvent extends PatientEvent {
   @override
   List<Object> get props => [itemId];
 }
+
+class ChangeAnatomicalViewModeEvent extends PatientEvent {
+  final AnatomicalViewMode viewMode;
+  const ChangeAnatomicalViewModeEvent(this.viewMode);
+
+  @override
+  List<Object> get props => [viewMode];
+}

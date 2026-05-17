@@ -82,3 +82,12 @@ fastlane/test_output
 *secret*.json
 *config*.json
 stripe*.json
+
+# --- Local PHI & Hive Database Security ---
+*.hive
+*.hivec
+*.lock
+
+# --- Agent & Build Logs ---
+*_log*.txt
+deploy_log.txt

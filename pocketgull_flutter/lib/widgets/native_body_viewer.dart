@@ -53,18 +53,34 @@ class _NativeBodyViewerState extends State<NativeBodyViewer> {
       } : null,
       onTapDown: widget.interactive ? (details) {
         final height = context.size?.height ?? 1.0;
+        final width = context.size?.width ?? 1.0;
         final normalizedY = details.localPosition.dy / height;
+        final normalizedX = details.localPosition.dx / width;
         
-        String partId;
-        if (normalizedY < 0.35) {
+        // Accurate 2D bounding box mapping (assuming default rotation/front facing)
+        String partId = 'chest';
+        
+        if (normalizedY < 0.25) {
           partId = 'head';
+        } else if (normalizedY < 0.55) {
+          if (normalizedX < 0.35) partId = 'r_arm';
+          else if (normalizedX > 0.65) partId = 'l_arm';
+          else partId = 'chest';
         } else if (normalizedY < 0.65) {
-          partId = 'chest';
+          if (normalizedX < 0.35) partId = 'r_hand';
+          else if (normalizedX > 0.65) partId = 'l_hand';
+          else partId = 'abdomen';
+        } else if (normalizedY < 0.75) {
+          partId = 'pelvis';
+        } else if (normalizedY < 0.9) {
+          if (normalizedX < 0.5) partId = 'r_thigh';
+          else partId = 'l_thigh';
         } else {
-          partId = 'legs';
+          if (normalizedX < 0.5) partId = 'r_shin';
+          else partId = 'l_shin';
         }
         
-        print('3D Selection: $partId (Y: $normalizedY)');
+        print('3D Selection: $partId (X: $normalizedX, Y: $normalizedY)');
         context.read<PatientBloc>().add(SelectPartEvent(partId));
       } : null,
       child: Container(
@@ -119,22 +135,57 @@ class _NativeBodyViewerState extends State<NativeBodyViewer> {
   }
 
   Color _getPartColor(String partId, PatientState state) {
-    // 1. Highlight selected part
     if (state.selectedPartId == partId) {
       return Colors.blue.withValues(alpha: 0.8);
     }
 
-    // 2. Color based on issues / pain level
     final issues = state.issues[partId];
+    int maxPain = 0;
+    bool hasEscalation = false;
+    
     if (issues != null && issues.isNotEmpty) {
-      // Get max pain level
-      final maxPain = issues.map((i) => i.painLevel).reduce((a, b) => a > b ? a : b);
-      if (maxPain >= 7) return Colors.red.withValues(alpha: 0.8);
-      if (maxPain >= 4) return Colors.orange.withValues(alpha: 0.8);
-      return Colors.yellow.withValues(alpha: 0.8);
+      maxPain = issues.map((i) => i.painLevel).reduce((a, b) => a > b ? a : b);
+      hasEscalation = issues.any((i) => i.escalationFlag || i.trajectory == 'rapidly_escalating');
     }
 
-    // 3. Default color
-    return Colors.white.withValues(alpha: 0.9);
+    // High Priority Escalation Override
+    if (hasEscalation) {
+       // Deep crimson red to indicate urgent escalation across all view modes
+       return const Color(0xFF991B1B).withValues(alpha: 0.95);
+    }
+
+    switch (state.viewMode) {
+      case AnatomicalViewMode.orthomolecular:
+        // Orthomolecular: Cyan/Green base, Magenta/Purple for metabolic stress
+        if (maxPain >= 7) return Colors.purpleAccent.shade400.withValues(alpha: 0.9);
+        if (maxPain >= 4) return Colors.deepPurple.shade300.withValues(alpha: 0.8);
+        return Colors.tealAccent.shade700.withValues(alpha: 0.6);
+
+      case AnatomicalViewMode.muscular:
+        // Muscular: Crimson base, Cyan for oxygen deprivation/injury
+        if (maxPain >= 7) return Colors.cyanAccent.shade400.withValues(alpha: 0.9);
+        if (maxPain >= 4) return Colors.blue.shade300.withValues(alpha: 0.8);
+        return Colors.red.shade900.withValues(alpha: 0.8);
+
+      case AnatomicalViewMode.skeletal:
+        // Skeletal: Bone white base, Orange/Yellow for structural stress
+        if (maxPain >= 7) return Colors.deepOrange.shade600.withValues(alpha: 0.9);
+        if (maxPain >= 4) return Colors.orangeAccent.shade200.withValues(alpha: 0.8);
+        return const Color(0xFFF1F0EA).withValues(alpha: 0.9);
+
+      case AnatomicalViewMode.vascular:
+        // Vascular: Blue/Red mix base, glowing Yellow/White for leak/hemorrhage
+        if (maxPain >= 7) return Colors.yellowAccent.shade400.withValues(alpha: 0.9);
+        if (maxPain >= 4) return Colors.amber.shade200.withValues(alpha: 0.8);
+        return const Color(0xFF4A148C).withValues(alpha: 0.7); // Deep purple-blue for veins/arteries
+
+      case AnatomicalViewMode.standard:
+      default:
+        // Standard: White base, Red/Orange for general pain
+        if (maxPain >= 7) return Colors.red.withValues(alpha: 0.8);
+        if (maxPain >= 4) return Colors.orange.withValues(alpha: 0.8);
+        if (maxPain > 0) return Colors.yellow.withValues(alpha: 0.8);
+        return Colors.white.withValues(alpha: 0.9);
+    }
   }
 }

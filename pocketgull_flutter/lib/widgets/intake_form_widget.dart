@@ -30,22 +30,54 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
     _dictationService.initialize();
   }
 
-  void _showDictationModal(TextEditingController controller, String partId, BodyPartIssue note) {
-    showModalBottomSheet(
+  void _showDictationModal(BuildContext buttonContext, TextEditingController controller, String partId, BodyPartIssue note, List<BodyPartIssue> history) {
+    final RenderBox button = buttonContext.findRenderObject() as RenderBox;
+    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
+    final Offset offset = button.localToGlobal(Offset.zero, ancestor: overlay);
+
+    // Format historical context
+    String historicalContext = "";
+    if (history.isNotEmpty) {
+      historicalContext = history.where((n) => n.noteId != note.noteId && n.noteId != 'temp').map((n) {
+        return "[Date: ${n.date ?? 'Unknown'}] Pain: ${n.painLevel}, Symptoms: ${n.description}";
+      }).join("\n");
+    }
+
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => DictationModalWidget(
-        dictationService: _dictationService,
-        onCancel: () {
-          _dictationService.cancelListening();
-          Navigator.pop(context);
-        },
-        onAccept: (text) {
-          _handleDictationResult(text, controller, partId, note);
-          Navigator.pop(context);
-        },
-      ),
+      barrierColor: Colors.black.withValues(alpha: 0.1),
+      builder: (context) {
+        double leftPos = offset.dx - 360; 
+        if (leftPos < 20) leftPos = 20;
+
+        return Stack(
+          children: [
+            Positioned(
+              left: leftPos,
+              top: offset.dy + button.size.height + 8,
+              child: Material(
+                color: Colors.transparent,
+                child: SizedBox(
+                  width: 380,
+                  child: DictationModalWidget(
+                    dictationService: _dictationService,
+                    partId: partId,
+                    historicalContext: historicalContext,
+                    onCancel: () {
+                      _dictationService.cancelListening();
+                      Navigator.pop(context);
+                    },
+                    onAccept: (text, aiResult) {
+                      _handleDictationResult(text, aiResult, controller, partId, note);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
     
     _dictationService.startListening((text, isFinal) {
@@ -53,18 +85,16 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
     });
   }
 
-  void _handleDictationResult(String text, TextEditingController controller, String partId, BodyPartIssue note) {
+  void _handleDictationResult(String text, dynamic aiResult, TextEditingController controller, String partId, BodyPartIssue note) {
     final command = _dictationService.parseCommand(text);
     
     if (command != null) {
       switch (command.action) {
         case CommandAction.newNote:
-          // Implement new note logic
           break;
         case CommandAction.switchAndNote:
           if (command.partId != null) {
             context.read<PatientBloc>().add(SelectPartEvent(command.partId));
-            // Further logic to create note if needed
           }
           break;
         case CommandAction.setPain:
@@ -91,18 +121,105 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
     final newText = currentText.isEmpty ? text : '$currentText $text';
     controller.text = newText;
     
+    // If AI extracted data, use it!
+    int resolvedPainLevel = note.painLevel;
+    String resolvedRecs = note.recommendation ?? '';
+    String? resolvedTrajectory = note.trajectory;
+    String? resolvedDeltaSummary = note.deltaSummary;
+    bool resolvedEscalationFlag = note.escalationFlag;
+    
+    if (aiResult != null) {
+      if (aiResult.painLevel != null) resolvedPainLevel = aiResult.painLevel;
+      if (aiResult.recommendations != null) {
+        resolvedRecs = (resolvedRecs.isEmpty) ? aiResult.recommendations : '$resolvedRecs ${aiResult.recommendations}';
+        _recController.text = resolvedRecs;
+      }
+      if (aiResult.trajectory != null) resolvedTrajectory = aiResult.trajectory;
+      if (aiResult.deltaSummary != null) resolvedDeltaSummary = aiResult.deltaSummary;
+      if (aiResult.escalationFlag != null) resolvedEscalationFlag = aiResult.escalationFlag;
+    }
+
     // Trigger bloc update
     final updatedNote = BodyPartIssue(
       id: note.id,
       noteId: note.noteId,
       name: note.name,
-      painLevel: note.painLevel,
+      painLevel: resolvedPainLevel,
       description: controller == _descController ? newText : note.description,
       symptoms: note.symptoms,
-      recommendation: controller == _recController ? newText : note.recommendation,
+      recommendation: controller == _recController ? newText : resolvedRecs,
       date: note.date,
+      trajectory: resolvedTrajectory,
+      deltaSummary: resolvedDeltaSummary,
+      escalationFlag: resolvedEscalationFlag,
     );
     context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
+  }
+
+  Widget _buildTrajectoryAlert(BodyPartIssue note) {
+    if (note.trajectory == null) return const SizedBox.shrink();
+
+    Color bgColor = Colors.blue.shade50;
+    Color iconColor = Colors.blue;
+    IconData icon = Icons.info_outline;
+
+    if (note.trajectory == 'rapidly_escalating' || note.escalationFlag) {
+      bgColor = Colors.red.shade50;
+      iconColor = Colors.red;
+      icon = Icons.warning_amber_rounded;
+    } else if (note.trajectory == 'gradually_worsening') {
+      bgColor = Colors.orange.shade50;
+      iconColor = Colors.orange;
+      icon = Icons.trending_up;
+    } else if (note.trajectory == 'improving') {
+      bgColor = Colors.green.shade50;
+      iconColor = Colors.green;
+      icon = Icons.trending_down;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: iconColor.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: iconColor, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'TRAJECTORY: ${note.trajectory!.replaceAll('_', ' ').toUpperCase()}',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: iconColor,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                if (note.deltaSummary != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    note.deltaSummary!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.black87,
+                      height: 1.3,
+                    ),
+                  ),
+                ]
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -220,12 +337,14 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildAssessmentHeader(state, currentNote),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                  _buildTrajectoryAlert(currentNote),
+                  const SizedBox(height: 8),
                   _buildPainSection(currentNote),
                   const SizedBox(height: 24),
-                  _buildObservationsSection(currentNote),
+                  _buildObservationsSection(currentNote, issues),
                   const SizedBox(height: 24),
-                  _buildRecommendationsSection(currentNote),
+                  _buildRecommendationsSection(currentNote, issues),
                   const SizedBox(height: 32),
                   HistoryTimelineWidget(partId: selectedPartId),
                 ],
@@ -401,7 +520,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
     );
   }
 
-  Widget _buildObservationsSection(BodyPartIssue note) {
+  Widget _buildObservationsSection(BodyPartIssue note, List<BodyPartIssue> history) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -425,13 +544,18 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
                 symptoms: note.symptoms,
                 recommendation: note.recommendation,
                 date: note.date,
+                trajectory: note.trajectory,
+                deltaSummary: note.deltaSummary,
+                escalationFlag: note.escalationFlag,
               );
               context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
             },
             decoration: _inputDecoration('Describe symptoms, triggers, and observations...').copyWith(
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.mic_none, size: 18, color: Color(0xFF689F38)),
-                onPressed: () => _showDictationModal(_descController, note.id, note),
+              suffixIcon: Builder(
+                builder: (btnContext) => IconButton(
+                  icon: const Icon(Icons.mic_none, size: 18, color: Color(0xFF689F38)),
+                  onPressed: () => _showDictationModal(btnContext, _descController, note.id, note, history),
+                ),
               ),
             ),
           ),
@@ -440,7 +564,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
     );
   }
 
-  Widget _buildRecommendationsSection(BodyPartIssue note) {
+  Widget _buildRecommendationsSection(BodyPartIssue note, List<BodyPartIssue> history) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -462,13 +586,18 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
               symptoms: note.symptoms,
               recommendation: value,
               date: note.date,
+              trajectory: note.trajectory,
+              deltaSummary: note.deltaSummary,
+              escalationFlag: note.escalationFlag,
             );
             context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
           },
           decoration: _inputDecoration('Suggested treatments, referrals, or next steps...').copyWith(
-            suffixIcon: IconButton(
-              icon: const Icon(Icons.mic_none, size: 18, color: Color(0xFF689F38)),
-              onPressed: () => _showDictationModal(_recController, note.id, note),
+            suffixIcon: Builder(
+              builder: (btnContext) => IconButton(
+                icon: const Icon(Icons.mic_none, size: 18, color: Color(0xFF689F38)),
+                onPressed: () => _showDictationModal(btnContext, _recController, note.id, note, history),
+              ),
             ),
           ),
         ),

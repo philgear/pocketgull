@@ -23,6 +23,8 @@ void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
+    // TODO: Uncomment after running 'flutterfire configure'
+    /*
     try {
       await Firebase.initializeApp();
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -40,6 +42,8 @@ void main() async {
       print("Firebase Initialization Error: $e");
       print("Note: You must run 'flutterfire configure' to generate native config files.");
     }
+    */
+    print("Firebase initialization skipped. Run 'flutterfire configure' first.");
     
     // Initialize Hive local offline database
     await Hive.initFlutter();

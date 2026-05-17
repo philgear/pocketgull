@@ -84,6 +84,49 @@ class PatientManagementService {
           {'id': '18893435', 'title': 'The heart in bronchial asthma.'},
           {'id': '20241492', 'title': 'Cardiac complications and deaths in asthmatic patients.'}
         ],
+      ),
+      Patient(
+        id: 'p003',
+        name: 'John Doe',
+        age: 34,
+        gender: 'Male',
+        lastVisit: '2024.11.20',
+        preexistingConditions: ['None'],
+        patientGoals: 'Survive severe respiratory distress and shock.',
+        vitals: const PatientVitals(bp: '85/50', hr: '130', temp: '103.1F', weight: '180 lbs', spO2: '82', height: '6\'0"'),
+        issues: const {
+          'chest': [
+            BodyPartIssue(id: 'chest', noteId: 'n1', name: 'Pulmonary Edema', description: 'Severe fluid buildup', painLevel: 9, symptoms: []),
+          ],
+          'abdomen': [
+            BodyPartIssue(id: 'abdomen', noteId: 'n2', name: 'Renal Failure', description: 'Hemorrhagic fever signs', painLevel: 7, symptoms: []),
+          ],
+          'pelvis': [
+            BodyPartIssue(id: 'pelvis', noteId: 'n3', name: 'Renal Failure', description: 'Kidney involvement', painLevel: 7, symptoms: []),
+          ],
+          'l_arm': [
+            BodyPartIssue(id: 'l_arm', noteId: 'n4', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
+          ],
+          'r_arm': [
+            BodyPartIssue(id: 'r_arm', noteId: 'n5', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
+          ],
+          'l_thigh': [
+            BodyPartIssue(id: 'l_thigh', noteId: 'n6', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
+          ],
+          'r_thigh': [
+            BodyPartIssue(id: 'r_thigh', noteId: 'n7', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
+          ]
+        },
+        history: const [],
+        bookmarks: const [],
+        scans: const [],
+        triageScore: 15,
+        kaizenColor: 'red',
+        activeTimerSeconds: 1800,
+        recommendedGuidelines: const [
+          {'id': '98765432', 'title': 'Hantavirus Pulmonary Syndrome: Clinical Management'},
+          {'id': '11223344', 'title': 'Extracorporeal Membrane Oxygenation in Severe HPS'}
+        ],
       )
     ];
   }

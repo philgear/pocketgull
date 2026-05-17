@@ -3,6 +3,14 @@ import 'package:flutter/material.dart';
 import '../models/patient_types.dart';
 import '../services/patient_management_service.dart';
 import '../widgets/native_body_viewer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/patient/patient_bloc.dart';
+import '../blocs/patient/patient_event.dart';
+import 'home_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/patient/patient_bloc.dart';
+import '../blocs/patient/patient_event.dart';
+import 'home_screen.dart';
 
 class TriageBoardScreen extends StatefulWidget {
   const TriageBoardScreen({super.key});
@@ -18,6 +26,8 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
   Timer? _ticker;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+
+  AnatomicalViewMode _currentViewMode = AnatomicalViewMode.standard;
 
   @override
   void initState() {
@@ -110,6 +120,37 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
     );
   }
 
+  Widget _buildViewModeToggle() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+      color: Colors.white,
+      child: Row(
+        children: [
+          const Text('CLINICAL MESH LAYER:', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Colors.grey, letterSpacing: 1.5)),
+          const SizedBox(width: 16),
+          SegmentedButton<AnatomicalViewMode>(
+            segments: const [
+              ButtonSegment(value: AnatomicalViewMode.standard, label: Text('Standard')),
+              ButtonSegment(value: AnatomicalViewMode.orthomolecular, label: Text('Orthomolecular')),
+              ButtonSegment(value: AnatomicalViewMode.vascular, label: Text('Vascular')),
+              ButtonSegment(value: AnatomicalViewMode.muscular, label: Text('Muscular')),
+              ButtonSegment(value: AnatomicalViewMode.skeletal, label: Text('Skeletal')),
+            ],
+            selected: {_currentViewMode},
+            onSelectionChanged: (Set<AnatomicalViewMode> newSelection) {
+              setState(() {
+                _currentViewMode = newSelection.first;
+              });
+            },
+            style: ButtonStyle(
+              textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -121,8 +162,7 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
       appBar: AppBar(
         title: const Text('KAIZEN TRIAGE DASHBOARD', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.5, fontSize: 16, color: Color(0xFF111827))),
         backgroundColor: Colors.white,
-        elevation: 1,
-        shadowColor: Colors.black.withValues(alpha: 0.05),
+        elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF111827)),
         actions: [
           IconButton(
@@ -135,10 +175,14 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
           const SizedBox(width: 8),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-        itemCount: _patients.length,
-        itemBuilder: (context, index) {
+      body: Column(
+        children: [
+          _buildViewModeToggle(),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+              itemCount: _patients.length,
+              itemBuilder: (context, index) {
           final patient = _patients[index];
           final color = _getKaizenColor(patient.kaizenColor);
           final isRed = patient.kaizenColor.toLowerCase() == 'red';
@@ -148,8 +192,16 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
             builder: (context, child) {
               final pulse = isRed ? _pulseAnimation.value : 0.0;
               
-              return Container(
-                margin: const EdgeInsets.only(bottom: 32),
+              return GestureDetector(
+                onTap: () {
+                  context.read<PatientBloc>().add(LoadPatient(patient));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 32),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
@@ -215,7 +267,7 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(16),
                                   child: NativeBodyViewer(
-                                    staticPatient: patient,
+                                    staticPatient: patient.copyWith(viewMode: _currentViewMode),
                                     interactive: false,
                                   ),
                                 ),
@@ -429,10 +481,14 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
                     ),
                   ),
                 ),
+                ),
               );
             },
           );
         },
+      ),
+          ),
+        ],
       ),
     );
   }

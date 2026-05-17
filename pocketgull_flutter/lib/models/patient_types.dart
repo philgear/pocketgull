@@ -28,6 +28,11 @@ class BodyPartIssue extends Equatable {
   final List<dynamic> symptoms; // Can be String or PatientSymptom
   final String? recommendation;
   final String? date;
+  
+  // Trajectory fields
+  final String? trajectory;
+  final String? deltaSummary;
+  final bool escalationFlag;
 
   const BodyPartIssue({
     required this.id,
@@ -38,10 +43,16 @@ class BodyPartIssue extends Equatable {
     required this.symptoms,
     this.recommendation,
     this.date,
+    this.trajectory,
+    this.deltaSummary,
+    this.escalationFlag = false,
   });
 
   @override
-  List<Object?> get props => [id, noteId, name, painLevel, description, symptoms, recommendation, date];
+  List<Object?> get props => [
+        id, noteId, name, painLevel, description, symptoms, recommendation, date,
+        trajectory, deltaSummary, escalationFlag
+      ];
 }
 
 class PatientVitals extends Equatable {
@@ -111,6 +122,8 @@ class ClinicalNote extends Equatable {
   List<Object?> get props => [id, text, sourceLens, date];
 }
 
+enum AnatomicalViewMode { standard, orthomolecular, muscular, skeletal, vascular }
+
 enum BracketingState { normal, added, removed }
 
 class ChecklistItem extends Equatable {
@@ -148,6 +161,7 @@ class PatientState extends Equatable {
   final List<ChecklistItem>? checklist;
   final bool isLiveAgentActive;
   final bool isResearchFrameVisible;
+  final AnatomicalViewMode viewMode;
 
   const PatientState({
     required this.issues,
@@ -161,6 +175,7 @@ class PatientState extends Equatable {
     this.checklist = const [],
     this.isLiveAgentActive = false,
     this.isResearchFrameVisible = false,
+    this.viewMode = AnatomicalViewMode.standard,
   });
 
   @override
@@ -176,6 +191,7 @@ class PatientState extends Equatable {
         checklist,
         isLiveAgentActive,
         isResearchFrameVisible,
+        viewMode,
       ];
 
   PatientState copyWith({
@@ -190,6 +206,7 @@ class PatientState extends Equatable {
     List<ChecklistItem>? checklist,
     bool? isLiveAgentActive,
     bool? isResearchFrameVisible,
+    AnatomicalViewMode? viewMode,
   }) {
     return PatientState(
       issues: issues ?? this.issues,
@@ -203,6 +220,7 @@ class PatientState extends Equatable {
       checklist: checklist ?? this.checklist,
       isLiveAgentActive: isLiveAgentActive ?? this.isLiveAgentActive,
       isResearchFrameVisible: isResearchFrameVisible ?? this.isResearchFrameVisible,
+      viewMode: viewMode ?? this.viewMode,
     );
   }
 }
@@ -467,6 +485,7 @@ class Patient extends PatientState {
     required super.patientGoals,
     required super.vitals,
     super.scans = const [],
+    super.viewMode = AnatomicalViewMode.standard,
   });
 
   @override
