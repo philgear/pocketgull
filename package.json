@@ -115,7 +115,7 @@
     "cors": "^2.8.6",
     "dompurify": "^3.3.3",
     "express": "^5.2.1",
-    "genkit": "^1.29.0",
+    "genkit": "^1.34.0",
     "google-auth-library": "^10.6.2",
     "helmet": "^8.1.0",
     "jspdf": "^4.2.0",
@@ -149,6 +149,8 @@
     "immutable": ">=5.1.5",
     "tar": ">=7.5.10",
     "@tootallnate/once": ">=3.0.1",
-    "yargs": "^17.7.2"
+    "yargs": "^17.7.2",
+    "@opentelemetry/sdk-node": ">=0.217.0",
+    "@opentelemetry/auto-instrumentations-node": ">=0.75.0"
   }
 }

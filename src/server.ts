@@ -16,8 +16,18 @@ const __dirname = dirname(__filename);
 const browserDistFolder = join(__dirname, '..').replace(/\\/g, '/'); // root dir of dist when built
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts: ['localhost', '0.0.0.0', 'pocketgull.app', '*.pocketgull.app', 'pocketgall.com', 'pocketgall.app', 'pocketgal.app', 'pocketgull.com', 'pocketgal.ai']
+});
 app.use(compression());
+
+// Fix for Node 20+ undici fetch rejecting 0.0.0.0 host header during SSR
+app.use((req, res, next) => {
+  if (req.headers.host && req.headers.host.includes('0.0.0.0')) {
+    req.headers.host = req.headers.host.replace('0.0.0.0', 'localhost');
+  }
+  next();
+});
 
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
 app.set('trust proxy', true);
