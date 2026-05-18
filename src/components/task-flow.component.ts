@@ -172,6 +172,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
             </div>
           </div>
         }
+        }
         @if (activeView() === 'collab') {
            <!-- Collaboration UI -->
            <div class="flex flex-col gap-4 h-full">
