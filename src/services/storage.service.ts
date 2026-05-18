@@ -1,6 +1,6 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { PatientState } from './patient.types';
+import { IPatientState } from './patient.types';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
@@ -32,7 +32,7 @@ export class StorageService {
     });
   }
 
-  async saveState(id: string, state: PatientState): Promise<void> {
+  async saveState(id: string, state: IPatientState): Promise<void> {
     if (!this.isBrowser) return;
     try {
       const db = await this.initDB();
@@ -78,7 +78,7 @@ export class StorageService {
     }
   }
 
-  async loadState(id: string): Promise<{ state: PatientState, chatHistory: any[] } | null> {
+  async loadState(id: string): Promise<{ state: IPatientState, chatHistory: any[] } | null> {
     if (!this.isBrowser) return null;
     try {
       const db = await this.initDB();
@@ -95,7 +95,7 @@ export class StorageService {
     }
   }
 
-  // --- Patient Roster Operations ---
+  // --- IPatient Roster Operations ---
   async loadPatients(): Promise<any[]> {
     if (!this.isBrowser) return [];
     try {

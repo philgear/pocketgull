@@ -174,9 +174,178 @@ export interface IPatientState {
     checklist?: IChecklistItem[];
     shoppingList?: IShoppingListItem[];
     scans?: IDiagnosticScan[];
+    /** Patient's occupational category — used to select AVS co-regulation profile. */
+    occupation?: string;
+    /** Chief complaint / reason for this encounter (may differ from patientGoals). */
+    reasonForVisit?: string;
+    /** Dietary Protocol / Nutrition Strategy for patient. */
+    dietaryProtocol?: string;
+    /** Trauma safety flags extracted from chart — gates AVS protocol selection. */
+    traumaFlags?: ITraumaFlags;
+    /** Current AI-generated AVS co-regulation protocol. */
+    avsProtocol?: IAvsProtocol;
+}
+
+/**
+ * Trauma safety flags — gates AVS protocol selection.
+ * These are extracted from clinical notes and medications by ClinicalContextAvsService.
+ * Contraindicated flags block AVS from activating.
+ */
+export interface ITraumaFlags {
+    hasPtsd: boolean;
+    hasSeizureDisorder: boolean;
+    hasDissociativeEpisodes: boolean;
+    hasCombatTrauma: boolean;
+    hasActivePsychosis: boolean;
+    hasPhotosensitivity: boolean;
+    hasStimulantMedication: boolean;
+    acuteSuicidality: boolean;
+    /** Free-text known triggers (extracted from notes). */
+    knownTriggers: string[];
+}
+
+/**
+ * Gemini-generated AVS co-regulation protocol, personalized from patient context.
+ * Applied by ClinicalContextAvsService → GlobalAvsService.
+ */
+export interface IAvsProtocol {
+    wave: 'delta' | 'theta' | 'alpha' | 'beta';
+    breathing_bpm: number;
+    color_palette: 'emerald' | 'blue' | 'violet' | 'amber' | 'rose-earth';
+    noise_type: 'brown' | 'pink' | 'white';
+    breath_ratio: { inhale: number; hold: number; exhale: number; };
+    /** Clinician-facing intent statement (clinical framing). */
+    session_intent: string;
+    /** Patient-facing message (wellness framing, no diagnoses). */
+    patient_message: string;
+    /** Non-blocking advisory warnings for the clinician. */
+    safety_flags: string[];
+    /** Blocking conditions — AVS will not activate if any are present. */
+    contraindications: string[];
+    generated_at: number;
+    context_hash: string;
+}
+
+/**
+ * Disorders of Consciousness (DOC) classification.
+ * Drives which stimulation approach is clinically indicated.
+ */
+export type DocLevel =
+  | 'coma'          // GCS 3–7, no wake-sleep cycle
+  | 'vs-uws'        // Vegetative / Unresponsive Wakefulness Syndrome — wake-sleep cycles present, no awareness
+  | 'mcs-minus'     // Minimally Conscious State (non-verbal responses only)
+  | 'mcs-plus'      // Minimally Conscious State+ (command-following, occasional yes/no)
+  | 'emcs'          // Emerging from MCS — functional communication / object use
+  | 'locked-in';    // Locked-in Syndrome — fully conscious, motor-locked
+
+export interface IDocProfile {
+    gcsScore:          number;        // 3–15
+    docLevel:          DocLevel;
+    daysPostOnset:     number;        // Days since injury/onset
+    etiology:          string;        // e.g. "TBI", "hypoxic", "stroke", "metabolic"
+    hasAutonomicStorming: boolean;    // Paroxysmal sympathetic hyperactivity
+    preferredMusic:    string;        // Patient's preferred genre/artist (from family)
+    familyVoiceAvailable: boolean;   // Family willing to record/participate
+    hasHearingAid:     boolean;
+    hasPhotosensitivity: boolean;     // Block flicker protocols
+    activeIcpMonitor:  boolean;       // Intracranial pressure monitor present
+}
+
+/** A single scheduled stimulation block within a DOC session. */
+export interface IDocStimBlock {
+    label:        string;
+    durationMin:  number;
+    modality:     'auditory' | 'vibroacoustic' | 'tactile-audio' | 'quiet' | 'familiar-voice' | 'gamma-light';
+    frequencyHz:  number | null;      // null = no entrainment frequency (e.g. rest/quiet)
+    instruction:  string;             // For nursing/family at bedside
+    rationale:    string;             // Evidence-based clinical rationale
+    contraindications: string[];
+}
+
+/** Full DOC stimulation session protocol output. */
+export interface IDocStimulationSession {
+    profile:      IDocProfile;
+    schedule:     IDocStimBlock[];    // Ordered sequence for the session
+    totalDurationMin: number;
+    sessionsPerDay: number;
+    clinician_note: string;
+    safety_warnings: string[];
+    family_guidance: string[];        // Plain-language instructions for family at bedside
+    evidence_references: string[];
+}
+
+/**
+ * Athletic State classification for AVS Performance Enhancement.
+ */
+export type AthleticState =
+  | 'priming'      // Pre-workout / Event High-Beta/Gamma
+  | 'flow'         // Skill-training SMR / Alpha
+  | 'recovery'     // Post-workout Down-regulation Theta
+  | 'phase-shift'; // Circadian Jet Lag mitigation
+
+export interface IAthleticProfile {
+    state:             AthleticState;
+    sportType:         string;        // e.g. "Sprinting", "Golf", "Powerlifting", "Esports"
+    timeToEventMin?:   number;        // Time until the event/game
+    targetTimezoneOffset?: number;    // For phase-shift
+    preferredMusic:    string;
+}
+
+export interface IAthleticStimBlock {
+    label:        string;
+    durationMin:  number;
+    modality:     'auditory' | 'vibroacoustic' | 'ambient-light' | 'quiet' | 'visual-focus';
+    frequencyHz:  number | null;
+    instruction:  string;
+    rationale:    string;
+}
+
+export interface IAthleticSession {
+    profile:      IAthleticProfile;
+    schedule:     IAthleticStimBlock[];
+    totalDurationMin: number;
+    coach_note: string;
+    athlete_guidance: string[];
+    evidence_references: string[];
+}
+
+/**
+ * Substance use and lifestyle context extracted from the patient chart.
+ * All fields are optional — only populated when the chart contains evidence.
+ */
+export interface ILifestyleContext {
+    hasCaffeine:       boolean;   // Coffee, energy drinks
+    hasAlcohol:        boolean;   // Active use or in recovery
+    inAlcoholRecovery: boolean;   // Explicitly noted as in recovery/AA
+    isSmoker:          boolean;   // Tobacco / nicotine
+    isCannabisUser:    boolean;   // THC (recreational or medical)
+    usesCbd:           boolean;   // CBD without significant THC
+    isDiabetic:        boolean;   // T1, T2, or gestational
+    isPreDiabetic:     boolean;
+    hasCaffeineWithinSession: boolean; // "had coffee before appointment"
+    notes: string[];              // Free-text extraction from chart
+}
+
+/** A single beverage or lifestyle recommendation for the session. */
+export interface ISessionRecommendation {
+    category: 'beverage' | 'timing' | 'avs-adjustment' | 'caution' | 'wind-down';
+    title:    string;
+    detail:   string;
+    emoji:    string;
+    /** If set, this adjusts an AVS parameter. */
+    avsAdjust?: { param: 'breathing_bpm' | 'wave'; value: string | number; };
+}
+
+/** Full lifestyle adjunct output for the current clinical encounter. */
+export interface ILifestyleAdjunct {
+    context:         ILifestyleContext;
+    recommendations: ISessionRecommendation[];
+    /** One-sentence summary for the clinician. */
+    clinician_note:  string;
 }
 
 export interface IBookmark {
+
     title: string;
     url: string;
     authors?: string;
@@ -240,4 +409,6 @@ export interface IPatient extends IPatientState {
     preexistingConditions: string[];
     history: HistoryEntry[];
     bookmarks: IBookmark[];
+    occupation?: string;
+    reasonForVisit?: string;
 }

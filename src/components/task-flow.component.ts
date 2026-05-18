@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
+import { DictationService } from '../services/dictation.service';
 import { RevealDirective } from '../directives/reveal.directive';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
@@ -14,11 +15,23 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
     <div class="h-full w-full flex flex-col overflow-hidden relative bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-all duration-300 hover:shadow-md">
       <!-- Bracket Header -->
       <div class="bg-gray-50/50 dark:bg-zinc-900/50 px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-start shrink-0">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] block mb-1">
-            Active Task
-          </span>
-          <h2 class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100">Tasks, Notes & Shopping</h2>
+        <div class="flex items-center gap-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] block mb-1">
+              Active Room
+            </span>
+            <div class="flex items-center gap-3">
+              <button (click)="activeView.set('tasks')" [class.text-gray-400]="activeView() !== 'tasks'" [class.dark:text-zinc-500]="activeView() !== 'tasks'" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100">Tasks & Notes</button>
+              <span class="text-gray-300 dark:text-zinc-700 text-xl font-light">|</span>
+              <button (click)="activeView.set('collab')" [class.text-gray-400]="activeView() !== 'collab'" [class.dark:text-zinc-500]="activeView() !== 'collab'" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100 flex items-center gap-2">
+                Colleague Chat
+                <span class="flex -space-x-2">
+                  <div class="w-6 h-6 rounded-full bg-blue-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[8px] font-bold text-blue-700 z-20 shadow-sm">SC</div>
+                  <div class="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[8px] font-bold text-indigo-700 z-10 shadow-sm">JT</div>
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="flex flex-col items-end gap-1 sm:gap-2">
             <div class="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-[#689f38]/10 rounded-full border border-green-100 dark:border-[#689f38]/30">
@@ -32,9 +45,10 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
       </div>
 
       <!-- Content / List -->
-      <div class="flex-1 overflow-y-auto p-6 bg-[#F9FAFB] dark:bg-zinc-950">
-        @if (clinicalNotes().length === 0 && checklist().length === 0 && shoppingList().length === 0) {
-          <div class="h-full flex flex-col items-center justify-center opacity-40">
+      <div class="flex-1 overflow-y-auto p-6 bg-[#F9FAFB] dark:bg-zinc-950 flex flex-col">
+        @if (activeView() === 'tasks') {
+          @if (clinicalNotes().length === 0 && checklist().length === 0 && shoppingList().length === 0) {
+            <div class="h-full flex flex-col items-center justify-center opacity-40">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mb-4 text-gray-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-100 text-center max-w-xs leading-relaxed">
               No tasks, notes, or list items yet. <br/> Add items using the input below or from the Assessment Panel.
@@ -158,6 +172,31 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
             </div>
           </div>
         }
+        @if (activeView() === 'collab') {
+           <!-- Collaboration UI -->
+           <div class="flex flex-col gap-4 h-full">
+             <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg p-3 text-xs text-blue-800 dark:text-blue-300 flex items-center gap-2 shrink-0">
+               <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+               Dr. Sarah Chen and Dr. James Thorne have joined this patient room.
+             </div>
+             
+             <div class="flex-1 overflow-y-auto flex flex-col gap-4 pb-2">
+               @for (msg of collabMessages(); track msg.id) {
+                 <div class="flex flex-col max-w-[85%]" [class.self-end]="msg.isSelf" [class.items-end]="msg.isSelf">
+                   <div class="flex items-center gap-1.5 mb-1" [class.flex-row-reverse]="msg.isSelf">
+                     <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">{{ msg.sender }}</span>
+                     <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-600">{{ msg.time }}</span>
+                   </div>
+                   <div class="px-4 py-2.5 rounded-2xl text-sm shadow-sm"
+                     [class.bg-[#1C1C1C]]="msg.isSelf" [class.text-white]="msg.isSelf" [class.rounded-br-sm]="msg.isSelf" [class.dark:bg-zinc-800]="msg.isSelf"
+                     [class.bg-white]="!msg.isSelf" [class.dark:bg-zinc-900]="!msg.isSelf" [class.text-gray-800]="!msg.isSelf" [class.dark:text-zinc-200]="!msg.isSelf" [class.border]="!msg.isSelf" [class.border-gray-100]="!msg.isSelf" [class.dark:border-zinc-800]="!msg.isSelf" [class.rounded-bl-sm]="!msg.isSelf">
+                     {{ msg.text }}
+                   </div>
+                 </div>
+               }
+             </div>
+           </div>
+        }
       </div>
 
       <!-- Add Item Input -->
@@ -169,36 +208,68 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
             #itemInput
             (keydown.enter)="handleEnter($event, itemInput)"
             (input)="autoResize(itemInput)"
-            placeholder="Type a clinical note, task, or shopping item... (Shift+Enter for new line)" 
+            [placeholder]="activeView() === 'tasks' ? 'Type a clinical note, task, or shopping item... (Shift+Enter for new line)' : 'Message your colleagues or @mention them...'" 
             rows="1"
             class="w-full bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg px-4 py-3 text-sm text-gray-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-[#416B1F]/30 focus:border-[#416B1F] transition-all placeholder-gray-400 dark:placeholder-zinc-600 resize-none max-h-32"
         ></textarea>
-        <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
-            <button (click)="submitNote(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200 hover:bg-gray-200 rounded transition-colors uppercase tracking-widest flex items-center gap-1.5">
-               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 border-gray-200 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-               Add Note
-            </button>
-            <button (click)="submitShoppingItem(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-white bg-[#E3663B] hover:bg-[#c95a34] rounded transition-colors uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
-               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-               Add Item
-            </button>
-            <button (click)="submitTask(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-white bg-[#1C1C1C] hover:bg-[#416B1F] rounded transition-colors uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
-               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-               Add Task
-            </button>
-        </div>
+        
+        @if (activeView() === 'tasks') {
+          <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
+              <button (click)="openDictation(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 rounded transition-colors uppercase tracking-widest flex items-center gap-1.5" title="Hands-free Dictation">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                Dictate
+              </button>
+              <button (click)="submitNote(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-gray-600 bg-gray-100 border border-gray-200 hover:bg-gray-200 rounded transition-colors uppercase tracking-widest flex items-center gap-1.5">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 border-gray-200 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                 Add Note
+              </button>
+              <button (click)="submitShoppingItem(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-white bg-[#E3663B] hover:bg-[#c95a34] rounded transition-colors uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                 Add Item
+              </button>
+              <button (click)="submitTask(itemInput)" class="w-full sm:w-auto justify-center px-4 py-2 sm:py-1.5 text-xs font-bold text-white bg-[#1C1C1C] hover:bg-[#416B1F] rounded transition-colors uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 sm:w-3 sm:h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                 Add Task
+              </button>
+          </div>
+        } @else {
+          <div class="flex justify-between items-center">
+             <div class="flex gap-2">
+                <button (click)="openDictation(itemInput)" class="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors" title="Dictate Message">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                </button>
+                <button class="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors" title="Share Patient State">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                </button>
+                <button class="w-8 h-8 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-zinc-400 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors" title="Attach Medical Image">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                </button>
+             </div>
+             <button (click)="submitCollabMessage(itemInput)" class="px-6 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+               Send
+             </button>
+          </div>
+        }
       </div>
     </div>
   `
 })
 export class TaskFlowComponent {
   state = inject(PatientStateService);
+  dictation = inject(DictationService);
 
   clinicalNotes = computed(() => this.state.clinicalNotes() || []);
   checklist = computed(() => this.state.checklist() || []);
   shoppingList = computed(() => this.state.shoppingList() || []);
 
   taskSortOrder = signal<'default' | 'pain' | 'status'>('default');
+  
+  activeView = signal<'tasks' | 'collab'>('tasks');
+  
+  collabMessages = signal<{id: string, sender: string, text: string, isSelf: boolean, time: string}[]>([
+    { id: '1', sender: 'Dr. Sarah Chen', text: 'Hey, I am taking a look at this patient. The Magnesium deficiency looks chronic. Have you considered IV therapy?', isSelf: false, time: '10:42 AM' },
+    { id: '2', sender: 'Dr. James Thorne', text: 'I was thinking the same thing. They also have MTHFR mutations, so we need to be careful with the methylation protocol.', isSelf: false, time: '10:45 AM' }
+  ]);
 
   enhancedChecklist = computed(() => {
     let tasks = this.checklist();
@@ -290,8 +361,11 @@ export class TaskFlowComponent {
   handleEnter(event: KeyboardEvent, el: HTMLTextAreaElement) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault(); // Prevent default newline
-      // Default to adding a task if they just press Enter
-      this.submitTask(el);
+      if (this.activeView() === 'tasks') {
+        this.submitTask(el);
+      } else {
+        this.submitCollabMessage(el);
+      }
     }
   }
 
@@ -350,6 +424,19 @@ export class TaskFlowComponent {
     this.state.removeShoppingListItem(id);
   }
 
+  submitCollabMessage(el: HTMLTextAreaElement) {
+    const text = el.value;
+    if (!text.trim()) return;
+    this.collabMessages.update(msgs => [...msgs, {
+      id: Date.now().toString(),
+      sender: 'You',
+      text: text.trim(),
+      isSelf: true,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }]);
+    this.resetInput(el);
+  }
+
   autoResize(el: HTMLTextAreaElement) {
     // Schedule resize for next frame to avoid synchronous layout thrashing
     requestAnimationFrame(() => {
@@ -360,6 +447,15 @@ export class TaskFlowComponent {
       requestAnimationFrame(() => {
         el.style.height = (scrollHeight < 128 ? scrollHeight : 128) + 'px';
       });
+    });
+  }
+
+  openDictation(el: HTMLTextAreaElement) {
+    this.dictation.openDictationModal(el.value, (newText: string) => {
+      el.value = newText;
+      this.autoResize(el);
+      // Give focus back so user can hit enter or click buttons
+      el.focus();
     });
   }
 }

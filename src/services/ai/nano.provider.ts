@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { IntelligenceProvider } from './intelligence.provider';
-import { ClinicalMetrics } from '../clinical-intelligence.service';
-import { VerificationIssue } from '../../components/analysis-report.types';
+import { IIntelligenceProvider } from './intelligence.provider';
+import { IClinicalMetrics } from '../clinical-intelligence.service';
+import { IVerificationIssue } from '../../components/analysis-report.types';
 
 // Declare experimental Chrome AI API types
 declare global {
@@ -19,7 +19,7 @@ declare global {
 @Injectable({
   providedIn: 'root'
 })
-export class NanoProvider implements IntelligenceProvider {
+export class NanoProvider implements IIntelligenceProvider {
   private chatSession: any = null;
 
   private async ensureAiAvailable() {
@@ -38,14 +38,14 @@ export class NanoProvider implements IntelligenceProvider {
     }
   }
 
-  async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+  async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
     await this.ensureAiAvailable();
     // Note: using ai.languageModel.create which is the most modern Chrome API for this
     const session = await window.ai!.languageModel!.create({
       systemPrompt: systemInstruction
     });
 
-    const prompt = `Patient Data:\n${patientData}\n\nTask: Generate a highly clinical report specifically for the following scope: [${lens}]. Formulate it purely as markdown.`;
+    const prompt = `IPatient Data:\n${patientData}\n\nTask: Generate a highly clinical report specifically for the following scope: [${lens}]. Formulate it purely as markdown.`;
     
     let previousChunk = '';
     const stream = await session.promptStreaming(prompt);
@@ -57,7 +57,7 @@ export class NanoProvider implements IntelligenceProvider {
     }
   }
 
-  async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
+  async generateMetrics(reportText: string): Promise<IClinicalMetrics> {
     return { complexity: 5, stability: 5, certainty: 5 }; 
   }
 
@@ -65,11 +65,11 @@ export class NanoProvider implements IntelligenceProvider {
     return true; 
   }
 
-  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }> {
+  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> {
     return { status: 'Verified efficiently by Gemini Nano (On-Device)', issues: [] };
   }
 
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child'): Promise<string> {
+  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
     try {
       await this.ensureAiAvailable();
       const session = await window.ai!.languageModel!.create({
@@ -93,7 +93,7 @@ export class NanoProvider implements IntelligenceProvider {
   async startChat(patientData: string, context: string): Promise<void> {
     await this.ensureAiAvailable();
     this.chatSession = await window.ai!.languageModel!.create({
-      systemPrompt: `Patient Context:\n${patientData}\n\nClinical Role:\n${context}`
+      systemPrompt: `IPatient Context:\n${patientData}\n\nClinical Role:\n${context}`
     });
   }
 

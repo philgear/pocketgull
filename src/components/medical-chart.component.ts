@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, computed, signal, viewChild
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
-import { PatientState, Patient, HistoryEntry } from '../services/patient.types';
+import { IPatientState, IPatient, HistoryEntry } from '../services/patient.types';
 import { BodyViewerComponent } from './body-viewer.component';
 import { PatientHistoryTimelineComponent } from './patient-history-timeline.component';
 import { DictationService } from '../services/dictation.service';
@@ -103,9 +103,9 @@ import { BiometricHistoryChartComponent } from './biometric-history-chart.compon
         }
       </pocket-gull-card>
 
-      <!-- Patient History Card -->
+      <!-- IPatient History Card -->
       <pocket-gull-card 
-        title="Patient History" 
+        title="IPatient History" 
         [icon]="historyIcon"
         [noPadding]="true">
         
@@ -159,7 +159,7 @@ import { BiometricHistoryChartComponent } from './biometric-history-chart.compon
         }
       </pocket-gull-card>
 
-      <!-- Patient Scans Card -->
+      <!-- IPatient Scans Card -->
       <pocket-gull-card 
         title="DICOM Viewer" 
         [icon]="scansIcon"

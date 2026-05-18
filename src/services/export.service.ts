@@ -1,31 +1,31 @@
 import { Injectable, inject } from '@angular/core';
 import { MarkdownService } from './markdown.service';
 
-import { Patient, HistoryEntry, PatientVitals, BodyPartIssue } from './patient.types';
+import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
 
 /** Shape of the native JSON export file. */
-export interface NativePatientExport {
+export interface INativePatientExport {
   _format: 'pocket-gull-native';
   _version: 1;
   exportedAt: string;
-  patient: Omit<Patient, 'id'>;
+  patient: Omit<IPatient, 'id'>;
 }
 
 /** Minimal FHIR R4 resource types used for import/export. */
-interface FhirResource {
+interface IFhirResource {
   resourceType: string;
   id?: string;
   [key: string]: any;
 }
 
-interface FhirBundle {
+interface IFhirBundle {
   resourceType: 'Bundle';
   id?: string;
   type: 'collection';
   timestamp: string;
   meta?: { tag?: { system: string; code: string; display: string }[] };
-  entry: { resource: FhirResource }[];
+  entry: { resource: IFhirResource }[];
 }
 
 @Injectable({
@@ -42,7 +42,7 @@ export class ExportService {
    * Uses the PocketGull design system: Inter font, brand colours, section cards,
    * markdown-rendered prose, proper tables, blockquotes, and page-break hints.
    */
-  async downloadAsPdf(data: any, patientName: string = 'Patient'): Promise<void> {
+  async downloadAsPdf(data: any, patientName: string = 'IPatient'): Promise<void> {
     console.log('[ExportService] Opening styled print report for:', patientName);
 
     // Ensure marked is loaded
@@ -71,21 +71,21 @@ export class ExportService {
       'Summary Overview': 'Summary Overview',
       'Functional Protocols': 'Functional Protocols',
       'Monitoring & Follow-up': 'Monitoring & Follow-up',
-      'Patient Education': 'Patient Education',
+      'IPatient Education': 'IPatient Education',
     };
 
     const lensIcons: Record<string, string> = {
       'Summary Overview': ClinicalIcons.Assessment,
       'Functional Protocols': ClinicalIcons.Medication,
       'Monitoring & Follow-up': ClinicalIcons.FollowUp,
-      'Patient Education': ClinicalIcons.Education,
+      'IPatient Education': ClinicalIcons.Education,
     };
 
     const lensColors: Record<string, string> = {
       'Summary Overview': '#1C6AFF',
       'Functional Protocols': '#059669',
       'Monitoring & Follow-up': '#D97706',
-      'Patient Education': '#7C3AED',
+      'IPatient Education': '#7C3AED',
     };
 
     const report = typeof data.report === 'object' ? data.report : {};
@@ -202,7 +202,7 @@ export class ExportService {
     }
     .report-meta strong { color: var(--ink); font-weight: 600; }
 
-    /* ─── Patient Banner ────────────────────────────── */
+    /* ─── IPatient Banner ────────────────────────────── */
     .patient-banner {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -484,10 +484,10 @@ export class ExportService {
         </div>
       </header>
 
-      <!-- Patient Banner -->
+      <!-- IPatient Banner -->
       <div class="patient-banner">
         <div class="patient-field">
-          <div class="patient-field-label">Patient Name</div>
+          <div class="patient-field-label">IPatient Name</div>
           <div class="patient-field-value">${patientName}</div>
         </div>
         <div class="patient-field">
@@ -546,7 +546,7 @@ export class ExportService {
    */
   async downloadCarePlanPdf(
     carePlanMarkdown: string,
-    patientName: string = 'Patient',
+    patientName: string = 'IPatient',
     vitals?: { bp?: string; hr?: string; temp?: string; spO2?: string; weight?: string },
     conditions?: string[],
     translationMatrix?: {
@@ -801,7 +801,7 @@ export class ExportService {
       border-radius: 50%;
     }
 
-    /* ─── Patient Banner ────────────────────────────── */
+    /* ─── IPatient Banner ────────────────────────────── */
     .patient-banner {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -1182,10 +1182,10 @@ export class ExportService {
       <!-- Document Type Badge -->
       <div class="doc-type-badge">${documentTypeBadge}</div>
 
-      <!-- Patient Banner -->
+      <!-- IPatient Banner -->
       <div class="patient-banner">
         <div class="patient-field">
-          <div class="patient-field-label">Patient Name</div>
+          <div class="patient-field-label">IPatient Name</div>
           <div class="patient-field-value">${patientName}</div>
         </div>
         <div class="patient-field">
@@ -1246,7 +1246,7 @@ export class ExportService {
   /**
    * Generates and downloads a FHIR DiagnosticReport (JSON) for the analysis only.
    */
-  async downloadAsFhir(data: any, patientName: string = 'Patient'): Promise<void> {
+  async downloadAsFhir(data: any, patientName: string = 'IPatient'): Promise<void> {
     console.log('[ExportService] Starting FHIR DiagnosticReport generation...');
     try {
       const fhirReport = {
@@ -1307,9 +1307,9 @@ export class ExportService {
    * Exports the full patient record as a native JSON file.
    * This is a lossless round-trip format that preserves all app data.
    */
-  downloadAsNativeJson(patient: Patient): void {
+  downloadAsNativeJson(patient: IPatient): void {
     const { id, ...patientWithoutId } = patient;
-    const exportData: NativePatientExport = {
+    const exportData: INativePatientExport = {
       _format: 'pocket-gull-native',
       _version: 1,
       exportedAt: new Date().toISOString(),
@@ -1320,12 +1320,12 @@ export class ExportService {
   }
 
   /**
-   * Parses a native JSON file and returns a Patient object.
+   * Parses a native JSON file and returns a IPatient object.
    * Assigns a new unique ID so imported patients never collide.
    */
-  async importFromNativeJson(file: File): Promise<Patient> {
+  async importFromNativeJson(file: File): Promise<IPatient> {
     const text = await file.text();
-    const data = JSON.parse(text) as NativePatientExport;
+    const data = JSON.parse(text) as INativePatientExport;
 
     if (data._format !== 'pocket-gull-native') {
       throw new Error('Not a valid PocketGull native export file.');
@@ -1345,13 +1345,13 @@ export class ExportService {
 
   /**
    * Exports the full patient record as a FHIR R4 Bundle.
-   * Includes Patient, Condition, Observation, Goal, and DiagnosticReport resources.
+   * Includes IPatient, Condition, Observation, Goal, and DiagnosticReport resources.
    */
-  downloadAsFhirBundle(patient: Patient): void {
+  downloadAsFhirBundle(patient: IPatient): void {
     console.log('[ExportService] Starting FHIR Bundle generation for:', patient.name);
     try {
       const patientRef = `Patient/pocket-gull-${patient.id}`;
-      const entries: { resource: FhirResource }[] = [];
+      const entries: { resource: IFhirResource }[] = [];
 
       // 1. Patient resource
       entries.push({
@@ -1387,7 +1387,7 @@ export class ExportService {
 
       // 3. Vitals as Observations
       const vitals = patient.vitals;
-      const vitalMappings: { field: keyof PatientVitals; loinc: string; display: string }[] = [
+      const vitalMappings: { field: keyof IPatientVitals; loinc: string; display: string }[] = [
         { field: 'bp', loinc: '85354-9', display: 'Blood Pressure' },
         { field: 'hr', loinc: '8867-4', display: 'Heart Rate' },
         { field: 'temp', loinc: '8310-5', display: 'Body Temperature' },
@@ -1416,7 +1416,7 @@ export class ExportService {
 
       // 4. Body issues as Observations
       Object.entries(patient.issues).forEach(([partId, issues]) => {
-        (issues as BodyPartIssue[]).forEach((issue, i) => {
+        (issues as IBodyPartIssue[]).forEach((issue, i) => {
           entries.push({
             resource: {
               resourceType: 'Observation',
@@ -1444,7 +1444,7 @@ export class ExportService {
         });
       });
 
-      // 5. Patient goals
+      // 5. IPatient goals
       if (patient.patientGoals) {
         entries.push({
           resource: {
@@ -1480,7 +1480,7 @@ export class ExportService {
           }
         });
 
-      const bundle: FhirBundle = {
+      const bundle: IFhirBundle = {
         resourceType: 'Bundle',
         id: `pocket-gull-bundle-${Date.now()}`,
         type: 'collection',
@@ -1489,7 +1489,7 @@ export class ExportService {
           tag: [{
             system: 'http://pocketgull.app/fhir',
             code: 'pocket-gull-export',
-            display: 'Pocket Gull Patient Export',
+            display: 'Pocket Gull IPatient Export',
           }]
         },
         entry: entries,
@@ -1504,18 +1504,18 @@ export class ExportService {
   }
 
   /**
-   * Parses a FHIR R4 Bundle and maps it back to an PocketGull Patient.
+   * Parses a FHIR R4 Bundle and maps it back to an PocketGull IPatient.
    */
-  async importFromFhirBundle(file: File): Promise<Patient> {
+  async importFromFhirBundle(file: File): Promise<IPatient> {
     const text = await file.text();
-    const bundle = JSON.parse(text) as FhirBundle;
+    const bundle = JSON.parse(text) as IFhirBundle;
 
     if (bundle.resourceType !== 'Bundle' || !Array.isArray(bundle.entry)) {
       throw new Error('Not a valid FHIR Bundle.');
     }
 
     const resources = bundle.entry.map(e => e.resource);
-    const fhirPatient = resources.find(r => r['resourceType'] === 'Patient');
+    const fhirPatient = resources.find(r => r['resourceType'] === 'Patient' || r['resourceType'] === 'IPatient');
 
     // Demographics
     const name = fhirPatient?.name?.[0]?.text || fhirPatient?.name?.[0]?.family || 'Imported Patient';
@@ -1530,12 +1530,12 @@ export class ExportService {
       .map(r => r['code']?.text || 'Unknown Condition');
 
     // Vitals
-    const vitals: PatientVitals = { bp: '', hr: '', temp: '', spO2: '', weight: '', height: '' };
+    const vitals: IPatientVitals = { bp: '', hr: '', temp: '', spO2: '', weight: '', height: '' };
     const vitalObs = resources.filter(r =>
       r['resourceType'] === 'Observation' &&
       r['category']?.[0]?.coding?.[0]?.code === 'vital-signs'
     );
-    const loincToField: Record<string, keyof PatientVitals> = {
+    const loincToField: Record<string, keyof IPatientVitals> = {
       '85354-9': 'bp', '8867-4': 'hr', '8310-5': 'temp',
       '2708-6': 'spO2', '29463-7': 'weight', '8302-2': 'height',
     };
@@ -1548,7 +1548,7 @@ export class ExportService {
     });
 
     // Body issues
-    const issues: Record<string, BodyPartIssue[]> = {};
+    const issues: Record<string, IBodyPartIssue[]> = {};
     const issueObs = resources.filter(r =>
       r['resourceType'] === 'Observation' &&
       r['category']?.[0]?.coding?.[0]?.code === 'exam'
@@ -1557,7 +1557,7 @@ export class ExportService {
       const partId = obs['bodySite']?.text || 'unknown';
       const painExt = obs['extension']?.find((e: any) => e.url?.includes('pain-level'));
       const noteIdExt = obs['extension']?.find((e: any) => e.url?.includes('note-id'));
-      const issue: BodyPartIssue = {
+      const issue: IBodyPartIssue = {
         id: partId,
         noteId: noteIdExt?.valueString || `note_imported_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         name: obs['code']?.text || partId,
@@ -1612,7 +1612,7 @@ export class ExportService {
   /**
    * Detects the format of a JSON file and imports accordingly.
    */
-  async importFromFile(file: File): Promise<Patient> {
+  async importFromFile(file: File): Promise<IPatient> {
     const text = await file.text();
     const data = JSON.parse(text);
 
@@ -1635,7 +1635,31 @@ export class ExportService {
   /**
    * Publishes the patient record to the BigQuery data warehouse.
    */
-  async exportToBigQuery(patient: Patient): Promise<void> {
+  /**
+   * Syncs/exports the patient record to the Google Cloud Healthcare FHIR Store.
+   */
+  async exportToGoogleHealth(patient: IPatient): Promise<void> {
+    console.log('[ExportService] Initiating Google Cloud Healthcare FHIR sync for:', patient.id);
+    try {
+      const response = await fetch('/api/healthcare/fhir/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patient)
+      });
+      
+      if (!response.ok) {
+        const errJson = await response.json();
+        throw new Error(errJson.error || 'Unknown Server Error');
+      }
+      
+      alert("✅ Patient record successfully synchronized to Google Cloud Healthcare FHIR Store.");
+    } catch (error) {
+      console.error('[ExportService] Google Cloud Healthcare FHIR sync failure:', error);
+      alert("Google Cloud Healthcare Sync Failed: " + (error as Error).message);
+    }
+  }
+
+  async exportToBigQuery(patient: IPatient): Promise<void> {
     console.log('[ExportService] Initiating BigQuery export sequence for:', patient.id);
     
     // Transform to standard JSON payload mapping strictly to the BigQuery DDL
@@ -1673,7 +1697,7 @@ export class ExportService {
         throw new Error(errJson.error || 'Unknown Server Error');
       }
       
-      alert("✅ Patient record successfully streamed into BigQuery Data Canvas.");
+      alert("✅ IPatient record successfully streamed into BigQuery Data Canvas.");
       
     } catch (error) {
       console.error('[ExportService] BigQuery pipeline failure:', error);

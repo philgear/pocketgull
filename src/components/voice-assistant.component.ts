@@ -8,17 +8,17 @@ import { PatientManagementService } from '../services/patient-management.service
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { MarkdownService } from '../services/markdown.service';
-import { RichMediaService, RichMediaCard } from '../services/rich-media.service';
+import { RichMediaService, IRichMediaCard } from '../services/rich-media.service';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { AdkLiveService } from '../services/ai/adk-live.service';
 import { StorageService } from '../services/storage.service';
 import { inject as baseInject } from '@angular/core';
 
-export interface ChatEntry {
+export interface IChatEntry {
     role: 'user' | 'model';
     text: string;
     htmlContent?: string;
-    richCards?: RichMediaCard[];
+    richCards?: IRichMediaCard[];
     feedback?: 'up' | 'down';
 }
 
@@ -336,7 +336,7 @@ export class VoiceAssistantComponent implements OnDestroy {
     permissionError = signal<string | null>(null);
     messageText = signal('');
     typingIntroText = signal('');
-    chatHistory = signal<ChatEntry[]>([]);
+    chatHistory = signal<IChatEntry[]>([]);
     selectedFiles = signal<File[]>([]);
     isResearchMode = signal(false);
 
@@ -353,12 +353,12 @@ export class VoiceAssistantComponent implements OnDestroy {
         navigator.clipboard.writeText(text);
     }
 
-    actionThumbsUp(entry: ChatEntry) {
+    actionThumbsUp(entry: IChatEntry) {
         entry.feedback = entry.feedback === 'up' ? undefined : 'up';
         this.chatHistory.update(h => [...h]);
     }
 
-    actionThumbsDown(entry: ChatEntry) {
+    actionThumbsDown(entry: IChatEntry) {
         entry.feedback = entry.feedback === 'down' ? undefined : 'down';
         this.chatHistory.update(h => [...h]);
     }
@@ -431,7 +431,7 @@ export class VoiceAssistantComponent implements OnDestroy {
                     // Token-Limit Awareness: Truncate heavily bloated sessions
                     if (history.length > 50 && this.agentState() === 'idle') {
                         const truncated = history.slice(-20);
-                        const summaryBubble: ChatEntry = {
+                        const summaryBubble: IChatEntry = {
                             role: 'model',
                             text: 'System Note: Previous conversation history has been archived to maintain memory efficiency.',
                             htmlContent: '<p class="text-xs text-purple-500 italic">System Note: Previous conversation history has been archived to maintain memory efficiency.</p>'
@@ -713,7 +713,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
         return { cleanMd, jsonStr };
     }
 
-    private _parseCards(jsonStr: string): RichMediaCard[] | undefined {
+    private _parseCards(jsonStr: string): IRichMediaCard[] | undefined {
         try {
             const parsed = JSON.parse(jsonStr.trim());
             const rawCards: Array<{ kind: string; query: string; severity?: string; afflictionHighlight?: string; particles?: boolean }> = parsed.cards ?? [];
@@ -791,7 +791,18 @@ Only include a rich-media block when the user explicitly requests visual or rese
                 this.speak(responseText);
             }
         } catch (e: any) {
-            this._accumulateModelText(`Error: ${e?.message ?? e}`);
+            const errorMsg = e?.message ?? e?.toString() ?? 'Unknown Error';
+            if (errorMsg.includes('SAFETY') || errorMsg.toLowerCase().includes('blocked') || errorMsg.includes('HARM_CATEGORY')) {
+                 this._accumulateModelText(`<div class="p-4 my-2 rounded-lg border border-amber-500/30 bg-amber-50 dark:bg-amber-900/10 text-amber-900 dark:text-amber-500 text-sm">
+                    <strong class="block uppercase tracking-wider mb-1 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Safety Threshold Reached
+                    </strong>
+                    Analysis halted to prevent potentially dangerous or unsupported medical guidance.
+                 </div>`);
+            } else {
+                 this._accumulateModelText(`Error: ${errorMsg}`);
+            }
             this._finalizeModelTurn();
         } finally {
             // For live WebSockets, the loading state clears asynchronously on `turnComplete`.

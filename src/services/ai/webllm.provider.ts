@@ -1,14 +1,14 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Observable } from 'rxjs';
-import { IntelligenceProvider } from './intelligence.provider';
-import { ClinicalMetrics } from '../clinical-intelligence.service';
-import { VerificationIssue } from '../../components/analysis-report.types';
+import { IIntelligenceProvider } from './intelligence.provider';
+import { IClinicalMetrics } from '../clinical-intelligence.service';
+import { IVerificationIssue } from '../../components/analysis-report.types';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WebLLMProvider implements IntelligenceProvider {
+export class WebLLMProvider implements IIntelligenceProvider {
   private engine: import('@mlc-ai/web-llm').WebWorkerMLCEngine | null = null;
   private isLoaded = false;
   private platformId = inject(PLATFORM_ID);
@@ -33,13 +33,13 @@ export class WebLLMProvider implements IntelligenceProvider {
       console.log('[WebLLM] Engine Ready.');
   }
 
-  async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+  async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
     await this.loadEngine();
     if (!this.engine) throw new Error("WebLLM Engine failed to initialize required hardware context.");
     
     const messages: import('@mlc-ai/web-llm').ChatCompletionMessageParam[] = [
         { role: "system", content: systemInstruction },
-        { role: "user", content: `Patient Data:\n${patientData}\n\nLens:\n${lens}` }
+        { role: "user", content: `IPatient Data:\n${patientData}\n\nLens:\n${lens}` }
     ];
     
     const requestTemp = Number(localStorage.getItem('preferredModelTemperature')) || 0.5;
@@ -57,7 +57,7 @@ export class WebLLMProvider implements IntelligenceProvider {
     }
   }
 
-  async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
+  async generateMetrics(reportText: string): Promise<IClinicalMetrics> {
       await this.loadEngine();
       if (!this.engine) throw new Error("WebLLM Engine failed to initialize.");
       
@@ -70,7 +70,7 @@ export class WebLLMProvider implements IntelligenceProvider {
       const content = res.choices[0]?.message?.content || "{}";
       
       try {
-          return JSON.parse(content) as ClinicalMetrics;
+          return JSON.parse(content) as IClinicalMetrics;
       } catch (e) {
           throw new Error('WebGPU metric parse failure.');
       }
@@ -84,7 +84,7 @@ export class WebLLMProvider implements IntelligenceProvider {
       return res.choices[0]?.message?.content?.toLowerCase().includes('yes') || false;
   }
   
-  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }> { 
+  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> { 
       throw new Error("WebGPU verification payload too large for current configuration. Deferring downward."); 
   }
   

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HistoryEntry, PatientVitals } from '../services/patient.types';
+import { HistoryEntry, IPatientVitals } from '../services/patient.types';
 import { Chart } from 'chart.js/auto';
 
 @Component({
@@ -53,9 +53,9 @@ export class PatientVitalsChartComponent implements OnChanges, OnDestroy {
       .sort((a, b) => new Date(a.date.replace(/\./g, '-')).getTime() - new Date(b.date.replace(/\./g, '-')).getTime());
 
     // 2. Parse vitals
-    interface ChartDataPoint { date: string; sys: number | null; dia: number | null; weight: number | null; }
+    interface IChartDataPoint { date: string; sys: number | null; dia: number | null; weight: number | null; }
     
-    const dataPoints: ChartDataPoint[] = visits.map(v => {
+    const dataPoints: IChartDataPoint[] = visits.map(v => {
       const vitals = ('state' in v && v.state) ? v.state.vitals : null;
       let sys: number | null = null;
       let dia: number | null = null;

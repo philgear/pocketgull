@@ -83,7 +83,29 @@
 
 <body>
 
-    <!-- Google Custom Search Engine -->
+    <!-- Google Custom Search Engine Callbacks -->
+    <script>
+        window.__gcse = {
+            searchCallbacks: {
+                web: {
+                    ready: (gname, query, promos, results, div) => {
+                        if (results && results.length > 0) {
+                            const parsedResults = results.map(r => ({
+                                title: r.title || 'Untitled',
+                                url: r.url || r.link || '',
+                                displayUrl: r.visibleUrl || r.displayUrl || r.url || r.link || '',
+                                snippet: r.snippet || r.content || ''
+                            }));
+                            window.parent.postMessage({
+                                type: 'GOOGLE_SEARCH_RESULTS',
+                                results: parsedResults
+                            }, '*');
+                        }
+                    }
+                }
+            }
+        };
+    </script>
     <script async src="https://cse.google.com/cse.js?cx=631456b3b98e3415b"></script>
     <div class="gcse-searchresults-only" data-gname="pocket-gull-search"></div>
 

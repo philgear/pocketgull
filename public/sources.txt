@@ -1,0 +1,10 @@
+# Sources
+Pocket Gull utilizes Google Gemini for clinical intelligence. 
+Medical guidelines and protocols referenced within the platform are derived from standard medical knowledge up to the AI's training cutoff.
+All 3D assets and visual systems are rendered using Three.js and custom shaders.
+
+## Thanks
+Thank you for exploring Pocket Gull!
+Vielen Dank für die Nutzung von Pocket Gull!
+Merci d'utiliser Pocket Gull!
+感谢您使用 Pocket Gull!

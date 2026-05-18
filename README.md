@@ -65,11 +65,18 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 **Core Features:**
 - **Live AI Consult & Multi-Agent Orchestration:** Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts synthesize clinical data into actionable insights through an interruptible, natural conversational UI with **context-aware memory** of recently discussed report nodes.
 - **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
-- **Cognition & Child Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly or pediatric formats, outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
+- **Orthomolecular Profiling & Biomarker Matrix:** Automatically extracts and visualizes biochemical markers (e.g., Magnesium, B12) from AI-generated functional protocols into a glassmorphic diagnostic dashboard.
+- **Cognition & Multilingual Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly, pediatric formats, or professionally translate them into **Spanish, German, French, or Mandarin**. Outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
+- **Colleague Collaboration Room (TaskFlow):** A real-time multiplayer workspace integrated directly into the patient's view for clinicians to share states, dictate notes, and chat collaboratively.
+- **Hands-Free Voice Dictation & Controls:** Voice command interception during dictation allows hands-free UI control, task addition, and message composition.
 - **Printable Clinical Stationery:** CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis, with user-selectable toggles for clinical summaries and history.
 - **Minimalist Dieter Rams Design:** A premium, minimalist UI prioritizing clarity, neutrality, functional excellence, and seamless mobile responsive layouts (`100dvh`). Includes dark-mode agent conversations.
 - **Detailed 3D Medical Imagery:** Precise anatomical selection using a Three.js-powered skeletal and surface model (including detailed procedural spine geometry) with dynamic particle systems highlighting diagnostic severity.
 - **Smartwatch & Mobile Optimization:** Responsive Two-Column Grid UI scaling down to extremely constrained viewports (e.g., Pixel Watch 2 at 286px width) for ultra-portable clinical referencing.
+- **Circadian UI & AVS Coregulation:** Seamless integration of continuous, time-based circadian CSS themes with the clinical interface to promote ambient rhythm alignment and offset clinician fatigue.
+- **IoT Smart Lighting Sync:** `AmbientLightingService` mathematically mapping UI circadian HSL values directly to local physical Philips Hue hardware to physically coregulate the clinical environment.
+- **Offline PWA Intelligence:** Built-in `window.ai` (Gemini Nano) routing for on-device fallback and token-free local processing in the Progressive Web App.
+- **KSS Readiness Gateway:** 9-point Karolinska Sleepiness Scale integration for real-time clinician alertness checks overriding the ambient circadian theme.
 - **Scans & Diagnostics Library:** Integrated visual gallery within the patient profile for organizing and analyzing medical imagery (e.g., MRI, X-Rays), complete with dynamic Wikimedia Commons linking.
 - **Evidence Focus Iconography:** Custom medical iconography enhancing the interactive Task Bracketing and inline chat systems.
 - **Box Breathing UX:** Focused 16-second box breathing visual animations integrated into primary intake text areas to promote practitioner mindfulness.
@@ -191,15 +198,16 @@ npm run dev
 ```
 
 #### 2. CLOUD ORCHESTRATION
-The project is built for **Google Cloud Run**. Our `deploy.sh` script automates the build-and-release pipeline, including Google Cloud Secret Manager integration for `GEMINI_API_KEY`.
+The project is built for **Google Cloud Run**. Our `cloudbuild.yaml` orchestrates an automated CI/CD pipeline, building the container image and securely deploying it with Google Cloud Secret Manager integration for the `GEMINI_API_KEY`.
 
 ---
 
 ## 📜 RESPONSIBLE AI & ETHICS
 
-Pocket Gull adheres to the **Human-in-the-Loop** (HITL) principle. 
+Pocket Gull adheres to the **Human-in-the-Loop** (HITL) principle and is hardened via automated red-teaming.
 - **Task Bracketing:** Clinicians must manually "bracket" (validate/edit) AI suggestions before they are archived.
-- **Explainability:** The agent surfaces its reasoning lens (Intervention, Monitoring, Education) for every output.
+- **Automated Red Teaming:** A built-in Vitest test suite (`tests/safety.spec.ts`) actively verifies the Google Gemini `BLOCK_MEDIUM_AND_ABOVE` boundaries against adversarial prompts targeting the live proxy.
+- **Explainability:** The agent surfaces its reasoning lens (Intervention, Monitoring, Education, Orthomolecular) for every output.
 - **Privacy Core:** Zero PII persistence. All patient state is transient or locally-stored.
 
 ---

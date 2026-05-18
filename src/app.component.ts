@@ -12,7 +12,7 @@ import { DictationModalComponent } from './components/dictation-modal.component'
 import { TaskFlowComponent } from './components/task-flow.component';
 import { IntakeFormComponent } from './components/intake-form.component';
 import { VoiceAssistantComponent } from './components/voice-assistant.component';
-import { AI_CONFIG, AiProviderConfig } from './services/ai-provider.types';
+import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { GeminiProvider } from './services/ai/gemini.provider';
 import { ClinicalIntelligenceService } from './services/clinical-intelligence.service';
@@ -29,8 +29,11 @@ import { WalkthroughTourService } from './services/walkthrough-tour.service';
 import { SecureSplashComponent } from './components/secure-splash.component';
 import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
+import { AvsTherapyComponent } from './components/avs-therapy.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
+import { AvsUiService } from './services/avs-ui.service';
+import { GlobalAvsService } from './services/global-avs.service';
 
 @Component({
   selector: 'app-root',
@@ -49,11 +52,15 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     RevealDirective,
     WalkthroughTourComponent,
     SecureSplashComponent,
-    PatientDirectoryComponent
+    PatientDirectoryComponent,
+    AvsTherapyComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <!-- Global AVS Ambient Halo — reacts to body.avs-active via CSS -->
+    <div id="avs-ambient-halo" aria-hidden="true"></div>
+
     @if (showFhirCallback()) {
       <app-fhir-callback></app-fhir-callback>
     } @else {
@@ -96,6 +103,60 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             }
           </div>
         }
+
+        <!-- Google Health Syncing Toast -->
+        @if (isGHealthSyncing()) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/50 animate-pulse">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" class="opacity-25"></circle>
+                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-blue-800 dark:text-blue-300">Synchronizing to Google Health</h3>
+                <p class="text-[11px] text-blue-600 dark:text-blue-400/80">Transforming medical data to FHIR resources and uploading to Cloud Healthcare Store...</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Google Health Sync Success Toast -->
+        @if (showGHealthSuccess()) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Google Health Sync Successful</h3>
+                <p class="text-[11px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and vital logs successfully archived in Google Cloud Healthcare FHIR Store.</p>
+              </div>
+            </div>
+            <button (click)="showGHealthSuccess.set(false)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors text-green-700 dark:text-green-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+
+        <!-- Google Health Sync Error Toast -->
+        @if (showGHealthError(); as errorMsg) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-red-800 dark:text-red-300">Google Health Sync Failed</h3>
+                <p class="text-[11px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
+              </div>
+            </div>
+            <button (click)="showGHealthError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
         <!-- Spectral P2-Urgent (585nm amber) demo mode banner -->
         @if (isDemoMode()) {
           <div class="border-b px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 no-print shrink-0"
@@ -132,6 +193,12 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                   <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
               </div>
             <div class="h-4 w-px bg-[#EEEEEE] hidden sm:block"></div>
+
+            <!-- AVS Status Badge — visible only when body.avs-active -->
+            <div id="avs-status-badge" aria-live="polite">
+              <span class="avs-badge-dot"></span>
+              <span>{{ state.avsBrainwaveFrequency() | uppercase }} MODE</span>
+            </div>
 
             <!-- System Status Indicator (Hidden on smallest watches) -->
             <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-full border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-pointer group relative no-print" 
@@ -192,9 +259,8 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           </div>
           
           <div class="flex items-center gap-2">
-
-
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
+                    (mouseenter)="avsUi.playHover()"
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
                     [class.bg-gray-800]="state.isLiveAgentActive()"
@@ -221,6 +287,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             </button>
             
             <button (click)="state.toggleResearchFrame()"
+                    (mouseenter)="avsUi.playHover()"
                     aria-label="Toggle Research Frame"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
@@ -228,6 +295,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             </button>
             
             <a href="/docs/" target="_blank" rel="noopener"
+               (mouseenter)="avsUi.playHover()"
                aria-label="Open Documentation"
                class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -236,9 +304,10 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
               </svg>
               <span class="hidden sm:inline">Docs</span>
             </a>
-
+ 
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
+                    (mouseenter)="avsUi.playHover()"
                     aria-label="Start Tour Guide"
                     title="Start Tour Guide"
                     class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer">
@@ -251,6 +320,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             
             <!-- Theme Toggle -->
             <button (click)="cycleTheme()" 
+                    (mouseenter)="avsUi.playHover()"
                     aria-label="Toggle Theme"
                     [title]="'Theme: ' + theme.currentTheme()"
                     class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer">
@@ -259,14 +329,19 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>   
                  }
                  @case ('light') {
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                  }
                  @case ('system') {
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                 }
+                 @case ('spark') {
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#FF6F3D] animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/>
+                   </svg>
                  }
               }
             </button>
-
+ 
             <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400 pl-4 border-l border-gray-100 dark:border-zinc-800">
               <span>{{ today | date:'yyyy.MM.dd' }}</span>
               <span class="text-[#416B1F] dark:text-[#689F38] pr-2">REQ. DR. SMITH</span>
@@ -274,7 +349,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           </div>
         </nav>
 
-        <!-- New Patient Navigation Bar -->
+        <!-- New IPatient Navigation Bar -->
         <nav class="h-12 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center px-3 sm:px-6 shrink-0 bg-gray-50 dark:bg-[#09090b] z-40 no-print gap-4">
            <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:block">INTAKE MODULE 01</div>
            <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
@@ -283,7 +358,8 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
            <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1">
              <!-- EXPORT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="exportMenuOpen.set(true)" (mouseleave)="exportMenuOpen.set(false)">
-               <button class="snap-start shrink-0 flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
+               <button (mouseenter)="avsUi.playHover()"
+                       class="snap-start shrink-0 flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                  <span>Export</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -291,13 +367,13 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                
                @if (exportMenuOpen()) {
                  <div class="absolute top-full left-0 mt-1 w-40 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                   <button (click)="exportPdf(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2">
+                   <button (click)="exportPdf(); exportMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> As PDF
                    </button>
-                   <button (click)="exportJson(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="exportJson(); exportMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg> As JSON
                    </button>
-                   <button (click)="exportFhir(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="exportFhir(); exportMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> As FHIR
                    </button>
                  </div>
@@ -308,7 +384,8 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
              <!-- CONNECT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="connectMenuOpen.set(true)" (mouseleave)="connectMenuOpen.set(false)">
-               <button class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
+               <button (mouseenter)="avsUi.playHover()"
+                       class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                  <span>Integrations</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -316,16 +393,16 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
                @if (connectMenuOpen()) {
                  <div class="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                   <button (click)="connectEpic(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#E33B44] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2">
+                   <button (click)="connectEpic(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#E33B44] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> epic®
                    </button>
-                   <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#4285F4] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#4285F4] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Health Connect
                    </button>
-                   <button (click)="connectAppleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="connectAppleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Apple Health
                    </button>
-                   <button (click)="uploadData(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="uploadData(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Upload Data
                    </button>
                  </div>
@@ -335,6 +412,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
              <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1"></div>
 
              <button (click)="finalizeRecord()"
+                     (mouseenter)="avsUi.playHover()"
                      id="tour-finalize-btn"
                      class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#689F38]/20 dark:border-[#689F38]/30 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 text-[#689F38] dark:text-[#689F38] bg-[#689F38]/5 dark:bg-[#689F38]/10 hover:bg-[#689F38]/10 dark:hover:bg-[#689F38]/20 rounded-md">
                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -348,7 +426,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
 
           
-          <!-- Column 1: Patient Medical Chart -->
+          <!-- Column 1: IPatient Medical Chart -->
            <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                 id="tour-body-chart"
                [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined"
@@ -469,6 +547,10 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  [class.max-md:hidden]="!!state.selectedPartId() && mobileActiveTab() !== 'analysis'"
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
+                 @if (theme.currentTheme() === 'spark') {
+                   <app-avs-therapy class="block w-full flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300 md:mb-6 mb-3"></app-avs-therapy>
+                 }
+
                  <!-- Section 1: Analysis Intake Container -->
                  <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]"
                       [class.rounded-none]="isChartCollapsed()"
@@ -624,6 +706,26 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                     class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
                     [ngClass]="selectedReadingLevel() === 'child' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
                     Pediatric
+                  </button>
+                  <button (click)="changeReadingLevel('spanish')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'spanish' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Spanish
+                  </button>
+                  <button (click)="changeReadingLevel('german')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'german' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    German
+                  </button>
+                  <button (click)="changeReadingLevel('french')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'french' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    French
+                  </button>
+                  <button (click)="changeReadingLevel('mandarin')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'mandarin' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Mandarin
                   </button>
                 </div>
               </div>
@@ -787,9 +889,19 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 })
 export class AppComponent implements OnDestroy {
   public tour = inject(WalkthroughTourService);
+  public avsUi = inject(AvsUiService);
+  /** GlobalAvsService bootstraps itself via effect(); inject here to instantiate eagerly. */
+  public readonly globalAvs = inject(GlobalAvsService);
   state = inject(PatientStateService);
   public theme = inject(ThemeService);
   private ngZone = inject(NgZone);
+
+  /** Unlock Web Audio API on the first user gesture (browser autoplay policy). */
+  @HostListener('document:click', [])
+  @HostListener('document:keydown', [])
+  onFirstGesture(): void {
+    this.globalAvs.onUserGesture();
+  }
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
   network = inject(NetworkStateService);
@@ -811,11 +923,16 @@ export class AppComponent implements OnDestroy {
   isSimplifying = signal(false);
   isSimplifyingChild = signal(false);
 
+  // Google Health (GCP Healthcare FHIR Store) Sync State
+  isGHealthSyncing = signal<boolean>(false);
+  showGHealthSuccess = signal<boolean>(false);
+  showGHealthError = signal<string | null>(null);
+
   // Finalize & Archive State
   showPreviewModal = signal(false);
   previewText = signal('');
   originalPreviewText = signal('');
-  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
+  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'>('standard');
   isTranslating = signal<boolean>(false);
   translationAnalysis = signal<string>('');
   isAnalyzingTranslation = signal(false);
@@ -920,8 +1037,42 @@ export class AppComponent implements OnDestroy {
     alert("Epic Integration placeholder: Connecting to Epic MyChart...");
   }
 
-  connectGoogleHealth() {
-    alert("Google Health Connect: Awaiting sync from Android Companion App...");
+  async connectGoogleHealth() {
+    const patient = this.patientMgmt.selectedPatient();
+    if (!patient) {
+      alert("No patient selected to sync to Google Health FHIR Store.");
+      return;
+    }
+
+    this.isGHealthSyncing.set(true);
+    this.showGHealthSuccess.set(false);
+    this.showGHealthError.set(null);
+
+    try {
+      const response = await fetch('/api/healthcare/fhir/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(patient)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Sync failed with status code ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('[Google Health Sync] Success:', result);
+      this.showGHealthSuccess.set(true);
+      setTimeout(() => this.showGHealthSuccess.set(false), 5000);
+    } catch (e: any) {
+      console.error('[Google Health Sync] Error:', e);
+      this.showGHealthError.set(e.message || 'An error occurred during synchronization.');
+      setTimeout(() => this.showGHealthError.set(null), 8000);
+    } finally {
+      this.isGHealthSyncing.set(false);
+    }
   }
 
   connectAppleHealth() {
@@ -995,7 +1146,7 @@ export class AppComponent implements OnDestroy {
       plan = plan ? `${plan}\n\n### ${ClinicalIcons.Medication} Medications\n${medsContent}` : `### ${ClinicalIcons.Medication} Medications\n${medsContent}`;
     }
     
-    const finalText = plan || 'No Active Patient Summary recorded for this visit.';
+    const finalText = plan || 'No Active IPatient Summary recorded for this visit.';
     this.previewText.set(finalText);
     this.originalPreviewText.set(finalText);
     this.selectedReadingLevel.set('standard');
@@ -1007,11 +1158,11 @@ export class AppComponent implements OnDestroy {
   }
 
   async changeReadingLevel(levelOrEvent: string | Event) {
-    let level: 'standard' | 'simplified' | 'dyslexia' | 'child';
+    let level: 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin';
     if (typeof levelOrEvent === 'string') {
-      level = levelOrEvent as 'standard' | 'simplified' | 'dyslexia' | 'child';
+      level = levelOrEvent as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin';
     } else {
-      level = (levelOrEvent.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child';
+      level = (levelOrEvent.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin';
     }
     
     this.selectedReadingLevel.set(level);
@@ -1088,7 +1239,7 @@ export class AppComponent implements OnDestroy {
 
       this.export.downloadCarePlanPdf(
         '',
-        p?.name ?? 'Patient',
+        p?.name ?? 'IPatient',
         {
           bp: vitals.bp || undefined,
           hr: vitals.hr || undefined,
@@ -1102,7 +1253,7 @@ export class AppComponent implements OnDestroy {
     } else {
       this.export.downloadCarePlanPdf(
         textToPrint,
-        p?.name ?? 'Patient',
+        p?.name ?? 'IPatient',
         {
           bp: vitals.bp || undefined,
           hr: vitals.hr || undefined,
@@ -1151,6 +1302,7 @@ export class AppComponent implements OnDestroy {
     const current = this.theme.currentTheme();
     if (current === 'system') this.theme.setTheme('light');
     else if (current === 'light') this.theme.setTheme('dark');
+    else if (current === 'dark') this.theme.setTheme('spark');
     else this.theme.setTheme('system');
   }
 

@@ -5,13 +5,21 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppComponent } from './src/app.component';
 import { AI_CONFIG, IAiProviderConfig } from './src/services/ai-provider.types';
 import { IntelligenceProviderToken } from './src/services/ai/intelligence.provider.token';
-import { GeminiProvider } from './src/services/ai/gemini.provider';
+import { HybridProvider } from './src/services/ai/hybrid.provider';
 import { provideServiceWorker } from '@angular/service-worker';
+
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { environment } from './src/environments/environment';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withFetch()),
     provideZonelessChangeDetection(),
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
     {
       provide: AI_CONFIG,
       useFactory: () => ({
@@ -22,7 +30,7 @@ bootstrapApplication(AppComponent, {
     },
     {
       provide: IntelligenceProviderToken,
-      useClass: GeminiProvider
+      useClass: HybridProvider
     }, provideClientHydration(withEventReplay()), provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000'

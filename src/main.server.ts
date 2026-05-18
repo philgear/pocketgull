@@ -3,7 +3,7 @@ import { BootstrapContext, bootstrapApplication, provideClientHydration, withEve
 import { AppComponent } from './app.component';
 import { provideServerRendering } from '@angular/platform-server';
 import { provideZonelessChangeDetection, ApplicationConfig } from '@angular/core';
-import { AI_CONFIG, AiProviderConfig } from './services/ai-provider.types';
+import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { PubGemmaProvider } from './services/ai/pubgemma.provider';
 import { NanoProvider } from './services/ai/nano.provider';
@@ -28,7 +28,7 @@ const serverConfig: ApplicationConfig = {
                 apiKey: process.env['GEMINI_API_KEY'] || '',
                 defaultModel: { modelId: 'gemini-2.5-flash', temperature: 0.1 },
                 verificationModel: { modelId: 'gemini-2.5-flash', temperature: 0.0 }
-            } as AiProviderConfig)
+            } as IAiProviderConfig)
         },
         {
             provide: IntelligenceProviderToken,

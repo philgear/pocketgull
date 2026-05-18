@@ -5,6 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-05-18
+
+### Added
+- **[2026-05-18] Multilingual & Pediatric Care Plans**: Expanded the `translateReadingLevel` infrastructure across all providers to support Spanish, German, French, Mandarin, Dyslexia, and Pediatric formats.
+- **[2026-05-18] Security & Red Teaming Framework**: Implemented `SECURITY.md` and a Vitest automated red-teaming suite (`tests/safety.spec.ts`) to actively verify Gemini `BLOCK_MEDIUM_AND_ABOVE` safety boundaries.
+- **[2026-05-18] Transparency Metadata**: Added `humans.txt`, `robots.txt`, `llms.txt`, and `sources.txt` to the public directory for AI indexing and human attribution.
+- **[2026-05-18] Cloud Build Integration**: Created `cloudbuild.yaml` to automate Docker builds and Google Cloud Run deployment pipelines.
+- **[2026-05-18] Advanced Clinical Mock Data**: Expanded `MOCK_PATIENTS` with updated 2026 timestamps, Orthomolecular Biomarkers, and dedicated Pediatric and Multilingual test profiles.
+
+## [0.8.0] - 2026-05-18
+
+### Added
+- **[2026-05-18] Multi-Layer Hemi-Sync Audio Engine**: Upgraded `GlobalAvsService` to a high-fidelity 4-oscillator engine supporting phase-locked frequency entrainment and a clinical-grade Pink Noise synthesizer.
+- **[2026-05-18] Athletic Enhancement AVS**: Implemented `AthleticProtocolService` and UI toggles to provide specialized AVS protocols (Priming, Flow, Recovery, Phase-Shift) for athletic performance and recovery.
+- **[2026-05-18] Real-Time DSP Pipeline**: Fleshed out the FastAPI sidecar to process real-time HDF5 ECG streams using SciPy to extract HRV (RMSSD) and respiratory frequency metrics.
+- **[2026-05-18] Philips Hue Local Relay Proxy**: Added a local `hue-relay.js` Node proxy to resolve HTTPS mixed-content restrictions when the PWA communicates with local Philips Hue hubs.
+
+## [0.7.0] - 2026-05-17
+- **[2026-05-17] Circadian UI & AVS Coregulation**: Replaced static UI themes with a continuous, hardware-accelerated circadian CSS variable system (`CircadianSleepinessService`) that smoothly transitions ambient UI colors based on the time of day.
+- **[2026-05-17] KSS Readiness Gateway**: Integrated the 9-point Karolinska Sleepiness Scale (KSS) into the secure splash screen, allowing manual readiness overrides of the circadian theme.
+- **[2026-05-17] DOC Stimulation Protocols**: Implemented `DocProtocolService` to provide structured auditory and vibroacoustic stimulation guidelines for Disorders of Consciousness (Coma, VS/UWS, MCS).
+- **[2026-05-17] PWA Gemini Nano Integration**: Upgraded `HybridProvider` to route chat and conversational queries to Chrome's on-device `window.ai` Nano model when offline or for token-saving local execution.
+- **[2026-05-17] Philips Hue & Ambient Lighting Sync**: Created `AmbientLightingService` to mathematically sync the application's real-time circadian HSL themes with physical Philips Hue smart lights via the local network.
+
 ## [0.6.0] - 2026-05-17
 
 ### Added

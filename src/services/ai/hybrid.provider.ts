@@ -1,37 +1,37 @@
 import { inject, Injectable } from '@angular/core';
-import { IntelligenceProvider } from './intelligence.provider';
+import { IIntelligenceProvider } from './intelligence.provider';
 import { GeminiProvider } from './gemini.provider';
 import { PubGemmaProvider } from './pubgemma.provider';
 import { NanoProvider } from './nano.provider';
 import { WebLLMProvider } from './webllm.provider';
-import { ClinicalMetrics } from '../clinical-intelligence.service';
-import { VerificationIssue } from '../../components/analysis-report.types';
+import { IClinicalMetrics } from '../clinical-intelligence.service';
+import { IVerificationIssue } from '../../components/analysis-report.types';
 import { NetworkStateService } from '../network-state.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class HybridProvider implements IntelligenceProvider {
+export class HybridProvider implements IIntelligenceProvider {
   private gemini = inject(GeminiProvider);
   private nvidia = inject(PubGemmaProvider); // Represents NVIDIA local inference
   private nano = inject(NanoProvider);
   private webgpu = inject(WebLLMProvider);
   private network = inject(NetworkStateService);
 
-  async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+  async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
     if (!this.network.useLocalInference()) {
       try {
-        yield* this.gemini.generateReportStream(patientData, lens, systemInstruction);
+        yield* this.gemini.generateReportStream$(patientData, lens, systemInstruction);
       } catch (errGem) {
         console.warn('Gemini API failed, falling back to WebLLM:', errGem);
         yield '\n\n_⚡ Cloud Gemini unavailable. Switching to WebLLM Inference..._\n\n';
         try {
-          yield* this.webgpu.generateReportStream(patientData, lens, systemInstruction);
+          yield* this.webgpu.generateReportStream$(patientData, lens, systemInstruction);
         } catch (errWeb) {
           console.warn('WebLLM failed, falling back to Nano:', errWeb);
           yield '\n\n_⚡ WebLLM unavailable. Switching to Chrome Nano..._\n\n';
           try {
-            yield* this.nano.generateReportStream(patientData, lens, systemInstruction);
+            yield* this.nano.generateReportStream$(patientData, lens, systemInstruction);
           } catch (errNano) {
             throw new Error(`All Online Engines failed.`);
           }
@@ -39,17 +39,17 @@ export class HybridProvider implements IntelligenceProvider {
       }
     } else {
       try {
-        yield* this.nvidia.generateReportStream(patientData, lens, systemInstruction);
+        yield* this.nvidia.generateReportStream$(patientData, lens, systemInstruction);
       } catch (errNvidia) {
         console.warn('NVIDIA API failed, falling back to WebLLM:', errNvidia);
         yield '\n\n_⚡ Local NVIDIA unavailable. Switching to WebLLM Inference..._\n\n';
         try {
-          yield* this.webgpu.generateReportStream(patientData, lens, systemInstruction);
+          yield* this.webgpu.generateReportStream$(patientData, lens, systemInstruction);
         } catch (errWeb) {
           console.warn('WebLLM failed, falling back to Nano:', errWeb);
           yield '\n\n_⚡ WebLLM unavailable. Switching to Chrome Nano..._\n\n';
           try {
-            yield* this.nano.generateReportStream(patientData, lens, systemInstruction);
+            yield* this.nano.generateReportStream$(patientData, lens, systemInstruction);
           } catch (errNano) {
             throw new Error(`All Offline Engines failed.`);
           }
@@ -58,7 +58,7 @@ export class HybridProvider implements IntelligenceProvider {
     }
   }
 
-  async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
+  async generateMetrics(reportText: string): Promise<IClinicalMetrics> {
     if (!this.network.useLocalInference()) {
       try { return await this.gemini.generateMetrics(reportText); } catch (e1) {
         try { return await this.webgpu.generateMetrics(reportText); } catch (e2) {
@@ -90,7 +90,7 @@ export class HybridProvider implements IntelligenceProvider {
     }
   }
 
-  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }> {
+  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> {
     if (!this.network.useLocalInference()) {
       try { return await this.gemini.verifySection(lens, content, sourceData); } catch (e1) {
         try { return await this.webgpu.verifySection(lens, content, sourceData); } catch (e2) {
@@ -106,7 +106,7 @@ export class HybridProvider implements IntelligenceProvider {
     }
   }
 
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child'): Promise<string> {
+  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
     if (!this.network.useLocalInference()) {
       try { return await this.gemini.translateReadingLevel(text, level); } catch (e1) {
         try { return await this.webgpu.translateReadingLevel(text, level); } catch (e2) {
@@ -156,17 +156,17 @@ export class HybridProvider implements IntelligenceProvider {
 
   async startChat(patientData: string, context: string): Promise<void> {
     if (!this.network.useLocalInference()) {
-      // Chat sessions require a stateful backend; Nano is not a valid fallback
-      // in cloud mode as it requires Chrome 138+ with specific flags. Surface
-      // the real error (e.g. auth failure) rather than hiding it behind a Nano error.
       try {
         await this.gemini.startChat(patientData, context);
       } catch (e1: any) {
         try {
           await this.webgpu.startChat(patientData, context);
         } catch (e2: any) {
-          // Throw the original Gemini error so the UI shows the real problem
-          throw new Error(e1?.message ?? 'Cloud chat session could not be established.');
+          try {
+             await this.nano.startChat(patientData, context);
+          } catch (e3: any) {
+             throw new Error(e1?.message ?? 'Cloud chat session could not be established.');
+          }
         }
       }
     } else {
@@ -176,7 +176,11 @@ export class HybridProvider implements IntelligenceProvider {
         try {
           await this.webgpu.startChat(patientData, context);
         } catch (e2: any) {
-          throw new Error(e1?.message ?? 'Local inference chat session could not be established.');
+          try {
+             await this.nano.startChat(patientData, context);
+          } catch (e3: any) {
+             throw new Error(e1?.message ?? 'Local inference chat session could not be established.');
+          }
         }
       }
     }
@@ -190,7 +194,11 @@ export class HybridProvider implements IntelligenceProvider {
         try {
           return await this.webgpu.sendMessage(message, files);
         } catch (e2: any) {
-          throw new Error(e1?.message ?? 'Cloud AI chat engine is unavailable.');
+          try {
+             return await this.nano.sendMessage(message, files);
+          } catch (e3: any) {
+             throw new Error(e1?.message ?? 'Cloud AI chat engine is unavailable.');
+          }
         }
       }
     } else {
@@ -200,7 +208,11 @@ export class HybridProvider implements IntelligenceProvider {
         try {
           return await this.webgpu.sendMessage(message, files);
         } catch (e2: any) {
-          throw new Error(e1?.message ?? 'Local inference chat engine is unavailable.');
+           try {
+             return await this.nano.sendMessage(message, files);
+           } catch (e3: any) {
+             throw new Error(e1?.message ?? 'Local inference chat engine is unavailable.');
+           }
         }
       }
     }

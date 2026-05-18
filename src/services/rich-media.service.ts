@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 // ─── Rich Media Card Interfaces ───────────────────────────────────────────────
 
-export interface ThreeJsModel {
+export interface IThreeJsModel {
     id: string;
     name: string;
     description: string;
@@ -12,7 +12,7 @@ export interface ThreeJsModel {
     particles?: boolean;
 }
 
-export interface WikimediaImage {
+export interface IWikimediaImage {
     title: string;
     url: string;
     thumbUrl: string;
@@ -21,7 +21,7 @@ export interface WikimediaImage {
     license: string;
 }
 
-export interface PubmedCitation {
+export interface IPubmedCitation {
     pmid: string;
     title: string;
     authors: string;
@@ -31,7 +31,7 @@ export interface PubmedCitation {
     url: string;
 }
 
-export interface PhilImage {
+export interface IPhilImage {
     id: number;
     url: string;
     thumbUrl: string;
@@ -41,17 +41,17 @@ export interface PhilImage {
 
 export type RichCardKind = 'model-3d' | 'image-gallery' | 'pubmed-refs' | 'phil-image';
 
-export interface RichMediaCard {
+export interface IRichMediaCard {
     kind: RichCardKind;
     query: string;
     severity?: 'green' | 'yellow' | 'red';
     afflictionHighlight?: string;
     particles?: boolean;
     // Resolved data (populated after fetching)
-    models?: ThreeJsModel[];
-    images?: WikimediaImage[];
-    citations?: PubmedCitation[];
-    philImages?: PhilImage[];
+    models?: IThreeJsModel[];
+    images?: IWikimediaImage[];
+    citations?: IPubmedCitation[];
+    philImages?: IPhilImage[];
     // Loading state
     loading?: boolean;
     error?: string;
@@ -60,7 +60,7 @@ export interface RichMediaCard {
 // ─── Curated Three.js Procedural Registry ────────────────────────────────────
 // Rendered locally using procedural shapes in Medical3DViewerComponent
 
-const THREEJS_REGISTRY: Record<string, ThreeJsModel[]> = {
+const THREEJS_REGISTRY: Record<string, IThreeJsModel[]> = {
     'spine': [
         {
             id: 'spine',
@@ -122,7 +122,7 @@ const THREEJS_REGISTRY: Record<string, ThreeJsModel[]> = {
 // ─── Curated PHIL Image Registry ─────────────────────────────────────────────
 // Public domain CDC images — no API key required
 
-const PHIL_REGISTRY: Record<string, PhilImage[]> = {
+const PHIL_REGISTRY: Record<string, IPhilImage[]> = {
     'spine': [
         { id: 9501, url: 'https://wwwn.cdc.gov/phil/PHIL_Images/9501/9501.jpg', thumbUrl: 'https://wwwn.cdc.gov/phil/PHIL_Images/9501/9501_lores.jpg', title: 'Spinal anatomy diagram', credit: 'CDC/PHIL' },
     ],
@@ -147,7 +147,7 @@ export class RichMediaService {
 
     // ─── Procedural Models (local registry) ───────────────────────────────────
 
-    getThreeJsModels(query: string): ThreeJsModel[] {
+    getThreeJsModels(query: string): IThreeJsModel[] {
         const q = query.toLowerCase();
         for (const key of Object.keys(THREEJS_REGISTRY)) {
             if (key === 'default') continue;
@@ -158,7 +158,7 @@ export class RichMediaService {
 
     // ─── PHIL (curated registry) ─────────────────────────────────────────────
 
-    getPhilImages(query: string): PhilImage[] {
+    getPhilImages(query: string): IPhilImage[] {
         const q = query.toLowerCase();
         for (const key of Object.keys(PHIL_REGISTRY)) {
             if (key === 'default') continue;
@@ -186,7 +186,7 @@ export class RichMediaService {
         return words.slice(0, 2).join(' ') || query.split(/\s+/).slice(0, 2).join(' ');
     }
 
-    private async _fetchWikimedia(searchTerm: string, limit: number): Promise<WikimediaImage[]> {
+    private async _fetchWikimedia(searchTerm: string, limit: number): Promise<IWikimediaImage[]> {
         const encoded = encodeURIComponent(`${searchTerm} anatomy`);
         const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrnamespace=6&gsrsearch=${encoded}&gsrlimit=${limit}&prop=imageinfo&iiprop=url|descriptionurl|extmetadata&iiurlwidth=400&format=json&origin=*`;
         const res = await fetch(url);
@@ -204,13 +204,13 @@ export class RichMediaService {
                     descriptionUrl: ii.descriptionurl ?? '',
                     credit: meta.Credit?.value?.replace(/<[^>]+>/g, '') ?? 'Wikimedia Commons',
                     license: meta.LicenseShortName?.value ?? 'See source'
-                } as WikimediaImage;
+                } as IWikimediaImage;
             })
-            .filter((img): img is WikimediaImage => img !== null)
+            .filter((img): img is IWikimediaImage => img !== null)
             .filter(img => img.url.match(/\.(jpg|jpeg|png|svg|webp)$/i));
     }
 
-    async searchWikimediaImages(query: string, limit = 6): Promise<WikimediaImage[]> {
+    async searchWikimediaImages(query: string, limit = 6): Promise<IWikimediaImage[]> {
         try {
             // Step 1: try with simplified focused keywords
             const simplified = this._simplifyQuery(query);
@@ -234,7 +234,7 @@ export class RichMediaService {
 
     // ─── PubMed ──────────────────────────────────────────────────────────────
 
-    async searchPubmed(query: string, limit = 3): Promise<PubmedCitation[]> {
+    async searchPubmed(query: string, limit = 3): Promise<IPubmedCitation[]> {
         const encoded = encodeURIComponent(query);
         const searchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encoded}&retmax=${limit}&retmode=json&sort=relevance`;
 
@@ -261,8 +261,8 @@ export class RichMediaService {
                     year: doc.pubdate?.split(' ')[0] ?? '',
                     abstract: doc.title ?? '', // summary doesn't include abstract — use title for preview
                     url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`
-                } as PubmedCitation;
-            }).filter((c): c is PubmedCitation => c !== null);
+                } as IPubmedCitation;
+            }).filter((c): c is IPubmedCitation => c !== null);
         } catch {
             return [];
         }
@@ -270,7 +270,7 @@ export class RichMediaService {
 
     // ─── Resolve a card (fetches live data if needed) ─────────────────────────
 
-    async resolveCard(card: RichMediaCard): Promise<RichMediaCard> {
+    async resolveCard(card: IRichMediaCard): Promise<IRichMediaCard> {
         switch (card.kind) {
             case 'model-3d':
                 return { ...card, models: this.getThreeJsModels(card.query), loading: false };

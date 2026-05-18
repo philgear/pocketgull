@@ -61,7 +61,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     // Inputs for external control
     rotation = input<number>(0);
     zoom = input<number>(1);
-    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
+    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
 
     readonly webglSupported = signal<boolean>(true);
     readonly webglError = signal<string>('');
@@ -114,8 +114,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             const mode = this.anatomyViewMode();
             this.updateTransparency(mode);
             if (this.bloomPass) {
-                this.bloomPass.strength = (mode === 'mind' || mode === 'molecular') ? 1.5 : 0.4;
+                this.bloomPass.strength = (mode === 'organs' || mode === 'molecular') ? 0.3 : 0.15;
             }
+        });
+
+        // React to AVS session activation to toggle neural globe visibility instantly
+        effect(() => {
+            const avsActive = this.state.isAvsSessionActive();
+            const mode = this.anatomyViewMode();
+            this.updateTransparency(mode);
         });
 
         // React to zoom changes to avoid updating projection matrix every frame
@@ -206,7 +213,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         // Setup Post-processing (Bloom)
         const renderScene = new RenderPass(this.scene, this.camera);
         // Resolution, strength, radius, threshold
-        this.bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 0.8, 0.5, 0.2);
+        this.bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 0.2, 0.5, 0.3);
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(renderScene);
         this.composer.addPass(this.bloomPass);
@@ -241,19 +248,19 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         // Define our three fundamental material layers
         const skinMaterial = new THREE.MeshStandardMaterial({
-            color: 0xffe0bd, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.9, depthWrite: true
+            color: 0xfdfdfd, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.9, depthWrite: true
         });
         const muscleMaterial = new THREE.MeshStandardMaterial({
-            color: 0x8a1c1c, roughness: 0.7, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xc95353, roughness: 0.7, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
         const boneMaterial = new THREE.MeshStandardMaterial({
-            color: 0xf5f5dc, roughness: 0.5, metalness: 0.05, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xe0e0e0, roughness: 0.5, metalness: 0.05, transparent: true, opacity: 0.0, depthWrite: false
         });
         const mindMaterial = new THREE.MeshStandardMaterial({
-            color: 0x8b5cf6, roughness: 0.2, metalness: 0.4, transparent: true, emissive: 0x8b5cf6, emissiveIntensity: 0.2, opacity: 0.0, depthWrite: false
+            color: 0x8b5cf6, roughness: 0.2, metalness: 0.4, transparent: true, emissive: 0x8b5cf6, emissiveIntensity: 0.1, opacity: 0.0, depthWrite: false
         });
         const molecularMaterial = new THREE.MeshStandardMaterial({
-            color: 0x00ffff, wireframe: true, transparent: true, emissive: 0x008888, emissiveIntensity: 0.5, opacity: 0.0, depthWrite: false
+            color: 0x00ffff, wireframe: true, transparent: true, emissive: 0x008888, emissiveIntensity: 0.2, opacity: 0.0, depthWrite: false
         });
 
         // Procedural construction functions for contoured/biological shapes
@@ -307,7 +314,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         // Add subtle procedural "breathing" and idle materials
         const mindGeo = new THREE.IcosahedronGeometry(0.5, 2);
         const mindMesh = new THREE.Mesh(mindGeo, new THREE.MeshStandardMaterial({
-            color: 0x8b5cf6, emissive: 0x8b5cf6, emissiveIntensity: 0.5, wireframe: true, transparent: true, opacity: 0.1
+            color: 0x8b5cf6, emissive: 0x8b5cf6, emissiveIntensity: 0.5, wireframe: true, transparent: true, opacity: 0.0, visible: false
         }));
         mindMesh.position.set(0, 1.7, 0);
         mindMesh.userData['isMindCore'] = true;
@@ -418,24 +425,24 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     if (layer === 'skin') {
                         material.color.setHex(0x1C1C1C);
                         material.emissive.setHex(0x76B362);
-                        material.emissiveIntensity = 0.4;
+                        material.emissiveIntensity = 0.2;
                     } else if (layer === 'molecular') {
                         material.emissive.setHex(0xffffff);
-                        material.emissiveIntensity = 1.0;
+                        material.emissiveIntensity = 0.4;
                     } else {
                         material.emissive.setHex(0x76B362);
-                        material.emissiveIntensity = 0.6;
+                        material.emissiveIntensity = 0.3;
                     }
                 } else {
                     if (layer === 'mind') {
                         material.emissive.setHex(0x8b5cf6);
-                        material.emissiveIntensity = 0.2;
+                        material.emissiveIntensity = 0.1;
                     } else if (layer === 'molecular' && maxPain === 0) {
                         material.emissive.setHex(0x008888);
-                        material.emissiveIntensity = 0.5;
+                        material.emissiveIntensity = 0.2;
                     } else if (layer === 'molecular' && maxPain > 0) {
                         material.emissive.setHex(0xff0066);
-                        material.emissiveIntensity = 0.5 + (maxPain / 20); // Scale emissive with pain
+                        material.emissiveIntensity = 0.2 + (maxPain / 40); // Scale emissive with pain softly
                     } else {
                         material.emissive.setHex(0x000000);
                         material.emissiveIntensity = 0;
@@ -445,7 +452,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         });
     }
 
-    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular') {
+    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular') {
         this.parts.forEach((group) => {
             const isSelected = this.state.selectedPartId() === group.userData['id'];
             group.children.forEach(child => {
@@ -468,7 +475,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     else if (layer === 'bone') { material.opacity = 1.0; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
-                else if (mode === 'mind') {
+                else if (mode === 'organs') {
                     if (layer === 'skin') { material.opacity = 0.10; material.depthWrite = false; }
                     else if (layer === 'mind') { material.opacity = 0.9; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
@@ -480,6 +487,21 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 }
             });
         });
+
+        // Update the neural field / brainwave entrainment globe (mindMesh)
+        if (this.mannequinGroup) {
+            const mindMesh = this.mannequinGroup.children.find(child => child.userData['isMindCore']);
+            if (mindMesh && mindMesh instanceof THREE.Mesh) {
+                const avsActive = this.state.isAvsSessionActive();
+                const showGlobe = avsActive || mode === 'organs' || mode === 'molecular';
+                
+                mindMesh.visible = showGlobe;
+                if (mindMesh.material instanceof THREE.MeshStandardMaterial) {
+                    mindMesh.material.opacity = showGlobe ? (avsActive ? 0.25 : 0.08) : 0.0;
+                    mindMesh.material.depthWrite = showGlobe;
+                }
+            }
+        }
     }
 
     private setupInteractions() {
@@ -543,23 +565,71 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.timer.update();
             const time = this.timer.getElapsed();
             
-            // Idle Breathing Animation
+            // Idle & Biometric AVS breathing and mind wave entrainment animations
             if (this.mannequinGroup) {
-                // Subtle chest heave
+                const avsActive = this.state.isAvsSessionActive();
+                
+                // 1. Respiratory Coherence Entrainment (Chest Heave Sync)
                 const chestPart = this.parts.get('chest');
                 if (chestPart) {
-                   chestPart.scale.set(1 + Math.sin(time * 2) * 0.02, 1 + Math.sin(time * 2) * 0.01, 1 + Math.sin(time * 2) * 0.03);
+                    if (avsActive) {
+                        const pacingFrequency = (this.state.avsBreathingRate() / 60) * 2 * Math.PI;
+                        chestPart.scale.set(
+                            1 + Math.sin(time * pacingFrequency) * 0.035, 
+                            1 + Math.sin(time * pacingFrequency) * 0.015, 
+                            1 + Math.sin(time * pacingFrequency) * 0.045
+                        );
+                    } else {
+                        chestPart.scale.set(
+                            1 + Math.sin(time * 2) * 0.02, 
+                            1 + Math.sin(time * 2) * 0.01, 
+                            1 + Math.sin(time * 2) * 0.03
+                        );
+                    }
                 }
-                // Gentle floating
+                
+                // 2. Gentle floating
                 this.mannequinGroup.position.y = Math.sin(time * 1.5) * 0.02;
                 
-                // Slowly rotate the mind core
+                // 3. Mind Core & Neural Pathway Entrainment
                 this.mannequinGroup.children.forEach(child => {
                     if (child.userData['isMindCore']) {
                         child.rotation.y += 0.01;
                         child.rotation.x += 0.005;
+                        
+                        if (avsActive) {
+                            const wave = this.state.avsBrainwaveFrequency();
+                            let waveFreq = 6.0; // default theta
+                            if (wave === 'delta') waveFreq = 2.5;
+                            else if (wave === 'theta') waveFreq = 6.0;
+                            else if (wave === 'alpha') waveFreq = 10.0;
+                            else if (wave === 'beta') waveFreq = 18.0;
+                            
+                            const wavePulsation = Math.sin(time * waveFreq * 2 * Math.PI);
+                            child.scale.set(1 + wavePulsation * 0.06, 1 + wavePulsation * 0.06, 1 + wavePulsation * 0.06);
+                            
+                            if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+                                child.material.emissiveIntensity = 0.3 + wavePulsation * 0.2;
+                            }
+                        } else {
+                            child.scale.set(1, 1, 1);
+                            if (child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+                                child.material.emissiveIntensity = 0.2;
+                            }
+                        }
                     }
                 });
+
+                // 4. Ambient Aura / Bloom entrainment
+                if (this.bloomPass) {
+                    if (avsActive) {
+                        const pacingFrequency = (this.state.avsBreathingRate() / 60) * 2 * Math.PI;
+                        this.bloomPass.strength = 0.4 + Math.sin(time * pacingFrequency) * 0.15;
+                    } else {
+                        const mode = this.anatomyViewMode();
+                        this.bloomPass.strength = (mode === 'organs' || mode === 'molecular') ? 0.3 : 0.15;
+                    }
+                }
             }
 
             // Sync external rotation

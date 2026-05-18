@@ -1,0 +1,15 @@
+/* TEAM */
+Author: Pocket Gull AI and The Developer
+Role: Medical AI Strategy
+
+/* THANKS */
+Thank you for using Pocket Gull!
+Vielen Dank für die Nutzung von Pocket Gull! 
+Merci d'utiliser Pocket Gull! 
+感谢您使用 Pocket Gull! 
+
+/* SITE */
+Last update: 2026
+Standards: HTML5, CSS3, Angular
+Components: TailwindCSS, Three.js
+Software: Google Gemini

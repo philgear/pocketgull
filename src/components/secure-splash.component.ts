@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef, viewChild, input, output, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef, viewChild, input, output, computed, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SessionStateService } from '../services/session-state.service';
 import { FirestoreSyncService } from '../services/firestore-sync.service';
+import { CircadianSleepinessService, KssScore } from '../services/circadian-sleepiness.service';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { FirestoreSyncService } from '../services/firestore-sync.service';
     <main class="fixed inset-0 z-[999] flex flex-col items-center justify-center p-6 backdrop-blur-3xl bg-zinc-950/95 animate-in fade-in duration-[800ms] overflow-hidden">
       <!-- Ambient light effect -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[100px]"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[100px] avs-breathing-glow"></div>
       </div>
 
       <!-- HIPAA Lock Status Header (Visible only when locked) -->
@@ -28,7 +29,7 @@ import { FirestoreSyncService } from '../services/firestore-sync.service';
       }
 
       <!-- Unified Seagull Mascot -->
-      <div class="origami-seagull-container group drop-shadow-2xl relative z-20 pointer-events-none mb-6">
+      <div class="origami-seagull-container group drop-shadow-2xl relative z-20 pointer-events-none mb-6 avs-breathing-mascot">
         <svg
           class="w-40 h-40 md:w-48 md:h-48 hover:scale-105 active:scale-95 transition-transform drop-shadow-[0_0_15px_rgba(255,255,255,0.05)]" 
           viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -98,6 +99,7 @@ import { FirestoreSyncService } from '../services/firestore-sync.service';
                  #pinInput
                  type="password" 
                  [(ngModel)]="pin"
+                 (ngModelChange)="onPinChange($event)"
                  (keyup.enter)="verifyPin()"
                  maxlength="4"
                  placeholder="1234" 
@@ -116,11 +118,31 @@ import { FirestoreSyncService } from '../services/firestore-sync.service';
 
             </div>
             @if (errorMsg()) {
-              <p class="mb-4 text-red-400/90 text-[10px] uppercase font-bold tracking-[0.1em] text-center w-full">{{ errorMsg() }}</p>
+              <p class="mb-4 text-red-400/90 text-[10px] uppercase font-bold tracking-[0.1em] text-center w-full animate-pulse">{{ errorMsg() }}</p>
             }
+
+            <!-- Subtle AVS Lock-State Controller -->
+            <div class="mt-6 pt-5 border-t border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-500 font-mono tracking-wider animate-in fade-in duration-700">
+               <div class="flex items-center gap-2">
+                  <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-emerald-400' : 'bg-zinc-600'"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2" [class]="isAvsPlaying() ? 'bg-emerald-500' : 'bg-zinc-500'"></span>
+                  </span>
+                  <span>{{ isAvsPlaying() ? 'AVS ENTRAINMENT ACTIVE' : 'AVS ENTRAINMENT MUTED' }}</span>
+               </div>
+               <button 
+                 type="button" 
+                 (click)="toggleAvs()"
+                 class="px-3 py-1 bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white rounded-full transition border border-zinc-700/40 text-[9px] uppercase font-bold tracking-widest active:scale-95 flex items-center gap-1.5"
+               >
+                  <svg *ngIf="!isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                  <svg *ngIf="isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 12V6.75A2.25 2.25 0 0 0 15 4.5h-1.5a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 13.5 19.5H15a2.25 2.25 0 0 0 2.25-2.25V12z" /></svg>
+                  <span>{{ isAvsPlaying() ? 'Mute' : 'Listen' }}</span>
+               </button>
+            </div>
           } 
           <!-- API Key Setup Flow -->
-          @else {
+          @else if (viewState() === 'auth') {
             <form (submit)="handleSubmitKey(); $event.preventDefault();" class="space-y-4">
               <div class="relative group">
                 <input 
@@ -173,17 +195,102 @@ import { FirestoreSyncService } from '../services/firestore-sync.service';
                   <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                   Google
                 </button>
-                <!--
-                <button type="button" class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 hover:text-zinc-200 border border-zinc-700/50 text-zinc-300 text-[9.5px] font-bold uppercase tracking-[0.1em] rounded-xl transition-all" (click)="viewState.set('beta')">
-                  Apply for Beta 
-                </button>
-                -->
               </div>
             </form>
           }
+
+          <!-- KSS Readiness Check (shown after successful auth) -->
+          @else if (viewState() === 'kss') {
+            <div class="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+              <!-- Circadian context card -->
+              <div class="p-3 rounded-xl border border-zinc-700/40 bg-zinc-800/40">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="text-base">{{ kss.circadian().phaseEmoji }}</span>
+                  <p class="text-[9px] font-bold uppercase tracking-widest text-zinc-300">{{ kss.circadian().phaseLabel }}</p>
+                </div>
+                <p class="text-[10px] text-zinc-400 leading-relaxed">{{ kss.circadian().recommendation }}</p>
+                <div class="flex items-center gap-3 mt-2 pt-2 border-t border-zinc-700/30">
+                  <span class="text-[8px] text-zinc-500 uppercase tracking-widest">Expected alertness</span>
+                  <div class="flex gap-0.5">
+                    @for (i of [1,2,3,4,5,6,7,8,9]; track i) {
+                      <div class="w-3 h-1.5 rounded-full transition-colors"
+                           [class]="i <= kss.circadian().expectedKss ? 'bg-emerald-500' : 'bg-zinc-700'"></div>
+                    }
+                  </div>
+                  <span class="text-[8px] font-bold"
+                        [class]="kss.circadian().cognitiveLoad === 'optimal' ? 'text-emerald-400' :
+                                 kss.circadian().cognitiveLoad === 'good' ? 'text-blue-400' :
+                                 kss.circadian().cognitiveLoad === 'reduced' ? 'text-amber-400' : 'text-red-400'">
+                    {{ kss.circadian().cognitiveLoad | uppercase }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- KSS question -->
+              <div class="text-center">
+                <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-0.5">Karolinska Sleepiness Scale</p>
+                <p class="text-sm font-medium text-zinc-100">How alert are you right now?</p>
+              </div>
+
+              <!-- KSS 9-point grid -->
+              <div class="grid grid-cols-3 gap-1.5">
+                @for (item of kss.KSS_ITEMS; track item.score) {
+                  <button (click)="selectClinicianKss(item.score)"
+                          class="p-2 rounded-xl border text-left transition-all duration-200 cursor-pointer"
+                          [class]="clinicianKssSelected() === item.score
+                            ? 'border-emerald-500/60 bg-emerald-500/10 ring-1 ring-emerald-500/30'
+                            : 'border-zinc-800/60 bg-zinc-900/40 hover:border-zinc-600/60 hover:bg-zinc-800/40'">
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                      <span class="text-sm">{{ item.emoji }}</span>
+                      <span class="text-[11px] font-bold tabular-nums"
+                            [class]="clinicianKssSelected() === item.score ? 'text-emerald-400' : 'text-zinc-300'">{{ item.score }}</span>
+                    </div>
+                    <p class="text-[8px] leading-tight"
+                       [class]="clinicianKssSelected() === item.score ? 'text-emerald-300' : 'text-zinc-500'">{{ item.label }}</p>
+                  </button>
+                }
+              </div>
+
+              <!-- Alert banner (appears once score selected) -->
+              @if (kss.readiness()) {
+                <div class="p-3 rounded-xl border animate-in fade-in duration-300"
+                     [class]="kss.readiness()!.combinedAlert === 'high-risk'
+                        ? 'border-red-500/30 bg-red-500/[0.06]'
+                        : kss.readiness()!.combinedAlert === 'caution'
+                        ? 'border-amber-500/30 bg-amber-500/[0.05]'
+                        : 'border-emerald-500/20 bg-emerald-500/[0.04]'">
+                  <p class="text-[10px] leading-relaxed"
+                     [class]="kss.readiness()!.combinedAlert === 'high-risk' ? 'text-red-300' :
+                              kss.readiness()!.combinedAlert === 'caution' ? 'text-amber-300' : 'text-emerald-300'">
+                    {{ kss.readiness()!.recommendation }}
+                  </p>
+                  @if (kss.readiness()!.avsReset) {
+                    <p class="text-[8px] text-zinc-500 mt-1.5 italic">Suggested: {{ kss.readiness()!.avsReset!.wave | uppercase }} reset · {{ kss.readiness()!.avsReset!.durationMin }} min · {{ kss.readiness()!.avsReset!.bpm }} BPM</p>
+                  }
+                </div>
+              }
+
+              <!-- Action buttons -->
+              <div class="flex flex-col gap-2">
+                <button (click)="enterApp()"
+                        [disabled]="!clinicianKssSelected()"
+                        class="w-full py-3.5 bg-zinc-100 hover:bg-white text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
+                  {{ kss.readiness()?.combinedAlert === 'high-risk' ? 'Acknowledge & Enter System' : 'Enter System' }}
+                </button>
+                <button (click)="enterApp()"
+                        class="text-[9px] text-zinc-600 hover:text-zinc-400 transition-colors text-center w-full">
+                  Skip assessment
+                </button>
+              </div>
+
+            </div>
+          }
+
         </div>
 
         <p class="text-[9px] text-zinc-500 mt-12 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
+
       </div>
     </main>
   `,
@@ -201,11 +308,29 @@ import { FirestoreSyncService } from '../services/firestore-sync.service';
     .fold-2 { animation-delay: 300ms; }
     .fold-3 { animation-delay: 450ms; }
     .fold-4 { animation-delay: 600ms; }
+
+    @keyframes avs-respiratory-breath {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.05)); }
+        50% { transform: scale(1.06); filter: drop-shadow(0 0 25px rgba(16, 185, 129, 0.25)); }
+    }
+    .avs-breathing-mascot {
+        animation: avs-respiratory-breath 10.909s ease-in-out infinite;
+    }
+
+    @keyframes avs-glow-breath {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.95; }
+    }
+    .avs-breathing-glow {
+        animation: avs-glow-breath 10.909s ease-in-out infinite;
+    }
   `]
 })
 export class SecureSplashComponent {
-  session = inject(SessionStateService);
+  session    = inject(SessionStateService);
+  readonly kss = inject(CircadianSleepinessService);
   syncService = inject(FirestoreSyncService);
+  private platformId = inject(PLATFORM_ID);
   
   // Inputs
   apiKeyError = input<string | null>(null);
@@ -216,7 +341,8 @@ export class SecureSplashComponent {
   selectAiStudio = output<void>();
 
   // State
-  viewState = signal<'auth' | 'beta'>('auth');
+  viewState = signal<'auth' | 'beta' | 'kss'>('auth');
+  clinicianKssSelected = signal<KssScore | null>(null);
   isLocked = computed(() => this.session.isLocked());
   apiKeyStr = signal('');
   pin = signal('');
@@ -231,6 +357,18 @@ export class SecureSplashComponent {
 
   pinInputRef = viewChild<ElementRef<HTMLInputElement>>('pinInput');
 
+  // AVS State & Audio Nodes
+  private audioCtx: AudioContext | null = null;
+  private primaryGain: GainNode | null = null;
+  private oscL: OscillatorNode | null = null;
+  private oscR: OscillatorNode | null = null;
+  private pinkNoiseNode: AudioBufferSourceNode | null = null;
+  private waveGain: GainNode | null = null;
+  private lfoNode: OscillatorNode | null = null;
+  
+  isAvsPlaying = signal(false);
+  private lastPinLength = 0;
+
   constructor() {
     effect(() => {
       // Auto-focus logic based on state
@@ -240,12 +378,281 @@ export class SecureSplashComponent {
     });
   }
 
+  ngOnDestroy() {
+    this.cleanupNodes();
+    if (this.audioCtx) {
+      this.audioCtx.close().catch(() => {});
+    }
+  }
+
+  // Safe AudioContext getter
+  getAudioContext(): AudioContext | null {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    if (!this.audioCtx) {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      this.audioCtx = new AudioContextClass();
+    }
+    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume().catch(() => {});
+    }
+    return this.audioCtx;
+  }
+
+  toggleAvs() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    if (this.isAvsPlaying()) {
+      this.stopAmbientSoundscape();
+    } else {
+      this.startAmbientSoundscape();
+    }
+  }
+
+  startAmbientSoundscape() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    this.cleanupNodes();
+
+    // 1. Create primary gain node for fading in
+    this.primaryGain = ctx.createGain();
+    this.primaryGain.gain.setValueAtTime(0, ctx.currentTime);
+    this.primaryGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 1.5);
+
+    // 2. Carrier Oscillators (432Hz Carrier & 4Hz Theta beat -> 436Hz Right)
+    this.oscL = ctx.createOscillator();
+    this.oscL.type = 'sine';
+    this.oscL.frequency.setValueAtTime(432, ctx.currentTime);
+
+    this.oscR = ctx.createOscillator();
+    this.oscR.type = 'sine';
+    this.oscR.frequency.setValueAtTime(436, ctx.currentTime);
+
+    const merger = ctx.createChannelMerger(2);
+    this.oscL.connect(merger, 0, 0);
+    this.oscR.connect(merger, 0, 1);
+    merger.connect(this.primaryGain);
+
+    // 3. Pink/Brown Background Noise
+    const bufferSize = 4 * ctx.sampleRate;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let lastOut = 0.0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      output[i] = (lastOut + (0.02 * white)) / 1.02;
+      lastOut = output[i];
+      output[i] *= 3.5;
+    }
+
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+    noiseSource.loop = true;
+    this.pinkNoiseNode = noiseSource;
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(180, ctx.currentTime);
+
+    this.waveGain = ctx.createGain();
+    this.waveGain.gain.setValueAtTime(0.05, ctx.currentTime);
+
+    noiseSource.connect(filter);
+    filter.connect(this.waveGain);
+    this.waveGain.connect(this.primaryGain);
+
+    // LFO to automate respiratory brown noise gain modulation matching visual seagull breathing (5.5 breaths/min -> 0.0917Hz)
+    this.lfoNode = ctx.createOscillator();
+    this.lfoNode.type = 'sine';
+    this.lfoNode.frequency.setValueAtTime(5.5 / 60, ctx.currentTime);
+
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.setValueAtTime(0.025, ctx.currentTime);
+
+    this.lfoNode.connect(lfoGain);
+    lfoGain.connect(this.waveGain.gain);
+
+    this.primaryGain.connect(ctx.destination);
+
+    this.oscL.start();
+    this.oscR.start();
+    noiseSource.start();
+    this.lfoNode.start();
+
+    this.isAvsPlaying.set(true);
+  }
+
+  stopAmbientSoundscape() {
+    if (!this.primaryGain || !this.audioCtx) {
+      this.isAvsPlaying.set(false);
+      return;
+    }
+
+    const ctx = this.audioCtx;
+    this.primaryGain.gain.cancelScheduledValues(ctx.currentTime);
+    this.primaryGain.gain.setValueAtTime(this.primaryGain.gain.value, ctx.currentTime);
+    this.primaryGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.0);
+
+    const currentOscL = this.oscL;
+    const currentOscR = this.oscR;
+    const currentNoise = this.pinkNoiseNode;
+    const currentLfo = this.lfoNode;
+
+    setTimeout(() => {
+      try {
+        currentOscL?.stop();
+        currentOscR?.stop();
+        currentNoise?.stop();
+        currentLfo?.stop();
+
+        currentOscL?.disconnect();
+        currentOscR?.disconnect();
+        currentNoise?.disconnect();
+        currentLfo?.disconnect();
+      } catch (e) {}
+    }, 1100);
+
+    this.oscL = null;
+    this.oscR = null;
+    this.pinkNoiseNode = null;
+    this.lfoNode = null;
+    this.primaryGain = null;
+    this.isAvsPlaying.set(false);
+  }
+
+  private cleanupNodes() {
+    try {
+      this.oscL?.stop();
+      this.oscR?.stop();
+      this.pinkNoiseNode?.stop();
+      this.lfoNode?.stop();
+    } catch (e) {}
+
+    try {
+      this.oscL?.disconnect();
+      this.oscR?.disconnect();
+      this.pinkNoiseNode?.disconnect();
+      this.lfoNode?.disconnect();
+      this.primaryGain?.disconnect();
+    } catch (e) {}
+
+    this.oscL = null;
+    this.oscR = null;
+    this.pinkNoiseNode = null;
+    this.lfoNode = null;
+    this.primaryGain = null;
+  }
+
+  // Harmonic sound synthesizers
+  playKeyPressChime() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(528, ctx.currentTime); // Transformation chime
+
+    gain.gain.setValueAtTime(0.03, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.35);
+  }
+
+  playSuccessChime() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    // Upward pentatonic major sweep: C4, D4, E4, G4, A4, C5
+    const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+    notes.forEach((freq, idx) => {
+      const timeOffset = idx * 0.08;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle'; // Warm, vintage synth tone
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + timeOffset);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime + timeOffset);
+      gain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + timeOffset + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + timeOffset + 0.8);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime + timeOffset);
+      osc.stop(ctx.currentTime + timeOffset + 0.85);
+    });
+  }
+
+  playErrorChime() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    const osc1 = ctx.createOscillator();
+    const osc2 = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(110, ctx.currentTime);
+
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(112, ctx.currentTime); // Resonant beat
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(150, ctx.currentTime);
+
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc1.start();
+    osc2.start();
+
+    osc1.stop(ctx.currentTime + 1.3);
+    osc2.stop(ctx.currentTime + 1.3);
+  }
+
+  onPinChange(val: string) {
+    // Enable/resume AudioContext automatically on first keypress
+    if (val.length === 1 && !this.isAvsPlaying()) {
+      this.startAmbientSoundscape();
+    }
+    
+    if (val.length > this.lastPinLength) {
+      this.playKeyPressChime();
+    }
+    this.lastPinLength = val.length;
+
+    if (val.length === 4) {
+      setTimeout(() => this.verifyPin(), 200);
+    }
+  }
+
   async handleUnlock() {
     this.isChecking.set(true);
     this.errorMsg.set('');
 
     const success = await this.session.unlock();
-    if (!success) {
+    if (success) {
+      this.playSuccessChime();
+      this.stopAmbientSoundscape();
+    } else {
+      this.playErrorChime();
       this.errorMsg.set('Biometric verification failed.');
     }
     this.isChecking.set(false);
@@ -254,10 +661,13 @@ export class SecureSplashComponent {
   verifyPin() {
     this.errorMsg.set('');
     if (this.pin() === '1234') {
+       this.playSuccessChime();
+       this.stopAmbientSoundscape();
        this.session.isLocked.set(false);
        this.session.resetIdleTimer();
        this.pin.set('');
     } else {
+       this.playErrorChime();
        this.errorMsg.set('Invalid Access Code.');
        this.pin.set('');
        setTimeout(() => this.pinInputRef()?.nativeElement.focus(), 50);
@@ -266,40 +676,53 @@ export class SecureSplashComponent {
 
   handleSubmitKey() {
     this.isChecking.set(true);
-    this.submitKey.emit(this.apiKeyStr());
-    setTimeout(() => this.isChecking.set(false), 300); // Visual delay
+    // Store the key to emit after KSS step, then go to readiness check
+    this._pendingKey = this.apiKeyStr();
+    setTimeout(() => { this.isChecking.set(false); this.gotoKss(); }, 300);
   }
+  private _pendingKey = '';
+  private _pendingDemo = false;
+  private _pendingAiStudio = false;
 
   handleDemo() {
-    this.loadDemo.emit();
+    this._pendingDemo = true;
+    this.gotoKss();
   }
 
   handleAiStudio() {
-    this.selectAiStudio.emit();
+    this._pendingAiStudio = true;
+    this.gotoKss();
   }
 
   async handleGoogleAuth() {
     try {
        await this.syncService.signInWithGoogle();
-       // Optionally alert or proceed to app...
-       this.handleDemo(); // Fallback to demo mode state hydration after login for now
+       this._pendingDemo = true;
+       this.gotoKss();
     } catch(err: any) {
        this.errorMsg.set(`Authentication Failed: ${err.message}`);
     }
   }
 
-  handleBetaSubmit() {
-    this.isSubmittingBeta.set(true);
-    // Simulate network request for beta access registration
-    setTimeout(() => {
-      this.isSubmittingBeta.set(false);
-      this.betaSuccess.set(true);
-      // Reset after a delay
-      setTimeout(() => {
-        this.betaSuccess.set(false);
-        this.viewState.set('auth');
-        this.betaForm.set({ name: '', clinic: '', email: '' });
-      }, 3500);
-    }, 1200);
+  /** Show the KSS readiness panel. */
+  gotoKss(): void {
+    this.stopAmbientSoundscape();
+    this.viewState.set('kss');
+  }
+
+  /** Select a KSS score and update the circadian service reactively. */
+  selectClinicianKss(score: KssScore): void {
+    this.clinicianKssSelected.set(score);
+    this.kss.clinicianKss.set(score);
+  }
+
+  /** Commit KSS result and enter the main application. */
+  enterApp(): void {
+    this.kss.dismissed.set(true);
+    if (this._pendingDemo || this._pendingAiStudio) {
+      this._pendingDemo ? this.loadDemo.emit() : this.selectAiStudio.emit();
+    } else {
+      this.submitKey.emit(this._pendingKey);
+    }
   }
 }

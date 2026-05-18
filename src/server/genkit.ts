@@ -59,7 +59,13 @@ export const generateMetricsFlow = ai.defineFlow(
       prompt,
       config: {
         temperature: 0,
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        safetySettings: [
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+        ]
       }
     });
 
@@ -90,7 +96,15 @@ export const detectClinicalChangesFlow = ai.defineFlow(
 
     const response = await ai.generate({
       prompt,
-      config: { temperature: 0 }
+      config: { 
+        temperature: 0,
+        safetySettings: [
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+        ]
+      }
     });
 
     return response.text.toUpperCase().includes('TRUE');
@@ -103,7 +117,7 @@ export const translateReadingLevelFlow = ai.defineFlow(
       name: 'translateReadingLevelFlow',
       inputSchema: z.object({
         text: z.string(),
-        level: z.enum(['simplified', 'dyslexia', 'child'])
+        level: z.enum(['simplified', 'dyslexia', 'child', 'spanish', 'german', 'french', 'mandarin'])
       }),
       outputSchema: z.string(),
     },
@@ -143,6 +157,42 @@ CRITICAL RULES:
 5. Use short sentences and simple formatting.
 6. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
 7. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
+      } else if (level === 'spanish') {
+          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into Spanish.
+
+CRITICAL RULES:
+1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
+2. Use professional, culturally appropriate medical Spanish.
+3. Do not add or remove any medical information.
+4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
+5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
+      } else if (level === 'german') {
+          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into German.
+
+CRITICAL RULES:
+1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
+2. Use professional, culturally appropriate medical German.
+3. Do not add or remove any medical information.
+4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
+5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
+      } else if (level === 'french') {
+          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into French.
+
+CRITICAL RULES:
+1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
+2. Use professional, culturally appropriate medical French.
+3. Do not add or remove any medical information.
+4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
+5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
+      } else if (level === 'mandarin') {
+          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into Mandarin Chinese (Simplified).
+
+CRITICAL RULES:
+1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
+2. Use professional, culturally appropriate medical Mandarin.
+3. Do not add or remove any medical information.
+4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
+5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
       }
   
       const prompt = `Please rewrite the following care plan text according to your system instructions:\n\n<clinical_text>\n${text}\n</clinical_text>`;
@@ -151,7 +201,13 @@ CRITICAL RULES:
         prompt,
         system: systemInstruction,
         config: {
-          temperature: 0.2
+          temperature: 0.2,
+          safetySettings: [
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+          ]
         }
       });
   
@@ -186,7 +242,15 @@ CRITIQUE:`;
 
       const response = await ai.generate({
         prompt,
-        config: { temperature: 0.2 }
+        config: { 
+          temperature: 0.2,
+          safetySettings: [
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+          ]
+        }
       });
       return response.text;
     }
@@ -229,7 +293,15 @@ Note: This is an AI preliminary analysis for decision-support, not an official d
             ]
           }
         ],
-        config: { temperature: 0.1 }
+        config: { 
+          temperature: 0.1,
+          safetySettings: [
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
+          ]
+        }
       });
       
       return response.text;

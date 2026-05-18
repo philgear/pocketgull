@@ -17,28 +17,28 @@ import {
 } from "./clinical-intelligence.service";
 import { NetworkStateService } from './network-state.service';
 import {
-  Bookmark,
+  IBookmark,
   HistoryEntry,
-  Patient,
-  PatientState,
-  BodyPartIssue,
-  DiagnosticScan
+  IPatient,
+  IPatientState,
+  IBodyPartIssue,
+  IDiagnosticScan
 } from "./patient.types";
 import * as CryptoJS from 'crypto-js';
 
 const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 
 // Re-export for use in other components
-export type { BodyPartIssue, HistoryEntry, Patient };
+export type { IBodyPartIssue, HistoryEntry, IPatient };
 
 // Mock Data
-const MOCK_PATIENTS: Patient[] = [
+const MOCK_PATIENTS: IPatient[] = [
   {
     id: "p001",
     name: "Robert Davis",
     age: 58,
     gender: "Male",
-    lastVisit: "2024.11.20",
+    lastVisit: "2026.11.20",
     preexistingConditions: [
       "Essential Hypertension",
       "Type 2 Diabetes Mellitus",
@@ -57,28 +57,16 @@ const MOCK_PATIENTS: Patient[] = [
       height: "5'10\"",
     },
     oxidativeStressMarkers: [
-      {
-        id: "1",
-        name: "Malondialdehyde (MDA)",
-        value: "3.8 μmol/L",
-      },
-      {
-        id: "2",
-        name: "F2-Isoprostanes",
-        value: "45 pg/mg creatinine",
-      },
+      { id: "1", name: "Malondialdehyde (MDA)", value: "3.8 μmol/L" },
+      { id: "2", name: "F2-Isoprostanes", value: "45 pg/mg creatinine" },
+      { id: "3", name: "Homocysteine", value: "14.2 μmol/L (Elevated)" }
     ],
     antioxidantSources: [
-      {
-        id: "1",
-        name: "Glutathione (GSH)",
-        value: "1.2 μmol/g Hb",
-      },
-      {
-        id: "2",
-        name: "CoQ10",
-        value: "0.45 μg/mL",
-      },
+      { id: "1", name: "Glutathione (GSH)", value: "1.2 μmol/g Hb" },
+      { id: "2", name: "CoQ10", value: "0.45 μg/mL" },
+      { id: "3", name: "Serum Magnesium", value: "1.6 mg/dL (Low)" },
+      { id: "4", name: "Vitamin B12", value: "310 pg/mL (Borderline)" },
+      { id: "5", name: "Vitamin D3 (25-OH)", value: "22 ng/mL (Deficient)" }
     ],
     medications: [
       {
@@ -98,24 +86,24 @@ const MOCK_PATIENTS: Patient[] = [
       },
     ],
     biometricHistory: [
-      { timestamp: "2023-10-01T09:00:00Z", type: "hr", value: "95" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "hr", value: "92" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "hr", value: "88" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "hr", value: "85" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "hr", value: "82" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "hr", value: "78" },
-      { timestamp: "2023-10-01T09:00:00Z", type: "spO2", value: "92" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "spO2", value: "93" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "spO2", value: "95" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "spO2", value: "96" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "spO2", value: "98" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "spO2", value: "99" },
-      { timestamp: "2023-10-01T09:00:00Z", type: "bp", value: "150/95" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "bp", value: "145/90" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "bp", value: "138/85" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "bp", value: "130/82" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "bp", value: "128/80" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "bp", value: "120/80" }
+      { timestamp: "2025-10-01T09:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "hr", value: "92" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "hr", value: "78" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "spO2", value: "92" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "spO2", value: "93" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "spO2", value: "95" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "bp", value: "150/95" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "bp", value: "145/90" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "bp", value: "138/85" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" }
     ],
     issues: {
       chest: [
@@ -155,13 +143,13 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of Robert's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Robert should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
       {
         type: "Visit",
-        date: "2024.10.10",
+        date: "2026.10.10",
         summary: "Initial consultation for sleep study follow-up.",
         state: {
           patientGoals: "Review sleep study results.",
@@ -214,7 +202,7 @@ const MOCK_PATIENTS: Patient[] = [
         id: "scan_003",
         type: "X-Ray",
         title: "PA and Lateral Chest",
-        date: "2024.10.12",
+        date: "2026.10.12",
         bodyPartId: "chest",
         description:
           "Bilateral hyperinflation consistent with COPD. No focal consolidation, pneumothorax or pleural effusion. Borderline cardiomegaly.",
@@ -229,7 +217,7 @@ const MOCK_PATIENTS: Patient[] = [
     name: "Sarah Jenkins",
     age: 42,
     gender: "Female",
-    lastVisit: "2024.12.01",
+    lastVisit: "2026.12.01",
     preexistingConditions: [
       "Asthma",
       "Anxiety Disorder",
@@ -278,24 +266,24 @@ const MOCK_PATIENTS: Patient[] = [
       },
     ],
     biometricHistory: [
-      { timestamp: "2023-10-01T09:00:00Z", type: "hr", value: "95" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "hr", value: "92" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "hr", value: "88" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "hr", value: "85" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "hr", value: "82" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "hr", value: "78" },
-      { timestamp: "2023-10-01T09:00:00Z", type: "spO2", value: "92" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "spO2", value: "93" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "spO2", value: "95" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "spO2", value: "96" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "spO2", value: "98" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "spO2", value: "99" },
-      { timestamp: "2023-10-01T09:00:00Z", type: "bp", value: "150/95" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "bp", value: "145/90" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "bp", value: "138/85" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "bp", value: "130/82" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "bp", value: "128/80" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "bp", value: "120/80" }
+      { timestamp: "2025-10-01T09:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "hr", value: "92" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "hr", value: "78" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "spO2", value: "92" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "spO2", value: "93" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "spO2", value: "95" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "bp", value: "150/95" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "bp", value: "145/90" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "bp", value: "138/85" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" }
     ],
     issues: {
       mid_back: [
@@ -324,13 +312,13 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of Sarah's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Sarah should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
       {
         type: "Visit",
-        date: "2024.10.15",
+        date: "2026.10.15",
         summary:
           "Discussion of physical therapy and cognitive behavioral therapy for pain.",
         state: {
@@ -384,7 +372,7 @@ const MOCK_PATIENTS: Patient[] = [
         id: "scan_001",
         type: "MRI",
         title: "Lumbar Spine MRI",
-        date: "2024.11.15",
+        date: "2026.11.15",
         bodyPartId: "lower_back",
         description:
           "L4-L5 disc desiccation and mild paracentral disc protrusion without significant canal stenosis. Mild bilateral neural foraminal narrowing.",
@@ -396,7 +384,7 @@ const MOCK_PATIENTS: Patient[] = [
         id: "scan_002",
         type: "X-Ray",
         title: "Lumbar Spine AP/Lateral X-Ray",
-        date: "2024.11.02",
+        date: "2026.11.02",
         bodyPartId: "lower_back",
         description:
           "Normal alignment. No fracture or acute bony abnormality. Mild degenerative disc disease at L4-L5.",
@@ -411,7 +399,7 @@ const MOCK_PATIENTS: Patient[] = [
     name: "William Henderson",
     age: 81,
     gender: "Male",
-    lastVisit: "2024.12.05",
+    lastVisit: "2026.12.05",
     preexistingConditions: [
       "Ischemic Heart Disease",
       "Chronic Kidney Disease",
@@ -471,24 +459,24 @@ const MOCK_PATIENTS: Patient[] = [
       },
     ],
     biometricHistory: [
-      { timestamp: "2023-10-01T09:00:00Z", type: "hr", value: "95" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "hr", value: "92" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "hr", value: "88" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "hr", value: "85" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "hr", value: "82" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "hr", value: "78" },
-      { timestamp: "2023-10-01T09:00:00Z", type: "spO2", value: "92" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "spO2", value: "93" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "spO2", value: "95" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "spO2", value: "96" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "spO2", value: "98" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "spO2", value: "99" },
-      { timestamp: "2023-10-01T09:00:00Z", type: "bp", value: "150/95" },
-      { timestamp: "2023-11-15T09:00:00Z", type: "bp", value: "145/90" },
-      { timestamp: "2023-12-20T09:00:00Z", type: "bp", value: "138/85" },
-      { timestamp: "2024-01-25T09:00:00Z", type: "bp", value: "130/82" },
-      { timestamp: "2024-02-28T09:00:00Z", type: "bp", value: "128/80" },
-      { timestamp: "2024-03-30T09:00:00Z", type: "bp", value: "120/80" }
+      { timestamp: "2025-10-01T09:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "hr", value: "92" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "hr", value: "78" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "spO2", value: "92" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "spO2", value: "93" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "spO2", value: "95" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "spO2", value: "99" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "bp", value: "150/95" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "bp", value: "145/90" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "bp", value: "138/85" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" }
     ],
     issues: {
       head: [
@@ -528,13 +516,13 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of William's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. William should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
       {
         type: "Visit",
-        date: "2024.06.12",
+        date: "2026.06.12",
         summary: "6-month geriatric assessment.",
         state: {
           patientGoals: "Routine check, family notes mild forgetfulness.",
@@ -598,7 +586,7 @@ const MOCK_PATIENTS: Patient[] = [
         id: "scan_004",
         type: "CT Scan",
         title: "Non-Contrast Head CT",
-        date: "2024.12.04",
+        date: "2026.12.04",
         bodyPartId: "head",
         description:
           "Mild diffuse age-related volume loss. No acute intracranial hemorrhage or mass effect. Tiny focal areas of chronic microvascular ischemic disease.",
@@ -610,7 +598,7 @@ const MOCK_PATIENTS: Patient[] = [
         id: "scan_005",
         type: "X-Ray",
         title: "Right Forearm/Wrist",
-        date: "2024.12.04",
+        date: "2026.12.04",
         bodyPartId: "r_arm",
         description:
           "No acute displaced fracture or dislocation. Degenerative changes in radiocarpal joint.",
@@ -645,7 +633,7 @@ const MOCK_PATIENTS: Patient[] = [
           name: "Systemic Health",
           painLevel: 5,
           description:
-            "Patient exhibits clinical signs or risks associated with the top 10 global causes of death based on WHO 2021 estimates.",
+            "IPatient exhibits clinical signs or risks associated with the top 10 global causes of death based on WHO 2021 estimates.",
           symptoms: [
             {
               name: "Ischaemic heart disease",
@@ -725,7 +713,7 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of Global's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Global should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
@@ -775,7 +763,7 @@ const MOCK_PATIENTS: Patient[] = [
           name: "Systemic Health",
           painLevel: 6,
           description:
-            "Patient exhibits clinical signs or risks associated with the top 10 leading causes of death in the US based on CDC 2023 provisional data.",
+            "IPatient exhibits clinical signs or risks associated with the top 10 leading causes of death in the US based on CDC 2025 provisional data.",
           symptoms: [
             {
               name: "Heart disease",
@@ -855,7 +843,7 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of CDC's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. CDC should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
@@ -905,7 +893,7 @@ const MOCK_PATIENTS: Patient[] = [
           name: "Systemic Health",
           painLevel: 4,
           description:
-            "Patient exhibits clinical signs or risks associated with the top causes of global under-5 child mortality.",
+            "IPatient exhibits clinical signs or risks associated with the top causes of global under-5 child mortality.",
           symptoms: [
             {
               name: "Preterm birth complications",
@@ -961,7 +949,7 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of Pediatric's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Pediatric should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
@@ -1011,7 +999,7 @@ const MOCK_PATIENTS: Patient[] = [
           name: "Systemic Health",
           painLevel: 7,
           description:
-            "Patient exhibits clinical signs or risks associated with the top causes of maternal mortality.",
+            "IPatient exhibits clinical signs or risks associated with the top causes of maternal mortality.",
           symptoms: [
             {
               name: "Severe bleeding (Hemorrhage)",
@@ -1061,7 +1049,7 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of Maternal's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Maternal should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
@@ -1091,7 +1079,7 @@ const MOCK_PATIENTS: Patient[] = [
     name: "Linus P (Functional Profile)",
     age: 93,
     gender: "Male",
-    lastVisit: "2024.12.10",
+    lastVisit: "2026.12.10",
     preexistingConditions: [
       "Prostate Cancer",
       "Coronary Artery Disease",
@@ -1165,13 +1153,13 @@ const MOCK_PATIENTS: Patient[] = [
             "### Biochemical Assessment\nAnalysis of Linus's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up":
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Linus should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education":
+          "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
         },
       },
       {
         type: "ChartArchived",
-        date: "2024.10.10",
+        date: "2026.10.10",
         summary: "Initiated Pauling Therapy (Vit C + Lysine + Proline).",
         state: {
           patientGoals: "Reduce lipoprotein(a) levels and arterial plaque.",
@@ -1225,7 +1213,7 @@ const MOCK_PATIENTS: Patient[] = [
       },
       {
         type: "ChartArchived",
-        date: "2024.11.10",
+        date: "2026.11.10",
         summary: "One month follow-up on Pauling Therapy.",
         state: {
           patientGoals: "Titrating dose to bowel tolerance.",
@@ -1279,7 +1267,7 @@ const MOCK_PATIENTS: Patient[] = [
       },
       {
         type: "Visit",
-        date: "2024.12.10",
+        date: "2026.12.10",
         summary: "Two month follow-up. Symptoms improving.",
         state: {
           patientGoals:
@@ -1502,14 +1490,14 @@ const MOCK_PATIENTS: Patient[] = [
     gender: "Male",
     lastVisit: "2026.03.20",
     preexistingConditions: [
-      "Coronary Artery Disease (post-stent, 2023)",
+      "Coronary Artery Disease (post-stent, 2025)",
       "Type 2 Diabetes Mellitus (A1c improving)",
       "Hypertriglyceridemia",
       "Non-Alcoholic Fatty Liver Disease (NAFLD)",
-      "Former Smoker (quit 2023)",
+      "Former Smoker (quit 2025)",
     ],
     patientGoals:
-      "Aggressively reduce cardiovascular risk after 2023 NSTEMI. Aiming for metabolic reversal of T2DM via lifestyle intervention. Current A1c: 6.4% (down from 9.1%).",
+      "Aggressively reduce cardiovascular risk after 2025 NSTEMI. Aiming for metabolic reversal of T2DM via lifestyle intervention. Current A1c: 6.4% (down from 9.1%).",
     vitals: {
       bp: "126/78",
       hr: "62",
@@ -1536,20 +1524,20 @@ const MOCK_PATIENTS: Patient[] = [
       { id: "6", name: "Ramipril", value: "5mg Daily" },
     ],
     biometricHistory: [
-      { timestamp: "2023-06-15T09:00:00Z", type: "hr", value: "88" },
-      { timestamp: "2023-09-01T09:00:00Z", type: "hr", value: "80" },
-      { timestamp: "2023-12-01T09:00:00Z", type: "hr", value: "74" },
-      { timestamp: "2024-03-01T09:00:00Z", type: "hr", value: "70" },
-      { timestamp: "2024-09-01T09:00:00Z", type: "hr", value: "66" },
+      { timestamp: "2025-06-15T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2025-09-01T09:00:00Z", type: "hr", value: "80" },
+      { timestamp: "2025-12-01T09:00:00Z", type: "hr", value: "74" },
+      { timestamp: "2026-03-01T09:00:00Z", type: "hr", value: "70" },
+      { timestamp: "2026-09-01T09:00:00Z", type: "hr", value: "66" },
       { timestamp: "2026-03-20T09:00:00Z", type: "hr", value: "62" },
-      { timestamp: "2023-06-15T09:00:00Z", type: "spO2", value: "96" },
-      { timestamp: "2024-03-01T09:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2025-06-15T09:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2026-03-01T09:00:00Z", type: "spO2", value: "98" },
       { timestamp: "2026-03-20T09:00:00Z", type: "spO2", value: "99" },
-      { timestamp: "2023-06-15T09:00:00Z", type: "bp", value: "148/94" },
-      { timestamp: "2023-09-01T09:00:00Z", type: "bp", value: "140/88" },
-      { timestamp: "2023-12-01T09:00:00Z", type: "bp", value: "134/84" },
-      { timestamp: "2024-03-01T09:00:00Z", type: "bp", value: "130/82" },
-      { timestamp: "2024-09-01T09:00:00Z", type: "bp", value: "128/80" },
+      { timestamp: "2025-06-15T09:00:00Z", type: "bp", value: "148/94" },
+      { timestamp: "2025-09-01T09:00:00Z", type: "bp", value: "140/88" },
+      { timestamp: "2025-12-01T09:00:00Z", type: "bp", value: "134/84" },
+      { timestamp: "2026-03-01T09:00:00Z", type: "bp", value: "130/82" },
+      { timestamp: "2026-09-01T09:00:00Z", type: "bp", value: "128/80" },
       { timestamp: "2026-03-20T09:00:00Z", type: "bp", value: "126/78" },
     ],
     issues: {
@@ -1560,7 +1548,7 @@ const MOCK_PATIENTS: Patient[] = [
           name: "Cardiovascular",
           painLevel: 1,
           description:
-            "Post-NSTEMI (LAD stent placed June 2023). Currently asymptomatic on dual antiplatelet therapy. Recent nuclear stress test negative for ischemia. Echo EF: 52% (up from 44% at discharge).",
+            "Post-NSTEMI (LAD stent placed June 2025). Currently asymptomatic on dual antiplatelet therapy. Recent nuclear stress test negative for ischemia. Echo EF: 52% (up from 44% at discharge).",
           symptoms: [],
         },
       ],
@@ -1622,7 +1610,7 @@ const MOCK_PATIENTS: Patient[] = [
       },
       {
         type: "Visit",
-        date: "2023.06.28",
+        date: "2025.06.28",
         summary: "Post-discharge follow-up. 2 weeks after NSTEMI and LAD stent placement.",
         state: {
           patientGoals: "Recover from cardiac event. Understand medications and lifestyle changes required.",
@@ -1848,7 +1836,7 @@ const MOCK_PATIENTS: Patient[] = [
       {
         type: "Visit",
         date: "2026.03.24",
-        summary: "Annual wellness exam. Patient is healthy and active. Discussed continuing current lifestyle.",
+        summary: "Annual wellness exam. IPatient is healthy and active. Discussed continuing current lifestyle.",
         state: {
           patientGoals: "Maintain current health status.",
           vitals: {
@@ -1868,6 +1856,69 @@ const MOCK_PATIENTS: Patient[] = [
     ],
     bookmarks: [],
     scans: []
+  },
+  {
+    id: "p_child",
+    name: "Leo Garcia",
+    age: 8,
+    gender: "Male",
+    lastVisit: "2026.04.15",
+    preexistingConditions: ["Atopic Asthma", "Peanut Allergy"],
+    patientGoals: "Reduce frequency of albuterol rescue inhaler usage.",
+    vitals: {
+      bp: "100/60", hr: "90", temp: "98.6°F", spO2: "97%", weight: "55 lbs", height: "4'2\""
+    },
+    oxidativeStressMarkers: [],
+    antioxidantSources: [],
+    medications: [
+      { id: "1", name: "Fluticasone propionate", value: "44mcg 1 puff BID" },
+      { id: "2", name: "Albuterol sulfate HFA", value: "90mcg 2 puffs PRN" }
+    ],
+    biometricHistory: [
+      { timestamp: "2026-03-01T09:00:00Z", type: "spO2", value: "95" },
+      { timestamp: "2026-04-10T09:00:00Z", type: "spO2", value: "98" }
+    ],
+    issues: {
+      chest: [{
+        id: "chest", noteId: "note_pchild_chest_1", name: "Chest & Lungs",
+        painLevel: 3, description: "Wheezing exacerbated by seasonal pollen.", symptoms: []
+      }]
+    },
+    history: [],
+    bookmarks: [],
+    scans: []
+  },
+  {
+    id: "p_multi",
+    name: "Amélie Dupont",
+    age: 34,
+    gender: "Female",
+    lastVisit: "2026.05.01",
+    preexistingConditions: ["Endometriosis", "Migraine with Aura"],
+    patientGoals: "Optimize fertility and manage pelvic pain. (Primary Language: French)",
+    vitals: {
+      bp: "115/75", hr: "72", temp: "98.2°F", spO2: "99%", weight: "135 lbs", height: "5'6\""
+    },
+    oxidativeStressMarkers: [],
+    antioxidantSources: [],
+    medications: [],
+    biometricHistory: [],
+    issues: {
+      pelvis: [{
+        id: "pelvis", noteId: "note_pmulti_pelvis_1", name: "Pelvis",
+        painLevel: 7, description: "Douleur pelvienne chronique (Chronic pelvic pain).", symptoms: []
+      }]
+    },
+    history: [],
+    bookmarks: [],
+    scans: [
+      {
+        id: "scan_004", type: "MRI", title: "Pelvic MRI (T2-Weighted)",
+        date: "2026.04.28", bodyPartId: "pelvis",
+        description: "Deep infiltrating endometriotic nodules noted in the posterior cul-de-sac.",
+        status: "Reviewed", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e0/MRI_of_the_pelvis_-_sagittal.png"
+      }
+    ]
   }
 ];
 @Injectable({
@@ -1880,7 +1931,7 @@ export class PatientManagementService {
   private http = inject(HttpClient);
   public storage = inject(StorageService);
 
-  readonly patients = signal<Patient[]>(MOCK_PATIENTS);
+  readonly patients = signal<IPatient[]>(MOCK_PATIENTS);
   readonly selectedPatientId: WritableSignal<string | null> = signal(
     MOCK_PATIENTS.find(p => p.id === 'p012')?.id || MOCK_PATIENTS[0]?.id || null,
   );
@@ -2004,9 +2055,9 @@ export class PatientManagementService {
     this.saveCurrentPatientState();
 
     const newPatientId = `p_${Date.now()}`;
-    const newPatient: Patient = {
+    const newPatient: IPatient = {
       id: newPatientId,
-      name: "New Patient",
+      name: "New IPatient",
       age: 0,
       gender: "Other",
       lastVisit: new Date().toISOString().split("T")[0].replace(/-/g, "."),
@@ -2045,8 +2096,8 @@ export class PatientManagementService {
     });
   }
 
-  /** Imports a pre-built Patient object (from JSON or FHIR import). */
-  importPatient(patient: Patient) {
+  /** Imports a pre-built IPatient object (from JSON or FHIR import). */
+  importPatient(patient: IPatient) {
     this.saveCurrentPatientState();
     this.patients.update((patients) => [patient, ...patients]);
     this.selectedPatientId.set(patient.id);
@@ -2058,7 +2109,7 @@ export class PatientManagementService {
     details: Partial<{
       name: string;
       age: number;
-      gender: Patient["gender"];
+      gender: IPatient["gender"];
       patientGoals: string;
     }>,
   ) {
@@ -2113,7 +2164,7 @@ export class PatientManagementService {
   }
 
   /** Adds a bookmark to the currently selected patient. */
-  addBookmark(bookmark: Bookmark) {
+  addBookmark(bookmark: IBookmark) {
     const patientId = this.selectedPatientId();
     if (!patientId) return;
 
@@ -2151,7 +2202,7 @@ export class PatientManagementService {
   }
 
   /** Injects a new rasterized diagnostic scan (like 3D markup) into the Vault */
-  addScan(scan: DiagnosticScan) {
+  addScan(scan: IDiagnosticScan) {
     const patientId = this.selectedPatientId();
     if (!patientId) return;
 
@@ -2165,7 +2216,7 @@ export class PatientManagementService {
   }
 
   /** Updates an existing bookmark's metadata. */
-  updateBookmark(url: string, updates: Partial<Bookmark>) {
+  updateBookmark(url: string, updates: Partial<IBookmark>) {
     const patientId = this.selectedPatientId();
     if (!patientId) return;
 
@@ -2271,7 +2322,7 @@ export class PatientManagementService {
     this.patientState.setViewingPastVisit(analysis);
   }
 
-  /** Ingests a standard SMART on FHIR R4 Bundle and maps it to the internal Patient list */
+  /** Ingests a standard SMART on FHIR R4 Bundle and maps it to the internal IPatient list */
   ingestFhirBundle(bundle: any) {
     if (!bundle || bundle.resourceType !== 'Bundle' || !bundle.entry) return;
 
@@ -2281,7 +2332,7 @@ export class PatientManagementService {
     let fhirGender = 'Unknown';
 
     // 1. Extract base demographics
-    const patientResource = bundle.entry.find((e: any) => e.resource?.resourceType === 'Patient')?.resource;
+    const patientResource = bundle.entry.find((e: any) => e.resource?.resourceType === 'Patient' || e.resource?.resourceType === 'IPatient')?.resource;
     if (patientResource) {
         fhirPatientId = patientResource.id;
         if (patientResource.name?.[0]) {
@@ -2349,7 +2400,7 @@ export class PatientManagementService {
         }
     });
 
-    const newPatient: Patient = {
+    const newPatient: IPatient = {
         id: `epic_${fhirPatientId || Date.now()}`,
         name: fhirName,
         age: fhirAge,

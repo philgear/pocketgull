@@ -6,7 +6,7 @@ import {
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { SummaryNode, SummaryNodeItem } from './analysis-report.types';
+import { ISummaryNode, ISummaryNodeItem } from './analysis-report.types';
 import { DictationService } from '../services/dictation.service';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -14,30 +14,30 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { MarkdownService } from '../services/markdown.service';
-import { RichMediaService, RichMediaCard } from '../services/rich-media.service';
+import { RichMediaService, IRichMediaCard } from '../services/rich-media.service';
 import { Medical3DViewerComponent } from './medical-3d-viewer.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { PatientStateService } from '../services/patient-state.service';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface ClaimUnit {
+interface IClaimUnit {
   id: string;
   type: 'paragraph' | 'list-item' | 'heading' | 'other';
   text: string; // plain text for drilling
   html: string; // rendered HTML for display
 }
 
-interface InlineChatEntry {
+interface IInlineChatEntry {
   role: 'user' | 'model';
   text: string;
   html?: string;
-  claims?: ClaimUnit[];    // parsed claim units for model messages
-  richCards?: RichMediaCard[]; // resolved rich media cards
+  claims?: IClaimUnit[];    // parsed claim units for model messages
+  richCards?: IRichMediaCard[]; // resolved rich media cards
   feedback?: 'up' | 'down';
 }
 
-interface BracketedClaim {
+interface IBracketedClaim {
   id: string;
   text: string;
   drillContext?: string; // what breadcrumb level it came from
@@ -45,8 +45,8 @@ interface BracketedClaim {
 
 // ─── Helper: Parse HTML → ClaimUnits ─────────────────────────────────────────
 
-function parseHtmlToClaims(html: string): ClaimUnit[] {
-  const claims: ClaimUnit[] = [];
+function parseHtmlToClaims(html: string): IClaimUnit[] {
+  const claims: IClaimUnit[] = [];
   let idx = 0;
 
   // Split at block-level HTML boundaries
@@ -60,7 +60,7 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
     const innerText = innerHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     if (!innerText || innerText.length < 8) continue;
 
-    let type: ClaimUnit['type'] = 'other';
+    let type: IClaimUnit['type'] = 'other';
     if (tag === 'p') type = 'paragraph';
     else if (tag === 'li') type = 'list-item';
     else if (tag === 'h2' || tag === 'h3' || tag === 'h4') type = 'heading';
@@ -950,8 +950,8 @@ function parseHtmlToClaims(html: string): ClaimUnit[] {
     `,
 })
 export class SummaryNodeComponent implements AfterViewChecked {
-  node = input.required<SummaryNode>();
-  nodeItem = input<SummaryNodeItem>({} as any);
+  node = input.required<ISummaryNode>();
+  nodeItem = input<ISummaryNodeItem>({} as any);
   type = input<'paragraph' | 'list-item'>('paragraph');
   sectionTitle = input<string>('');
 
@@ -981,7 +981,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   // ─── Inline chat ─────────────────────────────
   showChat = signal(false);
-  chatHistory = signal<InlineChatEntry[]>([]);
+  chatHistory = signal<IInlineChatEntry[]>([]);
   chatIsLoading = signal(false);
   showSuggestions = signal(true);
   selectedFiles = signal<File[]>([]);
@@ -996,7 +996,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   // ─── Claim bracketing ────────────────────────
-  bracketedClaims = signal<BracketedClaim[]>([]);
+  bracketedClaims = signal<IBracketedClaim[]>([]);
   bracketedIds = signal<Set<string>>(new Set());
 
   // ─── Drill stack (breadcrumb) ─────────────────
@@ -1031,12 +1031,12 @@ export class SummaryNodeComponent implements AfterViewChecked {
     this.isRejected.set(!this.isRejected());
   }
 
-  actionThumbsUp(entry: InlineChatEntry) {
+  actionThumbsUp(entry: IInlineChatEntry) {
     entry.feedback = entry.feedback === 'up' ? undefined : 'up';
     this.chatHistory.update(h => [...h]);
   }
 
-  actionThumbsDown(entry: InlineChatEntry) {
+  actionThumbsDown(entry: IInlineChatEntry) {
     entry.feedback = entry.feedback === 'down' ? undefined : 'down';
     this.chatHistory.update(h => [...h]);
   }
@@ -1048,7 +1048,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   // ─── Bracket a claim ─────────────────────────
   // ─── Bracket a claim ─────────────────────────
-  bracketClaim(claim: ClaimUnit) {
+  bracketClaim(claim: IClaimUnit) {
     if (this.isBracketed(claim.id)) return;
     const drill = this.activeDrillText();
     
@@ -1062,7 +1062,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
     };
 
     const cleanText = decodeHtml(claim.text);
-    const newClaim: BracketedClaim = { id: claim.id, text: cleanText, drillContext: drill ?? undefined };
+    const newClaim: IBracketedClaim = { id: claim.id, text: cleanText, drillContext: drill ?? undefined };
     
     this.bracketedClaims.update(c => [...c, newClaim]);
     this.bracketedIds.update(s => new Set([...s, claim.id]));
@@ -1088,7 +1088,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   // ─── Drill deeper into a claim ───────────────
-  async drillInto(claim: ClaimUnit) {
+  async drillInto(claim: IClaimUnit) {
     if (this.chatIsLoading()) return;
     this.drillStack.update(s => [...s, claim.text.slice(0, 50)]);
     const prompt = `Go deeper on this specific clinical claim: "${claim.text}"\n\nProvide detailed evidence, supporting guidelines, clinical studies, or specific contraindications relevant to this single statement. Be precise and evidence-based.`;
@@ -1152,7 +1152,7 @@ The recommendation under review:
 ${nodeText.slice(0, 400)}${nodeText.length > 400 ? '...' : ''}
 """
 
-Patient context is available. Your role:
+IPatient context is available. Your role:
 1. Briefly explain the clinical rationale (2-3 sentences).
 2. Cite supporting evidence or guidelines if applicable using strict UKRIO-compliant scientific reference formats. You MUST hyperlink DOI or PubMed URLs directly within your markdown (e.g. \`[Author et al. (2024)](https://pubmed.ncbi.nlm.nih.gov/...)\`).
 3. Answer follow-up questions about alternatives, risks, or nuances.
@@ -1238,7 +1238,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
 
   private _appendModel(md: string) {
     // ─── Parse out any rich-media fenced block ───────────────────────────────
-    let richCards: RichMediaCard[] | undefined;
+    let richCards: IRichMediaCard[] | undefined;
     let cleanMd = md;
 
     const fencedRegex = /```[a-z0-9-]*\s*(\{[\s\S]*?"cards"\s*:[\s\S]*?\})\s*```/i;
@@ -1280,7 +1280,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
     if (parser) { try { html = (parser as any).parse(cleanMd); } catch { html = `<p>${cleanMd}</p>`; } }
     const claims = parseHtmlToClaims(html);
 
-    const entry: InlineChatEntry = { role: 'model', text: cleanMd, html, claims, richCards };
+    const entry: IInlineChatEntry = { role: 'model', text: cleanMd, html, claims, richCards };
     this.chatHistory.update(h => [...h, entry]);
     this.needsScroll = true;
 

@@ -5,11 +5,11 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { fromEvent, Subscription } from 'rxjs';
 import { PatientManagementService } from '../services/patient-management.service';
 import { PatientStateService } from '../services/patient-state.service';
-import { Bookmark } from '../services/patient.types';
+import { IBookmark } from '../services/patient.types';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 
-export interface PubMedSearchResult {
+export interface IPubMedSearchResult {
   id: string;
   title: string;
   authors: string;
@@ -81,7 +81,7 @@ export interface PubMedSearchResult {
           <!-- Actions -->
           <pocket-gull-button variant="ghost" size="sm" (click)="search()" icon="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5A6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14" title="Execute Search" ariaLabel="Execute Search">
           </pocket-gull-button>
-          <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="Bookmark current page" ariaLabel="Bookmark current page">
+          <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="IBookmark current page" ariaLabel="IBookmark current page">
           </pocket-gull-button>
           <pocket-gull-button variant="ghost" size="sm" (click)="showCitationForm.set(!showCitationForm())" [class.text-gray-800]="showCitationForm()" [class.dark:text-white]="showCitationForm()" icon="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" title="Citation Metadata" ariaLabel="Citation Metadata">
           </pocket-gull-button>
@@ -155,6 +155,7 @@ export interface PubMedSearchResult {
       <div class="flex-1 bg-gray-200 dark:bg-zinc-950 overflow-y-auto relative">
         @if (sanitizedUrl(); as url) {
             <iframe #iframeEl credentialless [src]="url" 
+                    (load)="onIframeLoad()"
                     class="w-full h-full border-none transition-opacity bg-white dark:bg-zinc-950" 
                     [class.absolute]="searchEngine() === 'google' && googleResults() !== null"
                     [class.opacity-0]="searchEngine() === 'google' && googleResults() !== null"
@@ -186,7 +187,7 @@ export interface PubMedSearchResult {
                   </div>
                   <div class="flex items-center gap-2">
                     <pocket-gull-button variant="primary" size="sm" (click)="addPubmedBookmark(res)" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z">
-                      Bookmark & Cite
+                      IBookmark & Cite
                     </pocket-gull-button>
                     <button (click)="loadUrl('https://pubmed.ncbi.nlm.nih.gov/' + res.id + '/')" class="text-xs font-semibold text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-white transition-colors inline-block px-2 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded">
                       Open in PubMed
@@ -217,7 +218,7 @@ export interface PubMedSearchResult {
 
                   <div class="flex items-center gap-2">
                     <pocket-gull-button variant="primary" size="sm" (click)="addGseBookmark(res.title, res.url)" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z">
-                      Bookmark & Cite
+                      IBookmark & Cite
                     </pocket-gull-button>
                     <button (click)="loadUrl(res.url)" class="text-xs font-semibold text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-white transition-colors inline-block px-2 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded">
                       Open Document
@@ -272,7 +273,7 @@ export class ResearchFrameComponent {
   private currentUrl = signal<string | null>(null);
   sanitizedUrl = signal<SafeResourceUrl | null>(null);
 
-  pubmedResults = signal<PubMedSearchResult[] | null>(null);
+  pubmedResults = signal<IPubMedSearchResult[] | null>(null);
   isLoadingPubmed = signal(false);
 
   googleResults = signal<any[] | null>(null);
@@ -381,9 +382,18 @@ export class ResearchFrameComponent {
       }
     });
 
+    // Real-time synchronization: When vitals or selected part changes in PocketGull, sync to loaded Insight Spark
+    effect(() => {
+      const vitals = this.patientState.vitals();
+      const part = this.patientState.selectedPartName();
+      untracked(() => {
+        this.sendVitalsToIframe();
+      });
+    });
+
     // Load default page if no other request is pending at initialization
     if (!this.patientState.requestedResearchUrl() && !this.patientState.requestedResearchQuery()) {
-      this.loadUrl('https://spark.philgear.dev/#/care');
+      this.loadUrl(this.getInsightSparkUrl());
     }
   }
 
@@ -456,11 +466,12 @@ export class ResearchFrameComponent {
       this.isLoadingGoogle.set(true);
       this.googleResults.set([]);
 
-      // Use local wrapper for Google Custom Search Engine
-      const url = `/search.html`;
+      // Use local wrapper for Google Custom Search Engine, pass query as GET parameter
+      const url = `/search.html?q=${encodeURIComponent(query)}`;
       this.loadUrl(url);
 
-      // Post the query after iframe loads (give it a moment to render)
+      // If iframe is already loaded but we just changed the URL, we can still attempt a postMessage
+      // as a fallback for dynamic updates without a full reload, but the URL param ensures it fires on load.
       setTimeout(() => {
         if (this.iframeEl?.nativeElement?.contentWindow) {
           this.iframeEl.nativeElement.contentWindow.postMessage({
@@ -486,6 +497,46 @@ export class ResearchFrameComponent {
     this.googleResults.set(null); // Clear google native results if loading arbitrary URL
   }
 
+  getInsightSparkUrl(): string {
+    const vitals = this.patientState.vitals();
+    const selectedPart = this.patientState.selectedPartName() || '';
+    const params = new URLSearchParams({
+      bp: vitals.bp || '',
+      hr: vitals.hr || '',
+      temp: vitals.temp || '',
+      spO2: vitals.spO2 || '',
+      weight: vitals.weight || '',
+      part: selectedPart,
+      hide_snapshot: 'true'
+    });
+    return `https://insightspark-82c75.web.app/#/care?${params.toString()}`;
+  }
+
+  onIframeLoad() {
+    this.sendVitalsToIframe();
+  }
+
+  sendVitalsToIframe() {
+    if (this.iframeEl?.nativeElement?.contentWindow) {
+      const vitals = this.patientState.vitals();
+      const selectedPart = this.patientState.selectedPartName() || '';
+      this.iframeEl.nativeElement.contentWindow.postMessage({
+        type: 'SYNC_PATIENT_DATA',
+        vitals: {
+          bp: vitals.bp || '',
+          hr: vitals.hr || '',
+          temp: vitals.temp || '',
+          spO2: vitals.spO2 || '',
+          weight: vitals.weight || '',
+          height: vitals.height || '',
+        },
+        part: selectedPart,
+        hideSnapshot: true
+      }, '*');
+      console.log('[ResearchFrame] Successfully posted patient state synchronization message to Insight Spark.');
+    }
+  }
+
   async searchPubmed(query: string) {
     this.isLoadingPubmed.set(true);
     this.pubmedResults.set(null);
@@ -506,7 +557,7 @@ export class ResearchFrameComponent {
       const summaryRes = await fetch(eSummaryUrl);
       const summaryData = await summaryRes.json();
 
-      const results: PubMedSearchResult[] = ids.map((id: string) => {
+      const results: IPubMedSearchResult[] = ids.map((id: string) => {
         const item = summaryData.result[id];
         let authorsStr = '';
         if (item.authors && Array.isArray(item.authors)) {
@@ -538,7 +589,7 @@ export class ResearchFrameComponent {
     }
   }
 
-  addPubmedBookmark(result: PubMedSearchResult) {
+  addPubmedBookmark(result: IPubMedSearchResult) {
     const url = `https://pubmed.ncbi.nlm.nih.gov/${result.id}/`;
 
     const existing = this.bookmarks().find(b => b.url === url);
@@ -601,7 +652,7 @@ export class ResearchFrameComponent {
     }
   }
 
-  toggleCite(bookmark: Bookmark) {
+  toggleCite(bookmark: IBookmark) {
     // Note: We need a way to update an existing bookmark.
     // Adding it again with same URL but different 'cited' flag in PatientManagementService
     this.patientManager.updateBookmark(bookmark.url, { cited: !bookmark.cited });

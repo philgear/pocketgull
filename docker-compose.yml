@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4000:8080" # Maps local port 4000 to SSR port 8080
+    environment:
+      - NODE_ENV=production
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./pocketgull_api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  hue-relay:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["node", "scripts/hue-relay.js"]
+    ports:
+      - "8081:8080" # The Hue relay defaults to 8080, mapped to 8081
+    environment:
+      - NODE_ENV=production

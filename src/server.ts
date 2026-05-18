@@ -114,8 +114,20 @@ async function fetchGeminiApiKey() {
 let geminiApiKeyCached: string | null = null;
 let fetchPromise: Promise<string> | null = null;
 
-async function getApiKey(): Promise<string> {
-  if (geminiApiKeyCached !== null) return geminiApiKeyCached;
+async function getApiKey(req?: express.Request): Promise<string> {
+  const clientKey = req?.headers?.['x-gemini-api-key'] || req?.headers?.['X-Gemini-API-Key'];
+  if (typeof clientKey === 'string' && clientKey.trim()) {
+    const trimmed = clientKey.trim();
+    process.env['GEMINI_API_KEY'] = trimmed;
+    return trimmed;
+  }
+
+  if (geminiApiKeyCached !== null) {
+    if (geminiApiKeyCached) {
+      process.env['GEMINI_API_KEY'] = geminiApiKeyCached;
+    }
+    return geminiApiKeyCached;
+  }
   if (!fetchPromise) {
     fetchPromise = fetchGeminiApiKey().then(key => {
        geminiApiKeyCached = key;
@@ -144,6 +156,34 @@ app.use((req, res, next) => {
 });
 
 import { dicomRouter } from './server/dicom';
+import { healthcareRouter, ensureHealthcareStoresExist } from './server/healthcare';
+import swaggerUi from 'swagger-ui-express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+
+// Load OpenAPI specification dynamically for Swagger UI
+let openApiSpec: any = {};
+try {
+  const specPath = join(rootDir, 'docs', 'openapi.json');
+  openApiSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+} catch (err: any) {
+  console.warn('[Swagger] Failed to load docs/openapi.json:', err.message);
+}
+
+// ── Python Biosignal & Data Bridge Proxy ───────────────────────────────────
+// Routes /api/python/* → FastAPI sidecar on :8001 (dev) or PYTHON_API_URL (prod).
+// In Cloud Run both processes share a container, so the URL is always internal.
+const pythonApiTarget = process.env['PYTHON_API_URL'] ?? 'http://localhost:8001';
+app.use('/api/python', createProxyMiddleware({
+  target: pythonApiTarget,
+  changeOrigin: true,
+  pathRewrite: { '^/api/python': '' },
+  on: {
+    error: (err, req, res: any) => {
+      console.warn('[Python Proxy] FastAPI sidecar unavailable:', (err as Error).message);
+      res.status(503).json({ error: 'Python data service unavailable. Is the FastAPI sidecar running?' });
+    }
+  }
+}));
 
 // PubMed Proxy 
 app.get('/api/pubmed/search', async (req, res) => {
@@ -160,7 +200,35 @@ app.get('/api/pubmed/search', async (req, res) => {
   }
 });
 
+const swaggerAuth = (req: any, res: any, next: any) => {
+  const username = process.env['SWAGGER_USERNAME'] || 'dev-pocketgull';
+  const password = process.env['SWAGGER_PASSWORD'] || 'admin-secure-pocketgull-2026';
+
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) {
+    res.setHeader('WWW-Authenticate', 'Basic realm="Pocket Gull Secure Docs"');
+    return res.status(401).send('Authentication required.');
+  }
+
+  const [type, credentials] = authHeader.split(' ');
+  if (type === 'Basic' && credentials) {
+    const decoded = Buffer.from(credentials, 'base64').toString('utf8');
+    const [u, p] = decoded.split(':');
+    if (u === username && p === password) {
+      return next();
+    }
+  }
+
+  res.setHeader('WWW-Authenticate', 'Basic realm="Pocket Gull Secure Docs"');
+  return res.status(401).send('Invalid credentials.');
+};
+
+app.get('/docs', swaggerAuth, (req, res) => {
+  res.redirect('/api-docs');
+});
+app.use('/api-docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(openApiSpec));
 app.use('/api/dicom', dicomRouter);
+app.use('/api/healthcare', healthcareRouter);
 
 app.get('/api/pubmed/summary', async (req, res) => {
   try {
@@ -180,9 +248,21 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
+app.get('/api/health/baselines', async (req, res) => {
+  try {
+    const { fetchWorldHealthBaselines } = await import('./server/world-health.js');
+    const baselines = await fetchWorldHealthBaselines();
+    res.json(baselines);
+  } catch (err: any) {
+    console.error('Baselines Fetch Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Genkit AI Endpoints
 app.post('/api/ai/metrics', express.json(), async (req, res) => {
   try {
+      await getApiKey(req);
       const { generateMetricsFlow } = await import('./server/genkit.js');
       const result = await generateMetricsFlow(req.body.text);
       res.json(result);
@@ -193,6 +273,7 @@ app.post('/api/ai/metrics', express.json(), async (req, res) => {
 
 app.post('/api/ai/changes', express.json(), async (req, res) => {
   try {
+      await getApiKey(req);
       const { detectClinicalChangesFlow } = await import('./server/genkit.js');
       const result = await detectClinicalChangesFlow({
           oldData: req.body.oldData,
@@ -206,6 +287,7 @@ app.post('/api/ai/changes', express.json(), async (req, res) => {
 
 app.post('/api/ai/translate', express.json(), async (req, res) => {
   try {
+      await getApiKey(req);
       const { translateReadingLevelFlow } = await import('./server/genkit.js');
       const result = await translateReadingLevelFlow({
           text: req.body.text,
@@ -220,7 +302,7 @@ app.post('/api/ai/translate', express.json(), async (req, res) => {
 app.post('/api/ai/analyze-translation', express.json(), async (req, res) => {
   try {
     const { original, translated } = req.body;
-    await getApiKey(); // Ensure the key is loaded into process.env before Genkit initializes
+    await getApiKey(req); // Ensure the key is loaded into process.env before Genkit initializes
 
     if (!original || !translated) {
       return res.status(400).json({ error: 'Original and translated text are required' });
@@ -240,7 +322,7 @@ app.post('/api/ai/analyze-translation', express.json(), async (req, res) => {
 app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, res) => {
   try {
     const { base64Image, context } = req.body;
-    await getApiKey();
+    await getApiKey(req);
 
     if (!base64Image) {
       return res.status(400).json({ error: 'base64Image is required' });
@@ -261,7 +343,7 @@ app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, r
 app.post('/api/ai/stream', express.json(), async (req, res) => {
   try {
     const { patientData, systemInstruction, model, temperature } = req.body;
-    const key = await getApiKey();
+    const key = await getApiKey(req);
     if (!key) {
       res.status(500).json({ error: 'API key not available on server.' });
       return;
@@ -282,7 +364,25 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
       body: JSON.stringify({
         contents: [{ role: 'user', parts: [{ text: patientData }] }],
         systemInstruction: { parts: [{ text: systemInstruction }] },
-        generationConfig: { temperature: temperature ?? 0.1 }
+        generationConfig: { temperature: temperature ?? 0.1 },
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          }
+        ]
       })
     });
 
@@ -318,7 +418,7 @@ const chatSessions = new Map<string, { history: any[], systemInstruction: string
 app.post('/api/ai/chat/start', express.json(), async (req, res) => {
   try {
     const { sessionId, systemInstruction, model, temperature } = req.body;
-    const key = await getApiKey();
+    const key = await getApiKey(req);
     if (!key) throw new Error('API key not available on server.');
     
     chatSessions.set(sessionId, {
@@ -345,7 +445,7 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     const session = chatSessions.get(sessionId);
     if (!session) throw new Error('Chat session not found. Please refresh and try again.');
     
-    const key = await getApiKey();
+    const key = await getApiKey(req);
     if (!key) throw new Error('API key not available on server.');
 
     // Append user message
@@ -362,7 +462,25 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
       body: JSON.stringify({
         contents: session.history,
         systemInstruction: { parts: [{ text: session.systemInstruction }] },
-        generationConfig: { temperature: session.temperature }
+        generationConfig: { temperature: session.temperature },
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+          }
+        ]
       })
     });
 
@@ -407,7 +525,7 @@ app.use((req, res, next) => {
 
       // If the response is HTML and we have an API key, inject it
       const contentType = response.headers.get('content-type') || '';
-      const key = await getApiKey();
+      const key = await getApiKey(req);
       if (contentType.includes('text/html') && key) {
         let html = await response.text();
         const scriptTag = `<script px-api-key="true">window.GEMINI_API_KEY = "${key}";</script>\n</head>`;
@@ -439,6 +557,10 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
   const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4200;
   app.listen(port, '0.0.0.0', () => {
     console.log(`Node Express server listening on http://0.0.0.0:${port}`);
+    
+    // Auto-provision Cloud Healthcare API datasets and stores
+    ensureHealthcareStoresExist().catch(console.error);
+
     // Explicitly keep the process alive, as something is closing the event loop
     setInterval(() => {}, 1000 * 60 * 60 * 24);
   });

@@ -43,7 +43,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
                 variant="primary"
                 size="sm"
                 [icon]="hasReport() ? 'M17.65 6.35A7.95 7.95 0 0 0 12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.66-.67 3.17-1.76 4.24l1.42 1.42A9.92 9.92 0 0 0 22 12c0-2.76-1.12-5.26-2.35-7.65z' : 'M14 5l7 7m0 0l-7 7m7-7H3'">
-                {{ hasReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}
+                {{ hasReport() ? 'Refresh Analysis' : 'Generate IPatient Summary' }}
               </pocket-gull-button>
             }
           </div>

@@ -11,13 +11,13 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
-export interface NodeAgentDialogData {
+export interface INodeAgentDialogData {
     nodeKey: string;
     nodeText: string;          // Plain text content of the node
     sectionTitle: string;      // Which section/lens this node belongs to
 }
 
-interface ChatEntry {
+interface IChatEntry {
     role: 'user' | 'model' | 'system';
     text: string;
     html?: string;
@@ -531,7 +531,7 @@ interface ChatEntry {
 export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
     protected readonly ClinicalIcons = ClinicalIcons;
 
-    data = input.required<NodeAgentDialogData>();
+    data = input.required<INodeAgentDialogData>();
     patientData = input<string>('');
     closed = output<void>();
 
@@ -545,7 +545,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
 
     isOpen = signal(false);
     isLoading = signal(false);
-    chatHistory = signal<ChatEntry[]>([]);
+    chatHistory = signal<IChatEntry[]>([]);
     showSuggestionsDropdown = signal(false);
     selectedFiles = signal<File[]>([]);
     userInput = '';
@@ -630,7 +630,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
             const systemContext = `You are a focused clinical evidence assistant embedded in the Pocket Gull Clinical Intelligence Platform.
 A clinician is reviewing a specific recommendation from the "${section}" section of an AI-generated care plan and wants to understand or challenge it.
 
-Patient context is available. The recommendation under review is:
+IPatient context is available. The recommendation under review is:
 """
 ${nodeText}
 """

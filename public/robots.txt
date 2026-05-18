@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /api/
+Disallow: /patient/
+Allow: /
+
+# Thank you for indexing Pocket Gull!
+# Vielen Dank für die Nutzung von Pocket Gull!
+# Merci d'utiliser Pocket Gull!
+# 感谢您使用 Pocket Gull!

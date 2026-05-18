@@ -33,12 +33,15 @@ The layout is managed in `AppComponent` with a multi-directional resizable grid:
 - **DICOM API**: Requires `HC_DATASET` + `HC_DICOM_STORE` env vars. Returns 400 locally without them — expected behavior.
 
 ## MCP Tool Integration
+MCP config lives at: **`~/.gemini/antigravity/mcp_config.json`**
+
 For complex tasks, leverage the following MCP servers:
+- **`chrome-devtools`**: Inspect DOM, console logs, network requests, and Core Web Vitals in a live Chrome instance. Essential for verifying UI renders correctly at runtime.
 - **`firebase-mcp-server`**: For database queries, Firestore reads/writes, security rules validation, and Cloud Storage management.
-- **`github-mcp-server`**: For PR reviews, issue tracking, branch management, and repository automation.
+- **`github-mcp-server`**: For PR reviews, issue tracking, branch management, and repository automation. Requires `GITHUB_PERSONAL_ACCESS_TOKEN` env var.
 - **`google-maps-platform-code-assist`**: For all location-based logic, routing, and map rendering optimization.
 
-> To add or modify MCP servers, update the relevant MCP config file (e.g., `.cursor/mcp.json`, `claude_desktop_config.json`, or the IDE-specific config) and restart the AI client.
+> To add a new MCP server, add an entry to `~/.gemini/antigravity/mcp_config.json` and restart the AI client.
 
 ## Verification Patterns
 Use the following checks when verifying work:

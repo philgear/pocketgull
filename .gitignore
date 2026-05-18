@@ -52,3 +52,34 @@ companion-apps/
 pocketgull_api/package-lock.json
 pocketgull_api/node_modules/
 pocketgull_api/dist/
+
+# Temporary developer listings & tool logs
+all_ts_files.txt
+
+# Playwright Test Reports & Artifacts
+playwright-report/
+test-results/
+
+# Gemini Workspace Cache
+.gemini/
+
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+lib/
+pip-selfcheck.json
+
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Git Hooks / Husky
+.husky/
+
+
+

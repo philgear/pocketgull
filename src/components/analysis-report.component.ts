@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ClinicalIntelligenceService, TranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
+import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { HistoryEntry } from '../services/patient.types';
@@ -9,9 +9,10 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { DictationService } from '../services/dictation.service';
 
 declare var webkitSpeechRecognition: any;
-import { SummaryNode, SummaryNodeItem, ReportSection, ParsedTranscriptEntry, NodeAnnotation, LensAnnotations, VerificationIssue } from './analysis-report.types';
+import { ISummaryNode, ISummaryNodeItem, IReportSection, IParsedTranscriptEntry, NodeAnnotation, LensAnnotations, IVerificationIssue } from './analysis-report.types';
 import { SummaryNodeComponent } from './summary-node.component';
 import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
+import { BiomarkerMatrixComponent } from './biomarker-matrix.component';
 import { ExportService } from '../services/export.service';
 import { AuditService } from '../services/audit.service';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
@@ -25,7 +26,7 @@ import { RevealDirective } from '../directives/reveal.directive';
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe],
+  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
@@ -75,6 +76,17 @@ import { RevealDirective } from '../directives/reveal.directive';
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Nutrition
           </pocket-gull-button>
+          <pocket-gull-button (click)="changeLens('Orthomolecular Profiling')"
+            variant="ghost"
+            size="sm"
+            [class.border-b-2]="activeLens() === 'Orthomolecular Profiling'"
+            [class.border-[#1C1C1C]]="activeLens() === 'Orthomolecular Profiling'"
+            [class.dark:border-white]="activeLens() === 'Orthomolecular Profiling'"
+            [class.text-[#1C1C1C]]="activeLens() === 'Orthomolecular Profiling'"
+            [class.dark:text-white]="activeLens() === 'Orthomolecular Profiling'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            Orthomolecular Profiling
+          </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Monitoring & Follow-up')"
             variant="ghost"
             size="sm"
@@ -86,16 +98,16 @@ import { RevealDirective } from '../directives/reveal.directive';
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Monitoring & Follow-up
           </pocket-gull-button>
-          <pocket-gull-button (click)="changeLens('Patient Education')"
+          <pocket-gull-button (click)="changeLens('IPatient Education')"
             variant="ghost"
             size="sm"
-            [class.border-b-2]="activeLens() === 'Patient Education'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Patient Education'"
-            [class.dark:border-white]="activeLens() === 'Patient Education'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Patient Education'"
-            [class.dark:text-white]="activeLens() === 'Patient Education'"
+            [class.border-b-2]="activeLens() === 'IPatient Education'"
+            [class.border-[#1C1C1C]]="activeLens() === 'IPatient Education'"
+            [class.dark:border-white]="activeLens() === 'IPatient Education'"
+            [class.text-[#1C1C1C]]="activeLens() === 'IPatient Education'"
+            [class.dark:text-white]="activeLens() === 'IPatient Education'"
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
-            Patient Education
+            IPatient Education
           </pocket-gull-button>
         </div>
         </div>
@@ -124,7 +136,7 @@ import { RevealDirective } from '../directives/reveal.directive';
               label="Stability"
               [value]="metrics.stability"
               type="stability"
-              description="Patient physiological and functional compensatory status.">
+              description="IPatient physiological and functional compensatory status.">
             </app-clinical-gauge>
 
             <app-clinical-gauge
@@ -158,11 +170,17 @@ import { RevealDirective } from '../directives/reveal.directive';
             <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-200">Processing Comprehensive Analysis</p>
           </div>
         }
+        
         @if (intel.error() && !hasAnyReport()) {
           <div class="p-4 border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 text-xs rounded-lg mb-4">
             <strong class="block uppercase tracking-wider mb-1">System Error</strong>
             {{ intel.error() }}
           </div>
+        }
+
+        <!-- Biomarker Matrix (Orthomolecular Only) -->
+        @if (activeLens() === 'Orthomolecular Profiling' && hasAnyReport()) {
+          <app-biomarker-matrix [reportText]="activeReport()"></app-biomarker-matrix>
         }
 
         <!--AI Report Section-->
@@ -242,6 +260,16 @@ import { RevealDirective } from '../directives/reveal.directive';
                 </pocket-gull-card>
               </div>
             }
+          </div>
+          
+          <!-- AI Co-Pilot Transparency Watermark -->
+          <div class="mt-4 pb-8 flex items-center justify-center gap-3 opacity-60 no-print select-none">
+            <div class="h-px bg-gray-300 dark:bg-zinc-700 flex-1 max-w-[120px]"></div>
+            <div class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 flex items-center gap-1.5">
+               <span [innerHTML]="ClinicalIcons.Verified | safeHtml" class="w-3.5 h-3.5"></span>
+               Generated by AI Co-Pilot — Verify all clinical findings
+            </div>
+            <div class="h-px bg-gray-300 dark:bg-zinc-700 flex-1 max-w-[120px]"></div>
           </div>
         }
 
@@ -361,7 +389,7 @@ export class AnalysisReportComponent implements OnDestroy {
     'Monitor BP and heart rate twice daily.',
     'Continue current medication as prescribed.',
     'Schedule follow-up with specialist.',
-    'Patient education provided regarding diet.',
+    'IPatient education provided regarding diet.',
     'Increase fluid intake to 2L/day.',
     'Watch for signs of infection.'
   ];
@@ -392,11 +420,11 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   }
 
-  reportSections = computed<ReportSection[] | null>(() => {
+  reportSections = computed<IReportSection[] | null>(() => {
     const raw = this.activeReport();
     if (!raw) return null;
     try {
-      const sections: ReportSection[] = [];
+      const sections: IReportSection[] = [];
       const parts = raw.split(/\n(?=#{1,3}\s)/);
       for (let sIdx = 0; sIdx < parts.length; sIdx++) {
         const part = parts[sIdx];
@@ -421,7 +449,7 @@ export class AnalysisReportComponent implements OnDestroy {
         });
 
         const tokens = parser.lexer(cleanMarkdown);
-        const nodes: SummaryNode[] = [];
+        const nodes: ISummaryNode[] = [];
 
         for (let nIdx = 0; nIdx < tokens.length; nIdx++) {
           const token = tokens[nIdx];
@@ -448,7 +476,7 @@ export class AnalysisReportComponent implements OnDestroy {
             return { suggestions, proposedText, cleanedText };
           };
 
-          const applyHighlights = (html: string, issues: VerificationIssue[]) => {
+          const applyHighlights = (html: string, issues: IVerificationIssue[]) => {
             let highlightedHtml = html;
             for (const issue of issues) {
               if (issue.claim && highlightedHtml.includes(issue.claim)) {
@@ -544,11 +572,11 @@ export class AnalysisReportComponent implements OnDestroy {
     return ClinicalIcons.Assessment;
   }
 
-  parsedTranscript = computed<ParsedTranscriptEntry[]>(() => {
+  parsedTranscript = computed<IParsedTranscriptEntry[]>(() => {
     const transcript = this.intel.transcript();
     try {
       return transcript.map(entry => {
-        const parsed: ParsedTranscriptEntry = { ...entry };
+        const parsed: IParsedTranscriptEntry = { ...entry };
         if (entry.role === 'model') {
           parsed.htmlContent = this.renderInteractiveContent(entry.text);
         }
@@ -655,7 +683,7 @@ export class AnalysisReportComponent implements OnDestroy {
     const historyEntry: HistoryEntry = {
       type: 'FinalizedPatientSummary',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      summary: 'Patient Summary updated (auto-saved).',
+      summary: 'IPatient Summary updated (auto-saved).',
       report: this.intel.analysisResults(),
       annotations: this.lensAnnotations()
     };
@@ -690,7 +718,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return parser ? parser.parse(markdown) as string : '';
   }
 
-  handleNodeUpdate(node: SummaryNode | SummaryNodeItem, event: any) {
+  handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: any) {
     if (event.note !== undefined) {
       this.updateAnnotation(node.key, { note: event.note });
       node.note = event.note; // Update local node state
@@ -713,7 +741,7 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
 
-  private syncNodeToTaskFlow(node: SummaryNode | SummaryNodeItem) {
+  private syncNodeToTaskFlow(node: ISummaryNode | ISummaryNodeItem) {
     const text = node.note || (node as any).rawHtml || (node as any).html;
     if (node.bracketState === 'added' || node.note) {
       this.state.addClinicalNote({
@@ -743,9 +771,9 @@ export class AnalysisReportComponent implements OnDestroy {
     this.triggerAutoSave(key);
   }
 
-  activeDictationNode = signal<SummaryNode | SummaryNodeItem | null>(null);
+  activeDictationNode = signal<ISummaryNode | ISummaryNodeItem | null>(null);
 
-  openNodeDictation(node: SummaryNode | SummaryNodeItem) {
+  openNodeDictation(node: ISummaryNode | ISummaryNodeItem) {
     if (this.dictation.isListening() && this.activeDictationNode() === node) {
       this.dictation.stopRecognition();
       node.isDictating = false;
@@ -813,7 +841,7 @@ export class AnalysisReportComponent implements OnDestroy {
     const historyEntry: HistoryEntry = {
       type: 'FinalizedPatientSummary',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      summary: 'Patient Summary finalized and saved to chart.',
+      summary: 'IPatient Summary finalized and saved to chart.',
       report: this.intel.analysisResults(),
       annotations: this.lensAnnotations()
     };
@@ -822,7 +850,7 @@ export class AnalysisReportComponent implements OnDestroy {
 
     // Briefly change tab to show it's saved? 
     // For now we'll just log and rely on the history update
-    console.log('Patient summary finalized and saved to chart.');
+    console.log('IPatient summary finalized and saved to chart.');
   }
 
   printReport() {

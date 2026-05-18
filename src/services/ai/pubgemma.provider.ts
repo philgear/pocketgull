@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { IntelligenceProvider } from './intelligence.provider';
-import { ClinicalMetrics } from '../clinical-intelligence.service';
-import { VerificationIssue } from '../../components/analysis-report.types';
+import { IIntelligenceProvider } from './intelligence.provider';
+import { IClinicalMetrics } from '../clinical-intelligence.service';
+import { IVerificationIssue } from '../../components/analysis-report.types';
 
 @Injectable({
   providedIn: 'root'
 })
-export class PubGemmaProvider implements IntelligenceProvider {
+export class PubGemmaProvider implements IIntelligenceProvider {
   private readonly OLLAMA_URL = 'http://127.0.0.1:11434/api/generate';
   /** Model tag for Ollama. Pull with: docker exec pubgemma-local ollama pull gemma2:2b */
   private readonly MODEL_NAME = 'gemma2:2b';
@@ -47,7 +47,7 @@ export class PubGemmaProvider implements IntelligenceProvider {
   // Streaming report generation
   // ---------------------------------------------------------------------------
 
-  async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+  async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
     if (!(await this.isOllamaAvailable())) {
       throw new Error('Local Ollama endpoint unreachable.');
     }
@@ -83,7 +83,7 @@ export class PubGemmaProvider implements IntelligenceProvider {
    * Generates clinical complexity/stability/certainty scores from report text.
    * Prompts the model for a JSON object and parses it defensively.
    */
-  async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
+  async generateMetrics(reportText: string): Promise<IClinicalMetrics> {
     const prompt =
       `You are a clinical analyst. Given the following medical report, rate these three dimensions on a scale of 1–10:\n` +
       `- complexity: overall diagnostic complexity\n` +
@@ -94,7 +94,7 @@ export class PubGemmaProvider implements IntelligenceProvider {
     try {
       const raw = await this.ollamaPrompt(prompt);
       const match = raw.match(/\{[\s\S]*\}/);
-      if (match) return JSON.parse(match[0]) as ClinicalMetrics;
+      if (match) return JSON.parse(match[0]) as IClinicalMetrics;
     } catch (e) {
       console.warn('[PubGemma] generateMetrics parse failed, using defaults.', e);
     }
@@ -120,17 +120,17 @@ export class PubGemmaProvider implements IntelligenceProvider {
   /**
    * Verifies a care plan section against source patient data and returns structured issues.
    */
-  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }> {
+  async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> {
     const prompt =
       `You are a clinical auditor. Review the following care plan section for the "${lens}" lens.\n` +
       `Identify any discrepancies, unsupported claims, or red flags compared to the patient data.\n` +
       `List issues as JSON array: [{"field":"...","severity":"warning"|"error","message":"..."}]\n` +
       `If no issues, return an empty array []. Return ONLY the JSON array.\n\n` +
-      `Patient Data:\n${sourceData.slice(0, 1500)}\n\nCare Plan Section:\n${content.slice(0, 1500)}`;
+      `IPatient Data:\n${sourceData.slice(0, 1500)}\n\nCare Plan Section:\n${content.slice(0, 1500)}`;
     try {
       const raw = await this.ollamaPrompt(prompt);
       const match = raw.match(/\[[\s\S]*\]/);
-      const issues: VerificationIssue[] = match ? JSON.parse(match[0]) : [];
+      const issues: IVerificationIssue[] = match ? JSON.parse(match[0]) : [];
       const status = issues.length === 0
         ? `Verified by Local Open Weights (${this.MODEL_NAME})`
         : `${issues.length} issue(s) flagged by Local Open Weights (${this.MODEL_NAME})`;
@@ -148,11 +148,15 @@ export class PubGemmaProvider implements IntelligenceProvider {
   /**
    * Translates clinical text to the specified reading/cognition level using local inference.
    */
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child'): Promise<string> {
+  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
     const levelDescriptions: Record<typeof level, string> = {
       simplified: 'a simplified 6th-grade reading level, using plain language and short sentences',
       dyslexia: 'a dyslexia-friendly format with simple words, short paragraphs, and no complex medical jargon',
-      child: 'a child-friendly (pediatric) level, age 8–12, with analogies and reassuring, simple language'
+      child: 'a child-friendly (pediatric) level, age 8–12, with analogies and reassuring, simple language',
+      spanish: 'a professional clinical Spanish translation, culturally localized',
+      german: 'a professional clinical German translation, culturally localized',
+      french: 'a professional clinical French translation, culturally localized',
+      mandarin: 'a professional clinical Mandarin translation, culturally localized'
     };
     const prompt =
       `Rewrite the following clinical care plan text for ${levelDescriptions[level]}.\n` +
@@ -192,7 +196,7 @@ export class PubGemmaProvider implements IntelligenceProvider {
   }
 
   async startChat(patientData: string, context: string): Promise<void> {
-    this.chatContext = `Patient Context: ${patientData}\nRole: ${context}`;
+    this.chatContext = `IPatient Context: ${patientData}\nRole: ${context}`;
   }
 
   async sendMessage(message: string, files?: File[]): Promise<string> {

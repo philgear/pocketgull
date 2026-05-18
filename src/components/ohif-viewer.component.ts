@@ -26,7 +26,7 @@ import { DicomService } from '../services/dicom.service';
       <div class="relative z-10 text-center space-y-2">
         @if (dicomService.selectedStudy()) {
           <p class="text-xs uppercase tracking-widest font-bold text-zinc-500">Selected Study</p>
-          <p class="text-lg font-semibold text-zinc-100">{{ dicomService.selectedStudy()?.patientName || 'Unknown Patient' }}</p>
+          <p class="text-lg font-semibold text-zinc-100">{{ dicomService.selectedStudy()?.patientName || 'Unknown IPatient' }}</p>
           <p class="text-sm text-zinc-400">{{ dicomService.selectedStudy()?.studyDescription || 'No description' }}</p>
           <p class="text-xs font-mono text-zinc-600 max-w-xs truncate">{{ dicomService.selectedStudy()?.studyInstanceUid }}</p>
         } @else {

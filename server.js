@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import swaggerUi from 'swagger-ui-express';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,6 +35,48 @@ const distFolder = join(rootDir, 'dist');
 console.log(`[SERVER] Starting...`);
 console.log(`[SERVER] Current working directory: ${rootDir}`);
 console.log(`[SERVER] Expected dist folder: ${distFolder}`);
+
+// Load OpenAPI documentation dynamically
+let swaggerDocument;
+try {
+  const openApiPath = join(rootDir, 'docs', 'openapi.json');
+  if (fs.existsSync(openApiPath)) {
+    swaggerDocument = JSON.parse(fs.readFileSync(openApiPath, 'utf8'));
+    const swaggerAuth = (req, res, next) => {
+      const username = process.env.SWAGGER_USERNAME || 'dev-pocketgull';
+      const password = process.env.SWAGGER_PASSWORD || 'admin-secure-pocketgull-2026';
+
+      const authHeader = req.headers['authorization'];
+      if (!authHeader) {
+        res.setHeader('WWW-Authenticate', 'Basic realm="Pocket Gull Secure Docs"');
+        return res.status(401).send('Authentication required.');
+      }
+
+      const [type, credentials] = authHeader.split(' ');
+      if (type === 'Basic' && credentials) {
+        const decoded = Buffer.from(credentials, 'base64').toString('utf8');
+        const [u, p] = decoded.split(':');
+        if (u === username && p === password) {
+          return next();
+        }
+      }
+
+      res.setHeader('WWW-Authenticate', 'Basic realm="Pocket Gull Secure Docs"');
+      return res.status(401).send('Invalid credentials.');
+    };
+
+    // Mount the Swagger UI under /api-docs
+    app.get('/docs', swaggerAuth, (req, res) => {
+      res.redirect('/api-docs');
+    });
+    app.use('/api-docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    console.log('[SERVER] Swagger documentation mounted at /api-docs');
+  } else {
+    console.warn('[SERVER] Warning: docs/openapi.json not found. Swagger docs skipped.');
+  }
+} catch (err) {
+  console.error('[SERVER] Failed to load or parse docs/openapi.json:', err);
+}
 
 let geminiApiKeyCached = '';
 

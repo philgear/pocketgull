@@ -1,26 +1,39 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { IntelligenceProvider } from './intelligence.provider';
+import { IIntelligenceProvider } from './intelligence.provider';
 import { AI_CONFIG } from '../ai-provider.types';
-import { ClinicalMetrics } from '../clinical-intelligence.service';
-import { VerificationIssue } from '../../components/analysis-report.types';
+import { IClinicalMetrics } from '../clinical-intelligence.service';
+import { IVerificationIssue } from '../../components/analysis-report.types';
 import { VerifyAiService } from '../verify-ai.service';
 
 
 @Injectable({
     providedIn: 'root'
 })
-export class GeminiProvider implements IntelligenceProvider {
+export class GeminiProvider implements IIntelligenceProvider {
     private config = inject(AI_CONFIG);
     private verifier = inject(VerifyAiService);
 
     // Chat session ID for server-side session management
     private chatSessionId: string | null = null;
 
-    async *generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+    private getHeaders(): Record<string, string> {
+        const headers: Record<string, string> = {
+            'Content-Type': 'application/json'
+        };
+        if (typeof window !== 'undefined') {
+            const userKey = window.localStorage?.getItem('GEMINI_API_KEY') || (window as any).GEMINI_API_KEY;
+            if (userKey) {
+                headers['X-Gemini-API-Key'] = userKey.trim();
+            }
+        }
+        return headers;
+    }
+
+    async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
         const response = await fetch('/api/ai/stream', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({
                 patientData,
                 systemInstruction,
@@ -77,10 +90,10 @@ export class GeminiProvider implements IntelligenceProvider {
         }
     }
 
-    async generateMetrics(reportText: string): Promise<ClinicalMetrics> {
+    async generateMetrics(reportText: string): Promise<IClinicalMetrics> {
         const response = await fetch('/api/ai/metrics', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({ text: reportText })
         });
         if (!response.ok) throw new Error(await response.text());
@@ -99,7 +112,7 @@ export class GeminiProvider implements IntelligenceProvider {
     async detectClinicalChanges(oldData: string, newData: string): Promise<boolean> {
         const response = await fetch('/api/ai/changes', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({ oldData, newData })
         });
         if (!response.ok) throw new Error(await response.text());
@@ -107,14 +120,14 @@ export class GeminiProvider implements IntelligenceProvider {
         return data.significant;
     }
 
-    async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }> {
+    async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> {
         return await this.verifier.verifyReportSection(lens as any, content, sourceData);
     }
 
-    async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child'): Promise<string> {
+    async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
         const response = await fetch('/api/ai/translate', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({ text, level })
         });
         if (!response.ok) throw new Error(await response.text());
@@ -125,7 +138,7 @@ export class GeminiProvider implements IntelligenceProvider {
     async analyzeTranslation(original: string, translated: string): Promise<string> {
         const response = await fetch('/api/ai/analyze-translation', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({ original, translated })
         });
         if (!response.ok) throw new Error(await response.text());
@@ -136,7 +149,7 @@ export class GeminiProvider implements IntelligenceProvider {
     async analyzeImage(base64Image: string, context?: string): Promise<string> {
         const response = await fetch('/api/ai/analyze-image', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({ base64Image, context })
         });
         if (!response.ok) throw new Error(await response.text());
@@ -151,7 +164,7 @@ export class GeminiProvider implements IntelligenceProvider {
 
         const response = await fetch('/api/ai/chat/start', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({
                 sessionId: this.chatSessionId,
                 systemInstruction,
@@ -178,7 +191,7 @@ export class GeminiProvider implements IntelligenceProvider {
 
         const response = await fetch('/api/ai/chat/message', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getHeaders(),
             body: JSON.stringify({
                 sessionId: this.chatSessionId,
                 message,

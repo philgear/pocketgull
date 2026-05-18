@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ElementRef, effect, signal, viewChild, untracked } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { PatientStateService, PatientState } from '../services/patient-state.service';
-import { PatientManagementService, HistoryEntry, Patient } from '../services/patient-management.service';
-import { DraftSummaryItem } from '../services/patient.types';
+import { PatientStateService, IPatientState } from '../services/patient-state.service';
+import { PatientManagementService, HistoryEntry, IPatient } from '../services/patient-management.service';
+import { IDraftSummaryItem } from '../services/patient.types';
 import { ExportService } from '../services/export.service';
 import { ImportService } from '../services/import.service';
 import { FhirIntegrationService } from '../services/fhir-integration.service';
@@ -519,7 +519,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     }
                 </section>
 
-                <!-- Patient Trends Chart -->
+                <!-- IPatient Trends Chart -->
                 @defer (on viewport) {
                   <section>
                       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -1094,7 +1094,7 @@ export class MedicalChartSummaryComponent {
 
 
 
-  removeDraftItem(item: DraftSummaryItem) {
+  removeDraftItem(item: IDraftSummaryItem) {
     this.state.removeDraftSummaryItem(item.id);
   }
 
@@ -1103,7 +1103,7 @@ export class MedicalChartSummaryComponent {
     return draftItems && draftItems.length > 0;
   }
 
-  updateVital(key: keyof PatientState['vitals'], event: any) {
+  updateVital(key: keyof IPatientState['vitals'], event: any) {
     this.state.updateVital(key, event.target.value);
   }
 
@@ -1119,7 +1119,7 @@ export class MedicalChartSummaryComponent {
     if (!reason || !patient) return;
 
     // Capture the state at the time of this visit
-    const visitState: PatientState = {
+    const visitState: IPatientState = {
       ...this.state.getCurrentState(),
       patientGoals: reason // The primary goal for this snapshot is the reason for the visit.
     };
@@ -1163,7 +1163,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
 
     if (draftItems && draftItems.length > 0) {
-      if (confirm('Discard your draft modifications and revert to the saved Patient Summary?')) {
+      if (confirm('Discard your draft modifications and revert to the saved IPatient Summary?')) {
         this.state.clearDraftSummaryItems();
       }
     }
@@ -1174,7 +1174,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
     if (draftItems.length > 0) {
       const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
-      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
+      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### IPatient Summary\n${newContent}`;
       this.state.updateActivePatientSummary(plan);
       this.state.clearDraftSummaryItems();
     }

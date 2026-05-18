@@ -1,7 +1,7 @@
 import { Component, inject, signal, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DicomService, DicomStudy } from '../services/dicom.service';
+import { DicomService, IDicomStudy } from '../services/dicom.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 
 @Component({
@@ -138,7 +138,7 @@ export class DicomViewerComponent {
     this.dicomService.searchStudies();
   }
 
-  selectStudy(study: DicomStudy) {
+  selectStudy(study: IDicomStudy) {
     this.dicomService.selectedStudy.set(study);
 
     const studyUid = study.studyInstanceUid;

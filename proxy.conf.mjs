@@ -11,5 +11,27 @@ export default {
         proxyReq.setHeader('Origin', 'https://pocketgull.app/');
         proxyReq.setHeader('Referer', 'https://pocketgull.app/');
       }
+    },
+    "/api": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
+    "/api-docs": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
+    "/docs": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
+    "/api/python": {
+      target: "http://localhost:8001",
+      secure: false,
+      changeOrigin: true,
+      pathRewrite: { "^/api/python": "" }
     }
   };
+

@@ -62,7 +62,7 @@ export async function ensureHealthcareStoresExist() {
 
 /**
  * POST /api/healthcare/fhir/export
- * Receives the generic PocketGull patient JSON payload and uploads it to the FHIR Store.
+ * Receives the full PocketGull patient JSON payload and uploads it to the GCP Healthcare FHIR Store.
  */
 healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (req, res) => {
    try {
@@ -73,18 +73,218 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
      const client = await auth.getClient();
      const token = await client.getAccessToken();
      
-     // Minimum viable FHIR Patient mapping
+     const patientId = payload.id || 'unknown';
+     const fhirPatientId = `pocket-gull-${patientId}`;
+
+     // 1. Map patient demographics to standard FHIR R4 Patient
      const fhirPatient = {
          resourceType: "Patient",
-         id: payload.patient_id || 'unknown',
+         id: fhirPatientId,
          active: true,
-         gender: payload.gender === 'M' ? 'male' : (payload.gender === 'F' ? 'female' : 'unknown')
+         name: payload.name ? [
+             {
+                 use: "official",
+                 text: payload.name,
+                 family: payload.name.split(' ').pop(),
+                 given: payload.name.split(' ').slice(0, -1)
+             }
+         ] : undefined,
+         gender: payload.gender ? (
+             payload.gender === 'Male' ? 'male' : 
+             payload.gender === 'Female' ? 'female' : 
+             payload.gender === 'Non-binary' ? 'other' : 'unknown'
+         ) : 'unknown',
+         birthDate: payload.age ? `${new Date().getFullYear() - payload.age}-01-01` : undefined,
+         extension: [
+             {
+                 url: 'http://pocketgull.app/fhir/StructureDefinition/last-visit',
+                 valueString: payload.lastVisit || new Date().toISOString().split('T')[0]
+             }
+         ]
      };
 
-     const fhirUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Patient/${fhirPatient.id}`;
-     
-     const fhirRes = await fetch(fhirUrl, {
-         method: 'PUT', // PUT allows upsert with 'enableUpdateCreate' on the FHIR store
+     // 2. Map preexisting conditions to standard FHIR R4 Conditions
+     const fhirConditions: any[] = [];
+     if (Array.isArray(payload.preexistingConditions)) {
+         payload.preexistingConditions.forEach((conditionName: string, index: number) => {
+             fhirConditions.push({
+                 resourceType: "Condition",
+                 id: `${fhirPatientId}-cond-${index}`,
+                 clinicalStatus: {
+                     coding: [
+                         {
+                             system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
+                             code: "active",
+                             display: "Active"
+                         }
+                     ]
+                 },
+                 verificationStatus: {
+                     coding: [
+                         {
+                             system: "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+                             code: "confirmed",
+                             display: "Confirmed"
+                         }
+                     ]
+                 },
+                 category: [
+                     {
+                         coding: [
+                             {
+                                 system: "http://terminology.hl7.org/CodeSystem/condition-category",
+                                 code: "problem-list-item",
+                                 display: "Problem List Item"
+                             }
+                         ]
+                     }
+                 ],
+                 code: {
+                     text: conditionName
+                 },
+                 subject: {
+                     reference: `Patient/${fhirPatientId}`
+                 }
+             });
+         });
+     }
+
+     // 3. Map vitals to standard FHIR R4 Observations
+     const fhirObservations: any[] = [];
+     const vitals = payload.vitals || {};
+     const lastVisitDate = payload.lastVisit ? new Date(payload.lastVisit.replace(/\./g, '-')).toISOString() : new Date().toISOString();
+
+     const addQuantityObservation = (idSuffix: string, loinc: string, display: string, valStr: string, unit: string, code: string) => {
+         if (!valStr) return;
+         const numericValue = parseFloat(valStr);
+         if (isNaN(numericValue)) return;
+
+         fhirObservations.push({
+             resourceType: "Observation",
+             id: `${fhirPatientId}-obs-${idSuffix}`,
+             status: "final",
+             category: [
+                 {
+                     coding: [
+                         {
+                             system: "http://terminology.hl7.org/CodeSystem/observation-category",
+                             code: "vital-signs",
+                             display: "Vital Signs"
+                         }
+                     ]
+                 }
+             ],
+             code: {
+                 coding: [
+                     {
+                         system: "http://loinc.org",
+                         code: loinc,
+                         display: display
+                     }
+                 ],
+                 text: display
+             },
+             subject: {
+                 reference: `Patient/${fhirPatientId}`
+             },
+             effectiveDateTime: lastVisitDate,
+             valueQuantity: {
+                 value: numericValue,
+                 unit: unit,
+                 system: "http://unitsofmeasure.org",
+                 code: code
+             }
+         });
+     };
+
+     // Map simple vital signs
+     addQuantityObservation("hr", "8867-4", "Heart Rate", vitals.hr, "bpm", "/min");
+     addQuantityObservation("temp", "8310-5", "Body Temperature", vitals.temp, "F", "[degF]");
+     addQuantityObservation("spo2", "2708-6", "Oxygen Saturation", vitals.spO2, "%", "%");
+     addQuantityObservation("weight", "29463-7", "Body Weight", vitals.weight, "lbs", "[lb_av]");
+     addQuantityObservation("height", "8302-2", "Body Height", vitals.height, "in", "[in_i]");
+
+     // Map Blood Pressure panel (Systolic + Diastolic)
+     if (vitals.bp) {
+         const bpParts = vitals.bp.split('/');
+         if (bpParts.length === 2) {
+             const sysVal = parseFloat(bpParts[0]);
+             const diaVal = parseFloat(bpParts[1]);
+             if (!isNaN(sysVal) && !isNaN(diaVal)) {
+                 fhirObservations.push({
+                     resourceType: "Observation",
+                     id: `${fhirPatientId}-obs-bp`,
+                     status: "final",
+                     category: [
+                         {
+                             coding: [
+                                 {
+                                     system: "http://terminology.hl7.org/CodeSystem/observation-category",
+                                     code: "vital-signs",
+                                     display: "Vital Signs"
+                                 }
+                             ]
+                         }
+                     ],
+                     code: {
+                         coding: [
+                             {
+                                 system: "http://loinc.org",
+                                 code: "85354-9",
+                                 display: "Blood pressure panel with all children"
+                             }
+                         ],
+                         text: "Blood Pressure"
+                     },
+                     subject: {
+                         reference: `Patient/${fhirPatientId}`
+                     },
+                     effectiveDateTime: lastVisitDate,
+                     component: [
+                         {
+                             code: {
+                                 coding: [
+                                     {
+                                         system: "http://loinc.org",
+                                         code: "8480-6",
+                                         display: "Systolic blood pressure"
+                                     }
+                                 ]
+                             },
+                             valueQuantity: {
+                                 value: sysVal,
+                                 unit: "mmHg",
+                                 system: "http://unitsofmeasure.org",
+                                 code: "mm[Hg]"
+                             }
+                         },
+                         {
+                             code: {
+                                 coding: [
+                                     {
+                                         system: "http://loinc.org",
+                                         code: "8462-4",
+                                         display: "Diastolic blood pressure"
+                                     }
+                                 ]
+                             },
+                             valueQuantity: {
+                                 value: diaVal,
+                                 unit: "mmHg",
+                                 system: "http://unitsofmeasure.org",
+                                 code: "mm[Hg]"
+                             }
+                         }
+                     ]
+                 });
+             }
+         }
+     }
+
+     // 4. Save Patient to FHIR Store
+     const patientUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Patient/${fhirPatient.id}`;
+     const patientRes = await fetch(patientUrl, {
+         method: 'PUT',
          headers: {
              'Authorization': `Bearer ${token.token}`,
              'Content-Type': 'application/fhir+json;charset=utf-8'
@@ -92,12 +292,54 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
          body: JSON.stringify(fhirPatient)
      });
 
-     if (!fhirRes.ok) {
-         throw new Error(`FHIR Store Error: ${fhirRes.status} - ${await fhirRes.text()}`);
+     if (!patientRes.ok) {
+         throw new Error(`FHIR Patient Save Error: ${patientRes.status} - ${await patientRes.text()}`);
+     }
+     console.log(`[Healthcare FHIR] Synchronized Patient ${fhirPatient.id} to FHIR Store.`);
+
+     // 5. Save Conditions to FHIR Store
+     for (const cond of fhirConditions) {
+         const condUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Condition/${cond.id}`;
+         const condRes = await fetch(condUrl, {
+             method: 'PUT',
+             headers: {
+                 'Authorization': `Bearer ${token.token}`,
+                 'Content-Type': 'application/fhir+json;charset=utf-8'
+             },
+             body: JSON.stringify(cond)
+         });
+         if (condRes.ok) {
+             console.log(`[Healthcare FHIR] Synchronized Condition ${cond.id} to FHIR Store.`);
+         } else {
+             console.warn(`[Healthcare FHIR Warning] Failed to sync Condition ${cond.id}: ${condRes.status} - ${await condRes.text()}`);
+         }
      }
 
-     console.log(`[Healthcare FHIR] Exported Patient ${fhirPatient.id} to FHIR Store.`);
-     res.json({ success: true, resource: fhirPatient });
+     // 6. Save Observations to FHIR Store
+     for (const obs of fhirObservations) {
+         const obsUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Observation/${obs.id}`;
+         const obsRes = await fetch(obsUrl, {
+             method: 'PUT',
+             headers: {
+                 'Authorization': `Bearer ${token.token}`,
+                 'Content-Type': 'application/fhir+json;charset=utf-8'
+             },
+             body: JSON.stringify(obs)
+         });
+         if (obsRes.ok) {
+             console.log(`[Healthcare FHIR] Synchronized Observation ${obs.id} to FHIR Store.`);
+         } else {
+             console.warn(`[Healthcare FHIR Warning] Failed to sync Observation ${obs.id}: ${obsRes.status} - ${await obsRes.text()}`);
+         }
+     }
+
+     res.json({ 
+         success: true, 
+         message: "Patient record successfully synchronized to Google Cloud Healthcare FHIR Store.",
+         patient: fhirPatient, 
+         conditionsSynced: fhirConditions.length, 
+         observationsSynced: fhirObservations.length 
+     });
    } catch (error: any) {
      console.error('[Healthcare FHIR Export Error]', error);
      res.status(500).json({ error: error.message });

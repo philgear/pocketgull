@@ -1,0 +1,63 @@
+name: CI/CD Pipeline (HIPAA Compliant)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  security-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: npm ci --legacy-peer-deps
+        
+      - name: Security Audit
+        run: npm audit --audit-level=high
+        
+      # Ensure code quality for clinical safety
+      - name: Run Linters
+        run: npm run lint --if-present
+
+  build-and-deploy:
+    needs: security-and-lint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}' # Service account strictly scoped
+          
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+        
+      - name: Build and Push Docker Image
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }} .
+          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }}
+          
+      - name: Deploy to Cloud Run
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: 'pocketgull-ssr'
+          region: 'us-central1'
+          image: 'us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }}'
+          env_vars: |
+            NODE_ENV=production
+          # Secure deployment flags
+          flags: '--allow-unauthenticated --vpc-egress=private-ranges-only'

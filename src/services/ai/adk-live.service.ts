@@ -1,6 +1,6 @@
 import { Injectable, signal, NgZone, inject } from '@angular/core';
 
-export interface LiveMessageEvent {
+export interface ILiveMessageEvent {
   text?: string;
   isFinal?: boolean;
 }
@@ -32,7 +32,7 @@ export class AdkLiveService {
   private activeSource: AudioBufferSourceNode | null = null;
 
   // Callbacks
-  public onMessage?: (msg: LiveMessageEvent) => void;
+  public onMessage?: (msg: ILiveMessageEvent) => void;
   public onModelTurnComplete?: () => void;
 
   constructor() {}

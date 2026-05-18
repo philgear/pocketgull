@@ -1,13 +1,13 @@
 import { Injectable, signal, effect, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  public currentTheme = signal<AppTheme>('system');
+  public currentTheme = signal<AppTheme>('light');
   public activeTheme = signal<'light' | 'dark'>('light');
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
@@ -34,7 +34,7 @@ export class ThemeService {
     if (savedTheme) {
       this.currentTheme.set(savedTheme);
     } else {
-      this.currentTheme.set('system');
+      this.currentTheme.set('light');
     }
 
     // Listen to OS prefers-color-scheme changes
@@ -54,6 +54,8 @@ export class ThemeService {
     if (theme === 'system') {
       const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       this.activeTheme.set(isSystemDark ? 'dark' : 'light');
+    } else if (theme === 'spark') {
+      this.activeTheme.set('dark');
     } else {
       this.activeTheme.set(theme);
     }
@@ -62,15 +64,24 @@ export class ThemeService {
   private applyThemeToDom(resolvedTheme: 'light' | 'dark') {
     if (typeof document === 'undefined') return;
     
-    if (resolvedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
+    // Always remove existing classes first to clean up state
+    document.documentElement.classList.remove('dark', 'theme-spark');
+    
+    const theme = this.currentTheme();
+    if (theme === 'spark') {
+      document.documentElement.classList.add('dark', 'theme-spark');
       // Update meta theme-color for PWA
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#0a0503'); // Custom dark copper/ember background
+      }
+    } else if (resolvedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
         metaThemeColor.setAttribute('content', '#111827');
       }
     } else {
-      document.documentElement.classList.remove('dark');
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
         metaThemeColor.setAttribute('content', '#1C1C1C'); 

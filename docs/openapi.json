@@ -1,0 +1,371 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Pocket Gull Node.js Express Gateway",
+    "version": "1.0.0",
+    "description": "API Gateway for Pocket Gull - handles secrets, patient state sync, and PubMed proxy services."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "/api",
+      "description": "Relative URL (Proxied via Frontend)"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check Endpoint",
+        "description": "Determines if the Express gateway is online and functional.",
+        "responses": {
+          "200": {
+            "description": "Server is healthy",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "example": "OK"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pubmed/search": {
+      "get": {
+        "summary": "PubMed Search Proxy",
+        "description": "Queries the NCBI Entrez PubMed database for articles using a search term.",
+        "parameters": [
+          {
+            "name": "term",
+            "in": "query",
+            "required": true,
+            "description": "The search query (e.g., 'hypothyroidism symptoms')",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of PubMed search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "esearchresult": {
+                      "type": "object",
+                      "properties": {
+                        "count": { "type": "string" },
+                        "retmax": { "type": "string" },
+                        "retstart": { "type": "string" },
+                        "idlist": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing search term",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "Term is required" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/pubmed/summary": {
+      "get": {
+        "summary": "PubMed Summary Proxy",
+        "description": "Retrieves the detail summaries for a list of PubMed article IDs.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated PubMed IDs (e.g., '32912445,31023902')",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of PubMed article summaries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "uid": { "type": "string" },
+                          "title": { "type": "string" },
+                          "pubdate": { "type": "string" },
+                          "source": { "type": "string" },
+                          "authors": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": { "type": "string" },
+                                "authtype": { "type": "string" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string", "example": "ID is required" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/patients": {
+      "get": {
+        "summary": "Get All Patients",
+        "description": "Retrieves all synced patient structures currently stored in the JSON database file.",
+        "responses": {
+          "200": {
+            "description": "A JSON array of patients",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Patient"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error reading database"
+          }
+        }
+      },
+      "post": {
+        "summary": "Overwrite/Sync All Patients",
+        "description": "Completely overwrites the existing patients database with an updated array from the client.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Patient"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully saved database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "count": { "type": "integer", "example": 12 }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body"
+          },
+          "500": {
+            "description": "Error saving database"
+          }
+        }
+      }
+    },
+    "/api/patients/{id}": {
+      "put": {
+        "summary": "Sync or Create Patient by ID",
+        "description": "Upserts a specific patient object by its unique ID. Ensures changes match the local state in the mobile/web app.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the patient to upsert",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Patient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully upserted patient",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "patient": {
+                      "$ref": "#/components/schemas/Patient"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid patient object"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/api/healthcare/fhir/export": {
+      "post": {
+        "summary": "Synchronize Patient to Google Cloud Healthcare FHIR Store",
+        "description": "Transforms demographic details, conditions, and vitals from the local patient record into standard FHIR R4 Patient, Condition, and Observation resources, then synchronizes them to the GCP Healthcare FHIR Store via high-performance upsert PUT requests.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Patient"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Synchronization successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Patient record successfully synchronized to Google Cloud Healthcare FHIR Store." },
+                    "conditionsSynced": { "type": "integer", "example": 3 },
+                    "observationsSynced": { "type": "integer", "example": 6 }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing Project ID or malformed request"
+          },
+          "500": {
+            "description": "Internal or Google Cloud Healthcare API Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Patient": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the patient",
+            "example": "pat_88f99e3a"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the patient",
+            "example": "Jane Doe"
+          },
+          "age": {
+            "type": "integer",
+            "example": 42
+          },
+          "vitals": {
+            "type": "object",
+            "properties": {
+              "bp": { "type": "string", "example": "120/80" },
+              "hr": { "type": "string", "example": "72" },
+              "temp": { "type": "string", "example": "98.6" },
+              "spO2": { "type": "string", "example": "98" },
+              "weight": { "type": "string", "example": "68kg" },
+              "height": { "type": "string", "example": "165cm" }
+            }
+          },
+          "symptoms": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["fatigue", "brain fog", "joint stiffness"]
+          },
+          "conditions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "example": ["Hypothyroidism", "Vitamin D deficiency"]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-05-18T05:00:00Z"
+          }
+        }
+      }
+    }
+  }
+}
