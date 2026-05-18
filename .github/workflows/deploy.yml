@@ -82,4 +82,4 @@ jobs:
           env_vars: |
             NODE_ENV=production
           # Secure deployment flags + GEMINI API Key binding
-          flags: '--allow-unauthenticated --vpc-egress=private-ranges-only --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'
+          flags: '--vpc-egress=private-ranges-only --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'
