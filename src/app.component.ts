@@ -34,6 +34,7 @@ import { AvsTherapyComponent } from './components/avs-therapy.component';
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 import { AvsUiService } from './services/avs-ui.service';
 import { GlobalAvsService } from './services/global-avs.service';
+import { PetAuditoryService } from './services/pet-auditory.service';
 
 @Component({
   selector: 'app-root',
@@ -728,6 +729,31 @@ import { GlobalAvsService } from './services/global-avs.service';
                     Mandarin
                   </button>
                 </div>
+
+                <!-- Pet Auditory Modes -->
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
+                  <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Animal Comfort Protocols</p>
+                  <div class="flex flex-wrap gap-2">
+                    <button (click)="petAuditory.playCanineHeartbeat()" 
+                      [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-[#ff4500] text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300'"
+                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M3 12c0-3 2-6 5-6s5 3 5 3 2-3 5-3 5 3 5 6"/></svg>
+                      Canine Comfort
+                    </button>
+                    <button (click)="petAuditory.playFelinePurr()"
+                      [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-[#ff4500] text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300'"
+                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                      Feline Comfort
+                    </button>
+                    @if(petAuditory.isCurrentlyPlaying) {
+                      <button (click)="petAuditory.stop()" class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all">
+                        Stop
+                      </button>
+                    }
+                  </div>
+                </div>
+
               </div>
 
               <!-- PRINT STRATEGY OPTIONS -->
@@ -890,8 +916,8 @@ import { GlobalAvsService } from './services/global-avs.service';
 export class AppComponent implements OnDestroy {
   public tour = inject(WalkthroughTourService);
   public avsUi = inject(AvsUiService);
-  /** GlobalAvsService bootstraps itself via effect(); inject here to instantiate eagerly. */
   public readonly globalAvs = inject(GlobalAvsService);
+  public readonly petAuditory = inject(PetAuditoryService);
   state = inject(PatientStateService);
   public theme = inject(ThemeService);
   private ngZone = inject(NgZone);
