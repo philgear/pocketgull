@@ -60,8 +60,8 @@ jobs:
         
       - name: Build and Push Docker Image
         run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev
-          IMAGE_PATH=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr
+          gcloud auth configure-docker gcr.io
+          IMAGE_PATH=gcr.io/${{ secrets.GCP_PROJECT_ID }}/pocket-gull
           
           # Docker caching for faster builds
           docker pull $IMAGE_PATH:latest || true
@@ -78,7 +78,7 @@ jobs:
         with:
           service: 'pocket-gull-v2'
           region: 'us-central1'
-          image: 'us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }}'
+          image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/pocket-gull:${{ github.sha }}'
           env_vars: |
             NODE_ENV=production
           # Secure deployment flags + GEMINI API Key binding
