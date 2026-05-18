@@ -21,9 +21,9 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
               Active Room
             </span>
             <div class="flex items-center gap-3">
-              <button (click)="activeView.set('tasks')" [class.text-gray-400]="activeView() !== 'tasks'" [class.dark:text-zinc-500]="activeView() !== 'tasks'" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100">Tasks & Notes</button>
+              <button (click)="activeView.set('tasks')" [class.text-gray-400]="activeView() !== 'tasks'" [ngClass]="{'dark:text-zinc-500': activeView() !== 'tasks'}" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100">Tasks & Notes</button>
               <span class="text-gray-300 dark:text-zinc-700 text-xl font-light">|</span>
-              <button (click)="activeView.set('collab')" [class.text-gray-400]="activeView() !== 'collab'" [class.dark:text-zinc-500]="activeView() !== 'collab'" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100 flex items-center gap-2">
+              <button (click)="activeView.set('collab')" [class.text-gray-400]="activeView() !== 'collab'" [ngClass]="{'dark:text-zinc-500': activeView() !== 'collab'}" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100 flex items-center gap-2">
                 Colleague Chat
                 <span class="flex -space-x-2">
                   <div class="w-6 h-6 rounded-full bg-blue-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[8px] font-bold text-blue-700 z-20 shadow-sm">SC</div>
@@ -189,8 +189,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                      <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-600">{{ msg.time }}</span>
                    </div>
                    <div class="px-4 py-2.5 rounded-2xl text-sm shadow-sm"
-                     [class.bg-[#1C1C1C]]="msg.isSelf" [class.text-white]="msg.isSelf" [class.rounded-br-sm]="msg.isSelf" [class.dark:bg-zinc-800]="msg.isSelf"
-                     [class.bg-white]="!msg.isSelf" [class.dark:bg-zinc-900]="!msg.isSelf" [class.text-gray-800]="!msg.isSelf" [class.dark:text-zinc-200]="!msg.isSelf" [class.border]="!msg.isSelf" [class.border-gray-100]="!msg.isSelf" [class.dark:border-zinc-800]="!msg.isSelf" [class.rounded-bl-sm]="!msg.isSelf">
+                     [class.bg-[#1C1C1C]]="msg.isSelf" [class.text-white]="msg.isSelf" [class.rounded-br-sm]="msg.isSelf" [ngClass]="{'dark:bg-zinc-800': msg.isSelf}"
+                     [class.bg-white]="!msg.isSelf" [ngClass]="{'dark:bg-zinc-900': !msg.isSelf}" [class.text-gray-800]="!msg.isSelf" [ngClass]="{'dark:text-zinc-200': !msg.isSelf}" [class.border]="!msg.isSelf" [class.border-gray-100]="!msg.isSelf" [ngClass]="{'dark:border-zinc-800': !msg.isSelf}" [class.rounded-bl-sm]="!msg.isSelf">
                      {{ msg.text }}
                    </div>
                  </div>

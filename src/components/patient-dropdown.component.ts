@@ -52,15 +52,29 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 
           <div class="py-1 overflow-y-auto flex-1 group/list">
             @for (patient of filteredPatients(); track patient.id) {
-              <button (click)="selectPatient(patient.id)" class="group w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:bg-[#F8F9FA] dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white flex items-center gap-3 transition-colors relative border-l-4" [class.bg-brand-blue-50]="patient.id === patientManagement.selectedPatientId()" [class.dark:bg-[#689F38]/10]="patient.id === patientManagement.selectedPatientId()" [class.border-[#689F38]]="patient.id === patientManagement.selectedPatientId()" [class.border-transparent]="patient.id !== patientManagement.selectedPatientId()">
+              <div role="button" tabindex="0"
+                   (click)="selectPatient(patient.id)"
+                   (keydown.enter)="selectPatient(patient.id)"
+                   (keydown.space)="selectPatient(patient.id)"
+                   class="group w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:bg-[#F8F9FA] dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white flex items-center gap-3 transition-colors relative border-l-4 cursor-pointer"
+                   [ngClass]="patient.id === patientManagement.selectedPatientId() ? {
+                     'bg-brand-blue-50': true,
+                     'dark:bg-[#689F38]/10': true,
+                     'border-[#689F38]': true
+                   } : {
+                     'border-transparent': true
+                   }">
                 
                 <div class="w-8 h-8 rounded-sm flex items-center justify-center text-xs shrink-0 font-bold shadow-sm"
-                     [class.bg-[#689F38]]="patient.id === patientManagement.selectedPatientId()"
-                     [class.text-white]="patient.id === patientManagement.selectedPatientId()"
-                     [class.bg-gray-200]="patient.id !== patientManagement.selectedPatientId()"
-                     [class.dark:bg-zinc-700]="patient.id !== patientManagement.selectedPatientId()"
-                     [class.text-gray-600]="patient.id !== patientManagement.selectedPatientId()"
-                     [class.dark:text-zinc-300]="patient.id !== patientManagement.selectedPatientId()">
+                     [ngClass]="patient.id === patientManagement.selectedPatientId() ? {
+                       'bg-[#689F38]': true,
+                       'text-white': true
+                     } : {
+                       'bg-gray-200': true,
+                       'text-gray-600': true,
+                       'dark:bg-zinc-700': true,
+                       'dark:text-zinc-300': true
+                     }">
                   {{ patient.name.charAt(0) }}
                 </div>
                 <div class="min-w-0 flex-1">
@@ -80,7 +94,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                   </svg>
                 </button>
-              </button>
+              </div>
             }
             @if (filteredPatients().length === 0) {
               <div class="px-4 py-6 text-center text-sm text-gray-500 dark:text-zinc-400">

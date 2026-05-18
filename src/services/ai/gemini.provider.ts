@@ -106,7 +106,7 @@ export class GeminiProvider implements IIntelligenceProvider {
             certainty: z.number().min(0).max(10)
         });
 
-        return ClinicalMetricsSchema.parse(data);
+        return ClinicalMetricsSchema.parse(data) as IClinicalMetrics;
     }
 
     async detectClinicalChanges(oldData: string, newData: string): Promise<boolean> {

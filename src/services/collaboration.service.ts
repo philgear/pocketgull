@@ -1,7 +1,7 @@
-import { Injectable, signal, effect, inject } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { io, Socket } from 'socket.io-client';
 import { PatientStateService } from './patient-state.service';
-import { AuthService } from './auth.service';
 import { IPatientVitals } from './patient.types';
 
 export interface CollaborationNote {
@@ -17,26 +17,54 @@ export interface CollaborationNote {
 export class CollaborationService {
   private socket: Socket | null = null;
   private patientState = inject(PatientStateService);
-  private auth = inject(AuthService);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly isBrowser = isPlatformBrowser(this.platformId);
 
   // Reactive State using Signals
   activeClinicians = signal<string[]>([]);
   collaborationNotes = signal<CollaborationNote[]>([]);
   isConnected = signal<boolean>(false);
 
-  // In this architecture, patient state is global for the current session
   private readonly SESSION_ROOM_ID = 'global-clinical-room';
 
   constructor() {
-    this.connect();
+    // Only attempt socket.io in the browser, and only when the server
+    // is actually running (production / npm run preview).
+    // In npm run dev the Angular dev server does not mount socket.io,
+    // so we probe /socket.io/ping before connecting to avoid the
+    // console flood of 404 reconnection attempts.
+    if (this.isBrowser) {
+      this.probeAndConnect();
+    }
+  }
+
+  /**
+   * Lightweight probe: hit the socket.io handshake endpoint once.
+   * If the server responds, proceed to connect. If it 404s or errors,
+   * silently skip — collaboration is unavailable in this environment.
+   */
+  private probeAndConnect(): void {
+    fetch('/socket.io/?EIO=4&transport=polling', { method: 'GET' })
+      .then(res => {
+        if (res.ok || res.status === 400) {
+          // 400 = socket.io responded (wrong protocol version is still "up")
+          this.connect();
+        }
+        // 404 = not mounted (dev server) — stay silent
+      })
+      .catch(() => {
+        // Network error / not running — stay silent
+      });
   }
 
   private connect(): void {
     if (this.socket) return;
 
     this.socket = io({
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: 3,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
+      timeout: 5000,
     });
 
     this.socket.on('connect', () => {
@@ -45,24 +73,24 @@ export class CollaborationService {
       this.joinRoom();
     });
 
+    this.socket.on('connect_error', () => {
+      // Swallow — reconnectionAttempts will exhaust silently
+    });
+
     this.socket.on('disconnect', () => {
       console.log('[CollaborationService] Disconnected.');
       this.isConnected.set(false);
       this.activeClinicians.set([]);
     });
 
-    // Listen for incoming vitals
     this.socket.on('vitals_updated', (vitals: Partial<IPatientVitals>) => {
-      console.log('[CollaborationService] Received vitals update:', vitals);
       this.patientState.vitals.update(current => ({ ...current, ...vitals }));
     });
 
-    // Listen for chat notes from other clinicians
     this.socket.on('note_received', (note: CollaborationNote) => {
       this.collaborationNotes.update(notes => [...notes, note]);
     });
 
-    // Listen for presence updates
     this.socket.on('presence_updated', (clinicianName: string) => {
       this.activeClinicians.update(clinicians => {
         if (!clinicians.includes(clinicianName)) {
@@ -75,17 +103,15 @@ export class CollaborationService {
 
   private joinRoom(): void {
     if (!this.socket) return;
-    
     this.socket.emit('join_patient_room', this.SESSION_ROOM_ID);
-    
-    // Announce our presence to others in the room
-    // Mock user for now since AuthService might not have currentUser()
-    const clinicianName = 'Dr. Colleague'; 
-    this.socket.emit('presence_update', { patientId: this.SESSION_ROOM_ID, clinician: clinicianName });
+    this.socket.emit('presence_update', {
+      patientId: this.SESSION_ROOM_ID,
+      clinician: 'Dr. Colleague'
+    });
   }
 
   public sendNote(text: string): void {
-    if (!this.socket) return;
+    if (!this.socket || !this.isConnected()) return;
 
     const newNote: CollaborationNote = {
       id: crypto.randomUUID(),
@@ -95,20 +121,12 @@ export class CollaborationService {
     };
 
     this.collaborationNotes.update(notes => [...notes, newNote]);
-
-    this.socket.emit('send_note', {
-      patientId: this.SESSION_ROOM_ID,
-      note: newNote
-    });
+    this.socket.emit('send_note', { patientId: this.SESSION_ROOM_ID, note: newNote });
   }
 
   public syncVitals(vitals: Partial<IPatientVitals>): void {
-    if (!this.socket) return;
-
-    this.socket.emit('sync_vitals', {
-      patientId: this.SESSION_ROOM_ID,
-      vitals
-    });
+    if (!this.socket || !this.isConnected()) return;
+    this.socket.emit('sync_vitals', { patientId: this.SESSION_ROOM_ID, vitals });
   }
 
   public disconnect(): void {

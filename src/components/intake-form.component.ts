@@ -302,7 +302,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
                             <div class="absolute left-[7px] top-2.5 w-2.5 h-2.5 rounded-sm border-2 bg-white dark:bg-zinc-950 z-10 transition-colors"
                                 [class.border-[#689F38]]="timelineNote.isCurrent"
                                 [class.border-gray-300]="!timelineNote.isCurrent"
-                                [class.dark:border-zinc-700]="!timelineNote.isCurrent"
+                                [ngClass]="{'dark:border-zinc-700': !timelineNote.isCurrent}"
                                 [class.bg-[#689F38]]="timelineNote.noteId === state.selectedNoteId()">
                             </div>
                             
@@ -310,7 +310,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
                             <button (click)="selectNote(timelineNote.noteId)" 
                                     class="w-full text-left p-3 rounded-lg border transition-all duration-200 hover:shadow-md group-hover:border-gray-300 dark:border-zinc-800 dark:hover:border-zinc-600"
                                     [class.bg-white]="timelineNote.noteId !== state.selectedNoteId()"
-                                    [class.dark:bg-zinc-900]="timelineNote.noteId !== state.selectedNoteId()"
+                                    [ngClass]="{'dark:bg-zinc-900': timelineNote.noteId !== state.selectedNoteId()}"
                                     [class.bg-[#F1F8E9]]="timelineNote.noteId === state.selectedNoteId()"
                                     [class.dark:bg-[#1a2e0530]]="timelineNote.noteId === state.selectedNoteId()"
                                     [class.border-[#689F38]]="timelineNote.noteId === state.selectedNoteId()"
@@ -322,7 +322,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
                                        [class.text-[#416B1F]]="timelineNote.isCurrent"
                                        [class.dark:text-[#8bc34a]]="timelineNote.isCurrent"
                                        [class.text-gray-500]="!timelineNote.isCurrent"
-                                       [class.dark:text-zinc-400]="!timelineNote.isCurrent">
+                                       [ngClass]="{'dark:text-zinc-400': !timelineNote.isCurrent}">
                                         {{ timelineNote.date }}
                                     </span>
                                     <span class="text-xs font-bold px-1.5 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400">

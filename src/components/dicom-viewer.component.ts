@@ -46,11 +46,11 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
               <div class="p-3 rounded-lg border cursor-pointer transition-all active:scale-[0.98]"
                    [class.border-blue-500]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
                    [class.bg-blue-50]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
-                   [class.dark:bg-blue-900/20]="selectedStudy()?.studyInstanceUid === study.studyInstanceUid"
+                   [ngClass]="{'dark:bg-blue-900/20': selectedStudy()?.studyInstanceUid === study.studyInstanceUid}"
                    [class.border-zinc-200]="selectedStudy()?.studyInstanceUid !== study.studyInstanceUid"
-                   [class.dark:border-zinc-800]="selectedStudy()?.studyInstanceUid !== study.studyInstanceUid"
-                   [class.hover:border-zinc-300]="selectedStudy()?.studyInstanceUid !== study.studyInstanceUid"
-                   [class.dark:hover:border-zinc-700]="selectedStudy()?.studyInstanceUid !== study.studyInstanceUid"
+                   [ngClass]="{'dark:border-zinc-800': selectedStudy()?.studyInstanceUid !== study.studyInstanceUid}"
+                   [ngClass]="{'hover:border-zinc-300': selectedStudy()?.studyInstanceUid !== study.studyInstanceUid}"
+                   [ngClass]="{'dark:hover:border-zinc-700': selectedStudy()?.studyInstanceUid !== study.studyInstanceUid}"
                    (click)="selectStudy(study)">
                 <div class="flex justify-between items-start mb-1">
                   <div class="font-medium text-sm text-zinc-900 dark:text-zinc-100 truncate pr-2" title="{{ study.patientName }}">
@@ -87,7 +87,7 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
                       [disabled]="isAnalyzing()"
                       class="flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition-all active:scale-95"
                       [class.bg-blue-600]="!isAnalyzing()"
-                      [class.hover:bg-blue-500]="!isAnalyzing()"
+                      [ngClass]="{'hover:bg-blue-500': !isAnalyzing()}"
                       [class.text-white]="!isAnalyzing()"
                       [class.bg-zinc-800]="isAnalyzing()"
                       [class.text-zinc-400]="isAnalyzing()">

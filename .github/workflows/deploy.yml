@@ -83,3 +83,4 @@ jobs:
             NODE_ENV=production
           # Secure deployment flags + GEMINI API Key binding
           flags: '--vpc-egress=private-ranges-only --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'
+          project_id: '${{ secrets.GCP_PROJECT_ID }}'

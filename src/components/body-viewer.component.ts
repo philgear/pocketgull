@@ -30,11 +30,11 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
         <div class="absolute top-4 right-4 flex flex-col gap-2 z-20 no-print">
           <!-- View Modes -->
           <div class="flex flex-col gap-1 bg-white dark:bg-zinc-800 p-1 rounded-sm shadow-sm border border-[#EEEEEE] dark:border-zinc-700">
-            <button (click)="state.bodyViewerMode.set('3d')" [class.bg-black]="state.bodyViewerMode() === '3d'" [class.dark:bg-white]="state.bodyViewerMode() === '3d'" [class.text-white]="state.bodyViewerMode() === '3d'" [class.dark:text-black]="state.bodyViewerMode() === '3d'"
+            <button (click)="state.bodyViewerMode.set('3d')" [class.bg-black]="state.bodyViewerMode() === '3d'" [ngClass]="{'dark:bg-white': state.bodyViewerMode() === '3d'}" [class.text-white]="state.bodyViewerMode() === '3d'" [ngClass]="{'dark:text-black': state.bodyViewerMode() === '3d'}"
                     title="3D View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
             </button>
-            <button (click)="state.bodyViewerMode.set('2d')" [class.bg-black]="state.bodyViewerMode() === '2d'" [class.dark:bg-white]="state.bodyViewerMode() === '2d'" [class.text-white]="state.bodyViewerMode() === '2d'" [class.dark:text-black]="state.bodyViewerMode() === '2d'"
+            <button (click)="state.bodyViewerMode.set('2d')" [class.bg-black]="state.bodyViewerMode() === '2d'" [ngClass]="{'dark:bg-white': state.bodyViewerMode() === '2d'}" [class.text-white]="state.bodyViewerMode() === '2d'" [ngClass]="{'dark:text-black': state.bodyViewerMode() === '2d'}"
                     title="2D View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
             </button>
@@ -42,28 +42,28 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
 
           <!-- Anatomy Layers -->
           <div class="flex flex-col gap-1 bg-white dark:bg-zinc-800 p-1 rounded-sm shadow-sm border border-[#EEEEEE] dark:border-zinc-700">
-            <button (click)="state.anatomyViewMode.set('skin')" [class.bg-black]="state.anatomyViewMode() === 'skin'" [class.dark:bg-white]="state.anatomyViewMode() === 'skin'" [class.text-white]="state.anatomyViewMode() === 'skin'" [class.dark:text-black]="state.anatomyViewMode() === 'skin'"
+            <button (click)="state.anatomyViewMode.set('skin')" [class.bg-black]="state.anatomyViewMode() === 'skin'" [ngClass]="{'dark:bg-white': state.anatomyViewMode() === 'skin'}" [class.text-white]="state.anatomyViewMode() === 'skin'" [ngClass]="{'dark:text-black': state.anatomyViewMode() === 'skin'}"
                     title="Skin View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-black]="state.anatomyViewMode() === 'muscle'" [class.dark:bg-white]="state.anatomyViewMode() === 'muscle'" [class.text-white]="state.anatomyViewMode() === 'muscle'" [class.dark:text-black]="state.anatomyViewMode() === 'muscle'"
+            <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-black]="state.anatomyViewMode() === 'muscle'" [ngClass]="{'dark:bg-white': state.anatomyViewMode() === 'muscle'}" [class.text-white]="state.anatomyViewMode() === 'muscle'" [ngClass]="{'dark:text-black': state.anatomyViewMode() === 'muscle'}"
                     title="Muscle View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="6.5"></line></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-black]="state.anatomyViewMode() === 'skeleton'" [class.dark:bg-white]="state.anatomyViewMode() === 'skeleton'" [class.text-white]="state.anatomyViewMode() === 'skeleton'" [class.dark:text-black]="state.anatomyViewMode() === 'skeleton'"
+            <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-black]="state.anatomyViewMode() === 'skeleton'" [ngClass]="{'dark:bg-white': state.anatomyViewMode() === 'skeleton'}" [class.text-white]="state.anatomyViewMode() === 'skeleton'" [ngClass]="{'dark:text-black': state.anatomyViewMode() === 'skeleton'}"
                     title="Skeletal View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 2v20"></path><path d="M7 7h10"></path><path d="M5 12h14"></path><path d="M7 17h10"></path></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('organs')" [class.bg-black]="state.anatomyViewMode() === 'organs'" [class.dark:bg-white]="state.anatomyViewMode() === 'organs'" [class.text-white]="state.anatomyViewMode() === 'organs'" [class.dark:text-black]="state.anatomyViewMode() === 'organs'"
+            <button (click)="state.anatomyViewMode.set('organs')" [class.bg-black]="state.anatomyViewMode() === 'organs'" [ngClass]="{'dark:bg-white': state.anatomyViewMode() === 'organs'}" [class.text-white]="state.anatomyViewMode() === 'organs'" [ngClass]="{'dark:text-black': state.anatomyViewMode() === 'organs'}"
                     title="Organ View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('molecular')" [class.bg-black]="state.anatomyViewMode() === 'molecular'" [class.dark:bg-white]="state.anatomyViewMode() === 'molecular'" [class.text-white]="state.anatomyViewMode() === 'molecular'" [class.dark:text-black]="state.anatomyViewMode() === 'molecular'"
+            <button (click)="state.anatomyViewMode.set('molecular')" [class.bg-black]="state.anatomyViewMode() === 'molecular'" [ngClass]="{'dark:bg-white': state.anatomyViewMode() === 'molecular'}" [class.text-white]="state.anatomyViewMode() === 'molecular'" [ngClass]="{'dark:text-black': state.anatomyViewMode() === 'molecular'}"
                     title="Molecular View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="3"></circle><path d="m14 14 6 6"></path><circle cx="20" cy="20" r="3"></circle><path d="m14 10 6-6"></path><circle cx="20" cy="4" r="3"></circle><path d="m10 14-6 6"></path><circle cx="4" cy="20" r="3"></circle><path d="m10 10-6-6"></path><circle cx="4" cy="4" r="3"></circle></svg>
             </button>
             <!-- Ghost Reference Overlay -->
-            <button (click)="state.showGhostOverlay.update(v => !v)"
+            <button (click)="toggleGhostOverlay()"
                     [class.bg-indigo-600]="state.showGhostOverlay()"
                     [class.text-white]="state.showGhostOverlay()"
                     title="Toggle ghost reference overlay (healthy-baseline comparison)"
@@ -309,6 +309,7 @@ export class BodyViewerComponent implements OnDestroy {
     this.tooltipVisible.set(false);
   }
 
+  toggleGhostOverlay() { this.state.showGhostOverlay.update(v => !v); }
   zoomIn() { this.manualZoom.update(z => parseFloat((z + 0.1).toFixed(2))); }
   zoomOut() { this.manualZoom.update(z => parseFloat(Math.max(z - 0.1, 0.5).toFixed(2))); }
   resetControls() { this.manualZoom.set(1); }

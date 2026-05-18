@@ -1,7 +1,9 @@
 ---
 layout: ../layouts/DocsLayout.astro
 title: Changelog
+description: "All notable changes to Pocket Gull, by version."
 ---
+import DocNode from '../components/DocNode.astro';
 
 # Changelog
 
@@ -10,45 +12,108 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## v0.9.0 — 2026-05-18
+## v1.0.0 — 2026-05-18
 
-**Multilingual Care Plans & Orthomolecular Profiling**
+**Angular 19 Build Hardening & Platform Polish**
+
+### Fixed
+- **Angular NG5002 Template Errors**: Resolved widespread `NG5002` parser errors caused by illegal characters (`:`, `/`, `[`) in `[class.xxx]` bindings. Migrated all affected bindings to `[ngClass]` object syntax.
+- **SSR Build Pipeline**: Resolved "Could not resolve 'url'" error from `@mlc-ai/web-llm` blocking the SSR build. Implemented a browser-safe `url` shim at `src/shims/url-shim.ts`.
+- **`GlobalAvsService` AudioNode Crash**: `ChannelMergerNode` was never instantiated before oscillators connected to it, causing a `TypeError` on every AVS session start. Fixed with correct `createChannelMerger(2)` placement and proper stereo gain routing.
+- **Split View Panel Collapse**: Replaced Tailwind `hidden` (which kills CSS transitions) with `max-width/opacity/overflow` inline styles on both columns, so `transition-all duration-500` now interpolates the collapse smoothly.
+- **Permissions-Policy Header**: Removed 6 deprecated features (`ambient-light-sensor`, `battery`, `document-domain`, `execution-while-not-rendered`, `execution-while-out-of-viewport`, `web-share`) that Chrome 120+ no longer recognizes.
+- **`CollaborationService` Dev Console Flood**: Added `probeAndConnect()` preflight — socket.io only connects after confirming the endpoint is mounted. Eliminates the 404 reconnection storm in `npm run dev`.
 
 ### Added
-- **Multilingual & Pediatric Care Plans**: Expanded the `translateReadingLevel` infrastructure across all providers to support Spanish, German, French, Mandarin, Dyslexia, and Pediatric formats.
-- **Security & Red Teaming Framework**: Implemented `SECURITY.md` and a Vitest automated red-teaming suite (`tests/safety.spec.ts`) to actively verify safety boundaries.
-- **Transparency Metadata**: Added `humans.txt`, `robots.txt`, `llms.txt`, and `sources.txt` to the public directory.
-- **Cloud Build Integration**: Created `cloudbuild.yaml` to automate Docker builds and Google Cloud Run deployment pipelines.
-- **Advanced Clinical Mock Data**: Expanded `MOCK_PATIENTS` with updated 2026 timestamps, Orthomolecular Biomarkers, and dedicated Pediatric and Multilingual test profiles.
-- **Animal Comfort Protocols**: Engineered a Web Audio API synthesizer (`PetAuditoryService`) within the Care Plan Export module to generate species-specific soothing frequencies (Feline Purr at 25Hz, Canine Heartbeat at 60 BPM) for pets left home during hospitalizations.
+- **Split View Entrance Animation**: New `split-view-enter` CSS keyframe with a spring overshoot (cubic-bezier `0.34, 1.36`) plays when split view opens. `showSplitView()` now measures the actual container for a true 50/50 layout split.
+- **Walkthrough Tour v2** (9 steps): Added AVS Therapy and Circadian/KSS steps; reordered for natural first-run flow. Updated step copy to reference Gemini 2.5 Flash and Evidence Focus by name.
+
+### Changed
+- **Permissions-Policy**: Cleaned to contain only current W3C Permissions Policy features.
+- **Documentation**: Updated `getting-started.mdx` (shims/, workers/, WIF CI/CD, security hardening). Updated `features.mdx` with full AVS, Circadian UI, KSS, Hue lighting, DSP sidecar, and Gemini Nano sections.
 
 ---
 
-## v0.1.0 — 2026-03-16
+## v0.9.0 — 2026-05-18
+
+**Multilingual Care Plans & Security Hardening**
+
+### Added
+- **Multilingual & Pediatric Care Plans**: Expanded `translateReadingLevel` across all providers — Spanish, German, French, Mandarin, Dyslexia, Pediatric.
+- **Security & Red Teaming**: `SECURITY.md` + Vitest red-teaming suite (`tests/safety.spec.ts`) to verify Gemini `BLOCK_MEDIUM_AND_ABOVE` safety thresholds.
+- **Transparency Metadata**: `humans.txt`, `robots.txt`, `llms.txt`, `sources.txt` in public directory.
+- **Cloud Build CI/CD**: `cloudbuild.yaml` for automated Docker → Cloud Run pipeline.
+- **Advanced Clinical Mock Data**: 2026-timestamped `MOCK_PATIENTS` with Orthomolecular Biomarkers, Pediatric and Multilingual test profiles.
+- **Animal Comfort Protocols**: `PetAuditoryService` — species-specific frequencies (Feline Purr 25 Hz, Canine Heartbeat 60 BPM) for companion animals during owner hospitalizations.
+
+---
+
+## v0.8.0 — 2026-05-18
+
+**Multi-Layer AVS Engine & Athletic Protocols**
+
+### Added
+- **Multi-Layer Hemi-Sync Audio**: Upgraded `GlobalAvsService` to a 4-oscillator phase-locked engine with clinical-grade Pink Noise synthesizer.
+- **Athletic Enhancement AVS**: `AthleticProtocolService` — Priming, Flow State, Recovery, and Phase-Shift protocols.
+- **Real-Time DSP Pipeline**: FastAPI sidecar processing HDF5 ECG streams via SciPy (HRV RMSSD, respiratory frequency).
+- **Philips Hue Local Relay**: `hue-relay.js` Node proxy resolves HTTPS mixed-content for local Hue hub communication.
+
+---
+
+## v0.7.0 — 2026-05-17
+
+**Circadian UI & Ambient Intelligence**
+
+### Added
+- **Circadian UI**: Continuous hardware-accelerated CSS variable system smoothly transitions ambient colors across the 24-hour cycle to offset clinician fatigue.
+- **KSS Readiness Gateway**: 9-point Karolinska Sleepiness Scale on the splash screen for clinician alertness check before session start.
+- **DOC Stimulation Protocols**: `DocProtocolService` — evidence-based stimulation guidelines for Disorders of Consciousness (Coma, VS/UWS, MCS).
+- **PWA Gemini Nano**: `HybridProvider` routes queries to Chrome's on-device `window.ai` Nano model when offline.
+- **Philips Hue Ambient Sync**: `AmbientLightingService` maps real-time circadian HSL values to physical Hue smart lights.
+
+---
+
+## v0.6.0 — 2026-05-17
+
+**Build Stability & SSR**
+
+### Added
+- **Monorepo Env Fallback**: `fetchGeminiApiKey()` searches `pocketgull_api/.env.local` as a fallback, removing the need for a root `.env.local` in dev.
+
+### Changed
+- **THREE.Clock → THREE.Timer**: Migrated `Body3DViewerComponent` to `THREE.Timer` for Three.js r183 compatibility.
+- **OHIF Viewer**: Replaced blocked iframe with a launch card that deep-links to OHIF in a new tab.
+- **Production Source Maps**: Disabled in `production` config to eliminate upstream Angular `init.mjs.map` warnings.
+
+### Fixed
+- **Angular Schema Validation**: Removed unsupported `server` property from `angular.json` `sourceMap` object.
+
+---
+
+## v0.5.0 — 2026-03-16
+
+**Branding, Domains & Print**
+
+### Added
+- Origami seagull branding in header and splash screen.
+- Custom domains `pocketgull.app` and `pocketgall.app` mapped to Cloud Run.
+- COCOMO II effort estimation script + Lighthouse audit npm script.
+
+### Fixed
+- Translation reversion bug in print preview modal.
+- Security headers: HSTS, Cross-Origin-Opener-Policy, X-Frame-Options.
+
+---
+
+## v0.1.0–0.4.0 — 2026-02-22 → 2026-03-12
 
 **Initial Release · Gemini Live Agent Challenge**
 
-### Added
-- **Live AI Clinical Co-Pilot** — Voice-first consult powered by `gemini-2.5-flash` and ADK `InMemoryRunner`
-- **3D Body Viewer** — Procedural skeletal + surface anatomy with severity particles (Three.js v0.183)
-- **Multi-Agent Orchestration** — Specialized `LlmAgent` experts: Overview, Interventions, Monitoring, Education
-- **Interactive Task Bracketing** — Double-click state machine (Normal → Added → Removed) for care plan review
-- **FHIR R4 Export** — Unicode-safe Base64 encoded Bundles for clinical portability
-- **FHIR Import Service** — Ingest Epic/MyChart "Lucy" format payloads
-- **PubMed E-utilities Integration** — Server-side research queries with anonymized PHI
-- **Google CSE Integration** — Differential diagnostic information via Programmable Search
-- **Box Breathing UX** — 16-second guided animation during high-stress intake encounters
-- **Printable Clinical Stationery** — CSS Grid halftone body maps with diagnostic overlays
-- **Responsive Design** — Two-column grid down to **286px** viewport (Pixel Watch 2)
-- **Dark Mode** — WCAG-compliant contrast with automatic detection
-- **Cognition & Child Export** — Dyslexia-friendly typography, carousel informatics PDF
-
-### Infrastructure
-- Express.js backend on **Google Cloud Run** with SSR + hydration
-- Automated deployment via `scripts/deploy.sh`
-- Lighthouse score: **100/100** (Performance, Accessibility, Best Practices, SEO)
-
-### Documentation
-- Astro-powered docs site with 8 pages
-- AI-powered DocNode evidence drill-down (Gemini API)
-- Version selector and prev/next navigation
+- Live AI Clinical Co-Pilot (Gemini 2.5 Flash + ADK)
+- 3D Body Viewer (Three.js v0.183), Multi-Agent Orchestration
+- Interactive Task Bracketing (double-click state machine)
+- FHIR R4 Export + Import (Epic/MyChart Lucy format)
+- PubMed E-utilities + Google CSE research integration
+- Box Breathing UX, Printable Clinical Stationery
+- Responsive design to 286px (Pixel Watch 2), Dark Mode
+- Express.js SSR on Google Cloud Run, Lighthouse 100/100

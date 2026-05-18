@@ -11,12 +11,12 @@ import { CommonModule } from '@angular/common';
             <div class="relative w-48 h-48 md:w-64 md:h-64 transition-all duration-500" [class.opacity-10]="hasChatHistory" [class.opacity-100]="!hasChatHistory">
                 <!-- Glowing Orb -->
                 <div class="absolute inset-0 rounded-full transition-all duration-500" 
-                     [class.bg-green-400/10]="agentState === 'idle'"
-                     [class.dark:bg-green-400/20]="agentState === 'idle'"
-                     [class.bg-blue-400/20]="agentState === 'listening'"
-                     [class.dark:bg-blue-400/30]="agentState === 'listening'"
-                     [class.bg-purple-400/20]="agentState === 'processing'"
-                     [class.dark:bg-purple-400/30]="agentState === 'processing'"
+                     [ngClass]="{'bg-green-400/10': agentState === 'idle'}"
+                     [ngClass]="{'dark:bg-green-400/20': agentState === 'idle'}"
+                     [ngClass]="{'bg-blue-400/20': agentState === 'listening'}"
+                     [ngClass]="{'dark:bg-blue-400/30': agentState === 'listening'}"
+                     [ngClass]="{'bg-purple-400/20': agentState === 'processing'}"
+                     [ngClass]="{'dark:bg-purple-400/30': agentState === 'processing'}"
                      [class.blur-2xl]="true"
                      [class.scale-100]="agentState === 'idle'"
                      [class.scale-125]="agentState !== 'idle'">

@@ -523,7 +523,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800"
           [class.active-breathing]="!hasDiscoveredEvidenceFocus()"
           [class.text-green-600]="!showChat()" [class.text-gray-500]="showChat()"
-          [class.dark:text-[#8bc34a]]="!showChat()" [class.dark:text-zinc-400]="showChat()"
+          [class.dark:text-[#8bc34a]]="!showChat()" [ngClass]="{'dark:text-zinc-400': showChat()}"
           [ariaLabel]="showChat() ? 'Close Agent' : 'Ask Agent'"
           [icon]="showChat() ? ClinicalIcons.Clear : ClinicalIcons.EvidenceFocus">
         </pocket-gull-button>
@@ -563,13 +563,13 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
       @if (node().verificationStatus !== 'verified' && node().verificationIssues?.length) {
         <div class="mt-2 p-3 rounded-sm border flex flex-col gap-2 no-print"
              [class.bg-red-50]="node().verificationStatus === 'error'"
-             [class.dark:bg-red-950]="node().verificationStatus === 'error'"
+             [ngClass]="{'dark:bg-red-950': node().verificationStatus === 'error'}"
              [class.border-red-100]="node().verificationStatus === 'error'"
-             [class.dark:border-red-900]="node().verificationStatus === 'error'"
+             [ngClass]="{'dark:border-red-900': node().verificationStatus === 'error'}"
              [class.bg-amber-50]="node().verificationStatus === 'warning'"
-             [class.dark:bg-amber-950]="node().verificationStatus === 'warning'"
+             [ngClass]="{'dark:bg-amber-950': node().verificationStatus === 'warning'}"
              [class.border-amber-100]="node().verificationStatus === 'warning'"
-             [class.dark:border-amber-900]="node().verificationStatus === 'warning'">
+             [ngClass]="{'dark:border-amber-900': node().verificationStatus === 'warning'}">
           <div class="flex items-center gap-2">
             <pocket-gull-badge
               [label]="node().verificationStatus === 'error' ? 'Critical Accuracy Error' : 'Accuracy Warning'"
@@ -582,9 +582,9 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
             @for (issue of node().verificationIssues; track issue.message) {
               <div class="flex items-start gap-2 text-xs">
                 <span [class.text-red-600]="node().verificationStatus === 'error'"
-                      [class.dark:text-red-400]="node().verificationStatus === 'error'"
+                      [ngClass]="{'dark:text-red-400': node().verificationStatus === 'error'}"
                       [class.text-amber-600]="node().verificationStatus === 'warning'"
-                      [class.dark:text-amber-400]="node().verificationStatus === 'warning'">•</span>
+                      [ngClass]="{'dark:text-amber-400': node().verificationStatus === 'warning'}">•</span>
                 <span class="text-gray-700 dark:text-zinc-300 leading-relaxed">{{ issue.message }}</span>
               </div>
             }
@@ -833,8 +833,8 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 
                     <!-- Feedback Actions -->
                     <div class="mt-2 flex items-center justify-end gap-2 border-t border-black/5 dark:border-white/5 pt-2">
-                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(msg)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-green-600]="msg.feedback === 'up'" [class.dark:text-green-400]="msg.feedback === 'up'"></pocket-gull-button>
-                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(msg)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-red-600]="msg.feedback === 'down'" [class.dark:text-red-400]="msg.feedback === 'down'"></pocket-gull-button>
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(msg)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-green-600]="msg.feedback === 'up'" [ngClass]="{'dark:text-green-400': msg.feedback === 'up'}"></pocket-gull-button>
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(msg)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-red-600]="msg.feedback === 'down'" [ngClass]="{'dark:text-red-400': msg.feedback === 'down'}"></pocket-gull-button>
                     </div>
 
                   </div>

@@ -51,21 +51,21 @@ export interface IPubMedSearchResult {
             <button (click)="setSearchEngine('google')"
                     class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'google'"
-                    [class.dark:bg-zinc-600]="searchEngine() === 'google'"
+                    [ngClass]="{'dark:bg-zinc-600': searchEngine() === 'google'}"
                     [class.text-gray-800]="searchEngine() === 'google'"
-                    [class.dark:text-white]="searchEngine() === 'google'"
+                    [ngClass]="{'dark:text-white': searchEngine() === 'google'}"
                     [class.text-gray-500]="searchEngine() !== 'google'"
-                    [class.dark:text-zinc-400]="searchEngine() !== 'google'">
+                    [ngClass]="{'dark:text-zinc-400': searchEngine() !== 'google'}">
               Google
             </button>
             <button (click)="setSearchEngine('pubmed')"
                     class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'pubmed'"
-                    [class.dark:bg-zinc-600]="searchEngine() === 'pubmed'"
+                    [ngClass]="{'dark:bg-zinc-600': searchEngine() === 'pubmed'}"
                     [class.text-gray-800]="searchEngine() === 'pubmed'"
-                    [class.dark:text-white]="searchEngine() === 'pubmed'"
+                    [ngClass]="{'dark:text-white': searchEngine() === 'pubmed'}"
                     [class.text-gray-500]="searchEngine() !== 'pubmed'"
-                    [class.dark:text-zinc-400]="searchEngine() !== 'pubmed'">
+                    [ngClass]="{'dark:text-zinc-400': searchEngine() !== 'pubmed'}">
               PubMed
             </button>
           </div>
@@ -83,7 +83,7 @@ export interface IPubMedSearchResult {
           </pocket-gull-button>
           <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="IBookmark current page" ariaLabel="IBookmark current page">
           </pocket-gull-button>
-          <pocket-gull-button variant="ghost" size="sm" (click)="showCitationForm.set(!showCitationForm())" [class.text-gray-800]="showCitationForm()" [class.dark:text-white]="showCitationForm()" icon="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" title="Citation Metadata" ariaLabel="Citation Metadata">
+          <pocket-gull-button variant="ghost" size="sm" (click)="showCitationForm.set(!showCitationForm())" [class.text-gray-800]="showCitationForm()" [ngClass]="{'dark:text-white': showCitationForm()}" icon="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" title="Citation Metadata" ariaLabel="Citation Metadata">
           </pocket-gull-button>
         </div>
 
@@ -117,14 +117,14 @@ export interface IPubMedSearchResult {
                 <button (click)="loadUrl(bookmark.url)" 
                         class="pl-2 pr-1 py-0.5 text-[11px] font-medium rounded-l-md transition-colors max-w-48 truncate flex items-center gap-1.5"
                         [class.bg-gray-800]="bookmark.cited"
-                        [class.dark:bg-zinc-700]="bookmark.cited"
+                        [ngClass]="{'dark:bg-zinc-700': bookmark.cited}"
                         [class.text-white]="bookmark.cited"
                         [class.bg-gray-100]="!bookmark.cited"
-                        [class.dark:bg-zinc-800]="!bookmark.cited"
+                        [ngClass]="{'dark:bg-zinc-800': !bookmark.cited}"
                         [class.text-gray-500]="!bookmark.cited"
-                        [class.dark:text-zinc-400]="!bookmark.cited"
-                        [class.hover:bg-gray-200]="!bookmark.cited"
-                        [class.dark:hover:bg-zinc-700]="!bookmark.cited">
+                        [ngClass]="{'dark:text-zinc-400': !bookmark.cited}"
+                        [ngClass]="{'hover:bg-gray-200': !bookmark.cited}"
+                        [ngClass]="{'dark:hover:bg-zinc-700': !bookmark.cited}">
                   @if (bookmark.isPeerReviewed) {
                     <svg class="w-3 h-3 opacity-80" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
                   }
@@ -133,12 +133,12 @@ export interface IPubMedSearchResult {
                 <button (click)="toggleCite(bookmark)"
                         class="px-1.5 py-0.5 text-[10px] uppercase font-black transition-colors border-r border-gray-200/20 dark:border-zinc-800/50"
                         [class.bg-gray-900]="bookmark.cited"
-                        [class.dark:bg-zinc-900]="bookmark.cited"
+                        [ngClass]="{'dark:bg-zinc-900': bookmark.cited}"
                         [class.text-white]="bookmark.cited"
                         [class.bg-gray-50]="!bookmark.cited"
-                        [class.dark:bg-zinc-800]="!bookmark.cited"
+                        [ngClass]="{'dark:bg-zinc-800': !bookmark.cited}"
                         [class.text-gray-500]="!bookmark.cited"
-                        [class.dark:text-zinc-400]="!bookmark.cited"
+                        [ngClass]="{'dark:text-zinc-400': !bookmark.cited}"
                         [title]="bookmark.cited ? 'Remove from summary references' : 'Include in summary references'">
                     {{ bookmark.cited ? 'CITED' : 'CITE' }}
                 </button>

@@ -25,7 +25,7 @@ import { DomSanitizer } from '@angular/platform-browser';
         <ng-content select="[right-action]"></ng-content>
       </div>
 
-      <div class="flex-grow min-w-0" [class.p-4]="!noPadding()" [class.sm:p-6]="!noPadding()">
+      <div class="flex-grow min-w-0" [class.p-4]="!noPadding()" [ngClass]="{'sm:p-6': !noPadding()}">
         <ng-content></ng-content>
       </div>
       

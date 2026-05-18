@@ -40,57 +40,57 @@ Chart.register(...registerables);
           <button (click)="activeMetric.set('hr')"
                   class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'hr'"
-                  [class.dark:bg-zinc-800]="activeMetric() === 'hr'"
+                  [ngClass]="{'dark:bg-zinc-800': activeMetric() === 'hr'}"
                   [class.text-gray-900]="activeMetric() === 'hr'"
-                  [class.dark:text-white]="activeMetric() === 'hr'"
+                  [ngClass]="{'dark:text-white': activeMetric() === 'hr'}"
                   [class.shadow-sm]="activeMetric() === 'hr'"
                   [class.text-gray-500]="activeMetric() !== 'hr'"
-                  [class.dark:text-zinc-500]="activeMetric() !== 'hr'">HR</button>
+                  [ngClass]="{'dark:text-zinc-500': activeMetric() !== 'hr'}">HR</button>
           <button (click)="activeMetric.set('bp')"
                   class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'bp'"
-                  [class.dark:bg-zinc-800]="activeMetric() === 'bp'"
+                  [ngClass]="{'dark:bg-zinc-800': activeMetric() === 'bp'}"
                   [class.text-gray-900]="activeMetric() === 'bp'"
-                  [class.dark:text-white]="activeMetric() === 'bp'"
+                  [ngClass]="{'dark:text-white': activeMetric() === 'bp'}"
                   [class.shadow-sm]="activeMetric() === 'bp'"
                   [class.text-gray-500]="activeMetric() !== 'bp'"
-                  [class.dark:text-zinc-500]="activeMetric() !== 'bp'">BP</button>
+                  [ngClass]="{'dark:text-zinc-500': activeMetric() !== 'bp'}">BP</button>
           <button (click)="activeMetric.set('spO2')"
                   class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'spO2'"
-                  [class.dark:bg-zinc-800]="activeMetric() === 'spO2'"
+                  [ngClass]="{'dark:bg-zinc-800': activeMetric() === 'spO2'}"
                   [class.text-gray-900]="activeMetric() === 'spO2'"
-                  [class.dark:text-white]="activeMetric() === 'spO2'"
+                  [ngClass]="{'dark:text-white': activeMetric() === 'spO2'}"
                   [class.shadow-sm]="activeMetric() === 'spO2'"
                   [class.text-gray-500]="activeMetric() !== 'spO2'"
-                  [class.dark:text-zinc-500]="activeMetric() !== 'spO2'">SpO2</button>
+                  [ngClass]="{'dark:text-zinc-500': activeMetric() !== 'spO2'}">SpO2</button>
           <button (click)="activeMetric.set('hrv')"
                   class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'hrv'"
-                  [class.dark:bg-zinc-800]="activeMetric() === 'hrv'"
+                  [ngClass]="{'dark:bg-zinc-800': activeMetric() === 'hrv'}"
                   [class.text-gray-900]="activeMetric() === 'hrv'"
-                  [class.dark:text-white]="activeMetric() === 'hrv'"
+                  [ngClass]="{'dark:text-white': activeMetric() === 'hrv'}"
                   [class.shadow-sm]="activeMetric() === 'hrv'"
                   [class.text-gray-500]="activeMetric() !== 'hrv'"
-                  [class.dark:text-zinc-500]="activeMetric() !== 'hrv'">HRV</button>
+                  [ngClass]="{'dark:text-zinc-500': activeMetric() !== 'hrv'}">HRV</button>
           <button (click)="activeMetric.set('coherence')"
                   class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'coherence'"
-                  [class.dark:bg-zinc-800]="activeMetric() === 'coherence'"
+                  [ngClass]="{'dark:bg-zinc-800': activeMetric() === 'coherence'}"
                   [class.text-gray-900]="activeMetric() === 'coherence'"
-                  [class.dark:text-white]="activeMetric() === 'coherence'"
+                  [ngClass]="{'dark:text-white': activeMetric() === 'coherence'}"
                   [class.shadow-sm]="activeMetric() === 'coherence'"
                   [class.text-gray-500]="activeMetric() !== 'coherence'"
-                  [class.dark:text-zinc-500]="activeMetric() !== 'coherence'">Coherence</button>
+                  [ngClass]="{'dark:text-zinc-500': activeMetric() !== 'coherence'}">Coherence</button>
           <button (click)="activeMetric.set('breathing')"
                   class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'breathing'"
-                  [class.dark:bg-zinc-800]="activeMetric() === 'breathing'"
+                  [ngClass]="{'dark:bg-zinc-800': activeMetric() === 'breathing'}"
                   [class.text-gray-900]="activeMetric() === 'breathing'"
-                  [class.dark:text-white]="activeMetric() === 'breathing'"
+                  [ngClass]="{'dark:text-white': activeMetric() === 'breathing'}"
                   [class.shadow-sm]="activeMetric() === 'breathing'"
                   [class.text-gray-500]="activeMetric() !== 'breathing'"
-                  [class.dark:text-zinc-500]="activeMetric() !== 'breathing'">Breath</button>
+                  [ngClass]="{'dark:text-zinc-500': activeMetric() !== 'breathing'}">Breath</button>
         </div>
       </div>
       

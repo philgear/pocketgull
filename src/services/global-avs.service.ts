@@ -223,12 +223,17 @@ export class GlobalAvsService {
       leftGain.gain.value  = 0.35;
       rightGain.gain.value = 0.35;
 
-      this.leftOsc1.connect(leftGain).connect(this.merger, 0, 0);
-      this.rightOsc1.connect(rightGain).connect(this.merger, 0, 1);
-      
-      this.leftOsc2.connect(leftGain).connect(this.merger, 0, 0);
-      this.rightOsc2.connect(rightGain).connect(this.merger, 0, 1);
-      
+      // Create the stereo merger now that the context exists
+      this.merger = this.ctx.createChannelMerger(2);
+
+      this.leftOsc1.connect(leftGain);
+      this.leftOsc2.connect(leftGain);
+      leftGain.connect(this.merger, 0, 0);
+
+      this.rightOsc1.connect(rightGain);
+      this.rightOsc2.connect(rightGain);
+      rightGain.connect(this.merger, 0, 1);
+
       this.merger.connect(this.masterGain);
 
       this.leftOsc1.start();

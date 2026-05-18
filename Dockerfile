@@ -16,4 +16,4 @@ RUN npm run build
 # Expose port and run
 EXPOSE 8080
 ENV PORT=8080
-CMD ["node", "dist/server/server.mjs"]
+CMD ["node", "dist/app/server/server.mjs"]

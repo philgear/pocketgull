@@ -34,11 +34,11 @@ interface BiomarkerStatus {
             @for (marker of biomarkers(); track marker.name) {
               <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md rounded-xl p-4 border transition-all hover:scale-105 shadow-sm"
                    [class.border-red-200]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                   [class.dark:border-red-900]="marker.level === 'Deficient' || marker.level === 'Excess'"
+                   [ngClass]="{'dark:border-red-900': marker.level === 'Deficient' || marker.level === 'Excess'}"
                    [class.border-yellow-200]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                   [class.dark:border-yellow-900]="marker.level === 'Sub-optimal' || marker.level === 'High'"
+                   [ngClass]="{'dark:border-yellow-900': marker.level === 'Sub-optimal' || marker.level === 'High'}"
                    [class.border-emerald-200]="marker.level === 'Optimal'"
-                   [class.dark:border-emerald-900]="marker.level === 'Optimal'">
+                   [ngClass]="{'dark:border-emerald-900': marker.level === 'Optimal'}">
                 
                 <div class="flex justify-between items-start mb-2">
                   <span class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate pr-2" [title]="marker.name">{{ marker.name }}</span>
@@ -50,11 +50,11 @@ interface BiomarkerStatus {
                 
                 <div class="text-[10px] font-black uppercase tracking-wider mb-2"
                      [class.text-red-600]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                     [class.dark:text-red-400]="marker.level === 'Deficient' || marker.level === 'Excess'"
+                     [ngClass]="{'dark:text-red-400': marker.level === 'Deficient' || marker.level === 'Excess'}"
                      [class.text-yellow-600]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                     [class.dark:text-yellow-400]="marker.level === 'Sub-optimal' || marker.level === 'High'"
+                     [ngClass]="{'dark:text-yellow-400': marker.level === 'Sub-optimal' || marker.level === 'High'}"
                      [class.text-emerald-600]="marker.level === 'Optimal'"
-                     [class.dark:text-emerald-400]="marker.level === 'Optimal'">
+                     [ngClass]="{'dark:text-emerald-400': marker.level === 'Optimal'}">
                   {{ marker.level }}
                 </div>
 

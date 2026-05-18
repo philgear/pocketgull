@@ -144,9 +144,9 @@ export interface IChatEntry {
                         <div class="relative w-48 h-48 md:w-64 md:h-64 transition-all duration-500" [class.opacity-10]="chatHistory().length > 0" [class.opacity-100]="chatHistory().length === 0">
                             <!-- Glowing Orb -->
                             <div class="absolute inset-0 rounded-full transition-all duration-75" 
-                                 [class.bg-green-400/10]="agentState() === 'idle'"
-                                 [class.bg-blue-400/20]="agentState() === 'listening'"
-                                 [class.bg-purple-400/20]="agentState() === 'processing'"
+                                 [ngClass]="{'bg-green-400/10': agentState() === 'idle'}"
+                                 [ngClass]="{'bg-blue-400/20': agentState() === 'listening'}"
+                                 [ngClass]="{'bg-purple-400/20': agentState() === 'processing'}"
                                  [class.blur-2xl]="agentState() === 'idle' || agentState() === 'processing'"
                                  [class.blur-xl]="agentState() === 'listening'"
                                  [style.transform]="agentState() === 'listening' ? 'scale(' + (1.25 + (live.volumeLevel() / 150)) + ')' : (agentState() === 'idle' ? 'scale(1)' : 'scale(1.25)')">
@@ -269,8 +269,8 @@ export interface IChatEntry {
                                         title="Start/Stop Voice Capture"
                                         class="w-12 h-12 flex items-center justify-center rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
                                         [class.bg-red-500]="live.isListening()" [class.text-white]="live.isListening()"
-                                        [class.bg-gray-100]="!live.isListening()" [class.dark:bg-zinc-800]="!live.isListening()" [class.text-gray-600]="!live.isListening()" [class.dark:text-zinc-300]="!live.isListening()"
-                                        [class.hover:bg-red-600]="live.isListening()" [class.hover:bg-gray-200]="!live.isListening()" [class.dark:hover:bg-zinc-700]="!live.isListening()">
+                                        [class.bg-gray-100]="!live.isListening()" [ngClass]="{'dark:bg-zinc-800': !live.isListening()}" [class.text-gray-600]="!live.isListening()" [ngClass]="{'dark:text-zinc-300': !live.isListening()}"
+                                        [ngClass]="{'hover:bg-red-600': live.isListening()}" [ngClass]="{'hover:bg-gray-200': !live.isListening()}" [ngClass]="{'dark:hover:bg-zinc-700': !live.isListening()}">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
                                 </button>
 
@@ -289,8 +289,8 @@ export interface IChatEntry {
 
                                  <button type="button" class="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
                                          (click)="isResearchMode.set(!isResearchMode())"
-                                         [class.bg-blue-100]="isResearchMode()" [class.dark:bg-blue-900]="isResearchMode()" [class.text-blue-600]="isResearchMode()" [class.dark:text-blue-300]="isResearchMode()"
-                                         [class.text-gray-500]="!isResearchMode()" [class.hover:bg-gray-100]="!isResearchMode()" [class.dark:hover:bg-zinc-800]="!isResearchMode()"
+                                         [class.bg-blue-100]="isResearchMode()" [ngClass]="{'dark:bg-blue-900': isResearchMode()}" [class.text-blue-600]="isResearchMode()" [ngClass]="{'dark:text-blue-300': isResearchMode()}"
+                                         [class.text-gray-500]="!isResearchMode()" [ngClass]="{'hover:bg-gray-100': !isResearchMode()}" [ngClass]="{'dark:hover:bg-zinc-800': !isResearchMode()}"
                                          [disabled]="agentState() !== 'idle'" title="Toggle Research Grounding">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                                 </button>

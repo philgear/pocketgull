@@ -15,7 +15,7 @@ import DocNode from '../components/DocNode.astro';
 ## Prerequisites
 
 - <DocNode term="Node.js" category="OpenJS Foundation" hint="JavaScript runtime built on Chrome's V8 engine. Originally created by Ryan Dahl in 2009. Pocket Gull requires v20+." link="https://nodejs.org/en/docs" linkLabel="nodejs.org →" icon="https://nodejs.org/favicon.ico">Node.js</DocNode> ≥ 20.0.0
-- npm
+- npm ≥ 10
 - A <DocNode term="Gemini API Key" category="Google DeepMind" hint="Personal API key from Google AI Studio. Required for live AI consult, multi-agent analysis, and chat features." link="https://aistudio.google.com/apikey" linkLabel="Get API Key →" icon="https://ai.google.dev/favicon.ico">Gemini API key</DocNode> (for live AI features)
 
 ---
@@ -36,25 +36,45 @@ npm install
 ## Development
 
 ```bash
-# Start the development server
+# Start the development server (client + SSR Express)
 npm run dev
 ```
 
 The application will be available at `http://localhost:4200`. Enter your Gemini API key on the splash screen, or press **Try Demo** to load a pre-sampled patient with example AI analysis outputs.
+
+> **First-run tour:** On your first visit, Pocket Gull launches a 9-step interactive walkthrough. You can replay it anytime from the **?** help button in the header.
+
+---
+
+## Environment Variables
+
+Create a `.env.local` file in the project root (or in `pocketgull_api/` — the server searches both):
+
+```bash
+GEMINI_API_KEY=your_key_here
+
+# Optional — Philips Hue ambient sync
+HUE_BRIDGE_IP=192.168.x.x
+HUE_API_KEY=your_hue_key
+
+# Optional — Google Programmable Search (evidence panel)
+GOOGLE_CSE_ID=your_cse_id
+GOOGLE_CSE_KEY=your_cse_key
+```
 
 ---
 
 ## Production Build
 
 ```bash
-# Build for production
+# Build for production (Angular SSR + esbuild)
 npm run build
 
 # Preview the production build locally
 npm run preview
 ```
 
-The production build outputs to `dist/` with full <DocNode term="Angular SSR" category="Google · Angular Team" hint="Server-Side Rendering — Angular renders the initial page on the Express.js server, then hydrates client-side. Faster first paint and SEO." link="https://angular.dev/guide/ssr" linkLabel="SSR Guide →" icon="https://angular.dev/favicon.ico">SSR</DocNode> support.
+The production build outputs to `dist/app/` with full <DocNode term="Angular SSR" category="Google · Angular Team" hint="Server-Side Rendering — Angular renders the initial page on the Express.js server, then hydrates client-side. Faster first paint and SEO." link="https://angular.dev/guide/ssr" linkLabel="SSR Guide →" icon="https://angular.dev/favicon.ico">SSR</DocNode> support. An `@mlc-ai/web-llm` browser shim at `src/shims/url-shim.ts` redirects the Node.js `url` module for browser-safe bundling.
 
 ---
 
@@ -65,22 +85,25 @@ Pocket Gull is architecturally designed to deploy to <DocNode term="Google Cloud
 ### Live Deployment
 
 - **Primary URL:** [pocketgull.app](https://pocketgull.app)
-- **Cloud Run URL:** [understory-315235665910.us-west1.run.app](https://understory-315235665910.us-west1.run.app)
+- **Alt URL:** [pocketgall.app](https://pocketgall.app)
 
-### Automated Deployment Script
+### Keyless CI/CD (Workload Identity Federation)
 
-The repository includes a one-click deployment script at `scripts/deploy.sh`:
+The repository uses **Workload Identity Federation** for keyless, HIPAA-aligned CI/CD — no long-lived service account keys are ever stored in GitHub Secrets.
+
+```yaml
+# .github/workflows/deploy.yml (excerpt)
+- uses: google-github-actions/auth@v2
+  with:
+    workload_identity_provider: projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+    service_account: github-deployer@$PROJECT_ID.iam.gserviceaccount.com
+```
+
+### One-Click Manual Deploy
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-gcloud builds submit --tag gcr.io/$PROJECT_ID/pocket-gull
-gcloud run deploy pocket-gull \
-  --image gcr.io/$PROJECT_ID/pocket-gull \
-  --platform managed \
-  --region us-west1 \
-  --allow-unauthenticated
+npm run deploy
+# Equivalent to: gcloud run deploy pocket-gull --source . --region us-central1
 ```
 
 ### Key Infrastructure Files
@@ -88,9 +111,9 @@ gcloud run deploy pocket-gull \
 | File | Purpose |
 |---|---|
 | <DocNode term="Dockerfile" category="Docker · Solomon Hykes" hint="Container build configuration. Docker was created by Solomon Hykes at dotCloud (now Docker, Inc.)." link="https://docs.docker.com/reference/dockerfile/" linkLabel="Dockerfile Reference →" icon="https://www.docker.com/favicon.ico">`Dockerfile`</DocNode> | Container build — Node.js production image |
-| `server.js` | <DocNode term="Express.js" category="OpenJS Foundation" hint="Minimal Node.js web framework by TJ Holowaychuk. Handles SSR, API proxy, and static serving." link="https://expressjs.com/" linkLabel="expressjs.com →" icon="https://expressjs.com/images/favicon.png">Express.js</DocNode> backend — SSR, API proxy, static serving |
-| `scripts/deploy.sh` | Automated Cloud Run rollout |
-| `Procfile` | Process declaration for the container |
+| `src/server.ts` | <DocNode term="Express.js" category="OpenJS Foundation" hint="Minimal Node.js web framework by TJ Holowaychuk. Handles SSR, API proxy, and static serving." link="https://expressjs.com/" linkLabel="expressjs.com →" icon="https://expressjs.com/images/favicon.png">Express.js</DocNode> backend — SSR, API proxy, CSP headers |
+| `cloudbuild.yaml` | Automated Cloud Build → Cloud Run pipeline |
+| `src/shims/url-shim.ts` | Browser-safe `url` module shim for `@mlc-ai/web-llm` |
 
 ---
 
@@ -99,15 +122,41 @@ gcloud run deploy pocket-gull \
 ```
 pocket-gull/
 ├── src/
-│   ├── app.component.ts          # Root component, MCP tools
-│   ├── components/               # UI components
-│   ├── services/                 # State, AI, patient management
+│   ├── app.component.ts          # Root component, layout, tour host
+│   ├── components/               # Feature UI components
+│   │   ├── avs-therapy.component.ts
+│   │   ├── walkthrough-tour.component.ts
+│   │   └── ...
+│   ├── services/                 # State, AI providers, patient management
+│   │   ├── ai/                   # Gemini, ADK, WebLLM, Genkit providers
+│   │   ├── patient-state.service.ts
+│   │   ├── walkthrough-tour.service.ts
+│   │   └── ...
+│   ├── shims/                    # Browser compatibility shims
+│   │   └── url-shim.ts           # Node.js url → browser URL adapter
+│   ├── workers/                  # Web Workers
+│   │   └── webllm.worker.ts      # @mlc-ai/web-llm WebWorker handler
 │   └── directives/               # Animation directives
 ├── docs/
 │   ├── images/                   # Product screenshots
-│   └── study/                    # This documentation site
-├── server.js                     # Express.js backend
+│   └── study/                    # This documentation site (Astro)
+├── src/server.ts                 # Express.js SSR + API proxy backend
 ├── Dockerfile                    # Container config
-├── scripts/deploy.sh             # Cloud Run deployment
+├── cloudbuild.yaml               # Cloud Build CI/CD pipeline
+├── angular.json                  # Build configuration
 └── package.json
 ```
+
+---
+
+## Security Hardening
+
+Pocket Gull implements defense-in-depth security for a clinical platform:
+
+- **HTTPS Enforcement:** HSTS with `max-age=31536000; includeSubDomains` served by Express
+- **Content Security Policy:** Strict CSP with nonce-based inline script allowance
+- **CORS Allowlist:** Restricted to `pocketgull.app`, `pocketgall.app`, and `localhost`
+- **Automated Red-Teaming:** Vitest suite in `tests/safety.spec.ts` verifies Gemini `BLOCK_MEDIUM_AND_ABOVE` safety thresholds
+- **Zero PII Persistence:** All patient state is transient or stored only in `localStorage` — no server-side PHI
+
+See [`SECURITY.md`](../../SECURITY.md) for the full security policy and vulnerability disclosure process.

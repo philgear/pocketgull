@@ -2,7 +2,7 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
 import { BootstrapContext, bootstrapApplication, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { provideServerRendering } from '@angular/platform-server';
-import { provideZonelessChangeDetection, ApplicationConfig } from '@angular/core';
+import { provideExperimentalZonelessChangeDetection, ApplicationConfig } from '@angular/core';
 import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { PubGemmaProvider } from './services/ai/pubgemma.provider';
@@ -17,7 +17,7 @@ import { environment } from './environments/environment';
 const serverConfig: ApplicationConfig = {
     providers: [
         provideServerRendering(),
-        provideZonelessChangeDetection(),
+        provideExperimentalZonelessChangeDetection(),
         provideHttpClient(withFetch()),
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideFirestore(() => getFirestore()),

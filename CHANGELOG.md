@@ -5,7 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-05-18
+
+### Added
+- **Interactive Walkthrough Tour**: Expanded from 7 to 9 steps, adding AVS Therapy and Circadian/KSS panels to the guided tour. Reordered for a more natural first-run flow (patient → body chart → intake → generate → lenses → evidence → AVS → circadian → finalize).
+- **Split View Entrance Animation**: New `split-view-enter` CSS keyframe gives the analysis panel a spring-feel slide-in when the split view opens. Panel now animates with `opacity/max-width` instead of toggling `display:none`.
+- **`isSplitting` Signal**: Drives the one-shot entrance animation class on the analysis column, auto-clearing after 600ms.
+
+### Changed
+- **`showSplitView()` Layout Measurement**: Now uses `requestAnimationFrame` + actual container `offsetWidth` to compute a true 50/50 split, accounting for padding, gap, and resizer width. Previously used raw `window.innerWidth / 2`.
+- **Permissions-Policy Header**: Removed 6 deprecated features (`ambient-light-sensor`, `battery`, `document-domain`, `execution-while-not-rendered`, `execution-while-out-of-viewport`, `web-share`) that Chrome 120+ no longer recognizes, eliminating console warnings on every request.
+- **Walkthrough Tour**: Updated step bodies to reference Gemini 2.5 Flash, multilingual export, and Evidence Focus inline agent by name.
+- **Documentation**: Updated `getting-started.mdx` with current project structure (shims/, workers/, url-shim), Workload Identity Federation CI/CD, and security hardening summary. Updated `features.mdx` with full AVS Therapy, Circadian UI, KSS, Hue lighting, DSP sidecar, and Gemini Nano sections.
+
+### Fixed
+- **`GlobalAvsService` AudioNode Crash**: `ChannelMergerNode` was declared as a class field but never instantiated in `buildGraph()`, causing `TypeError: parameter 1 is not of type 'AudioNode'` on every AVS session start. Fixed by calling `this.ctx.createChannelMerger(2)` before oscillator connections; also corrected the gain routing so each channel's oscillators merge correctly into the stereo field.
+- **Angular NG5002 Template Errors**: Resolved `Opening tag "div" not terminated` caused by a missing `>` on the chart panel's opening tag after the CSS transition refactor. Also removed the invalid `[class.ease-[cubic-bezier(...)]]` binding (bracket chars in class bindings are rejected by the Angular 19 strict template parser).
+- **Split View Panel Collapse Animation**: Replaced `[class.hidden]` (Tailwind `display:none`) on both chart and analysis columns with `max-width/opacity/overflow/pointer-events` inline styles so `transition-all duration-500` can interpolate the collapse — previously the transition was short-circuited.
+- **`CollaborationService` Socket.io Dev Noise**: Service was connecting to socket.io immediately on construction, flooding the dev console with 404 reconnection attempts since the Angular dev server doesn't mount socket.io. Added a `probeAndConnect()` preflight fetch: if the handshake endpoint 404s, the service silently skips connecting. Also added `isPlatformBrowser` guard to prevent SSR from attempting socket connections.
+
 ## [0.9.0] - 2026-05-18
+
 
 ### Added
 - **[2026-05-18] Multilingual & Pediatric Care Plans**: Expanded the `translateReadingLevel` infrastructure across all providers to support Spanish, German, French, Mandarin, Dyslexia, and Pediatric formats.

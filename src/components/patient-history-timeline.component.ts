@@ -43,12 +43,12 @@ const ICONS: Record<string, string> = {
           <!-- Icon Node on the timeline -->
           <div class="absolute left-3 top-2 -translate-x-1/2 w-6 h-6 rounded-full bg-white dark:bg-[#09090b] flex items-center justify-center border"
                [class.border-gray-300]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
-               [class.dark:border-zinc-700]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
+               [ngClass]="{'dark:border-zinc-700': entry.type === 'Visit' || entry.type === 'ChartArchived'}"
                [class.border-gray-200]="entry.type !== 'Visit' && entry.type !== 'ChartArchived'"
-               [class.dark:border-zinc-800]="entry.type !== 'Visit' && entry.type !== 'ChartArchived'">
+               [ngClass]="{'dark:border-zinc-800': entry.type !== 'Visit' && entry.type !== 'ChartArchived'}">
             <span class="inline-flex items-center justify-center w-3.5 h-3.5"
                  [class.text-[#1C1C1C]]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
-                 [class.dark:text-zinc-100]="entry.type === 'Visit' || entry.type === 'ChartArchived'"
+                 [ngClass]="{'dark:text-zinc-100': entry.type === 'Visit' || entry.type === 'ChartArchived'}"
                  [class.text-brand-blue-500]="entry.type === 'PatientSummaryUpdate' || entry.type === 'FinalizedPatientSummary'"
                  [class.text-brand-amber-500]="entry.type === 'BookmarkAdded'"
                  [class.text-purple-500]="entry.type === 'NoteCreated'"
@@ -65,19 +65,19 @@ const ICONS: Record<string, string> = {
                 <button (click)="review.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
-                        [class.dark:bg-zinc-900]="activeVisit() === entry"
+                        [ngClass]="{'dark:bg-zinc-900': activeVisit() === entry}"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
-                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
+                        [ngClass]="{'dark:border-l-zinc-100': activeVisit() === entry}"
                         [class.bg-white]="activeVisit() !== entry"
                         [class.dark:bg-[#09090b]]="activeVisit() !== entry"
-                        [class.hover:bg-gray-50]="activeVisit() !== entry"
-                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
+                        [ngClass]="{'hover:bg-gray-50': activeVisit() !== entry}"
+                        [ngClass]="{'dark:hover:bg-zinc-900/50': activeVisit() !== entry}"
                         [class.border-l-gray-100]="activeVisit() !== entry"
-                        [class.dark:border-l-zinc-800]="activeVisit() !== entry"
+                        [ngClass]="{'dark:border-l-zinc-800': activeVisit() !== entry}"
                         [class.border-y]="true"
                         [class.border-r]="true"
                         [class.border-gray-100]="true"
-                        [class.dark:border-zinc-800]="true">
+                        [ngClass]="{'dark:border-zinc-800': true}">
                   <div class="flex justify-between items-start gap-4">
                     <div class="flex-1">
                       <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
@@ -90,19 +90,19 @@ const ICONS: Record<string, string> = {
                 <button (click)="review.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
-                        [class.dark:bg-zinc-900]="activeVisit() === entry"
+                        [ngClass]="{'dark:bg-zinc-900': activeVisit() === entry}"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
-                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
+                        [ngClass]="{'dark:border-l-zinc-100': activeVisit() === entry}"
                         [class.bg-white]="activeVisit() !== entry"
                         [class.dark:bg-[#09090b]]="activeVisit() !== entry"
-                        [class.hover:bg-gray-50]="activeVisit() !== entry"
-                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
+                        [ngClass]="{'hover:bg-gray-50': activeVisit() !== entry}"
+                        [ngClass]="{'dark:hover:bg-zinc-900/50': activeVisit() !== entry}"
                         [class.border-l-gray-100]="activeVisit() !== entry"
-                        [class.dark:border-l-zinc-800]="activeVisit() !== entry"
+                        [ngClass]="{'dark:border-l-zinc-800': activeVisit() !== entry}"
                         [class.border-y]="true"
                         [class.border-r]="true"
                         [class.border-gray-100]="true"
-                        [class.dark:border-zinc-800]="true">
+                        [ngClass]="{'dark:border-zinc-800': true}">
                     <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
                 </button>
@@ -150,18 +150,18 @@ const ICONS: Record<string, string> = {
                 <button (click)="reviewAnalysis.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
-                        [class.dark:bg-zinc-900]="activeVisit() === entry"
+                        [ngClass]="{'dark:bg-zinc-900': activeVisit() === entry}"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
-                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
+                        [ngClass]="{'dark:border-l-zinc-100': activeVisit() === entry}"
                         [class.bg-white]="activeVisit() !== entry"
                         [class.dark:bg-[#09090b]]="activeVisit() !== entry"
-                        [class.hover:bg-gray-50]="activeVisit() !== entry"
-                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
+                        [ngClass]="{'hover:bg-gray-50': activeVisit() !== entry}"
+                        [ngClass]="{'dark:hover:bg-zinc-900/50': activeVisit() !== entry}"
                         [class.border-l-brand-green-400]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
                         [class.border-gray-100]="true"
-                        [class.dark:border-zinc-800]="true">
+                        [ngClass]="{'dark:border-zinc-800': true}">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
                         <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-green-50 dark:bg-brand-green-900/30 text-brand-green-700 dark:text-brand-green-400 uppercase tracking-[0.1em] border border-brand-green-100 dark:border-brand-green-800/50">AI Report</span>
@@ -175,18 +175,18 @@ const ICONS: Record<string, string> = {
                 <button (click)="reviewAnalysis.emit(entry)"
                         class="w-full text-left p-4 rounded transition-colors duration-200 border-l-4"
                         [class.bg-white]="activeVisit() === entry"
-                        [class.dark:bg-zinc-900]="activeVisit() === entry"
+                        [ngClass]="{'dark:bg-zinc-900': activeVisit() === entry}"
                         [class.border-l-[#1C1C1C]]="activeVisit() === entry"
-                        [class.dark:border-l-zinc-100]="activeVisit() === entry"
+                        [ngClass]="{'dark:border-l-zinc-100': activeVisit() === entry}"
                         [class.bg-white]="activeVisit() !== entry"
                         [class.dark:bg-[#09090b]]="activeVisit() !== entry"
-                        [class.hover:bg-gray-50]="activeVisit() !== entry"
-                        [class.dark:hover:bg-zinc-900/50]="activeVisit() !== entry"
+                        [ngClass]="{'hover:bg-gray-50': activeVisit() !== entry}"
+                        [ngClass]="{'dark:hover:bg-zinc-900/50': activeVisit() !== entry}"
                         [class.border-l-brand-blue-400]="activeVisit() !== entry"
                         [class.border-y]="true"
                         [class.border-r]="true"
                         [class.border-gray-100]="true"
-                        [class.dark:border-zinc-800]="true">
+                        [ngClass]="{'dark:border-zinc-800': true}">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
                         <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400 uppercase tracking-[0.1em] border border-brand-blue-100 dark:border-brand-blue-800/50">IPatient Summary</span>

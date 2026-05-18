@@ -148,11 +148,119 @@ async function getApiKey(req?: express.Request): Promise<string> {
 // Prefetch the API key at boot to ensure all lazy loaded APIs have process.env populated
 await getApiKey().catch(console.error);
 
-// Security headers
+// ── Security Headers (Mozilla HTTP Observatory A+) ─────────────────────────
+// Generate a cryptographically random nonce for each request. This is used
+// by the CSP `script-src` directive to allow only Angular-rendered inline
+// scripts while blocking any injected third-party scripts (XSS mitigation).
 app.use((req, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  // Expose the nonce so downstream middleware (e.g. the HTML injector) can use it.
+  (res as any).locals = (res as any).locals ?? {};
+  (res as any).locals['cspNonce'] = nonce;
+
+  // ── HTTP Strict Transport Security ──────────────────────────────────────
+  // max-age of 2 years + includeSubDomains. Add `preload` once the domain is
+  // submitted to https://hstspreload.org — it gives an Observatory bonus.
+  res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+
+  // ── Anti-Clickjacking ────────────────────────────────────────────────────
+  // X-Frame-Options is a legacy fallback. CSP `frame-ancestors` takes
+  // precedence in modern browsers, but Observatory still checks this header.
   res.setHeader('X-Frame-Options', 'DENY');
+
+  // ── MIME-Type Sniffing Prevention ────────────────────────────────────────
+  // One of the most-penalized missing headers on the Observatory.
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+
+  // ── Referrer Policy ──────────────────────────────────────────────────────
+  // Sends the full URL on same-origin requests but only the origin on
+  // cross-origin requests (e.g. outbound Gemini API calls).
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  // ── Content Security Policy ──────────────────────────────────────────────
+  // Strategy: nonce-based `strict-dynamic` so Angular's SSR-injected scripts
+  // are trusted automatically, while eval and arbitrary inline scripts are
+  // blocked. Update the allow-list below if new external origins are added.
+  const csp = [
+    // Default: block everything not explicitly allowed
+    `default-src 'self'`,
+
+    // Scripts: only nonce-tagged scripts (Angular SSR) + their children via
+    // strict-dynamic. Blocks eval and data: URI scripts entirely.
+    `script-src 'nonce-${nonce}' 'strict-dynamic' https:`,
+
+    // Styles: self + Google Fonts + allow inline styles (Angular uses them)
+    `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
+
+    // Fonts: self + Google Fonts CDN
+    `font-src 'self' https://fonts.gstatic.com`,
+
+    // Images: self + data URIs (used for chart.js canvas exports) + blob:
+    `img-src 'self' data: blob: https:`,
+
+    // Connections: Gemini REST, Firebase, PubMed, own origin
+    `connect-src 'self' https://generativelanguage.googleapis.com https://firestore.googleapis.com https://firebase.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://eutils.ncbi.nlm.nih.gov https://*.run.app wss://generativelanguage.googleapis.com`,
+
+    // Media/Worker: blob: for Web Workers (WebLLM / ADK audio)
+    `media-src 'self' blob:`,
+    `worker-src 'self' blob:`,
+
+    // Frames: nobody may frame this app
+    `frame-src 'none'`,
+    `frame-ancestors 'none'`,
+
+    // Object/Embed: block plugins entirely
+    `object-src 'none'`,
+
+    // Base URI: prevent base-tag injection
+    `base-uri 'self'`,
+
+    // Form action: only submit to own origin
+    `form-action 'self'`,
+
+    // Upgrade all HTTP sub-resources to HTTPS
+    `upgrade-insecure-requests`,
+  ].join('; ');
+
+  res.setHeader('Content-Security-Policy', csp);
+
+  // ── Cross-Origin Policies ────────────────────────────────────────────────
+  // COOP: prevents cross-origin window references (e.g. OAuth popup attacks)
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  // COEP: required alongside COOP to enable cross-origin isolation
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  // CORP: restricts which origins can embed our resources
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
+
+  // ── Permissions Policy ───────────────────────────────────────────────────
+  // Lock down powerful browser APIs not used by the app. The microphone is
+  // intentionally left unlocked here because the ADK Live voice feature uses
+  // getUserMedia(). Remove `microphone=*` if audio is removed.
+  res.setHeader(
+    'Permissions-Policy',
+    [
+      'accelerometer=()',
+      'autoplay=()',
+      'camera=()',
+      'display-capture=()',
+      'encrypted-media=()',
+      'fullscreen=(self)',
+      'geolocation=()',
+      'gyroscope=()',
+      'keyboard-map=()',
+      'magnetometer=()',
+      'microphone=(self)',   // Required for ADK Live voice input
+      'midi=()',
+      'payment=()',
+      'picture-in-picture=()',
+      'publickey-credentials-get=()',
+      'screen-wake-lock=()',
+      'sync-xhr=()',
+      'usb=()',
+      'xr-spatial-tracking=()',
+    ].join(', '),
+  );
+
   next();
 });
 
@@ -524,13 +632,26 @@ app.use((req, res, next) => {
         return next();
       }
 
-      // If the response is HTML and we have an API key, inject it
+      // If the response is HTML, inject API key + stamp CSP nonce onto all
+      // inline scripts so they are trusted by the strict-dynamic CSP policy.
       const contentType = response.headers.get('content-type') || '';
       const key = await getApiKey(req);
-      if (contentType.includes('text/html') && key) {
+      const cspNonce: string = (res as any).locals?.['cspNonce'] ?? '';
+
+      if (contentType.includes('text/html')) {
         let html = await response.text();
-        const scriptTag = `<script px-api-key="true">window.GEMINI_API_KEY = "${key}";</script>\n</head>`;
-        html = html.replace('</head>', scriptTag);
+
+        // Inject Gemini API key (nonce-tagged so CSP allows it)
+        if (key) {
+          const scriptTag = `<script nonce="${cspNonce}" px-api-key="true">window.GEMINI_API_KEY = "${key}";</script>\n</head>`;
+          html = html.replace('</head>', scriptTag);
+        }
+
+        // Stamp the nonce onto any existing inline <script> tags that Angular
+        // SSR emitted (e.g. transfer-state JSON blobs) so they pass CSP.
+        if (cspNonce) {
+          html = html.replace(/<script(?![^>]*\snonce=)/g, `<script nonce="${cspNonce}"`);
+        }
 
         const modRes = new Response(html, {
           status: response.status,

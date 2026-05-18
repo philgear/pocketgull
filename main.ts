@@ -1,6 +1,6 @@
 
 import { bootstrapApplication, provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideZonelessChangeDetection, isDevMode } from '@angular/core';
+import { provideExperimentalZonelessChangeDetection, isDevMode } from '@angular/core';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { AppComponent } from './src/app.component';
 import { AI_CONFIG, IAiProviderConfig } from './src/services/ai-provider.types';
@@ -16,7 +16,7 @@ import { environment } from './src/environments/environment';
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withFetch()),
-    provideZonelessChangeDetection(),
+    provideExperimentalZonelessChangeDetection(),
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),

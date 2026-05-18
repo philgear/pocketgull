@@ -61,9 +61,9 @@ import { CollaborationService } from '../services/collaboration.service';
                      [class.text-white]="isSelf(note.clinicianName)"
                      [class.rounded-tr-sm]="isSelf(note.clinicianName)"
                      [class.bg-gray-100]="!isSelf(note.clinicianName)"
-                     [class.dark:bg-zinc-800]="!isSelf(note.clinicianName)"
+                     [ngClass]="{'dark:bg-zinc-800': !isSelf(note.clinicianName)}"
                      [class.text-gray-800]="!isSelf(note.clinicianName)"
-                     [class.dark:text-gray-200]="!isSelf(note.clinicianName)"
+                     [ngClass]="{'dark:text-gray-200': !isSelf(note.clinicianName)}"
                      [class.rounded-tl-sm]="!isSelf(note.clinicianName)">
                   {{ note.text }}
                 </div>

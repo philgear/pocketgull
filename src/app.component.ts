@@ -271,20 +271,20 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
                     [class.bg-gray-800]="state.isLiveAgentActive()"
-                    [class.dark:bg-white]="state.isLiveAgentActive()"
+                    [ngClass]="{'dark:bg-white': state.isLiveAgentActive()}"
                     [class.border-gray-800]="state.isLiveAgentActive()"
-                    [class.dark:border-white]="state.isLiveAgentActive()"
+                    [ngClass]="{'dark:border-white': state.isLiveAgentActive()}"
                     [class.text-white]="state.isLiveAgentActive()"
                     [class.dark:text-[#111111]]="state.isLiveAgentActive()"
                     [class.bg-transparent]="!state.isLiveAgentActive()"
                     [class.border-gray-300]="!state.isLiveAgentActive()"
-                    [class.dark:border-zinc-700]="!state.isLiveAgentActive()"
+                    [ngClass]="{'dark:border-zinc-700': !state.isLiveAgentActive()}"
                     [class.text-gray-700]="!state.isLiveAgentActive()"
-                    [class.dark:text-zinc-300]="!state.isLiveAgentActive()"
+                    [ngClass]="{'dark:text-zinc-300': !state.isLiveAgentActive()}"
                     [class.hover:bg-[#EEEEEE]]="!state.isLiveAgentActive()"
-                    [class.dark:hover:bg-zinc-800]="!state.isLiveAgentActive()"
-                    [class.hover:border-gray-400]="!state.isLiveAgentActive()"
-                    [class.dark:hover:border-zinc-500]="!state.isLiveAgentActive()">
+                    [ngClass]="{'dark:hover:bg-zinc-800': !state.isLiveAgentActive()}"
+                    [ngClass]="{'hover:border-gray-400': !state.isLiveAgentActive()}"
+                    [ngClass]="{'dark:hover:border-zinc-500': !state.isLiveAgentActive()}">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
@@ -436,14 +436,19 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
           <!-- Column 1: IPatient Medical Chart -->
            <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                 id="tour-body-chart"
-               [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined"
+               [ngClass]="{
+                 'md:flex-1': isAnalysisCollapsed() || inputPanelWidth() === undefined,
+                 'max-md:hidden': !!state.selectedPartId()
+               }"
                [class.transition-all]="!isDragging()"
                [class.duration-500]="!isDragging()"
-               [class.ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]]="!isDragging()"
                [style.--panel-width.px]="isChartCollapsed() ? 0 : (isAnalysisCollapsed() ? null : inputPanelWidth())"
                [class.md:w-[var(--panel-width)]]="!isAnalysisCollapsed() && inputPanelWidth() !== undefined"
-               [class.hidden]="isChartCollapsed()"
-               [class.max-md:hidden]="!!state.selectedPartId()">
+                [style.max-width]="isChartCollapsed() ? '0' : null"
+                [style.opacity]="isChartCollapsed() ? '0' : null"
+                [style.overflow]="isChartCollapsed() ? 'hidden' : null"
+                [style.pointer-events]="isChartCollapsed() ? 'none' : null"
+                [style.margin]="isChartCollapsed() ? '0' : null">
                <div class="md:h-full w-full md:overflow-hidden flex-1 flex flex-col min-h-0">
                  @defer (on viewport) {
                    <app-medical-chart class="no-print md:h-full block md:overflow-y-auto w-full max-md:overflow-visible"></app-medical-chart>
@@ -466,34 +471,38 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                 
                 <!-- Full-width background bar -->
                 <div class="absolute inset-y-0 w-4 bg-transparent group-hover:bg-gray-100/50 dark:group-hover:bg-zinc-800/50 transition-colors rounded-full z-0"
-                     [class.left-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
-                     [class.-translate-x-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
-                     [class.left-0]="isChartCollapsed()"
-                     [class.right-0]="isAnalysisCollapsed()"></div>
+                     [ngClass]="{
+                       'left-1/2': !isChartCollapsed() && !isAnalysisCollapsed(),
+                       '-translate-x-1/2': !isChartCollapsed() && !isAnalysisCollapsed(),
+                       'left-0': isChartCollapsed(),
+                       'right-0': isAnalysisCollapsed()
+                     }"></div>
                 <div class="absolute inset-0 bg-gray-100/50 dark:bg-zinc-800/50 group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors rounded"></div>
                 <!-- Handle -->
                 <div class="h-12 w-1.5 rounded-full bg-gray-200 dark:bg-zinc-700 group-hover:bg-gray-300 dark:group-hover:bg-zinc-600 transition-colors relative z-10"></div>
 
                 <!-- Quick Actions (V4) -->
                 <div class="absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white dark:bg-zinc-900 shadow-xl border border-gray-200 dark:border-zinc-800 rounded-full p-1.5 z-30"
-                     [class.left-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
-                     [class.-translate-x-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
-                     [class.left-0]="isChartCollapsed()"
-                     [class.translate-x-2]="isChartCollapsed()"
-                     [class.right-0]="isAnalysisCollapsed()"
-                     [class.-translate-x-2]="isAnalysisCollapsed()">
+                     [ngClass]="{
+                       'left-1/2': !isChartCollapsed() && !isAnalysisCollapsed(),
+                       '-translate-x-1/2': !isChartCollapsed() && !isAnalysisCollapsed(),
+                       'left-0': isChartCollapsed(),
+                       'translate-x-2': isChartCollapsed(),
+                       'right-0': isAnalysisCollapsed(),
+                       '-translate-x-2': isAnalysisCollapsed()
+                     }">
                    
                    <!-- Panel Management -->
                    <div class="flex flex-col gap-1 border-b border-gray-100 dark:border-zinc-800 pb-1.5 mb-0.5">
-                      <button (click)="$event.stopPropagation(); maximizeChart()" [class.bg-black]="!isChartCollapsed() && isAnalysisCollapsed()" [class.dark:bg-white]="!isChartCollapsed() && isAnalysisCollapsed()" [class.text-white]="!isChartCollapsed() && isAnalysisCollapsed()" [class.dark:text-black]="!isChartCollapsed() && isAnalysisCollapsed()"
+                      <button (click)="$event.stopPropagation(); maximizeChart()" [class.bg-black]="!isChartCollapsed() && isAnalysisCollapsed()" [ngClass]="{'dark:bg-white': !isChartCollapsed() && isAnalysisCollapsed()}" [class.text-white]="!isChartCollapsed() && isAnalysisCollapsed()" [ngClass]="{'dark:text-black': !isChartCollapsed() && isAnalysisCollapsed()}"
                               title="Maximize Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); maximizeAnalysis()" [class.bg-black]="isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:bg-white]="isChartCollapsed() && !isAnalysisCollapsed()" [class.text-white]="isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:text-black]="isChartCollapsed() && !isAnalysisCollapsed()"
+                      <button (click)="$event.stopPropagation(); maximizeAnalysis()" [class.bg-black]="isChartCollapsed() && !isAnalysisCollapsed()" [ngClass]="{'dark:bg-white': isChartCollapsed() && !isAnalysisCollapsed()}" [class.text-white]="isChartCollapsed() && !isAnalysisCollapsed()" [ngClass]="{'dark:text-black': isChartCollapsed() && !isAnalysisCollapsed()}"
                               title="Maximize Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); showSplitView()" [class.bg-black]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:bg-white]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.text-white]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:text-black]="!isChartCollapsed() && !isAnalysisCollapsed()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors" title="Split View">
+                      <button (click)="$event.stopPropagation(); showSplitView()" [class.bg-black]="!isChartCollapsed() && !isAnalysisCollapsed()" [ngClass]="{'dark:bg-white': !isChartCollapsed() && !isAnalysisCollapsed()}" [class.text-white]="!isChartCollapsed() && !isAnalysisCollapsed()" [ngClass]="{'dark:text-black': !isChartCollapsed() && !isAnalysisCollapsed()}" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors" title="Split View">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="2" y="3" width="20" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
                       </button>
                    </div>
@@ -512,14 +521,14 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                 <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full">
                   <button (click)="mobileActiveTab.set('tasks')" 
                           class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
-                          [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'" [class.hover:text-gray-700]="mobileActiveTab() !== 'tasks'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'tasks'">
+                          [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [ngClass]="{'dark:text-white': mobileActiveTab() === 'tasks'}"
+                          [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [ngClass]="{'dark:text-zinc-400': mobileActiveTab() !== 'tasks'}" [ngClass]="{'hover:text-gray-700': mobileActiveTab() !== 'tasks'}" [ngClass]="{'dark:hover:text-zinc-300': mobileActiveTab() !== 'tasks'}">
                     Tasks
                   </button>
                   <button (click)="mobileActiveTab.set('analysis')"
                           class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
-                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [class.dark:text-white]="mobileActiveTab() === 'analysis'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'" [class.hover:text-gray-700]="mobileActiveTab() !== 'analysis'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'analysis'">
+                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [ngClass]="{'dark:text-white': mobileActiveTab() === 'analysis'}"
+                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [ngClass]="{'dark:text-zinc-400': mobileActiveTab() !== 'analysis'}" [ngClass]="{'hover:text-gray-700': mobileActiveTab() !== 'analysis'}" [ngClass]="{'dark:hover:text-zinc-300': mobileActiveTab() !== 'analysis'}">
                     Analysis
                   </button>
                 </div>
@@ -529,7 +538,7 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
             <!-- Column 2 (Middle): Task Flow & Intake Bracket -->
             @if (state.selectedPartId() && !state.isLiveAgentActive()) {
                <div class="shrink-0 w-full md:w-[400px] flex flex-col gap-3 md:gap-6 h-full z-20 transition-all duration-300"
-                    [class.max-md:hidden]="mobileActiveTab() !== 'tasks'"
+                    [ngClass]="{'max-md:hidden': mobileActiveTab() !== 'tasks'}"
                     [class.tab-fade-enter]="mobileActiveTab() === 'tasks'">
                   <div id="tour-intake-form" class="flex-1 min-h-0 overflow-hidden rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                     @defer (on viewport) {
@@ -550,9 +559,16 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
 
              <!-- Column 3 (Right Area): Split View -->
             <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col"
-                 [class.hidden]="isAnalysisCollapsed()"
-                 [class.max-md:hidden]="!!state.selectedPartId() && mobileActiveTab() !== 'analysis'"
-                 [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
+                 [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'"
+                 [ngClass]="{'max-md:hidden': !!state.selectedPartId() && mobileActiveTab() !== 'analysis'}"
+                 [class.transition-all]="!isDragging()"
+                 [class.duration-500]="!isDragging()"
+                 [style.max-width]="isAnalysisCollapsed() ? '0' : null"
+                 [style.opacity]="isAnalysisCollapsed() ? '0' : null"
+                 [style.overflow]="isAnalysisCollapsed() ? 'hidden' : null"
+                 [style.pointer-events]="isAnalysisCollapsed() ? 'none' : null"
+                 [style.margin]="isAnalysisCollapsed() ? '0' : null"
+                 [class.split-view-enter]="isSplitting()">
              
                  @if (theme.currentTheme() === 'spark') {
                    <app-avs-therapy class="block w-full flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300 md:mb-6 mb-3"></app-avs-therapy>
@@ -785,7 +801,7 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                 </div>
               }
              
-              <div class="relative grid gap-8 transition-all duration-300" [class.grid-cols-1]="selectedReadingLevel() === 'standard'" [class.sm:grid-cols-2]="selectedReadingLevel() !== 'standard'">
+              <div class="relative grid gap-8 transition-all duration-300" [class.grid-cols-1]="selectedReadingLevel() === 'standard'" [ngClass]="{'sm:grid-cols-2': selectedReadingLevel() !== 'standard'}">
                
                <!-- Original English -->
                @if (selectedReadingLevel() !== 'standard') {
@@ -949,6 +965,7 @@ export class AppComponent implements OnDestroy {
   apiKeyError = signal<string | null>(null);
   isChartCollapsed = signal<boolean>(false);
   isAnalysisCollapsed = signal<boolean>(false);
+  isSplitting = signal<boolean>(false);
   showFhirCallback = signal<boolean>(false);
   showAnalysisPdf = signal<boolean>(false);
 
@@ -1799,7 +1816,22 @@ export class AppComponent implements OnDestroy {
   showSplitView() {
     this.isChartCollapsed.set(false);
     this.isAnalysisCollapsed.set(false);
-    this.inputPanelWidth.set(window.innerWidth / 2);
+
+    // Trigger entrance animation
+    this.isSplitting.set(true);
+    setTimeout(() => this.isSplitting.set(false), 600);
+
+    // Measure the actual container on next frame for a true 50/50 split
+    requestAnimationFrame(() => {
+      const containerEl = this.mainContainer()?.nativeElement as HTMLElement | undefined;
+      if (containerEl) {
+        // Subtract padding (p-6 = 24px each side) and resizer (8px) and gap (24px)
+        const usable = containerEl.offsetWidth - 48 - 8 - 24;
+        this.inputPanelWidth.set(Math.round(usable / 2));
+      } else {
+        this.inputPanelWidth.set(Math.round((window.innerWidth - 80) / 2));
+      }
+    });
   }
 
   // --- Column Resizing Logic ---

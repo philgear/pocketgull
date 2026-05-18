@@ -48,9 +48,9 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'Summary Overview'"
             [class.border-[#1C1C1C]]="activeLens() === 'Summary Overview'"
-            [class.dark:border-white]="activeLens() === 'Summary Overview'"
+            [ngClass]="{'dark:border-white': activeLens() === 'Summary Overview'}"
             [class.text-[#1C1C1C]]="activeLens() === 'Summary Overview'"
-            [class.dark:text-white]="activeLens() === 'Summary Overview'"
+            [ngClass]="{'dark:text-white': activeLens() === 'Summary Overview'}"
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Overview
           </pocket-gull-button>
@@ -59,9 +59,9 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'Functional Protocols'"
             [class.border-[#1C1C1C]]="activeLens() === 'Functional Protocols'"
-            [class.dark:border-white]="activeLens() === 'Functional Protocols'"
+            [ngClass]="{'dark:border-white': activeLens() === 'Functional Protocols'}"
             [class.text-[#1C1C1C]]="activeLens() === 'Functional Protocols'"
-            [class.dark:text-white]="activeLens() === 'Functional Protocols'"
+            [ngClass]="{'dark:text-white': activeLens() === 'Functional Protocols'}"
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Functional Protocols
           </pocket-gull-button>
@@ -70,9 +70,9 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'Nutrition'"
             [class.border-[#1C1C1C]]="activeLens() === 'Nutrition'"
-            [class.dark:border-white]="activeLens() === 'Nutrition'"
+            [ngClass]="{'dark:border-white': activeLens() === 'Nutrition'}"
             [class.text-[#1C1C1C]]="activeLens() === 'Nutrition'"
-            [class.dark:text-white]="activeLens() === 'Nutrition'"
+            [ngClass]="{'dark:text-white': activeLens() === 'Nutrition'}"
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Nutrition
           </pocket-gull-button>
@@ -81,9 +81,9 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'Orthomolecular Profiling'"
             [class.border-[#1C1C1C]]="activeLens() === 'Orthomolecular Profiling'"
-            [class.dark:border-white]="activeLens() === 'Orthomolecular Profiling'"
+            [ngClass]="{'dark:border-white': activeLens() === 'Orthomolecular Profiling'}"
             [class.text-[#1C1C1C]]="activeLens() === 'Orthomolecular Profiling'"
-            [class.dark:text-white]="activeLens() === 'Orthomolecular Profiling'"
+            [ngClass]="{'dark:text-white': activeLens() === 'Orthomolecular Profiling'}"
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Orthomolecular Profiling
           </pocket-gull-button>
@@ -92,9 +92,9 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'Monitoring & Follow-up'"
             [class.border-[#1C1C1C]]="activeLens() === 'Monitoring & Follow-up'"
-            [class.dark:border-white]="activeLens() === 'Monitoring & Follow-up'"
+            [ngClass]="{'dark:border-white': activeLens() === 'Monitoring & Follow-up'}"
             [class.text-[#1C1C1C]]="activeLens() === 'Monitoring & Follow-up'"
-            [class.dark:text-white]="activeLens() === 'Monitoring & Follow-up'"
+            [ngClass]="{'dark:text-white': activeLens() === 'Monitoring & Follow-up'}"
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             Monitoring & Follow-up
           </pocket-gull-button>
@@ -103,9 +103,9 @@ import { RevealDirective } from '../directives/reveal.directive';
             size="sm"
             [class.border-b-2]="activeLens() === 'IPatient Education'"
             [class.border-[#1C1C1C]]="activeLens() === 'IPatient Education'"
-            [class.dark:border-white]="activeLens() === 'IPatient Education'"
+            [ngClass]="{'dark:border-white': activeLens() === 'IPatient Education'}"
             [class.text-[#1C1C1C]]="activeLens() === 'IPatient Education'"
-            [class.dark:text-white]="activeLens() === 'IPatient Education'"
+            [ngClass]="{'dark:text-white': activeLens() === 'IPatient Education'}"
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             IPatient Education
           </pocket-gull-button>
