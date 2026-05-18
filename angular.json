@@ -59,7 +59,11 @@
               "debug",
               "agent-base",
               "node-domexception",
-              "web-streams-polyfill"
+              "web-streams-polyfill",
+              "@google-cloud/bigquery",
+              "@grpc/grpc-js",
+              "@grpc/proto-loader",
+              "xmlhttprequest-ssl"
             ],
             "externalDependencies": [
               "@mikro-orm/sqlite",
