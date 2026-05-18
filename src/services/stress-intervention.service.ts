@@ -18,7 +18,7 @@ export class StressInterventionService {
       if (!vitals) return;
 
       // High-stress heuristic (e.g., HR > 100 or BP Systolic > 140)
-      const isHighStress = vitals.heartRate > 100 || vitals.bloodPressureSys > 140;
+      const isHighStress = parseInt(vitals.hr, 10) > 100 || parseInt(vitals.bp.split('/')[0], 10) > 140;
 
       if (isHighStress && !this.hasTriggered) {
         this.triggerStressProtocol();

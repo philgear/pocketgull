@@ -56,10 +56,10 @@ export class AmbientLightingService {
       // Saturation: 0-254 (HSL sat 0-100 mapped to 0-254)
       // Brightness: 0-254 (HSL lightness 0-100 mapped to 0-254)
       
-      const hueValue = Math.round((currentTheme.h / 360) * 65535);
-      const satValue = Math.round((currentTheme.s / 100) * 254);
+      const hueValue = Math.round((currentTheme.colorHslData.h / 360) * 65535);
+      const satValue = Math.round((currentTheme.colorHslData.s / 100) * 254);
       // Adjust lightness for physical brightness, capping to ensure it's not too dark
-      const briValue = Math.max(10, Math.round((currentTheme.l / 100) * 254));
+      const briValue = Math.max(10, Math.round((currentTheme.colorHslData.l / 100) * 254));
 
       this.syncHueLight(config, hueValue, satValue, briValue);
     });
