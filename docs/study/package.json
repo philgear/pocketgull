@@ -14,5 +14,9 @@
   "dependencies": {
     "@astrojs/mdx": "^5.0.1",
     "astro": "^6.0.5"
+  },
+  "devDependencies": {
+    "defu": "^6.1.7",
+    "devalue": "^5.8.1"
   }
 }
