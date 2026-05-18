@@ -35,6 +35,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 import { AvsUiService } from './services/avs-ui.service';
 import { GlobalAvsService } from './services/global-avs.service';
 import { PetAuditoryService } from './services/pet-auditory.service';
+import { StressInterventionService } from './services/stress-intervention.service';
 
 @Component({
   selector: 'app-root',
@@ -918,6 +919,7 @@ export class AppComponent implements OnDestroy {
   public avsUi = inject(AvsUiService);
   public readonly globalAvs = inject(GlobalAvsService);
   public readonly petAuditory = inject(PetAuditoryService);
+  private readonly stressIntervention = inject(StressInterventionService);
   state = inject(PatientStateService);
   public theme = inject(ThemeService);
   private ngZone = inject(NgZone);

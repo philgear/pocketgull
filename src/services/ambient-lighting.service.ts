@@ -31,11 +31,23 @@ export class AmbientLightingService {
   readonly isConnected = signal(false);
   readonly lastError = signal<string | null>(null);
 
+  readonly emergencyOverride = signal<{active: boolean; hue: number; sat: number; bri: number}>({ active: false, hue: 0, sat: 0, bri: 0 });
+
+  public setEmergencyOverride(active: boolean, hue = 10000, sat = 200, bri = 50) {
+    this.emergencyOverride.set({ active, hue, sat, bri });
+  }
+
   constructor() {
     // Automatically sync circadian theme to physical room lights
     effect(() => {
       const config = this.hueConfig();
       if (!config.enabled || !config.bridgeIp || !config.username) return;
+
+      const emergency = this.emergencyOverride();
+      if (emergency.active) {
+        this.syncHueLight(config, emergency.hue, emergency.sat, emergency.bri);
+        return;
+      }
 
       const currentTheme = this.circadianService.circadian();
       
