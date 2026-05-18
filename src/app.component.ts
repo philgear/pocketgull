@@ -12,7 +12,7 @@ import { DictationModalComponent } from './components/dictation-modal.component'
 import { TaskFlowComponent } from './components/task-flow.component';
 import { IntakeFormComponent } from './components/intake-form.component';
 import { VoiceAssistantComponent } from './components/voice-assistant.component';
-import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
+import { AI_CONFIG, AiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { GeminiProvider } from './services/ai/gemini.provider';
 import { ClinicalIntelligenceService } from './services/clinical-intelligence.service';
@@ -22,10 +22,13 @@ import { NetworkStateService } from './services/network-state.service';
 import { ExportService } from './services/export.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT } from './demo-data';
+import { PatientDirectoryComponent } from './components/patient-directory.component';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
 import { WalkthroughTourService } from './services/walkthrough-tour.service';
-
+import { SecureSplashComponent } from './components/secure-splash.component';
+import { SessionStateService } from './services/session-state.service';
+import { RulesEngineService } from './services/rules-engine.service';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
@@ -44,8 +47,9 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     IntakeFormComponent,
     VoiceAssistantComponent,
     RevealDirective,
-    FhirCallbackComponent,
-    WalkthroughTourComponent
+    WalkthroughTourComponent,
+    SecureSplashComponent,
+    PatientDirectoryComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,140 +57,55 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
     @if (showFhirCallback()) {
       <app-fhir-callback></app-fhir-callback>
     } @else {
-    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 flex flex-col md:overflow-hidden font-sans selection:bg-brand-green-100 selection:text-brand-green-900 group/app">
+    <div class="min-h-[100dvh] md:h-[100dvh] w-full bg-[#EEEEEE] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 flex flex-col md:overflow-hidden font-sans selection:bg-green-100 selection:text-green-900 group/app">
       
-      <app-dictation-modal></app-dictation-modal>
+      @if (isDirectoryOpen() || !patientMgmt.selectedPatientId()) {
+         @defer (on immediate) {
+           <app-patient-directory></app-patient-directory>
+         }
+      }
+
+      @defer (on idle) {
+        <app-dictation-modal></app-dictation-modal>
+      }
+      @defer (on idle) {
         <app-walkthrough-tour></app-walkthrough-tour>
-
-      @if (!hasApiKey()) {
-        <main class="fixed inset-0 bg-white dark:bg-zinc-900 z-[100] flex flex-col items-center justify-center p-6 text-center landmark-main">
-          <!-- Origami Pocket Splash -->
-          <div class="mb-10 relative w-full h-56 max-w-sm mx-auto flex items-end justify-center">
-             <!-- The Pocket -->
-            <div class="origami-pocket"></div>
-            
-            <!-- The Seagull -->
-            <div class="origami-seagull-container origami-seagull-enter"
-                 [class.frightened]="isSeagullFrightened()"
-                 [style.--fly-x.px]="seagullFlyAwayX()"
-                 [style.--fly-y.px]="seagullFlyAwayY()">
-                
-                <!-- 3D Folding Paper -->
-                <div class="origami-paper-3d">
-                    <div class="paper-panel panel-base"></div>
-                    <div class="paper-panel panel-left text-[8px] text-gray-300 font-mono p-1 opacity-50">CLINICAL DATA</div>
-                    <div class="paper-panel panel-right text-[8px] text-gray-300 font-mono p-1 opacity-50 text-right">ASSESSMENT</div>
-                    <div class="paper-panel panel-top"></div>
-                 </div>
-
-                <div class="origami-seagull">
-                    <!-- Rotation wrapper for mouse tracking -->
-                    <div [style.transform]="'rotate(' + seagullAngle() + 'deg)'" class="w-full h-full transition-transform duration-200 ease-out origin-center">
-                    <!-- Origami SVG Seagull shape - Braun minimalist palette -->
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Far Wing -->
-                        <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round" />
-                        <!-- Tail -->
-                        <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round" />
-                        <!-- Body Base -->
-                        <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                        <!-- Near Wing (Upper) -->
-                        <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                        <!-- Near Wing (Fold) -->
-                        <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                        <!-- Neck/Head -->
-                        <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                        <!-- Beak - Functional Braun Orange Accent -->
-                        <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
-                    </svg>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <h1 class="text-xl font-bold mb-1 uppercase tracking-[0.2em] text-[#1C1C1C] dark:text-zinc-100">Pocket Gull</h1>
-          <p class="text-gray-500 dark:text-zinc-400 mb-8 text-xs uppercase tracking-widest">Clinical Intelligence Platform</p>
-
-            <!-- API Key Input -->
-            <div class="w-full max-w-sm relative z-40" id="seagull-safe-zone">
-              <p class="text-gray-500 dark:text-zinc-400 mb-4 text-sm">Enter your Gemini API key to access the live practitioner dashboard.</p>
-              <div class="relative flex items-center border border-gray-200 dark:border-zinc-800 rounded focus-within:border-gray-400 dark:focus-within:border-zinc-600 transition-colors mb-2">
-                <input
-                  id="api-key-input"
-                  [(ngModel)]="apiKeyInput"
-                  [type]="showPassword() ? 'text' : 'password'"
-                  placeholder="Paste your Gemini API key here"
-                  class="flex-1 px-4 py-3 text-sm bg-transparent outline-none font-mono text-gray-800 dark:text-zinc-100 placeholder-gray-300 dark:placeholder-zinc-600"
-                  (keydown.enter)="submitApiKey()"
-                />
-                <button (click)="showPassword.update(v => !v)" class="px-3 text-gray-500 dark:text-zinc-400 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors" [attr.aria-label]="showPassword() ? 'Hide key' : 'Show key'">
-                  @if (showPassword()) {
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  } @else {
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  }
-                </button>
-              </div>
-              @if (apiKeyError()) {
-                <p class="text-brand-red-500 text-xs mb-3">{{ apiKeyError() }}</p>
-              }
-              <button (click)="submitApiKey()" [disabled]="!apiKeyInput().trim()"
-                class="w-full py-3 bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-[#09090b] text-xs font-bold uppercase tracking-widest hover:bg-black dark:hover:bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed mb-3">
-                Enter Dashboard
-              </button>
-            <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener"
-              class="block text-xs text-[#416B1F] dark:text-[#689f38] hover:text-[#244626] dark:hover:text-[#8bc34a] transition-colors mb-8">
-              Get an API key at <span class="font-bold">ai.dev</span> →
-            </a>
-
-            <!-- Divider -->
-            <div class="relative flex items-center gap-4 mb-8">
-              <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
-              <span class="text-xs text-gray-500 dark:text-zinc-400 uppercase tracking-widest">or</span>
-              <div class="flex-1 h-px bg-gray-100 dark:bg-zinc-800/50"></div>
-            </div>
-
-            <!-- Demo Mode -->
-            <button (click)="loadDemoMode()"
-              class="w-full py-3 border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-zinc-900 hover:border-gray-300 dark:hover:border-zinc-700 transition-all">
-              Try Demo — No Key Required
-            </button>
-            <p class="text-gray-500 dark:text-zinc-400 text-xs mt-2">Loads a pre-sampled patient with example AI analysis outputs.</p>
-          </div>
-
-          <!-- Legal & Medical Disclaimer -->
-          <div class="absolute bottom-6 left-6 right-6 text-center max-w-3xl mx-auto no-print">
-            <p class="text-[10px] text-gray-500 dark:text-zinc-400 leading-relaxed uppercase tracking-widest font-medium">
-              Important Legal / Liability Disclaimer
-            </p>
-            <p class="text-[10px] text-gray-500 dark:text-zinc-400 leading-relaxed mt-1">
-              The software provided by Pocket Gull acts as a clinical support and administrative tool to aggregate and analyze explicitly provided medical data. It is not intended to independently diagnose, treat, or cure any disease, and final clinical judgments remain solely the responsibility of the licensed healthcare provider.
-            </p>
-          </div>
-        </main>
+      }
+      
+      @if (session.isLocked() || !hasApiKey()) {
+        <app-secure-splash
+          [apiKeyError]="apiKeyError()"
+          (submitKey)="apiKeyInput.set($event); submitApiKey()"
+          (loadDemo)="loadDemoMode()"
+          (selectAiStudio)="selectKey()">
+        </app-secure-splash>
       } @else {
         <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
         <!-- Offline Banner -->
         @if (!network.isOnline()) {
-          <div class="bg-red-50 border-b border-red-200 px-4 py-2 flex items-center justify-between gap-4 no-print shrink-0">
+          <!-- Spectral P1-Critical (640nm red) offline banner -->
+          <div class="border-b px-4 py-2 flex items-center justify-between gap-4 no-print shrink-0"
+               style="background-color: var(--spectral-critical-bg); border-color: var(--spectral-critical-border);">
             <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-red-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-              <p class="text-xs text-red-800 font-medium">You are currently offline. Certain AI features and cloud sync may be disabled.</p>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" style="color: var(--spectral-critical);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+              <p class="text-xs font-medium" style="color: var(--spectral-critical);">You are currently offline. Certain AI features and cloud sync may be disabled.</p>
             </div>
             @if (network.forceOffline()) {
-                <button (click)="network.toggleForceOffline()" class="text-xs font-bold text-red-800 uppercase tracking-widest hover:text-red-900 whitespace-nowrap transition-colors border border-red-300 rounded px-2 py-1 bg-white/50">Reconnect</button>
+                <button (click)="network.toggleForceOffline()" class="text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors rounded px-2 py-1"
+                        style="color: var(--spectral-critical); border: 1px solid var(--spectral-critical-border); background: white;">Reconnect</button>
             }
           </div>
         }
-        <!-- Demo Banner -->
+        <!-- Spectral P2-Urgent (585nm amber) demo mode banner -->
         @if (isDemoMode()) {
-          <div class="bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800/30 px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 no-print shrink-0">
+          <div class="border-b px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 no-print shrink-0"
+               style="background-color: var(--spectral-urgent-bg); border-color: var(--spectral-urgent-border);">
             <div class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <p class="text-xs text-amber-800 dark:text-amber-200 font-medium">Demo Mode <span class="hidden sm:inline">— Showing pre-sampled patient data. AI analysis generation requires an API key.</span></p>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 shrink-0" style="color: var(--spectral-urgent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p class="text-xs font-medium" style="color: var(--spectral-urgent);">Demo Mode <span class="hidden sm:inline">— Showing pre-sampled patient data. AI analysis generation requires an API key.</span></p>
             </div>
             <div class="flex items-center gap-3">
-
-              <button (click)="exitDemoMode()" class="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-widest hover:text-amber-900 dark:hover:text-amber-300 whitespace-nowrap transition-colors">Enter API Key →</button>
+              <button (click)="exitDemoMode()" class="text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors" style="color: var(--spectral-urgent);">Enter API Key →</button>
             </div>
           </div>
         }
@@ -220,9 +139,11 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  [title]="network.isOnline() ? 'Click to simulate offline' : 'Click to disable offline override'">
             <div class="relative flex h-2 w-2">
               <span class="absolute inline-flex h-full w-full rounded-full opacity-75" 
-                    [class.bg-brand-green-400]="network.isOnline()" [class.bg-brand-red-400]="!network.isOnline()" [class.animate-ping]="network.isOnline()"
+                    [style.background-color]="network.isOnline() ? 'var(--spectral-stable)' : 'var(--spectral-critical)'"
+                    [class.animate-ping]="network.isOnline()"
                     style="will-change: transform, opacity;"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2" [class.bg-brand-green-500]="network.isOnline()" [class.bg-brand-red-500]="!network.isOnline()"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2"
+                    [style.background-color]="network.isOnline() ? 'var(--spectral-stable)' : 'var(--spectral-critical)'"></span>
             </div>
             <span class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-widest">{{ network.isOnline() ? 'System Ready' : 'System Offline' }}</span>
               
@@ -231,12 +152,12 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  <div class="space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-gray-800">
                        <span class="text-xs font-bold text-gray-300">CORE STATUS</span>
-                       <span class="text-xs font-bold text-brand-green-500 uppercase">Active</span>
+                       <span class="text-xs font-bold text-green-500 uppercase">Active</span>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                        <div class="space-y-1">
                           <p class="text-xs text-gray-500 font-bold uppercase tracking-tighter">AI Node</p>
-                          <p class="text-xs text-white">Stable</p>
+                           <p class="text-xs text-white">{{ network.activeProvider() }}</p>
                        </div>
                        <div class="space-y-1">
                           <p class="text-xs text-gray-500 font-bold uppercase tracking-tighter">Relay</p>
@@ -251,7 +172,15 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                           <p class="text-xs text-white">Healthy</p>
                        </div>
                      </div>
-                     <div class="pt-2 mt-1 border-t border-gray-800">
+                     <div class="pt-2 mt-1 border-t border-gray-800 flex flex-col gap-2">
+                         <button (click)="network.togglePreferLocalInference(); $event.stopPropagation()"
+                                 [disabled]="!network.isOnline()"
+                                 class="flex items-center justify-between text-xs font-bold transition-colors disabled:opacity-40 disabled:cursor-not-allowed pointer-events-auto cursor-pointer"
+                                 [class.text-green-400]="!network.preferLocalInference()"
+                                 [class.text-amber-400]="network.preferLocalInference()">
+                            <span>{{ network.preferLocalInference() ? '⚡ Use Cloud Gemini' : '🖥 Use Local PubGemma' }}</span>
+                            <span>→</span>
+                         </button>
                         <a href="/docs/study/" target="_blank" rel="noopener" class="flex items-center justify-between text-xs font-bold text-gray-400 hover:text-green-400 transition-colors pointer-events-auto cursor-pointer">
                            <span>VIEW DOCS</span>
                            <span>→</span>
@@ -263,6 +192,8 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           </div>
           
           <div class="flex items-center gap-2">
+
+
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
@@ -296,6 +227,16 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
               <span class="hidden sm:inline">Research</span>
             </button>
             
+            <a href="/docs/" target="_blank" rel="noopener"
+               aria-label="Open Documentation"
+               class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+              <span class="hidden sm:inline">Docs</span>
+            </a>
+
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
                     aria-label="Start Tour Guide"
@@ -333,7 +274,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
           </div>
         </nav>
 
-        <!-- New IPatient Navigation Bar -->
+        <!-- New Patient Navigation Bar -->
         <nav class="h-12 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center px-3 sm:px-6 shrink-0 bg-gray-50 dark:bg-[#09090b] z-40 no-print gap-4">
            <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:block">INTAKE MODULE 01</div>
            <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
@@ -407,7 +348,7 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
 
           
-          <!-- Column 1: IPatient Medical Chart -->
+          <!-- Column 1: Patient Medical Chart -->
            <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                 id="tour-body-chart"
                [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined"
@@ -428,32 +369,47 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             </div>
 
             <!-- RESIZER V -->
-            <div title="Drag to resize, Double-click to maximize chart" class="hidden md:flex w-2 shrink-0 items-center justify-center cursor-col-resize z-20 no-print group relative"
-                 [class.md:hidden]="isChartCollapsed() || isAnalysisCollapsed()"
+            <div title="Drag to resize, Double-click to maximize chart" class="hidden md:flex w-2 shrink-0 items-center justify-center cursor-col-resize z-20 no-print group"
+                 [class.relative]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                 [class.absolute]="isChartCollapsed() || isAnalysisCollapsed()"
+                 [class.h-full]="isChartCollapsed() || isAnalysisCollapsed()"
+                 [class.left-0]="isChartCollapsed()"
+                 [class.right-0]="isAnalysisCollapsed()"
+                 [class.top-0]="isChartCollapsed() || isAnalysisCollapsed()"
                  (mousedown)="startColumnDrag($event)"
                  (dblclick)="maximizeChart()">
                 
                 <!-- Full-width background bar -->
-                <div class="absolute inset-y-0 left-1/2 -translate-x-1/2 w-4 bg-transparent group-hover:bg-gray-100/50 dark:group-hover:bg-zinc-800/50 transition-colors rounded-full z-0"></div>
+                <div class="absolute inset-y-0 w-4 bg-transparent group-hover:bg-gray-100/50 dark:group-hover:bg-zinc-800/50 transition-colors rounded-full z-0"
+                     [class.left-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.-translate-x-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.left-0]="isChartCollapsed()"
+                     [class.right-0]="isAnalysisCollapsed()"></div>
                 <div class="absolute inset-0 bg-gray-100/50 dark:bg-zinc-800/50 group-hover:bg-gray-200 dark:group-hover:bg-zinc-700 transition-colors rounded"></div>
                 <!-- Handle -->
                 <div class="h-12 w-1.5 rounded-full bg-gray-200 dark:bg-zinc-700 group-hover:bg-gray-300 dark:group-hover:bg-zinc-600 transition-colors relative z-10"></div>
 
                 <!-- Quick Actions (V4) -->
-                <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white dark:bg-zinc-900 shadow-xl border border-gray-200 dark:border-zinc-800 rounded-full p-1.5 z-30">
+                <div class="absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-3 bg-white dark:bg-zinc-900 shadow-xl border border-gray-200 dark:border-zinc-800 rounded-full p-1.5 z-30"
+                     [class.left-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.-translate-x-1/2]="!isChartCollapsed() && !isAnalysisCollapsed()"
+                     [class.left-0]="isChartCollapsed()"
+                     [class.translate-x-2]="isChartCollapsed()"
+                     [class.right-0]="isAnalysisCollapsed()"
+                     [class.-translate-x-2]="isAnalysisCollapsed()">
                    
                    <!-- Panel Management -->
                    <div class="flex flex-col gap-1 border-b border-gray-100 dark:border-zinc-800 pb-1.5 mb-0.5">
-                      <button (click)="$event.stopPropagation(); toggleChart()" [class.bg-black]="!isChartCollapsed()" [class.dark:bg-white]="!isChartCollapsed()" [class.text-white]="!isChartCollapsed()" [class.dark:text-black]="!isChartCollapsed()"
-                              title="Toggle Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
+                      <button (click)="$event.stopPropagation(); maximizeChart()" [class.bg-black]="!isChartCollapsed() && isAnalysisCollapsed()" [class.dark:bg-white]="!isChartCollapsed() && isAnalysisCollapsed()" [class.text-white]="!isChartCollapsed() && isAnalysisCollapsed()" [class.dark:text-black]="!isChartCollapsed() && isAnalysisCollapsed()"
+                              title="Maximize Medical Chart" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); toggleAnalysis()" [class.bg-black]="!isAnalysisCollapsed()" [class.dark:bg-white]="!isAnalysisCollapsed()" [class.text-white]="!isAnalysisCollapsed()" [class.dark:text-black]="!isAnalysisCollapsed()"
-                              title="Toggle Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
+                      <button (click)="$event.stopPropagation(); maximizeAnalysis()" [class.bg-black]="isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:bg-white]="isChartCollapsed() && !isAnalysisCollapsed()" [class.text-white]="isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:text-black]="isChartCollapsed() && !isAnalysisCollapsed()"
+                              title="Maximize Analysis Panel" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                       </button>
-                      <button (click)="$event.stopPropagation(); maximizeChart()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors" title="Maximize Chart">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="m15 18-6-6 6-6"></path></svg>
+                      <button (click)="$event.stopPropagation(); showSplitView()" [class.bg-black]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:bg-white]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.text-white]="!isChartCollapsed() && !isAnalysisCollapsed()" [class.dark:text-black]="!isChartCollapsed() && !isAnalysisCollapsed()" class="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors" title="Split View">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="2" y="3" width="20" height="18" rx="2" ry="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line></svg>
                       </button>
                    </div>
 
@@ -514,7 +470,13 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
                  <!-- Section 1: Analysis Intake Container -->
-                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]">
+                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]"
+                      [class.rounded-none]="isChartCollapsed()"
+                      [class.border-y-0]="isChartCollapsed()"
+                      [class.border-r-0]="isChartCollapsed()"
+                      [class.shadow-none]="isChartCollapsed()"
+                      [class.bg-[#F9FAFB]]="isChartCollapsed()"
+                      [class.dark:bg-[#09090b]]="isChartCollapsed()">
                      @defer (on viewport) {
                        <app-analysis-container class="block h-full min-h-0 min-w-0" appReveal [revealDelay]="100"></app-analysis-container>
                      } @placeholder {
@@ -523,11 +485,78 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
                  </div>
             </div>
 
-            <!-- Overlay: Full Screen Voice Assistant -->
+            <!-- Pocket: Floating Voice Assistant -->
             @if (state.isLiveAgentActive()) {
-              <div class="fixed inset-0 z-[100] bg-white dark:bg-[#111111] flex flex-col transition-all duration-700 animate-in fade-in"
-                   style="animation: intro-fullscreen 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;">
-                  <app-voice-assistant class="block h-full w-full"></app-voice-assistant>
+              <!-- Background backdrop blur -->
+              <div class="fixed inset-0 z-[99] bg-black/10 dark:bg-black/30 backdrop-blur-[2px] animate-in fade-in" (click)="state.toggleLiveAgent(false)"></div>
+              
+              <!-- Animation Styles for Folding -->
+              <style>
+                @keyframes origami-unfold {
+                    0% { transform: scaleY(0.1) rotateX(80deg) rotateZ(-10deg); opacity: 0; }
+                    60% { transform: scaleY(1.1) rotateX(-15deg) rotateZ(5deg); opacity: 1; }
+                    100% { transform: scaleY(1) rotateX(0deg) rotateZ(0deg); opacity: 1; }
+                }
+                @keyframes fly-out-pocket {
+                    0% { transform: translateY(100px) scale(0.2) rotate(-20deg); opacity: 0; }
+                    60% { transform: translateY(-15px) scale(1.1) rotate(10deg); opacity: 1; }
+                    100% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+                }
+                .origami-fold {
+                    animation: origami-unfold 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                    transform-style: preserve-3d;
+                }
+                .fly-out {
+                    animation: fly-out-pocket 1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+                }
+                .fold-1 { animation-delay: 150ms; }
+                .fold-2 { animation-delay: 300ms; }
+                .fold-3 { animation-delay: 450ms; }
+                .fold-4 { animation-delay: 600ms; }
+              </style>
+
+              <!-- The Pocket Container -->
+              <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100%-2rem)] sm:w-[420px] h-[650px] max-h-[calc(100dvh-4rem)] z-[100] flex flex-col transition-all duration-500 animate-in slide-in-from-bottom-10 fade-in pointer-events-none">
+                 
+                 <!-- Perched Origami Seagull -->
+                 <div class="relative w-full h-24 pointer-events-auto flex justify-center items-end pb-0 translate-y-[4px] z-[101]" style="perspective: 1000px;">
+                    <svg class="w-28 h-28 drop-shadow-[0_10px_10px_rgba(20,50,90,0.3)] fly-out" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                        <g fill-rule="evenodd" stroke="#1E3A5F" stroke-width="2.5" stroke-linejoin="round">
+                            <!-- Right Wing (Back) -->
+                            <polygon points="107,95 140,50 115,85" fill="#C5D9ED" class="origami-fold fold-4 origin-[60%_45%]" />
+                            <polygon points="140,50 115,85 130,100" fill="#E6F0FA" class="origami-fold fold-3 origin-[60%_45%]" />
+
+                            <!-- Left Wing (Front raised) -->
+                            <polygon points="40,35 60,65 30,55" fill="#FFFFFF" class="origami-fold fold-4 origin-[35%_35%]" />
+                            <polygon points="40,35 85,60 60,65" fill="#FFFFFF" class="origami-fold fold-3 origin-[40%_35%]" />
+                            <polygon points="85,60 107,95 60,65" fill="#DAE8F5" class="origami-fold fold-2 origin-[40%_35%]" />
+                            <polygon points="60,65 107,95 90,115" fill="#FFFFFF" class="origami-fold fold-1 origin-[50%_50%]" />
+
+                            <!-- Tail -->
+                            <polygon points="45,130 65,110 55,145" fill="#FFFFFF" class="origami-fold fold-4 origin-[30%_65%]" />
+                            <polygon points="65,110 55,145 90,115" fill="#E6F0FA" class="origami-fold fold-3 origin-[35%_65%]" />
+
+                            <!-- Body -->
+                            <polygon points="65,110 90,115 107,95" fill="#FFFFFF" class="origami-fold origin-[50%_60%]" />
+                            <polygon points="90,115 107,95 125,105" fill="#FFFFFF" class="origami-fold origin-[50%_60%]" />
+                            <polygon points="90,115 125,105 120,130" fill="#C5D9ED" class="origami-fold origin-[55%_60%]" />
+
+                            <!-- Head/Beak -->
+                            <polygon points="107,95 122,90 125,105" fill="#FFFFFF" class="origami-fold fold-1 origin-[60%_50%]" />
+                            <polygon points="122,90 135,93 125,105" fill="#FFFFFF" class="origami-fold fold-2 origin-[60%_50%]" />
+                            <polygon points="125,105 135,93 140,110" fill="#E6F0FA" class="origami-fold fold-2 origin-[60%_50%]" />
+                            <polygon points="135,93 150,100 133,102" fill="#E6F0FA" class="origami-fold fold-3 origin-[65%_50%]" />
+                        </g>
+                    </svg>
+                 </div>
+                 
+                 <!-- The Pocket Window styled like the Origami Theme -->
+                 <div class="flex-1 w-full bg-gradient-to-br from-[#E1EAF4] to-[#C9DEEE] dark:from-[#0F172A] dark:to-[#1E293B] rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(30,58,95,0.4)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] border-[3px] border-white dark:border-[#334155] overflow-hidden pointer-events-auto flex flex-col relative ring-1 ring-[#1E3A5F]/10 dark:ring-black/50">
+                    <!-- Embedded Voice Assistant logic takes over inner bounds transparently -->
+                    @defer (on immediate) {
+                      <app-voice-assistant class="block h-full w-full mix-blend-normal bg-white/70 dark:bg-black/50 backdrop-blur-md"></app-voice-assistant>
+                    }
+                 </div>
               </div>
             }
 
@@ -539,218 +568,204 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
             }
         }
 
-    <!-- Preview & Print Modal -->
+    <!-- Preview & Print Modal (Dieter Rams Style) -->
     @if (showPreviewModal()) {
-      <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 no-print">
-        <div class="bg-white dark:bg-[#09090b] w-full max-w-4xl max-h-[85dvh] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-[#F9FAFB] dark:bg-zinc-900">
-            <div>
-              <h2 class="text-lg font-bold text-[#1C1C1C] dark:text-zinc-100">Preview & Print Care Plan</h2>
-              <p class="text-xs uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-wider mt-1">Review and edit finalized text before archiving</p>
-            </div>
-            <pocket-gull-button 
-              variant="ghost" 
-              size="sm" 
-              (click)="closePreview()" 
-              ariaLabel="Close Preview Modal"
-              icon="M18 6L6 18M6 6l12 12">
-            </pocket-gull-button>
+      <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 no-print">
+        <div class="bg-[#f9f9f9] dark:bg-[#111111] w-full max-w-5xl max-h-[90dvh] rounded-[2px] shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-[0.98] duration-300 border border-gray-300 dark:border-zinc-800 relative print-medical-chart">
+          
+          <!-- Classic Dieter Rams Grill -->
+          <div class="absolute top-0 left-0 right-0 h-1 flex gap-0.5 px-6 opacity-40">
+             <div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div><div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div><div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div><div class="flex-1 bg-gray-400 dark:bg-zinc-600"></div>
           </div>
-          <div class="flex-1 overflow-y-auto p-6 bg-white dark:bg-[#09090b] relative">
-              <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex flex-col gap-1">
-                  <h3 class="block text-[10px] font-bold text-[#689F38] uppercase tracking-[0.2em]">Care Plan Finalization</h3>
-                  <p class="text-[10px] text-gray-500 lowercase font-medium italic">Adjust cognition level for patient understanding</p>
+
+          <!-- Header -->
+          <div class="px-8 pt-6 pb-4 border-b border-gray-200 dark:border-zinc-800 flex justify-between items-start bg-transparent">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                 <div class="w-2 h-2 rounded-full bg-[#ff4500] animate-pulse shadow-[0_0_8px_rgba(255,69,0,0.6)]"></div>
+                 <h2 class="text-[11px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.2em] font-mono">Care Plan Archiver</h2>
+              </div>
+              <p class="text-[9px] uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-[0.2em] ml-5">Review • Adjust • Finalize</p>
+            </div>
+            <button 
+              (click)="closePreview()" 
+              class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors text-gray-500"
+              aria-label="Close">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Content Body -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-transparent relative">
+              <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 border-b border-gray-300 dark:border-zinc-700 pb-4">
+                <div class="flex flex-col gap-1.5">
+                  <h3 class="text-[10px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.3em]">Cognitive Output Level</h3>
+                  <p class="text-[9px] text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">Select target patient comprehension</p>
                 </div>
                 
-                <div class="flex flex-col gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                  <div class="flex p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-inner w-full sm:w-fit">
-                    <button 
-                      (click)="changeReadingLevel('standard')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'standard' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Standard
-                    </button>
-                    <button 
-                      (click)="changeReadingLevel('simplified')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'simplified' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Simplified
-                    </button>
-                    <button 
-                      (click)="changeReadingLevel('dyslexia')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'dyslexia' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Cognition
-                    </button>
-                    <button 
-                      (click)="changeReadingLevel('child')"
-                      [disabled]="isTranslating()"
-                      class="flex-1 sm:flex-none px-4 py-2 text-[10px] uppercase tracking-widest font-bold rounded-lg transition-all duration-300 disabled:opacity-50"
-                      [ngClass]="selectedReadingLevel() === 'child' ? 'bg-white dark:bg-zinc-800 text-[#689F38] shadow-sm transform scale-[1.02]' : 'text-gray-400 hover:text-gray-600 dark:hover:text-zinc-300'">
-                      Pediatric
-                    </button>
-                  </div>
+                <div class="flex flex-wrap gap-1">
+                  <!-- Dieter Rams Tabs -->
+                  <button (click)="changeReadingLevel('standard')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'standard' ? 'bg-[#1C1C1C] text-white dark:bg-white dark:text-[#111111] border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Standard
+                  </button>
+                  <button (click)="changeReadingLevel('simplified')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'simplified' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Simplified
+                  </button>
+                  <button (click)="changeReadingLevel('dyslexia')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'dyslexia' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Cognition
+                  </button>
+                  <button (click)="changeReadingLevel('child')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'child' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Pediatric
+                  </button>
                 </div>
               </div>
 
               <!-- PRINT STRATEGY OPTIONS -->
               @if (selectedReadingLevel() !== 'standard') {
-                <div class="mb-6 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <div class="flex flex-wrap items-center gap-6 p-4 bg-zinc-50 dark:bg-zinc-900/40 rounded-xl border border-dashed border-zinc-200 dark:border-zinc-800">
+                <div class="mb-8 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <div class="flex flex-wrap items-center gap-6 p-4 bg-white/50 dark:bg-[#1C1C1C]/50 border border-gray-300 dark:border-zinc-700 rounded-[2px]">
                     <div class="flex items-center gap-3">
-                      <div class="relative inline-flex items-center cursor-pointer">
+                      <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" [checked]="includeAnalysisInPrint()" (change)="toggleAnalysisInPrint()" class="sr-only peer">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-[#689F38]"></div>
-                      </div>
-                      <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Include AI Analysis</span>
+                        <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-none peer dark:bg-zinc-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-400 after:border after:rounded-none after:h-3 after:w-3.5 after:transition-all dark:border-zinc-600 peer-checked:bg-[#1C1C1C] dark:peer-checked:bg-white"></div>
+                      </label>
+                      <span class="text-[9px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include AI Analysis</span>
                     </div>
 
                     <div class="flex items-center gap-3">
-                      <div class="relative inline-flex items-center cursor-pointer">
+                      <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" [checked]="includeOriginalInPrint()" (change)="toggleOriginalInPrint()" class="sr-only peer">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-zinc-600 peer-checked:bg-[#689F38]"></div>
-                      </div>
-                      <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Include Original</span>
-                    </div>
-                    
-                    <div class="ml-auto text-[9px] text-[#689F38] font-mono uppercase tracking-tighter opacity-60">
-                      Strategy: {{ includeAnalysisInPrint() && includeOriginalInPrint() ? 'Full Composite' : 'Selective' }}
+                        <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-none peer dark:bg-zinc-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-400 after:border after:rounded-none after:h-3 after:w-3.5 after:transition-all dark:border-zinc-600 peer-checked:bg-[#1C1C1C] dark:peer-checked:bg-white"></div>
+                      </label>
+                      <span class="text-[9px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include Original</span>
                     </div>
                   </div>
                 </div>
               }
              
-              <div class="relative grid gap-4 transition-all duration-300" [class.grid-cols-1]="selectedReadingLevel() === 'standard'" [class.sm:grid-cols-2]="selectedReadingLevel() !== 'standard'">
+              <div class="relative grid gap-8 transition-all duration-300" [class.grid-cols-1]="selectedReadingLevel() === 'standard'" [class.sm:grid-cols-2]="selectedReadingLevel() !== 'standard'">
                
+               <!-- Original English -->
                @if (selectedReadingLevel() !== 'standard') {
-                 <div class="flex flex-col gap-1.5 animate-in fade-in slide-in-from-left-4 duration-300">
-                    <label class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest ml-1">Original (English)</label>
+                 <div class="flex flex-col gap-2 animate-in fade-in slide-in-from-left-4 duration-300">
+                    <label class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Plan</label>
                     <pocket-gull-input
                       type="textarea"
-                      [rows]="16"
+                      [rows]="20"
                       [value]="originalPreviewText()"
                       (valueChange)="originalPreviewText.set($event)"
                       [disabled]="isTranslating()"
                       placeholder="No Active Care Plan recorded for this visit."
-                      class="w-full">
+                      class="w-full shadow-inner opacity-70 hover:opacity-100 transition-opacity">
                     </pocket-gull-input>
                  </div>
                } @else {
-                 <div class="flex flex-col gap-1.5 opacity-50">
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Original Active Care Plan</label>
+                 <div class="flex flex-col gap-2 relative">
+                    <label class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Care Plan</label>
                     <pocket-gull-input
                       type="textarea"
-                      [rows]="8"
+                      [rows]="20"
                       [value]="originalPreviewText()"
                       [disabled]="true"
                       placeholder="No Active Care Plan recorded for this visit."
-                      class="w-full h-full">
+                      class="w-full h-full opacity-60 pointer-events-none">
                     </pocket-gull-input>
                  </div>
                }
 
-               <div class="flex flex-col gap-1.5">
+               <!-- Translated Plan -->
+               <div class="flex flex-col gap-2 relative">
                   @if (selectedReadingLevel() !== 'standard') {
-                     <label class="text-[10px] font-bold text-[#689F38] uppercase tracking-widest ml-1 animate-in fade-in duration-300">Translated / Adjusted Plan</label>
+                     <label class="text-[9px] font-bold text-[#ff4500] uppercase tracking-[0.2em] font-mono border-b border-[#ff4500] pb-1 animate-in fade-in duration-300 flex justify-between items-center">
+                       <span>Translated / Adjusted Plan</span>
+                       <span class="w-1.5 h-1.5 bg-[#ff4500] rounded-full inline-block animate-pulse"></span>
+                     </label>
                   }
                   <pocket-gull-input
                     type="textarea"
-                    [rows]="16"
+                    [rows]="20"
                     [value]="previewText()"
                     (valueChange)="previewText.set($event)"
                     [disabled]="isTranslating()"
                     placeholder="No Active Care Plan recorded for this visit."
-                    class="w-full">
+                    class="w-full bg-white dark:bg-[#09090b] shadow-lg">
                   </pocket-gull-input>
                </div>
                
                @if (isTranslating()) {
-                 <div class="absolute inset-0 bg-white/70 dark:bg-[#09090b]/70 backdrop-blur-[1px] flex flex-col items-center justify-center z-10 rounded">
-                    <div class="w-6 h-6 border-2 border-[#689F38] border-t-transparent rounded-full animate-spin"></div>
-                    <p class="mt-2 text-xs font-bold text-[#689F38] uppercase tracking-wider animate-pulse">Translating...</p>
+                 <div class="absolute inset-x-0 inset-y-8 bg-white/80 dark:bg-[#111111]/80 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 rounded-sm">
+                    <div class="w-8 h-8 border-[3px] border-gray-200 border-t-[#ff4500] rounded-full animate-spin shadow-lg"></div>
+                    <p class="mt-4 text-[10px] font-bold text-[#ff4500] uppercase tracking-[0.3em] font-mono animate-pulse">Processing Translation</p>
                  </div>
                }
                @if (translationError()) {
-                  <div class="mt-2 text-[10px] font-bold text-brand-red-500 uppercase tracking-widest animate-in fade-in duration-300">
-                    ⚠️ {{ translationError() }}
+                  <div class="absolute bottom-4 left-4 right-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-[0.1em] font-mono shadow-md flex items-center gap-2 z-20">
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
+                    System Error: {{ translationError() }}
                   </div>
                }
              </div>
              
-             <!-- NEW TRANSLATION ANALYSIS UI -->
+             <!-- TRANSLATION ANALYSIS UI -->
              @if (selectedReadingLevel() !== 'standard') {
-               <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 animate-in fade-in duration-300">
-                  <div class="flex flex-col gap-2 mb-2">
-                    <div class="flex justify-between items-center">
-                      <h4 class="text-[10px] font-bold text-[#689F38] uppercase tracking-widest">AI Translation Analysis</h4>
-                      <pocket-gull-button 
+               <div class="mt-8 pt-6 border-t border-gray-300 dark:border-zinc-700 animate-in fade-in duration-500">
+                  <div class="flex flex-col gap-3 mb-2">
+                    <div class="flex justify-between items-end border-b border-gray-200 dark:border-zinc-800 pb-2">
+                      <h4 class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.3em] font-mono">Structural Analysis</h4>
+                      <button 
                         (click)="analyzeCurrentTranslation()" 
                         [disabled]="isAnalyzingTranslation() || isTranslating()"
-                        variant="secondary" 
-                        size="sm" 
-                        icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                        class="px-4 py-1.5 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all text-[#1C1C1C] dark:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
                         @if (isAnalyzingTranslation()) {
+                          <div class="w-2.5 h-2.5 border-2 border-gray-400 border-t-[#1C1C1C] rounded-full animate-spin"></div>
                           Analyzing...
                         } @else {
-                          Analyze Translation
+                          Analyze Translation Matrix
                         }
-                      </pocket-gull-button>
+                      </button>
                     </div>
                     @if (translationAnalysis()) {
-                      <div class="p-3 bg-gray-50 dark:bg-zinc-900 rounded border border-gray-200 dark:border-zinc-800 text-sm text-gray-700 dark:text-zinc-300 animate-in slide-in-from-top-2 duration-300 whitespace-pre-wrap">
+                      <div class="p-4 sm:p-6 bg-white dark:bg-[#09090b] shadow-inner border border-gray-200 dark:border-zinc-800 text-[11px] leading-relaxed text-gray-800 dark:text-zinc-300 font-mono animate-in slide-in-from-top-4 duration-500 whitespace-pre-wrap">
                          {{ translationAnalysis() }}
                       </div>
                     }
                   </div>
-                  
-                  <!-- PRINT STRATEGY TOGGLES -->
-                  <div class="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex flex-col sm:flex-row gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer group">
-                      <input type="checkbox" 
-                             [checked]="includeAnalysisInPrint()" 
-                             (change)="includeAnalysisInPrint.set(!includeAnalysisInPrint())"
-                             class="w-4 h-4 text-[#689F38] rounded border-gray-300 focus:ring-[#689F38] dark:border-zinc-700 dark:bg-zinc-900" />
-                      <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-zinc-100 transition-colors">Include AI Translation Analysis in Print</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer group">
-                      <input type="checkbox" 
-                             [checked]="includeOriginalInPrint()" 
-                             (change)="includeOriginalInPrint.set(!includeOriginalInPrint())"
-                             class="w-4 h-4 text-[#689F38] rounded border-gray-300 focus:ring-[#689F38] dark:border-zinc-700 dark:bg-zinc-900" />
-                      <span class="text-xs font-medium text-gray-700 dark:text-zinc-300 group-hover:text-gray-900 dark:group-hover:text-zinc-100 transition-colors">Include Original Clinical Plan in Print</span>
-                    </label>
-                  </div>
                </div>
              }
              
-             <p class="text-xs text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-wider mt-3 pl-1">This text will be archived in the patient's chart as the final Care Plan for this visit.</p>
+             <div class="mt-8 flex justify-center opacity-40">
+                <p class="text-[8px] font-mono uppercase tracking-[0.4em]">Final Output Target: Medical Chart Archive</p>
+             </div>
           </div>
-          <div class="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 bg-[#F9FAFB] dark:bg-zinc-900 flex justify-between items-center">
-            <pocket-gull-button 
+          
+          <!-- Footer -->
+          <div class="px-8 py-5 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 flex justify-between items-center mt-auto">
+            <button 
               (click)="printReport()" 
-              variant="secondary" 
-              size="sm" 
-              icon="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z">
-              Print Plan
-            </pocket-gull-button>
-            <div class="flex items-center gap-3">
-              <pocket-gull-button 
+              class="px-5 py-2.5 border border-[#1C1C1C] dark:border-zinc-600 text-[#1C1C1C] dark:text-zinc-100 bg-transparent text-[9px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-2 rounded-[2px]">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+              Print Document
+            </button>
+            <div class="flex items-center gap-4">
+              <button 
                 (click)="closePreview()" 
-                variant="ghost" 
-                size="sm">
+                class="px-4 py-2 text-gray-500 hover:text-[#1C1C1C] dark:hover:text-white text-[9px] font-bold uppercase tracking-[0.2em] transition-colors">
                 Cancel
-              </pocket-gull-button>
-              <pocket-gull-button 
+              </button>
+              <button 
                 (click)="confirmFinalize()" 
-                variant="primary" 
-                size="sm" 
-                trailingIcon="M20 6L9 17l-5-5">
+                class="px-8 py-3 bg-[#1C1C1C] dark:bg-white text-white dark:text-[#111111] text-[10px] font-bold uppercase tracking-[0.3em] font-mono hover:bg-black dark:hover:bg-gray-200 transition-all flex items-center gap-2 rounded-[2px] shadow-md active:translate-y-[1px]">
                 Commit to Chart
-              </pocket-gull-button>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -778,6 +793,7 @@ export class AppComponent implements OnDestroy {
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
   network = inject(NetworkStateService);
+  readonly rules = inject(RulesEngineService);
   private aiConfig = inject(AI_CONFIG, { optional: true });
   today = new Date();
   hasApiKey = signal<boolean>(!!this.aiConfig?.apiKey);
@@ -807,15 +823,10 @@ export class AppComponent implements OnDestroy {
   includeAnalysisInPrint = signal<boolean>(true);
   includeOriginalInPrint = signal<boolean>(true);
 
-  // Seagull Interactivity State
-  seagullAngle = signal<number>(0);
-  isSeagullFrightened = signal<boolean>(false);
-  seagullFlyAwayX = signal<number>(0);
-  seagullFlyAwayY = signal<number>(0);
-
   // Navbar Dropdown States
   exportMenuOpen = signal(false);
   connectMenuOpen = signal(false);
+  isDirectoryOpen = signal(false);
 
   hasReport = computed(() => Object.keys(this.clinicalIntelligence.analysisResults()).length > 0);
 
@@ -832,6 +843,7 @@ export class AppComponent implements OnDestroy {
 
   async exportSimplifiedPdf() {
     this.isSimplifying.set(true);
+    this.rules.setContext('dyslexia_mode', true);
     try {
       const results = this.clinicalIntelligence.analysisResults();
       const patient = this.patientMgmt.selectedPatient();
@@ -848,12 +860,14 @@ export class AppComponent implements OnDestroy {
       console.error("Failed to generate simplified PDF", e);
       alert("Failed to generated simplified export. " + (e as Error).message);
     } finally {
+      this.rules.setContext('dyslexia_mode', false);
       this.isSimplifying.set(false);
     }
   }
 
   async exportChildPdf() {
     this.isSimplifyingChild.set(true);
+    this.rules.setContext('pediatric_mode', true);
     try {
       const results = this.clinicalIntelligence.analysisResults();
       const patient = this.patientMgmt.selectedPatient();
@@ -870,6 +884,7 @@ export class AppComponent implements OnDestroy {
       console.error("Failed to generate child PDF", e);
       alert("Failed to generated child export. " + (e as Error).message);
     } finally {
+      this.rules.setContext('pediatric_mode', false);
       this.isSimplifyingChild.set(false);
     }
   }
@@ -916,81 +931,6 @@ export class AppComponent implements OnDestroy {
   uploadData() {
     // Usually this triggers file upload dialog from patient-dropdown, but for now we'll trigger an alert or sync.
     alert("Upload data modal placeholder");
-  }
-
-  // Window/Event listeners for Seagull interactivity
-  @HostListener('window:mousemove', ['$event'])
-  onMouseMove(event: MouseEvent) {
-    if (this.hasApiKey() || this.isSeagullFrightened() || typeof window === 'undefined') return;
-
-    // Approximate center of the seagull based on layout (adjust if needed)
-    const birdElement = document.querySelector('.origami-seagull-container');
-    if (!birdElement) return;
-    const birdRect = birdElement.getBoundingClientRect();
-
-    const birdCenterX = birdRect.left + (birdRect.width / 2);
-    const birdCenterY = birdRect.top + (birdRect.height / 2);
-
-    const mouseX = event.clientX;
-    const mouseY = event.clientY;
-
-    // Calculate angle towards mouse
-    const deltaX = mouseX - birdCenterX;
-    const deltaY = mouseY - birdCenterY;
-    
-    // Angle in degrees
-    let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-    // Add offset so the beak points toward the cursor instead of the top wing
-    this.seagullAngle.set(angle + 45); 
-
-    // Distance to trigger fly away
-    const distance = Math.hypot(deltaX, deltaY);
-    
-    // Check if mouse is over safe zone (API key input box)
-    const safeZone = document.getElementById('seagull-safe-zone');
-    let isSafe = false;
-    if (safeZone) {
-      const safeRect = safeZone.getBoundingClientRect();
-      isSafe = (mouseX >= safeRect.left - 50 && mouseX <= safeRect.right + 50 &&
-                mouseY >= safeRect.top - 50 && mouseY <= safeRect.bottom + 50);
-    }
-
-    if (distance < 120 && !isSafe) {
-      this.triggerFrightenedFlight(mouseX, mouseY);
-    }
-  }
-
-  // Touch support for interactivity
-  @HostListener('window:touchmove', ['$event'])
-  onTouchMove(event: TouchEvent) {
-    if (event.touches.length > 0) {
-      this.onMouseMove(event.touches[0] as unknown as MouseEvent);
-    }
-  }
-
-  private triggerFrightenedFlight(mouseX: number, mouseY: number) {
-     this.isSeagullFrightened.set(true);
-     // Fly away in opposite direction of mouse
-     const birdElement = document.querySelector('.origami-seagull-container');
-     if (birdElement) {
-         const birdRect = birdElement.getBoundingClientRect();
-         const dx = birdRect.left - mouseX;
-         const dy = birdRect.top - mouseY;
-         
-         // Normalize and scale up for fly-away distance
-         const mag = Math.hypot(dx, dy) || 1;
-         // Send bird flying rapidly off screen
-         this.seagullFlyAwayX.set((dx / mag) * window.innerWidth * 1.5);
-         this.seagullFlyAwayY.set((dy / mag) * window.innerHeight * 1.5 - 500); // go upward usually
-     }
-     
-     // Optionally reset after 5 seconds to try again
-     setTimeout(() => {
-        this.isSeagullFrightened.set(false);
-        this.seagullFlyAwayX.set(0);
-        this.seagullFlyAwayY.set(0);
-        this.seagullAngle.set(0);
-     }, 4000);
   }
 
   openFinalizePreview() {
@@ -1055,7 +995,7 @@ export class AppComponent implements OnDestroy {
       plan = plan ? `${plan}\n\n### ${ClinicalIcons.Medication} Medications\n${medsContent}` : `### ${ClinicalIcons.Medication} Medications\n${medsContent}`;
     }
     
-    const finalText = plan || 'No Active IPatient Summary recorded for this visit.';
+    const finalText = plan || 'No Active Patient Summary recorded for this visit.';
     this.previewText.set(finalText);
     this.originalPreviewText.set(finalText);
     this.selectedReadingLevel.set('standard');
@@ -1125,6 +1065,7 @@ export class AppComponent implements OnDestroy {
     }
   }
 
+
   printReport() {
     const p = this.patientMgmt.selectedPatient();
     const vitals = this.state.vitals();
@@ -1132,42 +1073,46 @@ export class AppComponent implements OnDestroy {
     const level = this.selectedReadingLevel();
 
     if (level !== 'standard') {
-      const levelNames = {
+      const levelNames: Record<string, string> = {
         'simplified': 'Simplified (6th Grade)',
         'dyslexia': 'Cognition (Dyslexia-Friendly)',
         'child': 'Child (Pediatric)'
       };
       
-      let compositePlan = `## COGNITIVE LEVEL PLAN: ${levelNames[level]?.toUpperCase() || level.toUpperCase()}\n\n`;
-      compositePlan += `${textToPrint}\n\n`;
+      const translationMatrix = {
+        levelName: levelNames[level] || level.toUpperCase(),
+        translatedPlanMarkdown: this.previewText(),
+        originalPlanMarkdown: this.includeOriginalInPrint() ? this.originalPreviewText() : null,
+        analysisMarkdown: this.includeAnalysisInPrint() ? this.translationAnalysis() : null
+      };
 
-      if (this.includeAnalysisInPrint()) {
-        const analysis = this.translationAnalysis();
-        if (analysis) {
-          compositePlan += `### AI Translation Analysis\n${analysis}\n\n`;
-          compositePlan += `---\n\n`;
-        }
-      }
-
-      if (this.includeOriginalInPrint()) {
-        compositePlan += `### Original Clinical Plan (Provider Reference)\n${this.originalPreviewText()}`;
-      }
-      
-      textToPrint = compositePlan;
+      this.export.downloadCarePlanPdf(
+        '',
+        p?.name ?? 'Patient',
+        {
+          bp: vitals.bp || undefined,
+          hr: vitals.hr || undefined,
+          temp: vitals.temp || undefined,
+          spO2: vitals.spO2 || undefined,
+          weight: vitals.weight || undefined,
+        },
+        p?.preexistingConditions ?? [],
+        translationMatrix
+      );
+    } else {
+      this.export.downloadCarePlanPdf(
+        textToPrint,
+        p?.name ?? 'Patient',
+        {
+          bp: vitals.bp || undefined,
+          hr: vitals.hr || undefined,
+          temp: vitals.temp || undefined,
+          spO2: vitals.spO2 || undefined,
+          weight: vitals.weight || undefined,
+        },
+        p?.preexistingConditions ?? []
+      );
     }
-
-    this.export.downloadCarePlanPdf(
-      textToPrint,
-      p?.name ?? 'IPatient',
-      {
-        bp: vitals.bp || undefined,
-        hr: vitals.hr || undefined,
-        temp: vitals.temp || undefined,
-        spO2: vitals.spO2 || undefined,
-        weight: vitals.weight || undefined,
-      },
-      p?.preexistingConditions ?? []
-    );
   }
 
   confirmFinalize() {
@@ -1264,6 +1209,18 @@ export class AppComponent implements OnDestroy {
   private boundDoVoiceColDrag = this.doVoiceColDrag.bind(this);
   private boundStopVoiceColDrag = this.stopVoiceColDrag.bind(this);
 
+  readonly session = inject(SessionStateService);
+
+  @HostListener('document:mousemove')
+  @HostListener('document:keydown')
+  @HostListener('document:touchstart')
+  @HostListener('document:wheel')
+  onUserInteraction() {
+    if (!this.session.isLocked()) {
+       this.session.resetIdleTimer();
+    }
+  }
+
   constructor() {
     afterNextRender(async () => {
       if (typeof window === 'undefined') return;
@@ -1275,12 +1232,21 @@ export class AppComponent implements OnDestroy {
 
       this.isMobile.set(window.innerWidth < 768);
 
-      // 1. Check for server-injected key (Cloud Run production)
-      if ((window as any).GEMINI_API_KEY) {
-        this.hasApiKey.set(true);
-      }
+      // 1. Fetch API key from server (replaces window.GEMINI_API_KEY HTML injection)
+      //    The server only serves /api/config to same-origin requests.
+      try {
+        const configRes = await fetch('/api/config');
+        if (configRes.ok) {
+          const config = await configRes.json();
+          if (config?.apiKey) {
+            try { localStorage.setItem('GEMINI_API_KEY', config.apiKey); } catch (_e) { /* ignore */ }
+            (window as any).GEMINI_API_KEY = config.apiKey; // keep compat for ADK WS handshake
+            this.hasApiKey.set(true);
+          }
+        }
+      } catch (_e) { /* network offline or dev mode without server */ }
 
-      // 2. Check for stored API key in localStorage (manual entry)
+      // 2. Check for stored API key in localStorage (manual entry / offline fallback)
       if (!this.hasApiKey()) {
         try {
           const storedKey = localStorage.getItem('GEMINI_API_KEY');
@@ -1644,6 +1610,12 @@ export class AppComponent implements OnDestroy {
     this.isAnalysisCollapsed.set(false);
   }
 
+  showSplitView() {
+    this.isChartCollapsed.set(false);
+    this.isAnalysisCollapsed.set(false);
+    this.inputPanelWidth.set(window.innerWidth / 2);
+  }
+
   // --- Column Resizing Logic ---
   startColumnDrag(event: MouseEvent): void {
     event.preventDefault();
@@ -1651,9 +1623,15 @@ export class AppComponent implements OnDestroy {
     this.initialColumnDragX = event.clientX;
 
     if (this.inputPanelWidth() === undefined) {
-      const panelEl = (event.target as HTMLElement).previousElementSibling as HTMLElement;
-      this.initialInputPanelWidth = panelEl.offsetWidth;
-      this.inputPanelWidth.set(this.initialInputPanelWidth);
+      const handleEl = event.currentTarget as HTMLElement;
+      const panelEl = handleEl?.previousElementSibling as HTMLElement;
+      if (panelEl) {
+        this.initialInputPanelWidth = panelEl.offsetWidth;
+        this.inputPanelWidth.set(this.initialInputPanelWidth);
+      } else {
+        this.initialInputPanelWidth = window.innerWidth / 2;
+        this.inputPanelWidth.set(this.initialInputPanelWidth);
+      }
     } else {
       this.initialInputPanelWidth = this.inputPanelWidth()!;
     }

@@ -208,6 +208,9 @@ export const analyzeImageFlow = ai.defineFlow(
       
       const prompt = `You are a world-class radiologist and clinical expert. Please analyze this medical image.
 ${context ? 'Additional Context: ' + context : ''}
+
+In accordance with the joint European and North American Multisociety Statement on the Ethics of AI in Radiology, this analysis is designed to promote patient well-being, minimize harm, and mitigate bias. Ultimate responsibility and accountability for clinical diagnosis remain strictly with the human operator.
+
 Please provide:
 1. Identifying visual findings (what is seen).
 2. Clinical interpretation (what it likely means).

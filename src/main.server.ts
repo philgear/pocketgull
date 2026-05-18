@@ -3,28 +3,36 @@ import { BootstrapContext, bootstrapApplication, provideClientHydration, withEve
 import { AppComponent } from './app.component';
 import { provideServerRendering } from '@angular/platform-server';
 import { provideZonelessChangeDetection, ApplicationConfig } from '@angular/core';
-import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
+import { AI_CONFIG, AiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
-import { GeminiProvider } from './services/ai/gemini.provider';
+import { PubGemmaProvider } from './services/ai/pubgemma.provider';
+import { NanoProvider } from './services/ai/nano.provider';
+import { HybridProvider } from './services/ai/hybrid.provider';
+
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideAuth, getAuth } from '@angular/fire/auth';
+import { environment } from './environments/environment';
 
 const serverConfig: ApplicationConfig = {
     providers: [
         provideServerRendering(),
         provideZonelessChangeDetection(),
         provideHttpClient(withFetch()),
+        provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideFirestore(() => getFirestore()),
+        provideAuth(() => getAuth()),
         {
             provide: AI_CONFIG,
             useFactory: () => ({
-                // During SSR, we don't have window. Use an empty string or process.env if available, 
-                // though our server.ts injects the script into HTML so the client gets it.
                 apiKey: process.env['GEMINI_API_KEY'] || '',
                 defaultModel: { modelId: 'gemini-2.5-flash', temperature: 0.1 },
                 verificationModel: { modelId: 'gemini-2.5-flash', temperature: 0.0 }
-            } as IAiProviderConfig)
+            } as AiProviderConfig)
         },
         {
             provide: IntelligenceProviderToken,
-            useClass: GeminiProvider
+            useClass: HybridProvider
         },
         provideClientHydration(withEventReplay())
     ]

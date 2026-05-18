@@ -1,31 +1,31 @@
 import { Injectable, inject } from '@angular/core';
 import { MarkdownService } from './markdown.service';
 
-import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
+import { Patient, HistoryEntry, PatientVitals, BodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
 
 /** Shape of the native JSON export file. */
-export interface INativePatientExport {
+export interface NativePatientExport {
   _format: 'pocket-gull-native';
   _version: 1;
   exportedAt: string;
-  patient: Omit<IPatient, 'id'>;
+  patient: Omit<Patient, 'id'>;
 }
 
 /** Minimal FHIR R4 resource types used for import/export. */
-interface IFhirResource {
+interface FhirResource {
   resourceType: string;
   id?: string;
   [key: string]: any;
 }
 
-interface IFhirBundle {
+interface FhirBundle {
   resourceType: 'Bundle';
   id?: string;
   type: 'collection';
   timestamp: string;
   meta?: { tag?: { system: string; code: string; display: string }[] };
-  entry: { resource: IFhirResource }[];
+  entry: { resource: FhirResource }[];
 }
 
 @Injectable({
@@ -42,7 +42,7 @@ export class ExportService {
    * Uses the PocketGull design system: Inter font, brand colours, section cards,
    * markdown-rendered prose, proper tables, blockquotes, and page-break hints.
    */
-  async downloadAsPdf(data: any, patientName: string = 'IPatient'): Promise<void> {
+  async downloadAsPdf(data: any, patientName: string = 'Patient'): Promise<void> {
     console.log('[ExportService] Opening styled print report for:', patientName);
 
     // Ensure marked is loaded
@@ -71,21 +71,21 @@ export class ExportService {
       'Summary Overview': 'Summary Overview',
       'Functional Protocols': 'Functional Protocols',
       'Monitoring & Follow-up': 'Monitoring & Follow-up',
-      'IPatient Education': 'IPatient Education',
+      'Patient Education': 'Patient Education',
     };
 
     const lensIcons: Record<string, string> = {
       'Summary Overview': ClinicalIcons.Assessment,
       'Functional Protocols': ClinicalIcons.Medication,
       'Monitoring & Follow-up': ClinicalIcons.FollowUp,
-      'IPatient Education': ClinicalIcons.Education,
+      'Patient Education': ClinicalIcons.Education,
     };
 
     const lensColors: Record<string, string> = {
       'Summary Overview': '#1C6AFF',
       'Functional Protocols': '#059669',
       'Monitoring & Follow-up': '#D97706',
-      'IPatient Education': '#7C3AED',
+      'Patient Education': '#7C3AED',
     };
 
     const report = typeof data.report === 'object' ? data.report : {};
@@ -146,6 +146,13 @@ export class ExportService {
       --font: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
+    /* Provide missing tailwind dimensions for inline icons */
+    .w-4 { width: 16px; }
+    .h-4 { height: 16px; }
+    .w-3\\.5 { width: 14px; }
+    .h-3\\.5 { height: 14px; }
+    svg { display: inline-block; vertical-align: middle; }
+
     html { font-size: 10pt; }
     body {
       font-family: var(--font);
@@ -195,7 +202,7 @@ export class ExportService {
     }
     .report-meta strong { color: var(--ink); font-weight: 600; }
 
-    /* ─── IPatient Banner ────────────────────────────── */
+    /* ─── Patient Banner ────────────────────────────── */
     .patient-banner {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -389,10 +396,12 @@ export class ExportService {
       html { font-size: 9.5pt; }
       body { background: white !important; }
       .page-wrap { padding: 0; max-width: 100%; }
-      .lens-section { page-break-inside: avoid; break-inside: avoid; }
+      .lens-section { page-break-inside: avoid; break-inside: avoid; margin-bottom: 20px; }
+      h1, h2, h3, h4, h5 { page-break-after: avoid; break-after: avoid; }
+      p, li, tr { page-break-inside: avoid; break-inside: avoid; }
       @page {
-        size: A4;
-        margin: 18mm 18mm 22mm 18mm;
+        size: letter portrait;
+        margin: 0.75in 0.75in 1in 0.75in;
       }
     }
 
@@ -453,9 +462,20 @@ export class ExportService {
 
       <!-- Letterhead -->
       <header class="letterhead">
-        <div class="brand-block">
-          <div class="brand-name">Pocket Gull</div>
-          <div class="brand-tagline">Clinical Intelligence Platform</div>
+        <div class="brand-block" style="display:flex;align-items:center;gap:12px;">
+          <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+            <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <div class="brand-name">Pocket Gull</div>
+            <div class="brand-tagline">Clinical Intelligence Platform</div>
+          </div>
         </div>
         <div class="report-meta">
           <div><strong>Generated</strong> ${timestamp}</div>
@@ -464,10 +484,10 @@ export class ExportService {
         </div>
       </header>
 
-      <!-- IPatient Banner -->
+      <!-- Patient Banner -->
       <div class="patient-banner">
         <div class="patient-field">
-          <div class="patient-field-label">IPatient Name</div>
+          <div class="patient-field-label">Patient Name</div>
           <div class="patient-field-value">${patientName}</div>
         </div>
         <div class="patient-field">
@@ -526,9 +546,15 @@ export class ExportService {
    */
   async downloadCarePlanPdf(
     carePlanMarkdown: string,
-    patientName: string = 'IPatient',
+    patientName: string = 'Patient',
     vitals?: { bp?: string; hr?: string; temp?: string; spO2?: string; weight?: string },
-    conditions?: string[]
+    conditions?: string[],
+    translationMatrix?: {
+      levelName: string;
+      translatedPlanMarkdown: string;
+      originalPlanMarkdown?: string | null;
+      analysisMarkdown?: string | null;
+    }
   ): Promise<void> {
     console.log('[ExportService] Opening styled Care Plan print report for:', patientName);
 
@@ -553,7 +579,10 @@ export class ExportService {
       hour: '2-digit', minute: '2-digit'
     });
 
-    const carePlanHtml = renderMd(carePlanMarkdown || '_No active care plan recorded for this visit._');
+    let documentTypeBadge = 'Finalized Care Plan';
+    if (translationMatrix) {
+      documentTypeBadge = `Translation Matrix: ${translationMatrix.levelName}`;
+    }
 
     // Strip trailing unit strings that may already be embedded in stored vitals values
     const stripUnits = (val: string, ...units: string[]): string => {
@@ -580,6 +609,75 @@ export class ExportService {
             <div class="conditions-tags">${conditions.map(c => `<span class="condition-tag">${c}</span>`).join('')}</div>
         </div>` : '';
 
+    let mainContentHtml = '';
+
+    if (translationMatrix) {
+      const translatedHtml = renderMd(translationMatrix.translatedPlanMarkdown);
+      const originalHtml = translationMatrix.originalPlanMarkdown ? renderMd(translationMatrix.originalPlanMarkdown) : '';
+      const analysisHtml = translationMatrix.analysisMarkdown ? renderMd(translationMatrix.analysisMarkdown) : '';
+
+      let analysisBlock = '';
+      if (analysisHtml) {
+        analysisBlock = `
+        <div class="matrix-analysis">
+          <div class="matrix-analysis-header">
+            <span style="display:inline-flex;color:var(--brand);width:14px;height:14px;">${ClinicalIcons.Verified}</span>
+            AI Translation Analysis
+          </div>
+          <div class="care-plan-body" style="padding:0;">
+            ${analysisHtml}
+          </div>
+        </div>`;
+      }
+
+      let matrixGrid = '';
+      if (originalHtml) {
+        matrixGrid = `
+        <div class="matrix-container split">
+          <div class="care-plan-section" style="margin-bottom:0;">
+            <div class="care-plan-header">
+              <div class="care-plan-header-icon" style="color:var(--brand);">${ClinicalIcons.Assessment}</div>
+              <div class="care-plan-title">Original Plan (Provider Ref)</div>
+            </div>
+            <div class="care-plan-body">${originalHtml}</div>
+          </div>
+          <div class="care-plan-section" style="margin-bottom:0;">
+            <div class="care-plan-header" style="background:var(--surface-accent);">
+              <div class="care-plan-header-icon" style="color:var(--brand);">${ClinicalIcons.Assessment}</div>
+              <div class="care-plan-title">Cognitive Level: ${translationMatrix.levelName}</div>
+            </div>
+            <div class="care-plan-body">${translatedHtml}</div>
+          </div>
+        </div>`;
+      } else {
+        matrixGrid = `
+        <div class="care-plan-section">
+          <div class="care-plan-header" style="background:var(--surface-accent);">
+            <div class="care-plan-header-icon" style="color:var(--brand);">${ClinicalIcons.Assessment}</div>
+            <div class="care-plan-title">Cognitive Level: ${translationMatrix.levelName}</div>
+          </div>
+          <div class="care-plan-body">${translatedHtml}</div>
+        </div>`;
+      }
+
+      mainContentHtml = analysisBlock + matrixGrid;
+
+    } else {
+      const carePlanHtml = renderMd(carePlanMarkdown || '_No active care plan recorded for this visit._');
+      mainContentHtml = `
+      <div class="care-plan-section">
+        <div class="care-plan-header">
+          <div class="care-plan-header-icon" style="color:var(--brand);">
+            ${ClinicalIcons.Assessment}
+          </div>
+          <div class="care-plan-title">Active Care Plan</div>
+        </div>
+        <div class="care-plan-body">
+          ${carePlanHtml}
+        </div>
+      </div>`;
+    }
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -592,18 +690,26 @@ export class ExportService {
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand: #689F38;
-      --brand-dark: #4a7428;
+      --brand: #059669;       /* Clinical green – Pocket Gull system */
+      --brand-dark: #047857;
+      --brand-blue: #1C6AFF;
       --ink: #1C1C1C;
       --ink-muted: #6B7280;
       --surface: #FFFFFF;
       --surface-subtle: #F9FAFB;
-      --surface-green: #F0F7E8;
+      --surface-accent: #F0FDF4;
       --border: #E5E7EB;
-      --border-green: #C8E6C9;
-      --radius: 10px;
+      --border-accent: #A7F3D0;
+      --radius: 8px;
       --font: 'Inter', system-ui, -apple-system, sans-serif;
     }
+
+    /* Provide missing tailwind dimensions for inline icons */
+    .w-4 { width: 16px; }
+    .h-4 { height: 16px; }
+    .w-3\\.5 { width: 14px; }
+    .h-3\\.5 { height: 14px; }
+    svg { display: inline-block; vertical-align: middle; }
 
     html { font-size: 10pt; }
     body {
@@ -616,30 +722,17 @@ export class ExportService {
       position: relative;
     }
 
-    /* ─── Halftone background decoration ───────────── */
+    /* ─── Structural background decoration ───────────── */
     body::before {
       content: '';
       position: fixed;
-      top: -60px;
-      right: -60px;
-      width: 340px;
-      height: 340px;
-      background-image: radial-gradient(circle, #689F38 1.5px, transparent 1.5px);
-      background-size: 16px 16px;
-      opacity: 0.08;
-      pointer-events: none;
-      z-index: 0;
-    }
-    body::after {
-      content: '';
-      position: fixed;
-      bottom: -80px;
-      left: -80px;
-      width: 280px;
-      height: 280px;
-      background-image: radial-gradient(circle, #689F38 1.5px, transparent 1.5px);
-      background-size: 18px 18px;
-      opacity: 0.055;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.15;
       pointer-events: none;
       z-index: 0;
     }
@@ -689,15 +782,15 @@ export class ExportService {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: var(--surface-green);
-      border: 1px solid var(--border-green);
+      background: var(--surface-accent);
+      border: 1px solid var(--border-accent);
       color: var(--brand-dark);
       font-size: 7.5pt;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.12em;
       padding: 5px 12px;
-      border-radius: 20px;
+      border-radius: var(--radius);
       margin-bottom: 20px;
     }
     .doc-type-badge::before {
@@ -708,7 +801,7 @@ export class ExportService {
       border-radius: 50%;
     }
 
-    /* ─── IPatient Banner ────────────────────────────── */
+    /* ─── Patient Banner ────────────────────────────── */
     .patient-banner {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
@@ -797,7 +890,7 @@ export class ExportService {
 
     /* ─── Care Plan Section ──────────────────────────── */
     .care-plan-section {
-      border: 1px solid var(--border-green);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       margin-bottom: 28px;
@@ -807,12 +900,12 @@ export class ExportService {
       align-items: center;
       gap: 10px;
       padding: 13px 18px;
-      background: var(--surface-green);
-      border-bottom: 1px solid var(--border-green);
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
     }
     .care-plan-header-icon {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       color: var(--brand);
       flex-shrink: 0;
       display: flex;
@@ -884,31 +977,60 @@ export class ExportService {
       margin: 10px 0 14px;
     }
     .care-plan-body th {
-      background: var(--surface-green);
+      background: var(--surface-accent);
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-size: 7.5pt;
       padding: 7px 10px;
       text-align: left;
-      border: 1px solid var(--border-green);
+      border: 1px solid var(--border-accent);
       color: var(--brand-dark);
     }
     .care-plan-body td {
       padding: 6px 10px;
       border: 1px solid var(--border);
       vertical-align: top;
-      color: #374151;
+      color: var(--ink-muted);
     }
-    .care-plan-body tr:nth-child(even) td { background: #F9FBF5; }
+    .care-plan-body tr:nth-child(even) td { background: var(--surface-subtle); }
     .care-plan-body blockquote {
       border-left: 3px solid var(--brand);
-      background: var(--surface-green);
+      background: var(--surface-accent);
       padding: 10px 14px;
       margin: 10px 0;
-      border-radius: 0 6px 6px 0;
+      border-radius: 0;
     }
     .care-plan-body blockquote p { margin: 0; font-size: 9pt; color: #374151; }
+
+    /* ─── Translation Matrix Layout ──────────────────── */
+    .matrix-container {
+      display: grid;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .matrix-container.split {
+      grid-template-columns: 1fr 1fr;
+    }
+    .matrix-analysis {
+      background: var(--surface-accent);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      page-break-inside: avoid;
+    }
+    .matrix-analysis-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 8pt;
+      font-weight: 700;
+      color: var(--brand-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
 
     /* ─── Attestation Box ────────────────────────────── */
     .attestation {
@@ -969,10 +1091,12 @@ export class ExportService {
       body { background: white !important; }
       body::before, body::after { position: absolute !important; }
       .page-wrap { padding: 0; max-width: 100%; }
-      .care-plan-section { page-break-inside: avoid; break-inside: avoid; }
+      .matrix-analysis { page-break-inside: avoid; break-inside: avoid; margin-bottom: 20px; }
+      h1, h2, h3, h4, h5 { page-break-after: avoid; break-after: avoid; }
+      p, li, tr { page-break-inside: avoid; break-inside: avoid; }
       @page {
-        size: A4;
-        margin: 18mm 18mm 22mm 18mm;
+        size: letter portrait;
+        margin: 0.75in 0.75in 1in 0.75in;
       }
     }
 
@@ -1033,9 +1157,20 @@ export class ExportService {
 
       <!-- Letterhead -->
       <header class="letterhead">
-        <div class="brand-block">
-          <div class="brand-name">Pocket Gull</div>
-          <div class="brand-tagline">Clinical Intelligence Platform</div>
+        <div class="brand-block" style="display:flex;align-items:center;gap:12px;">
+          <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+            <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <div class="brand-name">Pocket Gull</div>
+            <div class="brand-tagline">Clinical Intelligence Platform</div>
+          </div>
         </div>
         <div class="report-meta">
           <div><strong>Generated</strong> ${timestamp}</div>
@@ -1045,12 +1180,12 @@ export class ExportService {
       </header>
 
       <!-- Document Type Badge -->
-      <div class="doc-type-badge">Finalized Care Plan</div>
+      <div class="doc-type-badge">${documentTypeBadge}</div>
 
-      <!-- IPatient Banner -->
+      <!-- Patient Banner -->
       <div class="patient-banner">
         <div class="patient-field">
-          <div class="patient-field-label">IPatient Name</div>
+          <div class="patient-field-label">Patient Name</div>
           <div class="patient-field-value">${patientName}</div>
         </div>
         <div class="patient-field">
@@ -1066,18 +1201,7 @@ export class ExportService {
       ${vitalsHtml}
       ${conditionsHtml}
 
-      <!-- Care Plan Section -->
-      <div class="care-plan-section">
-        <div class="care-plan-header">
-          <div class="care-plan-header-icon">
-            ${ClinicalIcons.Verified}
-          </div>
-          <div class="care-plan-title">Active Care Plan</div>
-        </div>
-        <div class="care-plan-body">
-          ${carePlanHtml}
-        </div>
-      </div>
+      ${mainContentHtml}
 
       <!-- Clinician Attestation -->
       <div class="attestation">
@@ -1122,7 +1246,7 @@ export class ExportService {
   /**
    * Generates and downloads a FHIR DiagnosticReport (JSON) for the analysis only.
    */
-  async downloadAsFhir(data: any, patientName: string = 'IPatient'): Promise<void> {
+  async downloadAsFhir(data: any, patientName: string = 'Patient'): Promise<void> {
     console.log('[ExportService] Starting FHIR DiagnosticReport generation...');
     try {
       const fhirReport = {
@@ -1183,9 +1307,9 @@ export class ExportService {
    * Exports the full patient record as a native JSON file.
    * This is a lossless round-trip format that preserves all app data.
    */
-  downloadAsNativeJson(patient: IPatient): void {
+  downloadAsNativeJson(patient: Patient): void {
     const { id, ...patientWithoutId } = patient;
-    const exportData: INativePatientExport = {
+    const exportData: NativePatientExport = {
       _format: 'pocket-gull-native',
       _version: 1,
       exportedAt: new Date().toISOString(),
@@ -1196,12 +1320,12 @@ export class ExportService {
   }
 
   /**
-   * Parses a native JSON file and returns a IPatient object.
+   * Parses a native JSON file and returns a Patient object.
    * Assigns a new unique ID so imported patients never collide.
    */
-  async importFromNativeJson(file: File): Promise<IPatient> {
+  async importFromNativeJson(file: File): Promise<Patient> {
     const text = await file.text();
-    const data = JSON.parse(text) as INativePatientExport;
+    const data = JSON.parse(text) as NativePatientExport;
 
     if (data._format !== 'pocket-gull-native') {
       throw new Error('Not a valid PocketGull native export file.');
@@ -1221,18 +1345,18 @@ export class ExportService {
 
   /**
    * Exports the full patient record as a FHIR R4 Bundle.
-   * Includes IPatient, Condition, Observation, Goal, and DiagnosticReport resources.
+   * Includes Patient, Condition, Observation, Goal, and DiagnosticReport resources.
    */
-  downloadAsFhirBundle(patient: IPatient): void {
+  downloadAsFhirBundle(patient: Patient): void {
     console.log('[ExportService] Starting FHIR Bundle generation for:', patient.name);
     try {
-      const patientRef = `IPatient/pocket-gull-${patient.id}`;
-      const entries: { resource: IFhirResource }[] = [];
+      const patientRef = `Patient/pocket-gull-${patient.id}`;
+      const entries: { resource: FhirResource }[] = [];
 
-      // 1. IPatient resource
+      // 1. Patient resource
       entries.push({
         resource: {
-          resourceType: 'IPatient',
+          resourceType: 'Patient',
           id: `pocket-gull-${patient.id}`,
           name: [{ text: patient.name }],
           gender: this._toFhirGender(patient.gender),
@@ -1263,7 +1387,7 @@ export class ExportService {
 
       // 3. Vitals as Observations
       const vitals = patient.vitals;
-      const vitalMappings: { field: keyof IPatientVitals; loinc: string; display: string }[] = [
+      const vitalMappings: { field: keyof PatientVitals; loinc: string; display: string }[] = [
         { field: 'bp', loinc: '85354-9', display: 'Blood Pressure' },
         { field: 'hr', loinc: '8867-4', display: 'Heart Rate' },
         { field: 'temp', loinc: '8310-5', display: 'Body Temperature' },
@@ -1292,7 +1416,7 @@ export class ExportService {
 
       // 4. Body issues as Observations
       Object.entries(patient.issues).forEach(([partId, issues]) => {
-        (issues as IBodyPartIssue[]).forEach((issue, i) => {
+        (issues as BodyPartIssue[]).forEach((issue, i) => {
           entries.push({
             resource: {
               resourceType: 'Observation',
@@ -1320,7 +1444,7 @@ export class ExportService {
         });
       });
 
-      // 5. IPatient goals
+      // 5. Patient goals
       if (patient.patientGoals) {
         entries.push({
           resource: {
@@ -1356,7 +1480,7 @@ export class ExportService {
           }
         });
 
-      const bundle: IFhirBundle = {
+      const bundle: FhirBundle = {
         resourceType: 'Bundle',
         id: `pocket-gull-bundle-${Date.now()}`,
         type: 'collection',
@@ -1365,7 +1489,7 @@ export class ExportService {
           tag: [{
             system: 'http://pocketgull.app/fhir',
             code: 'pocket-gull-export',
-            display: 'Pocket Gull IPatient Export',
+            display: 'Pocket Gull Patient Export',
           }]
         },
         entry: entries,
@@ -1380,21 +1504,21 @@ export class ExportService {
   }
 
   /**
-   * Parses a FHIR R4 Bundle and maps it back to an PocketGull IPatient.
+   * Parses a FHIR R4 Bundle and maps it back to an PocketGull Patient.
    */
-  async importFromFhirBundle(file: File): Promise<IPatient> {
+  async importFromFhirBundle(file: File): Promise<Patient> {
     const text = await file.text();
-    const bundle = JSON.parse(text) as IFhirBundle;
+    const bundle = JSON.parse(text) as FhirBundle;
 
     if (bundle.resourceType !== 'Bundle' || !Array.isArray(bundle.entry)) {
       throw new Error('Not a valid FHIR Bundle.');
     }
 
     const resources = bundle.entry.map(e => e.resource);
-    const fhirPatient = resources.find(r => r['resourceType'] === 'IPatient');
+    const fhirPatient = resources.find(r => r['resourceType'] === 'Patient');
 
     // Demographics
-    const name = fhirPatient?.name?.[0]?.text || fhirPatient?.name?.[0]?.family || 'Imported IPatient';
+    const name = fhirPatient?.name?.[0]?.text || fhirPatient?.name?.[0]?.family || 'Imported Patient';
     const gender = this._fromFhirGender(fhirPatient?.gender);
     const age = fhirPatient?.birthDate ? this._ageFromBirthDate(fhirPatient.birthDate) : 0;
     const lastVisitExt = fhirPatient?.extension?.find((e: any) => e.url?.includes('last-visit'));
@@ -1406,12 +1530,12 @@ export class ExportService {
       .map(r => r['code']?.text || 'Unknown Condition');
 
     // Vitals
-    const vitals: IPatientVitals = { bp: '', hr: '', temp: '', spO2: '', weight: '', height: '' };
+    const vitals: PatientVitals = { bp: '', hr: '', temp: '', spO2: '', weight: '', height: '' };
     const vitalObs = resources.filter(r =>
       r['resourceType'] === 'Observation' &&
       r['category']?.[0]?.coding?.[0]?.code === 'vital-signs'
     );
-    const loincToField: Record<string, keyof IPatientVitals> = {
+    const loincToField: Record<string, keyof PatientVitals> = {
       '85354-9': 'bp', '8867-4': 'hr', '8310-5': 'temp',
       '2708-6': 'spO2', '29463-7': 'weight', '8302-2': 'height',
     };
@@ -1424,7 +1548,7 @@ export class ExportService {
     });
 
     // Body issues
-    const issues: Record<string, IBodyPartIssue[]> = {};
+    const issues: Record<string, BodyPartIssue[]> = {};
     const issueObs = resources.filter(r =>
       r['resourceType'] === 'Observation' &&
       r['category']?.[0]?.coding?.[0]?.code === 'exam'
@@ -1433,7 +1557,7 @@ export class ExportService {
       const partId = obs['bodySite']?.text || 'unknown';
       const painExt = obs['extension']?.find((e: any) => e.url?.includes('pain-level'));
       const noteIdExt = obs['extension']?.find((e: any) => e.url?.includes('note-id'));
-      const issue: IBodyPartIssue = {
+      const issue: BodyPartIssue = {
         id: partId,
         noteId: noteIdExt?.valueString || `note_imported_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         name: obs['code']?.text || partId,
@@ -1488,7 +1612,7 @@ export class ExportService {
   /**
    * Detects the format of a JSON file and imports accordingly.
    */
-  async importFromFile(file: File): Promise<IPatient> {
+  async importFromFile(file: File): Promise<Patient> {
     const text = await file.text();
     const data = JSON.parse(text);
 
@@ -1503,6 +1627,57 @@ export class ExportService {
       return this.importFromFhirBundle(syntheticFile);
     } else {
       throw new Error('Unrecognized file format. Expected PocketGull native JSON or FHIR R4 Bundle.');
+    }
+  }
+
+  // ─── BigQuery Export ──────────────────────────────────────
+  
+  /**
+   * Publishes the patient record to the BigQuery data warehouse.
+   */
+  async exportToBigQuery(patient: Patient): Promise<void> {
+    console.log('[ExportService] Initiating BigQuery export sequence for:', patient.id);
+    
+    // Transform to standard JSON payload mapping strictly to the BigQuery DDL
+    const payload = {
+      patient_id: patient.id,
+      encounter_timestamp: new Date().toISOString(),
+      gender: patient.gender,
+      age_years: patient.age,
+      active_diagnoses: patient.preexistingConditions,
+      vitals: (() => {
+          const v = patient.vitals;
+          const [sys, dia] = v.bp ? v.bp.split('/') : [null, null];
+          return [{
+            recorded_at: patient.lastVisit ? new Date(patient.lastVisit).toISOString() : new Date().toISOString(),
+            heart_rate_bpm: v.hr ? parseInt(v.hr, 10) : null,
+            systolic_bp: sys ? parseInt(sys, 10) : null,
+            diastolic_bp: dia ? parseInt(dia, 10) : null,
+            temperature_celsius: v.temp ? parseFloat(v.temp) : null,
+            weight_kg: v.weight ? parseFloat(v.weight) : null,
+            clinical_notes: null
+          }];
+      })()
+    };
+
+    try {
+      // Stream directly to the BigQuery relay
+      const response = await fetch('/api/export/bigquery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        const errJson = await response.json();
+        throw new Error(errJson.error || 'Unknown Server Error');
+      }
+      
+      alert("✅ Patient record successfully streamed into BigQuery Data Canvas.");
+      
+    } catch (error) {
+      console.error('[ExportService] BigQuery pipeline failure:', error);
+      alert("BigQuery Export Failed: " + (error as Error).message);
     }
   }
 

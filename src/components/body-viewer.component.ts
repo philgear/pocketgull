@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed, OnDestroy, effect, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
-import { IBodyPartIssue } from '../services/patient.types';
+import { BodyPartIssue } from '../services/patient.types';
 import { PatientManagementService } from '../services/patient-management.service';
 import { Body3DViewerComponent } from './body-3d-viewer.component';
 
@@ -54,13 +54,21 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
                     title="Skeletal View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 2v20"></path><path d="M7 7h10"></path><path d="M5 12h14"></path><path d="M7 17h10"></path></svg>
             </button>
-            <button (click)="state.anatomyViewMode.set('mind')" [class.bg-black]="state.anatomyViewMode() === 'mind'" [class.dark:bg-white]="state.anatomyViewMode() === 'mind'" [class.text-white]="state.anatomyViewMode() === 'mind'" [class.dark:text-black]="state.anatomyViewMode() === 'mind'"
-                    title="Mind View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            <button (click)="state.anatomyViewMode.set('organs')" [class.bg-black]="state.anatomyViewMode() === 'organs'" [class.dark:bg-white]="state.anatomyViewMode() === 'organs'" [class.text-white]="state.anatomyViewMode() === 'organs'" [class.dark:text-black]="state.anatomyViewMode() === 'organs'"
+                    title="Organ View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
             </button>
             <button (click)="state.anatomyViewMode.set('molecular')" [class.bg-black]="state.anatomyViewMode() === 'molecular'" [class.dark:bg-white]="state.anatomyViewMode() === 'molecular'" [class.text-white]="state.anatomyViewMode() === 'molecular'" [class.dark:text-black]="state.anatomyViewMode() === 'molecular'"
                     title="Molecular View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="3"></circle><path d="m14 14 6 6"></path><circle cx="20" cy="20" r="3"></circle><path d="m14 10 6-6"></path><circle cx="20" cy="4" r="3"></circle><path d="m10 14-6 6"></path><circle cx="4" cy="20" r="3"></circle><path d="m10 10-6-6"></path><circle cx="4" cy="4" r="3"></circle></svg>
+            </button>
+            <!-- Ghost Reference Overlay -->
+            <button (click)="state.showGhostOverlay.update(v => !v)"
+                    [class.bg-indigo-600]="state.showGhostOverlay()"
+                    [class.text-white]="state.showGhostOverlay()"
+                    title="Toggle ghost reference overlay (healthy-baseline comparison)"
+                    class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </button>
           </div>
         </div>
@@ -260,7 +268,7 @@ export class BodyViewerComponent implements OnDestroy {
     } else if (!this.state.viewingPastVisit()) {
       // Create a new note only if we are taking notes for current visit
       const newNoteId = `note_${Date.now()}`;
-      const newNote: IBodyPartIssue = {
+      const newNote: BodyPartIssue = {
         id,
         noteId: newNoteId,
         name,

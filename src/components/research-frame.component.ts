@@ -1,15 +1,15 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, untracked, HostListener, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, untracked, HostListener, ViewChild, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { fromEvent, Subscription } from 'rxjs';
 import { PatientManagementService } from '../services/patient-management.service';
 import { PatientStateService } from '../services/patient-state.service';
-import { IBookmark } from '../services/patient.types';
+import { Bookmark } from '../services/patient.types';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 
-export interface IPubMedSearchResult {
+export interface PubMedSearchResult {
   id: string;
   title: string;
   authors: string;
@@ -21,17 +21,23 @@ export interface IPubMedSearchResult {
 @Component({
   selector: 'app-research-frame',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent],
+  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="absolute flex flex-col bg-white dark:bg-[#09090b] shadow-2xl border border-gray-300 dark:border-zinc-800 rounded-lg overflow-hidden z-40"
-         [style.left.px]="position().x"
-         [style.top.px]="position().y"
-         [style.width.px]="size().width"
-         [style.height.px]="size().height">
+    <div class="flex flex-col bg-white dark:bg-[#09090b] shadow-2xl border border-gray-300 dark:border-zinc-800 rounded-none md:rounded-lg overflow-hidden z-40 transition-all"
+         [class.fixed]="isMobile()"
+         [class.inset-0]="isMobile()"
+         [class.absolute]="!isMobile()"
+         [style.left.px]="isMobile() ? null : position().x"
+         [style.top.px]="isMobile() ? null : position().y"
+         [style.width.px]="isMobile() ? null : size().width"
+         [style.height.px]="isMobile() ? null : size().height"
+         [style.max-height]="isMobile() ? '100dvh' : 'none'">
       
       <!-- Header / Drag Handle -->
-      <div (mousedown)="startDrag($event)" class="h-10 px-4 flex items-center justify-between bg-gray-100 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shrink-0 cursor-move select-none">
+      <div (mousedown)="isMobile() ? null : startDrag($event)" 
+           [class.cursor-move]="!isMobile()"
+           class="h-10 px-4 flex items-center justify-between bg-gray-100 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shrink-0 select-none">
         <h3 class="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-zinc-400">Research Frame</h3>
         <pocket-gull-button variant="ghost" size="sm" (click)="close()" icon="M12 10.586 16.95 5.636a1 1 0 1 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414L10.586 12 5.636 7.05a1 1 0 0 1 1.414-1.414L12 10.586z" title="Close Research Window" ariaLabel="Close Research Window">
         </pocket-gull-button>
@@ -39,10 +45,10 @@ export interface IPubMedSearchResult {
 
       <!-- Toolbar -->
       <div class="p-3 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 shrink-0">
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2 md:flex-nowrap">
           <!-- Search Engine Toggle -->
           <div class="flex items-center bg-gray-200 dark:bg-zinc-800 rounded-md p-0.5">
-            <button (click)="searchEngine.set('google')"
+            <button (click)="setSearchEngine('google')"
                     class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'google'"
                     [class.dark:bg-zinc-600]="searchEngine() === 'google'"
@@ -52,7 +58,7 @@ export interface IPubMedSearchResult {
                     [class.dark:text-zinc-400]="searchEngine() !== 'google'">
               Google
             </button>
-            <button (click)="searchEngine.set('pubmed')"
+            <button (click)="setSearchEngine('pubmed')"
                     class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'pubmed'"
                     [class.dark:bg-zinc-600]="searchEngine() === 'pubmed'"
@@ -64,7 +70,7 @@ export interface IPubMedSearchResult {
             </button>
           </div>
           <!-- Search Input -->
-          <div class="flex-1">
+          <div class="w-full md:flex-1 order-last md:order-none mt-2 md:mt-0">
               <pocket-gull-input 
                 [value]="searchText()"
                 (valueChange)="searchText.set($event)"
@@ -75,7 +81,7 @@ export interface IPubMedSearchResult {
           <!-- Actions -->
           <pocket-gull-button variant="ghost" size="sm" (click)="search()" icon="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5A6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14" title="Execute Search" ariaLabel="Execute Search">
           </pocket-gull-button>
-          <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="IBookmark current page" ariaLabel="IBookmark current page">
+          <pocket-gull-button variant="ghost" size="sm" (click)="addBookmark()" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z" title="Bookmark current page" ariaLabel="Bookmark current page">
           </pocket-gull-button>
           <pocket-gull-button variant="ghost" size="sm" (click)="showCitationForm.set(!showCitationForm())" [class.text-gray-800]="showCitationForm()" [class.dark:text-white]="showCitationForm()" icon="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" title="Citation Metadata" ariaLabel="Citation Metadata">
           </pocket-gull-button>
@@ -83,9 +89,9 @@ export interface IPubMedSearchResult {
 
         <!-- Citation Metadata Form -->
         @if (showCitationForm()) {
-          <div class="mt-3 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-inner space-y-2 animate-in fade-in slide-in-from-top-1">
+          <div class="mt-3 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-inner space-y-2 animate-in fade-in slide-in-from-top-1 w-full order-last">
             <h4 class="text-[10px] font-bold text-gray-800 dark:text-zinc-100 uppercase tracking-tighter mb-1">Citation Metadata (UKRIO Style)</h4>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <pocket-gull-input [value]="authors()" (valueChange)="authors.set($event)" placeholder="Authors (e.g. Smith et al.)" size="sm"></pocket-gull-input>
               <pocket-gull-input [value]="doi()" (valueChange)="doi.set($event)" placeholder="DOI (e.g. 10.1038/s41586-021-03503-x)" size="sm"></pocket-gull-input>
             </div>
@@ -137,7 +143,7 @@ export interface IPubMedSearchResult {
                     {{ bookmark.cited ? 'CITED' : 'CITE' }}
                 </button>
                 <button (click)="removeBookmark(bookmark.url)"
-                        class="px-1 py-0.5 text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 hover:bg-brand-red-100 dark:hover:bg-brand-red-900/50 hover:text-brand-red-600 dark:hover:text-brand-red-400 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
+                        class="px-1 py-0.5 text-gray-500 dark:text-zinc-400 bg-gray-100 dark:bg-zinc-800 hover:bg-red-100 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 rounded-r-md transition-colors opacity-50 group-hover:opacity-100">
                     ×
                 </button>
             </div>
@@ -146,9 +152,19 @@ export interface IPubMedSearchResult {
       }
 
       <!-- IFrame / Native Content -->
-      <div class="flex-1 bg-gray-200 dark:bg-zinc-950 overflow-y-auto">
+      <div class="flex-1 bg-gray-200 dark:bg-zinc-950 overflow-y-auto relative">
+        @if (sanitizedUrl(); as url) {
+            <iframe #iframeEl credentialless [src]="url" 
+                    class="w-full h-full border-none transition-opacity bg-white dark:bg-zinc-950" 
+                    [class.absolute]="searchEngine() === 'google' && googleResults() !== null"
+                    [class.opacity-0]="searchEngine() === 'google' && googleResults() !== null"
+                    [class.-z-10]="searchEngine() === 'google' && googleResults() !== null"
+                    [class.pointer-events-none]="searchEngine() === 'google' && googleResults() !== null">
+            </iframe>
+        }
+
         @if (searchEngine() === 'pubmed' && (pubmedResults() !== null || isLoadingPubmed())) {
-          <div class="p-4 space-y-4 max-w-3xl mx-auto">
+          <div class="p-4 space-y-4 max-w-3xl mx-auto relative z-20">
             @if (isLoadingPubmed()) {
               <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-400">
                 <p class="text-sm font-medium animate-pulse">Searching PubMed natively...</p>
@@ -170,31 +186,62 @@ export interface IPubMedSearchResult {
                   </div>
                   <div class="flex items-center gap-2">
                     <pocket-gull-button variant="primary" size="sm" (click)="addPubmedBookmark(res)" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z">
-                      IBookmark & Cite
+                      Bookmark & Cite
                     </pocket-gull-button>
-                    <a [href]="'https://pubmed.ncbi.nlm.nih.gov/' + res.id + '/'" target="_blank" class="text-xs font-semibold text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-white transition-colors inline-block px-2 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded">
+                    <button (click)="loadUrl('https://pubmed.ncbi.nlm.nih.gov/' + res.id + '/')" class="text-xs font-semibold text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-white transition-colors inline-block px-2 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded">
                       Open in PubMed
-                    </a>
+                    </button>
                   </div>
                 </div>
               }
             }
           </div>
-        } @else if (sanitizedUrl(); as url) {
-          <iframe #iframeEl [src]="url" class="w-full h-full border-none bg-white dark:bg-zinc-950"></iframe>
-        } @else {
-          <div class="w-full h-full flex items-center justify-center text-center text-gray-500 dark:text-zinc-400 p-4">
+        } @else if (searchEngine() === 'google' && (googleResults() !== null || isLoadingGoogle())) {
+          <div class="p-4 space-y-4 max-w-3xl mx-auto relative z-20">
+            @if (isLoadingGoogle() && googleResults()?.length === 0) {
+              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-400">
+                <p class="text-sm font-medium animate-pulse">Running Native Google CSE Query...</p>
+              </div>
+            } @else if (googleResults()?.length === 0 && !isLoadingGoogle()) {
+              <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-400">
+                <p class="text-sm">No results found on Google.</p>
+              </div>
+            } @else {
+              @for (res of googleResults(); track res.url) {
+                <div class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800">
+                  <h4 class="font-bold text-gray-800 dark:text-zinc-100 text-[13px] leading-snug mb-1">
+                      <a [href]="res.url" target="_blank" class="hover:underline" [innerHTML]="res.title | safeHtml"></a>
+                  </h4>
+                  <div class="text-[10px] text-green-700 dark:text-[#8bc34a] font-medium mb-1.5 truncate">{{ res.displayUrl || res.url }}</div>
+                  <p class="text-xs text-gray-600 dark:text-zinc-400 mb-4 leading-relaxed whitespace-pre-line" [innerHTML]="res.snippet | safeHtml"></p>
+
+                  <div class="flex items-center gap-2">
+                    <pocket-gull-button variant="primary" size="sm" (click)="addGseBookmark(res.title, res.url)" icon="m12 15.4 3.75 2.6-1-4.35L18 11l-4.45-.4L12 6.5 10.45 10.6 6 11l3.25 2.65-1 4.35z">
+                      Bookmark & Cite
+                    </pocket-gull-button>
+                    <button (click)="loadUrl(res.url)" class="text-xs font-semibold text-gray-600 dark:text-zinc-300 hover:text-gray-800 dark:hover:text-white transition-colors inline-block px-2 py-1 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded">
+                      Open Document
+                    </button>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        } @else if (!sanitizedUrl()) {
+          <div class="w-full h-full flex items-center justify-center text-center text-gray-500 dark:text-zinc-400 p-4 relative z-20">
              <p class="text-xs">Search results and bookmarked pages will appear here.</p>
           </div>
         }
       </div>
 
       <!-- Resize Handle -->
-      <div (mousedown)="startResize($event)" class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize text-gray-300 hover:text-gray-600 transition-colors flex items-end justify-end p-0.5">
-          <svg width="100%" height="100%" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 0 L10 10 L0 10" stroke="currentColor" stroke-width="2"/>
-          </svg>
-      </div>
+      @if (!isMobile()) {
+        <div (mousedown)="startResize($event)" class="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize text-gray-300 hover:text-gray-600 transition-colors flex items-end justify-end p-0.5">
+            <svg width="100%" height="100%" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 0 L10 10 L0 10" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </div>
+      }
     </div>
   `
 })
@@ -207,20 +254,29 @@ export class ResearchFrameComponent {
       this.loadUrl(event.data.url);
     } else if (event.data && event.data.type === 'BOOKMARK_RESULT') {
       this.addGseBookmark(event.data.title, event.data.url);
+    } else if (event.data && event.data.type === 'GOOGLE_SEARCH_RESULTS') {
+      this.isLoadingGoogle.set(false);
+      const current = this.googleResults() || [];
+      this.googleResults.set([...current, ...event.data.results]);
     }
   }
   private sanitizer: DomSanitizer = inject(DomSanitizer);
+  private platformId = inject(PLATFORM_ID);
   patientManager = inject(PatientManagementService);
   patientState = inject(PatientStateService);
 
+  isMobile = signal(false);
   searchEngine = signal<'google' | 'pubmed'>('google');
   searchText = signal<string>('');
 
   private currentUrl = signal<string | null>(null);
   sanitizedUrl = signal<SafeResourceUrl | null>(null);
 
-  pubmedResults = signal<IPubMedSearchResult[] | null>(null);
+  pubmedResults = signal<PubMedSearchResult[] | null>(null);
   isLoadingPubmed = signal(false);
+
+  googleResults = signal<any[] | null>(null);
+  isLoadingGoogle = signal(false);
 
   // --- Citation Signals ---
   showCitationForm = signal(false);
@@ -254,10 +310,14 @@ export class ResearchFrameComponent {
 
   constructor() {
     // Update size based on window
-    if (typeof window !== 'undefined') {
+    if (isPlatformBrowser(this.platformId)) {
       const w = window.innerWidth;
       const h = window.innerHeight;
       this.position.set({ x: w * 0.45, y: 100 });
+      
+      const checkMobile = () => this.isMobile.set(window.innerWidth < 768);
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
     }
 
     // --- Special Reference Trigger ---
@@ -381,11 +441,21 @@ export class ResearchFrameComponent {
   }
 
   // --- Browser Actions ---
+  setSearchEngine(engine: 'google' | 'pubmed') {
+    this.searchEngine.set(engine);
+    if (this.searchText().trim()) {
+      this.search();
+    }
+  }
+
   search() {
     const query = this.searchText().trim();
     if (!query) return;
 
     if (this.searchEngine() === 'google') {
+      this.isLoadingGoogle.set(true);
+      this.googleResults.set([]);
+
       // Use local wrapper for Google Custom Search Engine
       const url = `/search.html`;
       this.loadUrl(url);
@@ -399,6 +469,11 @@ export class ResearchFrameComponent {
           }, '*');
         }
       }, 500);
+
+      // Stop loading spinner if no results return after 8s timeout guard
+      setTimeout(() => { 
+        if (this.isLoadingGoogle()) this.isLoadingGoogle.set(false); 
+      }, 8000);
     } else {
       this.searchPubmed(query);
     }
@@ -408,6 +483,7 @@ export class ResearchFrameComponent {
     this.currentUrl.set(url);
     this.sanitizedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
     this.pubmedResults.set(null); // Clear pubmed native results if loading arbitrary URL
+    this.googleResults.set(null); // Clear google native results if loading arbitrary URL
   }
 
   async searchPubmed(query: string) {
@@ -430,7 +506,7 @@ export class ResearchFrameComponent {
       const summaryRes = await fetch(eSummaryUrl);
       const summaryData = await summaryRes.json();
 
-      const results: IPubMedSearchResult[] = ids.map((id: string) => {
+      const results: PubMedSearchResult[] = ids.map((id: string) => {
         const item = summaryData.result[id];
         let authorsStr = '';
         if (item.authors && Array.isArray(item.authors)) {
@@ -462,7 +538,7 @@ export class ResearchFrameComponent {
     }
   }
 
-  addPubmedBookmark(result: IPubMedSearchResult) {
+  addPubmedBookmark(result: PubMedSearchResult) {
     const url = `https://pubmed.ncbi.nlm.nih.gov/${result.id}/`;
 
     const existing = this.bookmarks().find(b => b.url === url);
@@ -525,7 +601,7 @@ export class ResearchFrameComponent {
     }
   }
 
-  toggleCite(bookmark: IBookmark) {
+  toggleCite(bookmark: Bookmark) {
     // Note: We need a way to update an existing bookmark.
     // Adding it again with same URL but different 'cited' flag in PatientManagementService
     this.patientManager.updateBookmark(bookmark.url, { cited: !bookmark.cited });

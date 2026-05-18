@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, Input, ViewChild, ElementRef, OnChanges, SimpleChanges, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HistoryEntry, IPatientVitals } from '../services/patient.types';
+import { HistoryEntry, PatientVitals } from '../services/patient.types';
 import { Chart } from 'chart.js/auto';
 
 @Component({

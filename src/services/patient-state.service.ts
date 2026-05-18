@@ -1,21 +1,22 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect, inject, untracked } from '@angular/core';
 import {
-  IBodyPartIssue,
-  IPatientVitals,
-  IBiometricEntry,
-  IClinicalNote,
-  IChecklistItem,
-  IShoppingListItem,
-  IDraftSummaryItem,
-  IPatientState,
+  BodyPartIssue,
+  PatientVitals,
+  BiometricEntry,
+  ClinicalNote,
+  ChecklistItem,
+  ShoppingListItem,
+  DraftSummaryItem,
+  PatientState,
   HistoryEntry,
-  IBookmark,
+  Bookmark,
   BODY_PART_NAMES,
   BODY_PART_MAPPING
 } from './patient.types';
 
-export { BODY_PART_NAMES, BODY_PART_MAPPING };
-export type { IPatientState };
+export type { PatientState };
+export { BODY_PART_NAMES };
+import { StorageService } from './storage.service';
 
 
 @Injectable({
@@ -34,15 +35,19 @@ export class PatientStateService {
   readonly requestedSearchEngine = signal<'google' | 'pubmed' | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
-  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'mind' | 'molecular'>('skin');
+  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
   readonly activePatientSummary = signal<string | null>(null);
-  readonly draftSummaryItems = signal<IDraftSummaryItem[]>([]);
+  readonly draftSummaryItems = signal<DraftSummaryItem[]>([]);
+  /** AI-derived anatomical findings mapped to severity tier for 3D overlay. */
+  readonly aiAnomalyHighlights = signal<Record<string, 'critical' | 'moderate' | 'mild'>>({});
+  /** Toggle the semi-transparent reference mannequin ghost overlay. */
+  readonly showGhostOverlay = signal<boolean>(false);
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
 
-  // --- IPatient Data State ---
-  readonly issues = signal<Record<string, IBodyPartIssue[]>>({});
+  // --- Patient Data State ---
+  readonly issues = signal<Record<string, BodyPartIssue[]>>({});
   readonly patientGoals = signal<string>("");
-  readonly    vitals = signal<IPatientVitals>({
+  readonly    vitals = signal<PatientVitals>({
         bp: '',
         hr: '',
         temp: '',
@@ -56,20 +61,41 @@ export class PatientStateService {
         b12: ''
     });
 
-    readonly dynamicNutrients = signal<import('./patient.types').IDynamicMarker[]>([]);
-  readonly oxidativeStressMarkers = signal<import('./patient.types').IDynamicMarker[]>([]);
-  readonly antioxidantSources = signal<import('./patient.types').IDynamicMarker[]>([]);
-  readonly medications = signal<import('./patient.types').IDynamicMarker[]>([]);
+    readonly dynamicNutrients = signal<import('./patient.types').DynamicMarker[]>([]);
+  readonly oxidativeStressMarkers = signal<import('./patient.types').DynamicMarker[]>([]);
+  readonly antioxidantSources = signal<import('./patient.types').DynamicMarker[]>([]);
+  readonly medications = signal<import('./patient.types').DynamicMarker[]>([]);
   
-  readonly clinicalNotes = signal<IClinicalNote[]>([]);
-  readonly checklist = signal<IChecklistItem[]>([]);
-  readonly shoppingList = signal<IShoppingListItem[]>([]);
-  readonly biometricHistory = signal<IBiometricEntry[]>([]);
+  readonly clinicalNotes = signal<ClinicalNote[]>([]);
+  readonly checklist = signal<ChecklistItem[]>([]);
+  readonly shoppingList = signal<ShoppingListItem[]>([]);
+  readonly biometricHistory = signal<BiometricEntry[]>([]);
 
   // A trigger to force the UI to expand the analysis panel when an item is selected/clicked
   readonly uiExpandTrigger = signal<number>(0);
 
-  constructor() { }
+  private storage = inject(StorageService);
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      // 1. Hydrate state asynchronously on app load
+      this.storage.loadState('current_patient').then(data => {
+        if (data && data.state) {
+          // Temporarily disable the effect by untracking the init load (if needed), 
+          // but loadState() mutations will just trigger a re-save, which is safe.
+          this.loadState(data.state);
+        }
+      });
+
+      // 2. Persist state on any signal mutation
+      effect(() => {
+        const currentState = this.getCurrentState();
+        untracked(() => {
+          this.storage.saveState('current_patient', currentState);
+        });
+      });
+    }
+  }
 
   // --- Computed State ---
   readonly hasIssues = computed(() =>
@@ -123,7 +149,7 @@ export class PatientStateService {
     }
   }
 
-  updateIssue(partId: string, issue: IBodyPartIssue) {
+  updateIssue(partId: string, issue: BodyPartIssue) {
     this.issues.update(current => {
       const issuesForPart = current[partId] ? [...current[partId]] : [];
       const existingIndex = issuesForPart.findIndex(i => i.noteId === issue.noteId);
@@ -160,7 +186,7 @@ export class PatientStateService {
     this.patientGoals.set(goals);
   }
 
-    updateVital(key: keyof IPatientVitals, value: string) {
+    updateVital(key: keyof PatientVitals, value: string) {
         this.vitals.update(vitals => ({ ...vitals, [key]: value }));
     }
 
@@ -239,7 +265,7 @@ export class PatientStateService {
   }
 
   // --- Biometric Data Actions ---
-  addBiometricEntries(entries: IBiometricEntry[]) {
+  addBiometricEntries(entries: BiometricEntry[]) {
     this.biometricHistory.update(history => [...history, ...entries]);
   }
 
@@ -248,7 +274,7 @@ export class PatientStateService {
   }
 
   // --- Care Plan Drafting Actions ---
-  addClinicalNote(note: IClinicalNote) {
+  addClinicalNote(note: ClinicalNote) {
     this.clinicalNotes.update(notes => {
       const existing = notes.findIndex(n => n.id === note.id);
       if (existing > -1) {
@@ -276,7 +302,7 @@ export class PatientStateService {
     });
   }
 
-  addChecklistItem(item: IChecklistItem) {
+  addChecklistItem(item: ChecklistItem) {
     this.checklist.update(items => [...items, item]);
   }
 
@@ -290,7 +316,7 @@ export class PatientStateService {
     this.checklist.update(items => items.filter(item => item.id !== id));
   }
 
-  addShoppingListItem(item: IShoppingListItem) {
+  addShoppingListItem(item: ShoppingListItem) {
     this.shoppingList.update(items => [...items, item]);
   }
 
@@ -333,7 +359,7 @@ export class PatientStateService {
   }
 
 
-  // --- State Management for Multi-IPatient ---
+  // --- State Management for Multi-Patient ---
 
   /** Clears all patient data to represent a clean slate. */
   clearState() {
@@ -341,6 +367,8 @@ export class PatientStateService {
     this.selectedNoteId.set(null);
     this.isLiveAgentActive.set(false); // also end any active consult
     this.isResearchFrameVisible.set(false);
+    this.aiAnomalyHighlights.set({});
+    this.showGhostOverlay.set(false);
     this.issues.set({});
     this.patientGoals.set('');
         this.vitals.set({
@@ -363,6 +391,16 @@ export class PatientStateService {
     this.viewingPastVisit.set(null);
   }
 
+  /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
+  setAiAnomalyHighlights(highlights: Record<string, 'critical' | 'moderate' | 'mild'>) {
+    this.aiAnomalyHighlights.set(highlights);
+  }
+
+  /** Remove all AI anomaly overlay markers from the 3D viewer. */
+  clearAiAnomalyHighlights() {
+    this.aiAnomalyHighlights.set({});
+  }
+
   /** Clears only patient data, leaving UI state intact, for review mode */
   clearIssuesAndGoalsForReview() {
     this.selectedPartId.set(null);
@@ -374,7 +412,7 @@ export class PatientStateService {
   }
 
   /** Loads the state of a specific patient. */
-  loadState(state: IPatientState) {
+  loadState(state: PatientState) {
     this.clearState(); // Start from a clean slate
     this.issues.set(state.issues);
         if (state.patientGoals) this.patientGoals.set(state.patientGoals);
@@ -390,7 +428,7 @@ export class PatientStateService {
   }
 
   /** Returns the current patient state for saving. */
-  getCurrentState(): IPatientState {
+  getCurrentState(): PatientState {
     return {
             issues: this.issues(),
             patientGoals: this.patientGoals(),
@@ -407,13 +445,13 @@ export class PatientStateService {
 
 
   // --- Data Aggregation ---
-  getAllDataForPrompt(patientHistory: HistoryEntry[] = [], bookmarks: IBookmark[] = []): string {
+  getAllDataForPrompt(patientHistory: HistoryEntry[] = [], bookmarks: Bookmark[] = []): string {
     const issues = this.issues();
     const vitals = this.vitals();
     const carePlan = this.activePatientSummary();
 
     // 1. Current Issues
-    const partsText = Object.values(issues).flat().map((i: IBodyPartIssue) =>
+    const partsText = Object.values(issues).flat().map((i: BodyPartIssue) =>
       `- Body Part: ${i.name}, Pain Level: ${i.painLevel}/10, Description: ${i.description}`
     ).join('\n');
 
@@ -451,7 +489,7 @@ Pain Areas:   `;
       .map(h => {
         if (h.type === 'Visit') return `- Visit (${h.date}): ${h.summary}`;
         if (h.type === 'NoteCreated') return `- Note (${h.date}): ${h.summary}`;
-        if (h.type === 'BookmarkAdded') return `- IBookmark (${h.date}): ${h.summary}`;
+        if (h.type === 'BookmarkAdded') return `- Bookmark (${h.date}): ${h.summary}`;
         return '';
       }).join('\n');
 
@@ -462,7 +500,7 @@ Pain Areas:   `;
     ).join('\n');
 
     let prompt = `
-    IPatient Goals/Chief Complaint: ${this.patientGoals()}
+    Patient Goals/Chief Complaint: ${this.patientGoals()}
     
     Vitals:
     ${vitalsText}

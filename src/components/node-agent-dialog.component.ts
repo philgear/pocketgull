@@ -11,13 +11,13 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
-export interface INodeAgentDialogData {
+export interface NodeAgentDialogData {
     nodeKey: string;
     nodeText: string;          // Plain text content of the node
     sectionTitle: string;      // Which section/lens this node belongs to
 }
 
-interface IChatEntry {
+interface ChatEntry {
     role: 'user' | 'model' | 'system';
     text: string;
     html?: string;
@@ -495,34 +495,35 @@ interface IChatEntry {
         .node-agent-send:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* --- Dark Mode Overrides --- */
-        .dark .node-agent-dialog { background: #09090b; border-color: #27272a; }
+        .dark .node-agent-dialog { background: #09090b; border-color: #27272a; box-shadow: 0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05); }
         .dark .node-agent-header { background: #18181b; border-color: #27272a; }
         .dark .node-agent-title { color: #f4f4f5; }
-        .dark .node-agent-section-chip { background: #1f2937; border-color: #374151; color: #8bc34a; }
+        .dark .node-agent-section-chip { background: #052e16; border-color: #14532d; color: #a3e635; }
         .dark .node-agent-context { background: #18181b; border-color: #27272a; }
-        .dark .node-agent-context-text { color: #d4d4d8; }
+        .dark .node-agent-context-text { color: #e4e4e7; }
         .dark .node-agent-context-text strong { color: #f4f4f5; }
         .dark .node-agent-avatar { background: #f4f4f5; color: #18181b; }
-        .dark .node-agent-bubble { background: #27272a; color: #d4d4d8; }
+        .dark .node-agent-bubble { background: #27272a; color: #e4e4e7; }
         
         .dark .node-agent-bubble.rams-typography h1, 
         .dark .node-agent-bubble.rams-typography h2, 
         .dark .node-agent-bubble.rams-typography h3, 
         .dark .node-agent-bubble.rams-typography strong { color: #f4f4f5; }
-        .dark .node-agent-bubble.rams-typography th { background: #3f3f46; border-color: #52525b; color: #f4f4f5; }
-        .dark .node-agent-bubble.rams-typography td { border-color: #52525b; }
+        .dark .node-agent-bubble.rams-typography th { background: #27272a; border-color: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-bubble.rams-typography td { border-color: #3f3f46; }
         
-        .dark .node-agent-message--model .node-agent-bubble { background: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-message--model .node-agent-bubble { background: #18181b; border: 1px solid #27272a; color: #f4f4f5; }
         .dark .node-agent-message--user .node-agent-avatar { background: #3f3f46; color: #f4f4f5; }
         .dark .node-agent-message--user .node-agent-bubble { background: #f4f4f5; color: #18181b; }
         
-        .dark .node-agent-message--system .node-agent-bubble { background: #1f2937; border-color: #374151; color: #d4d4d8; }
+        .dark .node-agent-message--system .node-agent-bubble { background: #052e16; border: 1px solid #166534; color: #d1fae5; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
         
         .dark .node-agent-input-container { background: #09090b; border-top-color: #27272a; }
-        .dark .node-agent-file-chip { background: #27272a; border-color: #3f3f46; color: #d4d4d8; }
+        .dark .node-agent-file-chip { background: #18181b; border-color: #27272a; color: #e4e4e7; }
         .dark .node-agent-file-remove:hover { color: #f4f4f5; }
         .dark .node-agent-attach:hover:not(:disabled) { color: #f4f4f5; background: #27272a; }
-        .dark .node-agent-input { background: #18181b; border-color: #3f3f46; color: #f4f4f5; }
+        .dark .node-agent-input { background: #18181b; border-color: #27272a; color: #f4f4f5; }
+        .dark .node-agent-input:focus { border-color: #689F38; background: #27272a; }
         .dark .node-agent-send { background: #f4f4f5; color: #18181b; }
         .dark .node-agent-send:hover:not(:disabled) { background: #d4d4d8; }
     `]
@@ -530,7 +531,7 @@ interface IChatEntry {
 export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
     protected readonly ClinicalIcons = ClinicalIcons;
 
-    data = input.required<INodeAgentDialogData>();
+    data = input.required<NodeAgentDialogData>();
     patientData = input<string>('');
     closed = output<void>();
 
@@ -544,7 +545,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
 
     isOpen = signal(false);
     isLoading = signal(false);
-    chatHistory = signal<IChatEntry[]>([]);
+    chatHistory = signal<ChatEntry[]>([]);
     showSuggestionsDropdown = signal(false);
     selectedFiles = signal<File[]>([]);
     userInput = '';
@@ -629,7 +630,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
             const systemContext = `You are a focused clinical evidence assistant embedded in the Pocket Gull Clinical Intelligence Platform.
 A clinician is reviewing a specific recommendation from the "${section}" section of an AI-generated care plan and wants to understand or challenge it.
 
-IPatient context is available. The recommendation under review is:
+Patient context is available. The recommendation under review is:
 """
 ${nodeText}
 """
@@ -637,7 +638,9 @@ ${nodeText}
 Your role:
 1. First, briefly explain the clinical rationale for this specific recommendation in 2-3 sentences.
 2. Then cite any supporting evidence or clinical guidelines if applicable.
-3. Then be ready to answer follow-up questions about alternatives, risks, drug interactions, or patient-specific nuances.
+3. Then be ready to answer follow-up questions about alternatives, risks, drug interactions, practical implementation items (like grocery lists), or patient-specific nuances.
+
+CRITICAL INSTRUCTION: You are operating as a clinician-to-clinician decision support tool. DO NOT refuse requests for practical items, shopping lists, or actionable implementation steps based on the clinical rationale. You MUST generate these lists confidently when requested by the practitioner. Do not include consumer medical disclaimers about seeking a doctor, as the user IS the doctor.
 Keep responses concise and clinically precise. Use markdown for structure when helpful.`;
 
             await this.intel.ai.startChat(patientCtx, systemContext);

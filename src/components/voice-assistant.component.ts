@@ -6,25 +6,25 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
 import { DictationService } from '../services/dictation.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
-import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { MarkdownService } from '../services/markdown.service';
-import { RichMediaService, IRichMediaCard } from '../services/rich-media.service';
+import { RichMediaService, RichMediaCard } from '../services/rich-media.service';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { AdkLiveService } from '../services/ai/adk-live.service';
+import { StorageService } from '../services/storage.service';
 import { inject as baseInject } from '@angular/core';
 
-export interface IChatEntry {
+export interface ChatEntry {
     role: 'user' | 'model';
     text: string;
     htmlContent?: string;
-    richCards?: IRichMediaCard[];
+    richCards?: RichMediaCard[];
     feedback?: 'up' | 'down';
 }
 
 @Component({
     selector: 'app-voice-assistant',
-    imports: [CommonModule, FormsModule, PocketGullButtonComponent, PocketGullInputComponent, SafeHtmlPipe],
+    imports: [CommonModule, FormsModule, PocketGullInputComponent, SafeHtmlPipe],
     changeDetection: ChangeDetectionStrategy.OnPush,
     styles: [`
         .prose {
@@ -81,57 +81,50 @@ export interface IChatEntry {
 
         .prose.prose-sm :where(h3):not(:where([class~="not-prose"] *)) {
             font-size: 0.9em;
-.foo {}
+        }
+
+        /* Tighter margin collapsing inside chat bubbles to prevent padding blowouts */
+        .prose :where(p):first-child { margin-top: 0; }
+        .prose :where(p):last-child { margin-bottom: 0; }
+        .prose :where(ul):last-child { margin-bottom: 0; }
+        .prose :where(h2, h3):first-child { margin-top: 0; }
+
+        @keyframes fadeUpRams {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-entry {
+            animation: fadeUpRams 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
     `],
     template: `
         <div class="h-full bg-white dark:bg-[#09090b] z-10 flex flex-col no-print w-full">
             
-            <!-- Panel Header -->
-            <div class="flex items-center justify-between px-4 sm:px-6 py-4 lg:px-12 h-16 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800">
-                <div class="flex items-center gap-2 sm:gap-4 min-w-0">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-6 h-6 shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <!-- Far Wing -->
-                            <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Tail -->
-                            <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Body Base -->
-                            <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Near Wing (Upper) -->
-                            <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Near Wing (Fold) -->
-                            <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Neck/Head -->
-                            <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                            <!-- Beak - Functional Braun Orange Accent -->
-                            <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
-                        </svg>
-                        <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.1em] sm:tracking-[0.15em] text-[10px] sm:text-sm uppercase truncate">Pocket Gull Intelligence</span>
-                    </div>
+            <!-- Minimal Pocket Header -->
+            <div class="flex items-center justify-between px-4 py-2 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800/50">
+                <div class="flex items-center pointer-events-none pl-2">
+                    <span class="font-bold text-gray-400 dark:text-zinc-500 tracking-[0.2em] text-[9px] uppercase">Live Session</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button
                         (click)="isMuted.set(!isMuted())"
-                        class="text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
+                        class="text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-2 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
                         title="Toggle Sound">
                         @if (isMuted()) {
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                               <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                             </svg>
                         } @else {
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                             </svg>
                         }
                     </button>
                     <button
                         (click)="endLiveConsult()"
-                        class="text-gray-500 dark:text-zinc-400 hover:text-black dark:hover:text-white flex items-center gap-1 sm:gap-2 transition-colors uppercase text-[10px] sm:text-xs font-bold tracking-wider sm:tracking-widest px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 shrink-0"
-                        title="Close Voice Assistant">
-                        <span class="hidden sm:inline">Close Session</span>
-                        <span class="sm:hidden">Close</span>
+                        class="text-gray-400 dark:text-zinc-500 hover:text-red-500 flex items-center justify-center transition-colors px-2 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30"
+                        title="Close Session">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
@@ -150,13 +143,13 @@ export interface IChatEntry {
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
                         <div class="relative w-48 h-48 md:w-64 md:h-64 transition-all duration-500" [class.opacity-10]="chatHistory().length > 0" [class.opacity-100]="chatHistory().length === 0">
                             <!-- Glowing Orb -->
-                            <div class="absolute inset-0 rounded-full transition-all duration-500" 
-                                 [class.bg-brand-green-400/10]="agentState() === 'idle'"
-                                 [class.bg-brand-blue-400/20]="agentState() === 'listening'"
+                            <div class="absolute inset-0 rounded-full transition-all duration-75" 
+                                 [class.bg-green-400/10]="agentState() === 'idle'"
+                                 [class.bg-blue-400/20]="agentState() === 'listening'"
                                  [class.bg-purple-400/20]="agentState() === 'processing'"
-                                 [class.blur-2xl]="true"
-                                 [class.scale-100]="agentState() === 'idle'"
-                                 [class.scale-125]="agentState() !== 'idle'">
+                                 [class.blur-2xl]="agentState() === 'idle' || agentState() === 'processing'"
+                                 [class.blur-xl]="agentState() === 'listening'"
+                                 [style.transform]="agentState() === 'listening' ? 'scale(' + (1.25 + (live.volumeLevel() / 150)) + ')' : (agentState() === 'idle' ? 'scale(1)' : 'scale(1.25)')">
                             </div>
 
                             <!-- Animated SVG Avatar -->
@@ -196,68 +189,58 @@ export interface IChatEntry {
                     <!-- Transcript Scroll Area -->
                     <div #transcriptContainer class="relative z-10 flex-1 overflow-y-auto w-full scroll-smooth pt-8 pb-48 px-4 lg:px-8">
                         <div class="max-w-3xl mx-auto space-y-12">
-                            <!-- Regular Transcript -->
-                            @for (entry of parsedTranscript(); track $index) {
-                                <div class="group flex gap-3 items-start w-full animate-in fade-in slide-in-from-bottom-3 duration-300" [class.flex-row-reverse]="entry.role === 'user'">
-                                    
-                                    <!-- Avatar -->
-                                    <div class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1" [class.bg-gray-700]="entry.role === 'model'" [class.bg-brand-blue-500]="entry.role === 'user'">
-                                        @if (entry.role === 'model') {
-                                            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-                                        } @else {
-                                            <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 21a8 8 0 0 0-16 0" /><circle cx="10" cy="8" r="5" /><path d="M10 13a3 3 0 0 0-3 3" /></svg>
-                                        }
-                                    </div>
-
-                                    <!-- Bubble & Content -->
-                                    <div class="flex flex-col gap-2 w-full min-w-0" [class.items-end]="entry.role === 'user'">
-                                         @if (entry.role === 'model') {
-                                             <!-- Model Bubble -->
-                                             <div class="prose prose-sm dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl rounded-tl-sm p-4 w-full break-words">
-                                                <div [innerHTML]="entry.htmlContent | safeHtml"></div>
-                                             </div>
-                                         } @else {
-                                            <!-- User Bubble -->
-                                            <div class="prose prose-sm max-w-none text-white bg-brand-blue-500 dark:bg-brand-blue-600 rounded-2xl rounded-tr-sm p-4 w-full break-words">
-                                                <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
+                            <!-- Telemetry Transcript -->
+                            <div class="font-mono text-sm space-y-6 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md p-6 rounded-2xl border border-white/20 dark:border-zinc-800/30 shadow-lg">
+                                @for (entry of parsedTranscript(); track $index) {
+                                    <div class="group relative pl-4 border-l-2 transition-colors duration-300 chat-entry" 
+                                         [class.border-blue-500]="entry.role === 'model'" 
+                                         [class.border-green-500]="entry.role === 'user'">
+                                        
+                                        <!-- Header line -->
+                                        <div class="text-[10px] uppercase font-bold tracking-widest mb-1.5 flex justify-between items-center opacity-60">
+                                            <span>{{entry.role === 'model' ? 'SYS.INTELLIGENCE' : 'USR.MIC'}}_</span>
+                                            
+                                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                                                 <button (click)="actionCopy(entry.text)" class="hover:text-black dark:hover:text-white" title="Copy">[COPY]</button>
+                                                 @if (entry.role === 'model') {
+                                                    <button (click)="actionInsert(entry.text)" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
+                                                 }
                                             </div>
-                                         }
-                                         
+                                        </div>
+
+                                        <!-- Content -->
+                                        <div class="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-a:text-blue-500 text-gray-800 dark:text-gray-200">
+                                            <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
+                                        </div>
+
                                         <!-- Rich Media Cards -->
                                         @if (entry.richCards && entry.richCards.length > 0) {
-                                             <div class="rm-panel">
+                                             <div class="rm-panel mt-3 opacity-90">
                                                  @for (card of entry.richCards; track card.query) {
-                                                    <!-- ... [Rest of rich media card templates remain the same] ... -->
+                                                    <!-- Simplified rendering placeholder for rich media -->
+                                                    <div class="text-xs bg-black/5 dark:bg-white/5 p-2 rounded border border-black/10 dark:border-white/10 my-1">
+                                                        [MEDIA_LINK: {{ card.kind }} | {{ card.query }}]
+                                                    </div>
                                                  }
                                              </div>
                                         }
-
-                                        <!-- Action Buttons on Hover -->
-                                        <div class="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200" [class.self-start]="entry.role === 'model'" [class.self-end]="entry.role === 'user'">
-                                            <pocket-gull-button variant="ghost" size="xs" (click)="actionCopy(entry.text)" icon="M9 9h13v13H9V9zm-4 6H4v-9h9v1z" ariaLabel="Copy Message"></pocket-gull-button>
-                                            <pocket-gull-button variant="ghost" size="xs" (click)="actionDictate(entry.text)" icon="M11 5L6 9H2v6h4l5 4V5zm8.07-.07a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" ariaLabel="Speak Aloud"></pocket-gull-button>
-                                            <pocket-gull-button variant="ghost" size="xs" (click)="actionInsert(entry.text)" icon="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" ariaLabel="Insert into Clinical Notes"></pocket-gull-button>
-                                            @if (entry.role === 'model') {
-                                                <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 mx-1"></div>
-                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(entry)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-brand-green-600]="entry.feedback === 'up'" [class.dark:text-brand-green-400]="entry.feedback === 'up'"></pocket-gull-button>
-                                                <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(entry)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-brand-red-600]="entry.feedback === 'down'" [class.dark:text-brand-red-400]="entry.feedback === 'down'"></pocket-gull-button>
-                                            }
+                                    </div>
+                                }
+                                
+                                <!-- Thinking Indicator -->
+                                @if (agentState() === 'processing') {
+                                    <div class="pl-4 border-l-2 border-purple-500 chat-entry">
+                                        <div class="text-[10px] uppercase font-bold tracking-widest mb-1.5 opacity-60 animate-pulse">
+                                            SYS.PROCESSING_
+                                        </div>
+                                        <div class="text-gray-500 dark:text-zinc-400 animate-pulse">
+                                            <span class="inline-block w-1.5 h-3 bg-purple-500 mr-1 animate-bounce"></span>
+                                            <span class="inline-block w-1.5 h-3 bg-purple-500 mr-1 animate-bounce" style="animation-delay: 0.1s"></span>
+                                            <span class="inline-block w-1.5 h-3 bg-purple-500 animate-bounce" style="animation-delay: 0.2s"></span>
                                         </div>
                                     </div>
-                                </div>
-                            }
-
-                            <!-- Thinking Indicator -->
-                            @if (agentState() === 'processing') {
-                                <div class="flex gap-3 items-start w-full animate-in fade-in">
-                                    <div class="shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mt-1">
-                                        <svg class="w-5 h-5 text-white animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-                                    </div>
-                                    <div class="prose prose-sm text-gray-500 bg-gray-100 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-2xl p-4">
-                                        Thinking...
-                                    </div>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
                     </div>
 
@@ -265,15 +248,15 @@ export interface IChatEntry {
                     <div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-white via-white/90 to-transparent dark:from-[#09090b] dark:via-[#09090b]/90 dark:to-transparent flex justify-center z-20">
                          <div class="w-full max-w-3xl flex flex-col gap-3 relative">
                             <!-- Smart Suggestions -->
-                            @if (chatHistory().length === 0 && agentState() === 'idle') {
+                            @if (agentState() === 'idle') {
                               <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-brand-blue-500 dark:hover:text-brand-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
                                      What is the most critical evidence?
                                  </button>
-                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-brand-blue-500 dark:hover:text-brand-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
                                      Alternative interventions?
                                  </button>
-                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-brand-blue-500 dark:hover:text-brand-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
                                      Explain rationale simply
                                  </button>
                               </div>
@@ -285,9 +268,9 @@ export interface IChatEntry {
                                 <button type="button" (click)="toggleListening()" [disabled]="agentState() !== 'idle' || !!permissionError()"
                                         title="Start/Stop Voice Capture"
                                         class="w-12 h-12 flex items-center justify-center rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
-                                        [class.bg-brand-red-500]="live.isListening()" [class.text-white]="live.isListening()"
+                                        [class.bg-red-500]="live.isListening()" [class.text-white]="live.isListening()"
                                         [class.bg-gray-100]="!live.isListening()" [class.dark:bg-zinc-800]="!live.isListening()" [class.text-gray-600]="!live.isListening()" [class.dark:text-zinc-300]="!live.isListening()"
-                                        [class.hover:bg-brand-red-600]="live.isListening()" [class.hover:bg-gray-200]="!live.isListening()" [class.dark:hover:bg-zinc-700]="!live.isListening()">
+                                        [class.hover:bg-red-600]="live.isListening()" [class.hover:bg-gray-200]="!live.isListening()" [class.dark:hover:bg-zinc-700]="!live.isListening()">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
                                 </button>
 
@@ -304,13 +287,22 @@ export interface IChatEntry {
                                     </pocket-gull-input>
                                 </div>
 
+                                 <button type="button" class="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
+                                         (click)="isResearchMode.set(!isResearchMode())"
+                                         [class.bg-blue-100]="isResearchMode()" [class.dark:bg-blue-900]="isResearchMode()" [class.text-blue-600]="isResearchMode()" [class.dark:text-blue-300]="isResearchMode()"
+                                         [class.text-gray-500]="!isResearchMode()" [class.hover:bg-gray-100]="!isResearchMode()" [class.dark:hover:bg-zinc-800]="!isResearchMode()"
+                                         [disabled]="agentState() !== 'idle'" title="Toggle Research Grounding">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                </button>
+
                                  <button type="button" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-50" (click)="triggerFileInput()" [disabled]="agentState() !== 'idle'" title="Attach Files">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                                 </button>
+                                <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*,application/pdf" multiple class="hidden">
 
                                 <button 
                                     type="submit" 
-                                    [disabled]="!messageText().trim() || agentState() !== 'idle'"
+                                    [disabled]="!messageText().trim() && selectedFiles().length === 0 || agentState() !== 'idle'"
                                     class="w-12 h-12 rounded-full flex items-center justify-center bg-black text-white disabled:bg-gray-300 dark:disabled:bg-zinc-700 hover:bg-gray-800 transition-colors shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                                 </button>
@@ -330,6 +322,7 @@ export class VoiceAssistantComponent implements OnDestroy {
     patientMgmt = inject(PatientManagementService);
     markdownService = inject(MarkdownService);
     richMedia = inject(RichMediaService);
+    storage = inject(StorageService);
 
     panelMode = signal<'selection' | 'chat' | 'dictation'>('selection');
 
@@ -343,8 +336,9 @@ export class VoiceAssistantComponent implements OnDestroy {
     permissionError = signal<string | null>(null);
     messageText = signal('');
     typingIntroText = signal('');
-    chatHistory = signal<IChatEntry[]>([]);
+    chatHistory = signal<ChatEntry[]>([]);
     selectedFiles = signal<File[]>([]);
+    isResearchMode = signal(false);
 
     protected readonly ClinicalIcons = ClinicalIcons;
     public live = inject(AdkLiveService);
@@ -359,12 +353,12 @@ export class VoiceAssistantComponent implements OnDestroy {
         navigator.clipboard.writeText(text);
     }
 
-    actionThumbsUp(entry: IChatEntry) {
+    actionThumbsUp(entry: ChatEntry) {
         entry.feedback = entry.feedback === 'up' ? undefined : 'up';
         this.chatHistory.update(h => [...h]);
     }
 
-    actionThumbsDown(entry: IChatEntry) {
+    actionThumbsDown(entry: ChatEntry) {
         entry.feedback = entry.feedback === 'down' ? undefined : 'down';
         this.chatHistory.update(h => [...h]);
     }
@@ -399,7 +393,7 @@ export class VoiceAssistantComponent implements OnDestroy {
                     setTimeout(() => this.sendMessage(), 50);
                 });
             }
-        }, { allowSignalWrites: true });
+        });
 
         // Ensure we always scroll to bottom when transcript updates
         effect(() => {
@@ -417,10 +411,36 @@ export class VoiceAssistantComponent implements OnDestroy {
                     this.panelMode.set('selection');
                 }
             });
-        }, { allowSignalWrites: true });
+        });
 
         // Only init if in browser
         if (typeof window !== 'undefined') {
+            // 1. Hydrate Chat History
+            this.storage.loadState('current_patient').then(data => {
+                if (data && data.chatHistory && data.chatHistory.length > 0) {
+                    this.chatHistory.set(data.chatHistory);
+                }
+            });
+
+            // 2. Persist Chat History & Manage Token Limits
+            effect(() => {
+                const history = this.chatHistory();
+                untracked(() => {
+                    this.storage.saveChatHistory('current_patient', history);
+                    
+                    // Token-Limit Awareness: Truncate heavily bloated sessions
+                    if (history.length > 50 && this.agentState() === 'idle') {
+                        const truncated = history.slice(-20);
+                        const summaryBubble: ChatEntry = {
+                            role: 'model',
+                            text: 'System Note: Previous conversation history has been archived to maintain memory efficiency.',
+                            htmlContent: '<p class="text-xs text-purple-500 italic">System Note: Previous conversation history has been archived to maintain memory efficiency.</p>'
+                        };
+                        this.chatHistory.set([summaryBubble, ...truncated]);
+                    }
+                });
+            });
+
             this.live.onMessage = (msg) => {
                 if (msg.text) {
                     this._accumulateModelText(msg.text);
@@ -483,8 +503,6 @@ export class VoiceAssistantComponent implements OnDestroy {
 
     async activateChat() {
         this.panelMode.set('chat');
-
-        this.chatHistory.set([]);
         console.log("Activating chat...");
 
         const patient = this.patientMgmt.selectedPatient();
@@ -503,6 +521,8 @@ export class VoiceAssistantComponent implements OnDestroy {
 
         // We'll manually specify context for VoiceAssistant to ensure rich-media parsing is respected
         const context = `You are a collaborative care plan co-pilot named "Pocket Gull". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.
+
+LAB REPORT EXTRACTION: If the user attaches an image or PDF of a lab report or medical document, automatically extract the patient's vitals, biomarkers, and key metrics. Summarize these findings clearly in your response so the doctor can easily review and commit them to the patient's longitudinal history.
 
 VISUAL GROUNDING: When the user asks for images, a 3D model, or research (e.g. "show me an image", "3D model of", "find research on"), respond with a \`\`\`rich-media\`\`\` JSON block BEFORE your prose explanation. Format:
 \`\`\`rich-media
@@ -693,7 +713,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
         return { cleanMd, jsonStr };
     }
 
-    private _parseCards(jsonStr: string): IRichMediaCard[] | undefined {
+    private _parseCards(jsonStr: string): RichMediaCard[] | undefined {
         try {
             const parsed = JSON.parse(jsonStr.trim());
             const rawCards: Array<{ kind: string; query: string; severity?: string; afflictionHighlight?: string; particles?: boolean }> = parsed.cards ?? [];
@@ -760,12 +780,12 @@ Only include a rich-media block when the user explicitly requests visual or rese
         this._appendUser(message, userDisplayHtml);
 
         try {
-            if (this.live.isConnected()) {
-                // Send text over WebSockets natively if connected to multimodal live
+            if (this.live.isConnected() && files.length === 0 && !this.isResearchMode()) {
+                // Send text over WebSockets natively if connected to multimodal live AND no files or grounding are required
                 this.live.sendText(message);
             } else {
-                // Fallback to standard chat endpoint if Live connection fails
-                const responseText = await this.intel.ai.sendMessage(message, files);
+                // Fallback to standard chat endpoint if Live connection fails, files are attached, or Grounding is enabled
+                const responseText = await this.intel.ai.sendMessage(message, files, this.isResearchMode());
                 this._accumulateModelText(responseText);
                 this._finalizeModelTurn();
                 this.speak(responseText);
@@ -774,9 +794,13 @@ Only include a rich-media block when the user explicitly requests visual or rese
             this._accumulateModelText(`Error: ${e?.message ?? e}`);
             this._finalizeModelTurn();
         } finally {
-            if (this.agentState() === 'processing') {
+            // For live WebSockets, the loading state clears asynchronously on `turnComplete`.
+            // Only manually reset if we used the REST API fallback.
+            if (this.agentState() === 'processing' && !this.live.isConnected()) {
                 this.agentState.set('idle');
             }
+            // Auto-disable research mode after a single query is fulfilled
+            this.isResearchMode.set(false);
             this.scrollToBottom();
         }
     }

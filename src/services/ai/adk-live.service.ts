@@ -1,6 +1,6 @@
 import { Injectable, signal, NgZone, inject } from '@angular/core';
 
-export interface ILiveMessageEvent {
+export interface LiveMessageEvent {
   text?: string;
   isFinal?: boolean;
 }
@@ -20,73 +20,33 @@ export class AdkLiveService {
   private audioContext: AudioContext | null = null;
   private mediaStream: MediaStream | null = null;
   private audioWorkletNode: AudioWorkletNode | null = null;
+  private analyserNode: AnalyserNode | null = null;
+  private volumeAnimationFrame: number | null = null;
   private liveClient: any = null; // The Gemini Live WS connection
   
+  public volumeLevel = signal(0); // 0-100 scale output
   // Audio playback queue
   private playbackContext: AudioContext | null = null;
   private audioQueue: ArrayBuffer[] = [];
   private isPlaying = false;
+  private activeSource: AudioBufferSourceNode | null = null;
 
   // Callbacks
-  public onMessage?: (msg: ILiveMessageEvent) => void;
+  public onMessage?: (msg: LiveMessageEvent) => void;
   public onModelTurnComplete?: () => void;
 
   constructor() {}
 
-  /**
-   * Initializes a full-duplex WebSocket connection to the Gemini 2.0 Realtime API.
-   * Establishes a dual-audio graph: 
-   * 1. A `MediaStreamSource` -> `ScriptProcessorNode` to capture, downsample to PCM 16kHz, and base64-encode outbound microphone audio.
-   * 2. An `AudioContext` queue to decode and continuously play inbound base64 PCM 24kHz audio from the model.
-   *
-   * @param apiKey - The Gemini API key.
-   * @param systemInstruction - Persona and behavioral guidelines for the live session.
-   * @throws Error if media device access is denied or the WebSocket connection fails.
-   */
   async connect(apiKey: string, systemInstruction: string) {
     if (this.isConnected()) return;
     this.connectionError.set(null);
 
     try {
       // We use the standard WebSocket approach directly to the Gemini API since the 
-      // `@google/genai` types are sometimes missing browser specific live features depending on the beta version,
-      // and it pulls in Node.js dependencies that break the Angular browser build.
-      let url = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-        url = `ws://${window.location.host}/ws/gemini-live?key=${apiKey}`;
-      }
-      this.liveClient = new WebSocket(url);
-
-      // 3. Setup WebSocket Listeners
-      this.liveClient.onopen = () => {
-        // Send initial setup
-        this.liveClient.send(JSON.stringify({
-          setup: {
-            model: 'models/gemini-2.0-flash-exp',
-            systemInstruction: { parts: [{ text: systemInstruction }] },
-            generationConfig: {
-              responseModalities: ["TEXT", "AUDIO"],
-              speechConfig: {
-                voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } }
-              }
-            }
-          }
-        }));
-        
-        // Wait for setup complete before fully activating
-      };
-
-      this.liveClient.onmessage = (event: MessageEvent) => {
-        this.handleLiveMessage(event.data);
-      };
-
-      this.liveClient.onclose = () => this.handleDisconnect();
-      this.liveClient.onerror = (err: Event) => {
-        console.error('Live API Error:', err);
-        this.ngZone.run(() => this.connectionError.set('WebSocket Error'));
-        this.disconnect();
-      };
-
+      // `@google/genai` types are sometimes missing browser specific live features depending on the beta version.
+      // We route this through our backend proxy to securely affix the Referer headers required by restricted API keys.
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      let url = `${protocol}//${window.location.host}/ws/gemini-live?key=${apiKey}`;
       // 4. Setup Audio Playback
       this.playbackContext = new AudioContext({ sampleRate: 24000 });
 
@@ -94,27 +54,51 @@ export class AdkLiveService {
       this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.audioContext = new AudioContext({ sampleRate: 16000 });
       
-      // We need a script processor or audio worklet to capture PCM data
-      // For simplicity in this implementation, we use a ScriptProcessorNode (deprecated but widely supported)
-      // Ideally this would be an AudioWorklet for performance.
       const source = this.audioContext.createMediaStreamSource(this.mediaStream);
-      const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
       
-      processor.onaudioprocess = (e) => {
+      const workletCode = `
+        class AudioProcessor extends AudioWorkletProcessor {
+          process(inputs, outputs, parameters) {
+            const input = inputs[0];
+            if (input.length > 0) {
+              const channelData = input[0];
+              if (channelData) {
+                this.port.postMessage(channelData);
+              }
+            }
+            return true;
+          }
+        }
+        registerProcessor('audio-processor', AudioProcessor);
+      `;
+      const blob = new Blob([workletCode], { type: 'application/javascript' });
+      const workletUrl = URL.createObjectURL(blob);
+
+      try {
+        await this.audioContext.audioWorklet.addModule(workletUrl);
+      } catch (e) {
+        console.error("Failed to load audio worklet. Falling back...", e);
+        // We could fallback, but modern browsers support this.
+        throw new Error("AudioWorklet not supported or module missing.");
+      }
+      
+      this.audioWorkletNode = new AudioWorkletNode(this.audioContext, 'audio-processor');
+      
+      this.audioWorkletNode.port.onmessage = (e) => {
         if (!this.isListening() || this.liveClient?.readyState !== WebSocket.OPEN) return;
         
-        const inputData = e.inputBuffer.getChannelData(0);
-        // Convert Float32Array to Int16Array (PCM 16-bit)
+        const inputData = e.data; // Float32Array from worklet
         const pcm16 = new Int16Array(inputData.length);
         for (let i = 0; i < inputData.length; i++) {
           let s = Math.max(-1, Math.min(1, inputData[i]));
           pcm16[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
         }
         
-        // Base64 encode the PCM data
         const uint8Array = new Uint8Array(pcm16.buffer);
         let binary = '';
         const len = uint8Array.byteLength;
+        // In tight loops, avoid massive string concatenation if possible, but for 4096 framing this is okay.
+        // A slightly faster way for large arrays is String.fromCharCode.apply, but it risks Call Stack limits.
         for (let i = 0; i < len; i++) {
             binary += String.fromCharCode(uint8Array[i]);
         }
@@ -130,15 +114,75 @@ export class AdkLiveService {
         }));
       };
 
-      source.connect(processor);
-      processor.connect(this.audioContext.destination);
+      this.analyserNode = this.audioContext.createAnalyser();
+      this.analyserNode.fftSize = 256;
+      this.analyserNode.smoothingTimeConstant = 0.5;
 
-      this.ngZone.run(() => {
-        this.isConnected.set(true);
-        this.isListening.set(true);
+      source.connect(this.analyserNode);
+      this.analyserNode.connect(this.audioWorkletNode);
+      this.audioWorkletNode.connect(this.audioContext.destination);
+
+      const updateVolume = () => {
+        if (!this.analyserNode || !this.isListening()) return;
+        const dataArray = new Uint8Array(this.analyserNode.frequencyBinCount);
+        this.analyserNode.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            sum += dataArray[i];
+        }
+        const average = sum / dataArray.length;
+        // Map 0-100 range logically for UI reaction (0-255 is byte limit, clipping around 128 usually for normal speech)
+        const vol = Math.min(100, Math.round((average / 128) * 100));
+        this.ngZone.run(() => this.volumeLevel.set(vol));
+        this.volumeAnimationFrame = requestAnimationFrame(updateVolume);
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        this.liveClient = new WebSocket(url);
+  
+        this.liveClient.onopen = () => {
+          this.liveClient.send(JSON.stringify({
+            setup: {
+              model: 'models/gemini-2.0-flash-exp',
+              systemInstruction: { parts: [{ text: systemInstruction }] },
+              generationConfig: {
+                responseModalities: ["TEXT", "AUDIO"],
+                speechConfig: {
+                  voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } }
+                }
+              }
+            }
+          }));
+          this.ngZone.run(() => {
+             this.isConnected.set(true);
+             this.isListening.set(true);
+          });
+          updateVolume(); // Start the VU loop
+          console.log('[AdkLiveService] Connected to Gemini Live API');
+          resolve();
+        };
+  
+        this.liveClient.onmessage = (event: MessageEvent) => {
+          this.handleLiveMessage(event.data);
+        };
+  
+        this.liveClient.onclose = (ev: CloseEvent) => {
+          console.warn(`[AdkLiveService] WebSocket closed: Code ${ev.code}, Reason: ${ev.reason || 'None provided'}`);
+          if (ev.code !== 1000 && ev.code !== 1005 && !this.connectionError()) {
+              this.ngZone.run(() => this.connectionError.set(`Connection Lost: Code ${ev.code} ${ev.reason}`));
+          }
+          this.handleDisconnect();
+          reject(new Error(`WebSocket connection closed: Code ${ev.code}`));
+        };
+        
+        this.liveClient.onerror = (err: Event) => {
+          console.error('[AdkLiveService] Live API Error:', err);
+          this.ngZone.run(() => this.connectionError.set('WebSocket Error'));
+          this.handleDisconnect();
+          reject(new Error('WebSocket connection error'));
+        };
       });
-      console.log('Connected to Gemini Live API');
-      
+
     } catch (err: any) {
       console.error('Failed to connect to Live API:', err);
       this.ngZone.run(() => this.connectionError.set(err.message));
@@ -175,16 +219,18 @@ export class AdkLiveService {
     this.processJsonMessage(unparsedData);
   }
 
-  /**
-   * Parses the inbound JSON payloads from the Gemini WebSocket stream.
-   * Responsibilities:
-   * 1. Extracts `text` parts and dispatches them to the `onMessage` callback for transcript rendering.
-   * 2. Extracts `inlineData` (base64 audio) and appends it to the continuous playback queue.
-   * 3. Intercepts 'barge-in' (`interrupted: true`) signals from the server to immediately dump the active audio queue.
-   * 
-   * @param data - The parsed JSON object received from the WebSocket.
-   */
   private processJsonMessage(data: any) {
+    if (data.error) {
+      console.error("[AdkLiveService] Server returned error:", data.error);
+      if (this.onMessage) {
+         this.ngZone.run(() => {
+             this.onMessage!({ text: `System Error: ${data.error.message || 'Unknown stream error'}` });
+             if (this.onModelTurnComplete) this.onModelTurnComplete();
+         });
+      }
+      return;
+    }
+
     if (data.serverContent?.modelTurn?.parts) {
       const parts = data.serverContent.modelTurn.parts;
       for (const part of parts) {
@@ -249,9 +295,11 @@ export class AdkLiveService {
       }
       
       const source = this.playbackContext.createBufferSource();
+      this.activeSource = source;
       source.buffer = audioBuffer;
       source.connect(this.playbackContext.destination);
       source.onended = () => {
+        if (this.activeSource === source) this.activeSource = null;
         this.playNextAudio();
       };
       source.start(0);
@@ -265,8 +313,11 @@ export class AdkLiveService {
     this.audioQueue = [];
     this.isPlaying = false;
     this.ngZone.run(() => this.isSpeaking.set(false));
-    // Unfortunately BufferSource nodes cannot be easily stopped if already started without keeping a reference.
-    // Given the short chunks, just letting it finish or doing a suspend/resume on context is an option.
+    
+    if (this.activeSource) {
+        try { this.activeSource.stop(); } catch (e) {}
+        this.activeSource = null;
+    }
   }
 
   startListening() {
@@ -295,6 +346,12 @@ export class AdkLiveService {
       this.isSpeaking.set(false);
     });
     
+    if (this.volumeAnimationFrame) {
+      cancelAnimationFrame(this.volumeAnimationFrame);
+      this.volumeAnimationFrame = null;
+    }
+    this.ngZone.run(() => this.volumeLevel.set(0));
+
     if (this.liveClient) {
       try { this.liveClient.close(); } catch(e){}
       this.liveClient = null;
@@ -303,6 +360,14 @@ export class AdkLiveService {
     if (this.mediaStream) {
       this.mediaStream.getTracks().forEach(t => t.stop());
       this.mediaStream = null;
+    }
+    if (this.audioWorkletNode) {
+      this.audioWorkletNode.disconnect();
+      this.audioWorkletNode = null;
+    }
+    if (this.analyserNode) {
+      this.analyserNode.disconnect();
+      this.analyserNode = null;
     }
     if (this.audioContext) {
       this.audioContext.close();

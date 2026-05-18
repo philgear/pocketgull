@@ -1,12 +1,12 @@
 import {
   Component, ChangeDetectionStrategy, inject, signal, input, output,
-  computed, OnDestroy, ViewChild, ElementRef, AfterViewChecked,
+  computed, OnDestroy, ViewChild, ElementRef, AfterViewChecked, HostListener, effect,
   ViewEncapsulation
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ISummaryNode, ISummaryNodeItem } from './analysis-report.types';
+import { SummaryNode, SummaryNodeItem } from './analysis-report.types';
 import { DictationService } from '../services/dictation.service';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -14,30 +14,30 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { MarkdownService } from '../services/markdown.service';
-import { RichMediaService, IRichMediaCard } from '../services/rich-media.service';
+import { RichMediaService, RichMediaCard } from '../services/rich-media.service';
 import { Medical3DViewerComponent } from './medical-3d-viewer.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { PatientStateService } from '../services/patient-state.service';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface IClaimUnit {
+interface ClaimUnit {
   id: string;
   type: 'paragraph' | 'list-item' | 'heading' | 'other';
   text: string; // plain text for drilling
   html: string; // rendered HTML for display
 }
 
-interface IInlineChatEntry {
+interface InlineChatEntry {
   role: 'user' | 'model';
   text: string;
   html?: string;
-  claims?: IClaimUnit[];    // parsed claim units for model messages
-  richCards?: IRichMediaCard[]; // resolved rich media cards
+  claims?: ClaimUnit[];    // parsed claim units for model messages
+  richCards?: RichMediaCard[]; // resolved rich media cards
   feedback?: 'up' | 'down';
 }
 
-interface IBracketedClaim {
+interface BracketedClaim {
   id: string;
   text: string;
   drillContext?: string; // what breadcrumb level it came from
@@ -45,8 +45,8 @@ interface IBracketedClaim {
 
 // ─── Helper: Parse HTML → ClaimUnits ─────────────────────────────────────────
 
-function parseHtmlToClaims(html: string): IClaimUnit[] {
-  const claims: IClaimUnit[] = [];
+function parseHtmlToClaims(html: string): ClaimUnit[] {
+  const claims: ClaimUnit[] = [];
   let idx = 0;
 
   // Split at block-level HTML boundaries
@@ -60,7 +60,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
     const innerText = innerHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     if (!innerText || innerText.length < 8) continue;
 
-    let type: IClaimUnit['type'] = 'other';
+    let type: ClaimUnit['type'] = 'other';
     if (tag === 'p') type = 'paragraph';
     else if (tag === 'li') type = 'list-item';
     else if (tag === 'h2' || tag === 'h3' || tag === 'h4') type = 'heading';
@@ -89,7 +89,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 @Component({
   selector: 'app-summary-node',
   standalone: true,
-  imports: [CommonModule, FormsModule, PocketGullBadgeComponent, PocketGullButtonComponent, PocketGullInputComponent, Medical3DViewerComponent, SafeHtmlPipe],
+  imports: [CommonModule, FormsModule, PocketGullBadgeComponent, PocketGullButtonComponent, PocketGullInputComponent, Medical3DViewerComponent, SafeHtmlPipe, NgOptimizedImage],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   styles: [`
@@ -189,8 +189,13 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
         /* Chat body: no internal scroll — parent right-panel handles all scrolling */
         .inline-chat-body { padding:10px 12px; display:flex; flex-direction:column; gap:8px; }
 
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* ─── Messages ───────────────────────────── */
-        .inline-msg { display:flex; gap:7px; align-items:flex-start; }
+        .inline-msg { display:flex; gap:7px; align-items:flex-start; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
         .inline-msg--user { flex-direction:row-reverse; }
         .inline-avatar {
             flex-shrink:0; width:20px; height:20px; border-radius:50%;
@@ -203,11 +208,18 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
             box-shadow:0 1px 2px rgba(0,0,0,0.05);
             border-radius:10px 10px 10px 2px; padding:10px 14px; width: 100%;
             max-width:calc(100% - 30px);
+            display: flex; flex-direction: column; gap: 8px; /* added gap for generic content */
         }
         .inline-msg--user .inline-bubble {
             background:#1C1C1C; color:#FFFFFF; border-color:transparent; box-shadow:none;
             border-radius:10px 10px 2px 10px;
         }
+
+        /* Tighter margin collapsing inside chat bubbles to prevent padding blowouts */
+        .inline-bubble :where(p):first-child { margin-top: 0; }
+        .inline-bubble :where(p):last-child { margin-bottom: 0; }
+        .inline-bubble :where(ul):last-child { margin-bottom: 0; }
+        .inline-bubble :where(h2, h3):first-child { margin-top: 0; }
 
         /* ─── Claim Units (AI response parsing) ──── */
         .claim-unit {
@@ -215,7 +227,15 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
             padding:4px 6px 4px 8px; margin:2px 0;
             transition:background .12s;
             border-left:2px solid transparent;
+            animation: fadeUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
+        .claim-unit:nth-child(1) { animation-delay: 0.05s; }
+        .claim-unit:nth-child(2) { animation-delay: 0.1s; }
+        .claim-unit:nth-child(3) { animation-delay: 0.15s; }
+        .claim-unit:nth-child(4) { animation-delay: 0.2s; }
+        .claim-unit:nth-child(5) { animation-delay: 0.25s; }
+        .claim-unit:nth-child(n+6) { animation-delay: 0.3s; }
+        
         .claim-unit:hover { background:#F0F7E8; border-left-color:#C8E6C9; }
         .claim-unit--heading { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#1C1C1C; border-left:none; background:transparent !important; padding-top:8px; }
 
@@ -249,8 +269,8 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
         }
         .claim-action[data-tooltip]::after {
             content: attr(data-tooltip);
-            bottom: calc(100% + 6px); left: 50%;
-            transform: translateX(-50%) translateY(4px);
+            bottom: calc(100% + 6px); right: 0;
+            transform: translateY(4px);
             background: #1C1C1C; color: #FFFFFF;
             padding: 4px 8px; border-radius: 2px; font-weight: 500;
             white-space: nowrap; letter-spacing: 0.05em;
@@ -263,7 +283,9 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
             border-width: 4px 4px 0; border-style: solid;
             border-color: #333 transparent transparent transparent;
         }
-        .claim-action[data-tooltip]:hover::after,
+        .claim-action[data-tooltip]:hover::after {
+            opacity: 1; transform: translateY(0);
+        }
         .claim-action[data-tooltip]:hover::before {
             opacity: 1; transform: translateX(-50%) translateY(0);
         }
@@ -348,13 +370,15 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
         .inline-send:disabled { opacity:.35; cursor:not-allowed; }
 
         /* ─── Markdown in bubbles ────────────────── */
-        .inline-bubble h2,.inline-bubble h3,.inline-bubble h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin:8px 0 3px; color:#111827; }
+        .inline-bubble h2,.inline-bubble h3,.inline-bubble h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin:12px 0 4px; color:#111827; line-height: 1.4; }
         .inline-bubble h2:first-child,.inline-bubble h3:first-child,.inline-bubble h4:first-child { margin-top:0; }
-        .inline-bubble p { margin-bottom:8px; }
-        .inline-bubble ul,.inline-bubble ol { padding-left:14px; margin-bottom:8px; }
-        .inline-bubble li { margin-bottom:2px; }
+        .inline-bubble p { margin-top:0; margin-bottom:0; line-height:1.65; }
+        .inline-bubble ul,.inline-bubble ol { padding-left:18px; margin-top:0; margin-bottom:0; }
+        .inline-bubble li { margin-bottom:4px; }
+        .inline-bubble li:last-child { margin-bottom:0; }
         .inline-bubble strong { font-weight:700; color:#111827; }
         .inline-msg--user .inline-bubble strong { color:#FFFFFF; }
+
 
         /* ─── Dark Mode Overrides ────────────────── */
         .dark .inline-chat { border-color: #27272a; background: #09090b; }
@@ -476,7 +500,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
       <div class="node-toolbar no-print">
         <pocket-gull-button (click)="rejectNode()" variant="ghost" size="sm"
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Flag Issue"
-          [class.text-brand-red-600]="isRejected()"
+          [class.text-red-600]="isRejected()"
           [icon]="ClinicalIcons.Flag">
         </pocket-gull-button>
         <pocket-gull-button (click)="toggleBracket()" variant="ghost" size="sm"
@@ -498,7 +522,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
         <pocket-gull-button (click)="toggleChat()" variant="ghost" size="sm"
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800"
           [class.active-breathing]="!hasDiscoveredEvidenceFocus()"
-          [class.text-brand-green-600]="!showChat()" [class.text-gray-500]="showChat()"
+          [class.text-green-600]="!showChat()" [class.text-gray-500]="showChat()"
           [class.dark:text-[#8bc34a]]="!showChat()" [class.dark:text-zinc-400]="showChat()"
           [ariaLabel]="showChat() ? 'Close Agent' : 'Ask Agent'"
           [icon]="showChat() ? ClinicalIcons.Clear : ClinicalIcons.EvidenceFocus">
@@ -538,10 +562,10 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
       <!-- ─── Verification Issues ───────────── -->
       @if (node().verificationStatus !== 'verified' && node().verificationIssues?.length) {
         <div class="mt-2 p-3 rounded-sm border flex flex-col gap-2 no-print"
-             [class.bg-brand-red-50]="node().verificationStatus === 'error'"
-             [class.dark:bg-brand-red-950]="node().verificationStatus === 'error'"
-             [class.border-brand-red-100]="node().verificationStatus === 'error'"
-             [class.dark:border-brand-red-900]="node().verificationStatus === 'error'"
+             [class.bg-red-50]="node().verificationStatus === 'error'"
+             [class.dark:bg-red-950]="node().verificationStatus === 'error'"
+             [class.border-red-100]="node().verificationStatus === 'error'"
+             [class.dark:border-red-900]="node().verificationStatus === 'error'"
              [class.bg-amber-50]="node().verificationStatus === 'warning'"
              [class.dark:bg-amber-950]="node().verificationStatus === 'warning'"
              [class.border-amber-100]="node().verificationStatus === 'warning'"
@@ -557,8 +581,8 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
           <div class="pl-1 flex flex-col gap-1">
             @for (issue of node().verificationIssues; track issue.message) {
               <div class="flex items-start gap-2 text-xs">
-                <span [class.text-brand-red-600]="node().verificationStatus === 'error'"
-                      [class.dark:text-brand-red-400]="node().verificationStatus === 'error'"
+                <span [class.text-red-600]="node().verificationStatus === 'error'"
+                      [class.dark:text-red-400]="node().verificationStatus === 'error'"
                       [class.text-amber-600]="node().verificationStatus === 'warning'"
                       [class.dark:text-amber-400]="node().verificationStatus === 'warning'">•</span>
                 <span class="text-gray-700 dark:text-zinc-300 leading-relaxed">{{ issue.message }}</span>
@@ -653,7 +677,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
                       <path d="M480-80q-139-35-229.5-159.5T160-516v-244l320-120 320 120v244q0 152-90.5 276.5T480-80Z"/>
                     </svg>
                   </div>
-                  <div class="inline-bubble" style="padding: 2px 8px;">
+                  <div class="inline-bubble claim-bubble" style="padding: 6px 8px;">
                     @if (msg.claims && msg.claims.length > 0) {
                       @for (claim of msg.claims; track claim.id) {
                         <div class="claim-unit" [class.claim-unit--heading]="claim.type === 'heading'">
@@ -742,8 +766,8 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
                               } @else if (card.images?.length) {
                                 <div class="rm-gallery-strip">
                                   @for (img of card.images; track img.url) {
-                                    <a [href]="img.descriptionUrl" target="_blank" rel="noopener" class="rm-gallery-item">
-                                      <img [src]="img.thumbUrl" [alt]="img.title" class="rm-gallery-img" loading="lazy">
+                                    <a [href]="img.descriptionUrl" target="_blank" rel="noopener" class="rm-gallery-item relative block overflow-hidden">
+                                      <img [ngSrc]="img.thumbUrl" fill [alt]="img.title" class="rm-gallery-img">
                                       <span class="rm-gallery-caption">{{ img.title | slice:0:40 }}</span>
                                     </a>
                                   }
@@ -809,8 +833,8 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 
                     <!-- Feedback Actions -->
                     <div class="mt-2 flex items-center justify-end gap-2 border-t border-black/5 dark:border-white/5 pt-2">
-                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(msg)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-brand-green-600]="msg.feedback === 'up'" [class.dark:text-brand-green-400]="msg.feedback === 'up'"></pocket-gull-button>
-                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(msg)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-brand-red-600]="msg.feedback === 'down'" [class.dark:text-brand-red-400]="msg.feedback === 'down'"></pocket-gull-button>
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsUp(msg)" [icon]="ClinicalIcons.Helpful" ariaLabel="Mark as Helpful" [class.text-green-600]="msg.feedback === 'up'" [class.dark:text-green-400]="msg.feedback === 'up'"></pocket-gull-button>
+                      <pocket-gull-button variant="ghost" size="xs" (click)="actionThumbsDown(msg)" [icon]="ClinicalIcons.Flag" ariaLabel="Flag Issue" [class.text-red-600]="msg.feedback === 'down'" [class.dark:text-red-400]="msg.feedback === 'down'"></pocket-gull-button>
                     </div>
 
                   </div>
@@ -832,24 +856,28 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
             }
           </div>
 
-          <!-- Suggestion pills (shown once after first response) -->
-          @if (showSuggestions() && !chatIsLoading() && chatHistory().length > 0 && drillStack().length === 0) {
-            <div class="inline-pills">
+          <!-- Suggestion pills (persist while idle) -->
+          @if (showSuggestions() && !chatIsLoading() && drillStack().length === 0) {
+            <div class="flex flex-wrap items-center justify-center gap-2 mt-4 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
               @for (s of suggestionPills(); track s) {
-                <pocket-gull-button variant="outline" size="xs" [icon]="ClinicalIcons.Suggestion" (clicked)="sendPill(s)">
-                  {{ s }}
-                </pocket-gull-button>
+                <button type="button" (click)="sendPill(s)" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-[#689F38] dark:hover:text-[#8bc34a] transition-all shadow-sm flex items-center gap-1.5">
+                   <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
+                   {{ s }}
+                </button>
               }
               <!-- Rich media action pills -->
-              <pocket-gull-button variant="secondary" size="xs" [icon]="ClinicalIcons.Image" (clicked)="requestImage()">
+              <button type="button" (click)="requestImage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-purple-600 dark:hover:text-purple-400 transition-all shadow-sm flex items-center gap-1.5">
+                <div [innerHTML]="ClinicalIcons.Image | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 Request Image
-              </pocket-gull-button>
-              <pocket-gull-button variant="secondary" size="xs" [icon]="ClinicalIcons.Model3D" (clicked)="request3DModel()">
+              </button>
+              <button type="button" (click)="request3DModel()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm flex items-center gap-1.5">
+                <div [innerHTML]="ClinicalIcons.Model3D | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 3D Model
-              </pocket-gull-button>
-              <pocket-gull-button variant="secondary" size="xs" [icon]="ClinicalIcons.Research" (clicked)="requestResearch()">
+              </button>
+              <button type="button" (click)="requestResearch()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-amber-600 dark:hover:text-amber-400 transition-all shadow-sm flex items-center gap-1.5">
+                <div [innerHTML]="ClinicalIcons.Research | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 Research
-              </pocket-gull-button>
+              </button>
             </div>
           }
 
@@ -898,8 +926,10 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
               <button class="inline-attach" (click)="triggerFileInput()" [disabled]="chatIsLoading()">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
               </button>
-              <input type="file" #fileInput (change)="onFileSelected($event)" multiple accept="image/*,video/*" class="hidden" style="display: none;">
+              <input type="file" #fileInput [name]="'fileInput-' + node().key" [id]="'fileInput-' + node().key" (change)="onFileSelected($event)" multiple accept="image/*,video/*" class="hidden" style="display: none;">
               <input #chatInput class="inline-input" type="text"
+                [name]="'chatInput-' + node().key"
+                [id]="'chatInput-' + node().key"
                 [(ngModel)]="chatInputText"
                 [placeholder]="drillStack().length > 0 ? 'Ask about this specific claim…' : 'Ask a follow-up…'"
                 (keydown.enter)="sendMessage()"
@@ -920,8 +950,8 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
     `,
 })
 export class SummaryNodeComponent implements AfterViewChecked {
-  node = input.required<ISummaryNode>();
-  nodeItem = input<ISummaryNodeItem>({} as any);
+  node = input.required<SummaryNode>();
+  nodeItem = input<SummaryNodeItem>({} as any);
   type = input<'paragraph' | 'list-item'>('paragraph');
   sectionTitle = input<string>('');
 
@@ -951,7 +981,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   // ─── Inline chat ─────────────────────────────
   showChat = signal(false);
-  chatHistory = signal<IInlineChatEntry[]>([]);
+  chatHistory = signal<InlineChatEntry[]>([]);
   chatIsLoading = signal(false);
   showSuggestions = signal(true);
   selectedFiles = signal<File[]>([]);
@@ -966,7 +996,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   // ─── Claim bracketing ────────────────────────
-  bracketedClaims = signal<IBracketedClaim[]>([]);
+  bracketedClaims = signal<BracketedClaim[]>([]);
   bracketedIds = signal<Set<string>>(new Set());
 
   // ─── Drill stack (breadcrumb) ─────────────────
@@ -1001,12 +1031,12 @@ export class SummaryNodeComponent implements AfterViewChecked {
     this.isRejected.set(!this.isRejected());
   }
 
-  actionThumbsUp(entry: IInlineChatEntry) {
+  actionThumbsUp(entry: InlineChatEntry) {
     entry.feedback = entry.feedback === 'up' ? undefined : 'up';
     this.chatHistory.update(h => [...h]);
   }
 
-  actionThumbsDown(entry: IInlineChatEntry) {
+  actionThumbsDown(entry: InlineChatEntry) {
     entry.feedback = entry.feedback === 'down' ? undefined : 'down';
     this.chatHistory.update(h => [...h]);
   }
@@ -1017,15 +1047,38 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   // ─── Bracket a claim ─────────────────────────
-  bracketClaim(claim: IClaimUnit) {
+  // ─── Bracket a claim ─────────────────────────
+  bracketClaim(claim: ClaimUnit) {
     if (this.isBracketed(claim.id)) return;
     const drill = this.activeDrillText();
-    const newClaim: IBracketedClaim = { id: claim.id, text: claim.text, drillContext: drill ?? undefined };
+    
+    const decodeHtml = (html: string) => {
+      if (typeof document !== 'undefined') {
+        const txt = document.createElement('textarea');
+        txt.innerHTML = html;
+        return txt.value;
+      }
+      return html.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    };
+
+    const cleanText = decodeHtml(claim.text);
+    const newClaim: BracketedClaim = { id: claim.id, text: cleanText, drillContext: drill ?? undefined };
+    
     this.bracketedClaims.update(c => [...c, newClaim]);
     this.bracketedIds.update(s => new Set([...s, claim.id]));
+    
+    // Formulate the contextual breadcrumbs [Category][Subcomponent]
+    const section = this.sectionTitle();
+    const cat = section ? `[${section}]` : '';
+    // Use the root of the drill stack or the current node's active html header to infer the subcategory
+    const rootDrill = this.drillStack().length > 0 ? this.drillStack()[0] : '';
+    const subCatRaw = rootDrill || this.listItemHtml().replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    const subCat = subCatRaw ? `[${decodeHtml(subCatRaw).slice(0, 35).trim()}]` : '';
+    const prefix = (cat || subCat) ? `${cat}${subCat}` : `[Bracketed claim]`;
+
     // Push to node notes as well
     const existingNote = this.node().note || '';
-    const noteAddition = `[Bracketed claim] ${claim.text}`;
+    const noteAddition = `${prefix} ${cleanText}`;
     this.update.emit({ key: this.node().key, note: existingNote ? `${existingNote}\n${noteAddition}` : noteAddition });
   }
 
@@ -1035,7 +1088,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   // ─── Drill deeper into a claim ───────────────
-  async drillInto(claim: IClaimUnit) {
+  async drillInto(claim: ClaimUnit) {
     if (this.chatIsLoading()) return;
     this.drillStack.update(s => [...s, claim.text.slice(0, 50)]);
     const prompt = `Go deeper on this specific clinical claim: "${claim.text}"\n\nProvide detailed evidence, supporting guidelines, clinical studies, or specific contraindications relevant to this single statement. Be precise and evidence-based.`;
@@ -1099,9 +1152,9 @@ The recommendation under review:
 ${nodeText.slice(0, 400)}${nodeText.length > 400 ? '...' : ''}
 """
 
-IPatient context is available. Your role:
+Patient context is available. Your role:
 1. Briefly explain the clinical rationale (2-3 sentences).
-2. Cite supporting evidence or guidelines if applicable.
+2. Cite supporting evidence or guidelines if applicable using strict UKRIO-compliant scientific reference formats. You MUST hyperlink DOI or PubMed URLs directly within your markdown (e.g. \`[Author et al. (2024)](https://pubmed.ncbi.nlm.nih.gov/...)\`).
 3. Answer follow-up questions about alternatives, risks, or nuances.
 Keep responses concise and clinically precise. Use short paragraphs and bullet lists for structure.
 
@@ -1185,7 +1238,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
 
   private _appendModel(md: string) {
     // ─── Parse out any rich-media fenced block ───────────────────────────────
-    let richCards: IRichMediaCard[] | undefined;
+    let richCards: RichMediaCard[] | undefined;
     let cleanMd = md;
 
     const fencedRegex = /```[a-z0-9-]*\s*(\{[\s\S]*?"cards"\s*:[\s\S]*?\})\s*```/i;
@@ -1227,7 +1280,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
     if (parser) { try { html = (parser as any).parse(cleanMd); } catch { html = `<p>${cleanMd}</p>`; } }
     const claims = parseHtmlToClaims(html);
 
-    const entry: IInlineChatEntry = { role: 'model', text: cleanMd, html, claims, richCards };
+    const entry: InlineChatEntry = { role: 'model', text: cleanMd, html, claims, richCards };
     this.chatHistory.update(h => [...h, entry]);
     this.needsScroll = true;
 
@@ -1276,7 +1329,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
   // ─── Existing node interactions ───────────────
   onDoubleClick() { this.update.emit({ key: this.node().key, note: this.node().note || '', showNote: true }); }
   getWikimediaSearchUrl(query: string): string {
-    return `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(query)}&title=Special:MediaSearch&go=Go&type=image`;
+    return `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(query + ' anatomy medical')}&title=Special:MediaSearch&go=Go&type=image`;
   }
 
   toggleBracket() {
@@ -1291,6 +1344,26 @@ Only include a rich-media block when the user explicitly requests visual or rese
   insertSuggestion(sugg: string) {
     const note = this.node().note ? `${this.node().note}\n${sugg}` : sugg;
     this.update.emit({ key: this.node().key, note });
+  }
+
+  @HostListener('click', ['$event'])
+  onGlobalClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const anchor = target.closest('a');
+    if (anchor && anchor.href && anchor.href.startsWith('http')) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Native Publishers like PubMed set X-Frame-Options: SAMEORIGIN which block classic iframing.
+      // So, extract the PMID from the URL and route it natively through our PocketGull JSON Research Proxy!
+      const pubmedMatch = anchor.href.match(/pubmed\.ncbi\.nlm\.nih\.gov\/(\d+)/i);
+      if (pubmedMatch && pubmedMatch[1]) {
+        this.patientState.requestResearchSearch(pubmedMatch[1], 'pubmed');
+        return;
+      }
+
+      this.patientState.requestResearchUrl(anchor.href);
+    }
   }
 
   acceptProposal() {

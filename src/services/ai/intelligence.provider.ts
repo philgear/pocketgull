@@ -1,24 +1,24 @@
 import { Observable } from 'rxjs';
-import { IClinicalMetrics, ITranscriptEntry } from '../clinical-intelligence.service';
-import { IVerificationIssue } from '../../components/analysis-report.types';
+import { ClinicalMetrics, TranscriptEntry } from '../clinical-intelligence.service';
+import { VerificationIssue } from '../../components/analysis-report.types';
 
-export interface IReportGenerationResult {
+export interface ReportGenerationResult {
     lens: string;
     text: string;
     isComplete: boolean;
 }
 
-export interface IIntelligenceProvider {
+export interface IntelligenceProvider {
     /**
      * Generates a clinical report for a specific lens.
-     * Supports streaming via Observable.
+     * Supports streaming via AsyncIterable.
      */
-    generateReportStream$(patientData: string, lens: string, systemInstruction: string): Observable<string>;
+    generateReportStream(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string>;
 
     /**
      * Generates clinical metrics (complexity, stability, certainty) for a report.
      */
-    generateMetrics(reportText: string): Promise<IClinicalMetrics>;
+    generateMetrics(reportText: string): Promise<ClinicalMetrics>;
 
     /**
      * Detects if changes between two clinical snapshots are clinically significant.
@@ -28,7 +28,7 @@ export interface IIntelligenceProvider {
     /**
      * Clinical verification layer to cross-reference AI output with source data.
      */
-    verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }>;
+    verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: VerificationIssue[] }>;
 
     /**
      * Translates clinical text to a specific reading, cognition, or philosophical level.
@@ -50,6 +50,6 @@ export interface IIntelligenceProvider {
      * Chat Session Management
      */
     startChat(patientData: string, context: string): Promise<void>;
-    sendMessage(message: string, files?: File[]): Promise<string>;
+    sendMessage(message: string, files?: File[], enableGrounding?: boolean): Promise<string>;
     getInitialGreeting(prompt: string): Promise<string>;
 }

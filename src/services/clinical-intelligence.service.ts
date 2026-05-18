@@ -1,28 +1,27 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
-import { scan, tap } from 'rxjs/operators';
-import { IIntelligenceProvider } from './ai/intelligence.provider';
+import { IntelligenceProvider } from './ai/intelligence.provider';
 import { AiCacheService } from './ai-cache.service';
-import { IVerificationIssue } from '../components/analysis-report.types';
+import { VerificationIssue } from '../components/analysis-report.types';
 import { AI_CONFIG } from './ai-provider.types';
 import { IntelligenceProviderToken } from './ai/intelligence.provider.token';
 import { NetworkStateService } from './network-state.service';
+import { RulesEngineService } from './rules-engine.service';
 
-export interface ITranscriptEntry {
+export interface TranscriptEntry {
     role: 'user' | 'model';
     text: string;
 }
 
-export interface INodeContext {
+export interface NodeContext {
     nodeText: string;
     sectionTitle: string;
-    transcript: ITranscriptEntry[];
+    transcript: TranscriptEntry[];
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'IPatient Education';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education';
 
-export interface IClinicalMetrics {
+export interface ClinicalMetrics {
     complexity: number; // 0-10
     stability: number;  // 0-10
     certainty: number;  // 0-10
@@ -35,24 +34,25 @@ export class ClinicalIntelligenceService {
     readonly ai = inject(IntelligenceProviderToken);
     private cache = inject(AiCacheService);
     private network = inject(NetworkStateService);
+    private rules = inject(RulesEngineService);
 
     readonly isLoading = signal<boolean>(false);
     readonly error = signal<string | null>(null);
 
     // Store analysis reports for each lens
     readonly analysisResults = signal<Partial<Record<AnalysisLens, string>>>({});
-    readonly analysisMetrics = signal<IClinicalMetrics | null>(null);
-    readonly verificationResults = signal<Partial<Record<AnalysisLens, { status: string, issues: IVerificationIssue[] }>>>({});
+    readonly analysisMetrics = signal<ClinicalMetrics | null>(null);
+    readonly verificationResults = signal<Partial<Record<AnalysisLens, { status: string, issues: VerificationIssue[] }>>>({});
     readonly lastRefreshTime = signal<Date | null>(null);
 
     // For live agent chat
-    readonly transcript = signal<ITranscriptEntry[]>([]);
+    readonly transcript = signal<TranscriptEntry[]>([]);
 
-    readonly recentNodes = signal<INodeContext[]>([]);
+    readonly recentNodes = signal<NodeContext[]>([]);
 
     readonly lastPatientData = signal<string | null>(null);
 
-    public addRecentNode(nodeContext: INodeContext) {
+    public addRecentNode(nodeContext: NodeContext) {
         this.recentNodes.update(nodes => {
             // Keep only the last 3 most recent nodes to prevent context bloat
             const next = [nodeContext, ...nodes];
@@ -148,7 +148,7 @@ Generate a structured monitoring and follow-up plan organized by time horizon:
 ### Long-term Trajectory (6+ months)
 (Provide a brief narrative on expected outcomes.)` + this.FORMATTING_RULES,
 
-        'IPatient Education': `You are a patient education specialist for a clinical decision-support tool. Translate the documented clinical findings into patient-friendly language.
+        'Patient Education': `You are a patient education specialist for a clinical decision-support tool. Translate the documented clinical findings into patient-friendly language.
 
 CRITICAL: You must ONLY include information that is explicitly documented in the patient data provided. Do NOT invent, assume, or add any clinical details, recommendations, or advice not present in the source material. Every statement must be directly traceable to the provided data.
 
@@ -185,12 +185,12 @@ If a section has no relevant source data, output the heading followed by: "*No s
     }
 
     private async generateVisualMetrics(report: Record<string, string>): Promise<void> {
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Monitoring & Follow-up', 'IPatient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
         const reportText = lenses.map(lens => report[lens]).filter(Boolean).join('\n\n');
         const cacheKey = await this.cache.generateKey([reportText, 'visual-metrics-v2']);
 
         try {
-            const cached = await this.cache.get<IClinicalMetrics>(cacheKey);
+            const cached = await this.cache.get<ClinicalMetrics>(cacheKey);
             if (cached) {
                 this.analysisMetrics.set(cached);
                 return;
@@ -210,19 +210,9 @@ If a section has no relevant source data, output the heading followed by: "*No s
         }
     }
 
-    /**
-     * Orchestrates the complex multi-lens analysis pipeline over the patient record.
-     * Evaluates existing cached reports to avoid redundant API calls if no clinically significant changes
-     * have occurred in the patient's data since the last snapshot.
-     * Manages parallelized requests across all defining clinical lenses: Summary, Protocols, Nutrition, Monitoring, and Education.
-     * Updates reactive signals incrementally as each lens completes its streaming compilation.
-     * 
-     * @param patientData - The current stringified representation of the complete patient state.
-     * @returns A Promise resolving to the multi-lens report map once all sections are generated.
-     */
     async generateComprehensiveReport(patientData: string): Promise<Partial<Record<AnalysisLens, string>>> {
-        if (!this.network.isOnline()) {
-            this.error.set("You are currently offline. Please reconnect to consult the AI.");
+        if (!this.network.useLocalInference() && !this.network.isOnline()) {
+            this.error.set("You are currently offline and no local inference endpoint is available.");
             return {};
         }
 
@@ -231,7 +221,7 @@ If a section has no relevant source data, output the heading followed by: "*No s
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
 
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Monitoring & Follow-up', 'IPatient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Monitoring & Follow-up', 'Patient Education'];
         const newReport: Partial<Record<AnalysisLens, string>> = {};
 
         if (this.lastPatientData()) {
@@ -271,16 +261,14 @@ If a section has no relevant source data, output the heading followed by: "*No s
                         newReport[lens] = responseText;
                         this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
                     } else {
-                        // Stream-based generation using browser-compatible genai
-                        responseText = await lastValueFrom(
-                            this.ai.generateReportStream$(patientData, lens, sysInstruction).pipe(
-                                scan((acc, chunk) => acc + chunk, ''),
-                                tap(accumulated => {
-                                    newReport[lens] = accumulated;
-                                    this.analysisResults.update(all => ({ ...all, [lens]: accumulated }));
-                                })
-                            )
-                        );
+                        // Stream-based generation using native AsyncIterables
+                        for await (const chunk of this.ai.generateReportStream(patientData, lens, sysInstruction)) {
+                            responseText += chunk;
+                            newReport[lens] = responseText;
+                            this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
+                        }
+                        // Apply rules-engine post-processing (disclaimer appends, etc.)
+                        responseText = this.rules.evaluateOnResponse(responseText, lens);
                         await this.cache.set(cacheKey, responseText);
                     }
 
@@ -323,16 +311,9 @@ If a section has no relevant source data, output the heading followed by: "*No s
         }
     }
 
-    /**
-     * Initializes the "Pocket Gull" AI co-pilot chat layer.
-     * Prepares the AI with strict system persona rules: emphasizing brevity, actionable advice, and holistic collaborative strategy.
-     * Resets any existing transcript state prior to connection.
-     * 
-     * @param patientData - The current patient state passed to the AI to establish context.
-     */
     async startChatSession(patientData: string) {
-        if (!this.network.isOnline()) {
-            this.error.set("You are currently offline. Please reconnect to start the chat session.");
+        if (!this.network.isOnline() && !this.network.useLocalInference()) {
+            this.error.set("You are currently offline and no local inference endpoint is available.");
             return;
         }
 
@@ -367,8 +348,15 @@ If a section has no relevant source data, output the heading followed by: "*No s
     async sendChatMessage(message: string): Promise<string> {
         this.transcript.update(t => [...t, { role: 'user', text: message }]);
 
-        if (!this.network.isOnline()) {
-            const errorMsg = "You are currently offline. Please reconnect to consult the AI.";
+        // ── Rules Engine: pre-send guard ────────────────────────────────────────
+        const blocked = this.rules.evaluateOnMessage(message);
+        if (blocked) {
+            this.transcript.update(t => [...t, { role: 'model', text: blocked.reply }]);
+            return blocked.reply;
+        }
+
+        if (!this.network.isOnline() && !this.network.useLocalInference()) {
+            const errorMsg = "You are currently offline and no local inference endpoint is available.";
             this.error.set(errorMsg);
             this.transcript.update(t => [...t, { role: 'model', text: errorMsg }]);
             return errorMsg;
@@ -378,7 +366,9 @@ If a section has no relevant source data, output the heading followed by: "*No s
         this.error.set(null);
 
         try {
-            const response = await this.ai.sendMessage(message);
+            let response = await this.ai.sendMessage(message);
+            // ── Rules Engine: post-process modifier ─────────────────────────────
+            response = this.rules.evaluateOnResponse(response, message);
             this.transcript.update(t => [...t, { role: 'model', text: response }]);
             return response;
         } catch (e: any) {

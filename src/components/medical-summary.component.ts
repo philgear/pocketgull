@@ -1,8 +1,9 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ElementRef, effect, signal, viewChild, untracked } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { PatientStateService, IPatientState } from '../services/patient-state.service';
-import { PatientManagementService, HistoryEntry, IPatient } from '../services/patient-management.service';
-import { IDraftSummaryItem } from '../services/patient.types';
+import { HttpClient } from '@angular/common/http';
+import { PatientStateService, PatientState } from '../services/patient-state.service';
+import { PatientManagementService, HistoryEntry, Patient } from '../services/patient-management.service';
+import { DraftSummaryItem } from '../services/patient.types';
 import { ExportService } from '../services/export.service';
 import { ImportService } from '../services/import.service';
 import { FhirIntegrationService } from '../services/fhir-integration.service';
@@ -12,13 +13,21 @@ import { marked } from 'marked';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
+import { MetricCardComponent } from './shared/metric-card.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
 @Component({
   selector: 'app-medical-summary',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, SafeHtmlPipe],
+  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, MetricCardComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [`
+    /* Tighter margin collapsing inside strategy prose to prevent padding blowouts */
+    .prose :where(p):first-child { margin-top: 0; }
+    .prose :where(p):last-child { margin-bottom: 0; }
+    .prose :where(ul):last-child { margin-bottom: 0; }
+    .prose :where(h2, h3):first-child { margin-top: 0; }
+  `],
   template: `
     @if (patient(); as p) {
       <div class="p-4 sm:p-8 font-sans text-gray-800 dark:text-zinc-200 h-full flex flex-col bg-white dark:bg-[#09090b]">
@@ -29,19 +38,18 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 <h1 class="text-3xl font-light text-[#1C1C1C] dark:text-zinc-100 tracking-tight">{{ p.name }}</h1>
                 <p class="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 dark:text-zinc-400 mt-2">{{ today | date:'fullDate' }}</p>
               </div>
-
             </div>
             
             <!-- Transient SMART on FHIR Success Notification -->
             @if (showEpicSuccess()) {
-              <div class="mb-6 bg-brand-green-50/50 dark:bg-brand-green-900/10 border border-brand-green-200 dark:border-brand-green-800/50 rounded-lg p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+              <div class="mb-6 bg-green-50/50 dark:bg-green-900/10 border border-green-200 dark:border-green-800/50 rounded-lg p-3 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-brand-green-100 dark:bg-brand-green-900/30 text-brand-green-600 dark:text-brand-green-400 rounded-full flex items-center justify-center">
+                  <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                   </div>
                   <div>
-                    <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-brand-green-800 dark:text-brand-green-300">Epic MyChart Connected</h3>
-                    <p class="text-[11px] text-brand-green-600 dark:text-brand-green-500/80">SMART on FHIR token securely established.</p>
+                    <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Epic MyChart Connected</h3>
+                    <p class="text-[11px] text-green-600 dark:text-green-500/80">SMART on FHIR token securely established.</p>
                   </div>
                 </div>
                 <pocket-gull-button variant="ghost" size="xs" (click)="showEpicSuccess.set(false)" icon="M6 18L18 6M6 6l12 12"></pocket-gull-button>
@@ -85,96 +93,157 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </div>
                 </div>
 
+                <!-- Live Biometric Telemetry Dashboard (Display Only) -->
+                <section class="mb-8">
+                  <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-4">Live Biometric Telemetry</h2>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <app-metric-card
+                      title="Blood Pressure"
+                      [value]="state.vitals().bp || '--'"
+                      unit="mmHg"
+                      [status]="state.vitals().bp === '120/80' ? 'normal' : 'warning'"
+                      trendDirection="stable"
+                    ></app-metric-card>
+                    
+                    <app-metric-card
+                      title="Heart Rate"
+                      [value]="state.vitals().hr || '--'"
+                      unit="bpm"
+                      [status]="parseVitalNum(state.vitals().hr) > 100 ? 'warning' : 'normal'"
+                      trendDirection="up"
+                      trendText="+2.5%"
+                    ></app-metric-card>
+                    
+                    <app-metric-card
+                      title="SpO2"
+                      [value]="state.vitals().spO2 || '--'"
+                      unit="%"
+                      [status]="parseVitalNum(state.vitals().spO2) < 95 ? 'critical' : 'normal'"
+                      trendDirection="stable"
+                    ></app-metric-card>
+                    
+                    <app-metric-card
+                      title="Temperature"
+                      [value]="state.vitals().temp || '--'"
+                      unit="°F"
+                      status="normal"
+                      trendDirection="stable"
+                    ></app-metric-card>
+                  </div>
+                </section>
+
                 <!-- Vitals Grid -->
                 <!-- Vitals & Biometrics -->
                 <section>
                     <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-6">Biometric Telemetry</h2>
                 </section>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 border-b border-gray-100 dark:border-zinc-800 pb-8">
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">BP</span>
-                    <pocket-gull-input
-                      id="vitals-bp"
-                      variant="minimal"
-                      placeholder="120/80"
-                      [value]="state.vitals().bp"
-                      (valueChange)="state.updateVital('bp', $event)">
-                    </pocket-gull-input>
+                <div class="flex flex-col gap-3 mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">BP</span>
+                    </div>
+                    <div class="flex-1 w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
+                      <pocket-gull-input
+                        id="vitals-bp"
+                        variant="minimal"
+                        placeholder="120/80"
+                        [value]="state.vitals().bp"
+                        (valueChange)="state.updateVital('bp', $event)"
+                        class="w-full">
+                      </pocket-gull-input>
+                    </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">HR</span>
-                    <div class="flex items-baseline gap-1">
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">HR</span>
+                    </div>
+                    <div class="flex-1 w-full flex items-center bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-hr"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().hr"
                         (valueChange)="state.updateVital('hr', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold tracking-tighter shrink-0 uppercase">BPM</span>
+                      <span class="text-xs text-gray-400 dark:text-zinc-500 font-bold tracking-tighter shrink-0 uppercase pl-2">BPM</span>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">SpO2</span>
-                    <div class="flex items-baseline gap-1">
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">SpO2</span>
+                    </div>
+                    <div class="flex-1 w-full flex items-center bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-spo2"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().spO2"
                         (valueChange)="state.updateVital('spO2', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0">%</span>
+                      <span class="text-xs text-gray-400 dark:text-zinc-500 font-bold tracking-tighter shrink-0 uppercase pl-2">%</span>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Temp</span>
-                    <div class="flex items-baseline gap-1">
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Temp</span>
+                    </div>
+                    <div class="flex-1 w-full flex items-center bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-temp"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().temp"
                         (valueChange)="state.updateVital('temp', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0">°F</span>
+                      <span class="text-xs text-gray-400 dark:text-zinc-500 font-bold tracking-tighter shrink-0 uppercase pl-2">°F</span>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Weight</span>
-                    <div class="flex items-baseline gap-1">
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Weight</span>
+                    </div>
+                    <div class="flex-1 w-full flex items-center bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-weight"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().weight"
                         (valueChange)="state.updateVital('weight', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0 uppercase tracking-tighter">LBS</span>
-                    </div>
-                  </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Height</span>
-                    <div class="flex items-baseline gap-1">
-                      <pocket-gull-input
-                        id="vitals-height"
-                        variant="minimal"
-                        placeholder="--/--"
-                        [value]="state.vitals().height"
-                        (valueChange)="state.updateVital('height', $event)"
-                        class="flex-1 min-w-0">
-                      </pocket-gull-input>
-                      <span class="text-xs text-gray-500 dark:text-zinc-400 font-bold shrink-0 uppercase tracking-tighter">FT</span>
+                      <span class="text-xs text-gray-400 dark:text-zinc-500 font-bold tracking-tighter shrink-0 uppercase pl-2">LBS</span>
                     </div>
                   </div>
 
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors md:col-span-2 lg:col-span-1">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Vit C</span>
-                    <div class="flex items-baseline gap-1">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Height</span>
+                    </div>
+                    <div class="flex-1 w-full flex items-center bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
+                      <pocket-gull-input
+                        id="vitals-height"
+                        variant="minimal"
+                        placeholder="--"
+                        [value]="state.vitals().height"
+                        (valueChange)="state.updateVital('height', $event)"
+                        class="w-full min-w-0">
+                      </pocket-gull-input>
+                      <span class="text-xs text-gray-400 dark:text-zinc-500 font-bold tracking-tighter shrink-0 uppercase pl-2">IN</span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Vit C</span>
+                    </div>
+                    <div class="flex-1 w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-vitC"
                         variant="minimal"
@@ -185,55 +254,66 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                       </pocket-gull-input>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors md:col-span-2 lg:col-span-1">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Vit D3</span>
-                    <div class="flex items-baseline gap-1">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Vit D3</span>
+                    </div>
+                    <div class="flex-1 w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-vitD3"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().vitD3 || ''"
                         (valueChange)="state.updateVital('vitD3', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors md:col-span-2 lg:col-span-1">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Magnesium</span>
-                    <div class="flex items-baseline gap-1">
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Magnesium</span>
+                    </div>
+                    <div class="flex-1 w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-magnesium"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().magnesium || ''"
                         (valueChange)="state.updateVital('magnesium', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors md:col-span-2 lg:col-span-1">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Zinc</span>
-                    <div class="flex items-baseline gap-1">
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Zinc</span>
+                    </div>
+                    <div class="flex-1 w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-zinc"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().zinc || ''"
                         (valueChange)="state.updateVital('zinc', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
                     </div>
                   </div>
-                  <div class="flex flex-col gap-2 p-3 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-700 transition-colors md:col-span-2 lg:col-span-1">
-                    <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Vit B12</span>
-                    <div class="flex items-baseline gap-1">
+
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 shrink-0">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] leading-normal">Vit B12</span>
+                    </div>
+                    <div class="flex-1 w-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg pr-4">
                       <pocket-gull-input
                         id="vitals-b12"
                         variant="minimal"
                         placeholder="--"
                         [value]="state.vitals().b12 || ''"
                         (valueChange)="state.updateVital('b12', $event)"
-                        class="flex-1 min-w-0">
+                        class="w-full min-w-0">
                       </pocket-gull-input>
                     </div>
                   </div>
@@ -439,10 +519,22 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     }
                 </section>
 
-                <!-- IPatient Trends Chart -->
+                <!-- Patient Trends Chart -->
                 @defer (on viewport) {
                   <section>
-                      <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-6">Retrospective Data Visualization</h2>
+                      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-0">Retrospective Data Visualization</h2>
+                        <div class="flex items-center gap-4 text-xs font-medium text-gray-600 dark:text-zinc-400 bg-white dark:bg-zinc-900 px-3 py-1.5 rounded border border-gray-200 dark:border-zinc-800">
+                          <label class="flex items-center gap-2 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">
+                            <input type="checkbox" [checked]="showCDCBaseline()" (change)="showCDCBaseline.set(!showCDCBaseline())" class="w-3.5 h-3.5 accent-[#4285F4] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <span class="flex items-center gap-1.5"><div class="w-2 h-0.5 bg-[#4285F4]"></div> CDC Baselines</span>
+                          </label>
+                          <label class="flex items-center gap-2 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">
+                            <input type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3.5 h-3.5 accent-[#689F38] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <span class="flex items-center gap-1.5"><div class="w-2 h-0.5 bg-[#689F38]"></div> WHO Baselines</span>
+                          </label>
+                        </div>
+                      </div>
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
                               <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Pain Path / 0–10</h3>
@@ -570,10 +662,48 @@ export class MedicalChartSummaryComponent {
   fhirAuth = inject(FhirIntegrationService);
   dictation = inject(DictationService);
   clinicalAI = inject(ClinicalIntelligenceService);
+  http = inject(HttpClient);
+  
   today = new Date();
   newVisitReason = signal('');
   showExportMenu = signal(false);
   showEpicSuccess = signal(false);
+  isExporting = signal(false);
+
+  // BigQuery Healthcare Baseline Overlays
+  baselines = signal<any>(null);
+  showCDCBaseline = signal(false);
+  showWHOBaseline = signal(false);
+
+  parseVitalNum(val: string | undefined): number {
+    if (!val) return 0;
+    const num = parseFloat(val);
+    return isNaN(num) ? 0 : num;
+  }
+
+  ngOnInit() {
+    // Fetch aggregated baselines from server
+    this.http.get('/api/health/baselines').subscribe({
+        next: (data) => this.baselines.set(data),
+        error: (err) => console.error('Failed to load world health baselines', err)
+    });
+  }
+
+  async exportToBigQuery() {
+    const p = this.patient();
+    if (!p) return;
+    this.isExporting.set(true);
+    try {
+      await this.exportService.exportToBigQuery(p);
+      this.showEpicSuccess.set(true); // Reusing the success toast to signal export completion as a generic notification for now
+      setTimeout(() => this.showEpicSuccess.set(false), 3000);
+    } catch (e) {
+      console.error('Failed to export to BigQuery', e);
+      alert('BigQuery export failed. Please check the console.');
+    } finally {
+      this.isExporting.set(false);
+    }
+  }
 
 
 
@@ -658,6 +788,9 @@ export class MedicalChartSummaryComponent {
       const p = this.patient();
       this.state.vitals();
       this.state.issues();
+      this.showCDCBaseline();
+      this.showWHOBaseline();
+      this.baselines();
       const pc = this.painChartRef();
       const bp = this.bpChartRef();
       const hr = this.hrChartRef();
@@ -782,7 +915,7 @@ export class MedicalChartSummaryComponent {
     zincLevels.push(parseNum(this.state.vitals().zinc));
     b12Levels.push(parseNum(this.state.vitals().b12));
 
-    const createChart = (ref: ElementRef<HTMLCanvasElement> | undefined, label: string, data: (number | null)[], color: string, dataset2?: any, yOpts?: any) => {
+    const createChart = (ref: ElementRef<HTMLCanvasElement> | undefined, label: string, data: (number | null)[], color: string, dataset2?: any, yOpts?: any, baselineKey?: string) => {
       if (!ref || !ref.nativeElement) return null;
 
       // Destroy existing chart if present to prevent "Canvas is already in use" error
@@ -834,6 +967,37 @@ export class MedicalChartSummaryComponent {
           tension: 0.4,
           spanGaps: true
         });
+      }
+
+      if (baselineKey && this.baselines()) {
+          const info = this.baselines()[baselineKey];
+          if (info) {
+              const pushOverlay = (src: string, themeColor: string) => {
+                  const b = info.find((x: any) => x.source === src);
+                  if (!b) return;
+                  if (typeof b.value === 'string' && b.value.includes('/')) {
+                      const parts = b.value.split('/');
+                      datasets.push({
+                          label: `${src} Sys. Avg`,
+                          data: Array(dates.length).fill(parseInt(parts[0], 10)),
+                          borderColor: themeColor, borderDash: [4, 4], borderWidth: 2, pointRadius: 0, fill: false
+                      });
+                      datasets.push({
+                          label: `${src} Dia. Avg`,
+                          data: Array(dates.length).fill(parseInt(parts[1], 10)),
+                          borderColor: themeColor, borderDash: [2, 2], borderWidth: 2, pointRadius: 0, fill: false
+                      });
+                  } else {
+                      datasets.push({
+                          label: `${src} Avg Baseline`,
+                          data: Array(dates.length).fill(parseFloat(b.value)),
+                          borderColor: themeColor, borderDash: [4, 4], borderWidth: 2, pointRadius: 0, fill: false
+                      });
+                  }
+              };
+              if (this.showCDCBaseline()) pushOverlay('CDC', '#4285F4');
+              if (this.showWHOBaseline()) pushOverlay('WHO', '#689F38');
+          }
       }
 
       return new Chart(ctx, {
@@ -916,10 +1080,10 @@ export class MedicalChartSummaryComponent {
         label: 'DIASTOLIC',
         data: diastolicLevels,
         borderColor: '#64748B'
-      });
-      this.charts['hr'] = createChart(this.hrChartRef(), 'HEART RATE', hrLevels, '#94A3B8');
+      }, undefined, 'bloodPressure');
+      this.charts['hr'] = createChart(this.hrChartRef(), 'HEART RATE', hrLevels, '#94A3B8', undefined, undefined, 'heartRate');
       this.charts['spo2'] = createChart(this.spo2ChartRef(), 'OXYGEN SATURATION', spo2Levels, '#94A3B8');
-      this.charts['temp'] = createChart(this.tempChartRef(), 'CORE TEMPERATURE', tempLevels, '#94A3B8');
+      this.charts['temp'] = createChart(this.tempChartRef(), 'CORE TEMPERATURE', tempLevels, '#94A3B8', undefined, undefined, 'temperature');
       this.charts['vitC'] = createChart(this.vitCChartRef(), 'VITAMIN C', vitCLevels, '#F59E0B');
       this.charts['vitD3'] = createChart(this.vitD3ChartRef(), 'VITAMIN D3', vitD3Levels, '#F59E0B');
       this.charts['magnesium'] = createChart(this.magnesiumChartRef(), 'MAGNESIUM', magnesiumLevels, '#F59E0B');
@@ -930,7 +1094,7 @@ export class MedicalChartSummaryComponent {
 
 
 
-  removeDraftItem(item: IDraftSummaryItem) {
+  removeDraftItem(item: DraftSummaryItem) {
     this.state.removeDraftSummaryItem(item.id);
   }
 
@@ -939,7 +1103,7 @@ export class MedicalChartSummaryComponent {
     return draftItems && draftItems.length > 0;
   }
 
-  updateVital(key: keyof IPatientState['vitals'], event: any) {
+  updateVital(key: keyof PatientState['vitals'], event: any) {
     this.state.updateVital(key, event.target.value);
   }
 
@@ -955,7 +1119,7 @@ export class MedicalChartSummaryComponent {
     if (!reason || !patient) return;
 
     // Capture the state at the time of this visit
-    const visitState: IPatientState = {
+    const visitState: PatientState = {
       ...this.state.getCurrentState(),
       patientGoals: reason // The primary goal for this snapshot is the reason for the visit.
     };
@@ -999,7 +1163,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
 
     if (draftItems && draftItems.length > 0) {
-      if (confirm('Discard your draft modifications and revert to the saved IPatient Summary?')) {
+      if (confirm('Discard your draft modifications and revert to the saved Patient Summary?')) {
         this.state.clearDraftSummaryItems();
       }
     }
@@ -1010,7 +1174,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
     if (draftItems.length > 0) {
       const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
-      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### IPatient Summary\n${newContent}`;
+      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
       this.state.updateActivePatientSummary(plan);
       this.state.clearDraftSummaryItems();
     }
