@@ -60,8 +60,8 @@ jobs:
         
       - name: Build and Push Docker Image
         run: |
-          gcloud auth configure-docker us-central1-docker.pkg.dev
-          IMAGE_PATH=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr
+          gcloud auth configure-docker us-west1-docker.pkg.dev
+          IMAGE_PATH=us-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr
           
           # Docker caching for faster builds
           docker pull $IMAGE_PATH:latest || true
@@ -76,10 +76,10 @@ jobs:
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v2'
         with:
-          service: 'pocketgull-ssr'
-          region: 'us-central1'
-          image: 'us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }}'
+          service: 'pocket-gull'
+          region: 'us-west1'
+          image: 'us-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }}'
           env_vars: |
             NODE_ENV=production
-          # Secure deployment flags
-          flags: '--allow-unauthenticated --vpc-egress=private-ranges-only'
+          # Secure deployment flags + GEMINI API Key binding
+          flags: '--allow-unauthenticated --vpc-egress=private-ranges-only --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'
