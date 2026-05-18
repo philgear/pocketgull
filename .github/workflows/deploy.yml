@@ -30,7 +30,7 @@ jobs:
 
       # Run Red-Team Safety Checks
       - name: Run AI Safety Tests
-        run: npx tsx tests/safety.spec.ts
+        run: npx vitest run tests/safety.spec.ts
 
   build-and-deploy:
     needs: security-and-lint
