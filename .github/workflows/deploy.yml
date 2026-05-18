@@ -36,7 +36,8 @@ jobs:
     needs: security-and-lint
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    environment: production # Enables manual approval gates in GitHub
+    environment:
+      name: production # Enables manual approval gates in GitHub
     
     # Required permissions for Workload Identity Federation
     permissions:
