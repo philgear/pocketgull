@@ -36,7 +36,8 @@ import { AvsUiService } from './services/avs-ui.service';
 import { GlobalAvsService } from './services/global-avs.service';
 import { PetAuditoryService } from './services/pet-auditory.service';
 import { StressInterventionService } from './services/stress-intervention.service';
-
+import { CollaborationService } from './services/collaboration.service';
+import { CollaborationDockComponent } from './components/collaboration-dock.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -55,7 +56,8 @@ import { StressInterventionService } from './services/stress-intervention.servic
     WalkthroughTourComponent,
     SecureSplashComponent,
     PatientDirectoryComponent,
-    AvsTherapyComponent
+    AvsTherapyComponent,
+    CollaborationDockComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -80,6 +82,9 @@ import { StressInterventionService } from './services/stress-intervention.servic
       @defer (on idle) {
         <app-walkthrough-tour></app-walkthrough-tour>
       }
+      
+      <!-- Collaboration Dock -->
+      <app-collaboration-dock></app-collaboration-dock>
       
       @if (session.isLocked() || !hasApiKey()) {
         <app-secure-splash
@@ -920,6 +925,7 @@ export class AppComponent implements OnDestroy {
   public readonly globalAvs = inject(GlobalAvsService);
   public readonly petAuditory = inject(PetAuditoryService);
   private readonly stressIntervention = inject(StressInterventionService);
+  public readonly collaboration = inject(CollaborationService);
   state = inject(PatientStateService);
   public theme = inject(ThemeService);
   private ngZone = inject(NgZone);

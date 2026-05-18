@@ -5,6 +5,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { Server as SocketIOServer } from 'socket.io';
 import compression from 'compression';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -555,7 +556,7 @@ app.use((req, res, next) => {
  */
 if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT']) {
   const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4200;
-  app.listen(port, '0.0.0.0', () => {
+  const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Node Express server listening on http://0.0.0.0:${port}`);
     
     // Auto-provision Cloud Healthcare API datasets and stores
@@ -563,6 +564,43 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
 
     // Explicitly keep the process alive, as something is closing the event loop
     setInterval(() => {}, 1000 * 60 * 60 * 24);
+  });
+
+  // Attach Socket.IO for the Colleague Collaboration Room
+  const io = new SocketIOServer(server, {
+    cors: {
+      origin: "*", // Lock this down to pocketgull.app in a real production scenario
+      methods: ["GET", "POST"]
+    }
+  });
+
+  io.on('connection', (socket) => {
+    console.log('[Socket.IO] Clinician connected:', socket.id);
+
+    // Join a specific patient's collaboration room
+    socket.on('join_patient_room', (patientId: string) => {
+      socket.join(patientId);
+      console.log(`[Socket.IO] ${socket.id} joined patient room: ${patientId}`);
+    });
+
+    // Real-time Vitals Sync
+    socket.on('sync_vitals', (data: { patientId: string, vitals: any }) => {
+      socket.to(data.patientId).emit('vitals_updated', data.vitals);
+    });
+
+    // Colleague Chat & Intelligence Notes
+    socket.on('send_note', (data: { patientId: string, note: any }) => {
+      socket.to(data.patientId).emit('note_received', data.note);
+    });
+
+    // Colleague Presence (e.g. "Dr. Smith is viewing this chart")
+    socket.on('presence_update', (data: { patientId: string, clinician: any }) => {
+      socket.to(data.patientId).emit('presence_updated', data.clinician);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('[Socket.IO] Clinician disconnected:', socket.id);
+    });
   });
 }
 
