@@ -28,10 +28,20 @@ jobs:
       - name: Run Linters
         run: npm run lint --if-present
 
+      # Run Red-Team Safety Checks
+      - name: Run AI Safety Tests
+        run: npx tsx tests/safety.spec.ts
+
   build-and-deploy:
     needs: security-and-lint
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    environment: production # Enables manual approval gates in GitHub
+    
+    # Required permissions for Workload Identity Federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +50,9 @@ jobs:
         id: auth
         uses: 'google-github-actions/auth@v2'
         with:
-          credentials_json: '${{ secrets.GCP_CREDENTIALS }}' # Service account strictly scoped
+          # Replaced credentials_json with Keyless Workload Identity
+          workload_identity_provider: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
           
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v2'
@@ -48,8 +60,17 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           gcloud auth configure-docker us-central1-docker.pkg.dev
-          docker build -t us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }} .
-          docker push us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr:${{ github.sha }}
+          IMAGE_PATH=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/pocketgull/web-ssr
+          
+          # Docker caching for faster builds
+          docker pull $IMAGE_PATH:latest || true
+          docker build \
+            --cache-from $IMAGE_PATH:latest \
+            -t $IMAGE_PATH:${{ github.sha }} \
+            -t $IMAGE_PATH:latest .
+            
+          docker push $IMAGE_PATH:${{ github.sha }}
+          docker push $IMAGE_PATH:latest
           
       - name: Deploy to Cloud Run
         uses: 'google-github-actions/deploy-cloudrun@v2'
