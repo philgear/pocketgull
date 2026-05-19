@@ -142,9 +142,44 @@ if (fs.existsSync(distFolder)) {
 
 // Add security headers
 app.use((req, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  // Strict Transport Security - preloaded via HSTS preload list
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  
+  // Cross-Origin-Opener-Policy
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  
+  // X-Frame-Options
   res.setHeader('X-Frame-Options', 'DENY');
+  
+  // Content Security Policy - prevents inline scripts and restricts resource loading
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+    "img-src 'self' https: data:; " +
+    "font-src 'self' https://fonts.gstatic.com; " +
+    "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com; " +
+    "frame-ancestors 'self'; " +
+    "base-uri 'self'; " +
+    "form-action 'self'"
+  );
+  
+  // X-Content-Type-Options - prevents MIME type sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  
+  // Referrer-Policy - controls referrer information
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Cross-Origin Resource Policy
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  
+  // Permissions-Policy (formerly Feature-Policy)
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()'
+  );
+  
   next();
 });
 
