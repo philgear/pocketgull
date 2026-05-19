@@ -73,7 +73,7 @@
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
     "release": "npm run changelog && npm version patch -m \"chore(release): %s\"",
-    "deploy": "npm run build && gcloud run deploy pocket-gull --source . --region=us-west1 --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest --quiet",
+    "deploy": "npm run build && gcloud run deploy pocket-gull --source . --region=us-west1 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --quiet",
     "serve:ssr:app": "node dist/server/server.mjs",
     "start": "node dist/server/server.mjs",
     "gcp-build": "npm run build && npm prune --production",
