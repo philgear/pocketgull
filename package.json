@@ -68,7 +68,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "dev": "ng serve",
-    "build": "ng build",
+    "build": "ng build && npm install --prefix docs/study && npm run build --prefix docs/study",
     "lint": "tsc --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",

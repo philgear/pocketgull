@@ -225,9 +225,20 @@ const swaggerAuth = (req: any, res: any, next: any) => {
   return res.status(401).send('Invalid credentials.');
 };
 
-app.get('/docs', swaggerAuth, (req, res) => {
+app.get(['/docs', '/docs/'], swaggerAuth, (req, res) => {
   res.redirect('/api-docs');
 });
+app.use('/docs/study', (req, res, next) => {
+  const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
+  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
+    const indexPath = join(browserDistFolder, 'docs', 'study', cleanPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  next();
+});
+app.use('/docs/study', express.static(join(browserDistFolder, 'docs', 'study')));
 app.use('/api-docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(openApiSpec));
 app.use('/api/dicom', dicomRouter);
 app.use('/api/healthcare', healthcareRouter);

@@ -201,6 +201,9 @@ export class GlobalAvsService {
       this.masterGain.gain.linearRampToValueAtTime(0.15, this.ctx.currentTime + 3.0);
       this.masterGain.connect(this.ctx.destination);
 
+      // Channel Merger
+      this.merger = this.ctx.createChannelMerger(2);
+
       // Hemi-Sync Layer 1 (Primary)
       this.leftOsc1  = this.ctx.createOscillator();
       this.rightOsc1 = this.ctx.createOscillator();
