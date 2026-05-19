@@ -1659,6 +1659,30 @@ export class ExportService {
     }
   }
 
+  /**
+   * Syncs/exports the patient record to the AWS HealthLake FHIR Store.
+   */
+  async exportToAwsHealthlake(patient: IPatient): Promise<void> {
+    console.log('[ExportService] Initiating AWS HealthLake FHIR sync for:', patient.id);
+    try {
+      const response = await fetch('/api/aws/healthlake/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patient)
+      });
+      
+      if (!response.ok) {
+        const errJson = await response.json();
+        throw new Error(errJson.error || 'Unknown Server Error');
+      }
+      
+      alert("✅ Patient record successfully synchronized to AWS HealthLake FHIR Store.");
+    } catch (error) {
+      console.error('[ExportService] AWS HealthLake FHIR sync failure:', error);
+      alert("AWS HealthLake Sync Failed: " + (error as Error).message);
+    }
+  }
+
   async exportToBigQuery(patient: IPatient): Promise<void> {
     console.log('[ExportService] Initiating BigQuery export sequence for:', patient.id);
     

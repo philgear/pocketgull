@@ -158,6 +158,7 @@ app.use((req, res, next) => {
 
 import { dicomRouter } from './server/dicom';
 import { healthcareRouter, ensureHealthcareStoresExist } from './server/healthcare';
+import { awsRouter } from './server/aws';
 import swaggerUi from 'swagger-ui-express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
@@ -230,6 +231,7 @@ app.get('/docs', swaggerAuth, (req, res) => {
 app.use('/api-docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(openApiSpec));
 app.use('/api/dicom', dicomRouter);
 app.use('/api/healthcare', healthcareRouter);
+app.use('/api/aws', awsRouter);
 
 app.get('/api/pubmed/summary', async (req, res) => {
   try {

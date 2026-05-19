@@ -6,6 +6,7 @@ import { dirname, join } from 'path';
 import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import swaggerUi from 'swagger-ui-express';
+import Stripe from 'stripe';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -212,8 +213,109 @@ app.get('/api/pubmed/summary', async (req, res) => {
   }
 });
 
+// Initialize Stripe
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+if (stripe) {
+  console.log('[Billing] Stripe client initialized successfully.');
+} else {
+  console.warn('[Billing] Warning: STRIPE_SECRET_KEY not set. Using mock billing fallback.');
+}
+
+// In-memory billing subscription database for testing
+const mockBillingDb = new Map();
+
+// Stripe Webhook Endpoint (Registered BEFORE json parser to enable raw body signature checking)
+app.post('/api/billing/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+
+  try {
+    if (stripe && sig && process.env.STRIPE_WEBHOOK_SECRET) {
+      // Production verification
+      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    } else {
+      // Heuristic parsing for development / local testing
+      const bodyString = Buffer.isBuffer(req.body) ? req.body.toString() : JSON.stringify(req.body);
+      event = JSON.parse(bodyString);
+      console.log('[Billing] Webhook signature verification bypassed (local testing or Stripe CLI).');
+    }
+  } catch (err) {
+    console.error(`[Billing] Webhook signature error: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle billing completed event
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const userId = session.metadata?.userId || 'unknown-user';
+    const amount = session.metadata?.amount || '49';
+    
+    console.log(`[Billing] Webhook success: User ${userId} upgraded successfully with $${amount}/mo!`);
+    mockBillingDb.set(userId, { tier: parseFloat(amount) >= 80 ? 'patron' : 'premium', amount });
+  }
+
+  res.json({ received: true });
+});
+
 // Enable parsing JSON bodies for POST requests
 app.use(express.json({ limit: '50mb' }));
+
+// Stripe Billing Checkout Session Creation (with Sliding Scale support)
+app.post('/api/billing/checkout', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    let amount = parseFloat(req.body.amount);
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+    
+    // Default to $49 if not specified, clamp between $10 and $150
+    if (isNaN(amount)) {
+      amount = 49;
+    }
+    if (amount < 10) amount = 10;
+    if (amount > 150) amount = 150;
+
+    const protocol = req.secure ? 'https' : 'http';
+    const host = req.get('host');
+    const origin = `${protocol}://${host}`;
+
+    console.log(`[Billing] Creating checkout session for user ${userId} with sliding scale amount: $${amount}`);
+
+    if (stripe) {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'PocketGull Premium License (Sliding Scale)',
+              description: `Support level: $${amount}/month. Unlocks full multi-device companion syncing and premium API rates.`,
+            },
+            unit_amount: Math.round(amount * 100), // convert to cents
+            recurring: { interval: 'month' }
+          },
+          quantity: 1,
+        }],
+        mode: 'subscription',
+        success_url: `${origin}/?upgrade=success&amount=${amount}`,
+        cancel_url: `${origin}/?upgrade=cancelled`,
+        metadata: { userId, amount: amount.toString() },
+      });
+
+      return res.json({ url: session.url });
+    } else {
+      // Mock Local Sandbox Redirection URL
+      console.log('[Billing] Stripe not configured. Redirecting directly to client sandbox success page.');
+      const mockSuccessUrl = `${origin}/?upgrade=success&amount=${amount}&sandbox=true`;
+      return res.json({ url: mockSuccessUrl });
+    }
+  } catch (err) {
+    console.error('[Billing] Checkout session error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {

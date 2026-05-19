@@ -38,6 +38,7 @@ import { PetAuditoryService } from './services/pet-auditory.service';
 import { StressInterventionService } from './services/stress-intervention.service';
 import { CollaborationService } from './services/collaboration.service';
 import { CollaborationDockComponent } from './components/collaboration-dock.component';
+import { BillingService } from './services/billing.service';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -160,6 +161,60 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
               </div>
             </div>
             <button (click)="showGHealthError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+
+        <!-- AWS HealthLake Syncing Toast -->
+        @if (isAwsSyncing()) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/50 animate-pulse">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" class="opacity-25"></circle>
+                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-amber-800 dark:text-amber-300">Synchronizing to AWS HealthLake</h3>
+                <p class="text-[11px] text-amber-600 dark:text-amber-400/80">Transforming medical data to FHIR resources and uploading to AWS HealthLake...</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- AWS HealthLake Sync Success Toast -->
+        @if (showAwsSuccess()) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">AWS HealthLake Sync Successful</h3>
+                <p class="text-[11px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and vital logs successfully archived in AWS HealthLake FHIR Store.</p>
+              </div>
+            </div>
+            <button (click)="showAwsSuccess.set(false)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors text-green-700 dark:text-green-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+
+        <!-- AWS HealthLake Sync Error Toast -->
+        @if (showAwsError(); as errorMsg) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-red-800 dark:text-red-300">AWS HealthLake Sync Failed</h3>
+                <p class="text-[11px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
+              </div>
+            </div>
+            <button (click)="showAwsError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
@@ -406,6 +461,9 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                    <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#4285F4] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Health Connect
                    </button>
+                    <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> AWS HealthLake
+                    </button>
                    <button (click)="connectAppleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Apple Health
                    </button>
@@ -418,6 +476,38 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
 
              <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1"></div>
 
+             <!-- LICENSE MANAGEMENT BUTTON -->
+             <button (click)="openBillingModal()"
+                     (mouseenter)="avsUi.playHover()"
+                     class="shrink-0 flex items-center gap-2 px-3 py-1.5 border rounded-md text-[10px] font-bold uppercase tracking-widest transition-all duration-300 animate-in fade-in duration-300"
+                     [class.border-amber-500/30]="billingService.userTier() !== 'free'"
+                     [class.bg-amber-500/5]="billingService.userTier() !== 'free'"
+                     [class.text-amber-500]="billingService.userTier() !== 'free'"
+                     [class.hover:bg-amber-500/10]="billingService.userTier() !== 'free'"
+                     [class.border-zinc-300]="billingService.userTier() === 'free'"
+                     [class.dark:border-zinc-700]="billingService.userTier() === 'free'"
+                     [class.text-zinc-600]="billingService.userTier() === 'free'"
+                     [class.dark:text-zinc-300]="billingService.userTier() === 'free'"
+                     [class.bg-white]="billingService.userTier() === 'free'"
+                     [class.dark:bg-zinc-900]="billingService.userTier() === 'free'"
+                     [class.hover:bg-gray-50]="billingService.userTier() === 'free'"
+                     [class.dark:hover:bg-zinc-800]="billingService.userTier() === 'free'">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" [class.text-amber-500]="billingService.userTier() !== 'free'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+               </svg>
+               <span>
+                 @if (billingService.userTier() === 'patron') {
+                   Patron ({{ billingService.selectedPrice() | currency:'USD':'symbol':'1.0-0' }}/mo)
+                 } @else if (billingService.userTier() === 'premium') {
+                   Premium ({{ billingService.selectedPrice() | currency:'USD':'symbol':'1.0-0' }}/mo)
+                 } @else {
+                   Upgrade License
+                 }
+               </span>
+             </button>
+
+             <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1"></div>
+
              <button (click)="finalizeRecord()"
                      (mouseenter)="avsUi.playHover()"
                      id="tour-finalize-btn"
@@ -427,6 +517,27 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
              </button>
            </div>
         </nav>
+
+        <!-- Stripe Redirect Status Alerts -->
+        @if (upgradeStatus() === 'success') {
+          <div class="bg-emerald-600 text-white px-6 py-3.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider animate-in slide-in-from-top duration-300 no-print">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <span>License upgraded successfully! Active: {{ billingService.userTier() | uppercase }} tier at {{ upgradeAmount() | currency:'USD':'symbol':'1.0-0' }}/mo. Thank you for supporting pocketgull!</span>
+            </div>
+            <button (click)="upgradeStatus.set(null)" class="hover:text-emerald-200 font-mono tracking-widest text-[10px]">DISMISS</button>
+          </div>
+        }
+        @if (upgradeStatus() === 'cancelled') {
+          <div class="bg-amber-600 text-white px-6 py-3.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider animate-in slide-in-from-top duration-300 no-print">
+            <div class="flex items-center gap-2.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>Checkout process cancelled. No changes have been made to your billing account.</span>
+            </div>
+            <button (click)="upgradeStatus.set(null)" class="hover:text-amber-200 font-mono tracking-widest text-[10px]">DISMISS</button>
+          </div>
+        }
 
         <!-- Main Grid Layout -->
         <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
@@ -656,6 +767,140 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
               <app-research-frame></app-research-frame>
             }
         }
+
+    <!-- Sliding-Scale Billing Modal (Sleek Glassmorphic Dark UI) -->
+    @if (isBillingModalOpen()) {
+      <div class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 no-print animate-in fade-in duration-300">
+        <div class="bg-zinc-950 dark:bg-black border border-zinc-800 text-white rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col relative max-h-[90vh] animate-in zoom-in-[0.98] duration-300">
+          
+          <!-- Top Accent Light Stripe -->
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600"></div>
+
+          <!-- Modal Header -->
+          <div class="p-6 border-b border-zinc-800 flex justify-between items-start">
+            <div>
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.6)] font-mono"></span>
+                <h2 class="text-xs font-bold uppercase tracking-[0.25em] font-mono text-zinc-100">PocketGull Licensing</h2>
+              </div>
+              <p class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Sliding Scale • Professional Support Tier</p>
+            </div>
+            <button (click)="closeBillingModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-800 text-zinc-400 transition-colors">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- Scrollable Content -->
+          <div class="p-6 overflow-y-auto space-y-6 flex-1 text-zinc-300">
+            <p class="text-xs leading-relaxed text-zinc-400">
+              PocketGull operates under a cooperative open-source model. Choose an amount matching your scale of practice, clinical usage volume, and financial capacity. We keep licensing sliding to keep advanced AI accessible to all practitioners.
+            </p>
+
+            <!-- Dynamic Pricing Indicator -->
+            <div class="bg-zinc-900 border border-zinc-800/80 rounded-xl p-5 text-center relative overflow-hidden group">
+              <div class="absolute top-0 right-0 p-2 text-[9px] font-bold text-amber-500 tracking-widest font-mono">
+                @if (billingService.selectedPrice() >= 80) {
+                  PATRON TIER
+                } @else if (billingService.selectedPrice() >= 30) {
+                  PRACTITIONER TIER
+                } @else {
+                  COMMUNITY TIER
+                }
+              </div>
+              
+              <div class="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-1.5">Selected Support Level</div>
+              <div class="flex items-baseline justify-center gap-1.5">
+                <span class="text-3xl font-extrabold font-mono text-amber-400">\${{ billingService.selectedPrice() }}</span>
+                <span class="text-xs text-zinc-500 uppercase tracking-widest font-semibold">/ month</span>
+              </div>
+
+              <!-- Tier Specific Info -->
+              <div class="mt-4 pt-4 border-t border-zinc-800/60 text-left text-xs leading-relaxed">
+                @if (billingService.selectedPrice() >= 80) {
+                  <div class="flex gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span class="text-zinc-300 font-medium">
+                      Unlocks full multi-device syncing, premium Gemini 1.5 Flash rates, dedicated server compute, and direct developer consulting channel.
+                    </span>
+                  </div>
+                } @else if (billingService.selectedPrice() >= 30) {
+                  <div class="flex gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span class="text-zinc-300">
+                      Standard professional access. Unlocks unlimited strategy outputs, full companion app connectivity, and EHR Integration pipelines.
+                    </span>
+                  </div>
+                } @else {
+                  <div class="flex gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span class="text-zinc-400">
+                      Cooperative community license. Supports local practitioner operation. Limits cloud strategy sync runs to 10 per day.
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Custom Slider UI -->
+            <div class="space-y-4">
+              <div class="flex justify-between items-center">
+                <span class="text-[10px] uppercase font-bold text-zinc-400 tracking-widest font-mono">Sliding scale range</span>
+                <span class="text-xs font-mono text-zinc-500">$10 – $150</span>
+              </div>
+
+              <div class="relative py-2 px-1">
+                <input type="range" 
+                       min="10" 
+                       max="150" 
+                       step="5"
+                       [value]="billingService.selectedPrice()" 
+                       (input)="onSliderChange($event)"
+                       class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-amber-500 transition-all focus:outline-none" />
+                <div class="flex justify-between text-[9px] font-bold text-zinc-600 mt-2 uppercase tracking-widest font-mono">
+                  <span>$10 Min</span>
+                  <span>$49 Default</span>
+                  <span>$150 Max</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active License Details -->
+            @if (billingService.userTier() !== 'free') {
+              <div class="bg-amber-950/20 border border-amber-900/30 rounded-xl p-4 flex items-center justify-between">
+                <div>
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-amber-400 font-mono mb-0.5">CURRENT ACTIVE LEVEL</div>
+                  <div class="text-xs text-zinc-300">Upgrade active at \${{ billingService.selectedPrice() }}/mo</div>
+                </div>
+                <button (click)="demoteBillingTier()" class="px-3 py-1 border border-zinc-700 hover:border-zinc-500 text-zinc-400 hover:text-zinc-200 text-[10px] font-bold uppercase tracking-widest rounded-md transition-colors font-mono">
+                  Revert to Free
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- Modal Footer -->
+          <div class="p-6 border-t border-zinc-800 bg-zinc-900/40 flex flex-col gap-3">
+            <button (click)="initiateUpgrade()"
+                    [disabled]="billingService.isProcessingCheckout()"
+                    class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-black text-xs font-bold uppercase tracking-[0.2em] transition-all rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] flex items-center justify-center gap-2">
+              @if (billingService.isProcessingCheckout()) {
+                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Processing Checkout...</span>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+                <span>{{ billingService.userTier() !== 'free' ? 'Update License via Stripe' : 'Upgrade via Stripe' }}</span>
+              }
+            </button>
+            <div class="text-[9px] uppercase tracking-widest text-zinc-500 font-bold text-center font-mono">
+              Secure recurring support via Stripe. 1-click cancellation.
+            </div>
+          </div>
+        </div>
+      </div>
+    }
 
     <!-- Preview & Print Modal (Dieter Rams Style) -->
     @if (showPreviewModal()) {
@@ -929,6 +1174,32 @@ export class AppComponent implements OnDestroy {
   state = inject(PatientStateService);
   public theme = inject(ThemeService);
   private ngZone = inject(NgZone);
+  public readonly billingService = inject(BillingService);
+  isBillingModalOpen = signal<boolean>(false);
+  upgradeStatus = signal<'success' | 'cancelled' | null>(null);
+  upgradeAmount = signal<number | null>(null);
+
+  closeBillingModal() {
+    this.isBillingModalOpen.set(false);
+  }
+
+  openBillingModal() {
+    this.isBillingModalOpen.set(true);
+  }
+
+  initiateUpgrade() {
+    const price = this.billingService.selectedPrice();
+    this.billingService.initiateCheckout(price);
+  }
+
+  demoteBillingTier() {
+    this.billingService.setTier('free');
+  }
+
+  onSliderChange(event: Event) {
+    const val = parseInt((event.target as HTMLInputElement).value, 10);
+    this.billingService.setPrice(val);
+  }
 
   /** Unlock Web Audio API on the first user gesture (browser autoplay policy). */
   @HostListener('document:click', [])
@@ -961,6 +1232,11 @@ export class AppComponent implements OnDestroy {
   isGHealthSyncing = signal<boolean>(false);
   showGHealthSuccess = signal<boolean>(false);
   showGHealthError = signal<string | null>(null);
+
+  // AWS HealthLake Sync State
+  isAwsSyncing = signal<boolean>(false);
+  showAwsSuccess = signal<boolean>(false);
+  showAwsError = signal<string | null>(null);
 
   // Finalize & Archive State
   showPreviewModal = signal(false);
@@ -1106,6 +1382,44 @@ export class AppComponent implements OnDestroy {
       setTimeout(() => this.showGHealthError.set(null), 8000);
     } finally {
       this.isGHealthSyncing.set(false);
+    }
+  }
+
+  async connectAwsHealth() {
+    const patient = this.patientMgmt.selectedPatient();
+    if (!patient) {
+      alert("No patient selected to sync to AWS HealthLake FHIR Store.");
+      return;
+    }
+
+    this.isAwsSyncing.set(true);
+    this.showAwsSuccess.set(false);
+    this.showAwsError.set(null);
+
+    try {
+      const response = await fetch('/api/aws/healthlake/export', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(patient)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `Sync failed with status code ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('[AWS HealthLake Sync] Success:', result);
+      this.showAwsSuccess.set(true);
+      setTimeout(() => this.showAwsSuccess.set(false), 5000);
+    } catch (e: any) {
+      console.error('[AWS HealthLake Sync] Error:', e);
+      this.showAwsError.set(e.message || 'An error occurred during synchronization.');
+      setTimeout(() => this.showAwsError.set(null), 8000);
+    } finally {
+      this.isAwsSyncing.set(false);
     }
   }
 
@@ -1414,6 +1728,32 @@ export class AppComponent implements OnDestroy {
       if (window.location.pathname === '/fhir-callback') {
         this.showFhirCallback.set(true);
         return;
+      }
+
+      // 0. Check for Stripe checkout redirect params (Sliding Scale)
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('upgrade')) {
+        const status = params.get('upgrade');
+        const amount = params.get('amount') ? parseInt(params.get('amount')!, 10) : 49;
+        if (status === 'success') {
+          const tier = amount >= 80 ? 'patron' : (amount >= 30 ? 'premium' : 'free');
+          this.billingService.setTier(tier);
+          this.billingService.setPrice(amount);
+          this.upgradeStatus.set('success');
+          this.upgradeAmount.set(amount);
+          
+          // Clear query params to keep clean URLs
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setTimeout(() => {
+            this.upgradeStatus.set(null);
+          }, 6000);
+        } else if (status === 'cancelled') {
+          this.upgradeStatus.set('cancelled');
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setTimeout(() => {
+            this.upgradeStatus.set(null);
+          }, 4000);
+        }
       }
 
       this.isMobile.set(window.innerWidth < 768);
