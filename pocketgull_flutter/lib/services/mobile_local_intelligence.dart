@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class LocalIntelligenceService {
-  LlmInference? _llmInference;
+  LlmInferenceEngine? _llmInference;
   bool _isLoaded = false;
 
   bool get isLoaded => _isLoaded;
@@ -26,14 +26,16 @@ class LocalIntelligenceService {
         }
       }
       
-      final options = LlmInferenceOptions(
+      final cacheDirectory = await getApplicationCacheDirectory();
+      final options = LlmInferenceOptions.cpu(
         modelPath: modelPath,
+        cacheDir: cacheDirectory.path,
         maxTokens: 512,
         temperature: 0.7,
         topK: 40,
       );
       
-      _llmInference = LlmInference.create(options);
+      _llmInference = LlmInferenceEngine(options);
       _isLoaded = true;
     } catch (e) {
       _isLoaded = true; 
@@ -44,8 +46,12 @@ class LocalIntelligenceService {
     if (!_isLoaded) return text;
     if (_llmInference != null) {
       try {
-        final response = await _llmInference!.generateResponse("Scrub PII: $text");
-        return response.trim();
+        final stream = _llmInference!.generateResponse("Scrub PII: $text");
+        final buffer = StringBuffer();
+        await for (final chunk in stream) {
+          buffer.write(chunk);
+        }
+        return buffer.toString().trim();
       } catch (e) {
         return text.replaceAll(RegExp(r'\d{3}-\d{3}-\d{4}'), '[REDACTED PHONE]');
       }
@@ -57,8 +63,12 @@ class LocalIntelligenceService {
     if (!_isLoaded) return 'unknown';
     if (_llmInference != null) {
       try {
-        final response = await _llmInference!.generateResponse("Classify: $input");
-        return response.trim().toUpperCase();
+        final stream = _llmInference!.generateResponse("Classify: $input");
+        final buffer = StringBuffer();
+        await for (final chunk in stream) {
+          buffer.write(chunk);
+        }
+        return buffer.toString().trim().toUpperCase();
       } catch (e) {}
     }
     if (input.contains('BP')) return 'VITAL';

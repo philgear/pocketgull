@@ -18,6 +18,7 @@ import { ClinicalIntelligenceService } from './services/clinical-intelligence.se
 import { PatientManagementService } from './services/patient-management.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT } from './demo-data';
+import { BillingService } from './services/billing.service';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 
@@ -240,6 +241,29 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
               <span class="hidden sm:inline">Research</span>
             </button>
+
+            <!-- Stripe Billing Upgrade Connector -->
+            @if (billingService.userTier() === 'free') {
+              <button (click)="openBillingModal()"
+                      aria-label="Upgrade to Premium License"
+                      class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-amber-300 bg-amber-50 hover:bg-amber-100 hover:border-amber-400 text-amber-900 transition-colors text-xs font-bold uppercase tracking-widest">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Upgrade</span>
+              </button>
+            } @else {
+              <div class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-yellow-400 bg-yellow-50 text-yellow-900 text-xs font-bold uppercase tracking-widest rounded-full relative cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 fill-yellow-500 text-yellow-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Premium</span>
+                
+                <div class="absolute top-full right-0 mt-2 w-48 bg-gray-900 border border-gray-800 p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-auto text-left">
+                  <p class="text-[10px] text-gray-400 mb-2 normal-case tracking-normal">Premium subscription is active. Click below to reset to standard tier for testing.</p>
+                  <button (click)="billingService.setPremiumStatus(false)" class="w-full py-1.5 bg-red-950 text-red-200 border border-red-800 text-[10px] uppercase font-bold tracking-widest rounded hover:bg-red-900 transition-colors">
+                    Demote Account
+                  </button>
+                </div>
+              </div>
+            }
+
             <div class="hidden sm:flex items-center gap-6 text-xs font-medium text-gray-500 pl-4">
               <span>{{ today | date:'yyyy.MM.dd' }}</span>
               <span class="text-[#416B1F]">REQ. DR. SMITH</span>
@@ -365,6 +389,73 @@ import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
         @if(state.isResearchFrameVisible()) {
             <app-research-frame></app-research-frame>
         }
+
+        <!-- Stripe Billing Upgrade Modal -->
+        @if (isBillingModalOpen()) {
+          <div class="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm no-print">
+            <div class="bg-white max-w-md w-full rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+              <!-- Modal Header -->
+              <div class="p-6 pb-4 border-b border-gray-100 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  </div>
+                  <div>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-gray-800">PocketGull Premium</h3>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Enterprise Clinical Licensing</p>
+                  </div>
+                </div>
+                <button (click)="closeBillingModal()" class="text-gray-400 hover:text-gray-600 transition-colors p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </div>
+              
+              <!-- Modal Body -->
+              <div class="p-6 space-y-4">
+                <p class="text-xs text-gray-600 leading-relaxed">
+                  Unlock native Stripe checkout capabilities and upgrade your clinical instance to handle full production load.
+                </p>
+                
+                <!-- Features comparison card -->
+                <div class="border border-gray-100 rounded-xl bg-gray-50/50 p-4 space-y-3">
+                  <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+                    <span class="text-xs font-bold text-gray-700 uppercase">Premium Features</span>
+                    <span class="text-xs font-bold text-gray-900">$49<span class="text-[10px] text-gray-500 font-normal">/mo</span></span>
+                  </div>
+                  
+                  <ul class="space-y-2">
+                    <li class="flex items-start gap-2.5 text-xs text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>Unlimited AI clinical strategy runs</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 text-xs text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>Active cloud synchronization to companion apps</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 text-xs text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>Full Google Cloud Apigee premium limits</span>
+                    </li>
+                    <li class="flex items-start gap-2.5 text-xs text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-green-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>HIPAA-compliant data trails</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- Modal Footer -->
+              <div class="p-6 pt-0 flex gap-3">
+                <button (click)="closeBillingModal()" class="flex-1 py-3 border border-gray-200 rounded-lg text-xs font-bold uppercase tracking-widest text-gray-600 hover:bg-gray-50 transition-colors">
+                  Cancel
+                </button>
+                <button (click)="initiateUpgrade()" [disabled]="billingService.isProcessingCheckout()" class="flex-1 py-3 bg-[#1C1C1C] text-white rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-black transition-colors disabled:opacity-40 disabled:cursor-wait">
+                  {{ billingService.isProcessingCheckout() ? 'Redirecting...' : 'Subscribe Now' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        }
       </main>
     }
   </div>
@@ -382,6 +473,8 @@ export class AppComponent implements OnDestroy {
   private ngZone = inject(NgZone);
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
+  billingService = inject(BillingService);
+  
   today = new Date();
   hasApiKey = signal<boolean>(false);
   isDemoMode = signal<boolean>(false);
@@ -391,6 +484,23 @@ export class AppComponent implements OnDestroy {
   isChartCollapsed = signal<boolean>(false);
   isAnalysisCollapsed = signal<boolean>(false);
   isSyncing = signal<boolean>(false);
+  isBillingModalOpen = signal<boolean>(false);
+
+  openBillingModal() {
+    this.isBillingModalOpen.set(true);
+  }
+
+  closeBillingModal() {
+    this.isBillingModalOpen.set(false);
+  }
+
+  async initiateUpgrade() {
+    try {
+      await this.billingService.startUpgradeCheckout('user_123');
+    } catch (e) {
+      alert('Failed to initiate Stripe Checkout. Make sure the server is running and STRIPE_SECRET_KEY is configured.');
+    }
+  }
 
   async syncToMobile() {
     this.isSyncing.set(true);
@@ -449,6 +559,23 @@ export class AppComponent implements OnDestroy {
     afterNextRender(async () => {
       if (typeof window === 'undefined') return;
       this.isMobile.set(window.innerWidth < 768);
+
+      // Handle Stripe billing redirect parameters
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('upgrade')) {
+          const upgradeStatus = urlParams.get('upgrade');
+          if (upgradeStatus === 'success') {
+            this.billingService.setPremiumStatus(true);
+            alert('Congratulations! Your clinical workspace has been successfully upgraded to Premium Tier via Stripe.');
+          } else if (upgradeStatus === 'cancelled') {
+            alert('Stripe checkout was cancelled. You can upgrade anytime to unlock premium features.');
+          }
+          // Clean the query params from browser navigation bar
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
+      } catch (e) { /* ignore */ }
 
       // Check for stored API key first
       try {

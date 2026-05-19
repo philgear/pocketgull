@@ -17,10 +17,21 @@ billingRouter.post('/checkout', async (req, res) => {
   try {
     const { userId } = req.body;
     
-    if (!userId || !userDatabase[userId]) {
-      res.status(400).json({ error: 'Valid User ID is required' });
+    if (!userId) {
+      res.status(400).json({ error: 'User ID is required' });
       return;
     }
+
+    // Dynamically register the user in the mock datastore if they don't exist yet
+    if (!userDatabase[userId]) {
+      userDatabase[userId] = {
+        apigeeAppId: `app_${Math.random().toString(36).substring(7)}`,
+        tier: 'free'
+      };
+    }
+
+    // Determine target domain from request context for dynamic redirects
+    const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -30,7 +41,7 @@ billingRouter.post('/checkout', async (req, res) => {
             currency: 'usd',
             product_data: {
               name: 'PocketGull Premium Clinical',
-              description: '100 AI Queries per day',
+              description: 'Unlimited multimodal queries, secure cloud sync, and literature index access.',
             },
             unit_amount: 4900, // $49.00 / month
             recurring: { interval: 'month' }
@@ -39,8 +50,8 @@ billingRouter.post('/checkout', async (req, res) => {
         },
       ],
       mode: 'subscription',
-      success_url: 'https://flutter.pocket-gull.app/?upgrade=success',
-      cancel_url: 'https://flutter.pocket-gull.app/?upgrade=cancelled',
+      success_url: `${origin}/?upgrade=success`,
+      cancel_url: `${origin}/?upgrade=cancelled`,
       client_reference_id: userId, // Pass our internal user ID to Stripe
     });
 

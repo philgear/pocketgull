@@ -4,9 +4,20 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import Stripe from 'stripe';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Initialize Stripe (requires STRIPE_SECRET_KEY in environment)
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_mock', {
+  apiVersion: '2023-10-16',
+});
+
+// Mock database to link Users with Stripe Customers
+const userDatabase = {
+  'user_123': { apigeeAppId: 'app_abc', tier: 'free' }
+};
 
 const app = express();
 app.use(compression());
@@ -179,6 +190,86 @@ app.post('/api/patients', (req, res) => {
     console.error('[API] Error saving patients database:', err);
     res.status(500).json({ error: 'Internal server error while saving database' });
   }
+});
+
+// Stripe Billing API Endpoints
+app.post('/api/billing/checkout', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // Register user if they do not exist
+    if (!userDatabase[userId]) {
+      userDatabase[userId] = {
+        apigeeAppId: `app_${Math.random().toString(36).substring(7)}`,
+        tier: 'free'
+      };
+    }
+
+    const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'PocketGull Premium Clinical',
+              description: 'Unlimited multimodal queries, secure cloud sync, and literature index access.',
+            },
+            unit_amount: 4900, // $49.00 / month
+            recurring: { interval: 'month' }
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: `${origin}/?upgrade=success`,
+      cancel_url: `${origin}/?upgrade=cancelled`,
+      client_reference_id: userId,
+    });
+
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('[Billing API] Checkout error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/billing/webhook', async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  let event;
+  try {
+    if (process.env.STRIPE_WEBHOOK_SECRET) {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } else {
+      event = req.body;
+    }
+  } catch (err) {
+    console.error(`[Billing API] Webhook signature verification failed: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  if (event && event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const userId = session.client_reference_id;
+
+    if (userId && userDatabase[userId]) {
+      console.log(`[Billing API] Payment successful for user ${userId}.`);
+      userDatabase[userId].tier = 'premium';
+      userDatabase[userId].stripeCustomerId = session.customer;
+    }
+  }
+
+  res.json({ received: true });
 });
 
 // Serve static files via Express directly to avoid generic filesystem deadlocks

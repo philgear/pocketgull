@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "google-maps": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@googlemaps/mcp-server"
+      ]
+    }
+  }
+}

@@ -7,10 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/patient/patient_bloc.dart';
 import '../blocs/patient/patient_event.dart';
 import 'home_screen.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/patient/patient_event.dart';
-import 'home_screen.dart';
 
 class TriageBoardScreen extends StatefulWidget {
   const TriageBoardScreen({super.key});
