@@ -104,8 +104,8 @@ try {
   fs.cpSync(path.join(apiDir, '.dockerignore'), path.join(stagingApi, '.dockerignore'));
   fs.cpSync(path.join(apiDir, 'deploy.sh'), path.join(stagingApi, 'deploy.sh'));
   fs.cpSync(path.join(apiDir, 'openapi.yaml'), path.join(stagingApi, 'openapi.yaml'));
-  if (fs.existsSync(path.join(apiDir, '.env'))) {
-    fs.cpSync(path.join(apiDir, '.env'), path.join(stagingApi, '.env'));
+  if (fs.existsSync(path.join(apiDir, '.env.example'))) {
+    fs.cpSync(path.join(apiDir, '.env.example'), path.join(stagingApi, '.env.example'));
   }
   runCommand(`tar -czf ${path.join(packagesDir, 'pocketgull-api.tar.gz')} -C ${stagingApi} .`, rootDir);
   fs.rmSync(stagingApi, { recursive: true, force: true });

@@ -26,6 +26,13 @@ dist-ssr
 # Local environment secrets
 .env
 .env.local
+**/.env
+**/.env.local
+**/.env.*
+
+# Generated Release Packages
+packages/
+pocketgull-release.tar.gz
 
 # Angular framework
 .angular
