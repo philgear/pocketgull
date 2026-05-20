@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<<<<<<< Updated upstream
 ## [0.10.0] - 2026-05-20
 
 ### Added
@@ -17,6 +18,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[2026-05-20] CommonJS Build Warnings**: Configured `angular.json` to allow CommonJS sub-dependencies of `@google-cloud/bigquery` (`@google-cloud/common`, `@google-cloud/paginator`, `@google-cloud/promisify`, `@google-cloud/precise-date`, `big.js`, `extend`, `stream-events`, and `duplexify`), eliminating build-time optimization warnings.
 - **[2026-05-20] Contrast and Contrast Accessibility Specificity**: Strengthened light-mode text readability and color contrast metrics, removed visual text shadows, and stabilized post-animation text styling to fully comply with WCAG AA guidelines.
 - **[2026-05-20] CSS String Escape Warning**: Corrected unescaped slash characters within CSS selectors inside the component template string to resolve the Angular compiler syntax warnings.
+=======
+## [1.0.0-rc1] - 2026-05-19
+
+### Added
+- **[2026-05-19] Security Hardening & MFA Gateways**: Added robust Firebase Google Login flow configurations including domain whitelists and multi-factor authentication (MFA) parameters.
+- **[2026-05-19] Tink Envelope Cryptography & PQC**: Integrated Google Tink AEAD cryptographic envelopment for local patient records and added Quantum-Safe Cryptography Kyber/Dilithium transport protocol fallbacks for HIPAA transit compliance.
+- **[2026-05-19] WebMCP Schema Mapping**: Registered WebMCP (Model Context Protocol) standards schemas to allow seamless integrations of external clinical knowledge databases.
+- **[2026-05-19] 3D Anatomical Extensions**: Enabled pluggable mesh loaders (GLTF, USDZ, OBJ) on the Three.js viewport for customized skeletal modeling.
+- **[2026-05-19] Multi-Cloud Enterprise Connectors**: Documented and verified identity sync wrappers for Windows Active Directory (AD FS) and envelope encryption bridges for AWS KMS.
+- **[2026-05-19] Sentinel Gamification & Cognitive Triage**: Integrated a clinician alertness and fatigue-tracking dashboard to monitor practitioner cognitive load in high-stress triage environments.
+>>>>>>> Stashed changes
 
 ## [0.9.0] - 2026-05-18
 

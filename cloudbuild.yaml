@@ -17,7 +17,7 @@ steps:
       - '--image'
       - 'gcr.io/$PROJECT_ID/pocket-gull'
       - '--region'
-      - 'us-west1'
+      - 'us-central1'
       - '--platform'
       - 'managed'
       - '--set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'

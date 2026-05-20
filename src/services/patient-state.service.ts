@@ -17,6 +17,7 @@ import {
 export type { IPatientState };
 export { BODY_PART_NAMES };
 import { StorageService } from './storage.service';
+import { GamificationService } from './gamification.service';
 
 
 @Injectable({
@@ -94,6 +95,7 @@ export class PatientStateService {
   readonly uiExpandTrigger = signal<number>(0);
 
   private storage = inject(StorageService);
+  private game = inject(GamificationService);
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -149,6 +151,8 @@ export class PatientStateService {
     this.triggerUiExpand();
     if (!partId) {
       this.selectedNoteId.set(null); // Deselect note when part is deselected
+    } else {
+      this.game.completeQuest('click_anatomy');
     }
   }
 
@@ -162,9 +166,16 @@ export class PatientStateService {
 
   toggleResearchFrame(visible?: boolean) {
     if (visible === undefined) {
-      this.isResearchFrameVisible.update(v => !v);
+      this.isResearchFrameVisible.update(v => {
+        const next = !v;
+        if (next) this.game.completeQuest('explore_evidence');
+        return next;
+      });
     } else {
       this.isResearchFrameVisible.set(visible);
+      if (visible) {
+        this.game.completeQuest('explore_evidence');
+      }
     }
   }
 

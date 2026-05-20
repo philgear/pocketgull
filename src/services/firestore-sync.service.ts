@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
-import { Auth, authState, signInWithPopup, GoogleAuthProvider, signOut } from '@angular/fire/auth';
+import { Firestore, collection, doc, setDoc, getDoc, onSnapshot } from '@angular/fire/firestore';
+import { Auth, authState, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut } from '@angular/fire/auth';
 import { IPatient } from './patient.types';
 import { environment } from '../environments/environment';
 
@@ -8,44 +8,72 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class FirestoreSyncService {
-  private firestore = inject(Firestore);
-  private auth = inject(Auth);
+  private firestore = inject(Firestore, { optional: true });
+  private auth = inject(Auth, { optional: true });
 
   /** Signal emitting the current user's UID or null if unauthenticated. */
   public readonly currentUser = signal<string | null>(null);
-  private _isMockAuthenticated = false;
 
   constructor() {
-    authState(this.auth).subscribe(user => {
-      if (user) {
-        this.currentUser.set(user.uid);
-      } else if (!this._isMockAuthenticated) {
-        this.currentUser.set(null);
+    if (this.auth) {
+      authState(this.auth).subscribe(user => {
+        if (user) {
+          this.currentUser.set(user.uid);
+        } else if (this.currentUser() !== 'mock-google-clinician') {
+          this.currentUser.set(null);
+        }
+      });
+
+      // Retrieve incoming redirect results on boot
+      if (typeof window !== 'undefined') {
+        getRedirectResult(this.auth)
+          .then(result => {
+            if (result?.user) {
+              console.log('[Firebase Auth] Logged in via redirect result:', result.user.uid);
+              this.currentUser.set(result.user.uid);
+            }
+          })
+          .catch(err => {
+            console.warn('[Firebase Auth] Redirect result lookup warning:', err.message);
+          });
       }
-    });
+    }
   }
 
-  /** Triggers a Google OAuth popup to authenticate the clinician, or simulates it if in demo mode. */
+  /** Triggers a Google OAuth popup, falling back to redirect, or using a mock if keys are placeholders. */
   async signInWithGoogle() {
-    if (environment.firebase.apiKey.includes('placeholder')) {
-      console.log('[FirestoreSyncService] Placeholder Firebase API key detected. Initiating offline mock Google SSO...');
-      // Simulate OAuth network latency
+    const isPlaceholder = !environment.firebase.apiKey || environment.firebase.apiKey.includes('placeholder');
+    if (isPlaceholder || !this.auth) {
+      console.warn('[Firebase Auth] Using placeholder configuration. Authenticating with mock clinician credentials...');
       await new Promise(resolve => setTimeout(resolve, 800));
-      this._isMockAuthenticated = true;
-      this.currentUser.set('mock-clinician-philgear');
+      this.currentUser.set('mock-google-clinician');
       return;
     }
 
     const provider = new GoogleAuthProvider();
     provider.addScope('profile');
     provider.addScope('email');
-    await signInWithPopup(this.auth, provider);
+
+    try {
+      console.log('[Firebase Auth] Initiating Google Popup Sign-in...');
+      await signInWithPopup(this.auth, provider);
+    } catch (err: any) {
+      // Handle blocked popup or third-party cookies block via redirect
+      console.warn('[Firebase Auth] Popup blocked or failed. Redirecting user instead:', err.message);
+      try {
+        await signInWithRedirect(this.auth, provider);
+      } catch (redirectErr: any) {
+        console.error('[Firebase Auth] Redirect attempt failed:', redirectErr.message);
+        throw redirectErr;
+      }
+    }
   }
 
   async logout() {
-    this._isMockAuthenticated = false;
+    if (this.auth && this.currentUser() !== 'mock-google-clinician') {
+      await signOut(this.auth);
+    }
     this.currentUser.set(null);
-    await signOut(this.auth);
   }
 
   /**
@@ -57,12 +85,10 @@ export class FirestoreSyncService {
       console.warn('[FirestoreSyncService] Cannot sync. Clinician is not authenticated.');
       return;
     }
-
-    if (this._isMockAuthenticated) {
-      console.log(`[FirestoreSyncService] [MOCK] Synced patient ${patient.id} to local memory for clinician ${uid}`);
+    if (uid === 'mock-google-clinician' || !this.firestore) {
+      console.log('[FirestoreSyncService] Mock sync complete (No cloud write).');
       return;
     }
-
     const docRef = doc(this.firestore, `clinicians/${uid}/patients/${patient.id}`);
     await setDoc(docRef, patient, { merge: true });
     console.log(`[FirestoreSyncService] Successfully synced ${patient.id} to cloud vault.`);
@@ -74,12 +100,11 @@ export class FirestoreSyncService {
   async fetchPatientFromCloud(patientId: string): Promise<IPatient | null> {
     const uid = this.currentUser();
     if (!uid) return null;
-    
-    if (this._isMockAuthenticated) {
-      console.log(`[FirestoreSyncService] [MOCK] Fetched patient ${patientId} from memory fallback.`);
+    if (uid === 'mock-google-clinician' || !this.firestore) {
+      console.log('[FirestoreSyncService] Mock fetch complete (Returning null).');
       return null;
     }
-
+    
     const docRef = doc(this.firestore, `clinicians/${uid}/patients/${patientId}`);
     const snap = await getDoc(docRef);
     if (snap.exists()) {

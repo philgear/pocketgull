@@ -73,7 +73,11 @@
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
     "release": "npm run changelog && npm version patch -m \"chore(release): %s\"",
+<<<<<<< Updated upstream
     "deploy": "npm run build && gcloud run deploy pocket-gull --source . --region=us-west1 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --quiet",
+=======
+    "deploy": "npm run build && gcloud run deploy pocket-gull --project gen-lang-client-0540208645 --source . --region=us-central1 --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest --quiet",
+>>>>>>> Stashed changes
     "serve:ssr:app": "node dist/server/server.mjs",
     "start": "node dist/server/server.mjs",
     "gcp-build": "npm run build && npm prune --production",
@@ -138,8 +142,8 @@
     "postcss": "^8.5.8",
     "rxjs": "^7.8.2",
     "sloc": "^0.3.2",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3",
+    "socket.io": "^4.2.0",
+    "socket.io-client": "^4.2.0",
     "swagger-ui-express": "^5.0.1",
     "tailwindcss": "^3.4.19",
     "three": "^0.183.2",

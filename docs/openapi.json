@@ -363,6 +363,262 @@
           }
         }
       }
+    },
+    "/api/hardware/telemetry": {
+      "get": {
+        "summary": "Retrieve Node Hardware Telemetry",
+        "description": "Gathers live CPU and GPU accelerator telemetry (NVIDIA-SMI, AMD ROCm, Intel XPU, Apple Silicon, and system RAM/load metrics) for dynamic local model routing decisions.",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of hardware metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cpuName": { "type": "string", "example": "Intel Core i7-9750H" },
+                    "cpuLoadPercent": { "type": "integer", "example": 15 },
+                    "systemMemoryTotalGb": { "type": "number", "example": 16 },
+                    "systemMemoryUsedGb": { "type": "number", "example": 8.5 },
+                    "gpus": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "vendor": { "type": "string", "example": "nvidia" },
+                          "name": { "type": "string", "example": "NVIDIA GeForce RTX 2060" },
+                          "temperatureC": { "type": "integer", "example": 62 },
+                          "utilizationPercent": { "type": "integer", "example": 40 },
+                          "memoryTotalMiB": { "type": "integer", "example": 6144 },
+                          "memoryUsedMiB": { "type": "integer", "example": 2048 },
+                          "memoryFreeMiB": { "type": "integer", "example": 4096 }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error gathering metrics"
+          }
+        }
+      }
+    },
+    "/api/health/baselines": {
+      "get": {
+        "summary": "Fetch Global Health Baselines",
+        "description": "Loads comparative baseline statistics from CDC and WHO for overlaid clinical charts.",
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of global health baselines"
+          }
+        }
+      }
+    },
+    "/api/ai/metrics": {
+      "post": {
+        "summary": "Generate Biomarker Metrics Flow",
+        "description": "Synthesizes orthomolecular biomarker metrics from clinical input text.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully parsed metrics object"
+          }
+        }
+      }
+    },
+    "/api/ai/changes": {
+      "post": {
+        "summary": "Detect Clinical State Changes",
+        "description": "Compares historical patient state with current state to evaluate clinical significance.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldData": { "type": "object" },
+                  "newData": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Significance evaluation completed"
+          }
+        }
+      }
+    },
+    "/api/ai/translate": {
+      "post": {
+        "summary": "Translate Reading Level Flow",
+        "description": "Translates care plan summaries into pediatric, dyslexia-friendly, or multi-lingual cognitive formats.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": { "type": "string" },
+                  "level": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Translation completed"
+          }
+        }
+      }
+    },
+    "/api/ai/analyze-translation": {
+      "post": {
+        "summary": "Analyze Care Plan Translation",
+        "description": "Audits a care plan translation against the original plan for clinical integrity and quality assurance.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "original": { "type": "string" },
+                  "translated": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Audit and translation analysis outputted successfully"
+          }
+        }
+      }
+    },
+    "/api/ai/analyze-image": {
+      "post": {
+        "summary": "Analyze Clinical Image Flow",
+        "description": "Analyzes medical scans and diagnostic imagery files uploaded in Base64 format.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "base64Image": { "type": "string" },
+                  "context": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vision model image analysis completed"
+          }
+        }
+      }
+    },
+    "/api/ai/stream": {
+      "post": {
+        "summary": "Server-Sent Events AI Content Stream",
+        "description": "Streams live care plan generations from Google Gemini models using server-sent events (SSE).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "patientData": { "type": "string" },
+                  "systemInstruction": { "type": "string" },
+                  "model": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Streaming connection established"
+          }
+        }
+      }
+    },
+    "/api/ai/chat/start": {
+      "post": {
+        "summary": "Initialize Multi-Turn AI Chat Session",
+        "description": "Allocates conversational history storage on the server for a specific session ID.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": { "type": "string" },
+                  "systemInstruction": { "type": "string" },
+                  "model": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session initialized"
+          }
+        }
+      }
+    },
+    "/api/ai/chat/message": {
+      "post": {
+        "summary": "Send Message to Chat Session",
+        "description": "Appends user message, queries Gemini model, updates context history, and returns the response.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Content successfully generated"
+          }
+        }
+      }
     }
   },
   "components": {

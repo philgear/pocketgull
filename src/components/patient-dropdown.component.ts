@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ExportService } from '../services/export.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
+import { GamificationService } from '../services/gamification.service';
 
 @Component({
   selector: 'app-patient-dropdown',
@@ -132,6 +133,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 export class PatientDropdownComponent {
   patientManagement = inject(PatientManagementService);
   exportService = inject(ExportService);
+  game = inject(GamificationService);
   elementRef = inject(ElementRef);
   isOpen = signal(false);
   importStatus = signal<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -171,6 +173,10 @@ export class PatientDropdownComponent {
 
   selectPatient(id: string) {
     this.patientManagement.selectPatient(id);
+    this.game.completeQuest('select_patient');
+    if (['p004', 'p005', 'p006', 'p007'].includes(id)) {
+      this.game.completeQuest('sentinel_triage');
+    }
     this.isOpen.set(false);
     this.searchQuery.set('');
   }

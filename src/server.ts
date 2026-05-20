@@ -158,7 +158,6 @@ app.use((req, res, next) => {
 
 import { dicomRouter } from './server/dicom';
 import { healthcareRouter, ensureHealthcareStoresExist } from './server/healthcare';
-import { awsRouter } from './server/aws';
 import swaggerUi from 'swagger-ui-express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 
@@ -225,44 +224,12 @@ const swaggerAuth = (req: any, res: any, next: any) => {
   return res.status(401).send('Invalid credentials.');
 };
 
-app.get(['/docs', '/docs/'], swaggerAuth, (req, res) => {
+app.get('/docs', swaggerAuth, (req, res) => {
   res.redirect('/api-docs');
 });
-app.use('/docs/study', (req, res, next) => {
-  // If the root /docs/study was requested without a trailing slash, redirect to ensure correct relative asset resolution.
-  const originalPath = req.originalUrl.split('?')[0];
-  if (originalPath === '/docs/study') {
-    let target = '/docs/study/';
-    const queryIdx = req.originalUrl.indexOf('?');
-    if (queryIdx !== -1) {
-      target += req.originalUrl.slice(queryIdx);
-    }
-    return res.redirect(301, target);
-  }
-
-  // If requesting a sub-route directory without a trailing slash, redirect to prevent relative asset issues
-  if (!req.path.endsWith('/') && !req.path.includes('.')) {
-    let target = req.baseUrl + req.path + '/';
-    const queryIdx = req.originalUrl.indexOf('?');
-    if (queryIdx !== -1) {
-      target += req.originalUrl.slice(queryIdx);
-    }
-    return res.redirect(301, target);
-  }
-
-  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(browserDistFolder, 'docs', 'study', req.path, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
-  }
-  next();
-});
-app.use('/docs/study', express.static(join(browserDistFolder, 'docs', 'study')));
 app.use('/api-docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(openApiSpec));
 app.use('/api/dicom', dicomRouter);
 app.use('/api/healthcare', healthcareRouter);
-app.use('/api/aws', awsRouter);
 
 app.get('/api/pubmed/summary', async (req, res) => {
   try {
@@ -293,293 +260,17 @@ app.get('/api/health/baselines', async (req, res) => {
   }
 });
 
-app.post('/api/export/bigquery', express.json(), async (req, res) => {
+app.get('/api/hardware/telemetry', async (req, res) => {
   try {
-    const payload = req.body;
-    console.log('[BigQuery Export] Received payload for patient:', payload?.patient_id);
-    
-    let success = false;
-    try {
-      const { BigQuery } = await import('@google-cloud/bigquery');
-      const bq = new BigQuery();
-      
-      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
-      const tableId = process.env['BQ_TABLE'] || 'patient_vitals';
-      
-      console.log(`[BigQuery Export] Attempting stream to BigQuery: ${datasetId}.${tableId}...`);
-      await bq.dataset(datasetId).table(tableId).insert([payload]);
-      success = true;
-      console.log('[BigQuery Export] BigQuery insert successful.');
-    } catch (bqErr: any) {
-      console.warn('[BigQuery Export Warning] Real BigQuery insert failed (likely local credentials or missing dataset/table). Continuing with simulated compliant success. Reason:', bqErr.message);
-    }
-    
-    res.json({
-      success: true,
-      simulated: !success,
-      message: success 
-        ? 'Successfully streamed to Google BigQuery warehouse.' 
-        : 'Simulated compliant export completed successfully.'
-    });
+    const { getHardwareTelemetry } = await import('./server/telemetry.js');
+    const telemetry = await getHardwareTelemetry();
+    res.json(telemetry);
   } catch (err: any) {
-    console.error('BigQuery Export Error:', err);
+    console.error('Telemetry Fetch Error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/export/swaggerhub', express.json(), async (req, res) => {
-  try {
-    const patient = req.body;
-    console.log('[SwaggerHub Export] Received payload for patient:', patient?.id);
-
-    // Read the local docs/openapi.json
-    const specPath = join(rootDir, 'docs', 'openapi.json');
-    let spec: any = {};
-    try {
-      spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
-    } catch (err: any) {
-      console.warn('[SwaggerHub Export] Failed to read docs/openapi.json, using fallback skeleton:', err.message);
-      spec = { openapi: "3.0.3", info: { title: "Pocket Gull", version: "1.0.0" }, paths: {}, components: { schemas: {} } };
-    }
-
-    // Populate or update components.schemas.Patient.example with the actual patient telemetry
-    if (!spec.components) spec.components = {};
-    if (!spec.components.schemas) spec.components.schemas = {};
-    if (!spec.components.schemas.Patient) {
-      spec.components.schemas.Patient = { type: "object", properties: {} };
-    }
-
-    const patientExample = {
-      id: patient.id || 'p_phil_gear',
-      name: patient.name || 'Phil Gear',
-      age: patient.age || 42,
-      vitals: {
-        bp: patient.vitals?.bloodPressure || '120/80',
-        hr: patient.vitals?.heartRate?.toString() || '72',
-        temp: patient.vitals?.temperature?.toString() || '98.6',
-        spO2: patient.vitals?.oxygenSaturation?.toString() || '98',
-        weight: patient.vitals?.weight || '80.5kg',
-        height: patient.vitals?.height || '180cm'
-      },
-      symptoms: Object.values(patient.issues || {}).flat().map((iss: any) => iss.name || iss.issue || ''),
-      conditions: patient.preexistingConditions || [],
-      updatedAt: new Date().toISOString()
-    };
-
-    spec.components.schemas.Patient.example = patientExample;
-
-    // Write it back to docs/openapi.json to keep it updated locally
-    try {
-      fs.writeFileSync(specPath, JSON.stringify(spec, null, 2), 'utf8');
-      console.log('[SwaggerHub Export] Locally updated docs/openapi.json with patient example.');
-    } catch (writeErr: any) {
-      console.warn('[SwaggerHub Export Warning] Could not write openapi.json locally:', writeErr.message);
-    }
-
-    // Now, push to SwaggerHub API registry.
-    const owner = 'philgear';
-    const api = 'pocketgull';
-    const version = '1.0.0';
-    const orgId = '736f055e-8bbe-4a40-9c16-36e58d88d9c8';
-    const swaggerHubUrl = `https://api.swaggerhub.com/apis/${owner}/${api}?version=${version}&isPrivate=false`;
-    
-    let success = false;
-    let bqErrMessage = '';
-    const apiKey = process.env['SWAGGERHUB_API_KEY'];
-
-    if (apiKey) {
-      try {
-        console.log(`[SwaggerHub Export] Pushing spec to SwaggerHub registry for org: ${orgId}...`);
-        const response = await fetch(swaggerHubUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': apiKey,
-            'X-API-Key': apiKey
-          },
-          body: JSON.stringify(spec)
-        });
-        if (response.ok) {
-          success = true;
-          console.log('[SwaggerHub Export] Successfully uploaded spec to SwaggerHub Registry.');
-        } else {
-          bqErrMessage = await response.text();
-          console.warn('[SwaggerHub Export Warning] SwaggerHub API response error:', bqErrMessage);
-        }
-      } catch (err: any) {
-        bqErrMessage = err.message;
-        console.warn('[SwaggerHub Export Warning] SwaggerHub API request failed:', err.message);
-      }
-    } else {
-      console.info('[SwaggerHub Export Info] No SWAGGERHUB_API_KEY set. Simulating successful connection to SwaggerHub Catalog.');
-    }
-
-    res.json({
-      success: true,
-      simulated: !success,
-      orgId: orgId,
-      owner: owner,
-      api: api,
-      error: bqErrMessage || undefined,
-      message: success 
-        ? `Successfully synchronized OpenAPI schema and Phil Gear's patient data to SwaggerHub Catalog (Org: ${orgId}).` 
-        : `Simulated successful connection to SwaggerHub Catalog (Org: ${orgId}) under owner '${owner}'.`
-    });
-  } catch (err: any) {
-    console.error('SwaggerHub Export Route Error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-// Loci Memory Palace state cache
-const lociStore = new Map<string, any[]>();
-
-// Seed with default clinical memories for the demo/standard patient
-lociStore.set('current_patient', [
-  {
-    id: 'locus_1',
-    patient_id: 'current_patient',
-    room: 'Foyer',
-    locus: 'Grandfather Clock',
-    memory_type: 'Clinical Note',
-    content: 'Patient reports mild fatigue and brain fog in the mornings. Advised early sun exposure.',
-    created_at: new Date(Date.now() - 3600000 * 2).toISOString()
-  },
-  {
-    id: 'locus_2',
-    patient_id: 'current_patient',
-    room: 'Library',
-    locus: 'Bookshelf',
-    memory_type: 'Recommendation',
-    content: 'Recommended 400mg Magnesium Glycinate before sleep to improve HRV.',
-    created_at: new Date(Date.now() - 3600000).toISOString()
-  },
-  {
-    id: 'locus_3',
-    patient_id: 'current_patient',
-    room: 'Office',
-    locus: 'Oak Desk',
-    memory_type: 'Lab Finding',
-    content: 'Discussed blood work: Vitamin D is slightly low (28 ng/mL). Goal is > 50 ng/mL.',
-    created_at: new Date().toISOString()
-  }
-]);
-
-app.get('/api/loci/:patientId', async (req, res) => {
-  try {
-    const patientId = req.params.patientId;
-    console.log(`[Loci] Fetching loci for patient: ${patientId}`);
-    
-    let success = false;
-    let entries = lociStore.get(patientId) || [];
-    
-    try {
-      const { BigQuery } = await import('@google-cloud/bigquery');
-      const bq = new BigQuery();
-      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
-      const tableId = 'loci_memories';
-      
-      const query = `SELECT * FROM \`${datasetId}.${tableId}\` WHERE patient_id = @patientId ORDER BY created_at DESC`;
-      const options = {
-        query: query,
-        params: { patientId }
-      };
-      
-      const [rows] = await bq.query(options);
-      if (rows && rows.length > 0) {
-        entries = rows;
-        success = true;
-      }
-    } catch (bqErr: any) {
-      console.warn('[Loci Warning] Real BigQuery select failed or not configured. Falling back to local store. Reason:', bqErr.message);
-    }
-    
-    res.json(entries);
-  } catch (err: any) {
-    console.error('Loci Fetch Error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/loci/save', express.json(), async (req, res) => {
-  try {
-    const payload = req.body;
-    if (!payload.id) {
-      payload.id = 'locus_' + Date.now();
-    }
-    if (!payload.created_at) {
-      payload.created_at = new Date().toISOString();
-    }
-    
-    console.log('[Loci Save] Received payload for patient:', payload?.patient_id, 'Room:', payload?.room, 'Locus:', payload?.locus);
-    
-    const patientId = payload.patient_id || 'current_patient';
-    const current = lociStore.get(patientId) || [];
-    current.unshift(payload);
-    lociStore.set(patientId, current);
-    
-    let success = false;
-    try {
-      const { BigQuery } = await import('@google-cloud/bigquery');
-      const bq = new BigQuery();
-      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
-      const tableId = 'loci_memories';
-      
-      await bq.dataset(datasetId).table(tableId).insert([payload]);
-      success = true;
-      console.log('[Loci Save] BigQuery insert successful.');
-    } catch (bqErr: any) {
-      console.warn('[Loci Save Warning] Real BigQuery insert failed (likely local credentials or missing dataset/table). Continuing with simulated success. Reason:', bqErr.message);
-    }
-    
-    res.json({
-      success: true,
-      simulated: !success,
-      entry: payload,
-      message: success 
-        ? 'Successfully saved to Google BigQuery memory palace.' 
-        : 'Simulated memory palace entry saved successfully.'
-    });
-  } catch (err: any) {
-    console.error('Loci Save Error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post('/api/loci/delete', express.json(), async (req, res) => {
-  try {
-    const { id, patient_id } = req.body;
-    console.log(`[Loci Delete] Deleting entry ${id} for patient ${patient_id}`);
-    
-    const current = lociStore.get(patient_id) || [];
-    const updated = current.filter(item => item.id !== id);
-    lociStore.set(patient_id, updated);
-    
-    let success = false;
-    try {
-      const { BigQuery } = await import('@google-cloud/bigquery');
-      const bq = new BigQuery();
-      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
-      const tableId = 'loci_memories';
-      
-      const query = `DELETE FROM \`${datasetId}.${tableId}\` WHERE id = @id AND patient_id = @patient_id`;
-      const options = {
-        query: query,
-        params: { id, patient_id }
-      };
-      await bq.query(options);
-      success = true;
-    } catch (bqErr: any) {
-      console.warn('[Loci Delete Warning] Real BigQuery delete failed or not configured. Falling back to local store. Reason:', bqErr.message);
-    }
-    
-    res.json({ success: true, simulated: !success });
-  } catch (err: any) {
-    console.error('Loci Delete Error:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // Genkit AI Endpoints
 app.post('/api/ai/metrics', express.json(), async (req, res) => {
@@ -822,63 +513,6 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
-
-// Serve the Core Flutter Application
-app.use('/pocketgull_flutter', (req, res, next) => {
-  const originalPath = req.originalUrl.split('?')[0];
-  if (originalPath === '/pocketgull_flutter') {
-    return res.redirect(301, '/pocketgull_flutter/');
-  }
-  if (!req.path.endsWith('/') && !req.path.includes('.')) {
-    return res.redirect(301, req.baseUrl + req.path + '/');
-  }
-  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(browserDistFolder, 'pocketgull_flutter', req.path, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
-  }
-  next();
-});
-app.use('/pocketgull_flutter', express.static(join(browserDistFolder, 'pocketgull_flutter')));
-
-// Serve the Provider Companion App
-app.use('/companion-apps/provider_app', (req, res, next) => {
-  const originalPath = req.originalUrl.split('?')[0];
-  if (originalPath === '/companion-apps/provider_app') {
-    return res.redirect(301, '/companion-apps/provider_app/');
-  }
-  if (!req.path.endsWith('/') && !req.path.includes('.')) {
-    return res.redirect(301, req.baseUrl + req.path + '/');
-  }
-  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(browserDistFolder, 'companion-apps/provider_app', req.path, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
-  }
-  next();
-});
-app.use('/companion-apps/provider_app', express.static(join(browserDistFolder, 'companion-apps/provider_app')));
-
-// Serve the Patient Companion App
-app.use('/companion-apps/patient_app', (req, res, next) => {
-  const originalPath = req.originalUrl.split('?')[0];
-  if (originalPath === '/companion-apps/patient_app') {
-    return res.redirect(301, '/companion-apps/patient_app/');
-  }
-  if (!req.path.endsWith('/') && !req.path.includes('.')) {
-    return res.redirect(301, req.baseUrl + req.path + '/');
-  }
-  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(browserDistFolder, 'companion-apps/patient_app', req.path, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
-  }
-  next();
-});
-app.use('/companion-apps/patient_app', express.static(join(browserDistFolder, 'companion-apps/patient_app')));
 
 /**
  * Serve static files from /.

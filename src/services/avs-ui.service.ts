@@ -205,4 +205,48 @@ export class AvsUiService implements OnDestroy {
       osc2.stop(now + 0.65);
     } catch (e) {}
   }
+
+  /**
+   * Finalize Chord: A majestic multi-harmonic major 7th chord sweep (C4, E4, G4, B4) with filter cutoff sweep.
+   */
+  playFinalizeChord() {
+    if (!this.isAudioFeedbackEnabled()) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      // C major 7th chord: C4 (261.63), E4 (329.63), G4 (392.00), B4 (493.88)
+      const notes = [261.63, 329.63, 392.00, 493.88];
+      
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      // Sweep the filter from 200Hz to 1200Hz for a beautiful opening swell
+      filter.frequency.setValueAtTime(200, now);
+      filter.frequency.exponentialRampToValueAtTime(1200, now + 0.6);
+      
+      const mainGain = ctx.createGain();
+      mainGain.gain.setValueAtTime(0, now);
+      mainGain.gain.linearRampToValueAtTime(0.04, now + 0.15);
+      mainGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+      
+      filter.connect(mainGain);
+      mainGain.connect(ctx.destination);
+      
+      notes.forEach((freq, idx) => {
+        // Stagger the note onset slightly (arpeggio feel)
+        const noteDelay = idx * 0.08;
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + noteDelay);
+        
+        // Connect to filter
+        osc.connect(filter);
+        
+        osc.start(now + noteDelay);
+        osc.stop(now + 1.95);
+      });
+    } catch (e) {}
+  }
 }
+

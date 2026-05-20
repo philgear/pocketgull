@@ -19,6 +19,7 @@ import { ClinicalIntelligenceService } from './services/clinical-intelligence.se
 import { PatientManagementService } from './services/patient-management.service';
 import { ThemeService } from './services/theme.service';
 import { NetworkStateService } from './services/network-state.service';
+import { HardwareTelemetryService } from './services/hardware-telemetry.service';
 import { ExportService } from './services/export.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT } from './demo-data';
@@ -38,6 +39,8 @@ import { PetAuditoryService } from './services/pet-auditory.service';
 import { StressInterventionService } from './services/stress-intervention.service';
 import { CollaborationService } from './services/collaboration.service';
 import { CollaborationDockComponent } from './components/collaboration-dock.component';
+import { GamificationService } from './services/gamification.service';
+import { SwUpdate } from '@angular/service-worker';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -355,6 +358,42 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                           <p class="text-xs text-white">Healthy</p>
                        </div>
                      </div>
+                     
+                     <!-- Hardware GPU & CPU Telemetry -->
+                     @if (hardware.primaryGpu(); as gpu) {
+                       <div class="pt-2 mt-2 border-t border-gray-800 space-y-2">
+                         <div class="flex justify-between items-center">
+                           <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">GPU ACCELERATOR</span>
+                           <span class="text-[8px] px-1 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono uppercase font-bold">{{ gpu.vendor }}</span>
+                         </div>
+                         <p class="text-[11px] text-zinc-100 font-mono truncate font-medium">{{ gpu.name }}</p>
+                         <div class="grid grid-cols-2 gap-2 text-[10px]">
+                           <div>
+                             <span class="text-zinc-500 block uppercase text-[8px] font-bold tracking-tighter">VRAM Usage</span>
+                             <span class="text-zinc-300 font-mono">{{ gpu.memoryUsedMiB }} / {{ gpu.memoryTotalMiB }} MB</span>
+                           </div>
+                           <div>
+                             <span class="text-zinc-500 block uppercase text-[8px] font-bold tracking-tighter">Utilization</span>
+                             <span class="text-zinc-300 font-mono">{{ gpu.utilizationPercent }}% @ {{ gpu.temperatureC }}°C</span>
+                           </div>
+                         </div>
+                         <div class="pt-1 text-[9px] text-zinc-500 border-t border-zinc-800/50 flex justify-between">
+                           <span>Recommended Path:</span>
+                           <span class="text-green-400 font-mono uppercase font-bold">{{ hardware.recommendedExecutionPath() }}</span>
+                         </div>
+                       </div>
+                     }
+                     
+                     <div class="pt-2 mt-2 border-t border-gray-800 text-[10px] space-y-1 text-zinc-400">
+                       <div class="flex justify-between">
+                         <span class="text-zinc-500">Host CPU:</span>
+                         <span class="truncate max-w-[120px] text-right font-mono" [title]="hardware.telemetry()?.cpuName || 'Searching...'">{{ hardware.telemetry()?.cpuName || 'Detecting...' }}</span>
+                       </div>
+                       <div class="flex justify-between">
+                         <span class="text-zinc-500">CPU / RAM:</span>
+                         <span class="font-mono">{{ hardware.telemetry()?.cpuLoadPercent }}% | {{ hardware.telemetry()?.systemMemoryUsedGb }}/{{ hardware.telemetry()?.systemMemoryTotalGb }} GB</span>
+                       </div>
+                     </div>
                      <div class="pt-2 mt-1 border-t border-gray-800 flex flex-col gap-2">
                          <button (click)="network.togglePreferLocalInference(); $event.stopPropagation()"
                                  [disabled]="!network.isOnline()"
@@ -459,6 +498,70 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
             </button>
  
             <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400 pl-4 border-l border-gray-100 dark:border-zinc-800">
+              <!-- Gamified Points & Level HUD capsule -->
+              <div class="relative group tracking-normal">
+                <div class="flex items-center gap-2.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 rounded-full hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer shadow-sm select-none">
+                  <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
+                  <span class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
+                    {{ game.levelTitle() }} (Lvl {{ game.level() }})
+                  </span>
+                  <span class="text-[10px] font-mono font-bold text-[#689F38]">
+                    {{ game.points() }} XP
+                  </span>
+                  
+                  <!-- Tiny progress bar -->
+                  <div class="w-12 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden shrink-0">
+                    <div class="h-full bg-amber-500 transition-all duration-500" [style.width.%]="game.progressPercentage()"></div>
+                  </div>
+                </div>
+
+                <!-- Hover Details Tooltip Panel -->
+                <div class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-xl p-4 hidden group-hover:flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                  <div class="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Clinician Progress</span>
+                    <span class="text-xs font-bold text-amber-500">Lvl {{ game.level() }}</span>
+                  </div>
+
+                  <!-- Next Objective -->
+                  <div class="p-2.5 bg-amber-500/5 dark:bg-amber-500/10 rounded-lg border border-amber-500/10">
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Current Objective:</span>
+                    <p class="text-xs text-zinc-700 dark:text-zinc-300 font-medium leading-normal mt-0.5">
+                      {{ game.nextStepText() }}
+                    </p>
+                  </div>
+
+                  <!-- Quests list -->
+                  <div class="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto pr-1">
+                    @for (q of game.quests(); track q.id) {
+                      <div class="flex items-start justify-between gap-2 text-xs">
+                        <div class="flex items-start gap-1.5 min-w-0">
+                          <span class="mt-0.5" [class.text-emerald-500]="q.completed" [class.text-zinc-300]="!q.completed">
+                            @if (q.completed) {
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                            } @else {
+                              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" /></svg>
+                            }
+                          </span>
+                          <div class="min-w-0">
+                            <div class="font-bold truncate" [class.text-zinc-400]="q.completed" [class.text-zinc-800]="!q.completed" [class.dark:text-zinc-200]="!q.completed" [class.dark:text-zinc-500]="q.completed">{{ q.name }}</div>
+                            <div class="text-[9px] text-zinc-500 leading-tight">{{ q.description }}</div>
+                          </div>
+                        </div>
+                        <span class="text-[10px] font-mono shrink-0" [class.text-zinc-400]="q.completed" [class.text-amber-500]="!q.completed">+{{ q.xpReward }} XP</span>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Reset -->
+                  <div class="border-t border-gray-100 dark:border-zinc-800 pt-2 flex justify-between items-center text-[10px]">
+                    <span class="text-zinc-500 font-mono">Progress stored locally</span>
+                    <button (click)="game.reset()" class="text-red-500 hover:underline uppercase font-bold tracking-wider">
+                      Reset
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <span>{{ today | date:'yyyy.MM.dd' }}</span>
               <span class="text-[#416B1F] dark:text-[#689F38] pr-2">REQ. DR. SMITH</span>
             </div>
@@ -1060,6 +1163,7 @@ export class AppComponent implements OnDestroy {
   public readonly collaboration = inject(CollaborationService);
   state = inject(PatientStateService);
   public theme = inject(ThemeService);
+  public game = inject(GamificationService);
   private ngZone = inject(NgZone);
 
   /** Unlock Web Audio API on the first user gesture (browser autoplay policy). */
@@ -1071,6 +1175,7 @@ export class AppComponent implements OnDestroy {
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
   network = inject(NetworkStateService);
+  hardware = inject(HardwareTelemetryService);
   readonly rules = inject(RulesEngineService);
   private aiConfig = inject(AI_CONFIG, { optional: true });
   today = new Date();
@@ -1571,6 +1676,8 @@ export class AppComponent implements OnDestroy {
       this.state.clearDraftSummaryItems();
     }
     this.finalizeChart();
+    this.game.completeQuest('finalize_plan');
+    this.avsUi.playFinalizeChord();
     this.closePreview();
   }
 
@@ -1603,6 +1710,7 @@ export class AppComponent implements OnDestroy {
     else if (current === 'light') this.theme.setTheme('dark');
     else if (current === 'dark') this.theme.setTheme('spark');
     else this.theme.setTheme('system');
+    this.avsUi.playTransition();
   }
 
   isSyncing = signal<boolean>(false);
@@ -1673,6 +1781,17 @@ export class AppComponent implements OnDestroy {
   }
 
   constructor() {
+    const swUpdate = inject(SwUpdate, { optional: true });
+    if (swUpdate && swUpdate.isEnabled) {
+      swUpdate.versionUpdates.subscribe((evt: any) => {
+        if (evt.type === 'VERSION_READY') {
+          if (confirm('A new version of Pocket-Gull is available! Would you like to reload now to apply the update?')) {
+            window.location.reload();
+          }
+        }
+      });
+    }
+
     afterNextRender(async () => {
       if (typeof window === 'undefined') return;
 

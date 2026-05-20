@@ -12,16 +12,23 @@ echo "=========================================================="
 # gcloud auth login
 # gcloud config set project YOUR_PROJECT_ID
 
+<<<<<<< Updated upstream
 # Automatically grab the current project
 PROJECT_ID=$(gcloud config get-value project)
 if [ -z "$PROJECT_ID" ]; then
     echo "❌ Error: Google Cloud Project ID is not set."
     echo "Please run 'gcloud auth login' and 'gcloud config set project <PROJECT_ID>' first."
+=======
+PROJECT_ID=$(gcloud config get-value project)
+if [ -z "$PROJECT_ID" ]; then
+    echo "❌ Error: Google Cloud Project ID is not set."
+    echo "Please set it using: gcloud config set project <PROJECT_ID>"
+>>>>>>> Stashed changes
     exit 1
 fi
 
 SERVICE_NAME="pocket-gull"
-REGION="us-west1"
+REGION="us-central1"
 IMAGE_TAG="gcr.io/$PROJECT_ID/$SERVICE_NAME:latest"
 
 echo "📦 1/3: Building the image for Cloud Run using Dockerfile..."

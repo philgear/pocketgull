@@ -11,11 +11,22 @@ import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
 import { MedicalChartSummaryComponent } from './medical-summary.component';
 import { DicomViewerComponent } from './dicom-viewer.component';
 import { BiometricHistoryChartComponent } from './biometric-history-chart.component';
+import { SentinelTriageComponent } from './sentinel-triage.component';
 
 @Component({
   selector: 'app-medical-chart',
   standalone: true,
-  imports: [CommonModule, BodyViewerComponent, PatientHistoryTimelineComponent, PocketGullButtonComponent, PocketGullCardComponent, MedicalChartSummaryComponent, DicomViewerComponent, BiometricHistoryChartComponent],
+  imports: [
+    CommonModule, 
+    BodyViewerComponent, 
+    PatientHistoryTimelineComponent, 
+    PocketGullButtonComponent, 
+    PocketGullCardComponent, 
+    MedicalChartSummaryComponent, 
+    DicomViewerComponent, 
+    BiometricHistoryChartComponent,
+    SentinelTriageComponent
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full min-h-full flex flex-col gap-4 sm:gap-6 p-4 sm:p-8 bg-[#F9FAFB] dark:bg-transparent">
@@ -42,6 +53,11 @@ import { BiometricHistoryChartComponent } from './biometric-history-chart.compon
           </div>
       }
       
+
+      <!-- Sentinel Triage View -->
+      @if (isSentinel()) {
+        <app-sentinel-triage class="block w-full animate-in fade-in slide-in-from-top-4 duration-300"></app-sentinel-triage>
+      }
 
       <!-- 3D Body Viewer Card -->
       <pocket-gull-card 
@@ -241,6 +257,11 @@ export class MedicalChartComponent {
   patientScans = computed(() => this.selectedPatient()?.scans || []);
 
   isReviewMode = computed(() => !!this.state.viewingPastVisit());
+
+  isSentinel = computed(() => {
+    const patient = this.selectedPatient();
+    return !!patient && (patient.name.toLowerCase().includes('sentinel') || ['p004', 'p005', 'p006', 'p007'].includes(patient.id));
+  });
 
   historyBodyParts = computed(() => {
     const history = this.selectedPatient()?.history || [];

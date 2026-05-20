@@ -8,6 +8,7 @@ import { ExportService } from '../services/export.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ClinicalIcons } from '../assets/clinical-icons';
+import { GamificationService } from '../services/gamification.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,12 +92,14 @@ export class AnalysisContainerComponent {
   state = inject(PatientStateService);
   cache = inject(AiCacheService);
   intelligence = inject(ClinicalIntelligenceService);
+  game = inject(GamificationService);
   ClinicalIcons = ClinicalIcons;
 
   justGenerated = signal(false);
 
   triggerAnalysisGenerate() {
     this.justGenerated.set(true);
+    this.game.completeQuest('generate_care_plan');
 
     if (this.reportComp) {
       this.reportComp.generate();
