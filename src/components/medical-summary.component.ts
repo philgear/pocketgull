@@ -533,6 +533,15 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             <input type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3.5 h-3.5 accent-[#689F38] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
                             <span class="flex items-center gap-1.5"><div class="w-2 h-0.5 bg-[#689F38]"></div> WHO Baselines</span>
                           </label>
+                          <label class="flex items-center gap-2 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">
+                            <input type="checkbox" [checked]="showBQBaseline()" (change)="showBQBaseline.set(!showBQBaseline())" class="w-3.5 h-3.5 accent-[#EA4335] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <span class="flex items-center gap-1.5">
+                              <div class="w-2 h-0.5 bg-[#EA4335]"></div> 
+                              BigQuery OMOP 
+                              <span class="text-[9px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
+                              <span class="text-[9px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
+                            </span>
+                          </label>
                         </div>
                       </div>
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -674,6 +683,7 @@ export class MedicalChartSummaryComponent {
   baselines = signal<any>(null);
   showCDCBaseline = signal(false);
   showWHOBaseline = signal(false);
+  showBQBaseline = signal(false);
 
   parseVitalNum(val: string | undefined): number {
     if (!val) return 0;
@@ -790,6 +800,7 @@ export class MedicalChartSummaryComponent {
       this.state.issues();
       this.showCDCBaseline();
       this.showWHOBaseline();
+      this.showBQBaseline();
       this.baselines();
       const pc = this.painChartRef();
       const bp = this.bpChartRef();
@@ -997,6 +1008,7 @@ export class MedicalChartSummaryComponent {
               };
               if (this.showCDCBaseline()) pushOverlay('CDC', '#4285F4');
               if (this.showWHOBaseline()) pushOverlay('WHO', '#689F38');
+              if (this.showBQBaseline()) pushOverlay('BigQuery', '#EA4335');
           }
       }
 
