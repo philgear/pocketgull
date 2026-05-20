@@ -110,24 +110,32 @@
     <div class="gcse-searchresults-only" data-gname="pocket-gull-search"></div>
 
     <script>
+        function runSearch(query) {
+            const checkExist = setInterval(function () {
+                if (window.google && window.google.search && window.google.search.cse) {
+                    clearInterval(checkExist);
+                    const element = google.search.cse.element.getElement('pocket-gull-search');
+                    if (element) {
+                        element.execute(query);
+                    }
+                }
+            }, 100);
+        }
+
         // Listen for messages from the parent Angular application
         window.addEventListener('message', (event) => {
             // Security check (ideally verify origin in prod)
             if (event.data && event.data.type === 'EXECUTE_SEARCH') {
-                const query = event.data.query;
-
-                // Wait for GSE to initialize if it hasn't yet
-                const checkExist = setInterval(function () {
-                    if (window.google && window.google.search && window.google.search.cse) {
-                        clearInterval(checkExist);
-                        const element = google.search.cse.element.getElement('pocket-gull-search');
-                        if (element) {
-                            element.execute(query);
-                        }
-                    }
-                }, 100);
+                runSearch(event.data.query);
             }
         });
+
+        // Also execute search from URL query parameter on load
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlQuery = urlParams.get('q');
+        if (urlQuery) {
+            runSearch(urlQuery);
+        }
 
         // Override links to ensure they open in parent frame or new tab
         document.addEventListener('click', function (e) {

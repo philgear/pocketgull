@@ -18,6 +18,7 @@ import { RichMediaService, IRichMediaCard } from '../services/rich-media.service
 import { Medical3DViewerComponent } from './medical-3d-viewer.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { PatientStateService } from '../services/patient-state.service';
+import { PatientManagementService } from '../services/patient-management.service';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1138,12 +1139,20 @@ export class SummaryNodeComponent implements AfterViewChecked {
     }
   }
 
+  private patientManager = inject(PatientManagementService);
+
   private async startInlineSession() {
     this.chatIsLoading.set(true);
     try {
       const nodeText = this.listItemHtml().replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
       const section = this.sectionTitle();
-      const patient = this.intel.lastPatientData() ?? '';
+      
+      const patientId = this.patientManager.selectedPatientId();
+      const patientObj = this.patientManager.patients().find(p => p.id === patientId);
+      const history = patientObj?.history || [];
+      const bookmarks = patientObj?.bookmarks || [];
+      const patient = this.patientState.getAllDataForPrompt(history, bookmarks);
+
       const context = `You are a focused clinical evidence assistant embedded in the PocketGull Clinical Intelligence Platform.
 A clinician is reviewing a specific recommendation from the "${section}" section of an AI-generated care plan.
 

@@ -82,8 +82,9 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 - **Box Breathing UX:** Focused 16-second box breathing visual animations integrated into primary intake text areas to promote practitioner mindfulness.
 - **Interactive Task Bracketing:** Rapidly markup generated care plans using a double-click state machine (Normal, Added, Removed) to vet and customize AI recommendations.
 - **FHIR-Standard Data Portability & Localized Auto-Save:** Real-time persistence with visual "Saving..." / "Saved ✔" indicators, exported via Unicode-safe Base64 encoded FHIR Bundles.
+- **Method of Loci (Memory Palace):** Anchor clinical chat entries to spatial memory loci across the 3D anatomical model, facilitating rapid spatial recall of complex patient histories.
+- **Secure Splash Authentication:** Gesture-based "smiley face" unlock mechanism with WebAuthn-compatible biometric conditional UI for robust and accessible clinical entry.
 - **Patient Management System:** Full CRUD capabilities for patient records, including historical visit review and permanent record removal.
-
 **Technologies Used:**
 - **Framework:** Angular v21.1 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
 - **Visualization:** Three.js (3D Anatomical Modeling)

@@ -558,7 +558,8 @@ export class ResearchFrameComponent {
       const summaryData = await summaryRes.json();
 
       const results: IPubMedSearchResult[] = ids.map((id: string) => {
-        const item = summaryData.result[id];
+        const item = summaryData.result && summaryData.result[id];
+        if (!item) return null;
         let authorsStr = '';
         if (item.authors && Array.isArray(item.authors)) {
           authorsStr = item.authors.map((a: any) => a.name).join(', ');
@@ -570,14 +571,14 @@ export class ResearchFrameComponent {
         }
 
         return {
-          id: item.uid,
-          title: item.title,
+          id: item.uid || id,
+          title: item.title || 'Untitled',
           authors: authorsStr,
-          source: item.source,
-          pubdate: item.pubdate,
+          source: item.source || '',
+          pubdate: item.pubdate || '',
           doi: doiStr
         };
-      });
+      }).filter((res: any): res is IPubMedSearchResult => res !== null);
 
       this.pubmedResults.set(results);
 
