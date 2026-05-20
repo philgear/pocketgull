@@ -167,22 +167,15 @@ import { ThemeService } from '../services/theme.service';
                 </div>
               }
 
-              <!-- Seizure Warning & Reduced Motion Toggle -->
-              <div class="p-4 bg-orange-950/20 border border-orange-900/30 rounded-xl mb-4 text-center">
-                <p class="text-[9px] text-orange-400/90 font-bold uppercase tracking-widest mb-2 flex items-center justify-center gap-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-                  Seizure Warning
-                </p>
-                <p class="text-[10px] text-orange-300/70 leading-relaxed mb-3 px-2">
-                  This platform contains visual entrainment and structural animations. If you or your patient have a history of photosensitive epilepsy, please enable the safety toggle below.
-                </p>
-                <label class="flex items-center justify-center gap-2 cursor-pointer group">
+              <!-- Reduced Motion Toggle -->
+              <div class="mb-4 flex justify-center">
+                <label class="flex items-center gap-2 cursor-pointer group">
                   <input type="checkbox"
                          [checked]="theme.reduceMotion()"
                          (change)="theme.setReduceMotion(!theme.reduceMotion())"
-                         class="w-3.5 h-3.5 rounded border-zinc-700 bg-zinc-900 text-orange-500 focus:ring-orange-500/30 focus:ring-offset-0 cursor-pointer">
-                  <span class="text-[9.5px] font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors uppercase tracking-widest">
-                    Disable Animations Globally
+                         class="w-3 h-3 rounded border-zinc-700/50 bg-black/40 text-zinc-400 focus:ring-zinc-500/30 focus:ring-offset-0 cursor-pointer transition-colors">
+                  <span class="text-[9px] font-medium text-zinc-500 group-hover:text-zinc-300 transition-colors uppercase tracking-widest">
+                    Reduce Motion
                   </span>
                 </label>
               </div>
