@@ -1517,3 +1517,24 @@ body[data-kss-tier="alert"]:not(.avs-active) .rounded-2xl {
     from { transform: translateY(32px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
+/* ─── Accessibility: Reduced Motion (Rachel Nabors Guidelines) ─── */
+/* We enforce near-zero duration instead of "none" so that framework JS events (transitionend/animationend) still fire. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

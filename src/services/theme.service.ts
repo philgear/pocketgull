@@ -9,6 +9,7 @@ export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
 export class ThemeService {
   public currentTheme = signal<AppTheme>('light');
   public activeTheme = signal<'light' | 'dark'>('light');
+  public reduceMotion = signal<boolean>(false);
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
     if (isPlatformBrowser(this.platformId)) {
@@ -26,15 +27,33 @@ export class ThemeService {
         const resolvedTheme = this.activeTheme();
         this.applyThemeToDom(resolvedTheme);
       });
+
+      // Setup effect to apply the reduce-motion class based on user preference
+      effect(() => {
+        const reduce = this.reduceMotion();
+        if (reduce) {
+          localStorage.setItem('pocket_gull_reduce_motion', 'true');
+          document.documentElement.classList.add('reduce-motion');
+        } else {
+          localStorage.setItem('pocket_gull_reduce_motion', 'false');
+          document.documentElement.classList.remove('reduce-motion');
+        }
+      });
     }
   }
 
   private initTheme() {
     const savedTheme = localStorage.getItem('pocket_gull_theme') as AppTheme;
-    if (savedTheme) {
+    // Never default to Spark Mode on load for clinical safety reasons.
+    if (savedTheme && savedTheme !== 'spark') {
       this.currentTheme.set(savedTheme);
     } else {
       this.currentTheme.set('light');
+    }
+
+    const savedReduceMotion = localStorage.getItem('pocket_gull_reduce_motion');
+    if (savedReduceMotion === 'true') {
+      this.reduceMotion.set(true);
     }
 
     // Listen to OS prefers-color-scheme changes
@@ -91,5 +110,9 @@ export class ThemeService {
 
   public setTheme(theme: AppTheme) {
     this.currentTheme.set(theme);
+  }
+
+  public setReduceMotion(reduce: boolean) {
+    this.reduceMotion.set(reduce);
   }
 }
