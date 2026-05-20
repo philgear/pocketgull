@@ -1,0 +1,93 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# --- Custom Additions for Project Security & Tools ---
+# Environment variables
+.env*
+
+# Missing from default Flutter generator
+.flutter-plugins
+
+# Flutter Version Management (if used)
+.fvm/flutter_sdk
+
+# Firebase/GCP Auto-generated files (Keeping keys out of repo)
+firebase_app_id_file.json
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+
+# --- Strict Security: Code Signing & Certificates ---
+*.jks
+*.keystore
+key.properties
+*.pem
+*.p12
+*.cer
+*.cert
+*.mobileprovision
+
+# --- Strict CI/CD & Fastlane ---
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+*.dSYM/
+*.dSYM.zip
+
+# --- Local Config & Secrets ---
+*secret*.json
+*config*.json
+stripe*.json
+
+# --- Local PHI & Hive Database Security ---
+*.hive
+*.hivec
+*.lock
+
+# --- Agent & Build Logs ---
+*_log*.txt
+deploy_log.txt

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ResponseCache async="false" continueOnError="false" enabled="true" name="Response-Cache-PubMed">
+    <DisplayName>Response Cache PubMed</DisplayName>
+    <Properties/>
+    <!-- Cache the response based on the exact request URI (path + query params) -->
+    <CacheKey>
+        <Prefix/>
+        <KeyFragment ref="request.uri" type="string"/>
+    </CacheKey>
+    <Scope>Exclusive</Scope>
+    <ExpirySettings>
+        <ExpiryDate/>
+        <TimeOfDay/>
+        <!-- Cache successful PubMed searches for 1 hour (3600 seconds) to save API costs -->
+        <TimeoutInSec ref="">3600</TimeoutInSec>
+    </ExpirySettings>
+    <!-- Do not cache errors -->
+    <SkipCacheLookup>request.header.bypass-cache = "true"</SkipCacheLookup>
+    <SkipCachePopulation>response.status.code != 200</SkipCachePopulation>
+</ResponseCache>

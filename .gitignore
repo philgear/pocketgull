@@ -45,9 +45,6 @@ sandbox/
 # Agent Rules
 rules.yaml
 
-# Companion apps
-companion-apps/
-
 # Legacy API artifact - no active source project
 pocketgull_api/package-lock.json
 pocketgull_api/node_modules/
@@ -81,5 +78,32 @@ __pycache__/
 # Git Hooks / Husky
 .husky/
 
+# --- Apigee & GCP Security ---
+# Apigee proxy deployment bundles
+*.zip
+# Local Service Accounts, Credentials, and Keys (Prevent accidental leaks)
+*service-account*.json
+*credentials*.json
+gcp-*.json
+*.pem
+*.key
 
+# --- Local Databases ---
+*.sqlite
+*.db
 
+# --- Mobile/Native Build Overrides (Safety Net) ---
+.dart_tool/
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+
+# --- Local PHI & Hive Database Security ---
+*.hive
+*.hivec
+*.lock
+
+# --- Agent & Build Logs ---
+*_log*.txt
+deploy_log.txt

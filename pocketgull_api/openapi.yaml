@@ -1,0 +1,82 @@
+openapi: 3.0.0
+info:
+  title: PocketGull Enterprise API
+  description: The decoupled backend for PocketGull Web and Mobile platforms. Managed via Apigee X.
+  version: 1.0.0
+servers:
+  - url: https://api.pocket-gull.app/v1
+    description: Production API Gateway (Apigee)
+paths:
+  /pubmed/search:
+    get:
+      summary: Search PubMed
+      parameters:
+        - name: term
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful search results
+  /pubmed/summary:
+    get:
+      summary: Get PubMed article summary
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful article summary
+  /patients:
+    post:
+      summary: Sync patients to cloud
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+      responses:
+        '200':
+          description: Successfully synced
+    get:
+      summary: Fetch patients
+      responses:
+        '200':
+          description: List of patients
+  /intelligence/chat:
+    post:
+      summary: Converse with the Gemini Clinical Assistant
+      description: This endpoint securely invokes the Gemini model using server-side credentials.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                context:
+                  type: string
+                history:
+                  type: array
+                  items:
+                    type: object
+      responses:
+        '200':
+          description: Successful AI response
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+security:
+  - ApiKeyAuth: []
