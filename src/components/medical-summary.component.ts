@@ -683,7 +683,7 @@ export class MedicalChartSummaryComponent {
   baselines = signal<any>(null);
   showCDCBaseline = signal(false);
   showWHOBaseline = signal(false);
-  showBQBaseline = signal(false);
+  showBQBaseline = signal(true);
 
   parseVitalNum(val: string | undefined): number {
     if (!val) return 0;

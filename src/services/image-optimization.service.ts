@@ -25,16 +25,25 @@ export class ImageOptimizationService {
 
     // Match the size part of the URL, e.g., /640px-
     const sizeMatch = url.match(/\/(\d+)px-/);
-    if (!sizeMatch) {
-      // Not a standard thumbnail URL or already at original resolution
-      return url;
+    if (sizeMatch) {
+      const currentWidth = parseInt(sizeMatch[1], 10);
+      const widthToUse = targetWidth !== undefined ? targetWidth : currentWidth;
+      const standardWidth = getStandardWikimediaSize(widthToUse);
+
+      // Replace the size in the URL
+      return url.replace(`/${currentWidth}px-`, `/${standardWidth}px-`);
     }
 
-    const currentWidth = parseInt(sizeMatch[1], 10);
-    const widthToUse = targetWidth !== undefined ? targetWidth : currentWidth;
-    const standardWidth = getStandardWikimediaSize(widthToUse);
+    // If it's an original image (doesn't contain '/thumb/'), rewrite it to a thumbnail URL
+    if (!url.includes('/thumb/')) {
+      const match = url.match(/(https:\/\/upload\.wikimedia\.org\/wikipedia\/[^/]+)\/(.+)\/([^/]+)$/);
+      if (match) {
+        const widthToUse = targetWidth !== undefined ? targetWidth : 640;
+        const standardWidth = getStandardWikimediaSize(widthToUse);
+        return `${match[1]}/thumb/${match[2]}/${match[3]}/${standardWidth}px-${match[3]}`;
+      }
+    }
 
-    // Replace the size in the URL
-    return url.replace(`/${currentWidth}px-`, `/${standardWidth}px-`);
+    return url;
   }
 }

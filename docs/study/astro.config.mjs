@@ -5,6 +5,7 @@ import mdx from '@astrojs/mdx';
 
 // https://astro.build/config
 export default defineConfig({
+  base: '/docs/study/',
   integrations: [mdx()],
-  outDir: '../../dist/docs/study'
+  outDir: './dist'
 });

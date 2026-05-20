@@ -115,5 +115,19 @@ Your lower back pain is coming from the area between two vertebrae called L4 and
 > Note: **Please be aware of the following:**
 > - Avoid lifting heavy objects or bending forward repeatedly until your physical therapist clears you.
 > - If you develop weakness in both legs, or have trouble controlling your bladder or bowels, go to the emergency room immediately.
-> - Your opioid-free status is a major health achievement. Let your care team know immediately if you experience cravings - this is not a failure, it is clinical information that helps us help you.`
+> - Your opioid-free status is a major health achievement. Let your care team know immediately if you experience cravings - this is not a failure, it is clinical information that helps us help you.`,
+
+    'Orthomolecular Profiling': `### Summary
+The patient exhibits signs of moderate systemic stress combined with suboptimal levels of cellular energy production cofactors. Primary focus is to support methylation pathways and improve mitochondrial respiration.
+
+### Biomarker Matrix
+\`\`\`json
+[
+  { "name": "Magnesium", "level": "Sub-optimal", "pathway": "ATP Synthesis / NMDA" },
+  { "name": "Vitamin D3", "level": "Sub-optimal", "pathway": "Immune / Bone" },
+  { "name": "Vitamin B12", "level": "Optimal", "pathway": "Methylation" },
+  { "name": "Zinc", "level": "Sub-optimal", "pathway": "Immune / Hormones" }
+]
+\`\`\`
+`
 };

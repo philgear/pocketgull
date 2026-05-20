@@ -74,10 +74,10 @@ export class BiomarkerMatrixComponent {
 
   // Auto-parse the AI markdown report to find implied biomarker statuses
   biomarkers = computed(() => {
-    const text = this.reportText().toLowerCase();
-    const markers: BiomarkerStatus[] = [];
+    const text = this.reportText();
+    if (!text) return [];
 
-    // Simple heuristic parser for common orthomolecular markers
+    const markers: BiomarkerStatus[] = [];
     const dictionary = [
       { name: 'Magnesium', pathway: 'ATP Synthesis / NMDA' },
       { name: 'Vitamin D3', pathway: 'Immune / Bone' },
@@ -89,10 +89,70 @@ export class BiomarkerMatrixComponent {
       { name: 'Vitamin C', pathway: 'Collagen / Antioxidant' }
     ];
 
+    // Strategy 1: Look for JSON code blocks
+    const jsonMatch = text.match(/```json\s*([\s\S]*?)(?:```|$)/i);
+    if (jsonMatch && jsonMatch[1]) {
+      try {
+        let jsonStr = jsonMatch[1].trim();
+        // Handle potentially incomplete JSON if streaming
+        if (!jsonStr.endsWith(']')) {
+          const lastCurly = jsonStr.lastIndexOf('}');
+          if (lastCurly !== -1) {
+            jsonStr = jsonStr.substring(0, lastCurly + 1) + '\n]';
+            if (!jsonStr.startsWith('[')) {
+              jsonStr = '[\n' + jsonStr;
+            }
+          }
+        }
+        const parsed = JSON.parse(jsonStr);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(item => {
+            if (item && typeof item === 'object' && item.name) {
+              const matchedDict = dictionary.find(d => d.name.toLowerCase() === item.name.toLowerCase());
+              const name = matchedDict ? matchedDict.name : item.name;
+              const pathway = item.pathway || (matchedDict ? matchedDict.pathway : 'Metabolic Pathway');
+              const levelLower = String(item.level || '').toLowerCase();
+              let level: BiomarkerStatus['level'] = 'Optimal';
+              if (levelLower.includes('defic') || levelLower === 'low') level = 'Deficient';
+              else if (levelLower === 'sub-optimal') level = 'Sub-optimal';
+              else if (levelLower === 'high') level = 'High';
+              else if (levelLower === 'excess') level = 'Excess';
+              else if (levelLower === 'optimal') level = 'Optimal';
+
+              markers.push({ name, level, pathway });
+            }
+          });
+        }
+      } catch (e) {
+        // If parsing fails, try custom regex extraction of individual objects
+        const objRegex = /\{\s*"name"\s*:\s*"([^"]+)"\s*,\s*"level"\s*:\s*"([^"]+)"\s*,\s*"pathway"\s*:\s*"([^"]+)"\s*\}/gi;
+        let match;
+        while ((match = objRegex.exec(jsonMatch[1])) !== null) {
+          const name = match[1];
+          const levelStr = match[2].toLowerCase();
+          const pathway = match[3];
+          let level: BiomarkerStatus['level'] = 'Optimal';
+          if (levelStr.includes('defic') || levelStr === 'low') level = 'Deficient';
+          else if (levelStr === 'sub-optimal') level = 'Sub-optimal';
+          else if (levelStr === 'high') level = 'High';
+          else if (levelStr === 'excess') level = 'Excess';
+
+          markers.push({ name, level, pathway });
+        }
+      }
+    }
+
+    // If Strategy 1 successfully extracted markers, return them
+    if (markers.length > 0) {
+      return markers;
+    }
+
+    // Strategy 2: Heuristic regex fallback
+    const textLower = text.toLowerCase();
     dictionary.forEach(d => {
       // Look for the biomarker name near words like deficient, low, optimal, high
       const regex = new RegExp(`(?:${d.name.toLowerCase().replace(/\\(.+\\)/, '').trim()}).{0,40}(deficient|deficiency|low|sub-optimal|optimal|high|excess)`, 'i');
-      const match = text.match(regex);
+      const match = textLower.match(regex);
       if (match) {
         const val = match[1].toLowerCase();
         let level: BiomarkerStatus['level'] = 'Optimal';
@@ -105,7 +165,7 @@ export class BiomarkerMatrixComponent {
       } else {
         // Look backwards as well (e.g., "deficient in magnesium")
         const reverseRegex = new RegExp(`(deficient|deficiency|low|sub-optimal|optimal|high|excess).{0,40}(?:${d.name.toLowerCase().replace(/\\(.+\\)/, '').trim()})`, 'i');
-        const revMatch = text.match(reverseRegex);
+        const revMatch = textLower.match(reverseRegex);
         if (revMatch) {
           const val = revMatch[1].toLowerCase();
           let level: BiomarkerStatus['level'] = 'Optimal';

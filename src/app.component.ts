@@ -112,7 +112,7 @@ import { BillingService } from './services/billing.service';
           </div>
         }
 
-        <!-- Google Health Syncing Toast -->
+        <!-- Fitbit Health Syncing Toast -->
         @if (isGHealthSyncing()) {
           <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/50 animate-pulse">
             <div class="flex items-center gap-3">
@@ -123,14 +123,14 @@ import { BillingService } from './services/billing.service';
                 </svg>
               </div>
               <div>
-                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-blue-800 dark:text-blue-300">Synchronizing to Google Health</h3>
-                <p class="text-[11px] text-blue-600 dark:text-blue-400/80">Transforming medical data to FHIR resources and uploading to Cloud Healthcare Store...</p>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-blue-800 dark:text-blue-300">Synchronizing Fitbit Health Data</h3>
+                <p class="text-[11px] text-blue-600 dark:text-blue-400/80">Transferring and transforming patient records, vital logs, and Fitbit metrics between PocketGull and Google Cloud Healthcare FHIR Store...</p>
               </div>
             </div>
           </div>
         }
 
-        <!-- Google Health Sync Success Toast -->
+        <!-- Fitbit Health Sync Success Toast -->
         @if (showGHealthSuccess()) {
           <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
             <div class="flex items-center gap-3">
@@ -138,8 +138,8 @@ import { BillingService } from './services/billing.service';
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
               </div>
               <div>
-                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Google Health Sync Successful</h3>
-                <p class="text-[11px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and vital logs successfully archived in Google Cloud Healthcare FHIR Store.</p>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Fitbit Health Sync Successful</h3>
+                <p class="text-[11px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and Fitbit vital logs successfully synchronized with Google Cloud Healthcare FHIR Store.</p>
               </div>
             </div>
             <button (click)="showGHealthSuccess.set(false)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors text-green-700 dark:text-green-400">
@@ -356,7 +356,7 @@ import { BillingService } from './services/billing.service';
               <span class="hidden sm:inline">Research</span>
             </button>
             
-            <a href="/docs/" target="_blank" rel="noopener"
+            <a href="/docs/study/" target="_blank" rel="noopener"
                (mouseenter)="avsUi.playHover()"
                aria-label="Open Documentation"
                class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
@@ -458,9 +458,12 @@ import { BillingService } from './services/billing.service';
                    <button (click)="connectEpic(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#E33B44] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> epic®
                    </button>
-                   <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#4285F4] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Health Connect
+                   <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Fitbit Sync (Out)
                    </button>
+                    <button (click)="importGoogleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Fitbit Import (In)
+                    </button>
                     <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> AWS HealthLake
                     </button>
@@ -666,7 +669,7 @@ import { BillingService } from './services/billing.service';
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
                  @if (theme.currentTheme() === 'spark') {
-                   <app-avs-therapy class="block w-full flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300 md:mb-6 mb-3"></app-avs-therapy>
+                   <app-avs-therapy id="tour-avs-therapy" class="block w-full flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300 md:mb-6 mb-3"></app-avs-therapy>
                  }
 
                  <!-- Section 1: Analysis Intake Container -->
@@ -768,36 +771,36 @@ import { BillingService } from './services/billing.service';
             }
         }
 
-    <!-- Sliding-Scale Billing Modal (Sleek Glassmorphic Dark UI) -->
+    <!-- Sliding-Scale Billing Modal (Sleek Glassmorphic Fluid UI) -->
     @if (isBillingModalOpen()) {
       <div class="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 no-print animate-in fade-in duration-300">
-        <div class="bg-zinc-950 dark:bg-black border border-zinc-800 text-white rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col relative max-h-[90vh] animate-in zoom-in-[0.98] duration-300">
+        <div class="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-100 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col relative max-h-[90vh] animate-in zoom-in-[0.98] duration-300">
           
           <!-- Top Accent Light Stripe -->
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600"></div>
 
           <!-- Modal Header -->
-          <div class="p-6 border-b border-zinc-800 flex justify-between items-start">
+          <div class="p-6 border-b border-slate-200 dark:border-zinc-800 flex justify-between items-start">
             <div>
               <div class="flex items-center gap-2 mb-1.5">
                 <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.6)] font-mono"></span>
-                <h2 class="text-xs font-bold uppercase tracking-[0.25em] font-mono text-zinc-100">PocketGull Licensing</h2>
+                <h2 class="text-xs font-bold uppercase tracking-[0.25em] font-mono text-slate-800 dark:text-zinc-100">PocketGull Licensing</h2>
               </div>
-              <p class="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Sliding Scale • Professional Support Tier</p>
+              <p class="text-[10px] uppercase font-bold text-slate-500 dark:text-zinc-400 tracking-wider">Sliding Scale • Professional Support Tier</p>
             </div>
-            <button (click)="closeBillingModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-zinc-800 text-zinc-400 transition-colors">
+            <button (click)="closeBillingModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-400 dark:text-zinc-400 transition-colors">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
           </div>
 
           <!-- Scrollable Content -->
-          <div class="p-6 overflow-y-auto space-y-6 flex-1 text-zinc-300">
-            <p class="text-xs leading-relaxed text-zinc-400">
+          <div class="p-6 overflow-y-auto space-y-6 flex-1 text-slate-600 dark:text-zinc-300">
+            <p class="text-xs leading-relaxed text-slate-500 dark:text-zinc-400">
               PocketGull operates under a cooperative open-source model. Choose an amount matching your scale of practice, clinical usage volume, and financial capacity. We keep licensing sliding to keep advanced AI accessible to all practitioners.
             </p>
 
             <!-- Dynamic Pricing Indicator -->
-            <div class="bg-zinc-900 border border-zinc-800/80 rounded-xl p-5 text-center relative overflow-hidden group">
+            <div class="bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800/80 rounded-xl p-5 text-center relative overflow-hidden group">
               <div class="absolute top-0 right-0 p-2 text-[9px] font-bold text-amber-500 tracking-widest font-mono">
                 @if (billingService.selectedPrice() >= 80) {
                   PATRON TIER
@@ -808,32 +811,32 @@ import { BillingService } from './services/billing.service';
                 }
               </div>
               
-              <div class="text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-1.5">Selected Support Level</div>
+              <div class="text-slate-400 dark:text-zinc-500 text-[10px] uppercase font-bold tracking-widest mb-1.5">Selected Support Level</div>
               <div class="flex items-baseline justify-center gap-1.5">
-                <span class="text-3xl font-extrabold font-mono text-amber-400">\${{ billingService.selectedPrice() }}</span>
-                <span class="text-xs text-zinc-500 uppercase tracking-widest font-semibold">/ month</span>
+                <span class="text-3xl font-extrabold font-mono text-amber-500 dark:text-amber-400">\${{ billingService.selectedPrice() }}</span>
+                <span class="text-xs text-slate-400 dark:text-zinc-500 uppercase tracking-widest font-semibold">/ month</span>
               </div>
 
               <!-- Tier Specific Info -->
-              <div class="mt-4 pt-4 border-t border-zinc-800/60 text-left text-xs leading-relaxed">
+              <div class="mt-4 pt-4 border-t border-slate-200 dark:border-zinc-800/60 text-left text-xs leading-relaxed">
                 @if (billingService.selectedPrice() >= 80) {
                   <div class="flex gap-2.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <span class="text-zinc-300 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span class="text-slate-600 dark:text-zinc-300 font-medium">
                       Unlocks full multi-device syncing, premium Gemini 1.5 Flash rates, dedicated server compute, and direct developer consulting channel.
                     </span>
                   </div>
                 } @else if (billingService.selectedPrice() >= 30) {
                   <div class="flex gap-2.5">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <span class="text-zinc-300">
+                    <span class="text-slate-600 dark:text-zinc-300">
                       Standard professional access. Unlocks unlimited strategy outputs, full companion app connectivity, and EHR Integration pipelines.
                     </span>
                   </div>
                 } @else {
                   <div class="flex gap-2.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    <span class="text-zinc-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-slate-400 dark:text-zinc-500 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span class="text-slate-500 dark:text-zinc-400">
                       Cooperative community license. Supports local practitioner operation. Limits cloud strategy sync runs to 10 per day.
                     </span>
                   </div>
@@ -844,8 +847,8 @@ import { BillingService } from './services/billing.service';
             <!-- Custom Slider UI -->
             <div class="space-y-4">
               <div class="flex justify-between items-center">
-                <span class="text-[10px] uppercase font-bold text-zinc-400 tracking-widest font-mono">Sliding scale range</span>
-                <span class="text-xs font-mono text-zinc-500">$10 – $150</span>
+                <span class="text-[10px] uppercase font-bold text-slate-400 dark:text-zinc-400 tracking-widest font-mono">Sliding scale range</span>
+                <span class="text-xs font-mono text-slate-400 dark:text-zinc-500">$10 – $150</span>
               </div>
 
               <div class="relative py-2 px-1">
@@ -855,8 +858,8 @@ import { BillingService } from './services/billing.service';
                        step="5"
                        [value]="billingService.selectedPrice()" 
                        (input)="onSliderChange($event)"
-                       class="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-amber-500 transition-all focus:outline-none" />
-                <div class="flex justify-between text-[9px] font-bold text-zinc-600 mt-2 uppercase tracking-widest font-mono">
+                       class="w-full h-2 bg-slate-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-amber-500 transition-all focus:outline-none" />
+                <div class="flex justify-between text-[9px] font-bold text-slate-400 dark:text-zinc-600 mt-2 uppercase tracking-widest font-mono">
                   <span>$10 Min</span>
                   <span>$49 Default</span>
                   <span>$150 Max</span>
@@ -866,12 +869,12 @@ import { BillingService } from './services/billing.service';
 
             <!-- Active License Details -->
             @if (billingService.userTier() !== 'free') {
-              <div class="bg-amber-950/20 border border-amber-900/30 rounded-xl p-4 flex items-center justify-between">
+              <div class="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 flex items-center justify-between">
                 <div>
-                  <div class="text-[10px] font-bold uppercase tracking-widest text-amber-400 font-mono mb-0.5">CURRENT ACTIVE LEVEL</div>
-                  <div class="text-xs text-zinc-300">Upgrade active at \${{ billingService.selectedPrice() }}/mo</div>
+                  <div class="text-[10px] font-bold uppercase tracking-widest text-amber-500 dark:text-amber-400 font-mono mb-0.5">CURRENT ACTIVE LEVEL</div>
+                  <div class="text-xs text-slate-600 dark:text-zinc-300">Upgrade active at \${{ billingService.selectedPrice() }}/mo</div>
                 </div>
-                <button (click)="demoteBillingTier()" class="px-3 py-1 border border-zinc-700 hover:border-zinc-500 text-zinc-400 hover:text-zinc-200 text-[10px] font-bold uppercase tracking-widest rounded-md transition-colors font-mono">
+                <button (click)="demoteBillingTier()" class="px-3 py-1 border border-slate-200 dark:border-zinc-700 hover:border-slate-400 dark:hover:border-zinc-500 text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-200 text-[10px] font-bold uppercase tracking-widest rounded-md transition-colors font-mono">
                   Revert to Free
                 </button>
               </div>
@@ -879,7 +882,7 @@ import { BillingService } from './services/billing.service';
           </div>
 
           <!-- Modal Footer -->
-          <div class="p-6 border-t border-zinc-800 bg-zinc-900/40 flex flex-col gap-3">
+          <div class="p-6 border-t border-slate-200 dark:border-zinc-800 bg-slate-50/40 dark:bg-zinc-900/40 flex flex-col gap-3">
             <button (click)="initiateUpgrade()"
                     [disabled]="billingService.isProcessingCheckout()"
                     class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 disabled:opacity-50 text-black text-xs font-bold uppercase tracking-[0.2em] transition-all rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.35)] flex items-center justify-center gap-2">
@@ -894,7 +897,7 @@ import { BillingService } from './services/billing.service';
                 <span>{{ billingService.userTier() !== 'free' ? 'Update License via Stripe' : 'Upgrade via Stripe' }}</span>
               }
             </button>
-            <div class="text-[9px] uppercase tracking-widest text-zinc-500 font-bold text-center font-mono">
+            <div class="text-[9px] uppercase tracking-widest text-slate-400 dark:text-zinc-500 font-bold text-center font-mono">
               Secure recurring support via Stripe. 1-click cancellation.
             </div>
           </div>
@@ -1379,6 +1382,65 @@ export class AppComponent implements OnDestroy {
     } catch (e: any) {
       console.error('[Google Health Sync] Error:', e);
       this.showGHealthError.set(e.message || 'An error occurred during synchronization.');
+      setTimeout(() => this.showGHealthError.set(null), 8000);
+    } finally {
+      this.isGHealthSyncing.set(false);
+    }
+  }
+
+  async importGoogleHealth() {
+    const patient = this.patientMgmt.selectedPatient();
+    if (!patient) {
+      alert("No patient selected to import data from Google Health.");
+      return;
+    }
+
+    this.isGHealthSyncing.set(true);
+    this.showGHealthSuccess.set(false);
+    this.showGHealthError.set(null);
+
+    try {
+      let response = await fetch(`/api/healthcare/fhir/import/${patient.id}`, {
+        method: 'GET'
+      });
+
+      if (!response.ok && response.status === 404) {
+        console.log('[Google Health Import] Patient not found in FHIR Store. Auto-provisioning patient record first...');
+        // Auto-provision (export) local patient details
+        const exportRes = await fetch('/api/healthcare/fhir/export', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(patient)
+        });
+        if (!exportRes.ok) {
+          const exportErr = await exportRes.json().catch(() => ({}));
+          throw new Error(exportErr.error || `Auto-provisioning failed with status ${exportRes.status}`);
+        }
+        
+        // Retry the import
+        response = await fetch(`/api/healthcare/fhir/import/${patient.id}`, {
+          method: 'GET'
+        });
+      }
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || `Import failed with status code ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('[Google Health Import] Success:', result);
+      
+      // Update our local patient state registry
+      this.patientMgmt.importPatient(result.patient);
+      
+      this.showGHealthSuccess.set(true);
+      setTimeout(() => this.showGHealthSuccess.set(false), 5000);
+    } catch (e: any) {
+      console.error('[Google Health Import] Error:', e);
+      this.showGHealthError.set(e.message || 'An error occurred during import.');
       setTimeout(() => this.showGHealthError.set(null), 8000);
     } finally {
       this.isGHealthSyncing.set(false);

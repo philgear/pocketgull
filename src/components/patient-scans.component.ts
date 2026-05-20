@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IDiagnosticScan } from '../services/patient.types';
+import { ImageOptimizationService } from '../services/image-optimization.service';
 
 @Component({
     selector: 'app-patient-scans',
@@ -9,7 +10,7 @@ import { IDiagnosticScan } from '../services/patient.types';
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      @for(scan of scans(); track scan.id) {
+      @for(scan of optimizedScans(); track scan.id) {
         <div class="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg overflow-hidden flex flex-col hover:border-gray-300 dark:hover:border-zinc-700 transition-colors shadow-sm group">
           @if (scan.imageUrl) {
              <div class="h-40 bg-gray-100 dark:bg-zinc-950 relative overflow-hidden flex-shrink-0 border-b border-gray-100 dark:border-zinc-800">
@@ -70,4 +71,12 @@ import { IDiagnosticScan } from '../services/patient.types';
 })
 export class PatientScansComponent {
     scans = input<IDiagnosticScan[]>([]);
+    private imageOptimizer = inject(ImageOptimizationService);
+
+    optimizedScans = computed(() => {
+        return this.scans().map(scan => ({
+            ...scan,
+            imageUrl: scan.imageUrl ? this.imageOptimizer.standardizeWikipediaUrl(scan.imageUrl, 500) : scan.imageUrl
+        }));
+    });
 }

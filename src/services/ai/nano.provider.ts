@@ -82,7 +82,15 @@ export class NanoProvider implements IIntelligenceProvider {
   }
 
   async analyzeTranslation(original: string, translated: string): Promise<string> {
-    return "Translation delegated to on-device Nano limits and may lack external stylistic analysis.";
+    try {
+      await this.ensureAiAvailable();
+      const session = await window.ai!.languageModel!.create({
+        systemPrompt: "You are an expert medical translation editor. Compare the original medical text and its translated version. Analyze readability, style, and check if any key clinical facts were lost or altered. Respond in clean, concise markdown."
+      });
+      return await session.prompt(`Original:\n${original}\n\nTranslated:\n${translated}\n\nProvide the translation analysis:`);
+    } catch {
+      return "Translation delegated to on-device Nano limits and may lack external stylistic analysis.";
+    }
   }
 
   async analyzeImage(base64Image: string, context?: string): Promise<string> {

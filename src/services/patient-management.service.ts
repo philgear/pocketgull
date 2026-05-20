@@ -145,6 +145,8 @@ const MOCK_PATIENTS: IPatient[] = [
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Robert should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
           "IPatient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
+          "Orthomolecular Profiling":
+            "### Summary\nRobert presents with significant systemic oxidative stress markers and low serum magnesium and Vitamin D3 levels. Methylation support and intracellular mineral replenishment are indicated.\n\n### Biomarker Matrix\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Deficient\", \"pathway\": \"ATP Synthesis / NMDA\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Deficient\", \"pathway\": \"Immune / Bone\" },\n  { \"name\": \"Vitamin B12\", \"level\": \"Sub-optimal\", \"pathway\": \"Methylation\" },\n  { \"name\": \"Zinc\", \"level\": \"Optimal\", \"pathway\": \"Immune / Hormones\" },\n  { \"name\": \"Homocysteine\", \"level\": \"High\", \"pathway\": \"Cardiovascular / Methylation\" }\n]\n```"
         },
       },
       {
@@ -1919,6 +1921,114 @@ const MOCK_PATIENTS: IPatient[] = [
         status: "Reviewed", imageUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e0/MRI_of_the_pelvis_-_sagittal.png"
       }
     ]
+  },
+  {
+    id: "p002_bottom",
+    name: "Sarah Jenkins",
+    age: 38,
+    gender: "Female",
+    lastVisit: "2026.10.15",
+    preexistingConditions: ["Asthma", "Generalized Anxiety Disorder", "Chronic Low Back Pain"],
+    patientGoals: "Need help managing flare-ups without medication.",
+    vitals: {
+      bp: "120/75",
+      hr: "74",
+      temp: "98.5°F",
+      spO2: "99%",
+      weight: "148 lbs",
+      height: "5'5\""
+    },
+    oxidativeStressMarkers: [],
+    antioxidantSources: [],
+    medications: [
+      { id: "1", name: "Albuterol Inhaler", value: "2 puffs PRN" },
+      { id: "2", name: "Sertraline", value: "50mg Daily" },
+      { id: "3", name: "Gabapentin", value: "300mg TID" }
+    ],
+    biometricHistory: [
+      { timestamp: "2025-10-01T09:00:00Z", type: "hr", value: "95" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "hr", value: "92" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "hr", value: "88" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "hr", value: "85" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "hr", value: "82" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "hr", value: "78" }
+    ],
+    issues: {
+      mid_back: [
+        {
+          id: "mid_back",
+          noteId: "note_p002_back_1",
+          name: "Lower Back",
+          painLevel: 7,
+          description: "Constant aching pain in L4-L5 region radiating to the left glute. Worsens with prolonged standing.",
+          symptoms: []
+        }
+      ]
+    },
+    history: [],
+    bookmarks: [],
+    scans: []
+  },
+  {
+    id: "p_phil_gear",
+    name: "Phil Gear",
+    age: 42,
+    gender: "Male",
+    lastVisit: "2026.05.20",
+    preexistingConditions: ["Hypertension", "Mild Sleep Apnea", "Google Health Integration"],
+    patientGoals: "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
+    vitals: {
+      bp: "122/82",
+      hr: "68",
+      temp: "98.6°F",
+      spO2: "98%",
+      weight: "178 lbs",
+      height: "5'10\""
+    },
+    oxidativeStressMarkers: [],
+    antioxidantSources: [],
+    medications: [
+      { id: "1", name: "Lisinopril", value: "10mg Daily" }
+    ],
+    biometricHistory: [
+      { timestamp: "2026-05-20T08:00:00Z", type: "hr", value: "68" },
+      { timestamp: "2026-05-20T08:00:00Z", type: "bp", value: "122/82" }
+    ],
+    issues: {
+      head: [
+        {
+          id: "head",
+          noteId: "note_phil_head_1",
+          name: "Head & Neck",
+          painLevel: 2,
+          description: "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
+          symptoms: []
+        }
+      ]
+    },
+    history: [
+      {
+        type: "AnalysisRun",
+        date: "2026.05.20",
+        summary: "Comprehensive Clinical Analysis",
+        report: {
+          "Summary Overview":
+            "### Clinical Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Focus is on optimization of metabolic pathways, screen time hygiene, and real-time biometric telemetry tracking.\n\n### Goals\n*   **Short-term**: Reduce sleep latency to < 20 minutes.\n*   **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
+          "Functional Protocols":
+            "### Circadian Alignment\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.",
+          Nutrition:
+            "### Dietary Recommendations\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.",
+          "Monitoring & Follow-up":
+            "### Biometric Synchronization\n- Monitor daily resting heart rate and sleep cycles using Fitbit/Google Health Connect.\n- Follow up in 4 weeks.",
+          "IPatient Education":
+            "### Your Health Strategy\nWe are focusing on tuning your body's daily rhythms, syncing Fitbit metrics, and optimizing cellular nutrients to resolve evening tension.",
+          "Orthomolecular Profiling":
+            "### Summary\nPhil has suboptimal intracellular magnesium and vitamin D3 levels. Supporting these cofactors will improve sleep quality and neuromuscular relaxation.\n\n### Biomarker Matrix\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Sub-optimal\", \"pathway\": \"ATP Synthesis / NMDA\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Sub-optimal\", \"pathway\": \"Immune / Bone\" },\n  { \"name\": \"Vitamin B12\", \"level\": \"Optimal\", \"pathway\": \"Methylation\" },\n  { \"name\": \"Zinc\", \"level\": \"Optimal\", \"pathway\": \"Immune / Hormones\" }\n]\n```"
+        }
+      }
+    ],
+    bookmarks: [],
+    scans: []
   }
 ];
 @Injectable({
@@ -1933,7 +2043,7 @@ export class PatientManagementService {
 
   readonly patients = signal<IPatient[]>(MOCK_PATIENTS);
   readonly selectedPatientId: WritableSignal<string | null> = signal(
-    MOCK_PATIENTS.find(p => p.id === 'p012')?.id || MOCK_PATIENTS[0]?.id || null,
+    MOCK_PATIENTS.find(p => p.id === 'p_phil_gear')?.id || MOCK_PATIENTS.find(p => p.id === 'p012')?.id || MOCK_PATIENTS[0]?.id || null,
   );
   readonly selectedPatient = computed(() => {
     const id = this.selectedPatientId();
@@ -1944,8 +2054,18 @@ export class PatientManagementService {
     if (typeof window !== 'undefined') {
         const loaded = await this.storage.loadPatients();
         if (loaded && loaded.length > 0) {
-            this.patients.set(loaded);
-            this.selectedPatientId.set(loaded[0]?.id || null);
+            let updatedList = [...loaded];
+            let modified = false;
+            for (const p of MOCK_PATIENTS) {
+                if (!updatedList.some(item => item.id === p.id)) {
+                    updatedList.push(p);
+                    await this.storage.savePatient(p);
+                    modified = true;
+                }
+            }
+            this.patients.set(updatedList);
+            const defaultId = updatedList.find(p => p.id === 'p_phil_gear')?.id || updatedList[0]?.id || null;
+            this.selectedPatientId.set(defaultId);
         } else {
             // Seed DB on first run
             for (const p of MOCK_PATIENTS) {

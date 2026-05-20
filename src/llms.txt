@@ -56,3 +56,10 @@ Pocket Gull is a clinical productivity tool, not a medical device. All AI-genera
 - AI inference calls transmit only the current patient context snapshot to `gemini-2.5-flash` via transient HTTPS requests.
 - No remote database. No analytics tracking of patient data. FHIR R4 compliant export.
 - Gemini API key is managed as a Cloud Run environment variable; never exposed to the client.
+
+## Dependency & License Management
+
+- Pocket Gull is licensed under the MIT License.
+- External dependencies are strictly audited for security (vulnerability checking via Dependabot) and compatibility.
+- Integrates Apache 2.0-licensed packages (including Google Genkit, @google/adk, @google/genai, and OpenTelemetry) while maintaining full attribution compliance in DEPENDENCIES.md.
+

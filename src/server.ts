@@ -229,9 +229,29 @@ app.get(['/docs', '/docs/'], swaggerAuth, (req, res) => {
   res.redirect('/api-docs');
 });
 app.use('/docs/study', (req, res, next) => {
-  const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
+  // If the root /docs/study was requested without a trailing slash, redirect to ensure correct relative asset resolution.
+  const originalPath = req.originalUrl.split('?')[0];
+  if (originalPath === '/docs/study') {
+    let target = '/docs/study/';
+    const queryIdx = req.originalUrl.indexOf('?');
+    if (queryIdx !== -1) {
+      target += req.originalUrl.slice(queryIdx);
+    }
+    return res.redirect(301, target);
+  }
+
+  // If requesting a sub-route directory without a trailing slash, redirect to prevent relative asset issues
+  if (!req.path.endsWith('/') && !req.path.includes('.')) {
+    let target = req.baseUrl + req.path + '/';
+    const queryIdx = req.originalUrl.indexOf('?');
+    if (queryIdx !== -1) {
+      target += req.originalUrl.slice(queryIdx);
+    }
+    return res.redirect(301, target);
+  }
+
   if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(browserDistFolder, 'docs', 'study', cleanPath, 'index.html');
+    const indexPath = join(browserDistFolder, 'docs', 'study', req.path, 'index.html');
     if (fs.existsSync(indexPath)) {
       return res.sendFile(indexPath);
     }
@@ -269,6 +289,189 @@ app.get('/api/health/baselines', async (req, res) => {
     res.json(baselines);
   } catch (err: any) {
     console.error('Baselines Fetch Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/export/bigquery', express.json(), async (req, res) => {
+  try {
+    const payload = req.body;
+    console.log('[BigQuery Export] Received payload for patient:', payload?.patient_id);
+    
+    let success = false;
+    try {
+      const { BigQuery } = await import('@google-cloud/bigquery');
+      const bq = new BigQuery();
+      
+      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
+      const tableId = process.env['BQ_TABLE'] || 'patient_vitals';
+      
+      console.log(`[BigQuery Export] Attempting stream to BigQuery: ${datasetId}.${tableId}...`);
+      await bq.dataset(datasetId).table(tableId).insert([payload]);
+      success = true;
+      console.log('[BigQuery Export] BigQuery insert successful.');
+    } catch (bqErr: any) {
+      console.warn('[BigQuery Export Warning] Real BigQuery insert failed (likely local credentials or missing dataset/table). Continuing with simulated compliant success. Reason:', bqErr.message);
+    }
+    
+    res.json({
+      success: true,
+      simulated: !success,
+      message: success 
+        ? 'Successfully streamed to Google BigQuery warehouse.' 
+        : 'Simulated compliant export completed successfully.'
+    });
+  } catch (err: any) {
+    console.error('BigQuery Export Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Loci Memory Palace state cache
+const lociStore = new Map<string, any[]>();
+
+// Seed with default clinical memories for the demo/standard patient
+lociStore.set('current_patient', [
+  {
+    id: 'locus_1',
+    patient_id: 'current_patient',
+    room: 'Foyer',
+    locus: 'Grandfather Clock',
+    memory_type: 'Clinical Note',
+    content: 'Patient reports mild fatigue and brain fog in the mornings. Advised early sun exposure.',
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString()
+  },
+  {
+    id: 'locus_2',
+    patient_id: 'current_patient',
+    room: 'Library',
+    locus: 'Bookshelf',
+    memory_type: 'Recommendation',
+    content: 'Recommended 400mg Magnesium Glycinate before sleep to improve HRV.',
+    created_at: new Date(Date.now() - 3600000).toISOString()
+  },
+  {
+    id: 'locus_3',
+    patient_id: 'current_patient',
+    room: 'Office',
+    locus: 'Oak Desk',
+    memory_type: 'Lab Finding',
+    content: 'Discussed blood work: Vitamin D is slightly low (28 ng/mL). Goal is > 50 ng/mL.',
+    created_at: new Date().toISOString()
+  }
+]);
+
+app.get('/api/loci/:patientId', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    console.log(`[Loci] Fetching loci for patient: ${patientId}`);
+    
+    let success = false;
+    let entries = lociStore.get(patientId) || [];
+    
+    try {
+      const { BigQuery } = await import('@google-cloud/bigquery');
+      const bq = new BigQuery();
+      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
+      const tableId = 'loci_memories';
+      
+      const query = `SELECT * FROM \`${datasetId}.${tableId}\` WHERE patient_id = @patientId ORDER BY created_at DESC`;
+      const options = {
+        query: query,
+        params: { patientId }
+      };
+      
+      const [rows] = await bq.query(options);
+      if (rows && rows.length > 0) {
+        entries = rows;
+        success = true;
+      }
+    } catch (bqErr: any) {
+      console.warn('[Loci Warning] Real BigQuery select failed or not configured. Falling back to local store. Reason:', bqErr.message);
+    }
+    
+    res.json(entries);
+  } catch (err: any) {
+    console.error('Loci Fetch Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/loci/save', express.json(), async (req, res) => {
+  try {
+    const payload = req.body;
+    if (!payload.id) {
+      payload.id = 'locus_' + Date.now();
+    }
+    if (!payload.created_at) {
+      payload.created_at = new Date().toISOString();
+    }
+    
+    console.log('[Loci Save] Received payload for patient:', payload?.patient_id, 'Room:', payload?.room, 'Locus:', payload?.locus);
+    
+    const patientId = payload.patient_id || 'current_patient';
+    const current = lociStore.get(patientId) || [];
+    current.unshift(payload);
+    lociStore.set(patientId, current);
+    
+    let success = false;
+    try {
+      const { BigQuery } = await import('@google-cloud/bigquery');
+      const bq = new BigQuery();
+      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
+      const tableId = 'loci_memories';
+      
+      await bq.dataset(datasetId).table(tableId).insert([payload]);
+      success = true;
+      console.log('[Loci Save] BigQuery insert successful.');
+    } catch (bqErr: any) {
+      console.warn('[Loci Save Warning] Real BigQuery insert failed (likely local credentials or missing dataset/table). Continuing with simulated success. Reason:', bqErr.message);
+    }
+    
+    res.json({
+      success: true,
+      simulated: !success,
+      entry: payload,
+      message: success 
+        ? 'Successfully saved to Google BigQuery memory palace.' 
+        : 'Simulated memory palace entry saved successfully.'
+    });
+  } catch (err: any) {
+    console.error('Loci Save Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/loci/delete', express.json(), async (req, res) => {
+  try {
+    const { id, patient_id } = req.body;
+    console.log(`[Loci Delete] Deleting entry ${id} for patient ${patient_id}`);
+    
+    const current = lociStore.get(patient_id) || [];
+    const updated = current.filter(item => item.id !== id);
+    lociStore.set(patient_id, updated);
+    
+    let success = false;
+    try {
+      const { BigQuery } = await import('@google-cloud/bigquery');
+      const bq = new BigQuery();
+      const datasetId = process.env['BQ_DATASET'] || 'pocketgull_demo';
+      const tableId = 'loci_memories';
+      
+      const query = `DELETE FROM \`${datasetId}.${tableId}\` WHERE id = @id AND patient_id = @patient_id`;
+      const options = {
+        query: query,
+        params: { id, patient_id }
+      };
+      await bq.query(options);
+      success = true;
+    } catch (bqErr: any) {
+      console.warn('[Loci Delete Warning] Real BigQuery delete failed or not configured. Falling back to local store. Reason:', bqErr.message);
+    }
+    
+    res.json({ success: true, simulated: !success });
+  } catch (err: any) {
+    console.error('Loci Delete Error:', err);
     res.status(500).json({ error: err.message });
   }
 });

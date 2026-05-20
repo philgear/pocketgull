@@ -37,9 +37,16 @@ describe('ImageOptimizationService', () => {
       expect(service.standardizeWikipediaUrl(url)).toBe(url);
     });
 
-    it('should return original URL if no size pattern found', () => {
+    it('should convert original URL to optimized thumbnail URL if no size pattern found', () => {
       const url = 'https://upload.wikimedia.org/wikipedia/commons/1/1a/File.jpg';
-      expect(service.standardizeWikipediaUrl(url)).toBe(url);
+      const expected = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/File.jpg/960px-File.jpg';
+      expect(service.standardizeWikipediaUrl(url)).toBe(expected);
+    });
+
+    it('should convert original URL using custom target width', () => {
+      const url = 'https://upload.wikimedia.org/wikipedia/commons/1/1a/File.jpg';
+      const expected = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/File.jpg/500px-File.jpg';
+      expect(service.standardizeWikipediaUrl(url, 500)).toBe(expected);
     });
   });
 });

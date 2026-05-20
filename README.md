@@ -111,6 +111,7 @@ Full engineering documentation is available in the [`docs/study/`](./docs/study/
 - **[Features](./docs/study/src/pages/features.mdx)** — Complete feature reference by category
 - **[Data & Privacy](./docs/study/src/pages/data.mdx)** — Storage model, PHI handling, and FHIR portability
 - **[Responsible AI](./docs/study/src/pages/responsible-ai.mdx)** — Core principles and societal impact
+- **[Dependencies & Licenses](./docs/study/src/pages/dependencies.mdx)** — Third-party compliance, import considerations, and Apache/MIT attributions
 - **[Getting Started](./docs/study/src/pages/getting-started.mdx)** — Installation, development, and deployment
 - **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
 

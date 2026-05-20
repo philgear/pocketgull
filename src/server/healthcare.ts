@@ -9,7 +9,24 @@ const auth = new GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/cloud-healthcare']
 });
 
-const defaultProjectId = process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
+let cachedProjectId = process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
+
+export async function getProjectId(): Promise<string> {
+  if (cachedProjectId) return cachedProjectId;
+  try {
+    const pId = await auth.getProjectId();
+    if (pId) {
+      cachedProjectId = pId;
+      return pId;
+    }
+  } catch (error: any) {
+    console.warn('[Healthcare Auth] Failed to dynamically get project ID:', error.message);
+  }
+  // Hardcoded fallback for Understory project ID
+  cachedProjectId = 'gen-lang-client-0540208645';
+  return cachedProjectId;
+}
+
 const defaultLocation = process.env['HC_LOCATION'] || 'us-west1';
 const defaultDatasetId = process.env['HC_DATASET'] || 'pocket_gull_clinical';
 const dicomStoreId = process.env['HC_DICOM_STORE'] || 'dicom_primary';
@@ -20,7 +37,7 @@ const fhirStoreId = process.env['HC_FHIR_STORE'] || 'fhir_primary';
  */
 export async function ensureHealthcareStoresExist() {
   try {
-    const projectId = defaultProjectId;
+    const projectId = await getProjectId();
     if (!projectId) {
       console.warn('[Healthcare Auto-Provision] No GCP Project ID found, skipping auto-provisioning.');
       return;
@@ -67,7 +84,7 @@ export async function ensureHealthcareStoresExist() {
 healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (req, res) => {
    try {
      const payload = req.body;
-     const projectId = defaultProjectId;
+     const projectId = await getProjectId();
      if (!projectId) return res.status(400).json({ error: 'GCP Project ID not configured.' });
 
      const client = await auth.getClient();
@@ -340,8 +357,133 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
          conditionsSynced: fhirConditions.length, 
          observationsSynced: fhirObservations.length 
      });
+    } catch (error: any) {
+      console.error('[Healthcare FHIR Export Error]', error);
+      res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * GET /api/healthcare/fhir/import/:id
+ * Fetches patient, conditions, and observations from the GCP Healthcare FHIR Store and maps them back to PocketGull IPatient format.
+ */
+healthcareRouter.get('/fhir/import/:id', async (req, res) => {
+   try {
+     const patientId = req.params.id;
+     const projectId = await getProjectId();
+     if (!projectId) return res.status(400).json({ error: 'GCP Project ID not configured.' });
+
+     console.log(`[Healthcare FHIR] Attempting to import patient pocket-gull-${patientId} from FHIR Store...`);
+     const client = await auth.getClient();
+     const token = await client.getAccessToken();
+     const headers = { 'Authorization': `Bearer ${token.token}` };
+
+     const fhirPatientId = `pocket-gull-${patientId}`;
+
+     // 1. Fetch Patient
+     const patientUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Patient/${fhirPatientId}`;
+     const patientRes = await fetch(patientUrl, { headers });
+     if (!patientRes.ok) {
+         if (patientRes.status === 404) {
+             return res.status(404).json({ error: 'Patient not found in Google Health FHIR store.' });
+         }
+         throw new Error(`FHIR Patient Fetch Error: ${patientRes.status} - ${await patientRes.text()}`);
+     }
+     const fhirPatient = await patientRes.json();
+
+     // 2. Search for Conditions of this Patient
+     const conditionsUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Condition?subject=Patient/${fhirPatientId}`;
+     const conditionsRes = await fetch(conditionsUrl, { headers });
+     let conditions: string[] = [];
+     if (conditionsRes.ok) {
+         const bundle = await conditionsRes.json();
+         if (bundle.entry && Array.isArray(bundle.entry)) {
+             conditions = bundle.entry.map((e: any) => e.resource?.code?.text).filter(Boolean);
+         }
+     }
+
+     // 3. Search for Observations of this Patient
+     const observationsUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Observation?subject=Patient/${fhirPatientId}`;
+     const observationsRes = await fetch(observationsUrl, { headers });
+     const vitals: any = {};
+     if (observationsRes.ok) {
+         const bundle = await observationsRes.json();
+         if (bundle.entry && Array.isArray(bundle.entry)) {
+             bundle.entry.forEach((e: any) => {
+                 const obs = e.resource;
+                 if (!obs) return;
+                 const code = obs.code?.coding?.[0]?.code;
+                 const value = obs.valueQuantity?.value;
+                 if (code === "8867-4") { // Heart Rate
+                     vitals.hr = `${value}`;
+                 } else if (code === "8310-5") { // Temp
+                     vitals.temp = `${value}°F`;
+                 } else if (code === "2708-6") { // SpO2
+                     vitals.spO2 = `${value}%`;
+                 } else if (code === "29463-7") { // Weight
+                     vitals.weight = `${value} lbs`;
+                 } else if (code === "8302-2") { // Height
+                     const inches = parseFloat(value);
+                     if (!isNaN(inches)) {
+                         if (inches > 20) {
+                             vitals.height = `${Math.floor(inches / 12)}'${Math.round(inches % 12)}"`;
+                         } else {
+                             vitals.height = `${inches}'0"`;
+                         }
+                     }
+                 } else if (code === "85354-9") { // Blood Pressure Panel
+                     const sys = obs.component?.find((c: any) => c.code?.coding?.[0]?.code === "8480-6")?.valueQuantity?.value;
+                     const dia = obs.component?.find((c: any) => c.code?.coding?.[0]?.code === "8462-4")?.valueQuantity?.value;
+                     if (sys !== undefined && dia !== undefined) {
+                         vitals.bp = `${sys}/${dia}`;
+                     }
+                 }
+             });
+         }
+     }
+
+     // Parse gender back
+     let gender: 'Male' | 'Female' | 'Non-binary' | 'Other' = 'Other';
+     if (fhirPatient.gender === 'male') gender = 'Male';
+     else if (fhirPatient.gender === 'female') gender = 'Female';
+     else if (fhirPatient.gender === 'other') gender = 'Non-binary';
+
+     // Parse age back (using birthDate)
+     let age = 30;
+     if (fhirPatient.birthDate) {
+         const birthYear = parseInt(fhirPatient.birthDate.split('-')[0]);
+         if (!isNaN(birthYear)) {
+             age = new Date().getFullYear() - birthYear;
+         }
+     }
+
+     // Get lastVisit extension if exists
+     const lastVisitExt = fhirPatient.extension?.find((ext: any) => ext.url === 'http://pocketgull.app/fhir/StructureDefinition/last-visit');
+     const lastVisit = lastVisitExt?.valueString || new Date().toISOString().split('T')[0];
+
+     console.log(`[Healthcare FHIR] Successfully imported patient ${fhirPatientId} from FHIR Store.`);
+     res.json({
+         success: true,
+         patient: {
+             id: patientId,
+             name: fhirPatient.name?.[0]?.text || 'Unknown',
+             age,
+             gender,
+             lastVisit,
+             preexistingConditions: conditions,
+             vitals,
+             oxidativeStressMarkers: [],
+             antioxidantSources: [],
+             medications: [],
+             biometricHistory: [],
+             issues: {},
+             history: [],
+             bookmarks: [],
+             scans: []
+         }
+     });
    } catch (error: any) {
-     console.error('[Healthcare FHIR Export Error]', error);
+     console.error('[Healthcare FHIR Import Error]', error);
      res.status(500).json({ error: error.message });
    }
 });

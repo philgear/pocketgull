@@ -178,6 +178,17 @@ Analyze the patient overview, specifically hunting for lab metrics, micronutrien
 ### Biochemical & Biomarker Matrix
 (2-3 sentences summarizing the patient's critical orthomolecular status based on the provided data.)
 
+At the very end of the "Biochemical & Biomarker Matrix" section, you MUST output a structured JSON block containing the status of key biomarkers. Use EXACTLY the following JSON format inside a json code block:
+\`\`\`json
+[
+  { "name": "Magnesium", "level": "Deficient", "pathway": "ATP Synthesis / NMDA" },
+  { "name": "Vitamin D3", "level": "Sub-optimal", "pathway": "Immune / Bone" }
+]
+\`\`\`
+Allowed names are: "Magnesium", "Vitamin D3", "Vitamin B12", "Folate (B9)", "Zinc", "Homocysteine", "Ferritin", "Vitamin C".
+Allowed levels are: "Deficient", "Sub-optimal", "Optimal", "High", "Excess".
+Provide a status for at least 3-4 biomarkers that are most relevant to the patient's data, labs, or symptoms.
+
 ### Detected Deficiencies
 (Bullet list of specific nutrient depletions or metabolic blocks detected. If none are explicitly found, list "potential" deficiencies based strictly on the symptom profile.)
 

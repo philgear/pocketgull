@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed, viewChild
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientStateService } from '../services/patient-state.service';
+import { LociPalaceService } from '../services/loci-palace.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { DictationService } from '../services/dictation.service';
 import { PatientManagementService } from '../services/patient-management.service';
@@ -202,6 +203,7 @@ export interface IChatEntry {
                                             
                                             <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                                                  <button (click)="actionCopy(entry.text)" class="hover:text-black dark:hover:text-white" title="Copy">[COPY]</button>
+                                                 <button (click)="actionAnchorToLoci(entry)" class="hover:text-purple-600 dark:hover:text-purple-400 font-semibold" title="Anchor to Memory Palace">[ANCHOR]</button>
                                                  @if (entry.role === 'model') {
                                                     <button (click)="actionInsert(entry.text)" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
                                                  }
@@ -312,6 +314,74 @@ export interface IChatEntry {
                     </div>
                 </div>
             }
+
+            <!-- Anchor to Loci Modal Overlay -->
+            @if (isAnchorModalOpen()) {
+              <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" (click)="closeAnchorModal()">
+                <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl w-full max-w-lg overflow-hidden" (click)="$event.stopPropagation()">
+                  
+                  <div class="px-6 py-4 bg-gradient-to-r from-purple-800 to-indigo-900 text-white flex justify-between items-center">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-white">Anchor to Memory Palace</h3>
+                    <button type="button" (click)="closeAnchorModal()" class="text-white/60 hover:text-white transition-colors">
+                      <svg xmlns="http://www.w3.org/2005/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+
+                  <form (ngSubmit)="submitAnchorLocus()" class="p-6 space-y-4 text-left">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1.5">PALACE CHAMBER *</label>
+                        <select [(ngModel)]="anchorRoom" name="anchorRoom" required
+                                class="w-full text-xs font-bold rounded-xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 text-gray-900 dark:text-zinc-100">
+                          <option value="Foyer">Foyer</option>
+                          <option value="Library">Library</option>
+                          <option value="Office">Office</option>
+                          <option value="Laboratory">Laboratory</option>
+                          <option value="Sanctuary">Sanctuary</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label class="block text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1.5">SPECIFIC LOCUS SPOT *</label>
+                        <input [(ngModel)]="anchorLocus" name="anchorLocus" required type="text" placeholder="e.g. Oak Desk"
+                               class="w-full text-xs font-bold rounded-xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 text-gray-900 dark:text-zinc-100">
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1.5">MEMORY TYPE *</label>
+                      <select [(ngModel)]="anchorType" name="anchorType" required
+                              class="w-full text-xs font-bold rounded-xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 text-gray-900 dark:text-zinc-100">
+                        <option value="Clinical Note">Clinical Note</option>
+                        <option value="Recommendation">Recommendation</option>
+                        <option value="Lab Finding">Lab Finding</option>
+                        <option value="Intervention">Intervention</option>
+                        <option value="Chat History">Chat History</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="block text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1.5">MEMORY CONTENT *</label>
+                      <textarea [(ngModel)]="anchorContent" name="anchorContent" required rows="4" placeholder="Enter findings or insights to anchor to this locus..."
+                                class="w-full text-xs font-medium rounded-xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 px-3.5 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 text-gray-900 dark:text-zinc-100"></textarea>
+                    </div>
+
+                    <div class="pt-4 flex justify-end gap-3 border-t border-gray-100 dark:border-zinc-800/80">
+                      <button type="button" (click)="closeAnchorModal()"
+                              class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-zinc-400 hover:bg-gray-100 dark:hover:bg-zinc-850 rounded-xl transition-colors">
+                        Cancel
+                      </button>
+                      <button type="submit"
+                              class="px-5 py-2 text-xs font-bold uppercase tracking-wider text-white bg-purple-600 hover:bg-purple-500 shadow-md rounded-xl transition-colors border border-purple-500/20">
+                        Anchor Memory
+                      </button>
+                    </div>
+
+                  </form>
+                </div>
+              </div>
+            }
         </div>
     `
 })
@@ -323,6 +393,7 @@ export class VoiceAssistantComponent implements OnDestroy {
     markdownService = inject(MarkdownService);
     richMedia = inject(RichMediaService);
     storage = inject(StorageService);
+    lociPalace = inject(LociPalaceService);
 
     panelMode = signal<'selection' | 'chat' | 'dictation'>('selection');
 
@@ -376,6 +447,44 @@ export class VoiceAssistantComponent implements OnDestroy {
             date: new Date().toISOString()
         };
         this.state.addClinicalNote(newNote);
+    }
+
+    isAnchorModalOpen = signal<boolean>(false);
+    selectedChatEntry = signal<IChatEntry | null>(null);
+    anchorRoom = 'Foyer';
+    anchorLocus = '';
+    anchorType = 'Clinical Note';
+    anchorContent = '';
+
+    actionAnchorToLoci(entry: IChatEntry) {
+        this.selectedChatEntry.set(entry);
+        this.anchorRoom = 'Foyer';
+        this.anchorLocus = '';
+        this.anchorType = 'Clinical Note';
+        this.anchorContent = entry.text.replace(/[*_~`#]/g, '');
+        this.isAnchorModalOpen.set(true);
+    }
+
+    closeAnchorModal() {
+        this.isAnchorModalOpen.set(false);
+        this.selectedChatEntry.set(null);
+    }
+
+    async submitAnchorLocus() {
+        if (!this.anchorRoom || !this.anchorLocus || !this.anchorContent) return;
+
+        const patient = this.patientMgmt.selectedPatient();
+        const patientId = patient ? patient.id : 'current_patient';
+
+        await this.lociPalace.saveLocus({
+            patient_id: patientId,
+            room: this.anchorRoom,
+            locus: this.anchorLocus,
+            memory_type: this.anchorType,
+            content: this.anchorContent
+        });
+
+        this.closeAnchorModal();
     }
 
     // --- Dictation State ---

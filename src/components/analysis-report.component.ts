@@ -22,11 +22,12 @@ import { ClinicalTrendComponent } from './clinical-trend.component';
 import { AiCacheService } from '../services/ai-cache.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { RevealDirective } from '../directives/reveal.directive';
+import { MemoryPalaceComponent } from './memory-palace.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent],
+  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, MemoryPalaceComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
@@ -109,6 +110,17 @@ import { RevealDirective } from '../directives/reveal.directive';
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
             IPatient Education
           </pocket-gull-button>
+          <pocket-gull-button (click)="changeLens('Memory Palace')"
+            variant="ghost"
+            size="sm"
+            [class.border-b-2]="activeLens() === 'Memory Palace'"
+            [class.border-[#1C1C1C]]="activeLens() === 'Memory Palace'"
+            [class.dark:border-white]="activeLens() === 'Memory Palace'"
+            [class.text-[#1C1C1C]]="activeLens() === 'Memory Palace'"
+            [class.dark:text-white]="activeLens() === 'Memory Palace'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            Memory Palace
+          </pocket-gull-button>
         </div>
         </div>
       </div>
@@ -119,7 +131,7 @@ import { RevealDirective } from '../directives/reveal.directive';
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
         <!--Clinical Overview Dashboard-->
-        @if (intel.analysisMetrics(); as metrics) {
+        @if (activeLens() !== 'Memory Palace' && intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
             <div class="col-span-full mb-2">
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
@@ -178,13 +190,18 @@ import { RevealDirective } from '../directives/reveal.directive';
           </div>
         }
 
+        <!-- Memory Palace Component -->
+        @if (activeLens() === 'Memory Palace') {
+          <app-memory-palace></app-memory-palace>
+        }
+
         <!-- Biomarker Matrix (Orthomolecular Only) -->
         @if (activeLens() === 'Orthomolecular Profiling' && hasAnyReport()) {
           <app-biomarker-matrix [reportText]="activeReport()"></app-biomarker-matrix>
         }
 
         <!--AI Report Section-->
-        @if (reportSections(); as sections) {
+        @if (activeLens() !== 'Memory Palace' && reportSections(); as sections) {
           <div class="flex flex-col gap-4 sm:gap-6 pb-4 w-full min-w-0">
             @for (section of sections; track section.title; let i = $index) {
               <div [id]="i === 0 ? 'tour-report-node' : null" appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
@@ -346,7 +363,7 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
 
-  activeLens = signal<AnalysisLens>('Summary Overview');
+  activeLens = signal<AnalysisLens | 'Memory Palace'>('Summary Overview');
 
   // --- Portal Hover Tooltip ---
   activeTooltip = signal<{ text: string, x: number, y: number, severity: string } | null>(null);
@@ -395,7 +412,11 @@ export class AnalysisReportComponent implements OnDestroy {
   ];
 
   hasAnyReport = computed(() => Object.keys(this.intel.analysisResults()).length > 0);
-  activeReport = computed(() => this.intel.analysisResults()[this.activeLens()]);
+  activeReport = computed(() => {
+    const lens = this.activeLens();
+    if (lens === 'Memory Palace') return '';
+    return this.intel.analysisResults()[lens];
+  });
   contentArea = viewChild<ElementRef<HTMLDivElement>>('contentArea');
 
   isSectionEmpty(section: any): boolean {
@@ -407,7 +428,9 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
   verificationStatus(sectionTitle: string): string | null {
-    const res = this.intel.verificationResults()[this.activeLens()];
+    const lens = this.activeLens();
+    if (lens === 'Memory Palace') return null;
+    const res = this.intel.verificationResults()[lens];
     return res?.status || null;
   }
 

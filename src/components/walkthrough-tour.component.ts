@@ -1,9 +1,9 @@
 import {
   Component, ChangeDetectionStrategy, inject, signal, computed,
-  effect, ViewEncapsulation, OnDestroy, NgZone, afterNextRender
+  effect, ViewEncapsulation, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { WalkthroughTourService, TOUR_STEPS, ITourStep } from '../services/walkthrough-tour.service';
+import { WalkthroughTourService, ITourStep } from '../services/walkthrough-tour.service';
 
 interface IRect { top: number; left: number; width: number; height: number; }
 
@@ -30,7 +30,7 @@ interface IRect { top: number; left: number; width: number; height: number; }
     }
     .tour-mask-bg {
       fill: rgba(0, 0, 0, 0.72);
-      transition: d 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: fill 0.3s ease, d 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tour-spotlight {
       fill: transparent;
@@ -42,11 +42,13 @@ interface IRect { top: number; left: number; width: number; height: number; }
     .tour-card {
       position: fixed; z-index: 9100;
       width: 320px;
+      max-width: calc(100dvw - 40px);
       background: #ffffff;
       border-radius: 16px;
       box-shadow: 0 32px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06);
       overflow: hidden;
       animation: tour-card-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1), left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .dark .tour-card {
       background: #18181b;
@@ -166,6 +168,59 @@ interface IRect { top: number; left: number; width: number; height: number; }
       0%, 100% { box-shadow: 0 0 0 4px rgba(104,159,56,0.12); }
       50%       { box-shadow: 0 0 0 8px rgba(104,159,56,0.06); }
     }
+
+    /* ─── Spark Theme Specifics ───────────────────── */
+    .theme-spark .tour-ring {
+      border: 2px solid rgba(249, 115, 22, 0.8) !important;
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.18) !important;
+    }
+    .theme-spark .tour-dot.active {
+      background: #f97316 !important;
+    }
+    .theme-spark .tour-card {
+      background: #0f0704 !important;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(249, 115, 22, 0.2) !important;
+      border: 1px solid rgba(249, 115, 22, 0.15) !important;
+    }
+    .theme-spark .tour-gull-header {
+      background: linear-gradient(135deg, #1f0b04 0%, #0f0704 100%) !important;
+    }
+    .theme-spark .tour-gull-header::before {
+      background: radial-gradient(ellipse at 80% 50%, rgba(249, 115, 22, 0.2) 0%, transparent 60%) !important;
+    }
+    .theme-spark .tour-gull-svg {
+      filter: drop-shadow(0 4px 12px rgba(249, 115, 22, 0.4)) !important;
+    }
+    .theme-spark .tour-body-text {
+      color: #dfc8bf !important;
+    }
+    .theme-spark .tour-btn-prev {
+      background: #23110a !important;
+      color: #dfc8bf !important;
+    }
+    .theme-spark .tour-btn-prev:hover {
+      background: #3c1e12 !important;
+      color: #fffaf7 !important;
+    }
+    .theme-spark .tour-btn-next {
+      background: #f97316 !important;
+      color: #ffffff !important;
+    }
+    .theme-spark .tour-btn-next:hover {
+      background: #ea580c !important;
+    }
+    .theme-spark .tour-btn-next--finish {
+      background: #d97706 !important;
+    }
+    .theme-spark .tour-btn-next--finish:hover {
+      background: #b45309 !important;
+    }
+    .theme-spark .tour-btn-ghost:hover {
+      color: #f97316 !important;
+    }
+    .theme-spark .tour-mask-bg {
+      fill: rgba(12, 6, 4, 0.8) !important;
+    }
   `],
   template: `
     @if (tour.isActive()) {
@@ -187,12 +242,12 @@ interface IRect { top: number; left: number; width: number; height: number; }
                 </rect>
               </mask>
             </defs>
-            <rect width="100%" height="100%" fill="rgba(0,0,0,0.72)" mask="url(#tour-cutout)"></rect>
+            <rect width="100%" height="100%" class="tour-mask-bg" mask="url(#tour-cutout)"></rect>
           </svg>
         } @else {
           <!-- No target: full dark overlay -->
           <svg class="tour-svg" aria-hidden="true">
-            <rect width="100%" height="100%" fill="rgba(0,0,0,0.72)"></rect>
+            <rect width="100%" height="100%" class="tour-mask-bg"></rect>
           </svg>
         }
       </div>
@@ -222,7 +277,7 @@ interface IRect { top: number; left: number; width: number; height: number; }
             </div>
             <!-- Progress dots -->
             <div class="tour-dots">
-              @for (s of stepsArray; track $index) {
+              @for (s of stepsArray(); track $index) {
                 <div class="tour-dot" [class.active]="$index === tour.currentStep()"></div>
               }
             </div>
@@ -255,16 +310,16 @@ export class WalkthroughTourComponent implements OnDestroy {
   protected tour = inject(WalkthroughTourService);
 
   rect = signal<IRect | null>(null);
-  stepsArray = TOUR_STEPS;
+  stepsArray = computed(() => this.tour.steps());
 
   stepDef = computed<ITourStep | null>(() => {
     const idx = this.tour.currentStep();
-    return idx >= 0 && idx < TOUR_STEPS.length ? TOUR_STEPS[idx] : null;
+    const steps = this.tour.steps();
+    return idx >= 0 && idx < steps.length ? steps[idx] : null;
   });
 
-  isLastStep = computed(() => this.tour.currentStep() === TOUR_STEPS.length - 1);
+  isLastStep = computed(() => this.tour.currentStep() === this.tour.steps().length - 1);
 
-  private _resizeObs: ResizeObserver | null = null;
   private _rafId = 0;
 
   constructor() {
@@ -307,20 +362,50 @@ export class WalkthroughTourComponent implements OnDestroy {
     const def = this.stepDef();
     const PAD = 20;
     const CARD_W = 320;
-    const CARD_H = 240; // estimated
 
     if (!r || !def) {
       // Centre-screen fallback
       return {
         top: '50%',
+        bottom: 'auto',
         left: '50%',
-        transform: 'translate(-50%, -50%)'
+        right: 'auto',
+        transform: 'translate(-50%, -50%)',
+        width: `${CARD_W}px`
       };
     }
 
     const vw = typeof window !== 'undefined' ? window.innerWidth : 1200;
     const vh = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const isMobile = vw < 640;
 
+    if (isMobile) {
+      const isTargetInBottomHalf = (r.top + r.height / 2) > (vh / 2);
+      if (isTargetInBottomHalf) {
+        // Target is in bottom half -> place card at top
+        return {
+          top: `${PAD}px`,
+          bottom: 'auto',
+          left: `${PAD}px`,
+          right: `${PAD}px`,
+          width: 'auto',
+          transform: 'none'
+        };
+      } else {
+        // Target is in top half -> place card at bottom
+        return {
+          top: 'auto',
+          bottom: `${PAD}px`,
+          left: `${PAD}px`,
+          right: `${PAD}px`,
+          width: 'auto',
+          transform: 'none'
+        };
+      }
+    }
+
+    // Desktop positioning
+    const CARD_H = 220; // estimated
     let top: number, left: number;
 
     switch (def.position) {
@@ -347,7 +432,13 @@ export class WalkthroughTourComponent implements OnDestroy {
     top = Math.max(PAD, Math.min(top, vh - CARD_H - PAD));
     left = Math.max(PAD, Math.min(left, vw - CARD_W - PAD));
 
-    return { top: `${top}px`, left: `${left}px` };
+    return {
+      top: `${top}px`,
+      bottom: 'auto',
+      left: `${left}px`,
+      right: 'auto',
+      width: `${CARD_W}px`
+    };
   });
 
   onBackdropClick(e: MouseEvent) {

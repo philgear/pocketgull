@@ -7,16 +7,18 @@ interface Props {
 const { title, description = 'Engineering documentation for Pocket Gull — a voice-first clinical co-pilot.' } = Astro.props;
 
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const base = import.meta.env.BASE_URL.replace(/\/$/, ''); // base without trailing slash, e.g. "/docs/study"
 
 const navItems = [
-  { href: '/', label: 'Overview' },
-  { href: '/architecture', label: 'Architecture' },
-  { href: '/features', label: 'Features' },
-  { href: '/data', label: 'Data & Privacy' },
-  { href: '/responsible-ai', label: 'Responsible AI' },
-  { href: '/getting-started', label: 'Getting Started' },
-  { href: '/case-study', label: 'Case Study' },
-  { href: '/changelog', label: 'Changelog' },
+  { href: `${base}/`, label: 'Overview' },
+  { href: `${base}/architecture`, label: 'Architecture' },
+  { href: `${base}/features`, label: 'Features' },
+  { href: `${base}/data`, label: 'Data & Privacy' },
+  { href: `${base}/responsible-ai`, label: 'Responsible AI' },
+  { href: `${base}/dependencies`, label: 'Dependencies & Licenses' },
+  { href: `${base}/getting-started`, label: 'Getting Started' },
+  { href: `${base}/case-study`, label: 'Case Study' },
+  { href: `${base}/changelog`, label: 'Changelog' },
 ];
 
 function isActive(href: string): boolean {
@@ -55,7 +57,7 @@ const versions = [
         <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <a href="/" class="nav-brand">
+        <a href={import.meta.env.BASE_URL} class="nav-brand">
           <svg width="28" height="28" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g transform="translate(0, -20)">
               <rect x="166" y="275" width="180" height="10" rx="2" fill="#76B362" />
@@ -167,7 +169,7 @@ const versions = [
   </script>
 
   <!-- DocNode drill-down engine -->
-  <script is:inline src="/scripts/doc-drill.js"></script>
+  <script is:inline src={`${import.meta.env.BASE_URL}scripts/doc-drill.js`}></script>
 </body>
 </html>
 

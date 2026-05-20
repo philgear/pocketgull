@@ -17,15 +17,15 @@ import DocsLayout from '../layouts/DocsLayout.astro';
 
   <div class="screenshots">
     <figure>
-      <img src="/images/dashboard.png" alt="Pocket Gull Dashboard" loading="lazy" />
+      <img src={import.meta.env.BASE_URL + "images/dashboard.png"} alt="Pocket Gull Dashboard" loading="lazy" />
       <figcaption>Dashboard — Patient intake overview with real-time AI status</figcaption>
     </figure>
     <figure>
-      <img src="/images/body_viewer.png" alt="3D Body Viewer" loading="lazy" />
+      <img src={import.meta.env.BASE_URL + "images/body_viewer.png"} alt="3D Body Viewer" loading="lazy" />
       <figcaption>Body Viewer — Three.js anatomical selection with severity particles</figcaption>
     </figure>
     <figure>
-      <img src="/images/inline_chat.webp" alt="Inline Agent Chat" loading="lazy" />
+      <img src={import.meta.env.BASE_URL + "images/inline_chat.webp"} alt="Inline Agent Chat" loading="lazy" />
       <figcaption>Live Agent — Voice-first AI consult with context-aware memory</figcaption>
     </figure>
   </div>
@@ -67,19 +67,23 @@ import DocsLayout from '../layouts/DocsLayout.astro';
   <hr />
 
   <div class="nav-cards">
-    <a href="/architecture" class="nav-card">
+    <a href={`${import.meta.env.BASE_URL}architecture`} class="nav-card">
       <span class="nav-card-label">Architecture</span>
       <span class="nav-card-desc">System diagram & tech stack</span>
     </a>
-    <a href="/features" class="nav-card">
+    <a href={`${import.meta.env.BASE_URL}features`} class="nav-card">
       <span class="nav-card-label">Features</span>
       <span class="nav-card-desc">All capabilities in detail</span>
     </a>
-    <a href="/case-study" class="nav-card">
+    <a href={`${import.meta.env.BASE_URL}dependencies`} class="nav-card">
+      <span class="nav-card-label">Dependencies</span>
+      <span class="nav-card-desc">Third-party compliance & licenses</span>
+    </a>
+    <a href={`${import.meta.env.BASE_URL}case-study`} class="nav-card">
       <span class="nav-card-label">Case Study</span>
       <span class="nav-card-desc">Engineering deep dive & results</span>
     </a>
-    <a href="/getting-started" class="nav-card">
+    <a href={`${import.meta.env.BASE_URL}getting-started`} class="nav-card">
       <span class="nav-card-label">Getting Started</span>
       <span class="nav-card-desc">Setup & deployment</span>
     </a>
