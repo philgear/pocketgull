@@ -100,6 +100,7 @@ import { CircadianSleepinessService, KssScore } from '../services/circadian-slee
                  type="password" 
                  [(ngModel)]="pin"
                  (ngModelChange)="onPinChange($event)"
+                 (keydown)="onPinKeyDown($event)"
                  (keyup.enter)="verifyPin()"
                  maxlength="4"
                  placeholder="1234" 
@@ -625,6 +626,11 @@ export class SecureSplashComponent {
 
     osc1.stop(ctx.currentTime + 1.3);
     osc2.stop(ctx.currentTime + 1.3);
+  }
+
+  onPinKeyDown(event: KeyboardEvent) {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.getAudioContext();
   }
 
   onPinChange(val: string) {

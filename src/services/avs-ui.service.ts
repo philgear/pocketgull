@@ -36,13 +36,17 @@ export class AvsUiService implements OnDestroy {
     }
   }
 
-  private getAudioContext(): AudioContext | null {
+  private getAudioContext(requireGesture = true): AudioContext | null {
     if (!isPlatformBrowser(this.platformId)) return null;
     if (!this.audioCtx) {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      this.audioCtx = new AudioContextClass();
+      if (requireGesture) {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        this.audioCtx = new AudioContextClass();
+      } else {
+        return null;
+      }
     }
-    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+    if (this.audioCtx && this.audioCtx.state === 'suspended' && requireGesture) {
       this.audioCtx.resume().catch(() => {});
     }
     return this.audioCtx;
@@ -55,7 +59,7 @@ export class AvsUiService implements OnDestroy {
    */
   playHover() {
     if (!this.isAudioFeedbackEnabled()) return;
-    const ctx = this.getAudioContext();
+    const ctx = this.getAudioContext(false);
     if (!ctx) return;
 
     try {
