@@ -25,8 +25,8 @@ interface BiomarkerStatus {
               <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             </div>
             <div>
-              <h3 class="text-sm font-bold text-gray-900 dark:text-emerald-50 uppercase tracking-widest">Biomarker Matrix</h3>
-              <p class="text-[10px] text-gray-500 dark:text-emerald-500/60 uppercase tracking-widest">Orthomolecular Status Detected</p>
+              <h3 class="text-base font-bold text-gray-900 dark:text-emerald-50 uppercase tracking-widest">Biomarker Matrix</h3>
+              <p class="text-xs text-gray-600 dark:text-emerald-400/80 uppercase tracking-widest mt-0.5">Orthomolecular Status Detected</p>
             </div>
           </div>
 
@@ -41,24 +41,24 @@ interface BiomarkerStatus {
                    [class.dark:border-emerald-900]="marker.level === 'Optimal'">
                 
                 <div class="flex justify-between items-start mb-2">
-                  <span class="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate pr-2" [title]="marker.name">{{ marker.name }}</span>
-                  <div class="w-2 h-2 rounded-full mt-1 shrink-0 animate-pulse"
+                  <span class="text-sm font-bold text-gray-900 dark:text-zinc-100 truncate pr-2" [title]="marker.name">{{ marker.name }}</span>
+                  <div class="w-2.5 h-2.5 rounded-full mt-1 shrink-0 animate-pulse"
                        [class.bg-red-500]="marker.level === 'Deficient' || marker.level === 'Excess'"
                        [class.bg-yellow-500]="marker.level === 'Sub-optimal' || marker.level === 'High'"
                        [class.bg-emerald-500]="marker.level === 'Optimal'"></div>
                 </div>
                 
-                <div class="text-[10px] font-black uppercase tracking-wider mb-2"
-                     [class.text-red-600]="marker.level === 'Deficient' || marker.level === 'Excess'"
+                <div class="text-xs font-bold uppercase tracking-wider mb-2"
+                     [class.text-red-700]="marker.level === 'Deficient' || marker.level === 'Excess'"
                      [class.dark:text-red-400]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                     [class.text-yellow-600]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                     [class.dark:text-yellow-400]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                     [class.text-emerald-600]="marker.level === 'Optimal'"
+                     [class.text-amber-700]="marker.level === 'Sub-optimal' || marker.level === 'High'"
+                     [class.dark:text-amber-400]="marker.level === 'Sub-optimal' || marker.level === 'High'"
+                     [class.text-emerald-700]="marker.level === 'Optimal'"
                      [class.dark:text-emerald-400]="marker.level === 'Optimal'">
                   {{ marker.level }}
                 </div>
 
-                <div class="text-[9px] text-gray-500 dark:text-zinc-500 uppercase tracking-widest truncate" [title]="marker.pathway">
+                <div class="text-xs text-gray-600 dark:text-zinc-400 uppercase tracking-widest truncate" [title]="marker.pathway">
                   {{ marker.pathway }}
                 </div>
               </div>

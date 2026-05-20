@@ -94,8 +94,16 @@ __pycache__/
 gcp-*.json
 *.pem
 *.key
+*.jks
+*.keystore
 
-# --- Local Databases ---
+# --- Mobile Platform Overrides & Signing Secrets ---
+**/android/local.properties
+**/android/key.properties
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+
+# --- Local Databases & Cache ---
 *.sqlite
 *.db
 
@@ -110,7 +118,14 @@ build/
 *.hive
 *.hivec
 *.lock
+*patient*.json
+*session*.json
+*.pdf
+*.csv
+*.xlsx
 
 # --- Agent & Build Logs ---
 *_log*.txt
 deploy_log.txt
+firebase-debug.log
+firebase-debug.*.log

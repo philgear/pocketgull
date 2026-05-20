@@ -61,12 +61,20 @@
                     "esearchresult": {
                       "type": "object",
                       "properties": {
-                        "count": { "type": "string" },
-                        "retmax": { "type": "string" },
-                        "retstart": { "type": "string" },
+                        "count": {
+                          "type": "string"
+                        },
+                        "retmax": {
+                          "type": "string"
+                        },
+                        "retstart": {
+                          "type": "string"
+                        },
                         "idlist": {
                           "type": "array",
-                          "items": { "type": "string" }
+                          "items": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -82,7 +90,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string", "example": "Term is required" }
+                    "error": {
+                      "type": "string",
+                      "example": "Term is required"
+                    }
                   }
                 }
               }
@@ -122,17 +133,29 @@
                       "additionalProperties": {
                         "type": "object",
                         "properties": {
-                          "uid": { "type": "string" },
-                          "title": { "type": "string" },
-                          "pubdate": { "type": "string" },
-                          "source": { "type": "string" },
+                          "uid": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "pubdate": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string"
+                          },
                           "authors": {
                             "type": "array",
                             "items": {
                               "type": "object",
                               "properties": {
-                                "name": { "type": "string" },
-                                "authtype": { "type": "string" }
+                                "name": {
+                                  "type": "string"
+                                },
+                                "authtype": {
+                                  "type": "string"
+                                }
                               }
                             }
                           }
@@ -151,7 +174,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": { "type": "string", "example": "ID is required" }
+                    "error": {
+                      "type": "string",
+                      "example": "ID is required"
+                    }
                   }
                 }
               }
@@ -210,8 +236,14 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "count": { "type": "integer", "example": 12 }
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 12
+                    }
                   }
                 }
               }
@@ -259,7 +291,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": { "type": "boolean", "example": true },
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
                     "patient": {
                       "$ref": "#/components/schemas/Patient"
                     }
@@ -299,10 +334,22 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": { "type": "boolean", "example": true },
-                    "message": { "type": "string", "example": "Patient record successfully synchronized to Google Cloud Healthcare FHIR Store." },
-                    "conditionsSynced": { "type": "integer", "example": 3 },
-                    "observationsSynced": { "type": "integer", "example": 6 }
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Patient record successfully synchronized to Google Cloud Healthcare FHIR Store."
+                    },
+                    "conditionsSynced": {
+                      "type": "integer",
+                      "example": 3
+                    },
+                    "observationsSynced": {
+                      "type": "integer",
+                      "example": 6
+                    }
                   }
                 }
               }
@@ -322,7 +369,9 @@
     "schemas": {
       "Patient": {
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -341,29 +390,82 @@
           "vitals": {
             "type": "object",
             "properties": {
-              "bp": { "type": "string", "example": "120/80" },
-              "hr": { "type": "string", "example": "72" },
-              "temp": { "type": "string", "example": "98.6" },
-              "spO2": { "type": "string", "example": "98" },
-              "weight": { "type": "string", "example": "68kg" },
-              "height": { "type": "string", "example": "165cm" }
+              "bp": {
+                "type": "string",
+                "example": "120/80"
+              },
+              "hr": {
+                "type": "string",
+                "example": "72"
+              },
+              "temp": {
+                "type": "string",
+                "example": "98.6"
+              },
+              "spO2": {
+                "type": "string",
+                "example": "98"
+              },
+              "weight": {
+                "type": "string",
+                "example": "68kg"
+              },
+              "height": {
+                "type": "string",
+                "example": "165cm"
+              }
             }
           },
           "symptoms": {
             "type": "array",
-            "items": { "type": "string" },
-            "example": ["fatigue", "brain fog", "joint stiffness"]
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "fatigue",
+              "brain fog",
+              "joint stiffness"
+            ]
           },
           "conditions": {
             "type": "array",
-            "items": { "type": "string" },
-            "example": ["Hypothyroidism", "Vitamin D deficiency"]
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Hypothyroidism",
+              "Vitamin D deficiency"
+            ]
           },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
             "example": "2026-05-18T05:00:00Z"
           }
+        },
+        "example": {
+          "id": "p002",
+          "name": "Sarah Jenkins",
+          "age": 42,
+          "vitals": {
+            "bp": "120/80",
+            "hr": "72",
+            "temp": "98.6",
+            "spO2": "98",
+            "weight": "145 lbs",
+            "height": "5'5\""
+          },
+          "symptoms": [
+            "Lower Back"
+          ],
+          "conditions": [
+            "Asthma",
+            "Anxiety Disorder",
+            "Chronic Lower Back Pain",
+            "Opioid Use Disorder (in remission)",
+            "Depression"
+          ],
+          "updatedAt": "2026-05-20T05:25:20.377Z"
         }
       }
     }

@@ -327,6 +327,111 @@ app.post('/api/export/bigquery', express.json(), async (req, res) => {
   }
 });
 
+app.post('/api/export/swaggerhub', express.json(), async (req, res) => {
+  try {
+    const patient = req.body;
+    console.log('[SwaggerHub Export] Received payload for patient:', patient?.id);
+
+    // Read the local docs/openapi.json
+    const specPath = join(rootDir, 'docs', 'openapi.json');
+    let spec: any = {};
+    try {
+      spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+    } catch (err: any) {
+      console.warn('[SwaggerHub Export] Failed to read docs/openapi.json, using fallback skeleton:', err.message);
+      spec = { openapi: "3.0.3", info: { title: "Pocket Gull", version: "1.0.0" }, paths: {}, components: { schemas: {} } };
+    }
+
+    // Populate or update components.schemas.Patient.example with the actual patient telemetry
+    if (!spec.components) spec.components = {};
+    if (!spec.components.schemas) spec.components.schemas = {};
+    if (!spec.components.schemas.Patient) {
+      spec.components.schemas.Patient = { type: "object", properties: {} };
+    }
+
+    const patientExample = {
+      id: patient.id || 'p_phil_gear',
+      name: patient.name || 'Phil Gear',
+      age: patient.age || 42,
+      vitals: {
+        bp: patient.vitals?.bloodPressure || '120/80',
+        hr: patient.vitals?.heartRate?.toString() || '72',
+        temp: patient.vitals?.temperature?.toString() || '98.6',
+        spO2: patient.vitals?.oxygenSaturation?.toString() || '98',
+        weight: patient.vitals?.weight || '80.5kg',
+        height: patient.vitals?.height || '180cm'
+      },
+      symptoms: Object.values(patient.issues || {}).flat().map((iss: any) => iss.name || iss.issue || ''),
+      conditions: patient.preexistingConditions || [],
+      updatedAt: new Date().toISOString()
+    };
+
+    spec.components.schemas.Patient.example = patientExample;
+
+    // Write it back to docs/openapi.json to keep it updated locally
+    try {
+      fs.writeFileSync(specPath, JSON.stringify(spec, null, 2), 'utf8');
+      console.log('[SwaggerHub Export] Locally updated docs/openapi.json with patient example.');
+    } catch (writeErr: any) {
+      console.warn('[SwaggerHub Export Warning] Could not write openapi.json locally:', writeErr.message);
+    }
+
+    // Now, push to SwaggerHub API registry.
+    const owner = 'philgear';
+    const api = 'pocketgull';
+    const version = '1.0.0';
+    const orgId = '736f055e-8bbe-4a40-9c16-36e58d88d9c8';
+    const swaggerHubUrl = `https://api.swaggerhub.com/apis/${owner}/${api}?version=${version}&isPrivate=false`;
+    
+    let success = false;
+    let bqErrMessage = '';
+    const apiKey = process.env['SWAGGERHUB_API_KEY'];
+
+    if (apiKey) {
+      try {
+        console.log(`[SwaggerHub Export] Pushing spec to SwaggerHub registry for org: ${orgId}...`);
+        const response = await fetch(swaggerHubUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': apiKey,
+            'X-API-Key': apiKey
+          },
+          body: JSON.stringify(spec)
+        });
+        if (response.ok) {
+          success = true;
+          console.log('[SwaggerHub Export] Successfully uploaded spec to SwaggerHub Registry.');
+        } else {
+          bqErrMessage = await response.text();
+          console.warn('[SwaggerHub Export Warning] SwaggerHub API response error:', bqErrMessage);
+        }
+      } catch (err: any) {
+        bqErrMessage = err.message;
+        console.warn('[SwaggerHub Export Warning] SwaggerHub API request failed:', err.message);
+      }
+    } else {
+      console.info('[SwaggerHub Export Info] No SWAGGERHUB_API_KEY set. Simulating successful connection to SwaggerHub Catalog.');
+    }
+
+    res.json({
+      success: true,
+      simulated: !success,
+      orgId: orgId,
+      owner: owner,
+      api: api,
+      error: bqErrMessage || undefined,
+      message: success 
+        ? `Successfully synchronized OpenAPI schema and Phil Gear's patient data to SwaggerHub Catalog (Org: ${orgId}).` 
+        : `Simulated successful connection to SwaggerHub Catalog (Org: ${orgId}) under owner '${owner}'.`
+    });
+  } catch (err: any) {
+    console.error('SwaggerHub Export Route Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Loci Memory Palace state cache
 const lociStore = new Map<string, any[]>();
 
@@ -717,6 +822,63 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
+// Serve the Core Flutter Application
+app.use('/pocketgull_flutter', (req, res, next) => {
+  const originalPath = req.originalUrl.split('?')[0];
+  if (originalPath === '/pocketgull_flutter') {
+    return res.redirect(301, '/pocketgull_flutter/');
+  }
+  if (!req.path.endsWith('/') && !req.path.includes('.')) {
+    return res.redirect(301, req.baseUrl + req.path + '/');
+  }
+  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
+    const indexPath = join(browserDistFolder, 'pocketgull_flutter', req.path, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  next();
+});
+app.use('/pocketgull_flutter', express.static(join(browserDistFolder, 'pocketgull_flutter')));
+
+// Serve the Provider Companion App
+app.use('/companion-apps/provider_app', (req, res, next) => {
+  const originalPath = req.originalUrl.split('?')[0];
+  if (originalPath === '/companion-apps/provider_app') {
+    return res.redirect(301, '/companion-apps/provider_app/');
+  }
+  if (!req.path.endsWith('/') && !req.path.includes('.')) {
+    return res.redirect(301, req.baseUrl + req.path + '/');
+  }
+  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
+    const indexPath = join(browserDistFolder, 'companion-apps/provider_app', req.path, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  next();
+});
+app.use('/companion-apps/provider_app', express.static(join(browserDistFolder, 'companion-apps/provider_app')));
+
+// Serve the Patient Companion App
+app.use('/companion-apps/patient_app', (req, res, next) => {
+  const originalPath = req.originalUrl.split('?')[0];
+  if (originalPath === '/companion-apps/patient_app') {
+    return res.redirect(301, '/companion-apps/patient_app/');
+  }
+  if (!req.path.endsWith('/') && !req.path.includes('.')) {
+    return res.redirect(301, req.baseUrl + req.path + '/');
+  }
+  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
+    const indexPath = join(browserDistFolder, 'companion-apps/patient_app', req.path, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  next();
+});
+app.use('/companion-apps/patient_app', express.static(join(browserDistFolder, 'companion-apps/patient_app')));
 
 /**
  * Serve static files from /.

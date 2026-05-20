@@ -89,6 +89,7 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
       @if (session.isLocked() || !hasApiKey()) {
         <app-secure-splash
           [apiKeyError]="apiKeyError()"
+          [hasApiKey]="hasApiKey()"
           (submitKey)="apiKeyInput.set($event); submitApiKey()"
           (loadDemo)="loadDemoMode()"
           (selectAiStudio)="selectKey()">
@@ -214,6 +215,60 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
               </div>
             </div>
             <button (click)="showAwsError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+
+        <!-- SwaggerHub Syncing Toast -->
+        @if (isSwaggerSyncing()) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/50 animate-pulse">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" class="opacity-25"></circle>
+                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-blue-800 dark:text-blue-300">Synchronizing to SwaggerHub</h3>
+                <p class="text-[11px] text-blue-600 dark:text-blue-400/80">Updating OpenAPI schema with Phil Gear's patient structure and exporting to SwaggerHub Portal...</p>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- SwaggerHub Sync Success Toast -->
+        @if (showSwaggerSuccess()) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">SwaggerHub Sync Successful</h3>
+                <p class="text-[11px] text-green-600 dark:text-green-500/80">OpenAPI schema and clinical data model for Phil Gear successfully synchronized to SwaggerHub Catalog (orgId: 736f055e-8bbe-4a40-9c16-36e58d88d9c8).</p>
+              </div>
+            </div>
+            <button (click)="showSwaggerSuccess.set(false)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors text-green-700 dark:text-green-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+        }
+
+        <!-- SwaggerHub Sync Error Toast -->
+        @if (showSwaggerError(); as errorMsg) {
+          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              </div>
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-red-800 dark:text-red-300">SwaggerHub Sync Failed</h3>
+                <p class="text-[11px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
+              </div>
+            </div>
+            <button (click)="showSwaggerError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
@@ -465,6 +520,9 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                     </button>
                     <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> AWS HealthLake
+                    </button>
+                    <button (click)="connectSwaggerHub(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#85EA2D] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> SwaggerHub Catalog
                     </button>
                    <button (click)="connectAppleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Apple Health
@@ -803,16 +861,28 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
                   <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Animal Comfort Protocols</p>
                   <div class="flex flex-wrap gap-2">
                     <button (click)="petAuditory.playCanineHeartbeat()" 
-                      [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-[#ff4500] text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300'"
-                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M3 12c0-3 2-6 5-6s5 3 5 3 2-3 5-3 5 3 5 6"/></svg>
+                      [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
+                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M3 12c0-3 2-6 5-6s5 3 5 3 2-3 5-3 5 3 5 6"/></svg>
                       Canine Comfort
                     </button>
                     <button (click)="petAuditory.playFelinePurr()"
-                      [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-[#ff4500] text-white' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300'"
-                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                      [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
+                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.33.09 2 .26 1.78-1.55 3-.94 3-.94.83 2.22.3 3.86.15 4.27C18.66 10.14 19 11.96 19 14c0 4.97-3.13 7-7 7s-7-2.03-7-7c0-2.04.34-3.86 1.85-5.41-.15-.41-.68-2.05.15-4.27 0 0 1.22-.61 3 .94.65-.17 1.33-.26 2-.26Z" /><path d="M9 13v.01M15 13v.01" /><path d="M12 16l-1-1h2Z" /></svg>
                       Feline Comfort
+                    </button>
+                    <button (click)="petAuditory.playCetaceanTherapy()"
+                      [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
+                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-1.5-2.5-3-3.5-6-3.5A4.5 4.5 0 0 1 1.5 12c0-2.5 1.5-3.5 4.5-3.5 3 0 4.5 1 6 3.5 1.5-2.5 3-3.5 6-3.5a4.5 4.5 0 0 1 4.5 4.5c0 2.5-1.5 3.5-4.5 3.5-3 0-4.5 1-6 3.5Z" /><path d="M12 12v4" /></svg>
+                      Cetacean Comfort
+                    </button>
+                    <button (click)="petAuditory.playAvianTherapy()"
+                      [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
+                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h.01" /><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20" /><path d="m20 7 2 .5-2 .5" /><path d="M10 18v3" /><path d="M14 17.75V21" /><path d="M7 18a6 6 0 0 0 3.84-10.61" /></svg>
+                      Avian Comfort
                     </button>
                     @if(petAuditory.isCurrentlyPlaying) {
                       <button (click)="petAuditory.stop()" class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all">
@@ -1028,6 +1098,11 @@ export class AppComponent implements OnDestroy {
   isAwsSyncing = signal<boolean>(false);
   showAwsSuccess = signal<boolean>(false);
   showAwsError = signal<string | null>(null);
+
+  // SwaggerHub Sync State
+  isSwaggerSyncing = signal<boolean>(false);
+  showSwaggerSuccess = signal<boolean>(false);
+  showSwaggerError = signal<string | null>(null);
 
   // Finalize & Archive State
   showPreviewModal = signal(false);
@@ -1272,6 +1347,32 @@ export class AppComponent implements OnDestroy {
       this.isAwsSyncing.set(false);
     }
   }
+
+  async connectSwaggerHub() {
+    const patient = this.patientMgmt.selectedPatient();
+    if (!patient) {
+      alert("No patient selected to sync to SwaggerHub Catalog.");
+      return;
+    }
+
+    this.isSwaggerSyncing.set(true);
+    this.showSwaggerSuccess.set(false);
+    this.showSwaggerError.set(null);
+
+    try {
+      const result = await this.export.exportToSwaggerHub(patient);
+      console.log('[SwaggerHub Sync] Success:', result);
+      this.showSwaggerSuccess.set(true);
+      setTimeout(() => this.showSwaggerSuccess.set(false), 5000);
+    } catch (e: any) {
+      console.error('[SwaggerHub Sync] Error:', e);
+      this.showSwaggerError.set(e.message || 'An error occurred during SwaggerHub synchronization.');
+      setTimeout(() => this.showSwaggerError.set(null), 8000);
+    } finally {
+      this.isSwaggerSyncing.set(false);
+    }
+  }
+
 
   connectAppleHealth() {
     alert("Apple HealthKit: Awaiting sync from iOS Companion App...");

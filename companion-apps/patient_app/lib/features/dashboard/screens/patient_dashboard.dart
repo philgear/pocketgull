@@ -3,7 +3,8 @@ import '../../../../core/api/api_client.dart';
 import '../../../../core/models/patient.dart';
 
 class PatientDashboard extends StatefulWidget {
-  const PatientDashboard({super.key});
+  final Patient patient;
+  const PatientDashboard({super.key, required this.patient});
 
   @override
   State<PatientDashboard> createState() => _PatientDashboardState();
@@ -11,28 +12,29 @@ class PatientDashboard extends StatefulWidget {
 
 class _PatientDashboardState extends State<PatientDashboard> {
   final ApiClient _apiClient = ApiClient();
-  Patient? _currentPatient;
-  bool _isLoading = true;
+  late Patient _currentPatient;
+  bool _isLoading = false;
   bool _isSyncing = false;
 
   @override
   void initState() {
     super.initState();
+    _currentPatient = widget.patient;
     _loadData();
   }
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
     final data = await _apiClient.fetchPatients();
-    if (data.isNotEmpty) {
-      // For demo, just pick the first patient as "me"
-      setState(() {
-        _currentPatient = Patient.fromJson(data.first);
-        _isLoading = false;
-      });
-    } else {
-      setState(() => _isLoading = false);
+    if (data.isNotEmpty && mounted) {
+      final matching = data.where((json) => json['id'] == _currentPatient.id);
+      if (matching.isNotEmpty) {
+        setState(() {
+          _currentPatient = Patient.fromJson(matching.first);
+        });
+      }
     }
+    setState(() => _isLoading = false);
   }
 
   Future<void> _simulateHealthSync() async {

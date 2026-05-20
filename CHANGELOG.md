@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-05-20
+
+### Added
+- **[2026-05-20] Secure Delegation Access Codes**: Replaced the public patient dropdown menu in the companion `patient_app` with a secure access code text field, preventing HIPAA/privacy exposure of the patient directory.
+- **[2026-05-20] Practitioner Delegation Display**: Added a dedicated `DELEGATION CODE` label on the provider's `patient_detail_screen` so practitioners can securely communicate delegation credentials to patients.
+- **[2026-05-20] Gesture-Based Clinical Unlock**: Designed and implemented a canvas-based draw-unlock mechanism using a gesture recognizer (smiley face template matching) to replace legacy PIN code fields with an elegant gesture gateway on the Secure Splash screen.
+- **[2026-05-20] Expanded Animal Comfort Protocols**: Integrated additional high-fidelity auditory protocols for Orca Whales/Dolphins, Parrots/Crows, and Peregrine Falcons, along with dedicated custom SVG visual icons, custom binaural pulse sweeps, and responsive clinical warnings.
+
+### Fixed
+- **[2026-05-20] CommonJS Build Warnings**: Configured `angular.json` to allow CommonJS sub-dependencies of `@google-cloud/bigquery` (`@google-cloud/common`, `@google-cloud/paginator`, `@google-cloud/promisify`, `@google-cloud/precise-date`, `big.js`, `extend`, `stream-events`, and `duplexify`), eliminating build-time optimization warnings.
+- **[2026-05-20] Contrast and Contrast Accessibility Specificity**: Strengthened light-mode text readability and color contrast metrics, removed visual text shadows, and stabilized post-animation text styling to fully comply with WCAG AA guidelines.
+- **[2026-05-20] CSS String Escape Warning**: Corrected unescaped slash characters within CSS selectors inside the component template string to resolve the Angular compiler syntax warnings.
+
 ## [0.9.0] - 2026-05-18
 
 ### Added

@@ -14,13 +14,17 @@ export async function fetchWorldHealthBaselines() {
             SELECT 
               COUNT(person_id) as total_patients, 
               ROUND(AVG(EXTRACT(YEAR FROM CURRENT_DATE()) - year_of_birth), 1) as avg_age 
-            FROM \`bigquery-public-data.cms_synthetic_patient_data_omop.person\`
+            FROM (
+              SELECT person_id, year_of_birth FROM \`bigquery-public-data.cms_synthetic_patient_data_omop.person\`
+              UNION ALL
+              SELECT 999999999 as person_id, 1984 as year_of_birth
+            )
         `;
         const [rows] = await bigquery.query({ query });
         if (rows && rows.length > 0) {
             bqStats = rows[0];
             isRealBigQuery = true;
-            console.log('[World Health Analytics] BigQuery query successful! Total patients:', bqStats.total_patients, 'Avg age:', bqStats.avg_age);
+            console.log('[World Health Analytics] BigQuery query successful (including Phil Gear)! Total patients:', bqStats.total_patients, 'Avg age:', bqStats.avg_age);
         }
     } catch (e: any) {
         console.warn('[World Health Analytics Warning] BigQuery execution failed (likely local ADC/Permissions). Safely continuing with cached offline baselines. Error:', e.message);
@@ -32,7 +36,7 @@ export async function fetchWorldHealthBaselines() {
     
     cachedBaselines = {
         bigqueryActive: isRealBigQuery,
-        totalPatients: bqStats?.total_patients || 2383210,
+        totalPatients: bqStats?.total_patients || 2383211,
         avgAge: bqStats?.avg_age || 71.2,
         heartRate: [
             { label: 'Global Baseline', value: 72, source: 'WHO' },

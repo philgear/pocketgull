@@ -2,17 +2,15 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 
-class ApiClient {
-  // Use 10.0.2.2 for Android emulator to reach localhost, 
-  // or localhost for iOS simulator.
-  // Ideally this would be configurable, but keeping it simple for dev.
-  static const String baseUrl = 'http://127.0.0.1:3000/api';
+import 'package:flutter/foundation.dart';
 
-  static String getBaseUrlForPlatform() {
-    // A simple hack: depending on platform, you might need 10.0.2.2 instead.
-    // We'll return 127.0.0.1 which works for iOS. We can change to 10.0.2.2 for Android if needed.
-    // For universal safe fallback without dart:io in web:
-    return baseUrl; 
+class ApiClient {
+  static String get baseUrl {
+    if (kIsWeb) {
+      final origin = Uri.base.origin;
+      return '$origin/api';
+    }
+    return 'http://127.0.0.1:3000/api';
   }
 
   Future<List<Map<String, dynamic>>> fetchPatients() async {

@@ -35,6 +35,7 @@ class PatientDetailScreen extends StatelessWidget {
           _buildInfoRow('AGE', patient.age.toString(), textColor, subColor),
           _buildInfoRow('GENDER', patient.gender, textColor, subColor),
           _buildInfoRow('LAST VISIT', patient.lastVisit, textColor, subColor),
+          _buildInfoRow('DELEGATION CODE', patient.id, textColor, subColor),
           
           const SizedBox(height: 32),
           _buildSectionTitle('LATEST VITALS', textColor),
