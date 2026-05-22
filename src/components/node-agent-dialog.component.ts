@@ -1,6 +1,6 @@
 import {
     Component, ChangeDetectionStrategy, inject, signal, input, output,
-    OnInit, ViewChild, ElementRef, AfterViewChecked, ViewEncapsulation
+    OnInit, ViewChild, ElementRef, AfterViewChecked, ViewEncapsulation, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { MarkdownService } from '../services/markdown.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
+import { AdkLiveService } from '../services/ai/adk-live.service';
 
 export interface INodeAgentDialogData {
     nodeKey: string;
@@ -47,6 +48,13 @@ interface IChatEntry {
                     </span>
                     <span class="node-agent-title">Evidence Focus</span>
                     <span class="node-agent-section-chip">{{ data().sectionTitle }}</span>
+                    @if (live.isSpeaking()) {
+                        <span class="flex-shrink-0 flex h-2 w-2 relative ml-1">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C084FC] opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-[#C084FC]"></span>
+                        </span>
+                        <span class="text-[9px] font-bold text-[#C084FC] uppercase tracking-wider animate-pulse ml-1">Live Audio</span>
+                    }
                 </div>
                 <div class="flex items-center gap-1 flex-shrink-0">
                     @if (isLoading()) {
@@ -128,6 +136,22 @@ interface IChatEntry {
                             <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-4 h-4 flex items-center justify-center"></div>
                         </button>
                     }
+
+                    <!-- Microphone Toggle Button -->
+                    <button class="node-agent-attach relative" 
+                            (click)="toggleListening()" 
+                            [disabled]="isLoading() || !!permissionError()" 
+                            [class.node-agent-attach--listening]="live.isListening()"
+                            title="Toggle Voice Consult">
+                        @if (live.isListening()) {
+                            <span class="absolute inset-0 rounded-full bg-red-500/20 animate-ping"
+                                  [style.transform]="'scale(' + (1.1 + (live.volumeLevel() / 100) * 0.4) + ')'"
+                                  style="animation-duration: 1.5s;"></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="text-red-500 relative z-10" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                        } @else {
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        }
+                    </button>
 
                     <!-- Suggestions Dropdown -->
                     @if (showSuggestionsDropdown() && !isLoading()) {
@@ -526,9 +550,11 @@ interface IChatEntry {
         .dark .node-agent-input:focus { border-color: #689F38; background: #27272a; }
         .dark .node-agent-send { background: #f4f4f5; color: #18181b; }
         .dark .node-agent-send:hover:not(:disabled) { background: #d4d4d8; }
+        .node-agent-attach--listening { color: #ef4444; background: #fee2e2; }
+        .dark .node-agent-attach--listening { color: #f87171; background: #7f1d1d; }
     `]
 })
-export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
+export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDestroy {
     protected readonly ClinicalIcons = ClinicalIcons;
 
     data = input.required<INodeAgentDialogData>();
@@ -542,6 +568,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
     private intel = inject(ClinicalIntelligenceService);
     private state = inject(PatientStateService);
     private markdown = inject(MarkdownService);
+    public live = inject(AdkLiveService);
 
     isOpen = signal(false);
     isLoading = signal(false);
@@ -550,8 +577,12 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
     selectedFiles = signal<File[]>([]);
     userInput = '';
     contextHtml = signal('');
+    permissionError = signal<string | null>(null);
 
     private shouldScrollToBottom = false;
+    private recognition: any;
+    private _liveUserText = '';
+    private _liveModelText = '';
 
     suggestedQuestions = signal<string[]>([]);
 
@@ -574,6 +605,51 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
 
         // Seed the initial message
         this.startSession();
+
+        // Setup local SpeechRecognition for UI transcripts
+        if (typeof window !== 'undefined') {
+            const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                this.recognition = new SpeechRecognition();
+                this.recognition.continuous = true;
+                this.recognition.interimResults = true;
+                this.recognition.lang = 'en-US';
+                
+                this.recognition.onresult = (event: any) => {
+                    let interim = '';
+                    let finalBlock = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) finalBlock += transcript;
+                        else interim += transcript;
+                    }
+                    if (finalBlock) {
+                        this._liveUserText += finalBlock + " ";
+                        this.updateUserBubble(this._liveUserText.trim() + " " + interim);
+                    } else if (interim) {
+                        this.updateUserBubble(this._liveUserText.trim() + " " + interim);
+                    }
+                };
+                
+                this.recognition.onerror = (e: any) => console.log("UI STT Error:", e.error);
+                this.recognition.onend = () => {
+                    if (this.live.isListening() && this.live.isConnected()) {
+                        try { this.recognition.start(); } catch {}
+                    }
+                };
+            }
+
+            // Hook up ADK Live connection callbacks
+            this.live.onMessage = (msg) => {
+                if (msg.text) {
+                    this.isLoading.set(false);
+                    this.accumulateModelText(msg.text);
+                }
+            };
+            this.live.onModelTurnComplete = () => {
+                this.finalizeModelTurn();
+            };
+        }
     }
 
     ngAfterViewChecked() {
@@ -625,9 +701,40 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
         try {
             const patientCtx = this.patientData();
             const nodeText = this.data().nodeText;
-            const section = this.data().sectionTitle;
+            const systemContext = this.buildFullSystemContext();
 
-            const systemContext = `You are a focused clinical evidence assistant embedded in the Pocket Gull Clinical Intelligence Platform.
+            await this.intel.ai.startChat(patientCtx, systemContext);
+
+            // Auto-send the initial seeded question
+            const seedQuestion = this.state.isEmergencyMode()
+                ? "Start the conversation as an emergency assistant. Briefly state: 'Emergency Bystander Support active. Start CPR if unresponsive (110 BPM metronome available). What is the primary injury or symptom?' Keep it under 2 sentences."
+                : `Explain the clinical rationale for this recommendation: "${nodeText.slice(0, 200)}${nodeText.length > 200 ? '...' : ''}"`;
+            const response = await this.intel.ai.sendMessage(seedQuestion);
+
+            this.appendModelMessage(response);
+        } catch (e: any) {
+            this.appendModelMessage(`Unable to connect to the AI engine: ${e?.message ?? e}`);
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
+    private buildFullSystemContext(): string {
+        const isEmergency = this.state.isEmergencyMode();
+        if (isEmergency) {
+            return `EMERGENCY FIRST-AID COMPANION: You are assisting a bystander performing immediate triage or resuscitation under Good Samaritan principles.
+CRITICAL SAFETY CONSTRAINTS:
+- NEVER suggest, prescribe, or discuss drug dosages, chemical interventions, or invasive procedures.
+- Focus exclusively on non-invasive Basic Life Support (BLS) interventions: CPR chest compressions (110 BPM), rescue breathing, airway clearing, physical stabilization (recovery position), direct pressure for severe bleeding, and tourniquets.
+- Keep all replies extremely direct, concise, and structured in short, clear bullet points for high-stress situations.
+- Urgently remind the user to call emergency services (911) if not already done.`;
+        }
+
+        const patientCtx = this.patientData();
+        const nodeText = this.data().nodeText;
+        const section = this.data().sectionTitle;
+
+        return `You are a focused clinical evidence assistant embedded in the Pocket Gull Clinical Intelligence Platform.
 A clinician is reviewing a specific recommendation from the "${section}" section of an AI-generated care plan and wants to understand or challenge it.
 
 Patient context is available. The recommendation under review is:
@@ -641,20 +748,10 @@ Your role:
 3. Then be ready to answer follow-up questions about alternatives, risks, drug interactions, practical implementation items (like grocery lists), or patient-specific nuances.
 
 CRITICAL INSTRUCTION: You are operating as a clinician-to-clinician decision support tool. DO NOT refuse requests for practical items, shopping lists, or actionable implementation steps based on the clinical rationale. You MUST generate these lists confidently when requested by the practitioner. Do not include consumer medical disclaimers about seeking a doctor, as the user IS the doctor.
-Keep responses concise and clinically precise. Use markdown for structure when helpful.`;
+Keep responses concise and clinically precise. Use markdown for structure when helpful.
 
-            await this.intel.ai.startChat(patientCtx, systemContext);
-
-            // Auto-send the initial seeded question
-            const seedQuestion = `Explain the clinical rationale for this recommendation: "${nodeText.slice(0, 200)}${nodeText.length > 200 ? '...' : ''}"`;
-            const response = await this.intel.ai.sendMessage(seedQuestion);
-
-            this.appendModelMessage(response);
-        } catch (e: any) {
-            this.appendModelMessage(`Unable to connect to the AI engine: ${e?.message ?? e}`);
-        } finally {
-            this.isLoading.set(false);
-        }
+Patient Data:
+${patientCtx}`;
     }
 
     triggerFileInput() {
@@ -695,13 +792,19 @@ Keep responses concise and clinically precise. Use markdown for structure when h
         this.shouldScrollToBottom = true;
 
         try {
-            const response = await this.intel.ai.sendMessage(text, files);
-            this.appendModelMessage(response);
+            if (this.live.isConnected() && files.length === 0) {
+                this.live.sendText(text);
+            } else {
+                const response = await this.intel.ai.sendMessage(text, files);
+                this.appendModelMessage(response);
+            }
         } catch (e: any) {
             this.appendModelMessage(`Error: ${e?.message ?? e}`);
         } finally {
-            this.isLoading.set(false);
-            this.shouldScrollToBottom = true;
+            if (!this.live.isConnected()) {
+                this.isLoading.set(false);
+                this.shouldScrollToBottom = true;
+            }
         }
     }
 
@@ -712,6 +815,10 @@ Keep responses concise and clinically precise. Use markdown for structure when h
 
     close() {
         this.isOpen.set(false);
+        this.live.disconnect();
+        if (this.recognition) {
+            this.recognition.stop();
+        }
 
         // Save the context of this discussion before closing
         const history = this.chatHistory()
@@ -728,6 +835,13 @@ Keep responses concise and clinically precise. Use markdown for structure when h
         }
 
         setTimeout(() => this.closed.emit(), 240);
+    }
+
+    ngOnDestroy() {
+        this.live.disconnect();
+        if (this.recognition) {
+            this.recognition.stop();
+        }
     }
 
     private appendUserMessage(text: string, htmlOverride?: string) {
@@ -749,5 +863,104 @@ Keep responses concise and clinically precise. Use markdown for structure when h
     private scrollToBottom() {
         const el = this.chatBodyRef?.nativeElement;
         if (el) el.scrollTop = el.scrollHeight;
+    }
+
+    async toggleListening() {
+        if (this.permissionError()) return;
+
+        if (!this.live.isConnected()) {
+            this.isLoading.set(true);
+            try {
+                const apiKey = (window as any).GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY') || '';
+                if (!apiKey) {
+                    this.appendModelMessage('System Note: Missing API Key. Please configure it to use voice.');
+                    this.isLoading.set(false);
+                    return;
+                }
+                const systemContext = this.buildFullSystemContext();
+                await this.live.connect(apiKey, systemContext);
+            } catch (e: any) {
+                console.error("Failed to connect to Live API:", e);
+                this.permissionError.set('Failed to connect to Live Interface.');
+                this.appendModelMessage(`System Note: Failed to connect to Voice: ${e?.message ?? e}`);
+                this.isLoading.set(false);
+                return;
+            } finally {
+                this.isLoading.set(false);
+            }
+        }
+
+        if (this.live.isListening()) {
+            this.live.stopListening();
+            if (this.recognition) this.recognition.stop();
+        } else {
+            this.live.startListening();
+            this._liveUserText = ''; // Reset voice text buffer
+            if (this.recognition) {
+                try { this.recognition.start(); } catch {}
+            }
+        }
+    }
+
+    private updateUserBubble(tempText: string) {
+        this.chatHistory.update(h => {
+            const next = [...h];
+            let entry = next.length > 0 ? next[next.length - 1] : null;
+            if (!entry || entry.role !== 'user') {
+                entry = { role: 'user', text: '' };
+                next.push(entry);
+            }
+            entry.text = tempText;
+            entry.html = `<p>${tempText}</p>`;
+            return next;
+        });
+        this.shouldScrollToBottom = true;
+    }
+
+    private accumulateModelText(chunk: string) {
+        this._liveModelText += chunk;
+        const parser = this.markdown.parser();
+        let html = this._liveModelText;
+        if (parser) {
+            try { html = (parser as any).parse(this._liveModelText); } catch { html = `<p>${this._liveModelText}</p>`; }
+        } else {
+            html = `<p>${this._liveModelText}</p>`;
+        }
+
+        this.chatHistory.update(history => {
+            const updated = [...history];
+            let last = updated[updated.length - 1];
+            if (last && last.role === 'model' && last.isStreaming) {
+                last.text = this._liveModelText;
+                last.html = html;
+            } else {
+                updated.push({
+                    role: 'model',
+                    text: this._liveModelText,
+                    html: html,
+                    isStreaming: true
+                });
+            }
+            return updated;
+        });
+        this.shouldScrollToBottom = true;
+    }
+
+    private finalizeModelTurn() {
+        this.chatHistory.update(history => {
+            const updated = [...history];
+            const last = updated[updated.length - 1];
+            if (last && last.role === 'model' && last.isStreaming) {
+                last.isStreaming = false;
+            }
+            return updated;
+        });
+        this._liveModelText = '';
+        this._liveUserText = '';
+        this.shouldScrollToBottom = true;
+
+        if (this.live.isListening() && this.recognition) {
+            try { this.recognition.start(); } catch {}
+        }
     }
 }
