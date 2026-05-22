@@ -615,6 +615,12 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDes
                 this.recognition.interimResults = true;
                 this.recognition.lang = 'en-US';
                 
+                this.recognition.onspeechstart = () => {
+                    if (this.live.isSpeaking()) {
+                        this.live.interrupt();
+                    }
+                };
+                
                 this.recognition.onresult = (event: any) => {
                     let interim = '';
                     let finalBlock = '';
@@ -647,6 +653,9 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDes
                 }
             };
             this.live.onModelTurnComplete = () => {
+                this.finalizeModelTurn();
+            };
+            this.live.onInterrupted = () => {
                 this.finalizeModelTurn();
             };
         }
@@ -775,6 +784,10 @@ ${patientCtx}`;
         const text = this.userInput.trim();
         const files = this.selectedFiles();
         if ((!text && files.length === 0) || this.isLoading()) return;
+
+        if (this.live.isSpeaking()) {
+            this.live.interrupt();
+        }
 
         this.userInput = '';
         this.selectedFiles.set([]);

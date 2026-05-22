@@ -34,6 +34,7 @@ export class AdkLiveService {
   // Callbacks
   public onMessage?: (msg: ILiveMessageEvent) => void;
   public onModelTurnComplete?: () => void;
+  public onInterrupted?: () => void;
 
   constructor() {}
 
@@ -262,6 +263,9 @@ export class AdkLiveService {
     if (data.serverContent?.interrupted) {
       // Dump the audio queue immediately 
       this.clearAudioQueue();
+      if (this.onInterrupted) {
+        this.ngZone.run(() => this.onInterrupted!());
+      }
     }
   }
   
@@ -327,6 +331,10 @@ export class AdkLiveService {
 
   stopListening() {
     this.isListening.set(false);
+  }
+
+  interrupt() {
+    this.clearAudioQueue();
   }
 
   sendText(text: string) {

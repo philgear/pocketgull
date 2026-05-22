@@ -558,6 +558,9 @@ export class VoiceAssistantComponent implements OnDestroy {
             this.live.onModelTurnComplete = () => {
                 this._finalizeModelTurn();
             };
+            this.live.onInterrupted = () => {
+                this._finalizeModelTurn();
+            };
             
             // Setup local STT purely for UI feedback since Live API doesn't echo user speech
             const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -566,6 +569,12 @@ export class VoiceAssistantComponent implements OnDestroy {
                 this.recognition.continuous = true;
                 this.recognition.interimResults = true;
                 this.recognition.lang = 'en-US';
+                
+                this.recognition.onspeechstart = () => {
+                    if (this.live.isSpeaking()) {
+                        this.live.interrupt();
+                    }
+                };
                 
                 this.recognition.onresult = (event: any) => {
                     let interim = '';
@@ -873,6 +882,10 @@ Only include a rich-media block when the user explicitly requests visual or rese
         const message = this.messageText().trim();
         const files = this.selectedFiles();
         if ((!message && files.length === 0) || this.agentState() !== 'idle') return;
+
+        if (this.live.isSpeaking()) {
+            this.live.interrupt();
+        }
 
         this.messageText.set('');
         this.selectedFiles.set([]);
