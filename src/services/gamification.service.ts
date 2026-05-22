@@ -166,7 +166,7 @@ export class GamificationService {
   });
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
       const savedPoints = localStorage.getItem('pg_game_points');
       const savedQuests = localStorage.getItem('pg_game_quests');
       if (savedPoints) {

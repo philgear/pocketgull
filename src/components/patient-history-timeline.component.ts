@@ -189,7 +189,7 @@ const ICONS: Record<string, string> = {
                         [class.dark:border-zinc-800]="true">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400 uppercase tracking-[0.1em] border border-brand-blue-100 dark:border-brand-blue-800/50">IPatient Summary</span>
+                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400 uppercase tracking-[0.1em] border border-brand-blue-100 dark:border-brand-blue-800/50">Patient Summary</span>
                         <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
                     <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-bold">{{ entry.summary }}</p>

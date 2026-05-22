@@ -1,3 +1,5 @@
+process.env['OTEL_SDK_DISABLED'] = 'true';
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -241,6 +243,15 @@ app.get('/api/pubmed/summary', async (req, res) => {
     res.json(data);
   } catch (err: any) {
     console.error('PubMed Summary Proxy Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/config', async (req, res) => {
+  try {
+    const key = await getApiKey(req);
+    res.json({ apiKey: key });
+  } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
 });
@@ -595,7 +606,7 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
       console.log(`[Socket.IO] ${socket.id} joined patient room: ${patientId}`);
     });
 
-    // Real-time Vitals Sync
+    // Real-time IVitals Sync
     socket.on('sync_vitals', (data: { patientId: string, vitals: any }) => {
       socket.to(data.patientId).emit('vitals_updated', data.vitals);
     });

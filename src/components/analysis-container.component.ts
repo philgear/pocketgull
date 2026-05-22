@@ -22,8 +22,80 @@ import { GamificationService } from '../services/gamification.service';
       <div class="flex-1 flex flex-col min-w-0">
         
         <!-- Top Toolbar / Header -->
-        <div class="h-16 bg-white dark:bg-[#09090b] border-b border-gray-200 dark:border-zinc-800 flex items-center justify-end px-6 shrink-0 relative z-10">
+        <div class="h-16 bg-white dark:bg-[#09090b] border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 shrink-0 relative z-10">
             
+          <!-- Philosophy Selector -->
+          <div class="flex items-center gap-1 bg-gray-50 dark:bg-zinc-900/40 p-1 rounded-xl border border-gray-200/60 dark:border-zinc-800/80">
+            <button (click)="selectPhilosophy('western')"
+              class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
+              [class.bg-white]="state.activePhilosophy() === 'western'"
+              [class.dark:bg-zinc-800]="state.activePhilosophy() === 'western'"
+              [class.text-sky-600]="state.activePhilosophy() === 'western'"
+              [class.dark:text-sky-400]="state.activePhilosophy() === 'western'"
+              [class.shadow-sm]="state.activePhilosophy() === 'western'"
+              [class.border]="state.activePhilosophy() === 'western'"
+              [class.border-gray-200/50]="state.activePhilosophy() === 'western'"
+              [class.dark:border-zinc-700/50]="state.activePhilosophy() === 'western'"
+              [class.text-gray-500]="state.activePhilosophy() !== 'western'"
+              [class.dark:text-zinc-400]="state.activePhilosophy() !== 'western'"
+              [class.hover:text-gray-700]="state.activePhilosophy() !== 'western'"
+              [class.dark:hover:text-zinc-200]="state.activePhilosophy() !== 'western'">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+              Western
+            </button>
+            <button (click)="selectPhilosophy('eastern')"
+              class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
+              [class.bg-white]="state.activePhilosophy() === 'eastern'"
+              [class.dark:bg-zinc-800]="state.activePhilosophy() === 'eastern'"
+              [class.text-emerald-600]="state.activePhilosophy() === 'eastern'"
+              [class.dark:text-emerald-400]="state.activePhilosophy() === 'eastern'"
+              [class.shadow-sm]="state.activePhilosophy() === 'eastern'"
+              [class.border]="state.activePhilosophy() === 'eastern'"
+              [class.border-gray-200/50]="state.activePhilosophy() === 'eastern'"
+              [class.dark:border-zinc-700/50]="state.activePhilosophy() === 'eastern'"
+              [class.text-gray-500]="state.activePhilosophy() !== 'eastern'"
+              [class.dark:text-zinc-400]="state.activePhilosophy() !== 'eastern'"
+              [class.hover:text-gray-700]="state.activePhilosophy() !== 'eastern'"
+              [class.dark:hover:text-zinc-200]="state.activePhilosophy() !== 'eastern'">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Eastern (TCM)
+            </button>
+            <button (click)="selectPhilosophy('ayurvedic')"
+              class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
+              [class.bg-white]="state.activePhilosophy() === 'ayurvedic'"
+              [class.dark:bg-zinc-800]="state.activePhilosophy() === 'ayurvedic'"
+              [class.text-amber-600]="state.activePhilosophy() === 'ayurvedic'"
+              [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'"
+              [class.shadow-sm]="state.activePhilosophy() === 'ayurvedic'"
+              [class.border]="state.activePhilosophy() === 'ayurvedic'"
+              [class.border-gray-200/50]="state.activePhilosophy() === 'ayurvedic'"
+              [class.dark:border-zinc-700/50]="state.activePhilosophy() === 'ayurvedic'"
+              [class.text-gray-500]="state.activePhilosophy() !== 'ayurvedic'"
+              [class.dark:text-zinc-400]="state.activePhilosophy() !== 'ayurvedic'"
+              [class.hover:text-gray-700]="state.activePhilosophy() !== 'ayurvedic'"
+              [class.dark:hover:text-zinc-200]="state.activePhilosophy() !== 'ayurvedic'">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              Ayurvedic
+            </button>
+            <button (click)="selectPhilosophy('grow-thy-self')"
+              class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
+              [class.bg-white]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.dark:bg-zinc-800]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.text-indigo-600]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.shadow-sm]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.border]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.border-gray-200/50]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.dark:border-zinc-700/50]="state.activePhilosophy() === 'grow-thy-self'"
+              [class.text-gray-500]="state.activePhilosophy() !== 'grow-thy-self'"
+              [class.dark:text-zinc-400]="state.activePhilosophy() !== 'grow-thy-self'"
+              [class.hover:text-gray-700]="state.activePhilosophy() !== 'grow-thy-self'"
+              [class.dark:hover:text-indigo-200]="state.activePhilosophy() !== 'grow-thy-self'">
+              <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+              Grow Thy Self
+            </button>
+          </div>
+
           <!-- Export Actions & Status -->
           <div class="flex items-center gap-4">
             @if (justGenerated() && hasReport() && !intelligence.isLoading()) {
@@ -44,7 +116,7 @@ import { GamificationService } from '../services/gamification.service';
                 variant="primary"
                 size="sm"
                 [icon]="hasReport() ? 'M17.65 6.35A7.95 7.95 0 0 0 12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.66-.67 3.17-1.76 4.24l1.42 1.42A9.92 9.92 0 0 0 22 12c0-2.76-1.12-5.26-2.35-7.65z' : 'M14 5l7 7m0 0l-7 7m7-7H3'">
-                {{ hasReport() ? 'Refresh Analysis' : 'Generate IPatient Summary' }}
+                {{ hasReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}
               </pocket-gull-button>
             }
           </div>
@@ -104,6 +176,10 @@ export class AnalysisContainerComponent {
     if (this.reportComp) {
       this.reportComp.generate();
     }
+  }
+
+  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self') {
+    this.state.selectPhilosophy(philosophy);
   }
 
   hasReport = computed(() => Object.keys(this.intelligence.analysisResults()).length > 0);

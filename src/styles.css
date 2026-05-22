@@ -1538,3 +1538,20 @@ html.reduce-motion *::after {
   transition-duration: 0.01ms !important;
   scroll-behavior: auto !important;
 }
+
+/* Good Samaritan CPR Visual Metronome Flash */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border: 5px solid rgba(239, 68, 68, 0.8);
+  box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.5);
+  opacity: 0;
+  transition: opacity 100ms ease-out;
+}
+body.cpr-flash::after {
+  opacity: 1;
+  transition: none; /* Instant on, fade out */
+}

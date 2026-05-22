@@ -1,1 +1,3 @@
 npm audit --audit-level=high
+npm run precommit
+

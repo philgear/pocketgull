@@ -174,7 +174,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
                         size="xs"
                         (click)="addToPatientSummary()"
                         icon="M12 5v14M5 12h14">
-                        Add to IPatient Summary
+                        Add to Patient Summary
                       </pocket-gull-button>
                     }
                   </div>

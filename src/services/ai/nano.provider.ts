@@ -45,7 +45,7 @@ export class NanoProvider implements IIntelligenceProvider {
       systemPrompt: systemInstruction
     });
 
-    const prompt = `IPatient Data:\n${patientData}\n\nTask: Generate a highly clinical report specifically for the following scope: [${lens}]. Formulate it purely as markdown.`;
+    const prompt = `Patient Data:\n${patientData}\n\nTask: Generate a highly clinical report specifically for the following scope: [${lens}]. Formulate it purely as markdown.`;
     
     let previousChunk = '';
     const stream = await session.promptStreaming(prompt);
@@ -101,7 +101,7 @@ export class NanoProvider implements IIntelligenceProvider {
   async startChat(patientData: string, context: string): Promise<void> {
     await this.ensureAiAvailable();
     this.chatSession = await window.ai!.languageModel!.create({
-      systemPrompt: `IPatient Context:\n${patientData}\n\nClinical Role:\n${context}`
+      systemPrompt: `Patient Context:\n${patientData}\n\nClinical Role:\n${context}`
     });
   }
 

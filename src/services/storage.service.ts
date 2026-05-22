@@ -95,7 +95,7 @@ export class StorageService {
     }
   }
 
-  // --- IPatient Roster Operations ---
+  // --- Patient Roster Operations ---
   async loadPatients(): Promise<any[]> {
     if (!this.isBrowser) return [];
     try {

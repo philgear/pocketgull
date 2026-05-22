@@ -42,4 +42,31 @@ As a clinical co-pilot, Pocket Gull operates under strict security and data-hand
 - **Secrets Management**: API keys (e.g., `GEMINI_API_KEY`) must never be committed to version control. They are injected strictly via Google Cloud Secret Manager at runtime or via local `.env` files.
 - **No Unsigned Binaries**: The build pipeline only permits verified and audited Node modules.
 
+---
+
+## Clinical Engineering & Risk Management Guidelines
+
+To manage the long-term lifecycle and infrastructure safety of Understory, we adhere to the following core software engineering and operational risk practices:
+
+### 1. "Shift-Left" Risk Detection
+Google’s engineering practices emphasize "Shifting Left" to identify security risks and bugs as early as possible.
+- **Automated CI Scanning**: Fully integrate CodeQL code scanning and Dependabot into our GitHub Actions / CI pipeline.
+- **Pre-Deployment Auditing**: Automate vulnerability checks in the Angular frontend and Express.js backend before any container deployment to Google Cloud Run.
+
+### 2. Architect for Failure in Compute Services
+Because the application runs on serverless Google Cloud Run (Compute as a Service), instances are transient and can crash or restart unexpectedly.
+- **Zero Remote Database Dependency**: Data risk is minimized by relying on local browser persistence and exporting patient records as FHIR bundles rather than using a centralized database.
+- **Resilient AI Interchanges**: Future roadmaps include automated Disaster Recovery and Chaos Engineering tests to ensure the UI gracefully handles dropped, throttled, or timed-out inference requests to the Google Gemini API.
+
+### 3. Dependency Compatibility & Risk Management
+Modern web applications rely heavily on a complex web of packages (e.g., Angular v21.1, Three.js, Tailwind CSS, and Google GenAI SDK).
+- **Stability Over "Live at Head"**: To safeguard clinical workflows from unexpected regressions, we actively track the "Compatibility Promises" of upstream frameworks and pin critical packages rather than automatically updating to the latest head.
+
+### 4. Mitigating the "Bus Factor"
+The "Bus Factor" represents the project risk of having sole maintainers on critical systems (e.g., NIH PubMed E-utilities XML parsing, Express backend proxies, AI orchestration, and 3D anatomical body mapping).
+- **Canonical Sources of Information**: Maintain rigorous, central documentation in the repository (such as this `SECURITY.md` policy).
+- **Standardized Code Reviews**: Enforce pull-request reviews on orchestrators and rendering pipelines to ensure codebase familiarity is shared across contributors.
+
+---
+
 Thank you for helping us keep the clinical ocean safe and secure.

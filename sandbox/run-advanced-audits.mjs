@@ -4,11 +4,15 @@ import fs from 'fs';
 
 async function runAdvancedAudits() {
     console.log('Starting advanced accessibility sweeps...');
-    const browser = await puppeteer.launch({ headless: 'new', args: ['--remote-debugging-port=9222'] });
+    const browser = await puppeteer.launch({ 
+        headless: 'new', 
+        args: ['--remote-debugging-port=9222', '--no-sandbox', '--disable-setuid-sandbox'] 
+    });
     const page = await browser.newPage();
     
     // Setup for deeper state testing
-    await page.goto('http://localhost:4200', { waitUntil: 'networkidle2' });
+    const port = process.env.PORT || 4200;
+    await page.goto(`http://localhost:${port}`, { waitUntil: 'networkidle2' });
     
     console.log('\n--- 1. Axe-core Deep Scan (Demo Mode / Active State) ---');
     // Enable demo mode to populate the UI with actual patient data and interactive elements
@@ -44,7 +48,7 @@ async function runAdvancedAudits() {
 
     console.log('\n--- 2. Keyboard Navigation Traversal Audit ---');
     // Reload cleanly to test tab flow
-    await page.goto('http://localhost:4200', { waitUntil: 'networkidle2' });
+    await page.goto(`http://localhost:${port}`, { waitUntil: 'networkidle2' });
     
     const focusableElements = await page.evaluate(() => {
         const nodes = document.querySelectorAll('a[href], button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])');

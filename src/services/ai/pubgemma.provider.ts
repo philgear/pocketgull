@@ -126,7 +126,7 @@ export class PubGemmaProvider implements IIntelligenceProvider {
       `Identify any discrepancies, unsupported claims, or red flags compared to the patient data.\n` +
       `List issues as JSON array: [{"field":"...","severity":"warning"|"error","message":"..."}]\n` +
       `If no issues, return an empty array []. Return ONLY the JSON array.\n\n` +
-      `IPatient Data:\n${sourceData.slice(0, 1500)}\n\nCare Plan Section:\n${content.slice(0, 1500)}`;
+      `Patient Data:\n${sourceData.slice(0, 1500)}\n\nCare Plan Section:\n${content.slice(0, 1500)}`;
     try {
       const raw = await this.ollamaPrompt(prompt);
       const match = raw.match(/\[[\s\S]*\]/);
@@ -196,7 +196,7 @@ export class PubGemmaProvider implements IIntelligenceProvider {
   }
 
   async startChat(patientData: string, context: string): Promise<void> {
-    this.chatContext = `IPatient Context: ${patientData}\nRole: ${context}`;
+    this.chatContext = `Patient Context: ${patientData}\nRole: ${context}`;
   }
 
   async sendMessage(message: string, files?: File[]): Promise<string> {

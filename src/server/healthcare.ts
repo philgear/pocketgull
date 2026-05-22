@@ -365,7 +365,7 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
 
 /**
  * GET /api/healthcare/fhir/import/:id
- * Fetches patient, conditions, and observations from the GCP Healthcare FHIR Store and maps them back to PocketGull IPatient format.
+ * Fetches patient, conditions, and observations from the GCP Healthcare FHIR Store and maps them back to PocketGull Patient format.
  */
 healthcareRouter.get('/fhir/import/:id', async (req, res) => {
    try {

@@ -21,6 +21,7 @@ steps:
       - '--platform'
       - 'managed'
       - '--set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'
+      - '--set-env-vars=OTEL_SDK_DISABLED=true'
       - '--allow-unauthenticated'
 
 images:

@@ -64,8 +64,11 @@ export class HardwareTelemetryService {
       return 'local-nvidia';
     }
 
-    // WebGPU/WebLLM works beautifully on Apple Silicon (Universal memory) and AMD/Intel with high VRAM
-    if ((gpu.vendor === 'apple' || gpu.vendor === 'amd' || gpu.vendor === 'intel') && gpu.memoryTotalMiB >= 6000) {
+    // WebGPU/WebLLM works beautifully on Apple Silicon (Unified memory) and AMD/Intel with high VRAM
+    if (gpu.vendor === 'apple' && gpu.memoryTotalMiB >= 2000) {
+      return 'local-webgpu';
+    }
+    if ((gpu.vendor === 'amd' || gpu.vendor === 'intel') && gpu.memoryTotalMiB >= 6000) {
       return 'local-webgpu';
     }
 

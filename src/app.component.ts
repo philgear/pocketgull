@@ -22,7 +22,7 @@ import { NetworkStateService } from './services/network-state.service';
 import { HardwareTelemetryService } from './services/hardware-telemetry.service';
 import { ExportService } from './services/export.service';
 import { RevealDirective } from './directives/reveal.directive';
-import { DEMO_ANALYSIS_REPORT } from './demo-data';
+import { DEMO_ANALYSIS_REPORT_WESTERN } from './demo-data';
 import { PatientDirectoryComponent } from './components/patient-directory.component';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
@@ -89,13 +89,14 @@ import { SwUpdate } from '@angular/service-worker';
       <!-- Collaboration Dock -->
       <app-collaboration-dock></app-collaboration-dock>
       
-      @if (session.isLocked() || !hasApiKey()) {
+      @if ((session.isLocked() || !hasApiKey()) && !state.isEmergencyMode()) {
         <app-secure-splash
           [apiKeyError]="apiKeyError()"
           [hasApiKey]="hasApiKey()"
           (submitKey)="apiKeyInput.set($event); submitApiKey()"
           (loadDemo)="loadDemoMode()"
-          (selectAiStudio)="selectKey()">
+          (selectAiStudio)="selectKey()"
+          (emergencyBypass)="handleEmergencyBypass()">
         </app-secure-splash>
       } @else {
         <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
@@ -568,7 +569,7 @@ import { SwUpdate } from '@angular/service-worker';
           </div>
         </nav>
 
-        <!-- New IPatient Navigation Bar -->
+        <!-- New Patient Navigation Bar -->
         <nav class="h-12 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center px-3 sm:px-6 shrink-0 bg-gray-50 dark:bg-[#09090b] z-40 no-print gap-4">
            <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:block">INTAKE MODULE 01</div>
            <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
@@ -777,7 +778,7 @@ import { SwUpdate } from '@angular/service-worker';
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
                  @if (theme.currentTheme() === 'spark') {
-                   <app-avs-therapy id="tour-avs-therapy" class="block w-full flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300 md:mb-6 mb-3"></app-avs-therapy>
+                   <app-avs-therapy class="block w-full flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300 md:mb-6 mb-3"></app-avs-therapy>
                  }
 
                  <!-- Section 1: Analysis Intake Container -->
@@ -1180,7 +1181,7 @@ export class AppComponent implements OnDestroy {
   private aiConfig = inject(AI_CONFIG, { optional: true });
   today = new Date();
   hasApiKey = signal<boolean>(!!this.aiConfig?.apiKey);
-  isDemoMode = signal<boolean>(false);
+  isDemoMode = this.state.isDemoMode;
   apiKeyInput = signal<string>('');
   showPassword = signal<boolean>(false);
   apiKeyError = signal<string | null>(null);
@@ -1373,7 +1374,7 @@ export class AppComponent implements OnDestroy {
       });
 
       if (!response.ok && response.status === 404) {
-        console.log('[Google Health Import] Patient not found in FHIR Store. Auto-provisioning patient record first...');
+        console.log('[Google Health Import] IPatient not found in FHIR Store. Auto-provisioning patient record first...');
         // Auto-provision (export) local patient details
         const exportRes = await fetch('/api/healthcare/fhir/export', {
           method: 'POST',
@@ -1550,7 +1551,7 @@ export class AppComponent implements OnDestroy {
       plan = plan ? `${plan}\n\n### ${ClinicalIcons.Medication} Medications\n${medsContent}` : `### ${ClinicalIcons.Medication} Medications\n${medsContent}`;
     }
     
-    const finalText = plan || 'No Active IPatient Summary recorded for this visit.';
+    const finalText = plan || 'No Active Patient Summary recorded for this visit.';
     this.previewText.set(finalText);
     this.originalPreviewText.set(finalText);
     this.selectedReadingLevel.set('standard');
@@ -1643,7 +1644,7 @@ export class AppComponent implements OnDestroy {
 
       this.export.downloadCarePlanPdf(
         '',
-        p?.name ?? 'IPatient',
+        p?.name ?? 'Patient',
         {
           bp: vitals.bp || undefined,
           hr: vitals.hr || undefined,
@@ -1657,7 +1658,7 @@ export class AppComponent implements OnDestroy {
     } else {
       this.export.downloadCarePlanPdf(
         textToPrint,
-        p?.name ?? 'IPatient',
+        p?.name ?? 'Patient',
         {
           bp: vitals.bp || undefined,
           hr: vitals.hr || undefined,
@@ -2150,10 +2151,54 @@ export class AppComponent implements OnDestroy {
     this.patientMgmt.selectPatient('p002');
     // Inject pre-baked analysis outputs (no API call)
     setTimeout(() => {
-      this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT);
+      this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT_WESTERN);
+      this.clinicalIntelligence.lastActivePhilosophy.set('western');
+      this.clinicalIntelligence.lastPatientData.set(this.state.getAllDataForPrompt());
       // Start tour after data is loaded so targets exist in DOM
       setTimeout(() => this.tour.start(), 400);
     }, 350);
+  }
+
+  handleEmergencyBypass() {
+    this.state.isEmergencyMode.set(true);
+    this.state.clearState();
+
+    const emergencyPatient: any = {
+      id: 'emergency_casualty',
+      name: 'Emergency Casualty',
+      age: 30,
+      gender: 'Other',
+      lastVisit: new Date().toISOString(),
+      preexistingConditions: [],
+      history: [],
+      bookmarks: [],
+      issues: {},
+      patientGoals: 'Immediate trauma and emergency life support bypass mode.',
+      dietaryProtocol: '',
+      vitals: {
+        bp: '', hr: '', temp: '', spO2: '', weight: '', height: '',
+        vitC: '', vitD3: '', magnesium: '', zinc: '', b12: ''
+      },
+      dynamicNutrients: [],
+      oxidativeStressMarkers: [],
+      antioxidantSources: [],
+      medications: [],
+      clinicalNotes: [],
+      checklist: [],
+      shoppingList: []
+    };
+
+    const currentPatients = this.patientMgmt.patients();
+    if (!currentPatients.some(p => p.id === 'emergency_casualty')) {
+      const patientsSignal = this.patientMgmt.patients as any;
+      if (typeof patientsSignal.update === 'function') {
+        patientsSignal.update((list: any[]) => [...list, emergencyPatient]);
+      }
+    }
+
+    this.patientMgmt.selectedPatientId.set('emergency_casualty');
+    this.state.loadState(emergencyPatient);
+    this.session.isLocked.set(false);
   }
 
   exitDemoMode() {

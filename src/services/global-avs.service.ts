@@ -5,6 +5,7 @@ import {
   untracked,
   PLATFORM_ID,
   NgZone,
+  signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from './patient-state.service';
@@ -30,6 +31,10 @@ export class GlobalAvsService {
   private readonly zone = inject(NgZone);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
+
+  // ── CPR Metronome ──────────────────────────────────────────────
+  private cprIntervalId: any = null;
+  readonly isCprMetronomeActive = signal(false);
 
   // ── Audio graph nodes ──────────────────────────────────────────
   private ctx: AudioContext | null = null;
@@ -307,5 +312,70 @@ export class GlobalAvsService {
 
   private audioTime(): number {
     return this.ctx?.currentTime ?? 0;
+  }
+
+  // ── CPR Metronome Implementation ───────────────────────────────
+  startCprMetronome(): void {
+    if (!this.isBrowser) return;
+    if (this.cprIntervalId) return;
+
+    this.isCprMetronomeActive.set(true);
+    const intervalMs = 60000 / 110; // ~545.45 ms
+
+    // Trigger immediately on start
+    this.playCprClick();
+
+    this.cprIntervalId = setInterval(() => {
+      this.playCprClick();
+    }, intervalMs);
+  }
+
+  stopCprMetronome(): void {
+    if (this.cprIntervalId) {
+      clearInterval(this.cprIntervalId);
+      this.cprIntervalId = null;
+    }
+    this.isCprMetronomeActive.set(false);
+    if (this.isBrowser) {
+      document.body.classList.remove('cpr-flash');
+    }
+  }
+
+  playCprClick(): void {
+    if (!this.isBrowser) return;
+
+    // Trigger visual flash
+    document.body.classList.add('cpr-flash');
+    setTimeout(() => {
+      document.body.classList.remove('cpr-flash');
+    }, 100);
+
+    // Audio click
+    try {
+      if (!this.ctx || this.ctx.state === 'closed') {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        this.ctx = new AudioContextClass();
+      }
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.1);
+    } catch (e) {
+      console.warn('[GlobalAvsService] CPR audio click failed:', e);
+    }
   }
 }

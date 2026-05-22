@@ -14,7 +14,7 @@ export class VerifyAiService {
     private async getAi(): Promise<any> {
         if (!this._ai) {
             let initialKey = (window as any).GEMINI_API_KEY || this.config.apiKey;
-            if (!initialKey && typeof localStorage !== 'undefined') {
+            if (!initialKey && typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
                 try {
                     initialKey = localStorage.getItem('GEMINI_API_KEY');
                 } catch (e) { console.error("VerifyAiService: localStorage error", e); }

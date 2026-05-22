@@ -132,8 +132,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </div>
                 </section>
 
-                <!-- Vitals Grid -->
-                <!-- Vitals & Biometrics -->
+                <!-- IVitals Grid -->
+                <!-- IVitals & Biometrics -->
                 <section>
                     <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-6">Biometric Telemetry</h2>
                 </section>
@@ -519,7 +519,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     }
                 </section>
 
-                <!-- IPatient Trends Chart -->
+                <!-- Patient Trends Chart -->
                 @defer (on viewport) {
                   <section>
                       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -1175,7 +1175,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
 
     if (draftItems && draftItems.length > 0) {
-      if (confirm('Discard your draft modifications and revert to the saved IPatient Summary?')) {
+      if (confirm('Discard your draft modifications and revert to the saved Patient Summary?')) {
         this.state.clearDraftSummaryItems();
       }
     }
@@ -1186,7 +1186,7 @@ export class MedicalChartSummaryComponent {
     const draftItems = this.state.draftSummaryItems();
     if (draftItems.length > 0) {
       const newContent = draftItems.map(item => `- ${item.text}`).join('\n');
-      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### IPatient Summary\n${newContent}`;
+      plan = plan ? `${plan}\n\n### Added ${new Date().toLocaleDateString()}\n${newContent}` : `### Patient Summary\n${newContent}`;
       this.state.updateActivePatientSummary(plan);
       this.state.clearDraftSummaryItems();
     }

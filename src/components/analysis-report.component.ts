@@ -7,6 +7,8 @@ import { HistoryEntry } from '../services/patient.types';
 import { MarkdownService } from '../services/markdown.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { DictationService } from '../services/dictation.service';
+import { generate } from 'lean-qr';
+import { GlobalAvsService } from '../services/global-avs.service';
 
 declare var webkitSpeechRecognition: any;
 import { ISummaryNode, ISummaryNodeItem, IReportSection, IParsedTranscriptEntry, NodeAnnotation, LensAnnotations, IVerificationIssue } from './analysis-report.types';
@@ -40,7 +42,7 @@ import { MemoryPalaceComponent } from './memory-palace.component';
 
 
     <!--Analysis Tabs-->
-    @if (hasAnyReport()) {
+    @if (hasAnyReport() || state.isEmergencyMode()) {
       <div class="px-4 sm:px-8 py-2 sm:py-3 no-print overflow-x-auto w-full">
         <div class="max-w-4xl mx-auto min-w-0 relative">
           <div id="tour-lens-tabs" class="flex overflow-x-auto hide-scrollbar items-center gap-1 border-b border-gray-300 dark:border-zinc-700 w-full relative z-10">
@@ -48,79 +50,78 @@ import { MemoryPalaceComponent } from './memory-palace.component';
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Summary Overview'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Summary Overview'"
-            [class.dark:border-white]="activeLens() === 'Summary Overview'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Summary Overview'"
-            [class.dark:text-white]="activeLens() === 'Summary Overview'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            [class.border-transparent]="activeLens() !== 'Summary Overview'"
+            [ngClass]="activeLens() === 'Summary Overview' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
             Overview
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Functional Protocols')"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Functional Protocols'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Functional Protocols'"
-            [class.dark:border-white]="activeLens() === 'Functional Protocols'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Functional Protocols'"
-            [class.dark:text-white]="activeLens() === 'Functional Protocols'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            [class.border-transparent]="activeLens() !== 'Functional Protocols'"
+            [ngClass]="activeLens() === 'Functional Protocols' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
             Functional Protocols
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Nutrition')"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Nutrition'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Nutrition'"
-            [class.dark:border-white]="activeLens() === 'Nutrition'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Nutrition'"
-            [class.dark:text-white]="activeLens() === 'Nutrition'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            [class.border-transparent]="activeLens() !== 'Nutrition'"
+            [ngClass]="activeLens() === 'Nutrition' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
             Nutrition
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Orthomolecular Profiling')"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Orthomolecular Profiling'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Orthomolecular Profiling'"
-            [class.dark:border-white]="activeLens() === 'Orthomolecular Profiling'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Orthomolecular Profiling'"
-            [class.dark:text-white]="activeLens() === 'Orthomolecular Profiling'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            [class.border-transparent]="activeLens() !== 'Orthomolecular Profiling'"
+            [ngClass]="activeLens() === 'Orthomolecular Profiling' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
             Orthomolecular Profiling
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Monitoring & Follow-up')"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Monitoring & Follow-up'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Monitoring & Follow-up'"
-            [class.dark:border-white]="activeLens() === 'Monitoring & Follow-up'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Monitoring & Follow-up'"
-            [class.dark:text-white]="activeLens() === 'Monitoring & Follow-up'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            [class.border-transparent]="activeLens() !== 'Monitoring & Follow-up'"
+            [ngClass]="activeLens() === 'Monitoring & Follow-up' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
             Monitoring & Follow-up
           </pocket-gull-button>
-          <pocket-gull-button (click)="changeLens('IPatient Education')"
+          <pocket-gull-button (click)="changeLens('Patient Education')"
             variant="ghost"
             size="sm"
-            [class.border-b-2]="activeLens() === 'IPatient Education'"
-            [class.border-[#1C1C1C]]="activeLens() === 'IPatient Education'"
-            [class.dark:border-white]="activeLens() === 'IPatient Education'"
-            [class.text-[#1C1C1C]]="activeLens() === 'IPatient Education'"
-            [class.dark:text-white]="activeLens() === 'IPatient Education'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
-            IPatient Education
+            [class.border-b-2]="activeLens() === 'Patient Education'"
+            [class.border-transparent]="activeLens() !== 'Patient Education'"
+            [ngClass]="activeLens() === 'Patient Education' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
+            Patient Education
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Memory Palace')"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Memory Palace'"
-            [class.border-[#1C1C1C]]="activeLens() === 'Memory Palace'"
-            [class.dark:border-white]="activeLens() === 'Memory Palace'"
-            [class.text-[#1C1C1C]]="activeLens() === 'Memory Palace'"
-            [class.dark:text-white]="activeLens() === 'Memory Palace'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap">
+            [class.border-transparent]="activeLens() !== 'Memory Palace'"
+            [ngClass]="activeLens() === 'Memory Palace' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
+            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
             Memory Palace
           </pocket-gull-button>
+          @if (state.isEmergencyMode()) {
+            <pocket-gull-button (click)="changeLens('EMT Handoff')"
+              variant="ghost"
+              size="sm"
+              [class.border-b-2]="activeLens() === 'EMT Handoff'"
+              [class.border-[#EF4444]]="activeLens() === 'EMT Handoff'"
+              [class.dark:border-red-500]="activeLens() === 'EMT Handoff'"
+              [class.text-red-600]="activeLens() === 'EMT Handoff'"
+              [class.dark:text-red-400]="activeLens() === 'EMT Handoff'"
+              class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap font-bold">
+              🚑 EMT Handoff
+            </pocket-gull-button>
+          }
         </div>
         </div>
       </div>
@@ -130,8 +131,80 @@ import { MemoryPalaceComponent } from './memory-palace.component';
     <div #contentArea class="flex-1 mx-4 sm:mx-8 mb-6 mt-2 overflow-y-auto overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 min-h-0">
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
+        
+        <!-- Active Medicine Mode Info Banner -->
+        @if (hasAnyReport() && activeLens() !== 'Memory Palace' && activeLens() !== 'EMT Handoff') {
+          <div class="mb-6 p-4 rounded-xl border transition-all duration-300"
+               [class.bg-sky-50\/40]="state.activePhilosophy() === 'western'"
+               [class.border-sky-200\/60]="state.activePhilosophy() === 'western'"
+               [class.dark:bg-sky-950\/10]="state.activePhilosophy() === 'western'"
+               [class.dark:border-sky-900\/30]="state.activePhilosophy() === 'western'"
+               
+               [class.bg-emerald-50\/40]="state.activePhilosophy() === 'eastern'"
+               [class.border-emerald-200\/60]="state.activePhilosophy() === 'eastern'"
+               [class.dark:bg-emerald-950\/10]="state.activePhilosophy() === 'eastern'"
+               [class.dark:border-emerald-900\/30]="state.activePhilosophy() === 'eastern'"
+               
+               [class.bg-amber-50\/40]="state.activePhilosophy() === 'ayurvedic'"
+               [class.border-amber-200\/60]="state.activePhilosophy() === 'ayurvedic'"
+               [class.dark:bg-amber-950\/10]="state.activePhilosophy() === 'ayurvedic'"
+               [class.dark:border-amber-900\/30]="state.activePhilosophy() === 'ayurvedic'"
+               
+               [class.bg-indigo-50\/40]="state.activePhilosophy() === 'grow-thy-self'"
+               [class.border-indigo-200\/60]="state.activePhilosophy() === 'grow-thy-self'"
+               [class.dark:bg-indigo-950\/10]="state.activePhilosophy() === 'grow-thy-self'"
+               [class.dark:border-indigo-900\/30]="state.activePhilosophy() === 'grow-thy-self'">
+            
+            <div class="flex items-center gap-3">
+              <!-- Animated Accent Indicator Dot -->
+              <span class="relative flex h-2.5 w-2.5 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                      [class.bg-sky-400]="state.activePhilosophy() === 'western'"
+                      [class.bg-emerald-400]="state.activePhilosophy() === 'eastern'"
+                      [class.bg-amber-400]="state.activePhilosophy() === 'ayurvedic'"
+                      [class.bg-indigo-400]="state.activePhilosophy() === 'grow-thy-self'"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5"
+                      [class.bg-sky-500]="state.activePhilosophy() === 'western'"
+                      [class.bg-emerald-500]="state.activePhilosophy() === 'eastern'"
+                      [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"
+                      [class.bg-indigo-500]="state.activePhilosophy() === 'grow-thy-self'"></span>
+              </span>
+              
+              <div class="flex-1 min-w-0">
+                <span class="text-[10px] font-bold uppercase tracking-widest"
+                      [class.text-sky-700]="state.activePhilosophy() === 'western'"
+                      [class.dark:text-sky-400]="state.activePhilosophy() === 'western'"
+                      [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
+                      [class.dark:text-emerald-400]="state.activePhilosophy() === 'eastern'"
+                      [class.text-amber-700]="state.activePhilosophy() === 'ayurvedic'"
+                      [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'"
+                      [class.text-indigo-700]="state.activePhilosophy() === 'grow-thy-self'"
+                      [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'">
+                  Active Paradigm: 
+                  @if (state.activePhilosophy() === 'western') { Western (Allopathic) }
+                  @else if (state.activePhilosophy() === 'eastern') { Eastern (Traditional Chinese Medicine) }
+                  @else if (state.activePhilosophy() === 'ayurvedic') { Ayurvedic Medicine }
+                  @else if (state.activePhilosophy() === 'grow-thy-self') { Grow Thy Self (Preventive & Longevity) }
+                </span>
+                
+                <p class="text-xs mt-1 text-gray-600 dark:text-zinc-400 leading-relaxed font-sans">
+                  @if (state.activePhilosophy() === 'western') {
+                    Analyzing case telemetry under FDA and WHO pharmacotherapy reference standards, prioritizing conventional allopathic diagnostics.
+                  } @else if (state.activePhilosophy() === 'eastern') {
+                    Synthesizing patient history, symptoms, and vitals through TCM organ disharmonies, meridian flow, and energetic herbal/dietary dynamics.
+                  } @else if (state.activePhilosophy() === 'ayurvedic') {
+                    Mapping biomarkers and constitutional trends to the Tridosha framework (Vata/Pitta/Kapha), evaluating Agni (digestive fire) and Ama (cellular load).
+                  } @else if (state.activePhilosophy() === 'grow-thy-self') {
+                    Optimizing functional longevity, cell vitality, and circadian alignment by integrating 13 historical and contemporary global wisdom frameworks.
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+        }
+
         <!--Clinical Overview Dashboard-->
-        @if (activeLens() !== 'Memory Palace' && intel.analysisMetrics(); as metrics) {
+        @if (activeLens() !== 'Memory Palace' && activeLens() !== 'EMT Handoff' && intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
             <div class="col-span-full mb-2">
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
@@ -148,7 +221,7 @@ import { MemoryPalaceComponent } from './memory-palace.component';
               label="Stability"
               [value]="metrics.stability"
               type="stability"
-              description="IPatient physiological and functional compensatory status.">
+              description="Patient physiological and functional compensatory status.">
             </app-clinical-gauge>
 
             <app-clinical-gauge
@@ -195,13 +268,118 @@ import { MemoryPalaceComponent } from './memory-palace.component';
           <app-memory-palace></app-memory-palace>
         }
 
+        <!-- EMT Handoff Component/Layout -->
+        @if (activeLens() === 'EMT Handoff') {
+          <div class="flex flex-col gap-6">
+            <!-- Crimson alert banner -->
+            <div class="p-4 bg-red-955/40 border border-red-800/60 rounded-xl text-red-200 text-xs flex items-center justify-between shadow-inner">
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">🚨</span>
+                <div>
+                  <h4 class="font-bold uppercase tracking-wider text-red-400">Offline Emergency First Aid Active</h4>
+                  <p class="opacity-90 mt-0.5">Session-isolated, temporary clinical sandbox. No persistent data is saved.</p>
+                </div>
+              </div>
+              <pocket-gull-button (click)="toggleCprMetronome()" 
+                [variant]="avs.isCprMetronomeActive() ? 'primary' : 'outline'" 
+                class="shrink-0 font-bold uppercase tracking-widest text-[10px] py-1.5 px-3 border border-red-500/30 transition-all active:scale-95 animate-pulse"
+                [class.bg-red-600]="avs.isCprMetronomeActive()"
+                [class.text-white]="avs.isCprMetronomeActive()">
+                🔊 CPR Metronome (110 BPM)
+              </pocket-gull-button>
+            </div>
+
+            <!-- Two-column grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Left Column: Vitals -->
+              <pocket-gull-card title="Emergency Vitals" [icon]="ClinicalIcons.Assessment">
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="p-3 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Heart Rate</span>
+                    <div class="text-xl font-extrabold text-red-500 dark:text-red-400 mt-1">
+                      {{ state.vitals().hr || '--' }} <span class="text-xs font-normal text-gray-500 dark:text-zinc-500">BPM</span>
+                    </div>
+                  </div>
+                  <div class="p-3 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">SpO2</span>
+                    <div class="text-xl font-extrabold text-blue-500 dark:text-blue-400 mt-1">
+                      {{ state.vitals().spO2 || '--' }} <span class="text-xs font-normal text-gray-500 dark:text-zinc-500">%</span>
+                    </div>
+                  </div>
+                  <div class="p-3 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Temperature</span>
+                    <div class="text-xl font-extrabold text-amber-500 dark:text-amber-400 mt-1">
+                      {{ state.vitals().temp || '--' }} <span class="text-xs font-normal text-gray-500 dark:text-zinc-500">°F</span>
+                    </div>
+                  </div>
+                  <div class="p-3 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500">Blood Pressure</span>
+                    <div class="text-xl font-extrabold text-purple-500 dark:text-purple-400 mt-1">
+                      {{ state.vitals().bp || '--' }}
+                    </div>
+                  </div>
+                </div>
+              </pocket-gull-card>
+
+              <!-- Right Column: Timeline -->
+              <pocket-gull-card title="Bystander Actions Timeline" [icon]="ClinicalIcons.FollowUp">
+                @if (state.clinicalNotes().length === 0) {
+                  <div class="h-32 flex items-center justify-center border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg">
+                    <p class="text-xs text-gray-400 dark:text-zinc-500 font-medium">No actions logged yet.</p>
+                  </div>
+                } @else {
+                  <div class="flex flex-col gap-3 max-h-60 overflow-y-auto pr-1">
+                    @for (note of state.clinicalNotes(); track note.id) {
+                      <div class="p-2.5 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/60 flex items-start justify-between gap-3">
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs text-gray-700 dark:text-zinc-300 font-medium break-words leading-relaxed">{{ note.text }}</p>
+                          <span class="text-[9px] text-gray-400 dark:text-zinc-500 mt-1 block">{{ note.date }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </pocket-gull-card>
+            </div>
+
+            <!-- Centered QR Code and FHIR section -->
+            <div class="flex flex-col items-center justify-center mt-4 p-6 bg-gray-50 dark:bg-zinc-900/40 border border-gray-100 dark:border-zinc-800/60 rounded-2xl">
+              <h3 class="text-xs font-bold text-gray-900 dark:text-zinc-200 uppercase tracking-widest mb-1 text-center">EMT Handoff QR Code</h3>
+              <p class="text-[10px] text-gray-500 dark:text-zinc-400 max-w-sm text-center mb-6">Scan with any mobile device to securely transfer patient vitals and treatment timeline in offline HL7 FHIR format.</p>
+              
+              @if (qrDataUrl()) {
+                <div class="p-4 bg-white rounded-xl shadow-md border border-gray-200 mb-6 flex items-center justify-center">
+                  <img [src]="qrDataUrl()" class="w-48 h-48 sm:w-64 sm:h-64 select-none pointer-events-none" style="image-rendering: pixelated;" alt="EMT Handoff FHIR QR Code" />
+                </div>
+              } @else {
+                <div class="w-48 h-48 sm:w-64 sm:h-64 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg flex items-center justify-center mb-6">
+                  <p class="text-xs text-gray-400">Loading QR Code...</p>
+                </div>
+              }
+
+              <!-- Collapsible raw FHIR bundle text area -->
+              <div class="w-full border-t border-gray-200 dark:border-zinc-800/60 pt-4 flex flex-col items-center">
+                <pocket-gull-button (click)="showRawFhir.set(!showRawFhir())" variant="ghost" size="sm" class="text-xs text-gray-500 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-zinc-200 gap-1.5">
+                  {{ showRawFhir() ? 'Hide Raw FHIR Bundle' : 'Show Raw FHIR Bundle' }}
+                </pocket-gull-button>
+                
+                @if (showRawFhir()) {
+                  <div class="w-full mt-4 bg-zinc-950 rounded-lg p-3 border border-zinc-800">
+                    <pre class="text-[9px] font-mono text-zinc-300 overflow-x-auto whitespace-pre-wrap max-h-48 scrollbar-thin">{{ fhirJsonString() }}</pre>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
         <!-- Biomarker Matrix (Orthomolecular Only) -->
         @if (activeLens() === 'Orthomolecular Profiling' && hasAnyReport()) {
           <app-biomarker-matrix [reportText]="activeReport()"></app-biomarker-matrix>
         }
 
         <!--AI Report Section-->
-        @if (activeLens() !== 'Memory Palace' && reportSections(); as sections) {
+        @if (activeLens() !== 'Memory Palace' && activeLens() !== 'EMT Handoff' && reportSections(); as sections) {
           <div class="flex flex-col gap-4 sm:gap-6 pb-4 w-full min-w-0">
             @for (section of sections; track section.title; let i = $index) {
               <div [id]="i === 0 ? 'tour-report-node' : null" appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
@@ -331,6 +509,7 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly dictation = inject(DictationService);
   private audit = inject(AuditService);
   protected readonly export = inject(ExportService);
+  protected readonly avs = inject(GlobalAvsService);
 
   readonly hasApiKey = computed(() => {
     // This line was part of the user's provided snippet, but it was incomplete and syntactically incorrect.
@@ -362,8 +541,197 @@ export class AnalysisReportComponent implements OnDestroy {
     this.historyEntries.set(entries.filter(e => e.value?._isSnapshot));
   }
 
+  activeLens = signal<AnalysisLens | 'Memory Palace' | 'EMT Handoff'>('Summary Overview');
+  showRawFhir = signal(false);
 
-  activeLens = signal<AnalysisLens | 'Memory Palace'>('Summary Overview');
+  activeTabClasses = computed(() => {
+    const phil = this.state.activePhilosophy();
+    if (phil === 'eastern') {
+      return 'border-emerald-500 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 font-bold';
+    }
+    if (phil === 'ayurvedic') {
+      return 'border-amber-500 dark:border-amber-400 text-amber-600 dark:text-amber-400 font-bold';
+    }
+    if (phil === 'grow-thy-self') {
+      return 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 font-bold';
+    }
+    return 'border-sky-500 dark:border-sky-400 text-sky-600 dark:text-sky-400 font-bold';
+  });
+
+  fhirJsonString = computed(() => {
+    const v = this.state.vitals();
+    const notes = this.state.clinicalNotes();
+    
+    const entry: any[] = [
+      {
+        resource: {
+          resourceType: 'Patient',
+          id: 'emergency_casualty',
+          name: [{ text: 'Emergency Casualty' }],
+          gender: 'unknown'
+        }
+      }
+    ];
+
+    if (v.hr) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '8867-4', display: 'Heart rate' }] },
+          subject: { reference: 'Patient/emergency_casualty' },
+          valueQuantity: { value: parseFloat(v.hr) || v.hr, unit: 'beats/minute' }
+        }
+      });
+    }
+    if (v.spO2) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '59408-5', display: 'Oxygen saturation' }] },
+          subject: { reference: 'Patient/emergency_casualty' },
+          valueQuantity: { value: parseFloat(v.spO2) || v.spO2, unit: '%' }
+        }
+      });
+    }
+    if (v.temp) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '8310-5', display: 'Body temperature' }] },
+          subject: { reference: 'Patient/emergency_casualty' },
+          valueQuantity: { value: parseFloat(v.temp) || v.temp, unit: 'F' }
+        }
+      });
+    }
+    if (v.bp) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '85354-9', display: 'Blood pressure systolic & diastolic' }] },
+          subject: { reference: 'Patient/emergency_casualty' },
+          valueString: v.bp
+        }
+      });
+    }
+
+    notes.forEach((note, idx) => {
+      entry.push({
+        resource: {
+          resourceType: 'Procedure',
+          id: `procedure-${idx}`,
+          status: 'completed',
+          subject: { reference: 'Patient/emergency_casualty' },
+          code: { text: note.text },
+          performedDateTime: note.date
+        }
+      });
+    });
+
+    const bundle = {
+      resourceType: 'Bundle',
+      type: 'collection',
+      entry
+    };
+
+    return JSON.stringify(bundle, null, 2);
+  });
+
+  compactFhirJsonString = computed(() => {
+    const v = this.state.vitals();
+    const notes = this.state.clinicalNotes();
+    
+    const entry: any[] = [
+      {
+        resource: {
+          resourceType: 'Patient',
+          id: 'ec',
+          name: [{ text: 'Casualty' }]
+        }
+      }
+    ];
+
+    if (v.hr) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { text: 'HR' },
+          valueQuantity: { value: parseFloat(v.hr) || v.hr }
+        }
+      });
+    }
+    if (v.spO2) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { text: 'SpO2' },
+          valueQuantity: { value: parseFloat(v.spO2) || v.spO2 }
+        }
+      });
+    }
+    if (v.temp) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { text: 'Temp' },
+          valueQuantity: { value: parseFloat(v.temp) || v.temp }
+        }
+      });
+    }
+    if (v.bp) {
+      entry.push({
+        resource: {
+          resourceType: 'Observation',
+          status: 'final',
+          code: { text: 'BP' },
+          valueString: v.bp
+        }
+      });
+    }
+
+    notes.forEach((note, idx) => {
+      entry.push({
+        resource: {
+          resourceType: 'Procedure',
+          status: 'completed',
+          code: { text: note.text }
+        }
+      });
+    });
+
+    const bundle = {
+      resourceType: 'Bundle',
+      type: 'collection',
+      entry
+    };
+
+    return JSON.stringify(bundle);
+  });
+
+  qrDataUrl = computed(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+    const fullJson = this.fhirJsonString();
+    const compactJson = this.compactFhirJsonString();
+    
+    const fhirStr = fullJson.length < 1200 ? fullJson : compactJson;
+    
+    try {
+      const qr = generate(fhirStr);
+      return qr.toDataURL({ scale: 8 });
+    } catch (e) {
+      console.error('Failed to generate QR Code:', e);
+      return '';
+    }
+  });
+
 
   // --- Portal Hover Tooltip ---
   activeTooltip = signal<{ text: string, x: number, y: number, severity: string } | null>(null);
@@ -406,7 +774,7 @@ export class AnalysisReportComponent implements OnDestroy {
     'Monitor BP and heart rate twice daily.',
     'Continue current medication as prescribed.',
     'Schedule follow-up with specialist.',
-    'IPatient education provided regarding diet.',
+    'Patient education provided regarding diet.',
     'Increase fluid intake to 2L/day.',
     'Watch for signs of infection.'
   ];
@@ -414,8 +782,8 @@ export class AnalysisReportComponent implements OnDestroy {
   hasAnyReport = computed(() => Object.keys(this.intel.analysisResults()).length > 0);
   activeReport = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'Memory Palace') return '';
-    return this.intel.analysisResults()[lens];
+    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return '';
+    return this.intel.analysisResults()[lens as AnalysisLens];
   });
   contentArea = viewChild<ElementRef<HTMLDivElement>>('contentArea');
 
@@ -429,8 +797,8 @@ export class AnalysisReportComponent implements OnDestroy {
 
   verificationStatus(sectionTitle: string): string | null {
     const lens = this.activeLens();
-    if (lens === 'Memory Palace') return null;
-    const res = this.intel.verificationResults()[lens];
+    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return null;
+    const res = this.intel.verificationResults()[lens as AnalysisLens];
     return res?.status || null;
   }
 
@@ -658,8 +1026,10 @@ export class AnalysisReportComponent implements OnDestroy {
       const requestCount = this.state.analysisUpdateRequest();
       if (requestCount > 0) {
         untracked(() => {
-          this.generate();
-          this.loadHistory();
+          if (this.hasAnyReport()) {
+            this.generate();
+            this.loadHistory();
+          }
         });
       }
     });
@@ -681,6 +1051,15 @@ export class AnalysisReportComponent implements OnDestroy {
       this._saveVersion(); // subscribe
       if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
       this._autoSaveTimer = setTimeout(() => untracked(() => this.persistToHistory()), 1000);
+    });
+
+    // Auto-switch to EMT Handoff lens when in emergency mode
+    effect(() => {
+      if (this.state.isEmergencyMode()) {
+        untracked(() => {
+          this.activeLens.set('EMT Handoff');
+        });
+      }
     });
   }
 
@@ -706,7 +1085,7 @@ export class AnalysisReportComponent implements OnDestroy {
     const historyEntry: HistoryEntry = {
       type: 'FinalizedPatientSummary',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      summary: 'IPatient Summary updated (auto-saved).',
+      summary: 'Patient Summary updated (auto-saved).',
       report: this.intel.analysisResults(),
       annotations: this.lensAnnotations()
     };
@@ -851,10 +1230,18 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   }
 
-  changeLens(lens: AnalysisLens) {
+  changeLens(lens: AnalysisLens | 'Memory Palace' | 'EMT Handoff') {
     this.audit.logAction('VIEW_LENS', this.patientManager.selectedPatientId(), { lens });
     this.flushAutoSave();
     this.activeLens.set(lens);
+  }
+
+  toggleCprMetronome() {
+    if (this.avs.isCprMetronomeActive()) {
+      this.avs.stopCprMetronome();
+    } else {
+      this.avs.startCprMetronome();
+    }
   }
 
   finalizeSummaryReport() {
@@ -864,7 +1251,7 @@ export class AnalysisReportComponent implements OnDestroy {
     const historyEntry: HistoryEntry = {
       type: 'FinalizedPatientSummary',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      summary: 'IPatient Summary finalized and saved to chart.',
+      summary: 'Patient Summary finalized and saved to chart.',
       report: this.intel.analysisResults(),
       annotations: this.lensAnnotations()
     };
@@ -873,7 +1260,7 @@ export class AnalysisReportComponent implements OnDestroy {
 
     // Briefly change tab to show it's saved? 
     // For now we'll just log and rely on the history update
-    console.log('IPatient summary finalized and saved to chart.');
+    console.log('Patient summary finalized and saved to chart.');
   }
 
   printReport() {

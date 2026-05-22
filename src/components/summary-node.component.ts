@@ -990,7 +990,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   hasDiscoveredEvidenceFocus = signal(true);
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
       const discovered = localStorage.getItem('pocketgull_evidence_focus_discovered');
       this.hasDiscoveredEvidenceFocus.set(discovered === 'true');
     }
@@ -1161,7 +1161,7 @@ The recommendation under review:
 ${nodeText.slice(0, 400)}${nodeText.length > 400 ? '...' : ''}
 """
 
-IPatient context is available. Your role:
+Patient context is available. Your role:
 1. Briefly explain the clinical rationale (2-3 sentences).
 2. Cite supporting evidence or guidelines if applicable using strict UKRIO-compliant scientific reference formats. You MUST hyperlink DOI or PubMed URLs directly within your markdown (e.g. \`[Author et al. (2024)](https://pubmed.ncbi.nlm.nih.gov/...)\`).
 3. Answer follow-up questions about alternatives, risks, or nuances.

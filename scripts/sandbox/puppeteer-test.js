@@ -1,8 +1,9 @@
 import puppeteer from 'puppeteer';
 (async () => {
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   const page = await browser.newPage();
-  await page.goto('http://localhost:4200', { waitUntil: 'networkidle0' });
+  const port = process.env.PORT || 4200;
+  await page.goto(`http://localhost:${port}`, { waitUntil: 'networkidle0' });
   const content = await page.content();
   if (content.includes('process is not defined')) {
     console.error('Data failed to load.');

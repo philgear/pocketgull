@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-interface BiomarkerStatus {
+interface IBiomarkerStatus {
   name: string;
   level: 'Deficient' | 'Sub-optimal' | 'Optimal' | 'High' | 'Excess';
   pathway: string;
@@ -77,7 +77,7 @@ export class BiomarkerMatrixComponent {
     const text = this.reportText();
     if (!text) return [];
 
-    const markers: BiomarkerStatus[] = [];
+    const markers: IBiomarkerStatus[] = [];
     const dictionary = [
       { name: 'Magnesium', pathway: 'ATP Synthesis / NMDA' },
       { name: 'Vitamin D3', pathway: 'Immune / Bone' },
@@ -112,7 +112,7 @@ export class BiomarkerMatrixComponent {
               const name = matchedDict ? matchedDict.name : item.name;
               const pathway = item.pathway || (matchedDict ? matchedDict.pathway : 'Metabolic Pathway');
               const levelLower = String(item.level || '').toLowerCase();
-              let level: BiomarkerStatus['level'] = 'Optimal';
+              let level: IBiomarkerStatus['level'] = 'Optimal';
               if (levelLower.includes('defic') || levelLower === 'low') level = 'Deficient';
               else if (levelLower === 'sub-optimal') level = 'Sub-optimal';
               else if (levelLower === 'high') level = 'High';
@@ -131,7 +131,7 @@ export class BiomarkerMatrixComponent {
           const name = match[1];
           const levelStr = match[2].toLowerCase();
           const pathway = match[3];
-          let level: BiomarkerStatus['level'] = 'Optimal';
+          let level: IBiomarkerStatus['level'] = 'Optimal';
           if (levelStr.includes('defic') || levelStr === 'low') level = 'Deficient';
           else if (levelStr === 'sub-optimal') level = 'Sub-optimal';
           else if (levelStr === 'high') level = 'High';
@@ -155,7 +155,7 @@ export class BiomarkerMatrixComponent {
       const match = textLower.match(regex);
       if (match) {
         const val = match[1].toLowerCase();
-        let level: BiomarkerStatus['level'] = 'Optimal';
+        let level: IBiomarkerStatus['level'] = 'Optimal';
         if (val.includes('defic') || val === 'low') level = 'Deficient';
         if (val === 'sub-optimal') level = 'Sub-optimal';
         if (val === 'high') level = 'High';
@@ -168,7 +168,7 @@ export class BiomarkerMatrixComponent {
         const revMatch = textLower.match(reverseRegex);
         if (revMatch) {
           const val = revMatch[1].toLowerCase();
-          let level: BiomarkerStatus['level'] = 'Optimal';
+          let level: IBiomarkerStatus['level'] = 'Optimal';
           if (val.includes('defic') || val === 'low') level = 'Deficient';
           if (val === 'sub-optimal') level = 'Sub-optimal';
           if (val === 'high') level = 'High';

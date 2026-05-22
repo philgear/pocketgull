@@ -10,6 +10,7 @@ services:
     environment:
       - NODE_ENV=production
       - API_URL=http://api:8000
+      - OTEL_SDK_DISABLED=true
     depends_on:
       - api
 
@@ -31,3 +32,4 @@ services:
       - "8081:8080" # The Hue relay defaults to 8080, mapped to 8081
     environment:
       - NODE_ENV=production
+      - OTEL_SDK_DISABLED=true

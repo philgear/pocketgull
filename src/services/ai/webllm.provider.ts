@@ -39,7 +39,7 @@ export class WebLLMProvider implements IIntelligenceProvider {
     
     const messages: import('@mlc-ai/web-llm').ChatCompletionMessageParam[] = [
         { role: "system", content: systemInstruction },
-        { role: "user", content: `IPatient Data:\n${patientData}\n\nLens:\n${lens}` }
+        { role: "user", content: `Patient Data:\n${patientData}\n\nLens:\n${lens}` }
     ];
     
     const requestTemp = Number(localStorage.getItem('preferredModelTemperature')) || 0.5;

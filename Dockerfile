@@ -16,4 +16,5 @@ RUN npm run build
 # Expose port and run
 EXPOSE 8080
 ENV PORT=8080
+ENV OTEL_SDK_DISABLED=true
 CMD ["node", "dist/server/server.mjs"]

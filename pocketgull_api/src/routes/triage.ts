@@ -2,14 +2,14 @@ import { Router } from 'express';
 
 export const triageRouter = Router();
 
-interface Vitals {
+interface IVitals {
   hr: string;
   bp: string;
   spO2: string;
   temp: string;
 }
 
-interface TriageResult {
+interface ITriageResult {
   triageScore: number;
   kaizenColor: 'red' | 'yellow' | 'green' | 'blue';
   activeTimerSeconds: number | null;
@@ -22,7 +22,7 @@ function parseNumeric(val: string): number | null {
   return match ? parseInt(match[0], 10) : null;
 }
 
-function calculateTriage(vitals: Vitals, conditions?: string[]): Promise<TriageResult> {
+function calculateTriage(vitals: IVitals, conditions?: string[]): Promise<ITriageResult> {
   return new Promise(async (resolve) => {
     let score = 0;
   let color: 'red' | 'yellow' | 'green' | 'blue' = 'green';
@@ -79,7 +79,7 @@ function calculateTriage(vitals: Vitals, conditions?: string[]): Promise<TriageR
   }
 
   if (score === 0) {
-    reasoning.push('Vitals are within normal limits.');
+    reasoning.push('IVitals are within normal limits.');
   }
 
   let recommendedGuidelines: { id: string; title: string; }[] | undefined = undefined;
@@ -123,7 +123,7 @@ triageRouter.post('/calculate', async (req, res) => {
     const { vitals, preexistingConditions } = req.body;
     
     if (!vitals) {
-      return res.status(400).json({ error: 'Vitals payload is required' });
+      return res.status(400).json({ error: 'IVitals payload is required' });
     }
 
     const result = await calculateTriage(vitals, preexistingConditions);

@@ -28,8 +28,8 @@ class _OrigamiSeagullState extends State<OrigamiSeagull>
     <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
     <!-- Neck/Head -->
     <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-    <!-- Beak - Functional Braun Orange Accent -->
-    <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
+    <!-- Beak - Kaizen Green Accent -->
+    <polygon points="85,38 82,45 95,34" fill="#34A853" stroke="#15803d" stroke-width="0.5" stroke-linejoin="round" />
   </svg>
   ''';
 

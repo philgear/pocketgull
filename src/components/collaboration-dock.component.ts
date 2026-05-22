@@ -45,7 +45,7 @@ import { CollaborationService } from '../services/collaboration.service';
           <div class="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col bg-transparent" #chatScroll>
             @if (notes().length === 0) {
               <div class="m-auto text-xs text-gray-400 text-center px-4">
-                No active discussions. Vitals are being synced in the background.
+                No active discussions. IVitals are being synced in the background.
               </div>
             }
 

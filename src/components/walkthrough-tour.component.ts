@@ -311,6 +311,7 @@ export class WalkthroughTourComponent implements OnDestroy {
 
   rect = signal<IRect | null>(null);
   stepsArray = computed(() => this.tour.steps());
+  cardHeight = signal<number>(220); // Dynamic card height signal with a sensible default fallback
 
   stepDef = computed<ITourStep | null>(() => {
     const idx = this.tour.currentStep();
@@ -333,14 +334,22 @@ export class WalkthroughTourComponent implements OnDestroy {
       }
     });
 
-    // Keyboard escape support
-    if (typeof document !== 'undefined') {
+    // Keyboard escape support & window resize support
+    if (typeof window !== 'undefined') {
       document.addEventListener('keydown', this._onKey);
+      window.addEventListener('resize', this._onResize);
     }
   }
 
   private _onKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape' && this.tour.isActive()) this.tour.dismiss();
+  };
+
+  private _onResize = () => {
+    const def = this.stepDef();
+    if (def) {
+      this._updateRect(def.targetId);
+    }
   };
 
   private _updateRect(targetId: string) {
@@ -352,6 +361,17 @@ export class WalkthroughTourComponent implements OnDestroy {
         if (!el) { this.rect.set(null); return; }
         const r = el.getBoundingClientRect();
         this.rect.set({ top: r.top, left: r.left, width: r.width, height: r.height });
+
+        // Measure actual card height after Angular has finished rendering the content
+        setTimeout(() => {
+          const cardEl = document.querySelector('.tour-card') as HTMLElement;
+          if (cardEl) {
+            const h = cardEl.offsetHeight;
+            if (h > 0) {
+              this.cardHeight.set(h);
+            }
+          }
+        }, 0);
       });
     }
   }
@@ -362,6 +382,7 @@ export class WalkthroughTourComponent implements OnDestroy {
     const def = this.stepDef();
     const PAD = 20;
     const CARD_W = 320;
+    const CARD_H = this.cardHeight();
 
     if (!r || !def) {
       // Centre-screen fallback
@@ -405,7 +426,6 @@ export class WalkthroughTourComponent implements OnDestroy {
     }
 
     // Desktop positioning
-    const CARD_H = 220; // estimated
     let top: number, left: number;
 
     switch (def.position) {
@@ -449,8 +469,9 @@ export class WalkthroughTourComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    if (typeof document !== 'undefined') {
+    if (typeof window !== 'undefined') {
       document.removeEventListener('keydown', this._onKey);
+      window.removeEventListener('resize', this._onResize);
     }
     if (typeof window !== 'undefined') {
       cancelAnimationFrame(this._rafId);

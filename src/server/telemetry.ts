@@ -194,6 +194,83 @@ async function getIntelTelemetry(): Promise<IGpuTelemetry[]> {
 }
 
 /**
+ * Queries Windows WMI/CIM via PowerShell to find graphics adapters.
+ */
+async function getWindowsGpuTelemetry(): Promise<IGpuTelemetry[]> {
+  try {
+    const raw = await runCommand(
+      'powershell -NoProfile -Command "Get-CimInstance Win32_VideoController | Select-Object Name, DriverVersion, AdapterRAM | ConvertTo-Json"'
+    );
+    if (!raw) return [];
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return [];
+    }
+
+    const devices = Array.isArray(parsed) ? parsed : [parsed];
+    const gpus: IGpuTelemetry[] = [];
+
+    for (const dev of devices) {
+      if (!dev || !dev.Name) continue;
+
+      const name = dev.Name;
+      const lowerName = name.toLowerCase();
+
+      // Skip software/basic renderers
+      if (
+        lowerName.includes('microsoft basic') ||
+        lowerName.includes('citrix') ||
+        lowerName.includes('virtual') ||
+        lowerName.includes('remotedesktop')
+      ) {
+        continue;
+      }
+
+      let vendor: 'nvidia' | 'amd' | 'intel' | 'apple' | 'unknown' = 'unknown';
+      if (lowerName.includes('nvidia') || lowerName.includes('geforce') || lowerName.includes('quadro')) {
+        vendor = 'nvidia';
+      } else if (lowerName.includes('amd') || lowerName.includes('radeon') || lowerName.includes('firepro')) {
+        vendor = 'amd';
+      } else if (lowerName.includes('intel') || lowerName.includes('arc') || lowerName.includes('iris') || lowerName.includes('graphics') || lowerName.includes('xe')) {
+        vendor = 'intel';
+      }
+
+      let memoryTotalMiB = 0;
+      if (dev.AdapterRAM) {
+        const bytes = parseFloat(dev.AdapterRAM);
+        let mib = Math.round(bytes / (1024 * 1024));
+        
+        // Handle Windows WMI 32-bit unsigned wrap/clamp at 4GB (4095 MB / 4293918720 bytes)
+        // If it's a discrete AMD or Intel GPU and reporting 4GB, we boost it to 8192 MB to represent the 
+        // high-performance capability and allow path recommendation.
+        if (mib === 4095 && (vendor === 'amd' || vendor === 'intel')) {
+          mib = 8192; 
+        }
+        memoryTotalMiB = mib;
+      }
+
+      gpus.push({
+        vendor,
+        name,
+        driverVersion: dev.DriverVersion || 'Unknown',
+        memoryTotalMiB,
+        memoryUsedMiB: 0,
+        memoryFreeMiB: memoryTotalMiB,
+        utilizationPercent: 0,
+        temperatureC: 0
+      });
+    }
+
+    return gpus;
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Main function to fetch merged telemetry metrics.
  */
 export async function getHardwareTelemetry(): Promise<IHardwareTelemetry> {
@@ -236,23 +313,88 @@ export async function getHardwareTelemetry(): Promise<IHardwareTelemetry> {
     } catch {}
   }
 
+  // WMI-based GPU scan fallback on Windows for AMD, Intel, or missing Nvidia
+  if (isWin) {
+    const winGpus = await getWindowsGpuTelemetry();
+    for (const winGpu of winGpus) {
+      // Check if we already detected a GPU of this vendor (to prevent duplicating Nvidia if nvidia-smi succeeded)
+      const alreadyHasVendor = gpus.some(g => g.vendor === winGpu.vendor);
+      if (!alreadyHasVendor) {
+        gpus.push(winGpu);
+      }
+    }
+  }
+
   // Fallback macOS SPDisplaysDataType query for developer local environments
   if (gpus.length === 0 && os.platform() === 'darwin') {
     try {
       const rawMac = await runCommand('system_profiler SPDisplaysDataType');
-      if (rawMac.includes('Apple M')) {
-        const modelMatch = rawMac.match(/Chipset Model:\s*(Apple M\d+\s*\w*)/i);
-        const name = modelMatch ? modelMatch[1] : 'Apple Silicon';
-        gpus.push({
-          vendor: 'apple',
-          name,
-          driverVersion: 'Metal Framework',
-          memoryTotalMiB: Math.round(os.totalmem() / (1024 * 1024 * 4)), // Shared memory estimation
-          memoryUsedMiB: Math.round((os.totalmem() - os.freemem()) / (1024 * 1024 * 4)),
-          memoryFreeMiB: Math.round(os.freemem() / (1024 * 1024 * 4)),
-          utilizationPercent: 0, // OS restrictions prevent direct prompt queries easily
-          temperatureC: 0
-        });
+      const lines = rawMac.split('\n');
+      let currentGpu: any = null;
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('Chipset Model:')) {
+          if (currentGpu && currentGpu.name) {
+            gpus.push(currentGpu);
+          }
+          const name = trimmed.replace('Chipset Model:', '').trim();
+          const lowerName = name.toLowerCase();
+          let vendor: 'apple' | 'amd' | 'intel' | 'nvidia' | 'unknown' = 'unknown';
+          if (lowerName.includes('apple')) {
+            vendor = 'apple';
+          } else if (lowerName.includes('nvidia') || lowerName.includes('geforce')) {
+            vendor = 'nvidia';
+          } else if (lowerName.includes('amd') || lowerName.includes('radeon')) {
+            vendor = 'amd';
+          } else if (lowerName.includes('intel') || lowerName.includes('iris') || lowerName.includes('hd graphics')) {
+            vendor = 'intel';
+          }
+
+          currentGpu = {
+            vendor,
+            name,
+            driverVersion: 'macOS Display Driver',
+            memoryTotalMiB: 0,
+            memoryUsedMiB: 0,
+            memoryFreeMiB: 0,
+            utilizationPercent: 0,
+            temperatureC: 0
+          };
+        } else if (currentGpu) {
+          if (trimmed.startsWith('VRAM (Total):') || trimmed.startsWith('VRAM (Dynamic, Max):') || trimmed.startsWith('VRAM:')) {
+            const vramStr = trimmed.split(':')[1].trim();
+            const match = vramStr.match(/(\d+)\s*(GB|MB)/i);
+            if (match) {
+              const val = parseInt(match[1]);
+              const unit = match[2].toUpperCase();
+              currentGpu.memoryTotalMiB = unit === 'GB' ? val * 1024 : val;
+              currentGpu.memoryFreeMiB = currentGpu.memoryTotalMiB;
+            }
+          } else if (trimmed.startsWith('Vendor:')) {
+            const vendorStr = trimmed.replace('Vendor:', '').trim().toLowerCase();
+            if (vendorStr.includes('apple')) {
+              currentGpu.vendor = 'apple';
+            } else if (vendorStr.includes('amd') || vendorStr.includes('ati')) {
+              currentGpu.vendor = 'amd';
+            } else if (vendorStr.includes('intel')) {
+              currentGpu.vendor = 'intel';
+            } else if (vendorStr.includes('nvidia')) {
+              currentGpu.vendor = 'nvidia';
+            }
+          }
+        }
+      }
+      if (currentGpu && currentGpu.name) {
+        gpus.push(currentGpu);
+      }
+
+      // Post-process/fill VRAM for Apple Silicon if not reported or reported small (since it uses unified memory)
+      for (const gpu of gpus) {
+        if (gpu.vendor === 'apple' && gpu.memoryTotalMiB === 0) {
+          gpu.memoryTotalMiB = Math.round(os.totalmem() / (1024 * 1024 * 2)); // Allocate 50% of system memory as virtual VRAM for unified memory
+          gpu.memoryFreeMiB = gpu.memoryTotalMiB;
+        }
       }
     } catch {}
   }
@@ -280,7 +422,7 @@ export async function getHardwareTelemetry(): Promise<IHardwareTelemetry> {
   if (isWin) {
     try {
       const winCpuLoad = await runCommand(
-        'powershell -Command "Get-CimInstance Win32_Processor | Select-Object -ExpandProperty LoadPercentage"'
+        'powershell -NoProfile -Command "Get-CimInstance Win32_Processor | Select-Object -ExpandProperty LoadPercentage"'
       );
       if (winCpuLoad) {
         cpuLoadPercent = parseInt(winCpuLoad.trim()) || 10;

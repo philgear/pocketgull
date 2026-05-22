@@ -8,6 +8,7 @@ import { IClinicalMetrics } from '../clinical-intelligence.service';
 import { IVerificationIssue } from '../../components/analysis-report.types';
 import { NetworkStateService } from '../network-state.service';
 import { HardwareTelemetryService } from '../hardware-telemetry.service';
+import { PatientStateService } from '../patient-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,12 +20,16 @@ export class HybridProvider implements IIntelligenceProvider {
   private webgpu = inject(WebLLMProvider); // Local WebGPU (WebLLM)
   private network = inject(NetworkStateService);
   private telemetry = inject(HardwareTelemetryService);
+  private patientState = inject(PatientStateService);
 
   /**
    * Builds the dynamically optimized chain of intelligence providers based on
    * user preferences, network status, and detected local hardware telemetry.
    */
   private getProviderChain(): IIntelligenceProvider[] {
+    if (this.patientState.isEmergencyMode() && !this.network.isOnline()) {
+      return [this.nano];
+    }
     const path = this.telemetry.recommendedExecutionPath();
     const useLocal = this.network.useLocalInference();
     const chain: IIntelligenceProvider[] = [];

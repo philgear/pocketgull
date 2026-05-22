@@ -6,6 +6,24 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     // Prevent the walkthrough tour from launching automatically on load
     await page.addInitScript(() => {
       window.localStorage.setItem('pg_tour_seen', '1');
+      // Disable service worker during tests so Playwright can intercept API requests
+      try {
+        const mockSW = {
+          register: () => Promise.reject(new Error('Service worker disabled for testing')),
+          addEventListener: () => {},
+          removeEventListener: () => {},
+          getRegistration: () => Promise.resolve(undefined),
+          getRegistrations: () => Promise.resolve([]),
+          controller: null,
+          ready: new Promise(() => {})
+        };
+        Object.defineProperty(navigator, 'serviceWorker', {
+          get() { return mockSW; },
+          configurable: true
+        });
+      } catch (e) {
+        console.error('Failed to disable service worker:', e);
+      }
     });
   });
 
@@ -22,6 +40,17 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const headingsCount = await page.locator('h1, h2, h3').count();
     expect(headingsCount).toBeGreaterThan(0);
 
+    // 4. Button descriptive names (WCAG 2.4.6 / 4.1.2)
+    // Ensure the Google SSO button contains visible text or an aria-label
+    const ssoBtn = page.locator('button', { hasText: 'Google Clinician Sign-In' });
+    await expect(ssoBtn).toBeVisible();
+
+    // Now mock the clinician authorization to test the PIN and API Key entry flow
+    await page.evaluate(() => {
+      window.localStorage.setItem('pg_mock_clinician', '1');
+    });
+    await page.reload();
+
     // Unlock using PIN code 1234 to show the login (auth) screen
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 5000 });
@@ -35,11 +64,6 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const placeholder = await apiKeyInput.getAttribute('placeholder');
     const ariaLabel = await apiKeyInput.getAttribute('aria-label');
     expect(placeholder || ariaLabel).toBeTruthy();
-
-    // 4. Button descriptive names (WCAG 2.4.6 / 4.1.2)
-    // Ensure the Google SSO button contains visible text or an aria-label
-    const ssoBtn = page.locator('button', { hasText: 'Google SSO Secure' });
-    await expect(ssoBtn).toBeVisible();
     
     // Ensure all SVGs are hidden from screen readers if they are purely presentational (WCAG 1.1.1)
     const svgs = page.locator('button svg');
@@ -52,6 +76,9 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
   });
 
   test('main clinical dashboard accessibility audit', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('pg_mock_clinician', '1');
+    });
     await page.goto('/');
     
     // Unlock using PIN code 1234
@@ -64,6 +91,16 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
     await expect(demoBtn).toBeVisible({ timeout: 5000 });
     await demoBtn.click();
+
+    // Accept ethics pledge
+    const pledgeCheckbox = page.locator('input[type="checkbox"]');
+    await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
+    await pledgeCheckbox.check();
+
+    // Click Accept & Continue
+    const acceptBtn = page.locator('button', { hasText: 'Accept & Continue' });
+    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+    await acceptBtn.click();
     
     // Dismiss the Karolinska Sleepiness Scale (KSS) assessment to enter the system
     const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
@@ -109,10 +146,13 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     // 4. ARIA Expanded States on Collapsible Panels
     // If there are collapsible sections, check their ARIA or structural tags
     const collapsibleCharts = page.locator('canvas');
+    await expect(collapsibleCharts.first()).toBeVisible({ timeout: 10000 });
     expect(await collapsibleCharts.count()).toBeGreaterThan(0);
   });
 
   test('memory palace anchoring flow audit', async ({ page }) => {
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+
     // 1. Intercept network endpoints
     await page.route('**/api/loci/current_patient', async route => {
       await route.fulfill({
@@ -160,6 +200,9 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     });
 
     // 2. Load dashboard
+    await page.addInitScript(() => {
+      window.localStorage.setItem('pg_mock_clinician', '1');
+    });
     await page.goto('/');
     
     // Unlock using PIN code 1234
@@ -172,6 +215,16 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
     await expect(demoBtn).toBeVisible({ timeout: 5000 });
     await demoBtn.click();
+
+    // Accept ethics pledge
+    const pledgeCheckbox = page.locator('input[type="checkbox"]');
+    await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
+    await pledgeCheckbox.check();
+
+    // Click Accept & Continue
+    const acceptBtn = page.locator('button', { hasText: 'Accept & Continue' });
+    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+    await acceptBtn.click();
     
     // Dismiss the Karolinska Sleepiness Scale (KSS) assessment
     const skipBtn = page.locator('button', { hasText: 'Skip assessment' });

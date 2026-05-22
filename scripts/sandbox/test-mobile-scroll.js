@@ -1,10 +1,14 @@
 import puppeteer from 'puppeteer';
 (async () => {
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({ 
+        headless: 'new',
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
     // Pixel 2 Watch or small mobile size
     await page.setViewport({ width: 320, height: 568, isMobile: true, hasTouch: true });
-    await page.goto('http://localhost:4200');
+    const port = process.env.PORT || 4200;
+    await page.goto(`http://localhost:${port}`);
     
     // Wait for angular to load
     await page.waitForSelector('app-root', { timeout: 10000 });

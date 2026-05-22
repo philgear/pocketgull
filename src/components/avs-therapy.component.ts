@@ -18,7 +18,7 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
   standalone: true,
   imports: [CommonModule, FormsModule, BreathGuideComponent],
   template: `
-    <div class="w-full bg-white dark:bg-[#0c0604] border border-gray-200 dark:border-zinc-800/80 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:border-orange-500/30">
+    <div id="tour-avs-therapy" class="w-full bg-white dark:bg-[#0c0604] border border-gray-200 dark:border-zinc-800/80 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:border-orange-500/30">
       
       <!-- Spark Header Banner -->
       <div class="px-6 py-4 bg-gradient-to-r from-orange-600/10 via-amber-600/5 to-transparent border-b border-gray-150 dark:border-zinc-800/50 flex items-center justify-between">
@@ -113,7 +113,7 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
                      (input)="onHrSliderChange($event)"
                      class="w-full accent-orange-500 h-1 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer">
               <div class="flex justify-between text-[9px] text-gray-400 dark:text-zinc-500 font-medium">
-                <span>Vitals Current: {{ patientState.vitals().hr || '--' }} BPM</span>
+                <span>IVitals Current: {{ patientState.vitals().hr || '--' }} BPM</span>
                 <span>Restorative Limit: 60-70</span>
               </div>
             </div>

@@ -44,6 +44,9 @@ export class PatientStateService {
   /** Toggle the semi-transparent reference mannequin ghost overlay. */
   readonly showGhostOverlay = signal<boolean>(false);
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
+  readonly isEmergencyMode = signal<boolean>(false);
+  readonly isDemoMode = signal<boolean>(false);
+  readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'>('western');
 
   // --- AVS Neuro-Therapy Synchronized State ---
   readonly isAvsSessionActive = signal<boolean>(false);
@@ -64,7 +67,7 @@ export class PatientStateService {
   /** Trauma safety flags extracted from chart — gates AVS protocol selection. */
   readonly traumaFlags = signal<import('./patient.types').ITraumaFlags | null>(null);
 
-  // --- IPatient Data State ---
+  // --- Patient Data State ---
   readonly issues = signal<Record<string, IBodyPartIssue[]>>({});
   readonly patientGoals = signal<string>("");
   readonly    vitals = signal<IPatientVitals>({
@@ -111,8 +114,11 @@ export class PatientStateService {
       // 2. Persist state on any signal mutation
       effect(() => {
         const currentState = this.getCurrentState();
+        const isEmergency = this.isEmergencyMode();
         untracked(() => {
-          this.storage.saveState('current_patient', currentState);
+          if (!isEmergency) {
+            this.storage.saveState('current_patient', currentState);
+          }
         });
       });
     }
@@ -158,6 +164,11 @@ export class PatientStateService {
 
   selectNote(noteId: string | null) {
     this.selectedNoteId.set(noteId);
+  }
+
+  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self') {
+    this.activePhilosophy.set(philosophy);
+    this.requestAnalysisUpdate();
   }
 
   toggleLiveAgent(active: boolean) {
@@ -389,7 +400,7 @@ export class PatientStateService {
   }
 
 
-  // --- State Management for Multi-IPatient ---
+  // --- State Management for Multi-Patient ---
 
   /** Clears all patient data to represent a clean slate. */
   clearState() {
@@ -420,6 +431,7 @@ export class PatientStateService {
     this.requestedResearchQuery.set(null);
     this.requestedSearchEngine.set(null);
     this.viewingPastVisit.set(null);
+    this.activePhilosophy.set('western');
   }
 
   /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
@@ -457,6 +469,7 @@ export class PatientStateService {
     this.checklist.set(state.checklist || []);
     this.shoppingList.set(state.shoppingList || []);
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
+    if (state.activePhilosophy) this.activePhilosophy.set(state.activePhilosophy);
   }
 
   /** Returns the current patient state for saving. */
@@ -473,6 +486,7 @@ export class PatientStateService {
             clinicalNotes: this.clinicalNotes(),
             checklist: this.checklist(),
             shoppingList: this.shoppingList(),
+            activePhilosophy: this.activePhilosophy(),
         };
   }
 
@@ -488,7 +502,7 @@ export class PatientStateService {
       `- Body Part: ${i.name}, Pain Level: ${i.painLevel}/10, Description: ${i.description}`
     ).join('\n');
 
-    // 2. Vitals
+    // 2. IVitals
     const vitalsText = `
     - BP: ${vitals.bp || 'N/A'}
     - HR: ${vitals.hr || 'N/A'}
@@ -533,11 +547,11 @@ Pain Areas:   `;
     ).join('\n');
 
     let prompt = `
-    IPatient Goals/Chief Complaint: ${this.patientGoals()}
+    Patient Goals/Chief Complaint: ${this.patientGoals()}
     
     Dietary & Nutrition Intake: ${this.dietaryProtocol() || 'None provided'}
     
-    Vitals:
+    IVitals:
     ${vitalsText}
 
     Reported Body Issues (Current):

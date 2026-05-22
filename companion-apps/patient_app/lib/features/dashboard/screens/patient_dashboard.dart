@@ -87,10 +87,24 @@ class _PatientDashboardState extends State<PatientDashboard> {
     final textColor = isDark ? const Color(0xFFF4F4F5) : const Color(0xFF1C1C1C);
     final subColor = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
 
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final bool isWatch = screenWidth < 240 || screenHeight < 320;
+    final bool isSmallPhone = screenWidth < 360 || screenHeight < 640;
+
+    final double outerPadding = isWatch ? 8.0 : (isSmallPhone ? 16.0 : 24.0);
+    final double welcomeFontSize = isWatch ? 16.0 : (isSmallPhone ? 22.0 : 28.0);
+    final double subtitleFontSize = isWatch ? 10.0 : (isSmallPhone ? 13.0 : 16.0);
+    final double sectionTitleFontSize = isWatch ? 9.0 : 12.0;
+    final double sectionSpacing = isWatch ? 16.0 : (isSmallPhone ? 24.0 : 32.0);
+    final double cardPadding = isWatch ? 10.0 : (isSmallPhone ? 12.0 : 16.0);
+    final double infoFontSize = isWatch ? 10.0 : 14.0;
+    final double buttonVerticalPadding = isWatch ? 10.0 : (isSmallPhone ? 12.0 : 16.0);
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text('MY CARE PLAN', style: TextStyle(letterSpacing: 2, fontSize: 14)),
+        title: Text('MY CARE PLAN', style: TextStyle(letterSpacing: 2, fontSize: isWatch ? 11 : 14)),
         centerTitle: true,
         backgroundColor: bgColor,
         elevation: 0,
@@ -103,26 +117,26 @@ class _PatientDashboardState extends State<PatientDashboard> {
               : RefreshIndicator(
                   onRefresh: _loadData,
                   child: ListView(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: EdgeInsets.all(outerPadding),
                     children: [
                       Text(
                         'Hello, ${_currentPatient!.name.split(' ').first}',
-                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: textColor),
+                        style: TextStyle(fontSize: welcomeFontSize, fontWeight: FontWeight.bold, color: textColor),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Here is your latest clinical summary.',
-                        style: TextStyle(fontSize: 16, color: subColor),
+                        style: TextStyle(fontSize: subtitleFontSize, color: subColor),
                       ),
-                      const SizedBox(height: 32),
+                      SizedBox(height: sectionSpacing),
                       
                       // Active Issues
-                      _buildSectionTitle('ACTIVE CONCERNS', textColor),
+                      _buildSectionTitle('ACTIVE CONCERNS', textColor, sectionTitleFontSize),
                       const SizedBox(height: 16),
                       ..._currentPatient!.state.issues.entries.map((entry) {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(16),
+                          padding: EdgeInsets.all(cardPadding),
                           decoration: BoxDecoration(
                             color: cardColor,
                             borderRadius: BorderRadius.circular(8),
@@ -133,25 +147,25 @@ class _PatientDashboardState extends State<PatientDashboard> {
                             children: [
                               Text(
                                 entry.key.toUpperCase(),
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1, color: subColor),
+                                style: TextStyle(fontSize: isWatch ? 9.0 : 12.0, fontWeight: FontWeight.bold, letterSpacing: 1, color: subColor),
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 '${entry.value.length} flagged node(s)',
-                                style: TextStyle(color: textColor),
+                                style: TextStyle(color: textColor, fontSize: infoFontSize),
                               ),
                             ],
                           ),
                         );
                       }).toList(),
 
-                      const SizedBox(height: 32),
+                      SizedBox(height: sectionSpacing),
 
                       // Chart Update Recommendations (Patient Nudges)
-                      _buildSectionTitle('RECOMMENDED ACTIONS', textColor),
+                      _buildSectionTitle('RECOMMENDED ACTIONS', textColor, sectionTitleFontSize),
                       const SizedBox(height: 16),
                       Container(
-                        padding: const EdgeInsets.all(20),
+                        padding: EdgeInsets.all(isWatch ? 12.0 : 20.0),
                         decoration: BoxDecoration(
                           color: isDark ? const Color(0xFF27272A).withOpacity(0.5) : const Color(0xFFF3F4F6),
                           borderRadius: BorderRadius.circular(8),
@@ -162,12 +176,12 @@ class _PatientDashboardState extends State<PatientDashboard> {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.favorite_border, color: textColor, size: 20),
-                                const SizedBox(width: 12),
+                                Icon(Icons.favorite_border, color: textColor, size: isWatch ? 16 : 20),
+                                SizedBox(width: isWatch ? 8 : 12),
                                 Expanded(
                                   child: Text(
                                     'Connect Health App',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: textColor),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: textColor, fontSize: infoFontSize),
                                   ),
                                 ),
                               ],
@@ -175,7 +189,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
                             const SizedBox(height: 8),
                             Text(
                               'Your doctor lacks recent activity data. Sync Apple Health or Google Health Connect to update your clinical chart automatically.',
-                              style: TextStyle(height: 1.5, color: subColor, fontSize: 14),
+                              style: TextStyle(height: 1.5, color: subColor, fontSize: isWatch ? 9 : 14),
                             ),
                             const SizedBox(height: 16),
                             SizedBox(
@@ -184,13 +198,13 @@ class _PatientDashboardState extends State<PatientDashboard> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: textColor,
                                   foregroundColor: bgColor,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  padding: EdgeInsets.symmetric(vertical: buttonVerticalPadding),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                                 ),
                                 onPressed: _isSyncing ? null : _simulateHealthSync,
                                 child: _isSyncing 
                                   ? SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: bgColor, strokeWidth: 2))
-                                  : const Text('SYNC BIOMETRICS', style: TextStyle(letterSpacing: 1.5, fontWeight: FontWeight.bold)),
+                                  : Text('SYNC BIOMETRICS', style: TextStyle(fontSize: isWatch ? 10 : 12, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
                               ),
                             )
                           ],
@@ -202,11 +216,11 @@ class _PatientDashboardState extends State<PatientDashboard> {
     );
   }
 
-  Widget _buildSectionTitle(String title, Color color) {
+  Widget _buildSectionTitle(String title, Color color, double fontSize) {
     return Text(
       title,
       style: TextStyle(
-        fontSize: 12,
+        fontSize: fontSize,
         fontWeight: FontWeight.bold,
         letterSpacing: 2.0,
         color: color,

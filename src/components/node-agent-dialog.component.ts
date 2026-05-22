@@ -630,7 +630,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked {
             const systemContext = `You are a focused clinical evidence assistant embedded in the Pocket Gull Clinical Intelligence Platform.
 A clinician is reviewing a specific recommendation from the "${section}" section of an AI-generated care plan and wants to understand or challenge it.
 
-IPatient context is available. The recommendation under review is:
+Patient context is available. The recommendation under review is:
 """
 ${nodeText}
 """

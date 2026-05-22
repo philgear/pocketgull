@@ -6,6 +6,13 @@ import { AI_CONFIG } from './ai-provider.types';
 import { IntelligenceProviderToken } from './ai/intelligence.provider.token';
 import { NetworkStateService } from './network-state.service';
 import { RulesEngineService } from './rules-engine.service';
+import { PatientStateService } from './patient-state.service';
+import {
+    DEMO_ANALYSIS_REPORT_WESTERN,
+    DEMO_ANALYSIS_REPORT_EASTERN,
+    DEMO_ANALYSIS_REPORT_AYURVEDIC,
+    DEMO_ANALYSIS_REPORT_GROW_THY_SELF
+} from '../demo-data';
 
 export interface ITranscriptEntry {
     role: 'user' | 'model';
@@ -19,7 +26,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'IPatient Education' | 'Orthomolecular Profiling';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Orthomolecular Profiling';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
@@ -35,6 +42,7 @@ export class ClinicalIntelligenceService {
     private cache = inject(AiCacheService);
     private network = inject(NetworkStateService);
     private rules = inject(RulesEngineService);
+    private patientState = inject(PatientStateService);
 
     readonly isLoading = signal<boolean>(false);
     readonly error = signal<string | null>(null);
@@ -51,6 +59,7 @@ export class ClinicalIntelligenceService {
     readonly recentNodes = signal<INodeContext[]>([]);
 
     readonly lastPatientData = signal<string | null>(null);
+    readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self' | null>(null);
 
     public addRecentNode(nodeContext: INodeContext) {
         this.recentNodes.update(nodes => {
@@ -83,6 +92,43 @@ ANNOTATION SYNTAX (place on a NEW LINE after the relevant paragraph or list item
 [[suggestion: Short actionable suggestion]]
 [[proposed: Full replacement text for the paragraph above]]
 `;
+
+    private readonly PHILOSOPHY_INSTRUCTIONS: Record<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self', string> = {
+        western: `CLINICAL PARADIGM: Western (Allopathic) Medicine.
+- Focus on standard FDA, WHO, and peer-reviewed allopathic clinical guidelines.
+- Target conventional pharmacology, evidence-based diagnostics, standard metabolic pathways, and structured healthcare interventions.
+- Ensure recommendations are backed by randomized controlled trials (RCTs) and clinical reference models.`,
+
+        eastern: `CLINICAL PARADIGM: Eastern (Traditional Chinese Medicine - TCM).
+- Frame the clinical assessment and care plan using TCM diagnostic paradigms: identify organ system disharmonies, Zang-Fu patterns, Qi and blood flow status, Yin/Yang balances, and potential tongue/pulse markers where applicable.
+- Tailor lifestyle, nutrition, and therapies toward acupressure/acupoints, meridians, moxibustion guidelines, and traditional herbal formulations (e.g., cooling vs. warming foods, Qi-tonifying herbs).
+- Always translate these concepts into clean clinical contexts that blend with modern physiological understanding (e.g. referencing autonomic nervous system or microcirculation alongside Qi/blood stasis).`,
+
+        ayurvedic: `CLINICAL PARADIGM: Ayurvedic Medicine.
+- Frame the clinical assessment and care plan using Ayurvedic medicine principles: evaluate the patient's likely Tridosha constitution or imbalances (Vata, Pitta, Kapha).
+- Analyze metabolic and cellular health through the concepts of Agni (digestive and metabolic fire) and Ama (accumulated toxicity/undigested metabolic byproducts).
+- Direct lifestyle and nutrition toward Dinacharya (daily circadian alignment/routines), seasonal regimens, spice/herb energetics (Rasayana), and balancing sensory inputs.
+- Translate these concepts into clear clinical advice that aligns with modern metabolic, gut microbiome, and circadian biology.`,
+
+        'grow-thy-self': `CLINICAL PARADIGM: Grow Thy Self (Preventive, Holistic & Longevity Medicine).
+- Focus on cellular optimization, Linus Pauling orthomolecular principles (supplying the right molecules in the right amounts), circadian rhythms, sleep architecture, and stress resilience.
+- SECULAR & HUMANIST FRAMING: Ensure all recommendations and wisdom lenses are framed in a completely secular and inclusive manner. For patients who do not identify with religious or spiritual traditions, translate all concepts (such as Purusharthas, Mizan, or Tikkun Olam) into physiological, psychological, and sociological frameworks (e.g. mapping spiritual harmony to autonomic balance, homeostatic regulation, existential purpose, emotional resilience, and active civic/communal engagement).
+- INTEGRATED WISDOM LENSES: Adapt the care strategy dynamically by applying the most relevant of these 13 world wisdom systems based on the patient's clinical situation and stressors:
+  1. Bagua (Taoist Energy Matrix): Harmonize daily routines, environmental/spatial habits, and circadian zones with specific life sectors.
+  2. Enso (Zen Wabi-Sabi): Practice self-compassion and acceptance of chronic symptoms or physical limitations, shifting from aggressive hyper-striving to gentle mindfulness.
+  3. Four Cardinal Values (Classical Virtues): Integrate Prudence (balanced pacing), Temperance (restraint in extreme biohacking/dieting), Fortitude (resilience during flares), and Justice (self-care as a fundamental responsibility).
+  4. Four Purusharthas (Hindu Life Goals): Align metabolic health with Dharma (ethical duty/body rhythms), Artha (vocation and work boundaries), Kama (sensory pleasure/wholesome foods), and Moksha (stress liberation/psychological freedom).
+  5. Golden Mean (Aristotelian Balance): Counsel the patient on moderation, avoiding extreme health regimes or hyper-supplements.
+  6. Hygge (Danish Comfort): Advocate for cozy, safe rest environments, somatic comfort, and warm relationships to down-regulate the sympathetic nervous system.
+  7. Ikigai (Japanese Purpose): Leverage daily activation, diet, and movement to fuel the patient's long-term passions, vocation, and longevity.
+  8. Lagom (Swedish Sufficiency): Focus on "just enough"—minimalist, highly sustainable supplementation, and balanced rest-activity ratios.
+  9. Medicine Wheel (Indigenous Sacred Circle): Structure and categorize lifestyle advice across Physical, Mental, Emotional, and Spiritual spheres (translating the spiritual sphere to existential meaning, deep connection to nature, and personal core values).
+  10. Mizan (Islamic Balance): Advocate for systemic bodily equilibrium, homeostatic moderation, and clean, wholesome (Tayyib) nutrition.
+  11. Wheel of Life (Coaching Dimensions): Track multidimensional lifestyle wellness (romance, home, career, fun, health) during follow-ups.
+  12. Tikkun Olam (Jewish World-Repair): Frame personal healing and recovery as a prerequisite for active altruism, community service, and world-repair.
+  13. Ubuntu (African Relational Wellness): Leverage collaborative healing, family support networks, and community co-regulation.
+- Always translate these philosophical structures into clear, practical clinical advice (e.g. referencing mitochondrial health, cortisol dynamics, autonomic tone, or sleep hygiene).`
+    };
 
     private systemInstructions: Record<AnalysisLens, string> = {
         'Summary Overview': `You are a world-class care plan recommendation engine for a clinical decision-support tool.
@@ -150,7 +196,7 @@ Generate a structured monitoring and follow-up plan organized by time horizon:
 ### Long-term Trajectory (6+ months)
 (Provide a brief narrative on expected outcomes.)` + this.FORMATTING_RULES,
 
-        'IPatient Education': `You are a patient education specialist for a clinical decision-support tool. Translate the documented clinical findings into patient-friendly language.
+        'Patient Education': `You are a patient education specialist for a clinical decision-support tool. Translate the documented clinical findings into patient-friendly language.
 
 CRITICAL: You must ONLY include information that is explicitly documented in the patient data provided. Do NOT invent, assume, or add any clinical details, recommendations, or advice not present in the source material. Every statement must be directly traceable to the provided data.
 
@@ -205,6 +251,7 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
         this.transcript.set([]);
+        this.lastActivePhilosophy.set(null);
     }
 
     public loadArchivedAnalysis(report: Partial<Record<AnalysisLens, string>>) {
@@ -214,7 +261,13 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
     }
 
     private async generateVisualMetrics(report: Record<string, string>): Promise<void> {
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'IPatient Education'];
+        const isEmergency = this.patientState.isEmergencyMode();
+        if (isEmergency) {
+            this.analysisMetrics.set({ complexity: 3, stability: 2, certainty: 8 });
+            return;
+        }
+
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'Patient Education'];
         const reportText = lenses.map(lens => report[lens]).filter(Boolean).join('\n\n');
         const cacheKey = await this.cache.generateKey([reportText, 'visual-metrics-v2']);
 
@@ -239,8 +292,57 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         }
     }
 
+    private getDemoReportForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'): Partial<Record<AnalysisLens, string>> {
+        if (philosophy === 'eastern') return DEMO_ANALYSIS_REPORT_EASTERN;
+        if (philosophy === 'ayurvedic') return DEMO_ANALYSIS_REPORT_AYURVEDIC;
+        if (philosophy === 'grow-thy-self') return DEMO_ANALYSIS_REPORT_GROW_THY_SELF;
+        return DEMO_ANALYSIS_REPORT_WESTERN;
+    }
+
+    private getDemoMetricsForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'): IClinicalMetrics {
+        if (philosophy === 'eastern') return { complexity: 7, stability: 6, certainty: 7 };
+        if (philosophy === 'ayurvedic') return { complexity: 8, stability: 5, certainty: 7 };
+        if (philosophy === 'grow-thy-self') return { complexity: 5, stability: 8, certainty: 9 };
+        return { complexity: 6, stability: 7, certainty: 8 };
+    }
+
     async generateComprehensiveReport(patientData: string): Promise<Partial<Record<AnalysisLens, string>>> {
-        if (!this.network.useLocalInference() && !this.network.isOnline()) {
+        const isEmergency = this.patientState.isEmergencyMode();
+        const currentPhilosophy = this.patientState.activePhilosophy();
+
+        if (!isEmergency && this.patientState.isDemoMode()) {
+            this.isLoading.set(true);
+            this.error.set(null);
+            this.analysisResults.set({});
+            this.analysisMetrics.set(null);
+
+            // Simulate network latency / parsing time for premium feel
+            await new Promise(resolve => setTimeout(resolve, 600));
+
+            const report = this.getDemoReportForPhilosophy(currentPhilosophy);
+            
+            this.analysisResults.set(report);
+            this.lastPatientData.set(patientData);
+            this.lastActivePhilosophy.set(currentPhilosophy);
+            this.lastRefreshTime.set(new Date());
+
+            const metrics = this.getDemoMetricsForPhilosophy(currentPhilosophy);
+            this.analysisMetrics.set(metrics);
+
+            // Mock verification results
+            const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'Patient Education'];
+            const mockVerification = { status: 'verified', issues: [] };
+            const newVerificationResults: Partial<Record<AnalysisLens, { status: string, issues: IVerificationIssue[] }>> = {};
+            for (const lens of lenses) {
+                newVerificationResults[lens] = mockVerification;
+            }
+            this.verificationResults.set(newVerificationResults);
+
+            this.isLoading.set(false);
+            return report;
+        }
+
+        if (!isEmergency && !this.network.useLocalInference() && !this.network.isOnline()) {
             this.error.set("You are currently offline and no local inference endpoint is available.");
             return {};
         }
@@ -250,15 +352,16 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
 
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'IPatient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'Patient Education'];
         const newReport: Partial<Record<AnalysisLens, string>> = {};
 
-        if (this.lastPatientData()) {
+        if (!isEmergency && this.lastPatientData() && this.lastActivePhilosophy() === currentPhilosophy) {
             const isSignificant = await this.ai.detectClinicalChanges(this.lastPatientData()!, patientData);
 
             if (!isSignificant) {
                 console.log("Clinical Delta: No significant changes detected. Reusing existing report.");
                 this.lastPatientData.set(patientData);
+                this.lastActivePhilosophy.set(currentPhilosophy);
 
                 const currentResults = this.analysisResults() as Record<string, string>;
                 if (Object.keys(currentResults).length > 0) {
@@ -278,7 +381,22 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
 
         try {
             const orchestrationPromises = lenses.map(async (lens) => {
-                const sysInstruction = this.systemInstructions[lens];
+                const philosophy = this.patientState.activePhilosophy();
+                const philosophyInstruction = this.PHILOSOPHY_INSTRUCTIONS[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
+
+                let sysInstruction = philosophyInstruction + '\n\n' + this.systemInstructions[lens];
+                if (isEmergency) {
+                    sysInstruction = `EMERGENCY FIRST AID MODE: You are assisting a bystander under the Good Samaritan law.
+CRITICAL EMERGENCY RULES:
+- ONLY suggest Basic Life Support (BLS) steps.
+- Restrict advice strictly to CPR (110 BPM), physical airway management, physical stabilizing steps, applying direct pressure, and using a tourniquet.
+- ABSOLUTELY PROHIBIT prescribing, recommending, or detailing drug dosages or surgical/invasive procedures.
+- Do NOT advise administering medications unless specifically requested by 911 dispatch.
+- Focus on immediate physical actions.
+- Keep instructions extremely short, bold, and clear.
+
+` + sysInstruction;
+                }
                 const cacheKey = await this.cache.generateKey([patientData, sysInstruction, lens]);
 
                 try {
@@ -317,6 +435,7 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
             await Promise.allSettled(orchestrationPromises);
 
             this.lastPatientData.set(patientData);
+            this.lastActivePhilosophy.set(currentPhilosophy);
             this.analysisResults.set(newReport);
             this.lastRefreshTime.set(new Date());
             await this.generateVisualMetrics(newReport as Record<string, string>);
@@ -341,18 +460,39 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
     }
 
     async startChatSession(patientData: string) {
-        if (!this.network.isOnline() && !this.network.useLocalInference()) {
+        const isEmergency = this.patientState.isEmergencyMode();
+        if (!isEmergency && !this.network.isOnline() && !this.network.useLocalInference()) {
             this.error.set("You are currently offline and no local inference endpoint is available.");
             return;
         }
 
         this.transcript.set([]);
-        const context = `You are a collaborative care plan co-pilot named "Pocket Gull". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient's data. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.`;
+        let context = `You are a collaborative care plan co-pilot named "Pocket Gull". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient's data. Keep your answers brief, actionable, and focused on strategic holistic care. Be ready to elaborate when asked.`;
+        if (isEmergency) {
+            context = `EMERGENCY FIRST-AID COMPANION: You are assisting a bystander performing immediate triage or resuscitation under Good Samaritan principles.
+CRITICAL SAFETY CONSTRAINTS:
+- NEVER suggest, prescribe, or discuss drug dosages, chemical interventions, or invasive procedures.
+- Focus exclusively on non-invasive Basic Life Support (BLS) interventions: CPR chest compressions (110 BPM), rescue breathing, airway clearing, physical stabilization (recovery position), direct pressure for severe bleeding, and tourniquets.
+- Keep all replies extremely direct, concise, and structured in short, clear bullet points for high-stress situations.
+- Urgently remind the user to call emergency services (911) if not already done.`;
+        } else {
+            const philosophy = this.patientState.activePhilosophy();
+            if (philosophy === 'eastern') {
+                context += `\n\nActive Medicine Mode: Eastern (Traditional Chinese Medicine). Frame your dialogue using TCM perspectives, including Zang-Fu imbalances, Qi and blood dynamics, Yin/Yang harmony, and traditional holistic advice, while keeping the interface and language accessible to modern clinicians.`;
+            } else if (philosophy === 'ayurvedic') {
+                context += `\n\nActive Medicine Mode: Ayurvedic Medicine. Frame your dialogue using Ayurvedic perspectives, including Doshas (Vata, Pitta, Kapha), Agni, Ama, Dinacharya daily rhythms, and Rasayana support, while translating concepts to align with modern functional medicine and metabolic science.`;
+            } else if (philosophy === 'grow-thy-self') {
+                context += `\n\nActive Medicine Mode: Grow Thy Self (Preventive & Longevity Medicine). Frame your dialogue using preventive wellness paradigms, cellular health, and the 13 world wisdom lenses: Bagua, Enso, Four Cardinal Values, Four Purusharthas, Golden Mean, Hygge, Ikigai, Lagom, Medicine Wheel, Mizan, Wheel of Life, Tikkun Olam, and Ubuntu. Ensure that if the patient is non-religious or secular, you present these lenses without theological or dogmatic language, framing them instead as models for physiological homeostasis, emotional integration, existential purpose, and community connection.`;
+            } else {
+                context += `\n\nActive Medicine Mode: Western (Allopathic) Medicine. Frame your dialogue using conventional clinical guidelines, pharmacology, and standard global medical baselines.`;
+            }
+        }
         await this.ai.startChat(patientData, context);
     }
 
     async getInitialGreeting(): Promise<string> {
-        if (!this.network.isOnline() && !this.network.useLocalInference()) {
+        const isEmergency = this.patientState.isEmergencyMode();
+        if (!isEmergency && !this.network.isOnline() && !this.network.useLocalInference()) {
             const errorMsg = "You are currently offline. Please reconnect to consult the AI.";
             this.error.set(errorMsg);
             this.transcript.set([{ role: 'model', text: errorMsg }]);
@@ -361,7 +501,11 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
 
         this.isLoading.set(true);
         try {
-            const response = await this.ai.getInitialGreeting("Start the conversation with a friendly and professional tone. Greet the doctor and confirm you have reviewed the patient's file and are ready for questions.");
+            let prompt = "Start the conversation with a friendly and professional tone. Greet the doctor and confirm you have reviewed the patient's file and are ready for questions.";
+            if (isEmergency) {
+                prompt = "Start the conversation as an emergency assistant. Briefly state: 'Emergency Bystander Support active. Start CPR if unresponsive (110 BPM metronome available). What is the primary injury or symptom?' Keep it under 2 sentences.";
+            }
+            const response = await this.ai.getInitialGreeting(prompt);
             this.transcript.set([{ role: 'model', text: response }]);
             return response;
         } catch (e: any) {
@@ -384,7 +528,8 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
             return blocked.reply;
         }
 
-        if (!this.network.isOnline() && !this.network.useLocalInference()) {
+        const isEmergency = this.patientState.isEmergencyMode();
+        if (!isEmergency && !this.network.isOnline() && !this.network.useLocalInference()) {
             const errorMsg = "You are currently offline and no local inference endpoint is available.";
             this.error.set(errorMsg);
             this.transcript.update(t => [...t, { role: 'model', text: errorMsg }]);

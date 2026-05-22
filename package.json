@@ -72,18 +72,15 @@
     "lint": "tsc --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
-    "release": "npm run changelog && npm version patch -m \"chore(release): %s\"",
-<<<<<<< Updated upstream
-    "deploy": "npm run build && gcloud run deploy pocket-gull --source . --region=us-west1 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --quiet",
-=======
-    "deploy": "npm run build && gcloud run deploy pocket-gull --project gen-lang-client-0540208645 --source . --region=us-central1 --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest --quiet",
->>>>>>> Stashed changes
+    "deploy": "npm run build && gcloud run deploy pocket-gull --source . --region=us-west1 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --update-env-vars=OTEL_SDK_DISABLED=true --quiet",
     "serve:ssr:app": "node dist/server/server.mjs",
     "start": "node dist/server/server.mjs",
     "gcp-build": "npm run build && npm prune --production",
     "audit": "lighthouse http://localhost:4000 --view",
     "estimate-effort": "node scripts/estimate-effort.js",
+    "precommit": "node scripts/pre-commit-check.cjs",
     "prepare": "husky"
+
   },
   "dependencies": {
     "@angular/build": "~21.2.0",

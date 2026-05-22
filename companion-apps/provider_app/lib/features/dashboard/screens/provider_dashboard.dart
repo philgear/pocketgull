@@ -37,16 +37,29 @@ class _ProviderDashboardState extends State<ProviderDashboard> {
     final textColor = isDark ? const Color(0xFFF4F4F5) : const Color(0xFF1C1C1C);
     final subColor = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
 
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final bool isWatch = screenWidth < 240 || screenHeight < 320;
+    final bool isSmallPhone = screenWidth < 360 || screenHeight < 640;
+
+    final double listPadding = isWatch ? 4.0 : 8.0;
+    final double tileHorizontalPadding = isWatch ? 8.0 : (isSmallPhone ? 16.0 : 24.0);
+    final double tileVerticalPadding = isWatch ? 4.0 : (isSmallPhone ? 6.0 : 8.0);
+    final double titleFontSize = isWatch ? 12.0 : (isSmallPhone ? 14.0 : 16.0);
+    final double subtitleFontSize = isWatch ? 9.0 : (isSmallPhone ? 11.0 : 13.0);
+    final double appBarTitleFontSize = isWatch ? 11.0 : 14.0;
+
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        title: const Text('PATIENT DIRECTORY', style: TextStyle(letterSpacing: 2, fontSize: 14)),
+        title: Text('PATIENT DIRECTORY', style: TextStyle(letterSpacing: 2, fontSize: appBarTitleFontSize)),
         centerTitle: true,
         backgroundColor: bgColor,
         elevation: 0,
         iconTheme: IconThemeData(color: textColor),
         actions: [
           IconButton(
+            iconSize: isWatch ? 16 : 24,
             icon: const Icon(Icons.refresh),
             onPressed: _loadData,
           )
@@ -55,11 +68,11 @@ class _ProviderDashboardState extends State<ProviderDashboard> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _patients.isEmpty
-              ? Center(child: Text('No patients found.', style: TextStyle(color: textColor)))
+              ? Center(child: Text('No patients found.', style: TextStyle(color: textColor, fontSize: titleFontSize)))
               : RefreshIndicator(
                   onRefresh: _loadData,
                   child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: EdgeInsets.symmetric(vertical: listPadding),
                     itemCount: _patients.length,
                     separatorBuilder: (_, __) => Divider(
                       height: 1, 
@@ -68,16 +81,16 @@ class _ProviderDashboardState extends State<ProviderDashboard> {
                     itemBuilder: (context, index) {
                       final patient = _patients[index];
                       return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                        contentPadding: EdgeInsets.symmetric(horizontal: tileHorizontalPadding, vertical: tileVerticalPadding),
                         title: Text(
                           patient.name,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColor),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: titleFontSize, color: textColor),
                         ),
                         subtitle: Text(
                           'Age: ${patient.age} • Last Visit: ${patient.lastVisit}',
-                          style: TextStyle(color: subColor, fontSize: 13),
+                          style: TextStyle(color: subColor, fontSize: subtitleFontSize),
                         ),
-                        trailing: Icon(Icons.chevron_right, color: subColor),
+                        trailing: Icon(Icons.chevron_right, color: subColor, size: isWatch ? 16 : 24),
                         onTap: () {
                           Navigator.push(
                             context,

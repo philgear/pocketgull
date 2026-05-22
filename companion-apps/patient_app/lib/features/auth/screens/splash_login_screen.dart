@@ -95,20 +95,32 @@ class _SplashLoginScreenState extends State<SplashLoginScreen> {
     final Color borderColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7);
     final Color textColor = isDark ? const Color(0xFFF4F4F5) : const Color(0xFF1C1C1C);
     final Color subColor = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A);
+
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final bool isWatch = screenWidth < 240 || screenHeight < 320;
+    final bool isSmallPhone = screenWidth < 360 || screenHeight < 640;
+
+    final double mascotHeight = isWatch ? 70.0 : (isSmallPhone ? 120.0 : 180.0);
+    final double titleFontSize = isWatch ? 14.0 : (isSmallPhone ? 18.0 : 24.0);
+    final double subtitleFontSize = isWatch ? 8.0 : (isSmallPhone ? 10.0 : 12.0);
+    final double spacingMascotToTitle = isWatch ? 8.0 : 16.0;
+    final double spacingTitleToFields = isWatch ? 12.0 : (isSmallPhone ? 24.0 : 40.0);
+    final double horizontalPadding = isWatch ? 12.0 : 24.0;
     
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Origami Seagull emerging from 'pocket'
-                const SizedBox(
-                  height: 200,
-                  child: ClipRect(
+                SizedBox(
+                  height: mascotHeight,
+                  child: const ClipRect(
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: OrigamiSeagull(),
@@ -116,49 +128,50 @@ class _SplashLoginScreenState extends State<SplashLoginScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 24),
+                SizedBox(height: spacingMascotToTitle),
                 
                 Text(
                   'POCKET GULL',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 4.0,
+                    letterSpacing: isWatch ? 2.0 : 4.0,
                     color: textColor,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   'PATIENT CARE PLAN PORTAL',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 12,
-                    letterSpacing: 2.5,
+                    fontSize: subtitleFontSize,
+                    letterSpacing: isWatch ? 1.5 : 2.5,
                     color: subColor,
                   ),
                 ),
                 
-                const SizedBox(height: 48),
+                SizedBox(height: spacingTitleToFields),
                 
-                Text(
-                  'Access your clinical care plan and sync biometrics securely.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: subColor,
+                if (!isWatch) ...[
+                  Text(
+                    'Access your clinical care plan and sync biometrics securely.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isSmallPhone ? 12 : 14,
+                      color: subColor,
+                    ),
                   ),
-                ),
-                
-                const SizedBox(height: 24),
+                  const SizedBox(height: 16),
+                ],
 
                 // API Key Field
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
+                    padding: const EdgeInsets.only(bottom: 6.0),
                     child: Text(
                       'GEMINI API KEY',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: subColor),
+                      style: TextStyle(fontSize: isWatch ? 8 : 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: subColor),
                     ),
                   ),
                 ),
@@ -175,20 +188,23 @@ class _SplashLoginScreenState extends State<SplashLoginScreen> {
                           obscureText: _obscureText,
                           style: TextStyle(
                             fontFamily: 'monospace',
+                            fontSize: isWatch ? 10 : 12,
                             color: isDark ? const Color(0xFFF4F4F5) : const Color(0xFF27272A),
                           ),
                           onSubmitted: (_) => _submitApiKey(),
                           decoration: InputDecoration(
-                            hintText: 'Paste your Gemini API key here',
+                            hintText: 'Paste Gemini API key',
                             hintStyle: TextStyle(
+                              fontSize: isWatch ? 10 : 12,
                               color: isDark ? const Color(0xFF52525B) : const Color(0xFFD1D5DB),
                             ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: isWatch ? 8 : 12),
                           ),
                         ),
                       ),
                       IconButton(
+                        iconSize: isWatch ? 16 : 20,
                         icon: Icon(
                           _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                           color: subColor,
@@ -203,16 +219,16 @@ class _SplashLoginScreenState extends State<SplashLoginScreen> {
                   ),
                 ),
                 
-                const SizedBox(height: 20),
+                SizedBox(height: isWatch ? 10 : 16),
 
                 // Patient Delegation Code
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
+                    padding: const EdgeInsets.only(bottom: 6.0),
                     child: Text(
                       'PATIENT DELEGATION CODE',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: subColor),
+                      style: TextStyle(fontSize: isWatch ? 8 : 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: subColor),
                     ),
                   ),
                 ),
@@ -225,21 +241,23 @@ class _SplashLoginScreenState extends State<SplashLoginScreen> {
                     controller: _delegationCodeController,
                     style: TextStyle(
                       fontFamily: 'monospace',
+                      fontSize: isWatch ? 10 : 12,
                       color: isDark ? const Color(0xFFF4F4F5) : const Color(0xFF27272A),
                     ),
                     onSubmitted: (_) => _submitApiKey(),
                     decoration: InputDecoration(
-                      hintText: 'Enter delegation access code (e.g. p001)',
+                      hintText: 'e.g. p001',
                       hintStyle: TextStyle(
+                        fontSize: isWatch ? 10 : 12,
                         color: isDark ? const Color(0xFF52525B) : const Color(0xFFD1D5DB),
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: isWatch ? 8 : 12),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                SizedBox(height: isWatch ? 16 : 24),
 
                 // Submit Button
                 SizedBox(
@@ -248,15 +266,19 @@ class _SplashLoginScreenState extends State<SplashLoginScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: textColor,
                       foregroundColor: isDark ? const Color(0xFF18181B) : Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: isWatch ? 10 : 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                     onPressed: _submitApiKey,
-                    child: const Text(
+                    child: Text(
                       'ACCESS CARE PLAN',
-                      style: TextStyle(letterSpacing: 2.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: isWatch ? 10 : 12,
+                        letterSpacing: 2.0, 
+                        fontWeight: FontWeight.bold
+                      ),
                     ),
                   ),
                 ),

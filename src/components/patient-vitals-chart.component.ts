@@ -10,7 +10,7 @@ import { Chart } from 'chart.js/auto';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full bg-white border border-gray-100 rounded-xl p-4 shadow-sm mb-4">
-      <h3 class="text-xs font-bold text-gray-800 uppercase tracking-widest mb-4">Longitudinal Vitals</h3>
+      <h3 class="text-xs font-bold text-gray-800 uppercase tracking-widest mb-4">Longitudinal IVitals</h3>
       <div class="relative w-full h-48">
          <canvas #chartCanvas></canvas>
          @if (noData) {

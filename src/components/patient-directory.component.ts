@@ -12,11 +12,11 @@ import { IPatient } from '../services/patient.types';
   template: `
     <div class="fixed inset-0 bg-[#EEEEEE] dark:bg-zinc-950 z-[60] overflow-y-auto w-full h-full flex flex-col no-print font-sans transition-colors duration-300">
       
-      <!-- New IPatient Modal -->
+      <!-- New Patient Modal -->
       @if (showNewPatientModal()) {
         <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
           <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-2xl border border-gray-200 dark:border-zinc-800 animate-in fade-in zoom-in-95 duration-200">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">Create New IPatient</h2>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">Create New Patient</h2>
             
             <form (ngSubmit)="saveNewPatient()" class="space-y-4">
               <div>
@@ -74,7 +74,7 @@ import { IPatient } from '../services/patient.types';
         <button (click)="openNewPatientModal()" 
                 class="flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded shadow-sm hover:shadow active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-black dark:hover:bg-gray-100 focus:ring-gray-900 dark:focus:ring-white">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-          <span class="text-sm font-semibold tracking-wide">New IPatient</span>
+          <span class="text-sm font-semibold tracking-wide">New Patient</span>
         </button>
       </div>
 
@@ -112,7 +112,7 @@ import { IPatient } from '../services/patient.types';
                   <span class="font-medium text-gray-900 dark:text-zinc-200">{{ patient.age }}</span>
                 </div>
                 <div class="flex justify-between">
-                  <span class="text-gray-500 dark:text-zinc-400">Vitals:</span>
+                  <span class="text-gray-500 dark:text-zinc-400">IVitals:</span>
                   <span class="font-medium text-gray-900 dark:text-zinc-200">{{ patient.vitals?.bp || '--/--' }}</span>
                 </div>
                 <div class="flex justify-between">

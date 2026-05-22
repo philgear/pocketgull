@@ -7,14 +7,23 @@ import puppeteer from 'puppeteer';
   const errors = [];
   page.on('console', msg => {
     if (msg.type() === 'error') {
-      errors.push(msg.text());
+      errors.push(`Console Error: ${msg.text()}`);
     }
   });
   page.on('pageerror', err => {
-    errors.push(err.toString());
+    errors.push(`Page Error: ${err.toString()}`);
+  });
+  page.on('requestfailed', req => {
+    errors.push(`Request Failed: ${req.url()} (${req.failure()?.errorText || 'unknown'})`);
+  });
+  page.on('response', res => {
+    if (res.status() >= 400) {
+      errors.push(`HTTP Error ${res.status()}: ${res.url()}`);
+    }
   });
 
-  await page.goto('http://localhost:4200', { waitUntil: 'networkidle0' });
+  const port = process.env.PORT || 4200;
+  await page.goto(`http://localhost:${port}`, { waitUntil: 'networkidle0' });
 
   if (errors.length > 0) {
     console.log('Found errors:', errors);

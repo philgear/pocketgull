@@ -184,6 +184,8 @@ export interface IPatientState {
     traumaFlags?: ITraumaFlags;
     /** Current AI-generated AVS co-regulation protocol. */
     avsProtocol?: IAvsProtocol;
+    /** Selected medical paradigm / philosophy mode. */
+    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self';
 }
 
 /**

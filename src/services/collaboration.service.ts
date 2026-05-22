@@ -4,7 +4,7 @@ import { PatientStateService } from './patient-state.service';
 import { AuthService } from './auth.service';
 import { IPatientVitals } from './patient.types';
 
-export interface CollaborationNote {
+export interface ICollaborationNote {
   id: string;
   clinicianName: string;
   text: string;
@@ -21,7 +21,7 @@ export class CollaborationService {
 
   // Reactive State using Signals
   activeClinicians = signal<string[]>([]);
-  collaborationNotes = signal<CollaborationNote[]>([]);
+  collaborationNotes = signal<ICollaborationNote[]>([]);
   isConnected = signal<boolean>(false);
 
   // In this architecture, patient state is global for the current session
@@ -58,7 +58,7 @@ export class CollaborationService {
     });
 
     // Listen for chat notes from other clinicians
-    this.socket.on('note_received', (note: CollaborationNote) => {
+    this.socket.on('note_received', (note: ICollaborationNote) => {
       this.collaborationNotes.update(notes => [...notes, note]);
     });
 
@@ -87,7 +87,7 @@ export class CollaborationService {
   public sendNote(text: string): void {
     if (!this.socket) return;
 
-    const newNote: CollaborationNote = {
+    const newNote: ICollaborationNote = {
       id: crypto.randomUUID(),
       clinicianName: 'Dr. Colleague',
       text,

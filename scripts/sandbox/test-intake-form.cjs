@@ -6,7 +6,8 @@ const puppeteer = require('puppeteer');
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
-    await page.goto('http://localhost:3000');
+    const port = process.env.PORT || 3000;
+    await page.goto(`http://localhost:${port}`);
 
     // Capture console logs
     page.on('console', msg => console.log('BROWSER LOG:', msg.text()));

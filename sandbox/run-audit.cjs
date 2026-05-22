@@ -6,13 +6,14 @@ const fs = require('fs');
   console.log('Starting browser...');
   const browser = await puppeteer.launch({ 
     headless: 'new',
-    args: ['--window-size=1280,1024']
+    args: ['--window-size=1280,1024', '--no-sandbox', '--disable-setuid-sandbox']
   });
   const page = await browser.newPage();
   await page.setViewport({ width: 1280, height: 1024 });
   
   console.log('Loading app...');
-  await page.goto('http://localhost:4200', { waitUntil: 'networkidle2' });
+  const port = process.env.PORT || 4200;
+  await page.goto(`http://localhost:${port}`, { waitUntil: 'networkidle2' });
   
   console.log('Clicking "Try Demo"...');
   await page.evaluate(() => {
@@ -50,15 +51,16 @@ const fs = require('fs');
     report += `**Affected Nodes (${v.nodes.length}):**\n`;
     v.nodes.slice(0, 3).forEach(n => {
        report += `- \`${n.html}\`\n  - *${n.failureSummary}*\n`;
-    });
+     });
     if (v.nodes.length > 3) {
       report += `- ...and ${v.nodes.length - 3} more.\n`;
     }
     report += '\n---\n\n';
   });
   
-  fs.writeFileSync('C:\\Users\\philg\\.gemini\\antigravity\\brain\\c5706165-a2bd-41b8-9f1c-c92d41842d17\\wcag_audit_report.md', report);
-  console.log('Saved detailed report to artifacts.');
+  const reportPath = process.env.WCAG_AUDIT_REPORT_PATH || 'wcag_audit_report.md';
+  fs.writeFileSync(reportPath, report);
+  console.log(`Saved detailed report to ${reportPath}`);
   
   await browser.close();
 })();

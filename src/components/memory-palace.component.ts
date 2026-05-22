@@ -163,7 +163,7 @@ import { PatientStateService } from '../services/patient-state.service';
                   </div>
                   <div class="mt-4">
                     <h4 class="text-sm font-extrabold text-gray-950 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Laboratory</h4>
-                    <p class="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Biomarkers / Vitals</p>
+                    <p class="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">Biomarkers / IVitals</p>
                     
                     @if (getLociForRoom('Laboratory'); as roomLoci) {
                       @if (roomLoci.length > 0) {

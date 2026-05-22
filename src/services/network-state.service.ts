@@ -1,15 +1,20 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HardwareTelemetryService } from './hardware-telemetry.service';
+import { PatientStateService } from './patient-state.service';
 
 const LOCAL_INFERENCE_KEY = 'pg_preferLocalInference';
 
 @Injectable({ providedIn: 'root' })
 export class NetworkStateService {
+    private telemetry = inject(HardwareTelemetryService);
+    private patientState = inject(PatientStateService);
+
     private browserOnline = signal(typeof navigator !== 'undefined' ? navigator.onLine : true);
     readonly forceOffline = signal(false);
 
-    /** When true, routes all AI calls to local PubGemma even when online. Persisted to localStorage. */
+    /** When true, routes all AI calls to local inference even when online. Persisted to localStorage. */
     readonly preferLocalInference = signal(
-        typeof localStorage !== 'undefined'
+        (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function')
             ? localStorage.getItem(LOCAL_INFERENCE_KEY) === 'true'
             : false
     );
@@ -21,11 +26,28 @@ export class NetworkStateService {
 
     /**
      * Reactive label for the active AI provider shown in UI status tooltips.
-     * Returns one of: 'Gemini Cloud', 'Local (PubGemma)', or 'Offline (PubGemma)'.
+     * Dynamically identifies the engine based on hardware recommendation and offline state.
      */
     readonly activeProvider = computed(() => {
-        if (!this.isOnline()) return 'Offline (PubGemma)';
-        if (this.preferLocalInference()) return 'Local (PubGemma)';
+        if (this.patientState.isEmergencyMode() && !this.isOnline()) {
+            return 'Offline (Gemini Nano)';
+        }
+
+        if (this.useLocalInference()) {
+            const path = this.telemetry.recommendedExecutionPath();
+            const prefix = this.isOnline() ? 'Local' : 'Offline';
+
+            if (path === 'local-nvidia') {
+                return `${prefix} (CUDA - PubGemma)`;
+            } else if (path === 'local-webgpu') {
+                return `${prefix} (WebGPU - WebLLM)`;
+            } else if (path === 'on-device-nano') {
+                return `${prefix} (Gemini Nano - window.ai)`;
+            } else {
+                return `${prefix} (WebGPU - WebLLM)`;
+            }
+        }
+
         return 'Gemini Cloud';
     });
 

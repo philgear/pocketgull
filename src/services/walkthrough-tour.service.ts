@@ -83,7 +83,7 @@ export class WalkthroughTourService {
   totalSteps = computed(() => this.steps().length);
 
   start() {
-    if (typeof localStorage !== 'undefined' && localStorage.getItem(TOUR_SEEN_KEY)) return;
+    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function' && localStorage.getItem(TOUR_SEEN_KEY)) return;
     this.currentStep.set(0);
   }
 
@@ -109,7 +109,7 @@ export class WalkthroughTourService {
 
   dismiss() {
     this.currentStep.set(-1);
-    if (typeof localStorage !== 'undefined') {
+    if (typeof localStorage !== 'undefined' && typeof localStorage.setItem === 'function') {
       localStorage.setItem(TOUR_SEEN_KEY, '1');
     }
   }

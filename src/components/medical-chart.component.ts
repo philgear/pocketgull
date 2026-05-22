@@ -119,9 +119,9 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
         }
       </pocket-gull-card>
 
-      <!-- IPatient History Card -->
+      <!-- Patient History Card -->
       <pocket-gull-card 
-        title="IPatient History" 
+        title="Patient History" 
         [icon]="historyIcon"
         [noPadding]="true">
         
@@ -175,7 +175,7 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
         }
       </pocket-gull-card>
 
-      <!-- IPatient Scans Card -->
+      <!-- Patient Scans Card -->
       <pocket-gull-card 
         title="DICOM Viewer" 
         [icon]="scansIcon"

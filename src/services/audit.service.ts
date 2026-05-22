@@ -7,7 +7,7 @@ export class AuditService {
   
   /**
    * Dispatches an immutable Cloud Audit Log metric containing the current action 
-   * and the affected PHI IPatient ID.
+   * and the affected PHI Patient ID.
    */
   logAction(action: string, patientId: string | null = null, details?: any) {
      fetch('/api/audit', {
