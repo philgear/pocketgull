@@ -8,7 +8,6 @@ import { MarkdownService } from '../services/markdown.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { DictationService } from '../services/dictation.service';
 import { generate } from 'lean-qr';
-import { GlobalAvsService } from '../services/global-avs.service';
 
 declare var webkitSpeechRecognition: any;
 import { ISummaryNode, ISummaryNodeItem, IReportSection, IParsedTranscriptEntry, NodeAnnotation, LensAnnotations, IVerificationIssue } from './analysis-report.types';
@@ -281,10 +280,10 @@ import { MemoryPalaceComponent } from './memory-palace.component';
                 </div>
               </div>
               <pocket-gull-button (click)="toggleCprMetronome()" 
-                [variant]="avs.isCprMetronomeActive() ? 'primary' : 'outline'" 
+                [variant]="isCprMetronomeActive() ? 'primary' : 'outline'" 
                 class="shrink-0 font-bold uppercase tracking-widest text-[10px] py-1.5 px-3 border border-red-500/30 transition-all active:scale-95 animate-pulse"
-                [class.bg-red-600]="avs.isCprMetronomeActive()"
-                [class.text-white]="avs.isCprMetronomeActive()">
+                [class.bg-red-600]="isCprMetronomeActive()"
+                [class.text-white]="isCprMetronomeActive()">
                 🔊 CPR Metronome (110 BPM)
               </pocket-gull-button>
             </div>
@@ -509,7 +508,9 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly dictation = inject(DictationService);
   private audit = inject(AuditService);
   protected readonly export = inject(ExportService);
-  protected readonly avs = inject(GlobalAvsService);
+  isCprMetronomeActive = signal<boolean>(false);
+  private cprIntervalId: any = null;
+  private audioCtx: AudioContext | null = null;
 
   readonly hasApiKey = computed(() => {
     // This line was part of the user's provided snippet, but it was incomplete and syntactically incorrect.
@@ -1066,6 +1067,7 @@ export class AnalysisReportComponent implements OnDestroy {
   ngOnDestroy() {
     if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
     this.flushAutoSave();
+    this.stopCprMetronome();
   }
 
   private triggerAutoSave(nodeKey: string) {
@@ -1237,10 +1239,74 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
   toggleCprMetronome() {
-    if (this.avs.isCprMetronomeActive()) {
-      this.avs.stopCprMetronome();
+    if (this.isCprMetronomeActive()) {
+      this.stopCprMetronome();
     } else {
-      this.avs.startCprMetronome();
+      this.startCprMetronome();
+    }
+  }
+
+  startCprMetronome(): void {
+    if (typeof window === 'undefined') return;
+    if (this.cprIntervalId) return;
+
+    this.isCprMetronomeActive.set(true);
+    const intervalMs = 60000 / 110; // ~545.45 ms
+
+    // Trigger immediately on start
+    this.playCprClick();
+
+    this.cprIntervalId = setInterval(() => {
+      this.playCprClick();
+    }, intervalMs);
+  }
+
+  stopCprMetronome(): void {
+    if (this.cprIntervalId) {
+      clearInterval(this.cprIntervalId);
+      this.cprIntervalId = null;
+    }
+    this.isCprMetronomeActive.set(false);
+    if (typeof window !== 'undefined') {
+      document.body.classList.remove('cpr-flash');
+    }
+  }
+
+  playCprClick(): void {
+    if (typeof window === 'undefined') return;
+
+    // Trigger visual flash
+    document.body.classList.add('cpr-flash');
+    setTimeout(() => {
+      document.body.classList.remove('cpr-flash');
+    }, 100);
+
+    // Audio click
+    try {
+      if (!this.audioCtx || this.audioCtx.state === 'closed') {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        this.audioCtx = new AudioContextClass();
+      }
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume().catch(() => {});
+      }
+
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(800, this.audioCtx.currentTime);
+
+      gain.gain.setValueAtTime(0.3, this.audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.08);
+
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+
+      osc.start();
+      osc.stop(this.audioCtx.currentTime + 0.1);
+    } catch (e) {
+      console.warn('[CPR] audio click failed:', e);
     }
   }
 

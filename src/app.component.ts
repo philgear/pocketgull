@@ -32,8 +32,6 @@ import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
-import { AvsUiService } from './services/avs-ui.service';
-import { GlobalAvsService } from './services/global-avs.service';
 import { PetAuditoryService } from './services/pet-auditory.service';
 import { StressInterventionService } from './services/stress-intervention.service';
 import { CollaborationService } from './services/collaboration.service';
@@ -64,8 +62,7 @@ import { SwUpdate } from '@angular/service-worker';
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <!-- Global AVS Ambient Halo — reacts to body.avs-active via CSS -->
-    <div id="avs-ambient-halo" aria-hidden="true"></div>
+
 
     @if (showFhirCallback()) {
       <app-fhir-callback></app-fhir-callback>
@@ -313,11 +310,7 @@ import { SwUpdate } from '@angular/service-worker';
               </div>
             <div class="h-4 w-px bg-[#EEEEEE] hidden sm:block"></div>
 
-            <!-- AVS Status Badge — visible only when body.avs-active -->
-            <div id="avs-status-badge" aria-live="polite">
-              <span class="avs-badge-dot"></span>
-              <span>{{ state.avsBrainwaveFrequency() | uppercase }} MODE</span>
-            </div>
+
 
             <!-- System Status Indicator (Hidden on smallest watches) -->
             <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-full border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-pointer group relative no-print" 
@@ -415,7 +408,7 @@ import { SwUpdate } from '@angular/service-worker';
           
           <div class="flex items-center gap-2">
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
-                    (mouseenter)="avsUi.playHover()"
+                   
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
                     [class.bg-gray-800]="state.isLiveAgentActive()"
@@ -442,7 +435,7 @@ import { SwUpdate } from '@angular/service-worker';
             </button>
             
             <button (click)="state.toggleResearchFrame()"
-                    (mouseenter)="avsUi.playHover()"
+                   
                     aria-label="Toggle Research Frame"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
@@ -450,7 +443,7 @@ import { SwUpdate } from '@angular/service-worker';
             </button>
             
             <a href="/docs/study/" target="_blank" rel="noopener"
-               (mouseenter)="avsUi.playHover()"
+              
                aria-label="Open Documentation"
                class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -461,7 +454,7 @@ import { SwUpdate } from '@angular/service-worker';
             </a>
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
-                    (mouseenter)="avsUi.playHover()"
+                   
                     aria-label="Start Tour Guide"
                     title="Start Tour Guide"
                     class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer">
@@ -474,7 +467,7 @@ import { SwUpdate } from '@angular/service-worker';
             
             <!-- Theme Toggle -->
             <button (click)="cycleTheme()" 
-                    (mouseenter)="avsUi.playHover()"
+                   
                     aria-label="Toggle Theme"
                     [title]="'Theme: ' + theme.currentTheme()"
                     class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer">
@@ -576,7 +569,7 @@ import { SwUpdate } from '@angular/service-worker';
            <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1">
              <!-- EXPORT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="exportMenuOpen.set(true)" (mouseleave)="exportMenuOpen.set(false)">
-               <button (mouseenter)="avsUi.playHover()"
+               <button
                        class="snap-start shrink-0 flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                  <span>Export</span>
@@ -585,13 +578,13 @@ import { SwUpdate } from '@angular/service-worker';
                
                @if (exportMenuOpen()) {
                  <div class="absolute top-full left-0 mt-1 w-40 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                   <button (click)="exportPdf(); exportMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2">
+                   <button (click)="exportPdf(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> As PDF
                    </button>
-                   <button (click)="exportJson(); exportMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="exportJson(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg> As JSON
                    </button>
-                   <button (click)="exportFhir(); exportMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="exportFhir(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> As FHIR
                    </button>
                  </div>
@@ -602,7 +595,7 @@ import { SwUpdate } from '@angular/service-worker';
 
              <!-- CONNECT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="connectMenuOpen.set(true)" (mouseleave)="connectMenuOpen.set(false)">
-               <button (mouseenter)="avsUi.playHover()"
+               <button
                        class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                  <span>Integrations</span>
@@ -611,25 +604,25 @@ import { SwUpdate } from '@angular/service-worker';
 
                @if (connectMenuOpen()) {
                  <div class="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                   <button (click)="connectEpic(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#E33B44] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2">
+                   <button (click)="connectEpic(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#E33B44] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> epic®
                    </button>
-                   <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Fitbit Sync (Out)
                    </button>
-                    <button (click)="importGoogleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                    <button (click)="importGoogleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Fitbit Import (In)
                     </button>
-                    <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                    <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> AWS HealthLake
                     </button>
-                    <button (click)="connectSwaggerHub(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#85EA2D] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                    <button (click)="connectSwaggerHub(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#85EA2D] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> SwaggerHub Catalog
                     </button>
-                   <button (click)="connectAppleHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="connectAppleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Apple Health
                    </button>
-                   <button (click)="uploadData(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                   <button (click)="uploadData(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> Upload Data
                    </button>
                  </div>
@@ -639,7 +632,7 @@ import { SwUpdate } from '@angular/service-worker';
              <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1"></div>
 
              <button (click)="finalizeRecord()"
-                     (mouseenter)="avsUi.playHover()"
+                    
                      id="tour-finalize-btn"
                      class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#689F38]/20 dark:border-[#689F38]/30 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 text-[#689F38] dark:text-[#689F38] bg-[#689F38]/5 dark:bg-[#689F38]/10 hover:bg-[#689F38]/10 dark:hover:bg-[#689F38]/20 rounded-md">
                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -1150,8 +1143,6 @@ import { SwUpdate } from '@angular/service-worker';
 })
 export class AppComponent implements OnDestroy {
   public tour = inject(WalkthroughTourService);
-  public avsUi = inject(AvsUiService);
-  public readonly globalAvs = inject(GlobalAvsService);
   public readonly petAuditory = inject(PetAuditoryService);
   private readonly stressIntervention = inject(StressInterventionService);
   public readonly collaboration = inject(CollaborationService);
@@ -1160,12 +1151,7 @@ export class AppComponent implements OnDestroy {
   public game = inject(GamificationService);
   private ngZone = inject(NgZone);
 
-  /** Unlock Web Audio API on the first user gesture (browser autoplay policy). */
-  @HostListener('document:click', [])
-  @HostListener('document:keydown', [])
-  onFirstGesture(): void {
-    this.globalAvs.onUserGesture();
-  }
+
   private patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
   network = inject(NetworkStateService);
@@ -1671,7 +1657,6 @@ export class AppComponent implements OnDestroy {
     }
     this.finalizeChart();
     this.game.completeQuest('finalize_plan');
-    this.avsUi.playFinalizeChord();
     this.closePreview();
   }
 
@@ -1704,7 +1689,6 @@ export class AppComponent implements OnDestroy {
     else if (current === 'light') this.theme.setTheme('dark');
     else if (current === 'dark') this.theme.setTheme('spark');
     else this.theme.setTheme('system');
-    this.avsUi.playTransition();
   }
 
   isSyncing = signal<boolean>(false);

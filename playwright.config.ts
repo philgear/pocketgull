@@ -18,7 +18,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    command: 'export PATH="/opt/homebrew/bin:$PATH" && GEMINI_API_KEY="" node dist/server/server.mjs',
     url: 'http://localhost:4200',
     reuseExistingServer: !process.env['CI'],
     timeout: 120000,

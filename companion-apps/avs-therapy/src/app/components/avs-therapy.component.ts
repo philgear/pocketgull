@@ -2,7 +2,6 @@ import { Component, signal, computed, effect, inject, OnDestroy, PLATFORM_ID, In
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientStateService } from '../services/patient-state.service';
-import { ThemeService } from '../services/theme.service';
 import { ClinicalContextAvsService } from '../services/clinical-context-avs.service';
 import { LifestyleAdjunctService } from '../services/lifestyle-adjunct.service';
 import { BreathGuideComponent } from './breath-guide.component';
@@ -143,16 +142,9 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
               @for (wave of waveProfiles; track wave.id) {
                 <button (click)="selectWaveProfile(wave.id)"
                         class="p-2.5 rounded-lg border text-center transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-0.5"
-                        [class.bg-orange-500/10]="targetWave() === wave.id"
-                        [class.border-orange-500]="targetWave() === wave.id"
-                        [class.text-orange-500]="targetWave() === wave.id"
-                        [class.bg-white]="targetWave() !== wave.id"
-                        [class.dark:bg-zinc-950/20]="targetWave() !== wave.id"
-                        [class.border-gray-200]="targetWave() !== wave.id"
-                        [class.dark:border-zinc-800]="targetWave() !== wave.id"
-                        [class.text-gray-500]="targetWave() !== wave.id"
-                        [class.dark:text-zinc-400]="targetWave() !== wave.id"
-                        [class.hover:border-orange-500/40]="targetWave() !== wave.id">
+                        [ngClass]="targetWave() === wave.id ? 
+                          'bg-orange-500/10 border-orange-500 text-orange-500' : 
+                          'bg-white dark:bg-zinc-950/20 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:border-orange-500/40'">
                   <span class="text-[10px] font-extrabold uppercase tracking-wide">{{ wave.id }}</span>
                   <span class="text-[9px] font-medium opacity-80">{{ wave.freq }}Hz</span>
                 </button>
@@ -166,8 +158,8 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
         </div>
 
         <!-- ══ CO-REGULATION PROTOCOL PANEL ══════════════════════════════════ -->
-        <div class="rounded-xl border border-violet-500/20 dark:border-violet-500/15 bg-violet-500/[0.03] dark:bg-violet-950/20 overflow-hidden transition-all duration-500"
-             [class.border-violet-500/40]="patientState.avsProtocol()">
+        <div class="rounded-xl border dark:border-violet-500/15 bg-violet-500/[0.03] dark:bg-violet-950/20 overflow-hidden transition-all duration-500"
+             [ngClass]="patientState.avsProtocol() ? 'border-violet-500/40' : 'border-violet-500/20'">
 
           <!-- Panel Header -->
           <div class="px-4 py-3 border-b border-violet-500/15 flex items-center justify-between">
@@ -252,14 +244,9 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
             <button (click)="protocolMode() === 'clinical' ? generateCoRegProtocol() : generateAthleticProtocol()"
                     [disabled]="patientState.isGeneratingAvsProtocol()"
                     class="w-full py-2.5 px-4 rounded-xl font-bold uppercase tracking-wider text-[11px] transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
-                    [class.bg-violet-600]="!patientState.isGeneratingAvsProtocol()"
-                    [class.hover:bg-violet-500]="!patientState.isGeneratingAvsProtocol()"
-                    [class.text-white]="!patientState.isGeneratingAvsProtocol()"
-                    [class.shadow-lg]="!patientState.isGeneratingAvsProtocol()"
-                    [class.shadow-violet-500/20]="!patientState.isGeneratingAvsProtocol()"
-                    [class.bg-zinc-800]="patientState.isGeneratingAvsProtocol()"
-                    [class.text-zinc-500]="patientState.isGeneratingAvsProtocol()"
-                    [class.cursor-not-allowed]="patientState.isGeneratingAvsProtocol()">
+                    [ngClass]="!patientState.isGeneratingAvsProtocol() ? 
+                      'bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/20' : 
+                      'bg-zinc-800 text-zinc-500 cursor-not-allowed'">
               @if (patientState.isGeneratingAvsProtocol()) {
                 <!-- Spinner -->
                 <svg class="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -336,15 +323,15 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
                 </button>
 
               </div>
-            } @else if (protocolMode() === 'athletic' && athleticService.session(); as aProto) {
+            } @else if (protocolMode() === 'athletic' && athleticService.session()) {
               <div class="space-y-4 pt-1" [@.disabled]="true">
                 <div class="p-3 rounded-lg bg-violet-500/[0.06] border border-violet-500/20">
                   <p class="text-[9px] font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-1">Coach Note</p>
-                  <p class="text-xs text-gray-700 dark:text-zinc-300 leading-relaxed italic">{{ aProto.coach_note }}</p>
+                  <p class="text-xs text-gray-700 dark:text-zinc-300 leading-relaxed italic">{{ athleticService.session()!.coach_note }}</p>
                 </div>
                 <div class="space-y-2">
                   <p class="text-[9px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Athlete Guidance</p>
-                  @for (g of aProto.athlete_guidance; track g) {
+                  @for (g of athleticService.session()!.athlete_guidance; track g) {
                     <p class="text-[10px] text-gray-700 dark:text-zinc-300 leading-snug">· {{ g }}</p>
                   }
                 </div>
@@ -366,18 +353,10 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
           
           <!-- Master Toggle -->
           <button (click)="toggleSession()"
-                  class="flex-1 py-3 px-4 rounded-xl font-bold uppercase tracking-wider text-xs shadow-md transition-all duration-300 text-center select-none cursor-pointer flex items-center justify-center gap-2"
-                  [class.bg-gradient-to-r]="true"
-                  [class.from-orange-500]="!isActive()"
-                  [class.to-amber-600]="!isActive()"
-                  [class.text-white]="!isActive()"
-                  [class.shadow-orange-500/20]="!isActive()"
-                  [class.hover:shadow-lg]="true"
-                  [class.bg-zinc-800]="isActive()"
-                  [class.dark:bg-zinc-800]="isActive()"
-                  [class.text-gray-200]="isActive()"
-                  [class.border]="isActive()"
-                  [class.border-zinc-700]="isActive()">
+                  class="flex-1 py-3 px-4 rounded-xl font-bold uppercase tracking-wider text-xs shadow-md transition-all duration-300 text-center select-none cursor-pointer flex items-center justify-center gap-2 hover:shadow-lg"
+                  [ngClass]="!isActive() ? 
+                    'bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-orange-500/20' : 
+                    'bg-zinc-800 dark:bg-zinc-800 text-gray-200 border border-zinc-700'">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" *ngIf="!isActive()">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
@@ -390,15 +369,9 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
           <!-- Voice Guidance Enable Toggle -->
           <button (click)="toggleVoice()"
                   class="py-3 px-4 rounded-xl font-bold uppercase tracking-wider text-xs border transition-all duration-300 flex items-center justify-center gap-2 select-none cursor-pointer"
-                  [class.bg-orange-500/10]="voiceEnabled()"
-                  [class.border-orange-500]="voiceEnabled()"
-                  [class.text-orange-500]="voiceEnabled()"
-                  [class.bg-white]="!voiceEnabled()"
-                  [class.dark:bg-zinc-950/10]="!voiceEnabled()"
-                  [class.border-gray-200]="!voiceEnabled()"
-                  [class.dark:border-zinc-800]="!voiceEnabled()"
-                  [class.text-gray-600]="!voiceEnabled()"
-                  [class.dark:text-zinc-400]="!voiceEnabled()">
+                  [ngClass]="voiceEnabled() ? 
+                    'bg-orange-500/10 border-orange-500 text-orange-500' : 
+                    'bg-white dark:bg-zinc-950/10 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400'">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
               <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
@@ -410,15 +383,9 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
           <!-- Rhythmic Haptic Vibration Toggle -->
           <button (click)="toggleVibration()"
                   class="py-3 px-4 rounded-xl font-bold uppercase tracking-wider text-xs border transition-all duration-300 flex items-center justify-center gap-2 select-none cursor-pointer"
-                  [class.bg-orange-500/10]="vibrationEnabled()"
-                  [class.border-orange-500]="vibrationEnabled()"
-                  [class.text-orange-500]="vibrationEnabled()"
-                  [class.bg-white]="!vibrationEnabled()"
-                  [class.dark:bg-zinc-950/10]="!vibrationEnabled()"
-                  [class.border-gray-200]="!vibrationEnabled()"
-                  [class.dark:border-zinc-800]="!vibrationEnabled()"
-                  [class.text-gray-600]="!vibrationEnabled()"
-                  [class.dark:text-zinc-400]="!vibrationEnabled()"
+                  [ngClass]="vibrationEnabled() ? 
+                    'bg-orange-500/10 border-orange-500 text-orange-500' : 
+                    'bg-white dark:bg-zinc-950/10 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400'"
                   [disabled]="!hasVibrator"
                   [class.opacity-50]="!hasVibrator"
                   [title]="hasVibrator ? 'Toggle Rhythmic Physical Entrainment' : 'Vibration API not supported on this device'">
@@ -436,8 +403,8 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
         </div>
 
         <!-- ══ LIFESTYLE & BEVERAGE ADJUNCT PANEL ══════════════════════════ -->
-        <div class="rounded-xl border border-emerald-500/20 dark:border-emerald-500/15 bg-emerald-500/[0.02] dark:bg-emerald-950/10 overflow-hidden"
-             [class.border-emerald-500/40]="lifestyleAdj.adjunct()">
+        <div class="rounded-xl border dark:border-emerald-500/15 bg-emerald-500/[0.02] dark:bg-emerald-950/10 overflow-hidden"
+             [ngClass]="lifestyleAdj.adjunct() ? 'border-emerald-500/40' : 'border-emerald-500/20'">
 
           <div class="px-4 py-3 border-b border-emerald-500/15 flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -548,7 +515,6 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
 })
 export class AvsTherapyComponent implements OnDestroy {
   patientState     = inject(PatientStateService);
-  theme            = inject(ThemeService);
   private contextAvs   = inject(ClinicalContextAvsService);
   readonly lifestyleAdj = inject(LifestyleAdjunctService);
   readonly athleticService = inject(AthleticProtocolService);

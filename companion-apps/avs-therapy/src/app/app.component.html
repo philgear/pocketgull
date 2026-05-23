@@ -1,0 +1,45 @@
+<div class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans relative overflow-hidden">
+  
+  <!-- Sleek Glowing Accents (Branddesk theme: Indigo/Sky Blue) -->
+  <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none"></div>
+  <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-sky-500/10 blur-3xl pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md px-6 py-4 flex items-center justify-between z-10">
+    <div class="flex items-center gap-3">
+      <!-- Icon/Logo -->
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/15">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-sm font-black tracking-[0.2em] text-white uppercase m-0 leading-none">AVS Therapy</h1>
+        <p class="text-[9px] font-bold text-zinc-500 tracking-widest uppercase m-0 mt-1">Companion Module // Offline Sandbox</p>
+      </div>
+    </div>
+    
+    <!-- Pulse stream indicator -->
+    <div class="flex items-center gap-2 px-3 py-1.5 bg-zinc-900/80 border border-zinc-800 rounded-full">
+      <span class="flex h-2 w-2 relative">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+      </span>
+      <span class="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">AVS Active // Secure Stream</span>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 flex items-center justify-center p-6 z-10">
+    <div class="w-full max-w-4xl">
+      <app-avs-therapy></app-avs-therapy>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-4 text-center text-[9px] text-zinc-600 border-t border-zinc-900 bg-zinc-950/40 tracking-wider">
+    POCKET GULL AVS COMPANION APP · SECURE CONSOLE
+  </footer>
+</div>

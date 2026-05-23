@@ -3,6 +3,30 @@ import { test, expect } from '@playwright/test';
 test.describe('WCAG & ARIA Accessibility Audit', () => {
   
   test.beforeEach(async ({ page }) => {
+    // Intercept config endpoint to return empty API key so splash screen shows Demo Mode
+    await page.route('**/api/config', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ apiKey: '' })
+      });
+    });
+
+    // Intercept hardware telemetry to prevent 500 error warnings
+    await page.route('**/api/hardware/telemetry', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          gpus: [],
+          cpuName: 'Mock CPU',
+          cpuLoadPercent: 12,
+          systemMemoryUsedGb: 4.5,
+          systemMemoryTotalGb: 16.0
+        })
+      });
+    });
+
     // Prevent the walkthrough tour from launching automatically on load
     await page.addInitScript(() => {
       window.localStorage.setItem('pg_tour_seen', '1');
@@ -55,7 +79,8 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 5000 });
     await pinInput.fill('1234');
-    await pinInput.press('Enter');
+    // Auto-submits on length 4, wait for transition
+    await page.waitForTimeout(300);
 
     // 3. Form input accessible labels (WCAG 1.3.1 / 3.3.2)
     // API key inputs must have either an associated label, placeholder, or aria-label
@@ -85,7 +110,8 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 5000 });
     await pinInput.fill('1234');
-    await pinInput.press('Enter');
+    // Auto-submits on length 4, wait for transition
+    await page.waitForTimeout(300);
     
     // Bypass auth to enter main clinical dashboard (using our new secure Mock SSO or Demo mode)
     const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
@@ -209,7 +235,8 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 5000 });
     await pinInput.fill('1234');
-    await pinInput.press('Enter');
+    // Auto-submits on length 4, wait for transition
+    await page.waitForTimeout(300);
     
     // Bypass auth to enter main clinical dashboard
     const demoBtn = page.locator('button', { hasText: 'Demo Mode' });

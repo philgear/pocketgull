@@ -1,5 +1,4 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { AvsUiService } from './avs-ui.service';
 
 export interface IQuest {
   id: string;
@@ -13,7 +12,6 @@ export interface IQuest {
   providedIn: 'root'
 })
 export class GamificationService {
-  private avsUi = inject(AvsUiService);
 
   readonly points = signal<number>(0);
   readonly completedQuestIds = signal<string[]>([]);

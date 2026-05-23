@@ -1,7 +1,6 @@
 import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from './patient-state.service';
-import { GlobalAvsService } from './global-avs.service';
 import { IPatientVitals, IBiometricEntry } from './patient.types';
 
 /** Health-check response from the FastAPI sidecar. */
@@ -46,7 +45,6 @@ export interface IRiskScoreResult {
 @Injectable({ providedIn: 'root' })
 export class PythonBridgeService {
   private readonly state  = inject(PatientStateService);
-  private readonly avs    = inject(GlobalAvsService);
   private readonly pid    = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.pid);
 
@@ -233,13 +231,11 @@ export class PythonBridgeService {
 
     if (data.suggested_wave !== currentWave) {
       this.state.avsBrainwaveFrequency.set(data.suggested_wave);
-      this.avs.updateWave(data.suggested_wave);
     }
 
     // Only update breathing rate if delta > 0.3 BPM (avoid micro-jitter)
     if (Math.abs(data.breathing_bpm - currentBpm) > 0.3) {
       this.state.avsBreathingRate.set(data.breathing_bpm);
-      this.avs.updateBreathRate(data.breathing_bpm);
     }
 
     // Append to biometric history for real-time charting

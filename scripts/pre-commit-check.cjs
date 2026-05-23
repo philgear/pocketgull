@@ -111,29 +111,34 @@ for (const file of uniqueFilesToCheck) {
       continue;
     }
 
+    let cleanImgPath = imgPath;
+    if (imgPath.startsWith('file://')) {
+      cleanImgPath = imgPath.slice(7);
+    }
+
     let resolvedPath;
-    if (path.isAbsolute(imgPath) || imgPath.startsWith('C:/') || imgPath.startsWith('c:/')) {
-      resolvedPath = imgPath;
-    } else if (imgPath.startsWith('/')) {
+    if (path.isAbsolute(cleanImgPath) || cleanImgPath.startsWith('C:/') || cleanImgPath.startsWith('c:/')) {
+      resolvedPath = cleanImgPath;
+    } else if (cleanImgPath.startsWith('/')) {
       // Starts with slash, check Windows absolute drive mapping
-      const driveLetterMatch = imgPath.match(/^\/([a-zA-Z]):/);
+      const driveLetterMatch = cleanImgPath.match(/^\/([a-zA-Z]):/);
       if (driveLetterMatch) {
         // e.g. /C:/path -> C:/path
-        resolvedPath = imgPath.slice(1);
+        resolvedPath = cleanImgPath.slice(1);
       } else {
         // Treat as relative to the drive root
-        resolvedPath = path.resolve('/', imgPath);
+        resolvedPath = path.resolve('/', cleanImgPath);
       }
     } else {
       // Relative path to the markdown file's directory
-      resolvedPath = path.resolve(path.dirname(file), imgPath);
+      resolvedPath = path.resolve(path.dirname(file), cleanImgPath);
     }
 
     // Normalized file path for check
     const normalizedPath = path.normalize(resolvedPath);
 
     // Validation checks
-    if (imgPath.startsWith('/C:/') || imgPath.startsWith('/c:/')) {
+    if (cleanImgPath.startsWith('/C:/') || cleanImgPath.startsWith('/c:/')) {
       console.error(`⚠️  [${path.basename(file)}]: Image path "${imgPath}" contains invalid leading slash on Windows drive letter. Use "C:/..." instead.`);
       errorsCount++;
     } else if (!fs.existsSync(normalizedPath)) {

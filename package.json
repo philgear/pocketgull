@@ -135,6 +135,7 @@
     "helmet": "^8.1.0",
     "http-proxy-middleware": "^4.0.0",
     "jspdf": "^4.2.0",
+    "lean-qr": "^2.7.1",
     "marked": "^17.0.4",
     "patch-package": "^8.0.1",
     "postcss": "^8.5.8",
