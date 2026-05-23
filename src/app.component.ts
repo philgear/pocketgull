@@ -30,7 +30,6 @@ import { WalkthroughTourService } from './services/walkthrough-tour.service';
 import { SecureSplashComponent } from './components/secure-splash.component';
 import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
-import { AvsTherapyComponent } from './components/avs-therapy.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 import { AvsUiService } from './services/avs-ui.service';
@@ -59,8 +58,8 @@ import { SwUpdate } from '@angular/service-worker';
     WalkthroughTourComponent,
     SecureSplashComponent,
     PatientDirectoryComponent,
-    AvsTherapyComponent,
-    CollaborationDockComponent
+    CollaborationDockComponent,
+    FhirCallbackComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -460,7 +459,6 @@ import { SwUpdate } from '@angular/service-worker';
               </svg>
               <span class="hidden sm:inline">Docs</span>
             </a>
- 
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
                     (mouseenter)="avsUi.playHover()"
@@ -659,14 +657,14 @@ import { SwUpdate } from '@angular/service-worker';
           <!-- Column 1: IPatient Medical Chart -->
            <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                 id="tour-body-chart"
-               [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined"
+               [class.md:flex-1]="isAnalysisCollapsed() || inputPanelWidth() === undefined || state.isSparkModeActive()"
                [class.transition-all]="!isDragging()"
                [class.duration-500]="!isDragging()"
                [class.ease-[cubic-bezier(0.68,-0.55,0.265,1.55)]]="!isDragging()"
                [style.--panel-width.px]="isChartCollapsed() ? 0 : (isAnalysisCollapsed() ? null : inputPanelWidth())"
-               [class.md:w-[var(--panel-width)]]="!isAnalysisCollapsed() && inputPanelWidth() !== undefined"
+               [class.md:w-[var(--panel-width)]]="!isAnalysisCollapsed() && inputPanelWidth() !== undefined && !state.isSparkModeActive()"
                [class.hidden]="isChartCollapsed()"
-               [class.max-md:hidden]="!!state.selectedPartId()">
+               [class.max-md:hidden]="!!state.selectedPartId() && !state.isSparkModeActive()">
                <div class="md:h-full w-full md:overflow-hidden flex-1 flex flex-col min-h-0">
                  @defer (on viewport) {
                    <app-medical-chart class="no-print md:h-full block md:overflow-y-auto w-full max-md:overflow-visible"></app-medical-chart>
@@ -726,7 +724,7 @@ import { SwUpdate } from '@angular/service-worker';
             </div>
 
             <!-- Mobile Header: Back Button & Tabs -->
-            @if (state.selectedPartId() && !state.isLiveAgentActive()) {
+            @if (state.selectedPartId() && !state.isLiveAgentActive() && !state.isSparkModeActive()) {
               <div class="w-full flex-col gap-3 shrink-0 z-20 hidden max-md:flex mb-3">
                 <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-3 -ml-2 transition-colors min-h-[44px]">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -750,7 +748,7 @@ import { SwUpdate } from '@angular/service-worker';
             }
 
             <!-- Column 2 (Middle): Task Flow & Intake Bracket -->
-            @if (state.selectedPartId() && !state.isLiveAgentActive()) {
+            @if (state.selectedPartId() && !state.isLiveAgentActive() && !state.isSparkModeActive()) {
                <div class="shrink-0 w-full md:w-[400px] flex flex-col gap-3 md:gap-6 h-full z-20 transition-all duration-300"
                     [class.max-md:hidden]="mobileActiveTab() !== 'tasks'"
                     [class.tab-fade-enter]="mobileActiveTab() === 'tasks'">
@@ -771,16 +769,11 @@ import { SwUpdate } from '@angular/service-worker';
                </div>
             }
 
-             <!-- Column 3 (Right Area): Split View -->
             <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col"
                  [class.hidden]="isAnalysisCollapsed()"
                  [class.max-md:hidden]="!!state.selectedPartId() && mobileActiveTab() !== 'analysis'"
                  [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
              
-                 @if (theme.currentTheme() === 'spark') {
-                   <app-avs-therapy class="block w-full flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300 md:mb-6 mb-3"></app-avs-therapy>
-                 }
-
                  <!-- Section 1: Analysis Intake Container -->
                  <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]"
                       [class.rounded-none]="isChartCollapsed()"

@@ -190,7 +190,6 @@ app.use((req, res, next) => {
     'Permissions-Policy',
     'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()'
   );
-  
   next();
 });
 

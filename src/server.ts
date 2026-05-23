@@ -155,7 +155,26 @@ app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   res.setHeader('X-Frame-Options', 'DENY');
+
+  const isProd = process.env['NODE_ENV'] === 'production';
+  let csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov https://spark.philgear.dev wss://spark.philgear.dev wss://generativelanguage.googleapis.com; frame-src 'self' https://spark.philgear.dev https://www.ncbi.nlm.nih.gov; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'none';";
+  
+  if (!isProd) {
+    res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
+    csp += " report-uri /api/csp-report; report-to csp-endpoint;";
+  }
+
+  res.setHeader('Content-Security-Policy', csp);
   next();
+});
+
+// CSP Telemetry Violation Reporting (Disabled in production for patient privacy)
+app.post('/api/csp-report', express.json({ type: ['application/json', 'application/csp-report'] }), (req, res: any) => {
+  if (process.env['NODE_ENV'] === 'production') {
+    return res.status(404).send('Not Found');
+  }
+  console.log('[CSP Violation Report]:', req.body);
+  res.status(204).end();
 });
 
 import { dicomRouter } from './server/dicom';

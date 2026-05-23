@@ -99,7 +99,7 @@ export interface IChatEntry {
         }
     `],
     template: `
-        <div class="h-full bg-white dark:bg-[#09090b] z-10 flex flex-col no-print w-full">
+        <div class="h-full bg-white dark:bg-[#09090b] z-10 flex flex-col no-print w-full spark-theme">
             
             <!-- Minimal Pocket Header -->
             <div class="flex items-center justify-between px-4 py-2 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800/50">

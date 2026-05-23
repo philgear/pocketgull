@@ -79,8 +79,9 @@
     "audit": "lighthouse http://localhost:4000 --view",
     "estimate-effort": "node scripts/estimate-effort.js",
     "precommit": "node scripts/pre-commit-check.cjs",
-    "prepare": "husky"
-
+    "prepare": "husky",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@angular/build": "~21.2.0",

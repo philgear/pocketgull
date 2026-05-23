@@ -724,7 +724,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 
                     <!-- ─── Rich Media Cards ──────────────────────── -->
                     @if (msg.richCards && msg.richCards.length > 0) {
-                      <div class="rm-panel">
+                      <div class="rm-panel spark-theme">
                         @for (card of msg.richCards; track card.query) {
 
                           <!-- 3D Model -->
