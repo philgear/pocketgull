@@ -103,7 +103,25 @@ const MOCK_PATIENTS: IPatient[] = [
       { timestamp: "2025-12-20T09:00:00Z", type: "bp", value: "138/85" },
       { timestamp: "2026-01-25T09:00:00Z", type: "bp", value: "130/82" },
       { timestamp: "2026-02-28T09:00:00Z", type: "bp", value: "128/80" },
-      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" }
+      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "hrv", value: "35" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "hrv", value: "38" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "hrv", value: "40" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "hrv", value: "45" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "hrv", value: "48" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "hrv", value: "54" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "coherence", value: "0.35" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "coherence", value: "0.40" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "coherence", value: "0.48" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "coherence", value: "0.55" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "coherence", value: "0.60" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "coherence", value: "0.68" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "breathing", value: "16.0" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "breathing", value: "15.2" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "breathing", value: "14.0" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "breathing", value: "12.8" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "breathing", value: "11.5" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "breathing", value: "9.8" }
     ],
     issues: {
       chest: [
@@ -115,6 +133,9 @@ const MOCK_PATIENTS: IPatient[] = [
           description:
             "Reports waking up gasping for air frequently. Daytime somnolence affecting work performance.",
           symptoms: [],
+          tcmPattern: "Lung Qi Deficiency with Phlegm-Damp obstruction",
+          ayurvedicImbalance: "Kapha Accumulation in Pranavaha Srotas",
+          growThySelfFocus: "Circadian Airflow & Vagal Tone Restructuring"
         },
       ],
       head: [
@@ -126,6 +147,9 @@ const MOCK_PATIENTS: IPatient[] = [
           description:
             "Morning headaches nearly every day, likely secondary to hypoxemia and OSA.",
           symptoms: [],
+          tcmPattern: "Clear Yang failing to ascend due to Phlegm-Damp",
+          ayurvedicImbalance: "Prana Vata Stagnation affecting Shiras (head)",
+          growThySelfFocus: "Sleep Architecture & Mitochondrial Oxygenation Restoration"
         },
       ],
     },
@@ -198,7 +222,18 @@ const MOCK_PATIENTS: IPatient[] = [
         },
       },
     ],
-    bookmarks: [],
+    bookmarks: [
+      {
+        title: "Integrative Approaches to Chronic Disease",
+        url: "https://doi.org/10.1234/jfm.2025.001",
+        authors: "Smith, J. et al.",
+        publicationDate: "2025-01-10",
+        publisher: "Journal of Functional Medicine",
+        isPeerReviewed: true,
+        cited: true,
+        paradigms: ["grow-thy-self"]
+      }
+    ],
     scans: [
       {
         id: "scan_003",
@@ -285,7 +320,25 @@ const MOCK_PATIENTS: IPatient[] = [
       { timestamp: "2025-12-20T09:00:00Z", type: "bp", value: "138/85" },
       { timestamp: "2026-01-25T09:00:00Z", type: "bp", value: "130/82" },
       { timestamp: "2026-02-28T09:00:00Z", type: "bp", value: "128/80" },
-      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" }
+      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "hrv", value: "38" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "hrv", value: "42" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "hrv", value: "48" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "hrv", value: "52" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "hrv", value: "58" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "hrv", value: "64" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "coherence", value: "0.42" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "coherence", value: "0.50" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "coherence", value: "0.62" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "coherence", value: "0.70" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "coherence", value: "0.78" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "coherence", value: "0.85" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "breathing", value: "14.5" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "breathing", value: "12.0" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "breathing", value: "9.8" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "breathing", value: "7.5" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "breathing", value: "6.2" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "breathing", value: "5.6" }
     ],
     issues: {
       mid_back: [
@@ -297,6 +350,9 @@ const MOCK_PATIENTS: IPatient[] = [
           description:
             "Constant aching pain in L4-L5 region radiating to the left glute. Worsens with prolonged standing.",
           symptoms: [],
+          tcmPattern: "Qi and Blood Stasis in Du/Ren meridians, Kidney Jing Deficiency",
+          ayurvedicImbalance: "Vata Vyadhi (Kati Shoola) with local Ama accumulation at L4-L5",
+          growThySelfFocus: "Cellular Longevity & Autonomic Nervous System Coregulation"
         },
       ],
     },
@@ -368,7 +424,40 @@ const MOCK_PATIENTS: IPatient[] = [
         },
       },
     ],
-    bookmarks: [],
+    bookmarks: [
+      {
+        title: "Clinical Practice Guideline for Prescribing Opioids for Pain",
+        url: "https://doi.org/10.15585/mmwr.rr7103a1",
+        authors: "Dowell, D. et al.",
+        publicationDate: "2022-11-04",
+        publisher: "CDC MMWR",
+        isPeerReviewed: true,
+        cited: true,
+        paradigms: ["western"]
+      },
+      {
+        title: "Acupuncture for Chronic Pain: Individual Patient Data Meta-analysis",
+        url: "https://doi.org/10.1016/j.pain.2016.12.001",
+        authors: "MacPherson, H. et al.",
+        publicationDate: "2017-03-01",
+        publisher: "Pain Journal",
+        isPeerReviewed: true,
+        cited: true,
+        paradigms: ["eastern"],
+        tcmMeridians: ["Du", "Ren", "Urinary Bladder"]
+      },
+      {
+        title: "Clinical Evaluation of Boswellia Serrata in Radiculopathy",
+        url: "https://doi.org/10.1016/j.ayur.2018.05.002",
+        authors: "Singh, L. et al.",
+        publicationDate: "2018-06-15",
+        publisher: "Journal of Ayurvedic Medicine",
+        isPeerReviewed: true,
+        cited: true,
+        paradigms: ["ayurvedic"],
+        ayurvedicDoshas: ["Vata"]
+      }
+    ],
     scans: [
       {
         id: "scan_001",
@@ -478,7 +567,25 @@ const MOCK_PATIENTS: IPatient[] = [
       { timestamp: "2025-12-20T09:00:00Z", type: "bp", value: "138/85" },
       { timestamp: "2026-01-25T09:00:00Z", type: "bp", value: "130/82" },
       { timestamp: "2026-02-28T09:00:00Z", type: "bp", value: "128/80" },
-      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" }
+      { timestamp: "2026-03-30T09:00:00Z", type: "bp", value: "120/80" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "hrv", value: "25" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "hrv", value: "28" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "hrv", value: "30" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "hrv", value: "32" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "hrv", value: "34" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "hrv", value: "38" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "coherence", value: "0.22" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "coherence", value: "0.28" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "coherence", value: "0.32" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "coherence", value: "0.35" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "coherence", value: "0.40" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "coherence", value: "0.45" },
+      { timestamp: "2025-10-01T09:00:00Z", type: "breathing", value: "18.5" },
+      { timestamp: "2025-11-15T09:00:00Z", type: "breathing", value: "17.0" },
+      { timestamp: "2025-12-20T09:00:00Z", type: "breathing", value: "15.8" },
+      { timestamp: "2026-01-25T09:00:00Z", type: "breathing", value: "14.2" },
+      { timestamp: "2026-02-28T09:00:00Z", type: "breathing", value: "13.0" },
+      { timestamp: "2026-03-30T09:00:00Z", type: "breathing", value: "12.2" }
     ],
     issues: {
       head: [
@@ -490,6 +597,9 @@ const MOCK_PATIENTS: IPatient[] = [
           description:
             "Daughter reports patient got lost returning from the grocery store yesterday. Requires prompting for ADLs. MoCA score: 18/30.",
           symptoms: [],
+          tcmPattern: "Heart and Kidney Yin Deficiency with Heat perturbing Shen",
+          ayurvedicImbalance: "Sadhaka Pitta and Tarpaka Kapha Imbalance (Maha Srotas blockage)",
+          growThySelfFocus: "Elder Philosophy: Cognitive Longevity & Autonomic Tone Maintenance"
         },
       ],
       r_arm: [
@@ -501,6 +611,9 @@ const MOCK_PATIENTS: IPatient[] = [
           description:
             "Bruising and tenderness from mechanical fall two days ago. X-ray negative for fracture.",
           symptoms: [],
+          tcmPattern: "Qi and Blood Stasis in the Channels of the Right Arm",
+          ayurvedicImbalance: "Localized Vata aggravation in Asthi and Sandhi (bones and joints)",
+          growThySelfFocus: "Functional Ergonomics & Fall Risk Mitigation Strategy"
         },
       ],
     },
@@ -582,7 +695,18 @@ const MOCK_PATIENTS: IPatient[] = [
         },
       },
     ],
-    bookmarks: [],
+    bookmarks: [
+      {
+        title: "Integrative Care for Cognitive Impairment",
+        url: "https://doi.org/10.1234/jfm.2025.002",
+        authors: "Smith, J. et al.",
+        publicationDate: "2025-02-15",
+        publisher: "Journal of Geriatric Health",
+        isPeerReviewed: true,
+        cited: true,
+        paradigms: ["ayurvedic", "eastern"]
+      }
+    ],
     scans: [
       {
         id: "scan_004",
@@ -2363,19 +2487,25 @@ export class PatientManagementService {
       patients.map((p) => {
         if (p.id !== patientId) return p;
 
+        // Guard against prototype pollution / invalid keys
+        const partId = noteEntry.partId;
+        if (!partId || partId === '__proto__' || partId === 'constructor' || partId === 'prototype') {
+          return p;
+        }
+
         // Create a mutable copy of the patient
         const updatedPatient = { ...p, issues: { ...p.issues } };
 
         // 1. Remove note from issues
-        const issuesForPart = updatedPatient.issues[noteEntry.partId] || [];
+        const issuesForPart = updatedPatient.issues[partId] || [];
         const updatedIssuesForPart = issuesForPart.filter(
           (i) => i.noteId !== noteEntry.noteId,
         );
 
         if (updatedIssuesForPart.length > 0) {
-          updatedPatient.issues[noteEntry.partId] = updatedIssuesForPart;
+          updatedPatient.issues[partId] = updatedIssuesForPart;
         } else {
-          delete updatedPatient.issues[noteEntry.partId];
+          delete updatedPatient.issues[partId];
         }
 
         // 2. Remove entry from history

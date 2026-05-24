@@ -169,19 +169,57 @@ async def ingest_dataframe(payload: DataFrameIngestRequest) -> PatientVitalsResp
 @app.post("/ingest/fhir-bundle", tags=["Ingest"])
 async def ingest_fhir_bundle(bundle_json: dict[str, Any]) -> dict[str, Any]:
     """
-    Validate a FHIR R4 Bundle via the fhir.resources Python SDK.
-    Acts as a validation gateway — malformed EHR exports are rejected here
-    before they reach the Angular fhir-integration.service.ts.
-
-    Returns the normalized, validated FHIR JSON that Pocket Gull can consume.
+    Validate a FHIR Bundle. Supports a hybrid validation model for R6:
+    - Standard resources (Patient, Observation, Condition, etc.) are validated via fhir.resources.
+    - Draft/R6-specific resources (Evidence, Device, DeviceDefinition) are validated structurally.
     """
     try:
-        from fhir.resources.bundle import Bundle
+        if bundle_json.get("resourceType") != "Bundle":
+            raise HTTPException(status_code=422, detail="Resource is not a FHIR Bundle")
+            
+        entries = bundle_json.get("entry", [])
+        if not isinstance(entries, list):
+            raise HTTPException(status_code=422, detail="Bundle entries must be a list")
 
-        bundle = Bundle.model_validate(bundle_json)
-        # Re-serialize: fhir.resources applies R4 validation on parse,
-        # so the output is guaranteed schema-compliant.
-        return bundle.model_dump(mode="json", exclude_none=True)
+        validated_entries = []
+        r6_resource_types = {"Evidence", "Device", "DeviceDefinition", "ArtifactAssessment", "SubscriptionTopic"}
+        
+        for entry in entries:
+            if not isinstance(entry, dict) or "resource" not in entry:
+                validated_entries.append(entry)
+                continue
+                
+            resource = entry["resource"]
+            if not isinstance(resource, dict) or "resourceType" not in resource:
+                raise HTTPException(status_code=422, detail="Entry resource must have a resourceType")
+                
+            res_type = resource["resourceType"]
+            
+            # If it's a draft R6-specific resource, do a structural schema check
+            if res_type in r6_resource_types:
+                if "id" not in resource:
+                    raise HTTPException(status_code=422, detail=f"R6 Draft Resource {res_type} missing 'id'")
+                validated_entries.append(entry)
+            else:
+                # Standard resource: validate using fhir.resources dynamically
+                try:
+                    module_name = res_type.lower()
+                    try:
+                        mod = __import__(f"fhir.resources.{module_name}", fromlist=[res_type])
+                        klass = getattr(mod, res_type)
+                        validated_res = klass.model_validate(resource)
+                        entry_copy = dict(entry)
+                        entry_copy["resource"] = validated_res.model_dump(mode="json", exclude_none=True)
+                        validated_entries.append(entry_copy)
+                    except (ImportError, AttributeError):
+                        # Fallback for unrecognized classes/modules
+                        validated_entries.append(entry)
+                except Exception as e:
+                    raise HTTPException(status_code=422, detail=f"Invalid standard FHIR resource {res_type}: {e}")
+
+        validated_bundle = dict(bundle_json)
+        validated_bundle["entry"] = validated_entries
+        return validated_bundle
 
     except ImportError:
         raise HTTPException(status_code=503, detail="fhir.resources not installed. Run: pip install fhir.resources")

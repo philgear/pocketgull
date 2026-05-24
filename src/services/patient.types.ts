@@ -93,6 +93,10 @@ export interface IBodyPartIssue {
     description: string;
     symptoms: (string | IPatientSymptom)[];
     recommendation?: string;
+    // Tri-Paradigm Diagnostic Matrix (TDM) Extensions
+    tcmPattern?: string;          // TCM disharmony mapping (e.g., Qi Stagnation)
+    ayurvedicImbalance?: string;  // Ayurvedic dosha imbalance (e.g., Vata Aggravation)
+    growThySelfFocus?: string;    // Secular/functional longevity category
 }
 
 export interface IPatientVitals {
@@ -118,7 +122,7 @@ export interface IDynamicMarker {
 
 export interface IBiometricEntry {
     timestamp: string; // ISO string
-    type: keyof IPatientVitals | 'pain';
+    type: keyof IPatientVitals | 'pain' | 'hrv' | 'coherence' | 'breathing';
     value: string | number;
     unit?: string;
     source?: string;
@@ -356,6 +360,10 @@ export interface IBookmark {
     publisher?: string;
     isPeerReviewed?: boolean;
     cited?: boolean; // If true, should be included in references
+    // Tri-Paradigm Diagnostic Matrix (TDM) Extensions
+    paradigms?: ('western' | 'eastern' | 'ayurvedic' | 'grow-thy-self')[];
+    tcmMeridians?: string[];
+    ayurvedicDoshas?: ('Vata' | 'Pitta' | 'Kapha')[];
 }
 
 export type HistoryEntry = {

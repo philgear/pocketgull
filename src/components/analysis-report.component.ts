@@ -170,21 +170,41 @@ import { MemoryPalaceComponent } from './memory-palace.component';
               </span>
               
               <div class="flex-1 min-w-0">
-                <span class="text-[10px] font-bold uppercase tracking-widest"
-                      [class.text-sky-700]="state.activePhilosophy() === 'western'"
-                      [class.dark:text-sky-400]="state.activePhilosophy() === 'western'"
-                      [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
-                      [class.dark:text-emerald-400]="state.activePhilosophy() === 'eastern'"
-                      [class.text-amber-700]="state.activePhilosophy() === 'ayurvedic'"
-                      [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'"
-                      [class.text-indigo-700]="state.activePhilosophy() === 'grow-thy-self'"
-                      [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'">
-                  Active Paradigm: 
-                  @if (state.activePhilosophy() === 'western') { Western (Allopathic) }
-                  @else if (state.activePhilosophy() === 'eastern') { Eastern (Traditional Chinese Medicine) }
-                  @else if (state.activePhilosophy() === 'ayurvedic') { Ayurvedic Medicine }
-                  @else if (state.activePhilosophy() === 'grow-thy-self') { Grow Thy Self (Preventive & Longevity) }
-                </span>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <span class="text-[10px] font-bold uppercase tracking-widest"
+                        [class.text-sky-700]="state.activePhilosophy() === 'western'"
+                        [class.dark:text-sky-400]="state.activePhilosophy() === 'western'"
+                        [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
+                        [class.dark:text-emerald-400]="state.activePhilosophy() === 'eastern'"
+                        [class.text-amber-700]="state.activePhilosophy() === 'ayurvedic'"
+                        [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'"
+                        [class.text-indigo-700]="state.activePhilosophy() === 'grow-thy-self'"
+                        [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'">
+                    Active Paradigm: 
+                    @if (state.activePhilosophy() === 'western') { Western (Allopathic) }
+                    @else if (state.activePhilosophy() === 'eastern') { Eastern (Traditional Chinese Medicine) }
+                    @else if (state.activePhilosophy() === 'ayurvedic') { Ayurvedic Medicine }
+                    @else if (state.activePhilosophy() === 'grow-thy-self') { Grow Thy Self (Preventive & Longevity) }
+                  </span>
+
+                  <!-- Dynamic Agent Pill -->
+                  <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[9px] font-bold uppercase tracking-wider bg-gray-50/50 dark:bg-zinc-900/50 border-gray-200/40 dark:border-zinc-800/40"
+                       [class.text-sky-700]="state.activePhilosophy() === 'western'"
+                       [class.dark:text-sky-400]="state.activePhilosophy() === 'western'"
+                       [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
+                       [class.dark:text-emerald-400]="state.activePhilosophy() === 'eastern'"
+                       [class.text-amber-700]="state.activePhilosophy() === 'ayurvedic'"
+                       [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'"
+                       [class.text-indigo-700]="state.activePhilosophy() === 'grow-thy-self'"
+                       [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'">
+                    <span class="flex h-1.5 w-1.5 rounded-full"
+                          [class.bg-sky-500]="state.activePhilosophy() === 'western'"
+                          [class.bg-emerald-500]="state.activePhilosophy() === 'eastern'"
+                          [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"
+                          [class.bg-indigo-500]="state.activePhilosophy() === 'grow-thy-self'"></span>
+                    Expert: {{ activeAgentName() }}
+                  </div>
+                </div>
                 
                 <p class="text-xs mt-1 text-gray-600 dark:text-zinc-400 leading-relaxed font-sans">
                   @if (state.activePhilosophy() === 'western') {
@@ -248,7 +268,7 @@ import { MemoryPalaceComponent } from './memory-palace.component';
               <span class="text-xs uppercase tracking-widest text-[#689F38] dark:text-[#8bc34a] font-bold">{{ activeLens() }}</span>
               @if (intel.isLoading() && isTextEmpty(activeReport())) {
                 <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
-                <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">Generating...</span>
+                <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">{{ activeAgentName() }} is synthesizing...</span>
               }
             </div>
             <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-200">Processing Comprehensive Analysis</p>
@@ -387,7 +407,7 @@ import { MemoryPalaceComponent } from './memory-palace.component';
                     @if (intel.isLoading() && !verificationStatus(section.title)) {
                       <div class="flex items-center gap-1.5 mr-2">
                         <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
-                        <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">Streaming Section...</span>
+                        <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">{{ activeAgentName() }} is streaming...</span>
                       </div>
                     }
                     @if (verificationStatus(section.title); as status) {
@@ -533,7 +553,14 @@ export class AnalysisReportComponent implements OnDestroy {
 
   getHistoryValues(type: 'complexity' | 'stability' | 'certainty'): number[] {
     return this.historyEntries()
-      .map(e => e.value?._metrics?.[type] || 5)
+      .map(e => {
+        const metrics = e.value?._metrics;
+        if (!metrics) return 5;
+        if (type === 'complexity') return metrics.complexity || 5;
+        if (type === 'stability') return metrics.stability || 5;
+        if (type === 'certainty') return metrics.certainty || 5;
+        return 5;
+      })
       .reverse();
   }
 
@@ -544,6 +571,18 @@ export class AnalysisReportComponent implements OnDestroy {
 
   activeLens = signal<AnalysisLens | 'Memory Palace' | 'EMT Handoff'>('Summary Overview');
   showRawFhir = signal(false);
+
+  activeAgentName = computed(() => {
+    const lens = this.activeLens();
+    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return '';
+    return this.intel.getAgentNameForLens(lens as AnalysisLens);
+  });
+
+  activeAgentRole = computed(() => {
+    const lens = this.activeLens();
+    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return '';
+    return this.intel.getAgentRoleForLens(lens as AnalysisLens);
+  });
 
   activeTabClasses = computed(() => {
     const phil = this.state.activePhilosophy();
@@ -784,7 +823,7 @@ export class AnalysisReportComponent implements OnDestroy {
   activeReport = computed(() => {
     const lens = this.activeLens();
     if (lens === 'Memory Palace' || lens === 'EMT Handoff') return '';
-    return this.intel.analysisResults()[lens as AnalysisLens];
+    return getSafeProperty(this.intel.analysisResults(), lens) || '';
   });
   contentArea = viewChild<ElementRef<HTMLDivElement>>('contentArea');
 
@@ -799,7 +838,7 @@ export class AnalysisReportComponent implements OnDestroy {
   verificationStatus(sectionTitle: string): string | null {
     const lens = this.activeLens();
     if (lens === 'Memory Palace' || lens === 'EMT Handoff') return null;
-    const res = this.intel.verificationResults()[lens as AnalysisLens];
+    const res = getSafeProperty(this.intel.verificationResults(), lens);
     return res?.status || null;
   }
 
@@ -818,18 +857,17 @@ export class AnalysisReportComponent implements OnDestroy {
     try {
       const sections: IReportSection[] = [];
       const parts = raw.split(/\n(?=#{1,3}\s)/);
-      for (let sIdx = 0; sIdx < parts.length; sIdx++) {
-        const part = parts[sIdx];
-        if (!part.trim()) continue;
+      parts.forEach((part, sIdx) => {
+        if (!part.trim()) return;
         const lines = part.split('\n');
         const headingMarkdown = lines.find(l => l.trim().startsWith('#')) || lines[0] || '';
         const title = headingMarkdown.replace(/^#+\s*/, '').trim();
         const icon = this.getIconForSection(title);
         const contentMarkdown = part === headingMarkdown ? '' : part.substring(part.indexOf(headingMarkdown) + headingMarkdown.length);
 
-        const verification = (this.intel.verificationResults()[this.activeLens()] || { status: 'verified', issues: [] });
+        const verification = getSafeProperty(this.intel.verificationResults(), this.activeLens()) || { status: 'verified', issues: [] };
         const parser = this.markdownService.parser();
-        if (!parser) continue;
+        if (!parser) return;
 
         let cleanMarkdown = contentMarkdown;
         // Strip out ```markdown code blocks if they consist of a table
@@ -843,11 +881,10 @@ export class AnalysisReportComponent implements OnDestroy {
         const tokens = parser.lexer(cleanMarkdown);
         const nodes: ISummaryNode[] = [];
 
-        for (let nIdx = 0; nIdx < tokens.length; nIdx++) {
-          const token = tokens[nIdx];
+        tokens.forEach((token, nIdx) => {
           const key = (token as any).text || token.raw || `node- ${sIdx} - ${nIdx}`;
-          const annotation = (this.lensAnnotations()[this.activeLens()] || {})[key] || { note: '', bracketState: 'normal' };
-          // const annotation = (this.lensAnnotations()[this.activeLens()] || {})[key] || { note: '', bracketState: 'normal' };
+          const activeLensAnns = getSafeProperty(this.lensAnnotations(), this.activeLens());
+          const annotation = getSafeProperty(activeLensAnns, key) || { note: '', bracketState: 'normal' };
 
           // Extract suggestions and proposals
           const extractMetadata = (text: string) => {
@@ -874,8 +911,13 @@ export class AnalysisReportComponent implements OnDestroy {
               if (issue.claim && highlightedHtml.includes(issue.claim)) {
                 const colorClass = issue.severity === 'high' ? 'bg-red-100 border-red-200 dark:bg-red-900/30 dark:border-red-800' : 'bg-amber-100 border-amber-200 dark:bg-amber-900/30 dark:border-amber-800';
                 // Encode the message to ensure it doesn't break data attributes
-                const encodedMsg = issue.message.replace(/"/g, '&quot;');
-                const highlightSpan = `<span class="verification-claim px-0.5 border-b-2 border-dotted cursor-help transition-colors ${colorClass}" data-message="${encodedMsg}">${issue.claim}</span>`;
+                const highlightSpan = '<span class="verification-claim px-0.5 border-b-2 border-dotted cursor-help transition-colors ' +
+                  colorClass +
+                  '" data-message="' +
+                  encodeHtml(issue.message) +
+                  '">' +
+                  encodeHtml(issue.claim) +
+                  '</span>';
                 highlightedHtml = highlightedHtml.replace(issue.claim, highlightSpan);
               }
             }
@@ -884,17 +926,18 @@ export class AnalysisReportComponent implements OnDestroy {
 
           if (token.type === 'paragraph') {
             const { suggestions, proposedText, cleanedText } = extractMetadata(token.text);
-            const annotation = (this.lensAnnotations()[this.activeLens()] || {})[key] || { note: '', bracketState: 'normal' };
-            const content = annotation.modifiedText || cleanedText;
+            const activeLensAnns2 = getSafeProperty(this.lensAnnotations(), this.activeLens());
+            const annotation2 = getSafeProperty(activeLensAnns2, key) || { note: '', bracketState: 'normal' };
+            const content = annotation2.modifiedText || cleanedText;
 
             nodes.push({
               id: `sec-${sIdx}-node-${nIdx}`,
               key,
               type: 'paragraph',
               rawHtml: applyHighlights(parser.parseInline(content) as string, verification.issues),
-              bracketState: annotation.bracketState,
-              note: annotation.note,
-              showNote: !!annotation.note,
+              bracketState: annotation2.bracketState,
+              note: annotation2.note,
+              showNote: !!annotation2.note,
               suggestions,
               proposedText,
               verificationStatus: verification.status as any,
@@ -908,7 +951,8 @@ export class AnalysisReportComponent implements OnDestroy {
               ordered: token.ordered || false,
               items: token.items.map((item, iIdx) => {
                 const itemKey = item.text;
-                const itemAnnotation = (this.lensAnnotations()[this.activeLens()] || {})[itemKey] || { note: '', bracketState: 'normal' };
+                const activeLensAnns3 = getSafeProperty(this.lensAnnotations(), this.activeLens());
+                const itemAnnotation = getSafeProperty(activeLensAnns3, itemKey) || { note: '', bracketState: 'normal' };
                 const { suggestions, proposedText, cleanedText } = extractMetadata(item.text);
                 const content = itemAnnotation.modifiedText || cleanedText;
 
@@ -938,7 +982,7 @@ export class AnalysisReportComponent implements OnDestroy {
               showNote: !!annotation.note
             });
           }
-        }
+        });
 
         sections.push({
           raw: part,
@@ -947,7 +991,7 @@ export class AnalysisReportComponent implements OnDestroy {
           icon,
           nodes
         });
-      }
+      });
       return sections;
     } catch (e) {
       console.error('Markdown parse error', e);
@@ -1100,7 +1144,9 @@ export class AnalysisReportComponent implements OnDestroy {
     this.nodeSaveStatuses.update(prev => {
       const next = { ...prev };
       Object.keys(next).forEach(key => {
-        if (next[key] === 'saving') next[key] = 'saved';
+        if (Reflect.get(next, key) === 'saving') {
+          setSafeProperty(next, key, 'saved');
+        }
       });
       return next;
     });
@@ -1110,7 +1156,11 @@ export class AnalysisReportComponent implements OnDestroy {
       this.nodeSaveStatuses.update(prev => {
         const next = { ...prev };
         Object.keys(next).forEach(key => {
-          if (next[key] === 'saved') delete next[key];
+          if (Reflect.get(next, key) === 'saved') {
+            if (key !== '__proto__' && key !== 'constructor' && key !== 'prototype') {
+              Reflect.deleteProperty(next, key);
+            }
+          }
         });
         return next;
       });
@@ -1168,9 +1218,13 @@ export class AnalysisReportComponent implements OnDestroy {
   private updateAnnotation(key: string, data: Partial<NodeAnnotation>) {
     this.state.lensAnnotations.update(all => {
       const currentLens = this.activeLens();
-      const lensData = { ...(all[currentLens] || {}) };
-      lensData[key] = { ...(lensData[key] || { note: '', bracketState: 'normal' }), ...data };
-      return { ...all, [currentLens]: lensData };
+      const lensData = { ...(getSafeProperty(all, currentLens) || {}) };
+      const currentAnn = getSafeProperty(lensData, key) || { note: '', bracketState: 'normal' };
+      setSafeProperty(lensData, key, { ...currentAnn, ...data });
+
+      const newAll = { ...all };
+      setSafeProperty(newAll, currentLens, lensData);
+      return newAll;
     });
     this.triggerAutoSave(key);
   }
@@ -1343,6 +1397,10 @@ export class AnalysisReportComponent implements OnDestroy {
 
 
 
+  openAgentDialog(nodeText: string) {
+    this.insertSectionIntoChat(nodeText);
+  }
+
   insertSectionIntoChat(sectionMarkdown: string) {
     this.state.toggleLiveAgent(true); // Ensure panel is open
     // Need to wait for view to update if we just switched modes
@@ -1352,4 +1410,27 @@ export class AnalysisReportComponent implements OnDestroy {
       input?.focus();
     }, 100);
   }
+}
+
+function getSafeProperty<T>(obj: Record<string, T> | undefined | null, key: string): T | undefined {
+  if (!obj || key === '__proto__' || key === 'constructor' || key === 'prototype') {
+    return undefined;
+  }
+  return Reflect.get(obj, key);
+}
+
+function setSafeProperty<T>(obj: Record<string, T>, key: string, value: T): void {
+  if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+    return;
+  }
+  Reflect.set(obj, key, value);
+}
+
+function encodeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

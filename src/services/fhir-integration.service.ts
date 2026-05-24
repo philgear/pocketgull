@@ -29,7 +29,7 @@ export class FhirIntegrationService {
       redirect_uri: redirectUri,
       scope: this.SCOPES,
       state: crypto.randomUUID(), // Prevent CSRF attacks
-      aud: 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4' // Target FHIR Server URL
+      aud: 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R6' // Target FHIR Server URL
     });
 
     const authorizeUrl = `${this.EPIC_AUTH_URL}?${params.toString()}`;
@@ -95,7 +95,7 @@ export class FhirIntegrationService {
       if (!token || !patientId) return null;
 
       try {
-        const response = await fetch(`https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4/Patient/${patientId}/$everything`, {
+        const response = await fetch(`https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R6/Patient/${patientId}/$everything`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
@@ -109,6 +109,27 @@ export class FhirIntegrationService {
           console.error('[FhirIntegrationService] Search error:', e);
       }
       return null;
+  }
+
+  /**
+   * FHIR R7 Capability: Emergency "Break-the-Glass" (BTG) Authorization.
+   * Immediately requests full override credentials bypassing standard patient consent scopes.
+   */
+  emergencyBreakTheGlass() {
+    const redirectUri = window.location.origin + '/fhir-callback';
+    const emergencyScopes = 'launch/patient openid fhirUser patient/*.read btg/patient';
+    
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: this.CLIENT_ID,
+      redirect_uri: redirectUri,
+      scope: emergencyScopes,
+      state: 'EMERGENCY_' + crypto.randomUUID(), 
+      aud: 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R6'
+    });
+
+    const authorizeUrl = `${this.EPIC_AUTH_URL}?${params.toString()}`;
+    window.location.href = authorizeUrl;
   }
 
   public hasValidToken(): boolean {

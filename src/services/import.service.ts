@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { PatientStateService } from './patient-state.service';
 import { PatientManagementService } from './patient-management.service';
-import { IDynamicMarker, IDiagnosticScan, IPatientVitals } from './patient.types';
+import { IDynamicMarker, IDiagnosticScan, IPatientVitals, BODY_PART_MAPPING } from './patient.types';
 
 export interface IParseResult {
   success: boolean;
@@ -164,12 +164,78 @@ export class ImportService {
           break;
         }
         case 'Condition': {
-          // Map FHIR Conditions to preexistingConditions
-          const conditionName = resource.code?.text || resource.code?.coding?.[0]?.display;
-          if (conditionName && !currentPatient.preexistingConditions.includes(conditionName)) {
-            currentPatient.preexistingConditions.push(conditionName);
+          const codings = resource.code?.coding || [];
+          let westernName = '';
+          let tcmPattern = '';
+          let ayurvedicImbalance = '';
+          let growThySelfFocus = '';
+
+          codings.forEach((c: any) => {
+            const system = (c.system || '').toLowerCase();
+            const display = c.display || c.code || '';
+            if (system.includes('tcm') || system.includes('traditional-chinese-medicine') || (system.includes('icd-11') && c.code?.startsWith('SF'))) {
+              tcmPattern = display;
+            } else if (system.includes('ayur') || system.includes('namaste')) {
+              ayurvedicImbalance = display;
+            } else if (system.includes('grow-thy-self') || system.includes('longevity') || system.includes('functional')) {
+              growThySelfFocus = display;
+            } else {
+              if (!westernName) westernName = display;
+            }
+          });
+
+          if (!westernName) {
+            westernName = resource.code?.text || 'Unspecified Condition';
+          }
+
+          if (westernName && !currentPatient.preexistingConditions.includes(westernName)) {
+            currentPatient.preexistingConditions.push(westernName);
+          }
+
+          let bodyPartId = 'full_body';
+          const bodySiteDisplay = resource.bodySite?.[0]?.coding?.[0]?.display || resource.bodySite?.[0]?.text;
+          if (bodySiteDisplay) {
+            const mapped = BODY_PART_MAPPING[bodySiteDisplay.toLowerCase()];
+            if (mapped) bodyPartId = mapped;
+          } else {
+            const nameLower = westernName.toLowerCase();
+            for (const [key, val] of Object.entries(BODY_PART_MAPPING)) {
+              if (nameLower.includes(key)) {
+                bodyPartId = val;
+                break;
+              }
+            }
+          }
+
+          currentPatient.issues = currentPatient.issues || {};
+          currentPatient.issues[bodyPartId] = currentPatient.issues[bodyPartId] || [];
+
+          let existingIssue = currentPatient.issues[bodyPartId].find(issue => issue.name === westernName);
+          if (existingIssue) {
+            if (tcmPattern) existingIssue.tcmPattern = tcmPattern;
+            if (ayurvedicImbalance) existingIssue.ayurvedicImbalance = ayurvedicImbalance;
+            if (growThySelfFocus) existingIssue.growThySelfFocus = growThySelfFocus;
+          } else {
+            currentPatient.issues[bodyPartId].push({
+              id: bodyPartId,
+              noteId: `imported_cond_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+              name: westernName,
+              painLevel: 5,
+              description: resource.note?.[0]?.text || resource.code?.text || `Imported condition: ${westernName}`,
+              symptoms: [],
+              tcmPattern,
+              ayurvedicImbalance,
+              growThySelfFocus
+            });
             conditionsAdded++;
           }
+
+          currentPatient.history = currentPatient.history || [];
+          currentPatient.history.push({
+            type: 'PatientSummaryUpdate',
+            date: new Date().toISOString().split('T')[0],
+            summary: `Imported multi-coded FHIR Condition: ${westernName} (TCM: ${tcmPattern || 'None'}, Ayurveda: ${ayurvedicImbalance || 'None'}, Longevity: ${growThySelfFocus || 'None'})`
+          });
           break;
         }
         case 'MedicationRequest':
@@ -195,6 +261,40 @@ export class ImportService {
         case 'Observation': {
           // Map common biometrics if applicable (e.g., BP, HR, Weight)
           this.parseFhirObservation(resource);
+          break;
+        }
+        case 'Device':
+        case 'DeviceDefinition': {
+          const deviceName = resource.deviceName?.[0]?.name || resource.name || 'AI Co-Pilot Device';
+          const manufacturer = resource.manufacturer || 'Google DeepMind';
+          const modelName = resource.modelNumber || resource.deviceVersion?.[0]?.value || 'Gemini 2.5 Flash';
+          
+          newScans.push({
+            id: resource.id || `fhir_device_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+            title: `System Attribution: ${deviceName}`,
+            date: new Date().toISOString().split('T')[0],
+            type: 'Document',
+            description: `Registered medical AI software device. Manufacturer: ${manufacturer}, Model/Version: ${modelName}. Active as co-pilot for Clinical Intelligence Strategy.`,
+            status: 'Normal'
+          });
+          scansAdded++;
+          break;
+        }
+        case 'Evidence': {
+          const title = resource.title || resource.description || 'Clinical Evidence Trail';
+          const url = resource.url || resource.citeAs?.relatedArtifact?.[0]?.document?.url || '';
+          const publisher = resource.publisher || 'NCBI PubMed';
+          const publicationDate = resource.date?.split('T')[0] || '';
+          
+          currentPatient.bookmarks = currentPatient.bookmarks || [];
+          currentPatient.bookmarks.push({
+            title,
+            url,
+            publisher,
+            publicationDate,
+            cited: true,
+            isPeerReviewed: true
+          });
           break;
         }
       }

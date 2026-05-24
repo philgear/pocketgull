@@ -1,5 +1,5 @@
 import {
-    Component, ChangeDetectionStrategy, inject, signal, input, output,
+    Component, ChangeDetectionStrategy, inject, signal, input, output, computed,
     OnInit, ViewChild, ElementRef, AfterViewChecked, ViewEncapsulation, OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -37,7 +37,7 @@ interface IChatEntry {
         <!-- Dialog Panel -->
         <div class="node-agent-dialog pointer-events-auto flex flex-col"
              [class.node-agent-dialog--open]="isOpen()">
-
+ 
             <!-- Header -->
             <div class="node-agent-header">
                 <div class="flex items-center gap-2 flex-1 min-w-0">
@@ -46,7 +46,7 @@ interface IChatEntry {
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#689F38] opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-[#689F38]"></span>
                     </span>
-                    <span class="node-agent-title">Evidence Focus</span>
+                    <span class="node-agent-title">{{ agentName() }}</span>
                     <span class="node-agent-section-chip">{{ data().sectionTitle }}</span>
                     @if (live.isSpeaking()) {
                         <span class="flex-shrink-0 flex h-2 w-2 relative ml-1">
@@ -586,6 +586,12 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDes
 
     suggestedQuestions = signal<string[]>([]);
 
+    agentName = computed(() => {
+        const section = this.data().sectionTitle;
+        if (!section) return 'Dr. Larus';
+        return this.intel.getAgentNameForLens(section as any);
+    });
+
     ngOnInit() {
         // Animate in
         requestAnimationFrame(() => this.isOpen.set(true));
@@ -742,8 +748,9 @@ CRITICAL SAFETY CONSTRAINTS:
         const patientCtx = this.patientData();
         const nodeText = this.data().nodeText;
         const section = this.data().sectionTitle;
+        const name = this.agentName();
 
-        return `You are a focused clinical evidence assistant embedded in the Pocket Gull Clinical Intelligence Platform.
+        return `You are ${name}, a focused clinical evidence assistant embedded in the Pocket Gull Clinical Intelligence Platform. Speak and write from this professional clinical expert persona.
 A clinician is reviewing a specific recommendation from the "${section}" section of an AI-generated care plan and wants to understand or challenge it.
 
 Patient context is available. The recommendation under review is:

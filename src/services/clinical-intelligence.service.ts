@@ -61,6 +61,40 @@ export class ClinicalIntelligenceService {
     readonly lastPatientData = signal<string | null>(null);
     readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self' | null>(null);
 
+    public getAgentNameForLens(lens: AnalysisLens): string {
+        switch (lens) {
+            case 'Summary Overview':
+                return 'Dr. Larus';
+            case 'Functional Protocols':
+            case 'Nutrition':
+            case 'Orthomolecular Profiling':
+                return 'Dr. Swoop';
+            case 'Monitoring & Follow-up':
+                return 'Dr. Heron';
+            case 'Patient Education':
+                return 'Dr. Nestor';
+            default:
+                return 'Dr. Larus';
+        }
+    }
+
+    public getAgentRoleForLens(lens: AnalysisLens): string {
+        switch (lens) {
+            case 'Summary Overview':
+                return 'Overview & Chart Synthesis Expert';
+            case 'Functional Protocols':
+            case 'Nutrition':
+            case 'Orthomolecular Profiling':
+                return 'Therapeutic & Dosing Interventionist';
+            case 'Monitoring & Follow-up':
+                return 'Vigilance & Patient Tracking Monitor';
+            case 'Patient Education':
+                return 'Patient Translation & Compliance Educator';
+            default:
+                return 'Clinical Co-Pilot';
+        }
+    }
+
     public addRecentNode(nodeContext: INodeContext) {
         this.recentNodes.update(nodes => {
             // Keep only the last 3 most recent nodes to prevent context bloat
@@ -102,16 +136,19 @@ ANNOTATION SYNTAX (place on a NEW LINE after the relevant paragraph or list item
         eastern: `CLINICAL PARADIGM: Eastern (Traditional Chinese Medicine - TCM).
 - Frame the clinical assessment and care plan using TCM diagnostic paradigms: identify organ system disharmonies, Zang-Fu patterns, Qi and blood flow status, Yin/Yang balances, and potential tongue/pulse markers where applicable.
 - Tailor lifestyle, nutrition, and therapies toward acupressure/acupoints, meridians, moxibustion guidelines, and traditional herbal formulations (e.g., cooling vs. warming foods, Qi-tonifying herbs).
+- LINK BIOCHEMISTRY TO TRADITIONAL ORGAN CHANNELS: Connect Western biomarker trends and minerals directly to Meridian/Zang-Fu systems (e.g., map Zinc to Kidney Essence/Jing, Magnesium to Heart/Liver Qi regulation, Vitamin D3 to Yang Vitality, and B12/Iron to Spleen Blood generation).
 - Always translate these concepts into clean clinical contexts that blend with modern physiological understanding (e.g. referencing autonomic nervous system or microcirculation alongside Qi/blood stasis).`,
 
         ayurvedic: `CLINICAL PARADIGM: Ayurvedic Medicine.
 - Frame the clinical assessment and care plan using Ayurvedic medicine principles: evaluate the patient's likely Tridosha constitution or imbalances (Vata, Pitta, Kapha).
 - Analyze metabolic and cellular health through the concepts of Agni (digestive and metabolic fire) and Ama (accumulated toxicity/undigested metabolic byproducts).
+- LINK BIOCHEMISTRY TO DHATUS & OJAS: Map specific nutrients and vitamins to the seven traditional Dhatus (tissues) and Ojas vitality (e.g., Vitamin D3 and Calcium to Asthi Dhatu/bone tissue, Iron and B12 to Rakta Dhatu/blood tissue, Zinc and Magnesium to Majja Dhatu/nervous tissue, and overall antioxidant markers to Ojas replenishment).
 - Direct lifestyle and nutrition toward Dinacharya (daily circadian alignment/routines), seasonal regimens, spice/herb energetics (Rasayana), and balancing sensory inputs.
 - Translate these concepts into clear clinical advice that aligns with modern metabolic, gut microbiome, and circadian biology.`,
 
         'grow-thy-self': `CLINICAL PARADIGM: Grow Thy Self (Preventive, Holistic & Longevity Medicine).
 - Focus on cellular optimization, Linus Pauling orthomolecular principles (supplying the right molecules in the right amounts), circadian rhythms, sleep architecture, and stress resilience.
+- LINK BIOCHEMISTRY TO ANCESTRAL LONGEVITY FRAMEWORKS: Tie mitochondrial health, biochemical telemetry (like CoQ10, glutathione, Vitamin D3), and metabolic markers to evolutionary/ancestral longevity principles (such as Cell Danger Response (CDR), calorie restriction mimetics, hormesis, and xenohormesis).
 - SECULAR & HUMANIST FRAMING: Ensure all recommendations and wisdom lenses are framed in a completely secular and inclusive manner. For patients who do not identify with religious or spiritual traditions, translate all concepts (such as Purusharthas, Mizan, or Tikkun Olam) into physiological, psychological, and sociological frameworks (e.g. mapping spiritual harmony to autonomic balance, homeostatic regulation, existential purpose, emotional resilience, and active civic/communal engagement).
 - INTEGRATED WISDOM LENSES: Adapt the care strategy dynamically by applying the most relevant of these 13 world wisdom systems based on the patient's clinical situation and stressors:
   1. Bagua (Taoist Energy Matrix): Harmonize daily routines, environmental/spatial habits, and circadian zones with specific life sectors.
@@ -383,8 +420,12 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
             const orchestrationPromises = lenses.map(async (lens) => {
                 const philosophy = this.patientState.activePhilosophy();
                 const philosophyInstruction = this.PHILOSOPHY_INSTRUCTIONS[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
+                
+                const agentName = this.getAgentNameForLens(lens);
+                const agentRole = this.getAgentRoleForLens(lens);
+                const agentIdentity = `You are ${agentName}, the ${agentRole} for the Pocket Gull Clinical Intelligence Platform. Speak and write from this professional clinical expert persona.`;
 
-                let sysInstruction = philosophyInstruction + '\n\n' + this.systemInstructions[lens];
+                let sysInstruction = agentIdentity + '\n\n' + philosophyInstruction + '\n\n' + this.systemInstructions[lens];
                 if (isEmergency) {
                     sysInstruction = `EMERGENCY FIRST AID MODE: You are assisting a bystander under the Good Samaritan law.
 CRITICAL EMERGENCY RULES:
