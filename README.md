@@ -7,7 +7,7 @@
 ![Three.js](https://img.shields.io/badge/Three.js-v0.183-000000?logo=three.js)
 ![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-blue)
 
 > **Note:** This application was created for the purposes of entering the Gemini Live Agent Challenge hackathon.
 > **Category:** Live Agents 🗣️ (Real-time Interaction Voice & Visual UI)

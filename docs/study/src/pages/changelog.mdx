@@ -1,0 +1,64 @@
+---
+layout: ../layouts/DocsLayout.astro
+title: Changelog
+---
+
+# Changelog
+
+All notable changes to Pocket Gull are documented here.
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+## v0.9.5 — 2026-05-20
+
+**Method of Loci Palace, Smiley Gesture Authentication, & AVS Therapy Suite**
+
+### Added
+- **Method of Loci (Clinical Memory Palace)**: Integrated an interactive 3D-assisted Method of Loci learning framework into the patient assessment report space, enabling clinicians to visually anchor complex care plan protocols and diagnostics to spatial memory hubs (Clinical Loci).
+- **Smiley Gesture Authentication & WebAuthn Safeguard**: Replaced PIN-based logins with a canvas-based smiley drawing unlock flow in `SecureSplashComponent`. Integrated conditional platform checks to only present the biometric WebAuthn security button on supported devices.
+- **AVS (Acoustic/Visual/Sensory) Therapy & Guided Circadian UI**: Added a clinic/patient visual entrainment interface featuring guided box breathing cycles and light frequency modulation, integrated natively within the system's tour guides and onboarding flows.
+- **Comprehensive Third-Party Register**: Formulated `DEPENDENCIES.md` and the interactive `dependencies.mdx` documentation page, compiling licensing info for Angular, FastAPI sidecar, and Flutter apps to enforce absolute open-source compatibility.
+
+---
+
+## v0.9.0 — 2026-05-18
+
+**Multilingual Care Plans & Orthomolecular Profiling**
+
+### Added
+- **Multilingual & Pediatric Care Plans**: Expanded the `translateReadingLevel` infrastructure across all providers to support Spanish, German, French, Mandarin, Dyslexia, and Pediatric formats.
+- **Security & Red Teaming Framework**: Implemented `SECURITY.md` and a Vitest automated red-teaming suite (`tests/safety.spec.ts`) to actively verify safety boundaries.
+- **Transparency Metadata**: Added `humans.txt`, `robots.txt`, `llms.txt`, and `sources.txt` to the public directory.
+- **Cloud Build Integration**: Created `cloudbuild.yaml` to automate Docker builds and Google Cloud Run deployment pipelines.
+- **Advanced Clinical Mock Data**: Expanded `MOCK_PATIENTS` with updated 2026 timestamps, Orthomolecular Biomarkers, and dedicated Pediatric and Multilingual test profiles.
+- **Animal Comfort Protocols**: Engineered a Web Audio API synthesizer (`PetAuditoryService`) within the Care Plan Export module to generate species-specific soothing frequencies (Feline Purr at 25Hz, Canine Heartbeat at 60 BPM) for pets left home during hospitalizations.
+
+---
+
+## v0.1.0 — 2026-03-16
+
+**Initial Release · Gemini Live Agent Challenge**
+
+### Added
+- **Live AI Clinical Co-Pilot** — Voice-first consult powered by `gemini-2.5-flash` and ADK `InMemoryRunner`
+- **3D Body Viewer** — Procedural skeletal + surface anatomy with severity particles (Three.js v0.183)
+- **Multi-Agent Orchestration** — Specialized `LlmAgent` experts: Overview, Interventions, Monitoring, Education
+- **Interactive Task Bracketing** — Double-click state machine (Normal → Added → Removed) for care plan review
+- **FHIR R4 Export** — Unicode-safe Base64 encoded Bundles for clinical portability
+- **FHIR Import Service** — Ingest Epic/MyChart "Lucy" format payloads
+- **PubMed E-utilities Integration** — Server-side research queries with anonymized PHI
+- **Google CSE Integration** — Differential diagnostic information via Programmable Search
+- **Box Breathing UX** — 16-second guided animation during high-stress intake encounters
+- **Printable Clinical Stationery** — CSS Grid halftone body maps with diagnostic overlays
+- **Responsive Design** — Two-column grid down to **286px** viewport (Pixel Watch 2)
+- **Dark Mode** — WCAG-compliant contrast with automatic detection
+- **Cognition & Child Export** — Dyslexia-friendly typography, carousel informatics PDF
+
+### Infrastructure
+- Express.js backend on **Google Cloud Run** with SSR + hydration
+- Automated deployment via `scripts/deploy.sh`
+- Lighthouse score: **100/100** (Performance, Accessibility, Best Practices, SEO)
+
+### Documentation
+- Astro-powered docs site with 8 pages
+- AI-powered DocNode evidence drill-down (Gemini API)
+- Version selector and prev/next navigation
