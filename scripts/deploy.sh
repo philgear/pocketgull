@@ -11,19 +11,11 @@ echo "=========================================================="
 # 1. Ensure gcloud is initialized and authenticated
 # gcloud auth login
 # gcloud config set project YOUR_PROJECT_ID
-
-<<<<<<< Updated upstream
 # Automatically grab the current project
 PROJECT_ID=$(gcloud config get-value project)
 if [ -z "$PROJECT_ID" ]; then
     echo "❌ Error: Google Cloud Project ID is not set."
     echo "Please run 'gcloud auth login' and 'gcloud config set project <PROJECT_ID>' first."
-=======
-PROJECT_ID=$(gcloud config get-value project)
-if [ -z "$PROJECT_ID" ]; then
-    echo "❌ Error: Google Cloud Project ID is not set."
-    echo "Please set it using: gcloud config set project <PROJECT_ID>"
->>>>>>> Stashed changes
     exit 1
 fi
 

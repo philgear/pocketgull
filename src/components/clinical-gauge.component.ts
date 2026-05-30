@@ -1,4 +1,4 @@
-import { Component, Input, computed , ChangeDetectionStrategy} from '@angular/core';
+import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,15 +9,17 @@ import { CommonModule } from '@angular/common';
     template: `
     <div class="gauge-container">
       <div class="gauge-header">
-        <span class="label">{{ label }}</span>
-        <span class="value">{{ value }}/10</span>
+        <span class="label">{{ label() }}</span>
+        <span class="value">{{ value() }}/10</span>
       </div>
       <div class="track">
-        <div class="bar" [style.width.%]="value * 10" [style.background]="barColor()"></div>
+        <div class="bar" [style.width.%]="value() * 10" [style.background]="barColor()"></div>
       </div>
-      <div class="description" *ngIf="description">
-        {{ description }}
-      </div>
+      @if (description()) {
+        <div class="description">
+          {{ description() }}
+        </div>
+      }
     </div>
   `,
     styles: [`
@@ -103,20 +105,21 @@ import { CommonModule } from '@angular/common';
   `]
 })
 export class ClinicalGaugeComponent {
-    @Input() label: string = '';
-    @Input() value: number = 0;
-    @Input() description: string = '';
-    @Input() type: 'complexity' | 'stability' | 'certainty' = 'certainty';
+    readonly label = input<string>('');
+    readonly value = input<number>(0);
+    readonly description = input<string>('');
+    readonly type = input<'complexity' | 'stability' | 'certainty'>('certainty');
 
-    barColor = computed(() => {
-        const val = this.value;
-        if (this.type === 'stability') {
+    readonly barColor = computed(() => {
+        const val = this.value();
+        const t = this.type();
+        if (t === 'stability') {
             if (val > 7) return 'linear-gradient(90deg, #48bb78, #38a169)'; // Stable Green
             if (val > 4) return 'linear-gradient(90deg, #ecc94b, #d69e2e)'; // Warning Yellow
             return 'linear-gradient(90deg, #f56565, #e53e3e)'; // Unstable Red
         }
 
-        if (this.type === 'complexity') {
+        if (t === 'complexity') {
             if (val > 7) return 'linear-gradient(90deg, #805ad5, #6b46c1)'; // High Complexity Purple
             if (val > 4) return 'linear-gradient(90deg, #4299e1, #3182ce)'; // Moderate Blue
             return 'linear-gradient(90deg, #4fd1c5, #38b2ac)'; // Low Complexity Teal
