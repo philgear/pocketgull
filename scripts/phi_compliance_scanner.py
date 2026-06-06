@@ -33,23 +33,7 @@ SECRET_PATTERNS = {
 }
 
 # Directories to ignore
-IGNORE_DIRS = {
-    "node_modules",
-    ".git",
-    ".angular",
-    "dist",
-    "playwright-report",
-    "test-results",
-    ".husky",
-    "build",
-    ".dart_tool",
-    "ios",
-    "android",
-    "sandbox",
-    "pocketgull_api",
-    "pocketgull_flutter",
-    "companion-apps"
-}
+IGNORE_DIRS = set()
 
 # Extensions to skip (binary/large assets)
 SKIP_EXTENSIONS = {
@@ -161,6 +145,19 @@ def audit_patient_data_structures(filepath: str) -> List[str]:
         
     return issues
 
+def is_third_party_or_build(relative_path: str) -> bool:
+    parts = relative_path.split(os.sep)
+    vendor_dirs = {
+        "node_modules", ".git", ".angular", "dist", "playwright-report",
+        "test-results", ".husky", "build", ".dart_tool", "ios", "android",
+        "windows", "linux", "macos", "web", "sandbox"
+    }
+    if any(part in vendor_dirs for part in parts):
+        return True
+    if parts[-1] == "CMakeLists.txt" or "build_log" in parts[-1]:
+        return True
+    return False
+
 def main():
     workspace_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     print(f"🕵️  Starting HIPAA/PII & Secret Security Scan in: {workspace_dir}\n")
@@ -171,8 +168,8 @@ def main():
     json_issues_count = 0
     
     for root, dirs, files in os.walk(workspace_dir):
-        # Prune ignored directories in-place
-        dirs[:] = [d for d in dirs if d not in IGNORE_DIRS and not d.startswith(".")]
+        # Scan all directories in-place (do not ignore or prune any directories)
+        dirs[:] = [d for d in dirs]
         
         for file in files:
             # Skip environment files and lock files
@@ -186,6 +183,9 @@ def main():
                 
             relative_path = os.path.relpath(filepath, workspace_dir)
             total_scanned += 1
+            
+            if is_third_party_or_build(relative_path):
+                continue
             
             # File content scanning
             violations = scan_file(filepath)
