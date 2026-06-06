@@ -73,10 +73,15 @@ export class GlobalAvsService {
       const active = this.state.isAvsSessionActive();
       const wave = this.state.avsBrainwaveFrequency();
       const bpm = this.state.avsBreathingRate();
+      const freqHz = this.state.avsBrainwaveFrequencyHz();
 
       untracked(() => {
         if (active) {
-          this.activateAvsMode(wave, bpm);
+          if (this.leftOsc1) {
+            this.updateFrequencyHz(freqHz);
+          } else {
+            this.activateAvsMode(wave, bpm, freqHz);
+          }
         } else {
           this.deactivateAvsMode();
         }
@@ -106,11 +111,24 @@ export class GlobalAvsService {
     if (!this.isBrowser) return;
     document.body.setAttribute('data-avs-wave', wave);
     const cfg = this.WAVE_CONFIG[wave];
+    const freqHz = this.state.avsBrainwaveFrequencyHz();
     if (cfg && this.leftOsc1 && this.rightOsc1 && this.leftOsc2 && this.rightOsc2) {
       this.leftOsc1.frequency.exponentialRampToValueAtTime(cfg.carrier1, this.audioTime() + 2.0);
-      this.rightOsc1.frequency.exponentialRampToValueAtTime(cfg.carrier1 + cfg.beat1, this.audioTime() + 2.0);
+      this.rightOsc1.frequency.exponentialRampToValueAtTime(cfg.carrier1 + freqHz, this.audioTime() + 2.0);
       this.leftOsc2.frequency.exponentialRampToValueAtTime(cfg.carrier2, this.audioTime() + 2.0);
-      this.rightOsc2.frequency.exponentialRampToValueAtTime(cfg.carrier2 + cfg.beat2, this.audioTime() + 2.0);
+      this.rightOsc2.frequency.exponentialRampToValueAtTime(cfg.carrier2 + (freqHz * 0.66), this.audioTime() + 2.0);
+    }
+  }
+
+  /** Dynamically update frequency during an active session. */
+  updateFrequencyHz(freqHz: number): void {
+    if (!this.isBrowser) return;
+    const wave = this.state.avsBrainwaveFrequency();
+    const cfg = this.WAVE_CONFIG[wave] ?? this.WAVE_CONFIG['theta'];
+    if (this.leftOsc1 && this.rightOsc1 && this.leftOsc2 && this.rightOsc2) {
+      const now = this.audioTime();
+      this.rightOsc1.frequency.setTargetAtTime(cfg.carrier1 + freqHz, now, 0.2);
+      this.rightOsc2.frequency.setTargetAtTime(cfg.carrier2 + (freqHz * 0.66), now, 0.2);
     }
   }
 
@@ -118,7 +136,7 @@ export class GlobalAvsService {
   // ACTIVATION
   // ══════════════════════════════════════════════════════════════
 
-  private activateAvsMode(wave: string, bpm: number): void {
+  private activateAvsMode(wave: string, bpm: number, freqHz: number): void {
     if (!this.isBrowser) return;
 
     // Set CSS state on body
@@ -132,7 +150,7 @@ export class GlobalAvsService {
     this.zone.runOutsideAngular(() => this.startRafLoop());
 
     // Start audio (may be gated on gesture)
-    this.startAudioGraph(wave);
+    this.startAudioGraph(wave, freqHz);
   }
 
   private deactivateAvsMode(): void {
@@ -181,9 +199,9 @@ export class GlobalAvsService {
   // 432 Hz binaural beat + brown noise floor
   // ══════════════════════════════════════════════════════════════
 
-  private startAudioGraph(wave: string): void {
+  private startAudioGraph(wave: string, freqHz: number): void {
     const start = () => {
-      this.buildGraph(wave);
+      this.buildGraph(wave, freqHz);
     };
 
     if (this.gestureUnlocked) {
@@ -193,7 +211,7 @@ export class GlobalAvsService {
     }
   }
 
-  private buildGraph(wave: string): void {
+  private buildGraph(wave: string, freqHz: number): void {
     this.stopAudioGraph();
 
     try {
@@ -215,7 +233,7 @@ export class GlobalAvsService {
       this.leftOsc1.type  = 'sine';
       this.rightOsc1.type = 'sine';
       this.leftOsc1.frequency.value  = cfg.carrier1;
-      this.rightOsc1.frequency.value = cfg.carrier1 + cfg.beat1;
+      this.rightOsc1.frequency.value = cfg.carrier1 + freqHz;
 
       // Hemi-Sync Layer 2 (Sub-harmonic)
       this.leftOsc2  = this.ctx.createOscillator();
@@ -223,7 +241,7 @@ export class GlobalAvsService {
       this.leftOsc2.type  = 'sine';
       this.rightOsc2.type = 'sine';
       this.leftOsc2.frequency.value  = cfg.carrier2;
-      this.rightOsc2.frequency.value = cfg.carrier2 + cfg.beat2;
+      this.rightOsc2.frequency.value = cfg.carrier2 + (freqHz * 0.66);
 
       const leftGain  = this.ctx.createGain();
       const rightGain = this.ctx.createGain();

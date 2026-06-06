@@ -54,6 +54,20 @@ interface INoteTimelineItem extends IBodyPartIssue {
                     {{ note.isCurrent ? 'Active Input' : 'Historical Record' }}
                   </span>
                   <h2 class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100">{{ state.selectedPartName() }}</h2>
+                  <!-- TDM UI Integration -->
+                  @if (state.activePhilosophy() === 'eastern' && note.tcmPattern) {
+                    <div class="mt-2">
+                      <pocket-gull-badge [label]="'TCM Pattern: ' + note.tcmPattern" severity="success"></pocket-gull-badge>
+                    </div>
+                  } @else if (state.activePhilosophy() === 'ayurvedic' && note.ayurvedicImbalance) {
+                    <div class="mt-2">
+                      <pocket-gull-badge [label]="'Ayurvedic Imbalance: ' + note.ayurvedicImbalance" severity="warning"></pocket-gull-badge>
+                    </div>
+                  } @else if (state.activePhilosophy() === 'grow-thy-self' && note.growThySelfFocus) {
+                    <div class="mt-2">
+                      <pocket-gull-badge [label]="'Longevity Focus: ' + note.growThySelfFocus" severity="info"></pocket-gull-badge>
+                    </div>
+                  }
                 </div>
                 @if (note.isCurrent) {
                   <pocket-gull-badge label="Live" severity="success" [hasIcon]="true">

@@ -22,6 +22,7 @@ export class PatientStateService {
   readonly isAvsSessionActive = signal<boolean>(false);
   readonly avsBreathingRate = signal<number>(6.0);
   readonly avsBrainwaveFrequency = signal<string>('theta');
+  readonly avsBrainwaveFrequencyHz = signal<number>(6.0);
   readonly avsProtocol = signal<IAvsProtocol | null>(null);
   readonly isGeneratingAvsProtocol = signal<boolean>(false);
 

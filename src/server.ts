@@ -17,6 +17,8 @@ import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import crypto from 'node:crypto';
 import { GoogleAuth } from 'google-auth-library';
 import { WebSocketServer, WebSocket } from 'ws';
+// @ts-ignore
+import AgonesSDK from '@google-cloud/agones-sdk';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -972,6 +974,39 @@ app.use((req, res, next) => {
  * Start the server if this module is the main entry point, or it is ran via PM2.
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4200.
  */
+async function initializeAgones() {
+  try {
+    const agonesSDK = new AgonesSDK();
+    await agonesSDK.connect();
+    console.log('[Agones] Connected to local SDK sidecar successfully.');
+    
+    await agonesSDK.ready();
+    console.log('[Agones] Sent ready state to controller.');
+
+    const healthInterval = setInterval(() => {
+      agonesSDK.health((err: any) => {
+        if (err) {
+          console.warn('[Agones] Health ping error:', err.message || err);
+        }
+      });
+    }, 10000);
+
+    process.on('SIGTERM', async () => {
+      console.log('[Agones] SIGTERM received. Initiating shutdown...');
+      clearInterval(healthInterval);
+      try {
+        await agonesSDK.shutdown();
+        console.log('[Agones] Sent shutdown state successfully.');
+      } catch (e: any) {
+        console.error('[Agones] Error during shutdown call:', e.message);
+      }
+      process.exit(0);
+    });
+  } catch (err: any) {
+    console.log('[Agones Info] Not running inside an Agones environment. Standing alone.');
+  }
+}
+
 if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT']) {
   const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4200;
   const server = app.listen(port, '0.0.0.0', () => {
@@ -1103,6 +1138,9 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
         }
       });
     });
+
+    // Initialize Agones SDK sidecar
+    initializeAgones().catch(console.error);
 
     // Explicitly keep the process alive, as something is closing the event loop
     setInterval(() => {}, 1000 * 60 * 60 * 24);

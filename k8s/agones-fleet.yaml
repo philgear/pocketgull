@@ -1,0 +1,32 @@
+apiVersion: "agones.dev/v1"
+kind: Fleet
+metadata:
+  name: pocketgull-consult-fleet
+  namespace: default
+spec:
+  replicas: 3 # keep 3 warm pods ready
+  scheduling: Packed # group pods tightly on nodes
+  template:
+    spec:
+      ports:
+      - name: websocket-port
+        containerPort: 4200
+        portPolicy: Dynamic # let Agones allocate a random node port for WebSocket media streams
+      template:
+        spec:
+          containers:
+          - name: pocketgull-app
+            image: gcr.io/philgear-understory/pocketgull:latest
+            imagePullPolicy: Always
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "500m"
+              limits:
+                memory: "1Gi"
+                cpu: "1"
+            env:
+            - name: PORT
+              value: "4200"
+            - name: NODE_ENV
+              value: "production"
