@@ -36,6 +36,10 @@ const fhirStoreId = process.env['HC_FHIR_STORE'] || 'fhir_primary';
  * Automatically provisions the GCP Healthcare Dataset, DICOM Store, and FHIR Store.
  */
 export async function ensureHealthcareStoresExist() {
+  if (process.env['SKIP_HEALTHCARE_PROVISION'] === 'true') {
+    console.log('[Healthcare Auto-Provision] SKIP_HEALTHCARE_PROVISION is set, skipping auto-provisioning.');
+    return;
+  }
   try {
     const projectId = await getProjectId();
     if (!projectId) {
