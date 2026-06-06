@@ -233,8 +233,15 @@ if (secretsCount > 0) {
   console.error('⚠️  Please remove the exposed secret keys or credentials, use environment variables (.env), and try committing again.\n');
   process.exit(1);
 } else {
-  console.log('✅ Secret / Credential Leak check passed.');
-  console.log('\n🎉 All pre-commit validation checks passed successfully. Safe to commit!\n');
-  process.exit(0);
+  console.log('✅ Secret / Credential Leak check passed.\n');
 }
+
+// Check 5: Python PHI / PII & Secret Compliance Scan
+const pythonScannerPassed = runCommand('python3 scripts/phi_compliance_scanner.py', 'Python HIPAA/PII and Compliance Scan');
+if (!pythonScannerPassed) {
+  process.exit(1);
+}
+
+console.log('\n🎉 All pre-commit validation checks passed successfully. Safe to commit!\n');
+process.exit(0);
 

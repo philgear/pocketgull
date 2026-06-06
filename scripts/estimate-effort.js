@@ -10,48 +10,81 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const projectRoot = path.normalize(path.resolve(__dirname, '..'));
 
-// Dynamically calculate KSLOC
+// Dynamically calculate KSLOC across modules
 function getDynamicKsloc() {
+    const modules = [
+        { name: 'Web Client (Angular)', path: 'src', exts: ['.ts', '.js', '.html', '.css'] },
+        { name: 'Backend API (Node)', path: 'pocketgull_api/src', exts: ['.ts'] },
+        { name: 'AVS Therapy Companion (Angular)', path: 'companion-apps/avs-therapy/src', exts: ['.ts', '.js', '.html', '.css'] }
+    ];
+
     let totalSloc = 0;
-    const srcDir = path.join(__dirname, '..', 'src');
-    
-    function walk(dir) {
+    const breakdown = [];
+
+    function walk(relativeDir, exts) {
         let results = [];
-        const list = fs.readdirSync(dir);
-        list.forEach(function(file) {
-            file = path.join(dir, file);
-            const stat = fs.statSync(file);
-            if (stat && stat.isDirectory()) { 
-                results = results.concat(walk(file));
-            } else { 
-                if (file.endsWith('.ts') || file.endsWith('.js') || file.endsWith('.html') || file.endsWith('.css')) {
-                   results.push(file);
+        const joinedDir = path.join(projectRoot, relativeDir);
+        const resolvedDir = path.normalize(joinedDir);
+        if (!resolvedDir.startsWith(projectRoot)) return results;
+        if (!fs.existsSync(resolvedDir)) return results;
+
+        const list = fs.readdirSync(resolvedDir);
+        list.forEach(file => {
+            const fileRelativePath = path.join(relativeDir, file);
+            const joinedPath = path.join(projectRoot, fileRelativePath);
+            const fullPath = path.normalize(joinedPath);
+            if (!fullPath.startsWith(projectRoot)) return;
+
+            try {
+                const stat = fs.statSync(fullPath);
+                if (stat && stat.isDirectory()) { 
+                    results = results.concat(walk(fileRelativePath, exts));
+                } else { 
+                    if (exts.some(ext => file.endsWith(ext))) {
+                       results.push(fullPath);
+                    }
                 }
-            }
+            } catch (e) { /* ignore unreachable files */ }
         });
         return results;
     }
 
-    const files = walk(srcDir);
-    files.forEach(file => {
-        const code = fs.readFileSync(file, 'utf8');
-        const ext = path.extname(file).substring(1);
-        try {
-            const stats = sloc(code, ext);
-            if (stats && stats.source) {
-                totalSloc += stats.source;
-            }
-        } catch(e) { /* ignore files sloc can't parse */ }
+    modules.forEach(mod => {
+        let modSloc = 0;
+        const files = walk(mod.path, mod.exts);
+        files.forEach(file => {
+            try {
+                const fullFile = path.normalize(file);
+                if (!fullFile.startsWith(projectRoot)) return;
+
+                const code = fs.readFileSync(fullFile, 'utf8');
+                let ext = path.extname(fullFile).substring(1);
+                if (ext === 'dart') {
+                    ext = 'ts'; // map dart comments to TS parser
+                }
+                const stats = sloc(code, ext);
+                if (stats && stats.source) {
+                    modSloc += stats.source;
+                }
+            } catch(e) { /* ignore */ }
+        });
+        if (modSloc > 0) {
+            breakdown.push({ name: mod.name, ksloc: modSloc / 1000 });
+            totalSloc += modSloc;
+        }
     });
 
-    return totalSloc / 1000;
+    return {
+        total: totalSloc / 1000,
+        breakdown
+    };
 }
 
-const KSLOC = getDynamicKsloc();
+const { total: KSLOC, breakdown } = getDynamicKsloc();
 
 // Post-Architecture Scale Factors (SF)
-// Range: Very Low (6.2) to Extra High (0.0) - simplified for this project
 const scaleFactors = {
     prec: 3.72, // Precedentedness: Nominal (New project area but existing tech)
     flex: 3.04, // Development Flexibility: Nominal
@@ -61,7 +94,6 @@ const scaleFactors = {
 };
 
 // Post-Architecture Cost Drivers (EM - Effort Multipliers)
-// Range: Very Low to Extra High
 const effortMultipliers = {
     rely: 1.10, // Required Software Reliability: High (Medical app)
     data: 1.14, // Data Base Size: High (Patient records/Gemini context)
@@ -93,11 +125,11 @@ function calculateEffort() {
     const PM = 2.94 * EAF * Math.pow(KSLOC, B);
 
     // Schedule estimation (TDEV)
-    const SCED_Percentage = (effortMultipliers.sced - 1) * 100; // Simplified
     const TDEV = 3.67 * Math.pow(PM, (0.28 + 0.1 * (B - 0.91)));
 
     return {
         ksloc: KSLOC,
+        breakdown,
         exponent_B: B.toFixed(4),
         eaf: EAF.toFixed(4),
         effort_pm: PM.toFixed(2),
@@ -108,7 +140,11 @@ function calculateEffort() {
 const results = calculateEffort();
 
 console.log('--- COCOMO II Estimation Results ---');
-console.log(`Project Size: ${results.ksloc} KSLOC`);
+console.log('Project Size Breakdown:');
+results.breakdown.forEach(mod => {
+    console.log(`  - ${mod.name}: ${mod.ksloc.toFixed(3)} KSLOC`);
+});
+console.log(`Total Project Size: ${results.ksloc.toFixed(3)} KSLOC`);
 console.log(`Exponent B: ${results.exponent_B}`);
 console.log(`Effort Adjustment Factor (EAF): ${results.eaf}`);
 console.log(`Estimated Effort: ${results.effort_pm} Person-Months`);

@@ -9,7 +9,7 @@ import {
 import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
 import compression from 'compression';
-import { dirname, join } from 'node:path';
+import { dirname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
@@ -53,7 +53,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const rootDir = process.cwd();
+const rootDir = normalize(resolve(__dirname, '..'));
 
 
 
@@ -65,14 +65,12 @@ async function fetchGeminiApiKey() {
 
   // Search the Angular project root first, then fall back to sibling pocketgull_api dir
   // so a single .env in either location satisfies all services in the monorepo.
-  const envSearchPaths = [
-    join(rootDir, '.env.local'),
-    join(rootDir, '.env'),
-    join(rootDir, 'pocketgull_api', '.env.local'),
-    join(rootDir, 'pocketgull_api', '.env'),
-  ];
+  const envFiles = ['.env.local', '.env', 'pocketgull_api/.env.local', 'pocketgull_api/.env'];
 
-  for (const envPath of envSearchPaths) {
+  for (const file of envFiles) {
+    const joinedPath = join(rootDir, file);
+    const envPath = normalize(joinedPath);
+    if (!envPath.startsWith(rootDir)) continue;
     try {
       const localEnv = fs.readFileSync(envPath, 'utf8');
       const match = localEnv.match(/GEMINI_API_KEY=["']?([^"'\n]+)["']?/);
@@ -185,8 +183,13 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 // Load OpenAPI specification dynamically for Swagger UI
 let openApiSpec: any = {};
 try {
-  const specPath = join(rootDir, 'docs', 'openapi.json');
-  openApiSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+  const joinedSpec = join(rootDir, 'docs', 'openapi.json');
+  const specPath = normalize(joinedSpec);
+  if (specPath.startsWith(rootDir)) {
+    openApiSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+  } else {
+    throw new Error('Unauthorized path access');
+  }
 } catch (err: any) {
   console.warn('[Swagger] Failed to load docs/openapi.json:', err.message);
 }
@@ -571,7 +574,8 @@ app.use((req, res, next) => {
       const key = await getApiKey(req);
       if (contentType.includes('text/html') && key) {
         let html = await response.text();
-        const scriptTag = `<script px-api-key="true">window.GEMINI_API_KEY = "${key}";</script>\n</head>`;
+        const safeKey = key.replace(/[^a-zA-Z0-9_\-]/g, '');
+        const scriptTag = '<script px-api-key="true">window.GEMINI_API_KEY = "' + safeKey + '";</script>\n</head>';
         html = html.replace('</head>', scriptTag);
 
         const modRes = new Response(html, {

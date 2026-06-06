@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""
+Understory - PHI & PII Security Compliance Scanner
+Automates scanning of code, assets, mock databases, and log files for:
+1. Accidental Protected Health Information (PHI) & PII leaks (SSNs, Phone Numbers, Email formats, Address Zip codes).
+2. Embedded API credentials, secrets, or high-entropy key patterns.
+3. HIPAA compliance validation on active patient models.
+
+Exit Codes:
+- 0: Scanning passed with no violations.
+- 1: Compliance violations detected.
+"""
+
+import os
+import re
+import sys
+import json
+from typing import List, Dict, Tuple
+
+# Regex Patterns for PII / PHI
+PII_PATTERNS = {
+    "Social Security Number (SSN)": re.compile(r"\b(?!000|666|9\d{2})\d{3}-(?!00)\d{2}-(?!0000)\d{4}\b"),
+    "Email Address": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
+    "US Phone Number": re.compile(r"\b(?:\+?1[-. ]?)?\(?([2-9][0-8][0-9])\)?[-. ]?([2-9][0-9]{2})[-. ]?([0-9]{4})\b"),
+    "Zip Code": re.compile(r"\b\d{5}(?:-\d{4})?\b")
+}
+
+# Regex Patterns for Secrets and API Keys
+SECRET_PATTERNS = {
+    "Google API Key": re.compile(r"AIzaSy[A-Za-z0-9_-]{33}"),
+    "Generic Private Key": re.compile(r"-----BEGIN [A-Z0-9_-]+ PRIVATE KEY-----"),
+    "Generic Password/Secret Assignment": re.compile(r"(api[-_]?key|secret[-_]?key|password|db[-_]?pass)\s*[:=]\s*['\"`][a-zA-Z0-9_\-*!@#%^&()]{16,}['\"`]", re.IGNORECASE)
+}
+
+# Directories to ignore
+IGNORE_DIRS = {
+    "node_modules",
+    ".git",
+    ".angular",
+    "dist",
+    "playwright-report",
+    "test-results",
+    ".husky",
+    "build",
+    ".dart_tool",
+    "ios",
+    "android",
+    "sandbox",
+    "pocketgull_api",
+    "pocketgull_flutter",
+    "companion-apps"
+}
+
+# Extensions to skip (binary/large assets)
+SKIP_EXTENSIONS = {
+    ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip", ".sqlite",
+    ".db", ".keystore", ".jks", ".lock", ".ico", ".dill"
+}
+
+# Files to ignore completely (e.g. package locks containing metadata/emails)
+IGNORE_FILES = {
+    "package-lock.json",
+    "yarn.lock"
+}
+
+# Known safe placeholders that regex might flag (like mock variables in tests)
+SAFE_PLACEHOLDERS = {
+    "fake_", "mock_", "dummy_", "test_", "placeholder", "example.com", "555-0199", "12345"
+}
+
+def is_safe_placeholder(text: str) -> bool:
+    text_lower = text.lower()
+    return any(p in text_lower for p in SAFE_PLACEHOLDERS)
+
+def scan_file(filepath: str) -> List[Tuple[str, int, str, str]]:
+    """
+    Scans a single file for PII/PHI and Secrets.
+    Returns: List of (type, line_number, matched_text, description)
+    """
+    violations = []
+    ext = os.path.splitext(filepath)[1].lower()
+    
+    # Restrict PII/PHI pattern scans to data, documentation, and log files.
+    # Code files (.ts, .js, .dart, .html, .css) are highly prone to false positives (constants, ports, colors).
+    # Skip JSON files as well since they are checked structurally by audit_patient_data_structures.
+    scan_pii = ext in (".csv", ".txt", ".log", ".md")
+    
+    try:
+        with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+            for line_no, line in enumerate(f, 1):
+                # 1. Scan for PII (only on data/log/doc files)
+                if scan_pii:
+                    for label, pattern in PII_PATTERNS.items():
+                        for match in pattern.finditer(line):
+                            match_text = match.group(0)
+                            if not is_safe_placeholder(match_text):
+                                violations.append(("PII/PHI", line_no, match_text, label))
+                
+                # 2. Scan for Secrets (exclude this scanner script to avoid false positives)
+                if "phi_compliance_scanner" not in filepath:
+                    for label, pattern in SECRET_PATTERNS.items():
+                        for match in pattern.finditer(line):
+                            match_text = match.group(0)
+                            if not is_safe_placeholder(match_text):
+                                # Mask match text for safety in logs
+                                masked = match_text[:6] + "..." + match_text[-4:] if len(match_text) > 10 else "******"
+                                violations.append(("SECRET", line_no, masked, label))
+                                
+    except Exception as e:
+        print(f"⚠️  Could not read file {filepath}: {e}")
+        
+    return violations
+
+def audit_patient_data_structures(filepath: str) -> List[str]:
+    """
+    Specifically validates patient data models (.json files) to ensure
+    they follow HIPAA de-identification (no real names or addresses).
+    """
+    issues = []
+    if not filepath.endswith(".json"):
+        return issues
+        
+    # Known safe mock names and clinical categories that fit Name format
+    allowed_names = {
+        "Robert Davis", "Sarah Jenkins", "William Henderson", 
+        "Global Sentinel", "Maternal Sentinel", "Pediatric Sentinel", "Geriatric Sentinel",
+        "Systemic Health", "Oxidative Stress", "Antioxidant Status"
+    }
+        
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            
+        # Helper to inspect objects recursively
+        def check_node(node):
+            if isinstance(node, dict):
+                # HIPAA Check: ensure clinical JSON data uses structured codes/mock IDs, not real PII keys
+                for k, v in node.items():
+                    if k.lower() in ("ssn", "socialsecurity", "birthdate") and v:
+                        issues.append(f"Found sensitive key '{k}' in JSON structure.")
+                    if isinstance(v, str):
+                        # Simple name heuristic (Capitalized First + Last, e.g. 'John Doe')
+                        if k.lower() == "name" and re.match(r"^[A-Z][a-z]+\s[A-Z][a-z]+$", v):
+                            # Refined heuristic: patient names reside in dicts containing other profile keys
+                            # (like 'age', 'gender', 'history', etc.) and not in sub-structures 
+                            # (like 'dose', 'value', 'pathway', 'unit', etc.)
+                            is_patient_name_prop = any(prop in node for prop in ("age", "gender", "history", "vitals", "scans"))
+                            if is_patient_name_prop:
+                                if not is_safe_placeholder(v) and v not in allowed_names:
+                                    issues.append(f"Potential real patient name '{v}' in JSON property '{k}'")
+                    check_node(v)
+            elif isinstance(node, list):
+                for item in node:
+                    check_node(item)
+                    
+        check_node(data)
+    except json.JSONDecodeError:
+        pass # Not a valid json file, skip structure checks
+    except Exception as e:
+        print(f"⚠️  Could not parse JSON in {filepath}: {e}")
+        
+    return issues
+
+def main():
+    workspace_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    print(f"🕵️  Starting HIPAA/PII & Secret Security Scan in: {workspace_dir}\n")
+    
+    total_scanned = 0
+    pii_violations_count = 0
+    secret_violations_count = 0
+    json_issues_count = 0
+    
+    for root, dirs, files in os.walk(workspace_dir):
+        # Prune ignored directories in-place
+        dirs[:] = [d for d in dirs if d not in IGNORE_DIRS and not d.startswith(".")]
+        
+        for file in files:
+            # Skip environment files and lock files
+            if file.startswith(".env") or file in IGNORE_FILES:
+                continue
+            filepath = os.path.join(root, file)
+            ext = os.path.splitext(file)[1].lower()
+            
+            if ext in SKIP_EXTENSIONS:
+                continue
+                
+            relative_path = os.path.relpath(filepath, workspace_dir)
+            total_scanned += 1
+            
+            # File content scanning
+            violations = scan_file(filepath)
+            if violations:
+                for v_type, line_no, matched, desc in violations:
+                    print(f"❌ [{v_type}] {relative_path}:{line_no} -> Found {desc} matching '{matched}'")
+                    if v_type == "PII/PHI":
+                        pii_violations_count += 1
+                    else:
+                        secret_violations_count += 1
+                        
+            # Custom JSON structure compliance checks
+            json_issues = audit_patient_data_structures(filepath)
+            if json_issues:
+                for issue in json_issues:
+                    print(f"⚠️  [HIPAA SCHEMA] {relative_path} -> {issue}")
+                    json_issues_count += 1
+                    
+    print("\n" + "="*50)
+    print("📊 Scan Summary:")
+    print(f"🔍 Scanned Files: {total_scanned}")
+    print(f"🛡️  PII/PHI Violations: {pii_violations_count}")
+    print(f"🔑 Secrets/API Keys: {secret_violations_count}")
+    print(f"📋 HIPAA Schema Issues: {json_issues_count}")
+    print("="*50)
+    
+    if pii_violations_count > 0 or secret_violations_count > 0 or json_issues_count > 0:
+        print("\n❌ Compliance check failed! Please address the security findings above.")
+        sys.exit(1)
+    else:
+        print("\n✅ Compliance scan passed. No PII/PHI or credential leaks detected.")
+        sys.exit(0)
+
+if __name__ == "__main__":
+    main()
