@@ -46,6 +46,15 @@ Pocket Gull follows a **Privacy by Design** architecture:
 
 ---
 
+## HIPAA De-identification & Compliance Auditing
+
+To protect patient confidentiality and comply with HIPAA guidelines, Pocket Gull integrates automated **Shift-Left Compliance Auditing**:
+- **Automated PII Scans** — The `scripts/phi_compliance_scanner.py` runs on local pre-commit hooks to audit files for pattern-based leaks of Social Security Numbers, emails, phone numbers, and zip codes.
+- **Heuristic HIPAA JSON Auditing** — JSON database structures are programmatically validated to ensure they contain no real names or unmasked PII. Property-based audits flag any capitalized strings matching a name format (First Last) under a patient profile structure, while ignoring standard clinical keys (like medications, conditions, or biomarkers).
+- **Pre-commit Guards** — The compliance scanner is linked to the Husky pre-commit hook (`pre-commit-check.cjs`), preventing any commit containing raw API secrets or compliance violations.
+
+---
+
 ## Data Export & Portability
 
 ### FHIR Bundles

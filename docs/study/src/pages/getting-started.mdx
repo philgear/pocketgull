@@ -58,6 +58,31 @@ The production build outputs to `dist/` with full <DocNode term="Angular SSR" ca
 
 ---
 
+## Running Security & Safety Tests
+
+Pocket Gull implements a "Shift-Left" security verification sequence to ensure de-identification and credential safety before code is staged or committed:
+
+### 1. HIPAA PII & Secrets Compliance Scan
+The repository includes an automated Python script to scan the workspace for accidental patient PII (such as Social Security Numbers, phone numbers, and zip codes in text/log files), raw credentials (like Google AI keys), and validates JSON patient data structures:
+```bash
+python3 scripts/phi_compliance_scanner.py
+```
+
+### 2. Responsible AI Safety Tests
+To run the adversarial safety red-teaming checks locally:
+```bash
+# 1. Start the local Express server in one terminal
+export SKIP_HEALTHCARE_PROVISION=true
+node dist/server/server.mjs
+
+# 2. Run the Vitest safety tests in another terminal window
+export TEST_API_URL=http://localhost:4000/api/ai/stream
+export GEMINI_API_KEY=your_key_here
+npx vitest run tests/safety.spec.ts
+```
+
+---
+
 ## Deployment
 
 Pocket Gull is architecturally designed to deploy to <DocNode term="Google Cloud Run" category="Google Cloud" hint="Fully managed serverless container platform. Auto-scales from zero. Pocket Gull deploys as a Docker container with Express.js + Angular SSR." link="https://cloud.google.com/run/docs" linkLabel="Cloud Run Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">**Google Cloud Run**</DocNode>.
