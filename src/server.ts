@@ -155,7 +155,7 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
 
   const isProd = process.env['NODE_ENV'] === 'production';
-  let csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com; frame-src 'self' https://www.ncbi.nlm.nih.gov; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';";
+  let csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://www.ncbi.nlm.nih.gov; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';";
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
