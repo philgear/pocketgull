@@ -2163,8 +2163,8 @@ export class AppComponent implements OnDestroy {
   loadDemoMode() {
     this.isDemoMode.set(true);
     this.hasApiKey.set(true);
-    // Load demo patient (Sarah Jenkins – p002)
-    this.patientMgmt.selectPatient('p002');
+    // Load demo patient (Sarah Jenkins – p002_bottom)
+    this.patientMgmt.selectPatient('p002_bottom');
     // Inject pre-baked analysis outputs (no API call)
     setTimeout(() => {
       this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT_WESTERN);
