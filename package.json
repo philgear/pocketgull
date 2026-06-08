@@ -78,6 +78,7 @@
     "gcp-build": "npm run build && npm prune --production",
     "audit": "lighthouse http://localhost:4000 --view",
     "estimate-effort": "node scripts/estimate-effort.js",
+    "estimate-effort:detailed": "node scripts/estimate-effort-detailed.js",
     "precommit": "node scripts/pre-commit-check.cjs",
     "prepare": "husky",
     "test:e2e": "playwright test",
