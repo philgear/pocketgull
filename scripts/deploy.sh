@@ -39,6 +39,13 @@ gcloud run deploy $SERVICE_NAME \
     --max-instances 5 \
     --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest
 
+if [ -n "$PORKBUN_API_KEY" ] && [ -n "$PORKBUN_SECRET_KEY" ]; then
+    echo "🌐 Updating Porkbun DNS records..."
+    node scripts/update-porkbun-dns.js
+else
+    echo "⚠️ Skipping DNS update: PORKBUN_API_KEY and PORKBUN_SECRET_KEY environment variables are not set."
+fi
+
 echo "✅ 3/3: Deployment Complete!"
 echo "Your live agent is now running on Google Cloud."
 echo "=========================================================="

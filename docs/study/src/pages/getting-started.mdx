@@ -116,6 +116,30 @@ gcloud run deploy pocket-gull \
 | `server.js` | <DocNode term="Express.js" category="OpenJS Foundation" hint="Minimal Node.js web framework by TJ Holowaychuk. Handles SSR, API proxy, and static serving." link="https://expressjs.com/" linkLabel="expressjs.com →" icon="https://expressjs.com/images/favicon.png">Express.js</DocNode> backend — SSR, API proxy, static serving |
 | `scripts/deploy.sh` | Automated Cloud Run rollout |
 | `Procfile` | Process declaration for the container |
+| `scripts/update-porkbun-dns.js` | Porkbun DNS API automation |
+
+---
+
+## DNS Automation (Porkbun Integration)
+
+Pocket Gull includes automated DNS management using the Porkbun API to map your Google Cloud Run custom domain front-end IP addresses (A & AAAA records) dynamically.
+
+### 1. Requirements
+Configure the following local, git-ignored `.env` variables:
+```env
+PORKBUN_API_KEY=pk1_...
+PORKBUN_SECRET_KEY=sk1_...
+```
+
+### 2. Manual Update
+You can run the script manually to inspect and sync domain records:
+```bash
+npm run dns:update
+```
+This script will:
+- Retrieve current DNS entries.
+- Map the Google Cloud Run GFE IPs (A and AAAA) to the apex and `www` records.
+- Delete stale records (such as default forwarders/alias entries) to prevent routing issues.
 
 ---
 

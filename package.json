@@ -81,7 +81,8 @@
     "precommit": "node scripts/pre-commit-check.cjs",
     "prepare": "husky",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "dns:update": "node scripts/update-porkbun-dns.js"
   },
   "dependencies": {
     "@angular/build": "~21.2.0",

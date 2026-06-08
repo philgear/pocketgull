@@ -237,7 +237,21 @@ if (secretsCount > 0) {
 }
 
 // Check 5: Python PHI / PII & Secret Compliance Scan
-const pythonScannerPassed = runCommand('python3 scripts/phi_compliance_scanner.py', 'Python HIPAA/PII and Compliance Scan');
+let pythonCmd = 'python3';
+if (process.platform === 'win32') {
+  const possiblePaths = [
+    path.join(process.env.USERPROFILE || '', 'anaconda3', 'python.exe'),
+    'C:\\Users\\philg\\anaconda3\\python.exe',
+    'python'
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      pythonCmd = `"${p}"`;
+      break;
+    }
+  }
+}
+const pythonScannerPassed = runCommand(`${pythonCmd} scripts/phi_compliance_scanner.py`, 'Python HIPAA/PII and Compliance Scan');
 if (!pythonScannerPassed) {
   process.exit(1);
 }

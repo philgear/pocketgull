@@ -45,6 +45,7 @@ lighthouse-*.html
 bundle-*.json
 dist_*.json
 .lighthouseci/
+security-report.md
 
 # Sandbox environment
 sandbox/

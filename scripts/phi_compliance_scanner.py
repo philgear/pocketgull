@@ -91,7 +91,7 @@ def scan_file(filepath: str) -> List[Tuple[str, int, str, str]]:
                                 violations.append(("SECRET", line_no, masked, label))
                                 
     except Exception as e:
-        print(f"⚠️  Could not read file {filepath}: {e}")
+        print(f"[WARN] Could not read file {filepath}: {e}")
         
     return violations
 
@@ -141,7 +141,7 @@ def audit_patient_data_structures(filepath: str) -> List[str]:
     except json.JSONDecodeError:
         pass # Not a valid json file, skip structure checks
     except Exception as e:
-        print(f"⚠️  Could not parse JSON in {filepath}: {e}")
+        print(f"[WARN] Could not parse JSON in {filepath}: {e}")
         
     return issues
 
@@ -160,7 +160,7 @@ def is_third_party_or_build(relative_path: str) -> bool:
 
 def main():
     workspace_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    print(f"🕵️  Starting HIPAA/PII & Secret Security Scan in: {workspace_dir}\n")
+    print(f"[START] Starting HIPAA/PII & Secret Security Scan in: {workspace_dir}\n")
     
     total_scanned = 0
     pii_violations_count = 0
@@ -201,22 +201,22 @@ def main():
             json_issues = audit_patient_data_structures(filepath)
             if json_issues:
                 for issue in json_issues:
-                    print(f"⚠️  [HIPAA SCHEMA] {relative_path} -> {issue}")
+                    print(f"[WARN] [HIPAA SCHEMA] {relative_path} -> {issue}")
                     json_issues_count += 1
                     
     print("\n" + "="*50)
-    print("📊 Scan Summary:")
-    print(f"🔍 Scanned Files: {total_scanned}")
-    print(f"🛡️  PII/PHI Violations: {pii_violations_count}")
-    print(f"🔑 Secrets/API Keys: {secret_violations_count}")
-    print(f"📋 HIPAA Schema Issues: {json_issues_count}")
+    print("Scan Summary:")
+    print(f"Scanned Files: {total_scanned}")
+    print(f"  PII/PHI Violations: {pii_violations_count}")
+    print(f"  Secrets/API Keys: {secret_violations_count}")
+    print(f"  HIPAA Schema Issues: {json_issues_count}")
     print("="*50)
     
     if pii_violations_count > 0 or secret_violations_count > 0 or json_issues_count > 0:
-        print("\n❌ Compliance check failed! Please address the security findings above.")
+        print("\n[FAIL] Compliance check failed! Please address the security findings above.")
         sys.exit(1)
     else:
-        print("\n✅ Compliance scan passed. No PII/PHI or credential leaks detected.")
+        print("\n[PASS] Compliance scan passed. No PII/PHI or credential leaks detected.")
         sys.exit(0)
 
 if __name__ == "__main__":

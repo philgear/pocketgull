@@ -29,7 +29,7 @@ Like its namesake, the agent is **agile**, **interruptible**, and **highly obser
 
 > **Industrial Grace:** We believe medical tools should be as beautiful as they are functional. Our design language combines the clinical precision of a laboratory with the "Less, but better" philosophy of Dieter Rams.
 
-![Pocket Gull Dashboard](./docs/images/pocket-gull_dashboard.png)
+![Pocket Gull Dashboard](./docs/images/pocket-gall_dashboard.png)
 
 ---
 
@@ -122,6 +122,7 @@ Full engineering documentation is available in the [`docs/study/`](./docs/study/
 - **[Dependencies & Licenses](./docs/study/src/pages/dependencies.mdx)** — Third-party compliance, import considerations, and Apache/MIT attributions
 - **[Getting Started](./docs/study/src/pages/getting-started.mdx)** — Installation, development, and deployment
 - **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
+- **[Valuation & Positioning](./docs/valuation_and_positioning.md)** — Business case, target audience, and valuation framework
 
 ---
 
