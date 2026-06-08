@@ -99,4 +99,34 @@ graph TD
   * **3.x Microfrontend Widget:** Package Pocket Gull as a standard OpenMRS 3.x ESM (ECMAScript Module) widget using their single-spa micro-frontend architecture.
   * **Bi-directional Sync:** Push formulated care plans back into OpenMRS as standard FHIR Observation/CarePlan resources.
 
+---
+
+## ⚡ Data & AI Scale Architecture (BigQuery & Vertex AI)
+
+When deploying Pocket Gull into enterprise health systems, we recommend leveraging GCP's secure data and AI engines to scale patient analytics and model lifecycles under HIPAA compliance:
+
+```mermaid
+graph TD
+    Data[Clinical Data Sources] --> BQ[BigQuery Analytics]
+    BQ --> BI[BI Engine (Sub-second dashboarding)]
+    
+    Model[Research Guidelines] --> VertexSearch[Vertex AI Search]
+    VertexSearch --> Grounding[Gemini Grounded Citations]
+    
+    Tune[Clinical Datasets] --> VertexRegistry[Vertex Model Registry]
+    VertexRegistry --> FineTune[Fine-Tuned Gemini 1.5 Flash]
+```
+
+### 1. BigQuery Analytics Best Practices
+* **Partitioning & Clustering:** Partition clinical event tables by Date (e.g. `recorded_time` or `visit_start_date`) and cluster by dimensions (e.g., `person_id`, `concept_id`). This limits scan volume and drastically reduces querying costs.
+* **Avoid SELECT *:** Explicitly call required columns to optimize performance.
+* **Pre-aggregated Dashboards:** Use scheduled queries to build lightweight statistics summary tables (e.g. `omop_demographics_summary`) instead of querying raw millions of patient records on every load.
+* **BI Engine Memory Reservation:** Allocate 1-5 GB of BI Engine memory to ensure sub-second dashboard rendering times.
+
+### 2. Vertex AI Operations Best Practices
+* **Vertex AI Search Grounding:** Ground Gemini's responses in internal clinical reference manuals or NIH guidelines using Vertex AI Search to eliminate hallucinations and secure factual citations.
+* **Supervised Fine-Tuning (SFT):** Fine-tune Gemini 1.5 Flash in the **Vertex AI Model Registry** on de-identified clinical notes to capture specialized medical shorthand.
+* **Automated Safety Evaluation:** Use **Vertex AI Pipelines** (based on Kubeflow) to build automated regression evaluation loops ensuring safety threshold filters (`BLOCK_MEDIUM_AND_ABOVE`) remain hardened.
+
+
 
