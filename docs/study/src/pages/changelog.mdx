@@ -8,6 +8,18 @@ title: Changelog
 All notable changes to Pocket Gull are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## v1.0.0-rc3 — 2026-06-08
+
+**Porkbun DNS Automation, Enterprise EHR Blueprints & Security Hardening**
+
+### Added
+- **Porkbun DNS Automation Integration**: Created `scripts/update-porkbun-dns.js` to automatically sync Cloud Run custom domains (`pocketgull.app`) via the Porkbun API.
+- **Enterprise Scaling & Valuation Manuals**: Added deep architectural blueprints in `docs/valuation_and_positioning.md` and `docs/study/src/pages/positioning.mdx` explaining BigQuery partitioning/clustering, Vertex AI context caching optimization, and HL7 FHIR integrations with OpenEMR/OpenMRS.
+- **Dependency Vulnerability Resolution**: Patched package-lock overrides for `uuid` and `protobufjs` to achieve 0 vulnerabilities in the `pocketgull_api` sub-project.
+- **Windows Pre-Commit Unicode Fix**: Resolved standard encoding console crashes in `scripts/phi_compliance_scanner.py` on Windows Anaconda environments.
+
+---
+
 ## v0.9.5 — 2026-05-20
 
 **Method of Loci Palace, Smiley Gesture Authentication, & AVS Therapy Suite**
