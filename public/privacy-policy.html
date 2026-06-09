@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Pocket Gull</title>
+  <meta name="description" content="Pocket Gull Privacy Policy — how we collect, use, and protect your health data.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #00B0B9;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --card: #ffffff;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    header {
+      background: #0f172a;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    header a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: white;
+    }
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #00B0B9, #2563eb);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 20px; height: 20px; }
+    header span { font-size: 1rem; font-weight: 600; color: white; }
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      border-bottom: 1px solid #1e293b;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    .hero p { color: #94a3b8; font-size: 0.9rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(0,176,185,0.15);
+      color: var(--teal);
+      border: 1px solid rgba(0,176,185,0.3);
+      border-radius: 9999px;
+      padding: 0.25rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+    }
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+    .toc h2 { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+    .toc ol { padding-left: 1.25rem; }
+    .toc li { margin-bottom: 0.3rem; }
+    .toc a { color: var(--teal); text-decoration: none; font-size: 0.9rem; }
+    .toc a:hover { text-decoration: underline; }
+    section { margin-bottom: 2.75rem; }
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.875rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--teal);
+      display: inline-block;
+    }
+    p { margin-bottom: 1rem; color: #334155; }
+    ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+    li { margin-bottom: 0.4rem; color: #334155; }
+    .highlight {
+      background: #f0fffe;
+      border-left: 4px solid var(--teal);
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+    .highlight strong { color: var(--ink); display: block; margin-bottom: 0.25rem; }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0 1.5rem;
+      font-size: 0.875rem;
+    }
+    .data-table th {
+      background: #f1f5f9;
+      padding: 0.65rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--ink);
+      border-bottom: 2px solid var(--border);
+    }
+    .data-table td {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: #334155;
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    a { color: var(--teal); }
+    footer {
+      background: #0f172a;
+      color: #64748b;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.8rem;
+    }
+    footer a { color: var(--teal); text-decoration: none; }
+    @media (max-width: 600px) {
+      main { padding: 2rem 1.25rem 4rem; }
+      .hero h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="https://pocketgull.app">
+    <div class="logo-mark">
+      <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+    </div>
+    <span>Pocket Gull</span>
+  </a>
+</header>
+
+<div class="hero">
+  <div class="badge">Legal</div>
+  <h1>Privacy Policy</h1>
+  <p>Effective date: June 9, 2026 &nbsp;·&nbsp; Last updated: June 9, 2026</p>
+</div>
+
+<main>
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#data-collected">Data We Collect</a></li>
+      <li><a href="#health-data">Health Data (Google Health API)</a></li>
+      <li><a href="#how-we-use">How We Use Your Data</a></li>
+      <li><a href="#how-we-share">Data Sharing</a></li>
+      <li><a href="#retention">Data Retention</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#rights">Your Rights &amp; Choices</a></li>
+      <li><a href="#children">Children's Privacy</a></li>
+      <li><a href="#changes">Changes to This Policy</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ol>
+  </div>
+
+  <section id="overview">
+    <h2>1. Overview</h2>
+    <p>Pocket Gull ("we," "our," or "us") is a real-time medical Care Plan Strategy and AI consultation engine. This Privacy Policy explains how we collect, use, disclose, and protect information when you use our application at <a href="https://pocketgull.app">pocketgull.app</a>.</p>
+    <p>By using Pocket Gull, you agree to the practices described in this policy. If you do not agree, please do not use the service.</p>
+    <div class="highlight">
+      <strong>Key principle:</strong>
+      We collect only the minimum data necessary to provide clinical intelligence features. We never sell personal data, use it for advertising, or share it with unauthorized third parties.
+    </div>
+  </section>
+
+  <section id="data-collected">
+    <h2>2. Data We Collect</h2>
+    <table class="data-table">
+      <thead>
+        <tr><th>Category</th><th>Examples</th><th>Source</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Account Information</td><td>Name, email address</td><td>Google Sign-In</td></tr>
+        <tr><td>Patient Records</td><td>Clinical notes, conditions, symptoms, vitals</td><td>Entered by you</td></tr>
+        <tr><td>Health Biometrics</td><td>Resting HR, SpO₂, sleep duration</td><td>Google Health API (with consent)</td></tr>
+        <tr><td>Usage Data</td><td>Features accessed, session duration</td><td>Application logs</td></tr>
+        <tr><td>Technical Data</td><td>Browser type, IP address (hashed), device type</td><td>Server logs</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="health-data">
+    <h2>3. Health Data (Google Health API)</h2>
+    <p>When you choose to connect your Google Health / Fitbit account, we request access to the following data types via Google OAuth 2.0 with your explicit informed consent:</p>
+    <ul>
+      <li><strong>Resting Heart Rate</strong> — daily summary (bpm), last 30 days</li>
+      <li><strong>Oxygen Saturation (SpO₂)</strong> — daily average (%), last 30 days</li>
+      <li><strong>Sleep Duration &amp; Efficiency</strong> — nightly summary (minutes), last 30 days</li>
+    </ul>
+    <div class="highlight">
+      <strong>How health data is stored:</strong>
+      Health biometric data retrieved from Google Health API is held in server memory only for the duration of your session. It is never written to a database, disk, or third-party storage. Tokens are ephemeral — they are cleared when the server restarts.
+    </div>
+    <p>We do not access, collect, or store any health data types beyond those listed above and explicitly consented to. We will update this policy and re-request consent before adding new data types.</p>
+    <p>This integration complies with the <a href="https://developers.google.com/health/policies/health-api-user-data-and-research-policy">Google Health API Developer and User Data Policy</a>.</p>
+  </section>
+
+  <section id="how-we-use">
+    <h2>4. How We Use Your Data</h2>
+    <p>We use your data exclusively to:</p>
+    <ul>
+      <li>Provide biometric trend analysis within clinical intelligence dashboards</li>
+      <li>Support AI-assisted care plan optimization and consultation features</li>
+      <li>Maintain your session and authenticate your identity</li>
+      <li>Diagnose technical issues and improve application performance</li>
+      <li>Comply with legal obligations</li>
+    </ul>
+    <p><strong>We never use your data for:</strong> advertising, marketing, profiling for third-party purposes, re-identification after de-identification, or any purpose not described above.</p>
+  </section>
+
+  <section id="how-we-share">
+    <h2>5. Data Sharing</h2>
+    <p>We do not sell, rent, or trade your personal information. We may share data only in these limited circumstances:</p>
+    <ul>
+      <li><strong>Google (AI services):</strong> Clinical queries may be processed by Google Gemini API to generate AI responses. We minimize personal identifiers in prompts.</li>
+      <li><strong>Google Cloud:</strong> The application is hosted on Google Cloud Run. Infrastructure providers process data on our behalf under strict data processing agreements.</li>
+      <li><strong>Legal requirements:</strong> We may disclose data if required by law, court order, or to protect the safety of users or the public.</li>
+    </ul>
+    <p>No health biometric data retrieved from Google Health API is shared with any third party other than as required for application hosting.</p>
+  </section>
+
+  <section id="retention">
+    <h2>6. Data Retention</h2>
+    <ul>
+      <li><strong>Health biometrics (Google Health API):</strong> In-memory only — cleared on server restart or when you disconnect your account.</li>
+      <li><strong>OAuth tokens:</strong> In-memory only — not persisted to disk or database.</li>
+      <li><strong>Audit logs:</strong> Retained for 90 days for security and compliance, then permanently deleted.</li>
+      <li><strong>Patient records you enter:</strong> Retained until you delete them or close your account.</li>
+    </ul>
+  </section>
+
+  <section id="security">
+    <h2>7. Security</h2>
+    <p>We implement technical, administrative, and physical safeguards appropriate to the sensitivity of health data:</p>
+    <ul>
+      <li>All data is transmitted over TLS/HTTPS</li>
+      <li>OAuth 2.0 with PKCE (RFC 7636) on every authorization request</li>
+      <li>Tokens stored in memory only — never written to disk</li>
+      <li>IP addresses are hashed (SHA-256) before logging</li>
+      <li>Access to production systems is limited to authorized personnel</li>
+      <li>All health data access events are logged in an audit trail</li>
+    </ul>
+    <p>To report a security vulnerability, email <a href="mailto:security@pocketgull.app">security@pocketgull.app</a>.</p>
+  </section>
+
+  <section id="rights">
+    <h2>8. Your Rights &amp; Choices</h2>
+    <p>You have the following rights regarding your data:</p>
+    <ul>
+      <li><strong>Withdraw consent:</strong> Disconnect Google Health at any time via Integrations → Google Health → Disconnect.</li>
+      <li><strong>Erase health data:</strong> Use "Disconnect &amp; Erase Data" to permanently remove all synced biometric data from your session.</li>
+      <li><strong>Access:</strong> Request a copy of data we hold about you.</li>
+      <li><strong>Correction:</strong> Request correction of inaccurate personal data.</li>
+      <li><strong>Deletion:</strong> Request deletion of your account and all associated data.</li>
+      <li><strong>Portability:</strong> Request your data in a machine-readable format.</li>
+      <li><strong>Object:</strong> Object to processing of your data in certain circumstances.</li>
+    </ul>
+    <p>To exercise these rights, contact <a href="mailto:privacy@pocketgull.app">privacy@pocketgull.app</a>. We will respond within 30 days.</p>
+    <p>If you are located in the EU/EEA, you may also lodge a complaint with your local data protection authority.</p>
+  </section>
+
+  <section id="children">
+    <h2>9. Children's Privacy</h2>
+    <p>Pocket Gull is not intended for use by individuals under the age of 18. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, contact <a href="mailto:privacy@pocketgull.app">privacy@pocketgull.app</a> and we will promptly delete it.</p>
+  </section>
+
+  <section id="changes">
+    <h2>10. Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. When we do, we will update the "Last updated" date at the top of this page and, for material changes, notify you via email or a prominent notice in the application. Your continued use of Pocket Gull after changes take effect constitutes acceptance of the revised policy.</p>
+  </section>
+
+  <section id="contact">
+    <h2>11. Contact</h2>
+    <p>For privacy questions, data requests, or concerns:</p>
+    <ul>
+      <li><strong>Email:</strong> <a href="mailto:privacy@pocketgull.app">privacy@pocketgull.app</a></li>
+      <li><strong>Security issues:</strong> <a href="mailto:security@pocketgull.app">security@pocketgull.app</a></li>
+      <li><strong>Website:</strong> <a href="https://pocketgull.app">pocketgull.app</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2026 Pocket Gull. All rights reserved. &nbsp;·&nbsp;
+    <a href="/privacy-policy.html">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="/terms-of-service.html">Terms of Service</a>
+  </p>
+</footer>
+
+</body>
+</html>

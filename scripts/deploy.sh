@@ -37,7 +37,8 @@ gcloud run deploy $SERVICE_NAME \
     --cpu 1 \
     --min-instances 0 \
     --max-instances 5 \
-    --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest
+    --set-secrets="GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest" \
+    --update-env-vars=OTEL_SDK_DISABLED=true
 
 if [ -n "$PORKBUN_API_KEY" ] && [ -n "$PORKBUN_SECRET_KEY" ]; then
     echo "🌐 Updating Porkbun DNS records..."

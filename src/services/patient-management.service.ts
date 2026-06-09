@@ -372,6 +372,8 @@ const MOCK_PATIENTS: IPatient[] = [
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Sarah should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
           "Patient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
+          "Orthomolecular Profiling":
+            "### Biochemical & Biomarker Matrix\nSarah's micronutrient profile, combined with chronic pain and SSRI pharmacology, reveals depletion patterns amplifying central sensitization and mood instability.\n\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Sub-optimal\", \"pathway\": \"NMDA / ATP Synthesis\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Sub-optimal\", \"pathway\": \"Immune / Mood Regulation\" },\n  { \"name\": \"Vitamin B12\", \"level\": \"Optimal\", \"pathway\": \"Methylation\" },\n  { \"name\": \"Vitamin C\", \"level\": \"Low-Normal\", \"pathway\": \"Collagen / Antioxidant\" }\n]\n```\n\n### Detected Deficiencies\n- **Magnesium**: NMDA modulation deficit worsens pain sensitization and anxiety.\n- **Vitamin D3**: Low D3 correlates with depression severity.\n- **SSRI Depletion Risk**: Sertraline depletes CoQ10 and folate; monitor and replete.\n\n### Orthomolecular Protocol\n| Intervention | Dose | Delivery | Pathway |\n|---|---|---|---|\n| Magnesium Glycinate | 400mg | Oral, nightly | NMDA block / Pain |\n| Vitamin D3 + K2 | 5000 IU | Oral with fat | Mood / Immune |\n| L-Methylfolate (5-MTHF) | 400mcg | Oral | Serotonin synthesis |\n| CoQ10 Ubiquinol | 100mg | Oral with fat | Mitochondrial support |\n\n### Cautions & Interactions\n- **5-MTHF + Sertraline**: Monitor for serotonin excess; titrate from 400mcg.\n- **Magnesium + Gabapentin**: Additive CNS-calming; titrate magnesium slowly.",
         },
       },
       {
@@ -633,6 +635,8 @@ const MOCK_PATIENTS: IPatient[] = [
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. William should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
           "Patient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
+          "Orthomolecular Profiling":
+            "### Biochemical & Biomarker Matrix\nWilliam's frailty, CKD, and cognitive decline require carefully dosed orthomolecular support with nephroprotective priorities.\n\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Sub-optimal\", \"pathway\": \"NMDA / ATP Synthesis\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Sub-optimal\", \"pathway\": \"Bone / Immune / Cognition\" },\n  { \"name\": \"Omega-3 DHA\", \"level\": \"Sub-optimal\", \"pathway\": \"Neuronal membrane integrity\" },\n  { \"name\": \"Vitamin E\", \"level\": \"Adequate\", \"pathway\": \"Neuroprotection / Antioxidant\" }\n]\n```\n\n### Detected Deficiencies\n- **Magnesium**: NMDA excitotoxicity implicated in Alzheimer's; low Mg worsens this.\n- **Vitamin D3**: Associated with accelerated cognitive decline and fall risk.\n- **DHA**: Neuronal membranes degrade with age; DHA slows this process.\n\n### Orthomolecular Protocol\n| Intervention | Dose | Delivery | Pathway |\n|---|---|---|---|\n| Magnesium L-Threonate | 144mg elemental | Oral, divided | BBB-penetrating NMDA modulation |\n| Vitamin D3 + K2 | 2000 IU (CKD-adjusted) | Oral with fat | Bone / Cognition |\n| Algal DHA | 500mg | Oral with fat | Neuronal membrane |\n| Lion's Mane Extract | 500mg | Oral | NGF induction / Neuroplasticity |\n\n### Cautions & Interactions\n- **CKD Dose Adjustment**: All minerals must be dose-reduced; monitor eGFR/electrolytes.\n- **Aspirin + DHA**: Additive anti-platelet effect; algal DHA preferred over fish oil.\n- **Vitamin D3 in CKD**: May require activated calcitriol form; monitor serum calcium.",
         },
       },
       {
@@ -841,6 +845,8 @@ const MOCK_PATIENTS: IPatient[] = [
             "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Global should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
           "Patient Education":
             "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
+          "Orthomolecular Profiling":
+            "### Biochemical & Biomarker Matrix\nGlobal multimorbidity demands a pan-systems orthomolecular strategy across cardiovascular, metabolic, renal, and neurological pathways.\n\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Sub-optimal\", \"pathway\": \"Cardiovascular / NMDA / ATP\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Deficient\", \"pathway\": \"Immune / Bone / Glucose Metabolism\" },\n  { \"name\": \"CoQ10\", \"level\": \"Deficient\", \"pathway\": \"Mitochondrial / Cardiac Contractility\" },\n  { \"name\": \"Omega-3\", \"level\": \"Sub-optimal\", \"pathway\": \"Anti-inflammatory / Cardiovascular\" }\n]\n```\n\n### Detected Deficiencies\n- **Magnesium**: Hypertension and ischemia increase Mg turnover; worsens arrhythmia and insulin resistance.\n- **Vitamin D3**: WHO data links low D3 to cardiovascular mortality, T2D, and COPD progression.\n- **CoQ10**: Statin therapy severely depletes CoQ10; essential for cardiac mitochondrial function.\n\n### Orthomolecular Protocol\n| Intervention | Dose | Delivery | Pathway |\n|---|---|---|---|\n| Magnesium Glycinate | 400mg | Oral, nightly | Cardiac rhythm / NMDA |\n| Vitamin D3 + K2 | 4000 IU | Oral with fat | Immune / Glucose |\n| CoQ10 Ubiquinol | 200mg | Oral with fat | Cardiac contractility |\n| Omega-3 EPA/DHA | 2000mg | Oral with meals | Triglycerides / Anti-inflammatory |\n\n### Cautions & Interactions\n- **CoQ10 + Anticoagulants**: Structural similarity to Vitamin K; monitor INR if on warfarin.\n- **High-Dose D3**: Monitor serum calcium; hypercalcemia worsens vascular calcification.",
         },
       },
       {
@@ -2085,7 +2091,7 @@ const MOCK_PATIENTS: IPatient[] = [
           name: "Lower Back",
           painLevel: 7,
           description: "Constant aching pain in L4-L5 region radiating to the left glute. Worsens with prolonged standing.",
-          symptoms: []
+          symptoms: [],
         }
       ]
     },
@@ -2098,25 +2104,58 @@ const MOCK_PATIENTS: IPatient[] = [
     name: "Phil Gear",
     age: 42,
     gender: "Male",
-    lastVisit: "2026.05.20",
-    preexistingConditions: ["Hypertension", "Mild Sleep Apnea", "Google Health Integration"],
-    patientGoals: "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
+    lastVisit: "2026.06.08",
+    preexistingConditions: [
+      "Mild Hypertension",
+      "Mild Sleep Apnea (CPAP-managed)",
+      "Chronic Tension Headache",
+      "Developer & Founder (High Cognitive Load)",
+    ],
+    patientGoals:
+      "Optimize metabolic health, resolve evening tension headaches, reduce sleep latency to under 20 minutes, and synchronize biometrics from Google Health Connect.",
     vitals: {
       bp: "122/82",
-      hr: "68",
-      temp: "98.6°F",
+      hr: "64",
+      temp: "98.4°F",
       spO2: "98%",
       weight: "178 lbs",
-      height: "5'10\""
+      height: "5'10\"",
+      vitD3: "28 ng/mL (Sub-optimal)",
+      magnesium: "1.7 mg/dL (Low-normal)",
+      b12: "412 pg/mL (Adequate)",
+      zinc: "82 mcg/dL (Optimal)",
     },
-    oxidativeStressMarkers: [],
-    antioxidantSources: [],
+    oxidativeStressMarkers: [
+      { id: "1", name: "Homocysteine", value: "10.2 μmol/L (Borderline)" },
+      { id: "2", name: "hsCRP", value: "1.4 mg/L (Low-grade)" },
+    ],
+    antioxidantSources: [
+      { id: "1", name: "Glutathione (GSH)", value: "1.8 μmol/g Hb (Adequate)" },
+      { id: "2", name: "CoQ10", value: "0.62 μg/mL (Adequate)" },
+    ],
     medications: [
-      { id: "1", name: "Lisinopril", value: "10mg Daily" }
+      { id: "1", name: "Lisinopril", value: "10mg Daily" },
+      { id: "2", name: "Melatonin", value: "0.5mg PRN sleep onset" },
     ],
     biometricHistory: [
-      { timestamp: "2026-05-20T08:00:00Z", type: "hr", value: "68" },
-      { timestamp: "2026-05-20T08:00:00Z", type: "bp", value: "122/82" }
+      { timestamp: "2025-12-01T08:00:00Z", type: "hr", value: "72" },
+      { timestamp: "2026-01-15T08:00:00Z", type: "hr", value: "70" },
+      { timestamp: "2026-02-20T08:00:00Z", type: "hr", value: "68" },
+      { timestamp: "2026-03-15T08:00:00Z", type: "hr", value: "66" },
+      { timestamp: "2026-04-10T08:00:00Z", type: "hr", value: "65" },
+      { timestamp: "2026-06-08T08:00:00Z", type: "hr", value: "64" },
+      { timestamp: "2025-12-01T08:00:00Z", type: "spO2", value: "96" },
+      { timestamp: "2026-01-15T08:00:00Z", type: "spO2", value: "97" },
+      { timestamp: "2026-02-20T08:00:00Z", type: "spO2", value: "97" },
+      { timestamp: "2026-03-15T08:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-04-10T08:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2026-06-08T08:00:00Z", type: "spO2", value: "98" },
+      { timestamp: "2025-12-01T08:00:00Z", type: "bp", value: "130/88" },
+      { timestamp: "2026-01-15T08:00:00Z", type: "bp", value: "128/85" },
+      { timestamp: "2026-02-20T08:00:00Z", type: "bp", value: "126/84" },
+      { timestamp: "2026-03-15T08:00:00Z", type: "bp", value: "124/83" },
+      { timestamp: "2026-04-10T08:00:00Z", type: "bp", value: "123/82" },
+      { timestamp: "2026-06-08T08:00:00Z", type: "bp", value: "122/82" },
     ],
     issues: {
       head: [
@@ -2124,35 +2163,72 @@ const MOCK_PATIENTS: IPatient[] = [
           id: "head",
           noteId: "note_phil_head_1",
           name: "Head & Neck",
+          painLevel: 3,
+          description:
+            "Mild-to-moderate tension headaches occurring 3-4x per week in the evening after extended screen time. Associated with suboccipital tightness and eye strain. Worsens with caffeine excess and poor sleep.",
+          symptoms: [
+            { name: "Tension headache", type: "Neurological", verified: true, timeline: "Recurrent" },
+            { name: "Sleep onset insomnia", type: "Neurological/Sleep", verified: true, timeline: "Chronic" },
+          ],
+        },
+      ],
+      upper_back: [
+        {
+          id: "upper_back",
+          noteId: "note_phil_back_1",
+          name: "Upper Back & Shoulders",
           painLevel: 2,
-          description: "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
-          symptoms: []
-        }
-      ]
+          description:
+            "Mild trapezius tightness bilaterally. Attributable to prolonged seated developer posture and laptop use. Improves with movement.",
+          symptoms: [],
+        },
+      ],
     },
     history: [
       {
         type: "AnalysisRun",
-        date: "2026.05.20",
+        date: "2026.06.08",
         summary: "Comprehensive Clinical Analysis",
         report: {
           "Summary Overview":
-            "### Clinical Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Focus is on optimization of metabolic pathways, screen time hygiene, and real-time biometric telemetry tracking.\n\n### Goals\n*   **Short-term**: Reduce sleep latency to < 20 minutes.\n*   **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
+            "### Clinical Assessment\nPhil Gear presents as a high-cognitive-load developer and founder managing mild hypertension, CPAP-treated sleep apnea, and recurrent tension headaches. The primary drivers are screen-time-induced circadian disruption, suboptimal intracellular magnesium, borderline Vitamin D3, and low-grade sympathetic nervous system dominance from sustained work demands.\n\n### Priority List\n*   **Circadian Realignment**: Blue-light hygiene and structured morning anchor protocol.\n*   **Magnesium Repletion**: Targeting NMDA receptor stabilization and tension headache reduction.\n*   **HPA Axis Support**: Adaptogenic protocol to reduce cortisol load from founder stress.\n*   **Biometric Tracking**: Google Health Connect integration for daily HRV, HR, and SpO2 trend analysis.\n\n### Plan of Care\n*   Initiate magnesium glycinate and Vitamin D3/K2 protocol.\n*   Implement strict circadian anchor routine (sleep onset 10:30 PM target).\n*   Introduce zone 2 cardio 3x/week to support HRV recovery.\n*   Follow-up biometric review in 4 weeks.\n\n### Goals\n*   **Short-term (4 weeks)**: Reduce headache frequency by 50%. Sleep latency < 20 minutes.\n*   **Long-term (3 months)**: BP < 120/80, HRV improvement > 15%, and stable circadian rhythm.",
           "Functional Protocols":
-            "### Circadian Alignment\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.",
+            "### Immediate Actions (72 hours)\n*   Install blue-light blocking glasses or activate Night Shift/f.lux after 7:00 PM.\n*   Move all high-cognitive-load work to before 4:00 PM; reserve evenings for low-stimulation activities.\n\n### Circadian Anchor Protocol\n| Anchor Point | Activity | Rationale |\n| :--- | :--- | :--- |\n| 6:30 AM | 10-min outdoor sunlight + cold splash | Cortisol pulse suppression + circadian set |\n| 12:00 PM | Walk (20 min) | Zone 2 + insulin sensitivity reset |\n| 7:00 PM | Blue-light off; dim lighting | Melatonin onset preservation |\n| 10:30 PM | Target sleep onset | 8h sleep window for apnea management |\n\n### Foundational Protocol\n*   Zone 2 cardio (HR 120-140): 3x per week, 30-45 minutes (cycle or treadmill)\n*   Daily 4-7-8 breathing (evening): 4 rounds before sleep to activate parasympathetic tone\n*   Posture reset: Chin tucks + thoracic extension x 10 reps every 90 minutes at desk",
           Nutrition:
-            "### Dietary Recommendations\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.",
+            "### Biochemical Assessment\nPhil's dietary profile shows adequate macronutrient intake but micronutrient gaps in magnesium (chronic dietary shortfall in Western male developers) and Vitamin D3 (insufficient outdoor exposure). Borderline homocysteine suggests mild methylation strain from high cognitive demand.\n\n### Nutrition Targets\n*   **Magnesium Repletion**: Top dietary priority — target 420mg elemental/day.\n*   **Vitamin D3 Optimization**: Combined dietary + supplement target 50 ng/mL serum level.\n*   **Anti-inflammatory Pattern**: Reduce arachidonic acid load from processed snacks.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Magnesium Glycinate | 400mg | Before bed | NMDA / Muscle tension / Sleep |\n| Vitamin D3 + K2 | 5000 IU / 100mcg | With breakfast | Immune / Bone / Mood |\n| Omega-3 EPA/DHA | 2000mg | With meals | hsCRP reduction / Cardiovascular |\n| L-Theanine | 200mg | Pre-work + evening | Focus / Cortisol smoothing |\n\n### Dietary Adjustments\n- **Add**: Dark leafy greens (400g/day), pumpkin seeds (30g/day), avocado (daily)\n- **Reduce**: Caffeine after 1:00 PM; switch to L-theanine + green tea after noon\n- **Hydration**: 2.5L water/day minimum; add electrolytes (sodium, potassium) to morning water",
           "Monitoring & Follow-up":
-            "### Biometric Synchronization\n- Monitor daily resting heart rate and sleep cycles using Fitbit/Google Health Connect.\n- Follow up in 4 weeks.",
+            "### Immediate Next Steps (0-30 days)\n1.  Begin magnesium glycinate + Vitamin D3/K2 protocol immediately.\n2.  Set up Google Health Connect dashboard for daily HR, HRV, and SpO2 monitoring.\n3.  Activate blue-light blocking protocol.\n4.  4-week check-in: assess headache frequency, sleep latency, and resting HR trend.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Resting HR | < 62 bpm | Daily (wearable) | > 75 bpm for 3+ days |\n| Sleep Latency | < 20 min | Daily | > 45 min on 3+ consecutive nights |\n| Headache Frequency | < 1x/week | Weekly log | > 4x/week or severity > 6/10 |\n| BP | < 120/80 | Bi-weekly | > 135/85 on 2 consecutive readings |\n| Serum Vitamin D3 | 50-70 ng/mL | 12-week lab | < 30 ng/mL |\n\n### Long-term Trajectory (6+ months)\nWith consistent execution, Phil should see normalization of BP without Lisinopril dose increase, significant HRV improvement via wearable tracking, and elimination of recurrent tension headaches. Quarterly biometric reviews via Google Health Connect will guide protocol adjustments.",
           "Patient Education":
-            "### Your Health Strategy\nWe are focusing on tuning your body's daily rhythms, syncing Fitbit metrics, and optimizing cellular nutrients to resolve evening tension.",
+            "### Understanding Your Health Picture\nYour body is dealing with the classic high-performance developer pattern: sustained mental output without adequate physical recovery, low dietary magnesium, disrupted circadian rhythm from screens, and compounding sympathetic nervous system activation from founder responsibilities.\n\n### What Was Found\n*   **Magnesium Gap**: This single deficiency explains your tension headaches, mild sleep issues, and suboptimal BP control.\n*   **Circadian Disruption**: Screen-induced blue light is delaying your melatonin onset by 1-2 hours, fragmenting your sleep architecture.\n*   **Low-Grade Inflammation**: Your hsCRP of 1.4 mg/L is manageable but warrants dietary attention.\n\n### Your Action Plan\n*   **Tonight**: Take magnesium glycinate before bed. Install f.lux or Night Shift. This will produce measurable results within 72 hours.\n*   **This Week**: Walk for 20 minutes at lunch daily. No caffeine after 1:00 PM.\n*   **Month 1**: Track sleep + HRV daily. Report any headaches in the Pocket Gull app.\n\n### Important Notes\n> 💡 Your Lisinopril is doing its job — do not stop it. These protocols are designed to work alongside it, and over time may reduce the dose required. Always consult your prescribing physician before any medication changes.",
           "Orthomolecular Profiling":
-            "### Summary\nPhil has suboptimal intracellular magnesium and vitamin D3 levels. Supporting these cofactors will improve sleep quality and neuromuscular relaxation.\n\n### Biomarker Matrix\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Sub-optimal\", \"pathway\": \"ATP Synthesis / NMDA\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Sub-optimal\", \"pathway\": \"Immune / Bone\" },\n  { \"name\": \"Vitamin B12\", \"level\": \"Optimal\", \"pathway\": \"Methylation\" },\n  { \"name\": \"Zinc\", \"level\": \"Optimal\", \"pathway\": \"Immune / Hormones\" }\n]\n```"
+            "### Biochemical & Biomarker Matrix\nPhil's orthomolecular profile is consistent with a high-cognitive-load male in his early 40s: suboptimal intracellular magnesium (the most common deficiency in Western male knowledge workers), insufficient Vitamin D3, and borderline homocysteine signaling mild methylation cycle strain. CoQ10 and glutathione are adequate.\n\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Sub-optimal\", \"pathway\": \"NMDA / ATP Synthesis / Sleep\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Sub-optimal\", \"pathway\": \"Immune / Mood / Bone\" },\n  { \"name\": \"Vitamin B12\", \"level\": \"Optimal\", \"pathway\": \"Methylation\" },\n  { \"name\": \"Zinc\", \"level\": \"Optimal\", \"pathway\": \"Immune / Hormones\" },\n  { \"name\": \"Homocysteine\", \"level\": \"Borderline\", \"pathway\": \"Cardiovascular / Methylation\" },\n  { \"name\": \"CoQ10\", \"level\": \"Adequate\", \"pathway\": \"Mitochondrial / Cardiac\" }\n]\n```\n\n### Detected Deficiencies\n- **Magnesium (Sub-optimal)**: NMDA receptor hyperexcitability from low Mg directly causes tension-type headaches and sleep-onset difficulty. Priority one intervention.\n- **Vitamin D3 (Sub-optimal at 28 ng/mL)**: Target is 50-70 ng/mL. Low D3 contributes to mood instability, impaired immune surveillance, and suboptimal serotonin synthesis.\n- **Homocysteine (Borderline at 10.2 μmol/L)**: Suggests mild one-carbon metabolism strain. May worsen if cognitive demand continues without B-vitamin support.\n\n### Orthomolecular Protocol\n| Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway |\n|---|---|---|---|\n| Magnesium Glycinate | 400mg elemental | Oral, nightly with food | NMDA antagonism / Tension headache / Sleep |\n| Vitamin D3 + K2 | 5000 IU D3 / 100mcg MK-7 | Oral with fat-containing meal | Serum D3 optimization / Bone / Mood |\n| L-Methylfolate (5-MTHF) | 400mcg | Oral with B12 | Homocysteine reduction / Methylation |\n| L-Theanine | 200mg | Oral (AM + PM) | Alpha-wave induction / Cortisol smoothing |\n| Omega-3 EPA/DHA | 2000mg | Oral with meals | hsCRP reduction / Cardiovascular |\n\n### Cautions & Interactions\n- **Magnesium + Lisinopril**: Generally well-tolerated; high-dose Mg may slightly lower BP — monitor for dizziness. Adjust Lisinopril if BP drops below 110/70.\n- **L-Methylfolate + SSRI (if initiated)**: Monitor for serotonin syndrome if antidepressant therapy is ever added; methylfolate enhances serotonergic activity.\n- **Vitamin D3 Toxicity**: Recheck 25(OH)D at 12 weeks; target 50-70 ng/mL. Above 100 ng/mL carries hypercalcemia risk."
         }
-      }
+      },
+      {
+        type: "Visit",
+        date: "2026.03.15",
+        summary: "Initial biometric review: HRV trending low, sleep latency complaints, and headache pattern established.",
+        state: {
+          patientGoals: "Reduce headache frequency and improve sleep quality.",
+          vitals: {
+            bp: "126/84", hr: "68", temp: "98.5°F", spO2: "97%",
+            weight: "180 lbs", height: "5'10\"",
+          },
+          oxidativeStressMarkers: [],
+          antioxidantSources: [],
+          medications: [{ id: "1", name: "Lisinopril", value: "10mg Daily" }],
+          issues: {
+            head: [{
+              id: "head", noteId: "note_phil_head_hist1", name: "Head & Neck",
+              painLevel: 4, description: "Frequent evening headaches, 4-5x per week. Attributable to screen time.",
+              symptoms: [],
+            }],
+          },
+        },
+      },
     ],
     bookmarks: [],
-    scans: []
+    scans: [],
   }
 ];
 @Injectable({

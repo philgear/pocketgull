@@ -24,11 +24,12 @@ import { AiCacheService } from '../services/ai-cache.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { RevealDirective } from '../directives/reveal.directive';
 import { MemoryPalaceComponent } from './memory-palace.component';
+import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, MemoryPalaceComponent],
+  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, MemoryPalaceComponent, NodeAgentDialogComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
@@ -518,6 +519,15 @@ import { MemoryPalaceComponent } from './memory-palace.component';
         <!-- Caret -->
         <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white dark:bg-zinc-900 border-b border-r border-gray-200 dark:border-zinc-800 rotate-45"></div>
      </div>
+    }
+
+    <!-- Node Agent Dialog (Evidence Focus) -->
+    @if (nodeAgentDialogData()) {
+      <app-node-agent-dialog
+        [data]="nodeAgentDialogData()!"
+        [patientData]="currentPatientDataForDialog()"
+        (closed)="nodeAgentDialogData.set(null)">
+      </app-node-agent-dialog>
     }
   `
 })
@@ -1395,10 +1405,26 @@ export class AnalysisReportComponent implements OnDestroy {
 
   // --- Live Consult Actions ---
 
+  /** Signal holding the currently-open NodeAgentDialog data (null = closed). */
+  nodeAgentDialogData = signal<INodeAgentDialogData | null>(null);
 
+  /** Provides the serialised patient data string for the NodeAgentDialog context. */
+  currentPatientDataForDialog = computed(() => {
+    const patient = this.patientManager.selectedPatient();
+    if (!patient) return '';
+    return this.state.getAllDataForPrompt(patient.history, patient.bookmarks || []);
+  });
 
-  openAgentDialog(nodeText: string) {
-    this.insertSectionIntoChat(nodeText);
+  openAgentDialog(event: string | { nodeKey: string; nodeText: string; sectionTitle: string }) {
+    if (typeof event === 'string') {
+      this.insertSectionIntoChat(event);
+    } else {
+      this.nodeAgentDialogData.set({
+        nodeKey: event.nodeKey,
+        nodeText: event.nodeText,
+        sectionTitle: event.sectionTitle
+      });
+    }
   }
 
   insertSectionIntoChat(sectionMarkdown: string) {

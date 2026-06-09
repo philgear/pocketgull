@@ -38,6 +38,7 @@ import { CollaborationService } from './services/collaboration.service';
 import { CollaborationDockComponent } from './components/collaboration-dock.component';
 import { GamificationService } from './services/gamification.service';
 import { SwUpdate } from '@angular/service-worker';
+import { FitbitService } from './services/fitbit.service';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -109,6 +110,57 @@ import { SwUpdate } from '@angular/service-worker';
                 <button (click)="network.toggleForceOffline()" class="text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors rounded px-2 py-1"
                         style="color: var(--spectral-critical); border: 1px solid var(--spectral-critical-border); background: white;">Reconnect</button>
             }
+          </div>
+        }
+
+        <!-- ═══ Google Health Informed Consent Modal ═══════════════════════════════ -->
+        @if (fitbit.showConsentModal()) {
+          <div class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+            <div class="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-700 max-w-lg w-full max-h-[90vh] overflow-y-auto">
+              <!-- Header -->
+              <div class="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-zinc-800">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00B0B9] to-blue-600 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  </div>
+                  <div>
+                    <h2 id="consent-title" class="text-base font-bold text-gray-900 dark:text-gray-100">Google Health Data Access — Informed Consent</h2>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400">Required before connecting your health data</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Body -->
+              <div class="px-6 py-4 space-y-4 text-sm text-gray-700 dark:text-zinc-300">
+                <div class="rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40 p-4">
+                  <p class="font-semibold text-blue-900 dark:text-blue-300 mb-2">What data will be accessed:</p>
+                  <ul class="space-y-1.5">
+                    <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Resting Heart Rate (bpm) — daily summary, last 30 days</li>
+                    <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Oxygen Saturation / SpO₂ (%) — daily average, last 30 days</li>
+                    <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>Sleep duration (minutes) &amp; efficiency — nightly summary, last 30 days</li>
+                  </ul>
+                </div>
+                <div class="space-y-2">
+                  <p><span class="font-semibold">Purpose:</span> Clinical intelligence features in PocketGull — biometric trend analysis, care plan optimization, and AI-assisted consultation support.</p>
+                  <p><span class="font-semibold">Data handling:</span> Health data is held in server memory only during your session and is never written to permanent storage, sold, shared with third parties, or used for advertising.</p>
+                  <p><span class="font-semibold">Security:</span> Data is transmitted over HTTPS. Tokens are stored in memory only (ephemeral — cleared on server restart).</p>
+                  <p><span class="font-semibold">Your rights:</span> You may withdraw at any time via Integrations → Google Health Disconnect. Selecting "Disconnect &amp; Erase Data" will permanently remove all synced health data from this session.</p>
+                  <p><span class="font-semibold">Contact:</span> <a href="mailto:privacy@pocketgull.app" class="text-blue-600 dark:text-blue-400 underline">privacy@pocketgull.app</a></p>
+                </div>
+                <div class="rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 p-3 text-xs text-amber-800 dark:text-amber-300">
+                  <strong>Note:</strong> Google Health API scopes are classified as Restricted. Your own personal data is accessible immediately. Production use with other users requires Google's privacy review.
+                </div>
+              </div>
+              <!-- Footer -->
+              <div class="px-6 pb-6 pt-2 flex flex-col gap-2">
+                <button id="btn-consent-accept" (click)="fitbit.acceptConsent()" class="w-full py-3 px-4 bg-gradient-to-r from-[#00B0B9] to-blue-600 text-white text-sm font-bold rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                  I Understand &amp; Consent — Connect Google Health
+                </button>
+                <button id="btn-consent-decline" (click)="fitbit.declineConsent()" class="w-full py-2.5 px-4 text-sm text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 transition-colors">
+                  Cancel — Do not connect
+                </button>
+              </div>
+            </div>
           </div>
         }
 
@@ -607,13 +659,26 @@ import { SwUpdate } from '@angular/service-worker';
                    <button (click)="connectEpic(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#E33B44] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> epic®
                    </button>
-                   <button (click)="connectGoogleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
-                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Fitbit Sync (Out)
-                   </button>
-                    <button (click)="importGoogleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Fitbit Import (In)
-                    </button>
-                    <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                    @if (!fitbit.isConnected()) {
+                      <button id="btn-fitbit-connect" (click)="fitbit.initiateAuth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        Google Health Connect
+                      </button>
+                    } @else {
+                      <button id="btn-fitbit-sync" (click)="fitbit.sync(); connectMenuOpen.set(false)" [disabled]="fitbit.isSyncing()" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800 disabled:opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" [class.animate-spin]="fitbit.isSyncing()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>
+                        {{ fitbit.isSyncing() ? 'Syncing...' : 'Google Health Sync' }}
+                      </button>
+                      <button id="btn-fitbit-disconnect" (click)="fitbit.revoke(false); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-amber-600 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64A9 9 0 0 1 20.77 15"/><path d="M6.16 6.16a9 9 0 1 0 12.68 12.68"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                        Disconnect
+                      </button>
+                      <button id="btn-fitbit-purge" (click)="fitbit.revoke(true); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-rose-500 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                        Disconnect & Erase Data
+                      </button>
+                    }
+                    <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> AWS HealthLake
                     </button>
                     <button (click)="connectSwaggerHub(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#85EA2D] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
@@ -1747,6 +1812,7 @@ export class AppComponent implements OnDestroy {
   private boundStopVoiceColDrag = this.stopVoiceColDrag.bind(this);
 
   readonly session = inject(SessionStateService);
+  readonly fitbit = inject(FitbitService);
 
   @HostListener('document:mousemove')
   @HostListener('document:keydown')
@@ -1779,6 +1845,11 @@ export class AppComponent implements OnDestroy {
         this.showFhirCallback.set(true);
         return;
       }
+
+      // Handle Fitbit OAuth redirect (?fitbit=connected|denied|error)
+      this.fitbit.handleOAuthRedirect();
+      // Check initial Fitbit connection status for current patient
+      this.fitbit.checkStatus().catch(() => {});
 
       this.isMobile.set(window.innerWidth < 768);
 

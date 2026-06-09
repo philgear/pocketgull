@@ -138,10 +138,9 @@ Your lower back pain is coming from the area between two vertebrae called L4 and
 > - If you develop weakness in both legs, or have trouble controlling your bladder or bowels, go to the emergency room immediately.
 > - Your opioid-free status is a major health achievement. Let your care team know immediately if you experience cravings - this is not a failure, it is clinical information that helps us help you.`,
 
-    'Orthomolecular Profiling': `### Summary
-The patient exhibits signs of moderate systemic stress combined with suboptimal levels of cellular energy production cofactors. Primary focus is to support methylation pathways and improve mitochondrial respiration.
+    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
+The patient exhibits moderate systemic stress combined with suboptimal cellular energy production cofactors. Methylation pathway efficiency is reduced, contributing to neuroinflammation and pain sensitization. Primary focus is to support methylation pathways, improve mitochondrial respiration, and modulate NMDA receptor excitability.
 
-### Biomarker Matrix
 \`\`\`json
 [
   { "name": "Magnesium", "level": "Sub-optimal", "pathway": "ATP Synthesis / NMDA" },
@@ -150,6 +149,27 @@ The patient exhibits signs of moderate systemic stress combined with suboptimal 
   { "name": "Zinc", "level": "Sub-optimal", "pathway": "Immune / Hormones" }
 ]
 \`\`\`
+
+### Detected Deficiencies
+- **Magnesium (Sub-optimal)**: Consistent with chronic pain sensitization. Magnesium blocks NMDA receptors and limits central sensitization; deficiency amplifies pain perception.
+- **Vitamin D3 (Sub-optimal)**: Reduced levels associated with increased musculoskeletal pain, depression severity, and immune dysregulation.
+- **Zinc (Sub-optimal)**: Zinc depletion impairs immune surveillance, slows tissue repair, and may worsen depression through altered dopaminergic signaling.
+- **Potential Folate/B9**: Chronic NSAID use depletes folate; assess homocysteine for methylation cycle blockage.
+
+### Orthomolecular Protocol
+| Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway |
+|---|---|---|---|
+| Magnesium Glycinate | 400mg elemental Mg | Oral, nightly with food | NMDA antagonism / ATP Synthesis / Sleep |
+| Vitamin D3 + K2 | 5000 IU D3 / 100mcg MK-7 | Oral with fat-containing meal | Bone mineral density / Immune modulation |
+| Zinc Picolinate | 30mg | Oral with food (avoid with calcium) | Immune function / Hormonal balance |
+| Methylcobalamin (B12) | 1000mcg | Sublingual (if GI absorption uncertain) | Myelin sheath integrity / Methylation |
+| P-5-P (Active B6) | 50mg | Oral with food | Neurotransmitter synthesis / Homocysteine |
+
+### Cautions & Interactions
+- **Magnesium + NSAIDs**: Concurrent use is generally safe; however, high-dose NSAIDs reduce magnesium absorption — monitor renal function.
+- **Vitamin D3 Toxicity Threshold**: Doses >10,000 IU/day long-term carry hypercalcemia risk; recheck 25(OH)D at 3 months.
+- **Zinc + Copper Antagonism**: Doses >40mg zinc/day require copper co-supplementation (1–2mg/day) to prevent induced copper deficiency.
+- **B6 (P-5-P) Neuropathy**: Doses >200mg/day of P-5-P can paradoxically induce peripheral neuropathy; stay at therapeutic 50mg dose.
 `
 };
 
@@ -273,10 +293,9 @@ In Eastern medicine, pain is viewed as a blockage of energy (Qi) and blood flow 
 > - Avoid cold, raw food and iced drinks; choose cooked, warm meals.
 > - Notify your care team immediately if you experience sharp radiating pain or numbness.`,
 
-    'Orthomolecular Profiling': `### Summary
-Assessment reveals structural and metabolic strain linked to poor microcirculation. Cellular cofactor requirements must be satisfied to promote local tissue repair.
+    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
+Assessment reveals structural and metabolic strain linked to Qi stagnation and poor microcirculation at the tissue level. Cellular cofactor requirements must be satisfied to promote local tissue repair and restore Jing essence.
 
-### Biomarker Matrix
 \`\`\`json
 [
   { "name": "Magnesium", "level": "Sub-optimal", "pathway": "ATP Synthesis / NMDA" },
@@ -285,6 +304,27 @@ Assessment reveals structural and metabolic strain linked to poor microcirculati
   { "name": "Zinc", "level": "Sub-optimal", "pathway": "Immune / Hormones" }
 ]
 \`\`\`
+
+### Detected Deficiencies
+- **Magnesium (Sub-optimal)**: Corresponds to Kidney Yang deficiency in TCM; magnesium depletion impairs microcirculation and muscle relaxation, deepening blood stasis.
+- **Vitamin D3 (Sub-optimal)**: Correlates with Kidney Jing deficiency — insufficient bone marrow nourishment and reduced skeletal integrity.
+- **Zinc (Sub-optimal)**: Zinc is required for collagen cross-linking and joint tissue repair; depletion slows recovery from chronic musculoskeletal inflammation.
+- **Potential Iron (Ferritin)**: Given blood stasis presentation, assess ferritin; low iron worsens Blood deficiency and depletions in the Liver organ network.
+
+### Orthomolecular Protocol
+| Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway |
+|---|---|---|---|
+| Magnesium Glycinate | 400mg elemental Mg | Oral, nightly | Microcirculation / NMDA / Muscle relaxation |
+| Vitamin D3 + K2 | 4000 IU D3 / 100mcg MK-7 | Oral with fat | Bone nourishment / Kidney Jing support |
+| Zinc Picolinate | 25mg | Oral with food | Collagen synthesis / Immune / Joint repair |
+| Corydalis Yanhusuo Extract | 500mg | Oral TID | Dopamine receptor modulation / Pain |
+| Curcumin Phytosome | 500mg | Oral with fat | NF-kB inhibition / Microcirculation |
+
+### Cautions & Interactions
+- **Corydalis + Sedatives**: Corydalis has mild CNS depressant properties; avoid combination with benzodiazepines or opioid-containing compounds.
+- **Vitamin D3 Toxicity**: Monitor 25(OH)D levels at 12 weeks; hypercalcemia risk above 10,000 IU/day chronic dosing.
+- **Zinc + Copper**: Supplementing 25mg+ zinc daily for >8 weeks requires copper monitoring (1mg copper/day co-supplement).
+- **Curcumin Blood Thinning**: Curcumin has mild anti-platelet effects; caution if patient initiates anticoagulant therapy.
 `
 };
 
@@ -408,10 +448,9 @@ In Ayurveda, your pain is viewed as an imbalance in the "Vata" energy (governed 
 > - Stick to a regular sleep schedule; Vata needs routine to calm down.
 > - Reach out immediately if you experience sharp shooting pain or weakness in your leg.`,
 
-    'Orthomolecular Profiling': `### Summary
-The patient shows signs of structural dryness and metabolic toxin accumulation. Supporting bone mineral density and neural transmission is the primary metabolic goal.
+    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
+The patient shows signs of structural dryness (Vata aggravation) and Ama accumulation. Supporting bone mineral density and neural transmission via orthomolecular approaches is the primary metabolic goal, with care taken to preserve the digestive tract (Agni) as the delivery vehicle.
 
-### Biomarker Matrix
 \`\`\`json
 [
   { "name": "Magnesium", "level": "Sub-optimal", "pathway": "ATP Synthesis / NMDA" },
@@ -420,6 +459,27 @@ The patient shows signs of structural dryness and metabolic toxin accumulation. 
   { "name": "Zinc", "level": "Sub-optimal", "pathway": "Immune / Hormones" }
 ]
 \`\`\`
+
+### Detected Deficiencies
+- **Magnesium (Sub-optimal)**: Vata imbalance classically depletes nervous tissue lubrication; magnesium supports NMDA regulation and reduces neurogenic pain.
+- **Vitamin D3 (Sub-optimal)**: Linked to Asthi Dhatu (bone tissue) deficiency; required for calcium absorption and bone matrix mineralization.
+- **Zinc (Sub-optimal)**: Zinc depletion impairs Dhatu (tissue) regeneration and Ojas (vital essence) production.
+- **Potential Vitamin C Deficit**: Vata dryness and oxidative Ama accumulation increase tissue vitamin C turnover; assess ascorbate levels.
+
+### Orthomolecular Protocol
+| Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway |
+|---|---|---|---|
+| Magnesium Glycinate | 350mg | Oral, nightly with warm milk | NMDA / Nerve lubrication / Sleep |
+| Vitamin D3 + K2 | 4000 IU D3 / 100mcg MK-7 | Oral with ghee (fat) | Asthi Dhatu nourishment / Ca homeostasis |
+| Boswellia (Shallaki) Extract | 500mg | Oral BID with food | 5-LOX inhibition / Joint inflammation |
+| Ashwagandha (KSM-66) | 600mg | Oral, nightly with warm milk | Cortisol modulation / Nervous system Vata |
+| Zinc Glycinate | 25mg | Oral with food | Ojas / Immune / Collagen synthesis |
+
+### Cautions & Interactions
+- **Ashwagandha + Thyroid Medications**: Ashwagandha may alter thyroid hormone levels; monitor TSH if co-administered with levothyroxine.
+- **Boswellia + Anticoagulants**: Mild anti-platelet activity reported; caution with concurrent NSAID use (already prescribed).
+- **Magnesium + Digestive Sensitivity**: Magnesium glycinate is the gentlest form but loose stool can occur above 500mg; titrate slowly.
+- **Vitamin D3 Monitoring**: Recheck 25(OH)D at 12 weeks to prevent sub-toxic hypercalcemia.
 `
 };
 
@@ -544,10 +604,9 @@ Under the Grow Thy Self paradigm, we view your lower back pain and mood changes 
 > - Ensure your sleep environment is quiet, completely dark, and comfortable.
 > - Let your team know immediately if you feel warning signs of depression or opioid cravings.`,
 
-    'Orthomolecular Profiling': `### Summary
-Cellular methylation and energy pathways require specific cofactor replenishment to reduce stress load and neural hypersensitivity.
+    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
+Cellular methylation and mitochondrial energy pathways require specific cofactor replenishment to reduce stress load and neural hypersensitivity. The patient's HRV depression and sleep inefficiency are consistent with mitochondrial substrate depletion and chronic HPA axis dysregulation.
 
-### Biomarker Matrix
 \`\`\`json
 [
   { "name": "Magnesium", "level": "Sub-optimal", "pathway": "ATP Synthesis / NMDA" },
@@ -556,5 +615,26 @@ Cellular methylation and energy pathways require specific cofactor replenishment
   { "name": "Zinc", "level": "Sub-optimal", "pathway": "Immune / Hormones" }
 ]
 \`\`\`
+
+### Detected Deficiencies
+- **Magnesium (Sub-optimal)**: Mitochondrial ATP synthase requires magnesium as a cofactor; depletion directly reduces cellular energy output and worsens HRV.
+- **Vitamin D3 (Sub-optimal)**: Low D3 correlates with reduced serotonin synthesis, impaired circadian signaling, and greater depression severity.
+- **Zinc (Sub-optimal)**: Zinc is required for SOD (superoxide dismutase) antioxidant activity; depletion accelerates oxidative stress.
+- **Potential Coenzyme Q10 Deficit**: Not measurable via standard labs but clinically implied by mitochondrial stress; CoQ10 is the primary electron transport carrier.
+
+### Orthomolecular Protocol
+| Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway |
+|---|---|---|---|
+| Magnesium Glycinate | 400mg | Oral, nightly | ATP Synthesis / NMDA block / Sleep architecture |
+| Vitamin D3 + K2 | 5000 IU D3 / 100mcg MK-7 | Oral with fat | Calcium homeostasis / Serotonin / Immune |
+| Coenzyme Q10 (Ubiquinol) | 200mg | Oral with fat, AM | Mitochondrial Complex I–III / HRV support |
+| L-Methylfolate (5-MTHF) | 400mcg | Oral | BH4 pathway / Methylation / Serotonin |
+| Zinc Picolinate | 30mg | Oral with food | SOD antioxidant / Hormonal balance |
+
+### Cautions & Interactions
+- **CoQ10 + Anticoagulants**: CoQ10 has structural similarity to Vitamin K2; may mildly potentiate warfarin effects — monitor INR if relevant.
+- **5-MTHF + SSRIs/SNRIs**: Active folate may enhance serotonergic effects; if duloxetine is initiated concurrently, monitor for serotonin syndrome signs.
+- **Magnesium + Renal Impairment**: Given NSAID use (potential nephrotoxicity), baseline and periodic renal function checks are essential; avoid high-dose Mg if eGFR <30.
+- **Vitamin D3 Toxicity**: Recheck 25(OH)D at 12 weeks; stay below 100 ng/mL serum level to prevent hypercalcemia.
 `
 };

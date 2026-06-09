@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Pocket Gull</title>
+  <meta name="description" content="Pocket Gull Terms of Service — the rules and conditions for using our AI-assisted clinical intelligence platform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal: #00B0B9;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+      --card: #ffffff;
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    header {
+      background: #0f172a;
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    header a {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: white;
+    }
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #00B0B9, #2563eb);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 20px; height: 20px; }
+    header span { font-size: 1rem; font-weight: 600; color: white; }
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      padding: 3.5rem 2rem 3rem;
+      text-align: center;
+      border-bottom: 1px solid #1e293b;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+    .hero p { color: #94a3b8; font-size: 0.9rem; }
+    .badge {
+      display: inline-block;
+      background: rgba(0,176,185,0.15);
+      color: var(--teal);
+      border: 1px solid rgba(0,176,185,0.3);
+      border-radius: 9999px;
+      padding: 0.25rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 3rem 2rem 5rem;
+    }
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 2.5rem;
+    }
+    .toc h2 { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
+    .toc ol { padding-left: 1.25rem; }
+    .toc li { margin-bottom: 0.3rem; }
+    .toc a { color: var(--teal); text-decoration: none; font-size: 0.9rem; }
+    .toc a:hover { text-decoration: underline; }
+    section { margin-bottom: 2.75rem; }
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 0.875rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--teal);
+      display: inline-block;
+    }
+    p { margin-bottom: 1rem; color: #334155; }
+    ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+    li { margin-bottom: 0.4rem; color: #334155; }
+    .warning {
+      background: #fff7ed;
+      border-left: 4px solid #f97316;
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+    .warning strong { color: #9a3412; display: block; margin-bottom: 0.25rem; }
+    .warning p { color: #7c2d12; margin: 0; }
+    .highlight {
+      background: #f0fffe;
+      border-left: 4px solid var(--teal);
+      border-radius: 0 10px 10px 0;
+      padding: 1rem 1.25rem;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+    .highlight strong { color: var(--ink); display: block; margin-bottom: 0.25rem; }
+    a { color: var(--teal); }
+    footer {
+      background: #0f172a;
+      color: #64748b;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.8rem;
+    }
+    footer a { color: var(--teal); text-decoration: none; }
+    @media (max-width: 600px) {
+      main { padding: 2rem 1.25rem 4rem; }
+      .hero h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="https://pocketgull.app">
+    <div class="logo-mark">
+      <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      </svg>
+    </div>
+    <span>Pocket Gull</span>
+  </a>
+</header>
+
+<div class="hero">
+  <div class="badge">Legal</div>
+  <h1>Terms of Service</h1>
+  <p>Effective date: June 9, 2026 &nbsp;·&nbsp; Last updated: June 9, 2026</p>
+</div>
+
+<main>
+  <div class="warning">
+    <strong>⚕️ Not Medical Advice</strong>
+    <p>Pocket Gull is a clinical intelligence and care plan support tool. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider with questions regarding a medical condition.</p>
+  </div>
+
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#acceptance">Acceptance of Terms</a></li>
+      <li><a href="#description">Description of Service</a></li>
+      <li><a href="#eligibility">Eligibility</a></li>
+      <li><a href="#account">Account &amp; Access</a></li>
+      <li><a href="#health-data">Google Health API Data</a></li>
+      <li><a href="#acceptable-use">Acceptable Use</a></li>
+      <li><a href="#ip">Intellectual Property</a></li>
+      <li><a href="#disclaimer">Medical Disclaimer</a></li>
+      <li><a href="#limitation">Limitation of Liability</a></li>
+      <li><a href="#indemnification">Indemnification</a></li>
+      <li><a href="#termination">Termination</a></li>
+      <li><a href="#governing">Governing Law</a></li>
+      <li><a href="#changes">Changes to Terms</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ol>
+  </div>
+
+  <section id="acceptance">
+    <h2>1. Acceptance of Terms</h2>
+    <p>By accessing or using Pocket Gull ("Service") at <a href="https://pocketgull.app">pocketgull.app</a>, you agree to be bound by these Terms of Service ("Terms") and our <a href="/privacy-policy.html">Privacy Policy</a>. If you do not agree to these Terms, do not use the Service.</p>
+    <p>These Terms constitute a legally binding agreement between you and the operators of Pocket Gull ("we," "our," or "us").</p>
+  </section>
+
+  <section id="description">
+    <h2>2. Description of Service</h2>
+    <p>Pocket Gull is a real-time medical care plan strategy and AI consultation engine that provides:</p>
+    <ul>
+      <li>AI-assisted clinical intelligence dashboards powered by Google Gemini</li>
+      <li>Patient state management for symptoms, vitals, and conditions</li>
+      <li>Integration with Google Health API for biometric data (with your consent)</li>
+      <li>Live AI consultation streaming for symptom management support</li>
+      <li>Functional medicine and care plan strategy generation</li>
+    </ul>
+  </section>
+
+  <section id="eligibility">
+    <h2>3. Eligibility</h2>
+    <p>You must be at least 18 years old to use this Service. By using Pocket Gull, you represent and warrant that you meet this requirement. The Service is intended for healthcare professionals, researchers, and informed adult users managing their own health data.</p>
+  </section>
+
+  <section id="account">
+    <h2>4. Account &amp; Access</h2>
+    <ul>
+      <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+      <li>You are responsible for all activity that occurs under your account.</li>
+      <li>You must notify us immediately at <a href="mailto:security@pocketgull.app">security@pocketgull.app</a> of any unauthorized use of your account.</li>
+      <li>We reserve the right to suspend or terminate accounts that violate these Terms.</li>
+    </ul>
+  </section>
+
+  <section id="health-data">
+    <h2>5. Google Health API Data</h2>
+    <p>When you connect your Google Health account, you explicitly consent to the collection of specific biometric data types (resting heart rate, SpO₂, sleep) as described in our <a href="/privacy-policy.html">Privacy Policy</a>.</p>
+    <ul>
+      <li>You may withdraw this consent and disconnect your Google Health account at any time.</li>
+      <li>You may request erasure of all synced health data using the "Disconnect &amp; Erase Data" option.</li>
+      <li>We process this data solely to provide clinical intelligence features within the Service.</li>
+      <li>We do not sell, transfer, or use this data for advertising or any purpose outside the Service.</li>
+      <li>All use of Google Health API data complies with the <a href="https://developers.google.com/health/policies/health-api-user-data-and-research-policy" target="_blank" rel="noopener">Google Health API Developer and User Data Policy</a>.</li>
+    </ul>
+  </section>
+
+  <section id="acceptable-use">
+    <h2>6. Acceptable Use</h2>
+    <p>You agree not to:</p>
+    <ul>
+      <li>Use the Service to make final clinical decisions without appropriate professional oversight</li>
+      <li>Input false, misleading, or another person's health data without their consent</li>
+      <li>Attempt to reverse-engineer, scrape, or extract data from the Service</li>
+      <li>Use the Service in any way that violates applicable law, including HIPAA</li>
+      <li>Attempt to gain unauthorized access to any part of the Service or its infrastructure</li>
+      <li>Transmit malware, viruses, or any harmful code</li>
+      <li>Re-identify de-identified data or attempt to link health data to other individuals</li>
+    </ul>
+  </section>
+
+  <section id="ip">
+    <h2>7. Intellectual Property</h2>
+    <p>All software, design, AI models integration, and content comprising the Pocket Gull Service are owned by or licensed to us and are protected by applicable intellectual property laws. You may not copy, modify, distribute, or create derivative works without our express written permission.</p>
+    <p>Patient data and clinical notes you enter remain your property. You grant us a limited license to process this data solely to provide the Service to you.</p>
+  </section>
+
+  <section id="disclaimer">
+    <h2>8. Medical Disclaimer</h2>
+    <div class="warning">
+      <strong>Important — Read Carefully</strong>
+      <p>The information, AI responses, care plan suggestions, and clinical intelligence provided by Pocket Gull are for informational and educational purposes only. They do not constitute medical advice, diagnosis, or treatment recommendations. No physician-patient relationship is created by use of this Service. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay seeking it because of something you read or received from Pocket Gull.</p>
+    </div>
+  </section>
+
+  <section id="limitation">
+    <h2>9. Limitation of Liability</h2>
+    <p>To the maximum extent permitted by law, we shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of data, loss of health outcomes, or personal injury, arising out of or related to your use of the Service.</p>
+    <p>Our total liability to you for any claims arising from these Terms or your use of the Service shall not exceed the amount you paid us in the 12 months preceding the claim, or $100 USD, whichever is greater.</p>
+    <p>Some jurisdictions do not allow limitations on implied warranties or liability for consequential damages, so some of the above may not apply to you.</p>
+  </section>
+
+  <section id="indemnification">
+    <h2>10. Indemnification</h2>
+    <p>You agree to indemnify and hold harmless Pocket Gull and its operators from any claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising from your use of the Service, your violation of these Terms, or your violation of any rights of another party.</p>
+  </section>
+
+  <section id="termination">
+    <h2>11. Termination</h2>
+    <p>Either party may terminate these Terms at any time. You may stop using the Service at any time. We may suspend or terminate your access to the Service at our discretion if you violate these Terms.</p>
+    <p>Upon termination, your right to use the Service ceases immediately. Sections 7, 8, 9, 10, and 12 survive termination.</p>
+  </section>
+
+  <section id="governing">
+    <h2>12. Governing Law</h2>
+    <p>These Terms shall be governed by and construed in accordance with the laws of the United States, without regard to conflict of law principles. Any disputes arising under these Terms shall be resolved through binding arbitration or in the courts of competent jurisdiction.</p>
+  </section>
+
+  <section id="changes">
+    <h2>13. Changes to Terms</h2>
+    <p>We reserve the right to modify these Terms at any time. We will notify you of material changes by updating the "Last updated" date above and, where appropriate, by email or in-app notification. Your continued use of the Service after changes take effect constitutes acceptance of the revised Terms.</p>
+  </section>
+
+  <section id="contact">
+    <h2>14. Contact</h2>
+    <p>Questions about these Terms?</p>
+    <ul>
+      <li><strong>General:</strong> <a href="mailto:hello@pocketgull.app">hello@pocketgull.app</a></li>
+      <li><strong>Privacy:</strong> <a href="mailto:privacy@pocketgull.app">privacy@pocketgull.app</a></li>
+      <li><strong>Security:</strong> <a href="mailto:security@pocketgull.app">security@pocketgull.app</a></li>
+      <li><strong>Website:</strong> <a href="https://pocketgull.app">pocketgull.app</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2026 Pocket Gull. All rights reserved. &nbsp;·&nbsp;
+    <a href="/privacy-policy.html">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="/terms-of-service.html">Terms of Service</a>
+  </p>
+</footer>
+
+</body>
+</html>
