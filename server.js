@@ -36,6 +36,19 @@ console.log(`[SERVER] Starting...`);
 console.log(`[SERVER] Current working directory: ${rootDir}`);
 console.log(`[SERVER] Expected dist folder: ${distFolder}`);
 
+// Serve Astro Study Docs independently of Swagger
+app.use('/docs/study', (req, res, next) => {
+  const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
+  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
+    const indexPath = join(distFolder, 'docs', 'study', cleanPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  next();
+});
+app.use('/docs/study', express.static(join(distFolder, 'docs', 'study')));
+
 // Load OpenAPI documentation dynamically
 let swaggerDocument;
 try {
@@ -69,17 +82,6 @@ try {
     app.get(['/docs', '/docs/'], swaggerAuth, (req, res) => {
       res.redirect('/api-docs');
     });
-    app.use('/docs/study', (req, res, next) => {
-      const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
-      if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-        const indexPath = join(distFolder, 'docs', 'study', cleanPath, 'index.html');
-        if (fs.existsSync(indexPath)) {
-          return res.sendFile(indexPath);
-        }
-      }
-      next();
-    });
-    app.use('/docs/study', express.static(join(distFolder, 'docs', 'study')));
     app.use('/api-docs', swaggerAuth, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     console.log('[SERVER] Swagger documentation mounted at /api-docs');
   } else {
