@@ -97,6 +97,7 @@ import { CollaborationService } from '../services/collaboration.service';
       <!-- Toggle Button (Floating Action Button) -->
       <button 
         (click)="toggleOpen()"
+        aria-label="Toggle clinical room chat"
         class="h-14 w-14 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 border border-white/10"
         [class.bg-indigo-600]="!isOpen()"
         [class.bg-zinc-800]="isOpen()">

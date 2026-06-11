@@ -6,6 +6,7 @@ import { AiCacheService } from './ai-cache.service';
 import { NetworkStateService } from './network-state.service';
 import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
+import { OrcidService } from './orcid.service';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 describe('ClinicalIntelligenceService - Philosophy Modes', () => {
@@ -13,6 +14,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
   let mockPatientState: any;
   let mockIntelligenceProvider: any;
   let mockAiCache: any;
+  let mockOrcidService: any;
   let injector: Injector;
 
   beforeEach(() => {
@@ -46,12 +48,18 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
       set: vi.fn().mockResolvedValue(undefined)
     };
 
+    mockOrcidService = {
+      orcidProfile: signal<any>(null),
+      fetchRecord: vi.fn().mockResolvedValue({})
+    };
+
     injector = Injector.create({
       providers: [
         { provide: ClinicalIntelligenceService, useClass: ClinicalIntelligenceService },
         { provide: PatientStateService, useValue: mockPatientState },
         { provide: IntelligenceProviderToken, useValue: mockIntelligenceProvider },
         { provide: AiCacheService, useValue: mockAiCache },
+        { provide: OrcidService, useValue: mockOrcidService },
         { provide: NetworkStateService, useValue: {
             isOnline: () => true,
             useLocalInference: () => false
@@ -69,7 +77,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
 
   it('should prepend western philosophy instructions by default', async () => {
     await runInInjectionContext(injector, async () => {
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -80,7 +88,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
   it('should prepend eastern philosophy instructions when selected', async () => {
     await runInInjectionContext(injector, async () => {
       mockPatientState.activePhilosophy.set('eastern');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -91,7 +99,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
   it('should prepend ayurvedic philosophy instructions when selected', async () => {
     await runInInjectionContext(injector, async () => {
       mockPatientState.activePhilosophy.set('ayurvedic');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -102,7 +110,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
   it('should prepend grow-thy-self philosophy instructions when selected', async () => {
     await runInInjectionContext(injector, async () => {
       mockPatientState.activePhilosophy.set('grow-thy-self');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -118,7 +126,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
     await runInInjectionContext(injector, async () => {
       mockPatientState.isEmergencyMode.set(true);
       mockPatientState.activePhilosophy.set('eastern');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];

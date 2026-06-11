@@ -1,6 +1,8 @@
 import { Injectable, signal, computed, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
+declare const ai: any;
+
 export interface IGpuTelemetry {
   vendor: 'nvidia' | 'amd' | 'intel' | 'apple' | 'unknown';
   name: string;
@@ -49,10 +51,10 @@ export class HardwareTelemetryService {
   readonly recommendedExecutionPath = computed<'cloud' | 'local-nvidia' | 'local-webgpu' | 'on-device-nano'>(() => {
     const gpu = this.primaryGpu();
     
-    // Check if window.ai Gemini Nano is supported locally in browser
+    // Check if Gemini Nano is supported locally in browser
     let hasChromeNano = false;
     if (isPlatformBrowser(this.platformId)) {
-      hasChromeNano = !!(window as any).ai?.languageModel;
+      hasChromeNano = typeof ai !== 'undefined' && !!ai?.languageModel;
     }
 
     if (!gpu) {

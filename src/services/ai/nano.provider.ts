@@ -6,14 +6,12 @@ import { IVerificationIssue } from '../../components/analysis-report.types';
 
 // Declare experimental Chrome AI API types
 declare global {
-  interface Window {
-    ai?: {
-      languageModel?: {
-        capabilities: () => Promise<{ available: 'readily' | 'after-download' | 'no' }>;
-        create: (options?: { systemPrompt?: string }) => Promise<any>;
-      }
-    }
-  }
+  const ai: {
+    languageModel?: {
+      capabilities: () => Promise<{ available: 'readily' | 'after-download' | 'no' }>;
+      create: (options?: { systemPrompt?: string }) => Promise<any>;
+    };
+  } | undefined;
 }
 
 @Injectable({
@@ -26,10 +24,10 @@ export class NanoProvider implements IIntelligenceProvider {
     if (typeof window === 'undefined') {
       throw new Error("window is not defined in this environment (SSR).");
     }
-    if (!window.ai || !window.ai.languageModel) {
-      throw new Error("window.ai.languageModel is not available. Please ensure you are using Chrome 138+ with Optimization Guide On Device Model enabled.");
+    if (typeof ai === 'undefined' || !ai.languageModel) {
+      throw new Error("ai.languageModel is not available. Please ensure you are using Chrome 138+ with Optimization Guide On Device Model enabled.");
     }
-    const capabilities = await window.ai.languageModel.capabilities();
+    const capabilities = await ai.languageModel.capabilities();
     if (capabilities.available === 'no') {
       throw new Error("Device does not support Gemini Nano, or the feature is disabled.");
     }
@@ -41,7 +39,7 @@ export class NanoProvider implements IIntelligenceProvider {
   async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
     await this.ensureAiAvailable();
     // Note: using ai.languageModel.create which is the most modern Chrome API for this
-    const session = await window.ai!.languageModel!.create({
+    const session = await ai!.languageModel!.create({
       systemPrompt: systemInstruction
     });
 
@@ -72,7 +70,7 @@ export class NanoProvider implements IIntelligenceProvider {
   async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
     try {
       await this.ensureAiAvailable();
-      const session = await window.ai!.languageModel!.create({
+      const session = await ai!.languageModel!.create({
         systemPrompt: "You are a clinical educator. Translate the medical text into the requested reading level. Output only the translation."
       });
       return await session.prompt(`Translate this to ${level} reading level:\n\n${text}`);
@@ -84,7 +82,7 @@ export class NanoProvider implements IIntelligenceProvider {
   async analyzeTranslation(original: string, translated: string): Promise<string> {
     try {
       await this.ensureAiAvailable();
-      const session = await window.ai!.languageModel!.create({
+      const session = await ai!.languageModel!.create({
         systemPrompt: "You are an expert medical translation editor. Compare the original medical text and its translated version. Analyze readability, style, and check if any key clinical facts were lost or altered. Respond in clean, concise markdown."
       });
       return await session.prompt(`Original:\n${original}\n\nTranslated:\n${translated}\n\nProvide the translation analysis:`);
@@ -100,7 +98,7 @@ export class NanoProvider implements IIntelligenceProvider {
 
   async startChat(patientData: string, context: string): Promise<void> {
     await this.ensureAiAvailable();
-    this.chatSession = await window.ai!.languageModel!.create({
+    this.chatSession = await ai!.languageModel!.create({
       systemPrompt: `Patient Context:\n${patientData}\n\nClinical Role:\n${context}`
     });
   }
@@ -108,7 +106,7 @@ export class NanoProvider implements IIntelligenceProvider {
   async sendMessage(message: string, files?: File[]): Promise<string> {
     if (!this.chatSession) {
       await this.ensureAiAvailable();
-      this.chatSession = await window.ai!.languageModel!.create({});
+      this.chatSession = await ai!.languageModel!.create({});
     }
     
     try {

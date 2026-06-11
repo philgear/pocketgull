@@ -49,6 +49,15 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
         console.error('Failed to disable service worker:', e);
       }
     });
+
+    // Intercept current patient loci endpoint to avoid 503 sidecar errors
+    await page.route('**/api/loci/current_patient', async route => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([])
+      });
+    });
   });
 
   test('login page accessibility indicators', async ({ page }) => {
@@ -118,23 +127,24 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     await expect(demoBtn).toBeVisible({ timeout: 5000 });
     await demoBtn.click();
 
-    // Accept ethics pledge
-    const pledgeCheckbox = page.locator('input[type="checkbox"]');
-    await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
-    await pledgeCheckbox.check();
-
-    // Click Accept & Continue
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Continue' });
-    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
-    await acceptBtn.click();
-    
     // Dismiss the Karolinska Sleepiness Scale (KSS) assessment to enter the system
     const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
     await expect(skipBtn).toBeVisible({ timeout: 5000 });
     await skipBtn.click();
 
+    // Accept ethics pledge
+    const pledgeCheckbox = page.locator('input[type="checkbox"]');
+    await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
+    await pledgeCheckbox.check();
+
+    // Click Accept & Enter System
+    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
+    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
+    await acceptBtn.click();
+
     // Wait for the main viewport to load
     await expect(page.locator('main')).toBeVisible();
+    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
 
     // 1. Semantic Landmarks (WCAG 2.4.1 / ARIA Landmarks)
     // Ensure at least one <main> element exists
@@ -180,14 +190,6 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
     // 1. Intercept network endpoints
-    await page.route('**/api/loci/current_patient', async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify([])
-      });
-    });
-
     await page.route('**/api/ai/chat/start', async route => {
       await route.fulfill({
         status: 200,
@@ -243,20 +245,20 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     await expect(demoBtn).toBeVisible({ timeout: 5000 });
     await demoBtn.click();
 
+    // Dismiss the Karolinska Sleepiness Scale (KSS) assessment
+    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
+    await expect(skipBtn).toBeVisible({ timeout: 5000 });
+    await skipBtn.click();
+
     // Accept ethics pledge
     const pledgeCheckbox = page.locator('input[type="checkbox"]');
     await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
     await pledgeCheckbox.check();
 
-    // Click Accept & Continue
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Continue' });
+    // Click Accept & Enter System
+    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
     await expect(acceptBtn).toBeVisible({ timeout: 5000 });
     await acceptBtn.click();
-    
-    // Dismiss the Karolinska Sleepiness Scale (KSS) assessment
-    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-    await expect(skipBtn).toBeVisible({ timeout: 5000 });
-    await skipBtn.click();
 
     // Open the voice assistant panel
     const toggleAgentBtn = page.locator('button[aria-label="Toggle Live Agent"]');

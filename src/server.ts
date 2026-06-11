@@ -155,7 +155,7 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
 
   const isProd = process.env['NODE_ENV'] === 'production';
-  let csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://www.ncbi.nlm.nih.gov; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';";
+  let csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';";
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -276,6 +276,27 @@ app.get('/api/config', async (req, res) => {
     const key = await getApiKey(req);
     res.json({ apiKey: key });
   } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/orcid/:orcid', async (req, res) => {
+  try {
+    const { orcid } = req.params;
+    if (!orcid) return res.status(400).json({ error: 'ORCID iD is required' });
+    const orcidUrl = `https://pub.orcid.org/v3.0/${orcid}/record`;
+    const response = await fetch(orcidUrl, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    if (!response.ok) {
+      return res.status(response.status).json({ error: `ORCID API returned error: ${response.statusText}` });
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (err: any) {
+    console.error('ORCID Proxy Error:', err);
     res.status(500).json({ error: err.message });
   }
 });

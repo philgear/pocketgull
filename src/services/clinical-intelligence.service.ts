@@ -7,6 +7,7 @@ import { IntelligenceProviderToken } from './ai/intelligence.provider.token';
 import { NetworkStateService } from './network-state.service';
 import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
+import { OrcidService } from './orcid.service';
 import {
     DEMO_ANALYSIS_REPORT_WESTERN,
     DEMO_ANALYSIS_REPORT_EASTERN,
@@ -43,6 +44,7 @@ export class ClinicalIntelligenceService {
     private network = inject(NetworkStateService);
     private rules = inject(RulesEngineService);
     private patientState = inject(PatientStateService);
+    private orcid = inject(OrcidService);
 
     readonly isLoading = signal<boolean>(false);
     readonly error = signal<string | null>(null);
@@ -426,6 +428,18 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
                 const agentIdentity = `You are ${agentName}, the ${agentRole} for the Pocket Gull Clinical Intelligence Platform. Speak and write from this professional clinical expert persona.`;
 
                 let sysInstruction = agentIdentity + '\n\n' + philosophyInstruction + '\n\n' + this.systemInstructions[lens];
+                
+                const orcidProfile = this.orcid.orcidProfile();
+                if (orcidProfile) {
+                    sysInstruction += `\n\nCLINICIAN RESEARCH CONTEXT (ORCID ID: ${orcidProfile.orcidId}):
+The consulting clinician is ${orcidProfile.name}.
+Their research keywords include: ${orcidProfile.keywords.join(', ')}.
+Their published works and projects:
+${orcidProfile.works.map(w => `- "${w.title}" (${w.year || 'N/A'}) - ${w.type || 'publication'}${w.url ? ' (URL: ' + w.url + ')' : ''}`).join('\n')}
+
+When formulating recommendations, you should dynamically draw inspiration from their research areas and published works if they are clinically relevant to the patient's state.`;
+                }
+
                 if (isEmergency) {
                     sysInstruction = `EMERGENCY FIRST AID MODE: You are assisting a bystander under the Good Samaritan law.
 CRITICAL EMERGENCY RULES:
@@ -528,6 +542,18 @@ CRITICAL SAFETY CONSTRAINTS:
                 context += `\n\nActive Medicine Mode: Western (Allopathic) Medicine. Frame your dialogue using conventional clinical guidelines, pharmacology, and standard global medical baselines.`;
             }
         }
+
+        const orcidProfile = this.orcid.orcidProfile();
+        if (orcidProfile) {
+            context += `\n\nCLINICIAN RESEARCH CONTEXT (ORCID ID: ${orcidProfile.orcidId}):
+The consulting clinician is ${orcidProfile.name}.
+Their research keywords include: ${orcidProfile.keywords.join(', ')}.
+Their published works and projects:
+${orcidProfile.works.map(w => `- "${w.title}" (${w.year || 'N/A'}) - ${w.type || 'publication'}${w.url ? ' (URL: ' + w.url + ')' : ''}`).join('\n')}
+
+Feel free to reference their research areas and publications if it supports the clinical advice.`;
+        }
+
         await this.ai.startChat(patientData, context);
     }
 
