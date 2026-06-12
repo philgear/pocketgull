@@ -108,7 +108,7 @@ When deploying Pocket Gull into enterprise health systems, we recommend leveragi
 ```mermaid
 graph TD
     Data[Clinical Data Sources] --> BQ[BigQuery Analytics]
-    BQ --> BI[BI Engine (Sub-second dashboarding)]
+    BQ --> BI["BI Engine (Sub-second dashboarding)"]
     
     Model[Research Guidelines] --> VertexSearch[Vertex AI Search]
     VertexSearch --> Grounding[Gemini Grounded Citations]
