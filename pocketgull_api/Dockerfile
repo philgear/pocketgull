@@ -1,7 +1,10 @@
 # Stage 1: Build
-FROM node:22-alpine AS builder
+FROM node:22-alpine3.21 AS builder
 
 WORKDIR /usr/src/app
+
+# Update system packages to resolve vulnerabilities
+RUN apk update && apk upgrade --no-cache
 
 # Install dependencies
 COPY package*.json ./
@@ -12,9 +15,13 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production
-FROM node:22-alpine
+FROM node:22-alpine3.21
+
 
 WORKDIR /usr/src/app
+
+# Update system packages to resolve vulnerabilities in production stage
+RUN apk update && apk upgrade --no-cache
 
 # Set Node to production environment
 ENV NODE_ENV=production
@@ -34,3 +41,4 @@ EXPOSE 8080
 
 # Start the server
 CMD ["node", "dist/index.js"]
+

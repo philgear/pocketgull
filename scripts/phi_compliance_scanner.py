@@ -191,7 +191,7 @@ def main():
             violations = scan_file(filepath)
             if violations:
                 for v_type, line_no, matched, desc in violations:
-                    print(f"❌ [{v_type}] {relative_path}:{line_no} -> Found {desc} matching '{matched}'")
+                    print(f"[FAIL] [{v_type}] {relative_path}:{line_no} -> Found {desc} matching '{matched}'")
                     if v_type == "PII/PHI":
                         pii_violations_count += 1
                     else:
