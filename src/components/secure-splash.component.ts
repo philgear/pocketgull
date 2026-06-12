@@ -130,7 +130,7 @@ import { PatientStateService } from '../services/patient-state.service';
             </div>
           }
           <!-- Gesture Unlock Flow -->
-          @else if (isLocked()) {
+          @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
                <p class="text-[10px] text-zinc-500 uppercase tracking-widest font-medium mb-1">Draw smiley face to unlock</p>
                
@@ -499,8 +499,8 @@ import { PatientStateService } from '../services/patient-state.service';
     .secure-splash-main {
         background: radial-gradient(
             ellipse 80% 80% at 50% 0%,
-            hsl(var(--circadian-h) var(--circadian-s) var(--circadian-l) / 0.15) 0%,
-            #09090b 100%
+            hsl(var(--circadian-h) var(--circadian-s) var(--circadian-l) / 0.08) 0%,
+            #000000 100%
         ) !important;
         transition: background 1.5s ease;
     }
@@ -571,6 +571,7 @@ export class SecureSplashComponent implements OnInit {
   
   // Inputs
   apiKeyError = input<string | null>(null);
+  hasApiKey = input<boolean>(false);
 
   // Outputs
   submitKey = output<string>();
@@ -617,6 +618,88 @@ export class SecureSplashComponent implements OnInit {
   currentStroke: Array<{x: number, y: number}> = [];
   private verificationTimeoutId: any = null;
   gestureError = signal(false);
+
+  // Particles system (energy saving, pretty & fun)
+  particles: Array<{
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    life: number;
+    maxLife: number;
+    color: string;
+    size: number;
+  }> = [];
+  private isAnimating = false;
+
+  triggerParticleBurst(x: number, y: number, color: string, count: number) {
+    if (this.theme.reduceMotion()) return;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 4 + 2;
+      this.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        maxLife: Math.random() * 20 + 20,
+        color,
+        size: Math.random() * 4 + 2
+      });
+    }
+    this.startAnimationLoop();
+  }
+
+  addDrawParticle(x: number, y: number) {
+    if (this.theme.reduceMotion()) return;
+    const isDark = typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : true;
+    const color = isDark ? '#34d399' : '#10b981';
+    for (let i = 0; i < 2; i++) {
+      this.particles.push({
+        x,
+        y,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
+        life: 1,
+        maxLife: Math.random() * 15 + 10,
+        color,
+        size: Math.random() * 3 + 1
+      });
+    }
+    this.startAnimationLoop();
+  }
+
+  private startAnimationLoop() {
+    if (this.isAnimating) return;
+    this.isAnimating = true;
+    const loop = () => {
+      if (this.particles.length === 0 && !this.isDrawing) {
+        this.isAnimating = false;
+        return;
+      }
+      this.updateParticles();
+      this.redrawCanvas();
+      if (this.isAnimating) {
+        requestAnimationFrame(loop);
+      }
+    };
+    requestAnimationFrame(loop);
+  }
+
+  private updateParticles() {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.96;
+      p.vy *= 0.96;
+      p.life++;
+      if (p.life >= p.maxLife) {
+        this.particles.splice(i, 1);
+      }
+    }
+  }
 
   // AVS State & Audio Nodes
   private audioCtx: AudioContext | null = null;
@@ -993,6 +1076,20 @@ export class SecureSplashComponent implements OnInit {
     if (this.currentStroke.length > 0) {
       drawPoints(this.currentStroke);
     }
+
+    // Draw active sparks/particles (pretty & fun feedback)
+    for (const p of this.particles) {
+      const alpha = 1 - (p.life / p.maxLife);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = alpha;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = p.size * 2;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1.0;
+    ctx.shadowBlur = 0;
   }
 
   startDrawing(e: PointerEvent) {
@@ -1025,6 +1122,7 @@ export class SecureSplashComponent implements OnInit {
     if (!this.isDrawing) return;
     const pos = this.getCanvasCoords(e);
     this.currentStroke.push(pos);
+    this.addDrawParticle(pos.x, pos.y);
     this.redrawCanvas();
   }
 
@@ -1069,13 +1167,21 @@ export class SecureSplashComponent implements OnInit {
     setTimeout(() => {
       this.isChecking.set(false);
       if (isSmiley) {
+        this.triggerParticleBurst(110, 110, '#10b981', 40);
         this.playSuccessChime();
         this.stopAmbientSoundscape();
-        this.session.isLocked.set(false);
-        this.session.resetIdleTimer();
-        this.clearDrawing();
-        this.errorMsg.set('');
+        
+        setTimeout(() => {
+          this.session.isLocked.set(false);
+          this.session.resetIdleTimer();
+          this.clearDrawing();
+          this.errorMsg.set('');
+          if (this.hasApiKey()) {
+            this.gotoKss();
+          }
+        }, 500);
       } else {
+        this.triggerParticleBurst(110, 110, '#ef4444', 25);
         this.playErrorChime();
         this.gestureError.set(true);
         this.errorMsg.set('Drawing not recognized. Draw two eyes and a curved smile to unlock.');
@@ -1118,10 +1224,15 @@ export class SecureSplashComponent implements OnInit {
     this.isChecking.set(true);
     this.errorMsg.set('');
 
-    const success = await this.session.unlock();
+    const success = await this.session.verifyBiometrics();
     if (success) {
       this.playSuccessChime();
       this.stopAmbientSoundscape();
+      this.session.isLocked.set(false);
+      this.session.resetIdleTimer();
+      if (this.hasApiKey()) {
+        this.gotoKss();
+      }
     } else {
       this.playErrorChime();
       this.errorMsg.set('Biometric verification failed.');
@@ -1137,6 +1248,9 @@ export class SecureSplashComponent implements OnInit {
        this.session.isLocked.set(false);
        this.session.resetIdleTimer();
        this.pin.set('');
+       if (this.hasApiKey()) {
+         this.gotoKss();
+       }
     } else {
        this.playErrorChime();
        this.errorMsg.set('Invalid Access Code.');
@@ -1222,9 +1336,12 @@ export class SecureSplashComponent implements OnInit {
       this.state.selectPhilosophy('grow-thy-self');
     }
     
+    // Unlock session on successful entry
+    this.session.isLocked.set(false);
+    this.session.resetIdleTimer();
+    
     if (this._pendingDemo || this._pendingAiStudio) {
       if (this._pendingDemo) {
-        this.session.isLocked.set(false);
         this.loadDemo.emit();
       } else {
         this.selectAiStudio.emit();
