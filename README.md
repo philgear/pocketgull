@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./docs/images/transparent-banner.svg" alt="PocketGull Banner" width="100%">
+</p>
+
 # 🕊️ POCKET GULL
 **Aerial Perspective for the Clinical Ocean**
 
@@ -22,6 +26,14 @@
 
 ### VISION
 *"To provide practitioners with the 'Gull's Eye View'—the ability to rise above the turbulent sea of medical data and see the clear, actionable patterns beneath."*
+
+---
+
+## 🎨 BRAND IDENTITY & SOCIAL MEDIA CARD
+
+Pocket Gull's brand identity, structured logo, and custom marketing QR code (pointing to [pocketgull.app](https://pocketgull.app)) are showcased in our final paper-folded origami diorama social card. 
+
+![Pocket Gull Social Preview](./social-preview.png)
 
 ---
 
@@ -127,6 +139,7 @@ Full engineering documentation is available in the [`docs/study/`](./docs/study/
 - **[Getting Started](./docs/study/src/pages/getting-started.mdx)** — Installation, development, and deployment
 - **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
 - **[Valuation & Positioning](./docs/valuation_and_positioning.md)** — Business case, target audience, and valuation framework
+- **[Design System & Avian Personas](./DESIGN.md)** — Dieter Rams design language, brand identity, and the Gull Squadron AI agent personas
 
 ---
 

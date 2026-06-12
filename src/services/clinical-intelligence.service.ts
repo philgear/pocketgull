@@ -62,35 +62,43 @@ export class ClinicalIntelligenceService {
     readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | null>(null);
     readonly lastPatientData = signal<string | null>(null);
 
+    /**
+     * Maps each diagnostic lens to its Gull Squadron persona.
+     * @see DESIGN.md §7 — Avian Personas
+     */
     public getAgentNameForLens(lens: AnalysisLens): string {
         switch (lens) {
             case 'Summary Overview':
-                return 'Dr. Larus';
+                return 'Gulliver';
             case 'Functional Protocols':
             case 'Nutrition':
             case 'Orthomolecular Profiling':
-                return 'Dr. Swoop';
+                return 'Swoop';
             case 'Monitoring & Follow-up':
-                return 'Dr. Heron';
+                return 'Sentinel';
             case 'Patient Education':
-                return 'Dr. Nestor';
+                return 'Scribes';
             default:
-                return 'Dr. Larus';
+                return 'Gulliver';
         }
     }
 
+    /**
+     * Returns the role description for each Gull Squadron member.
+     * @see DESIGN.md §7.1 — The Four Diagnostic Agents
+     */
     public getAgentRoleForLens(lens: AnalysisLens): string {
         switch (lens) {
             case 'Summary Overview':
-                return 'Overview & Chart Synthesis Expert';
+                return 'Overview & Chart Synthesis Expert — "I see the whole ocean from up here."';
             case 'Functional Protocols':
             case 'Nutrition':
             case 'Orthomolecular Profiling':
-                return 'Therapeutic & Dosing Interventionist';
+                return 'Interventions & Precision Dosing Specialist — "Spotted. Locked. Delivering."';
             case 'Monitoring & Follow-up':
-                return 'Vigilance & Patient Tracking Monitor';
+                return 'Recovery Vigilance & Trend Monitor — "I never blink. I never look away."';
             case 'Patient Education':
-                return 'Patient Translation & Compliance Educator';
+                return 'Patient Translation & Education Specialist — "Let me explain that in a way that actually helps."';
             default:
                 return 'Clinical Co-Pilot';
         }

@@ -345,20 +345,20 @@ import { FitbitService } from './services/fitbit.service';
           <div class="flex items-center gap-4">
               <div class="flex items-center gap-3">
                   <svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
-                      <!-- Far Wing -->
-                      <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Tail -->
-                      <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Body Base -->
+                      <!-- Far Wing (Teal) -->
+                      <polygon points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Tail (Light gray paper) -->
+                      <polygon points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Body Base (White paper) -->
                       <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Near Wing (Upper) -->
-                      <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Near Wing (Fold) -->
-                      <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Neck/Head -->
+                      <!-- Near Wing Upper (Coral) -->
+                      <polygon points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Near Wing Fold (Darker Coral) -->
+                      <polygon points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Neck/Head (White paper) -->
                       <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Beak - Functional Braun Orange Accent -->
-                      <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Beak (Golden-Amber Orange) -->
+                      <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
                   </svg>
                   <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
               </div>
