@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'patient_event.dart';
@@ -166,7 +167,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
       
       await prefs.setString(_storageKey, jsonEncode(data));
     } catch (e) {
-      print('Failed to save state: $e');
+      debugPrint('Failed to save state: $e');
     }
   }
 
@@ -211,7 +212,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
         add(LoadPatient(loadedState));
       }
     } catch (e) {
-      print('Failed to load state: $e');
+      debugPrint('Failed to load state: $e');
     }
   }
 }

@@ -93,7 +93,7 @@ The latency reduction aligns with the performance expectations set out in the RE
 ## References
 
 
-- Project repository: <https://github.com/philgear/pocket-gull>
+- Project repository: <https://github.com/philgear/pocketgull>
 - Detailed documentation: **[README.md](../README.md)**
 - Benchmark scripts: `benchmarks/benchmark.py`  
 

@@ -63,24 +63,38 @@ class _NativeBodyViewerState extends State<NativeBodyViewer> {
         if (normalizedY < 0.25) {
           partId = 'head';
         } else if (normalizedY < 0.55) {
-          if (normalizedX < 0.35) partId = 'r_arm';
-          else if (normalizedX > 0.65) partId = 'l_arm';
-          else partId = 'chest';
+          if (normalizedX < 0.35) {
+            partId = 'r_arm';
+          } else if (normalizedX > 0.65) {
+            partId = 'l_arm';
+          } else {
+            partId = 'chest';
+          }
         } else if (normalizedY < 0.65) {
-          if (normalizedX < 0.35) partId = 'r_hand';
-          else if (normalizedX > 0.65) partId = 'l_hand';
-          else partId = 'abdomen';
+          if (normalizedX < 0.35) {
+            partId = 'r_hand';
+          } else if (normalizedX > 0.65) {
+            partId = 'l_hand';
+          } else {
+            partId = 'abdomen';
+          }
         } else if (normalizedY < 0.75) {
           partId = 'pelvis';
         } else if (normalizedY < 0.9) {
-          if (normalizedX < 0.5) partId = 'r_thigh';
-          else partId = 'l_thigh';
+          if (normalizedX < 0.5) {
+            partId = 'r_thigh';
+          } else {
+            partId = 'l_thigh';
+          }
         } else {
-          if (normalizedX < 0.5) partId = 'r_shin';
-          else partId = 'l_shin';
+          if (normalizedX < 0.5) {
+            partId = 'r_shin';
+          } else {
+            partId = 'l_shin';
+          }
         }
         
-        print('3D Selection: $partId (X: $normalizedX, Y: $normalizedY)');
+        debugPrint('3D Selection: $partId (X: $normalizedX, Y: $normalizedY)');
         context.read<PatientBloc>().add(SelectPartEvent(partId));
       } : null,
       child: Container(
@@ -180,7 +194,6 @@ class _NativeBodyViewerState extends State<NativeBodyViewer> {
         return const Color(0xFF4A148C).withValues(alpha: 0.7); // Deep purple-blue for veins/arteries
 
       case AnatomicalViewMode.standard:
-      default:
         // Standard: White base, Red/Orange for general pain
         if (maxPain >= 7) return Colors.red.withValues(alpha: 0.8);
         if (maxPain >= 4) return Colors.orange.withValues(alpha: 0.8);

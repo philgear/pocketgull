@@ -11,6 +11,23 @@ declare global {
       capabilities: () => Promise<{ available: 'readily' | 'after-download' | 'no' }>;
       create: (options?: { systemPrompt?: string }) => Promise<any>;
     };
+    summarizer?: {
+      capabilities: () => Promise<{ available: 'readily' | 'after-download' | 'no' }>;
+      create: (options?: { type?: string, format?: string, length?: string }) => Promise<any>;
+    };
+    writer?: {
+      capabilities: () => Promise<{ available: 'readily' | 'after-download' | 'no' }>;
+      create: (options?: { sharedContext?: string, tone?: string, format?: string }) => Promise<any>;
+    };
+    rewriter?: {
+      capabilities: () => Promise<{ available: 'readily' | 'after-download' | 'no' }>;
+      create: (options?: { sharedContext?: string, tone?: string, format?: string, length?: string }) => Promise<any>;
+    };
+  } | undefined;
+
+  const translation: {
+    canTranslate: (options: { sourceLanguage: string, targetLanguage: string }) => Promise<'readily' | 'after-download' | 'no'>;
+    createTranslator: (options: { sourceLanguage: string, targetLanguage: string }) => Promise<{ translate: (text: string) => Promise<string> }>;
   } | undefined;
 }
 
@@ -37,8 +54,39 @@ export class NanoProvider implements IIntelligenceProvider {
   }
 
   async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+    // 1. Try built-in Summarizer API for Summary Overview if available
+    if (lens === 'Summary Overview' && typeof ai !== 'undefined' && ai.summarizer) {
+      try {
+        const capabilities = await ai.summarizer.capabilities();
+        if (capabilities.available !== 'no') {
+          const summarizer = await ai.summarizer.create({
+            type: 'key-points',
+            format: 'markdown',
+            length: 'medium'
+          });
+          
+          if (typeof summarizer.summarizeStreaming === 'function') {
+            let previousChunk = '';
+            const stream = await summarizer.summarizeStreaming(patientData);
+            for await (const chunk of stream) {
+              const newText = chunk.startsWith(previousChunk) ? chunk.substring(previousChunk.length) : chunk;
+              previousChunk = chunk;
+              yield newText;
+            }
+            return;
+          } else {
+            const summary = await summarizer.summarize(patientData);
+            yield summary;
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('[NanoProvider] Summarizer API failed, falling back to Prompt API:', e);
+      }
+    }
+
+    // 2. Default fallback to Prompt API
     await this.ensureAiAvailable();
-    // Note: using ai.languageModel.create which is the most modern Chrome API for this
     const session = await ai!.languageModel!.create({
       systemPrompt: systemInstruction
     });
@@ -48,7 +96,6 @@ export class NanoProvider implements IIntelligenceProvider {
     let previousChunk = '';
     const stream = await session.promptStreaming(prompt);
     for await (const chunk of stream) {
-      // Safe fallback:
       const newText = chunk.startsWith(previousChunk) ? chunk.substring(previousChunk.length) : chunk;
       previousChunk = chunk;
       yield newText;
@@ -69,13 +116,53 @@ export class NanoProvider implements IIntelligenceProvider {
 
   async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
     try {
+      // 1. Try native Translation API
+      const langCodes: Record<string, string> = {
+        spanish: 'es',
+        french: 'fr',
+        german: 'de',
+        mandarin: 'zh'
+      };
+      const targetLang = langCodes[level];
+      if (targetLang && typeof translation !== 'undefined') {
+        const canTranslate = await translation.canTranslate({ sourceLanguage: 'en', targetLanguage: targetLang });
+        if (canTranslate !== 'no') {
+          const translator = await translation.createTranslator({ sourceLanguage: 'en', targetLanguage: targetLang });
+          return await translator.translate(text);
+        }
+      }
+
+      // 2. Try native Writing Assistant Rewriter API
+      if (['simplified', 'child', 'dyslexia'].includes(level) && typeof ai !== 'undefined' && ai.rewriter) {
+        const capabilities = await ai.rewriter.capabilities();
+        if (capabilities.available !== 'no') {
+          const rewriter = await ai.rewriter.create({
+            tone: level === 'child' ? 'informal' : 'formal',
+            length: level === 'simplified' ? 'short' : 'as-is'
+          });
+          return await rewriter.rewrite(text, {
+            context: `Adapt this medical explanation to a ${level} reading level.`
+          });
+        }
+      }
+
+      // 3. Fallback to basic Prompt API
       await this.ensureAiAvailable();
       const session = await ai!.languageModel!.create({
         systemPrompt: "You are a clinical educator. Translate the medical text into the requested reading level. Output only the translation."
       });
       return await session.prompt(`Translate this to ${level} reading level:\n\n${text}`);
-    } catch {
-      return text;
+    } catch (e) {
+      console.warn('[NanoProvider] Native translation/rewriter API failed, falling back to Prompt API:', e);
+      try {
+        await this.ensureAiAvailable();
+        const session = await ai!.languageModel!.create({
+          systemPrompt: "You are a clinical educator. Translate the medical text into the requested reading level. Output only the translation."
+        });
+        return await session.prompt(`Translate this to ${level} reading level:\n\n${text}`);
+      } catch {
+        return text;
+      }
     }
   }
 
@@ -92,7 +179,6 @@ export class NanoProvider implements IIntelligenceProvider {
   }
 
   async analyzeImage(base64Image: string, context?: string): Promise<string> {
-    // Gemini Nano built into Chrome doesn't currently support multi-modal image inputs natively
     throw new Error("The window.ai Nano integration limits visual analysis to the multimodal gemini server engine. Please switch intelligence modes.");
   }
 
@@ -110,7 +196,6 @@ export class NanoProvider implements IIntelligenceProvider {
     }
     
     try {
-      // Chrome's languageModel session maintains history
       const response = await this.chatSession.prompt(`User: ${message}\n\nPlease strictly fulfill this request. If asked to make a list or action items based on clinical data, provide it directly without disclaimers.`);
       return response;
     } catch (error) {

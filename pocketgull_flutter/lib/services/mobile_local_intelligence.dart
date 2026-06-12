@@ -69,7 +69,9 @@ class LocalIntelligenceService {
           buffer.write(chunk);
         }
         return buffer.toString().trim().toUpperCase();
-      } catch (e) {}
+      } catch (e) {
+        // Fallback to simple string parsing on inference failure
+      }
     }
     if (input.contains('BP')) return 'VITAL';
     return 'NOTE';

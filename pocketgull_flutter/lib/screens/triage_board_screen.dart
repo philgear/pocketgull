@@ -338,11 +338,11 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
                                     children: [
                                       const Icon(Icons.height, size: 16, color: Colors.grey),
                                       const SizedBox(width: 4),
-                                      Text('${patient.vitals.height.isEmpty ? 'N/A' : patient.vitals.height}', style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600)),
+                                      Text(patient.vitals.height.isEmpty ? 'N/A' : patient.vitals.height, style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600)),
                                       const SizedBox(width: 24),
                                       const Icon(Icons.scale, size: 16, color: Colors.grey),
                                       const SizedBox(width: 4),
-                                      Text('${patient.vitals.weight.isEmpty ? 'N/A' : patient.vitals.weight}', style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600)),
+                                      Text(patient.vitals.weight.isEmpty ? 'N/A' : patient.vitals.weight, style: const TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600)),
                                     ],
                                   ),
                                 ],

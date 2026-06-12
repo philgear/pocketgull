@@ -88,7 +88,7 @@ import { FitbitService } from './services/fitbit.service';
       <!-- Collaboration Dock -->
       <app-collaboration-dock></app-collaboration-dock>
       
-      @if ((session.isLocked() || !hasApiKey() || !session.isOnboardingComplete()) && !state.isEmergencyMode()) {
+      @if (showSplash()) {
         <app-secure-splash
           [apiKeyError]="apiKeyError()"
           [hasApiKey]="hasApiKey()"
@@ -1227,6 +1227,15 @@ export class AppComponent implements OnDestroy {
   private aiConfig = inject(AI_CONFIG, { optional: true });
   today = new Date();
   hasApiKey = signal<boolean>(!!this.aiConfig?.apiKey);
+  showSplash = computed(() => {
+    const locked = this.session.isLocked();
+    const hasKey = this.hasApiKey();
+    const onboard = this.session.isOnboardingComplete();
+    const emergency = this.state.isEmergencyMode();
+    const show = (locked || !hasKey || !onboard) && !emergency;
+    console.log('[DEBUG SHOW SPLASH]', { locked, hasKey, onboard, emergency, show });
+    return show;
+  });
   isDemoMode = this.state.isDemoMode;
   apiKeyInput = signal<string>('');
   showPassword = signal<boolean>(false);

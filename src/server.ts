@@ -13,6 +13,7 @@ import { dirname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import crypto from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -150,12 +151,19 @@ await getApiKey().catch(console.error);
 
 // Security headers
 app.use((req, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  const nonce = crypto.randomBytes(16).toString('base64');
+  res.locals = res.locals || {};
+  res.locals['nonce'] = nonce;
+
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
 
   const isProd = process.env['NODE_ENV'] === 'production';
-  let csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';";
+  let csp = `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://fonts.gstatic.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -284,20 +292,94 @@ app.get('/api/orcid/:orcid', async (req, res) => {
   try {
     const { orcid } = req.params;
     if (!orcid) return res.status(400).json({ error: 'ORCID iD is required' });
-    const orcidUrl = `https://pub.orcid.org/v3.0/${orcid}/record`;
+    
+    // Clean and validate format
+    const cleanId = orcid.trim().replace(/https?:\/\/orcid\.org\//, '');
+    if (!/^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/.test(cleanId)) {
+      return res.status(400).json({ error: 'Invalid ORCID iD format. Expected: 0000-0002-1825-0097' });
+    }
+
+    // Mock Developer Fallback Profile for Phil Gear
+    if (cleanId === '0009-0008-1372-5381') {
+      console.log('[ORCID Proxy] Serving SSR mock profile for developer: Phil Gear');
+      return res.json({
+        person: {
+          name: {
+            'given-names': { value: 'Phil' },
+            'family-name': { value: 'Gear' }
+          },
+          keywords: {
+            keyword: [
+              { content: 'Software' },
+              { content: 'Clinical Intelligence' },
+              { content: 'Care Consultation' }
+            ]
+          },
+          'researcher-urls': {
+            'researcher-url': [
+              {
+                'url-name': 'InsightSpark',
+                url: { value: 'https://github.com/philgear/InsightSpark' }
+              }
+            ]
+          }
+        },
+        'activities-summary': {
+          works: {
+            group: [
+              {
+                'work-summary': [
+                  {
+                    title: {
+                      title: { value: 'Pivot & Pulse' }
+                    },
+                    url: { value: 'https://github.com/philgear/InsightSpark' },
+                    type: 'software',
+                    'publication-date': {
+                      year: { value: '2026' }
+                    }
+                  }
+                ]
+              },
+              {
+                'work-summary': [
+                  {
+                    title: {
+                      title: { value: 'PocketGull Care Consultation Protocol' }
+                    },
+                    type: 'research-tool',
+                    'publication-date': {
+                      year: { value: '2026' }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      });
+    }
+
+    const orcidUrl = `https://pub.orcid.org/v3.0/${cleanId}/record`;
     const response = await fetch(orcidUrl, {
       headers: {
-        'Accept': 'application/json'
+        'Accept': 'application/vnd.orcid+json, application/json'
       }
     });
+
     if (!response.ok) {
-      return res.status(response.status).json({ error: `ORCID API returned error: ${response.statusText}` });
+      console.error(`ORCID API returned status ${response.status}`);
+      if (response.status === 404) {
+        return res.status(404).json({ error: 'ORCID profile not found. Please verify the ID.' });
+      }
+      return res.status(response.status).json({ error: `ORCID API returned error: ${response.statusText || 'Unknown Error'}` });
     }
+
     const data = await response.json();
     res.json(data);
   } catch (err: any) {
     console.error('ORCID Proxy Error:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to fetch profile from ORCID.' });
   }
 });
 
@@ -570,6 +652,86 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
   }
 });
 
+// JSON File Database Configuration
+const dataDir = join(rootDir, 'data');
+const patientsDbPath = join(dataDir, 'patients.json');
+
+// Ensure data directory and empty DB exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+if (!fs.existsSync(patientsDbPath)) {
+  fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2));
+}
+
+// Patients API Endpoints
+app.get('/api/patients', (req, res) => {
+  try {
+    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  } catch (err: any) {
+    console.error('[API] Error reading patients database:', err);
+    res.status(500).json({ error: 'Internal server error while reading database' });
+  }
+});
+
+app.post('/api/patients', express.json({ limit: '50mb' }), (req, res) => {
+  try {
+    if (!req.body || !Array.isArray(req.body)) {
+      return res.status(400).json({ error: 'Body must be a JSON array of patients' });
+    }
+
+    // Save exactly what the frontend sends
+    fs.writeFileSync(patientsDbPath, JSON.stringify(req.body, null, 2));
+
+    console.log(`[API] Saved ${req.body.length} patients to database.`);
+    res.status(200).json({ success: true, count: req.body.length });
+  } catch (err: any) {
+    console.error('[API] Error saving patients database:', err);
+    res.status(500).json({ error: 'Internal server error while saving database' });
+  }
+});
+
+app.put('/api/patients/:id', express.json({ limit: '50mb' }), (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!req.body || typeof req.body !== 'object') {
+      return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
+    }
+
+    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    const patients = JSON.parse(data);
+    const index = patients.findIndex((p: any) => p.id === id);
+
+    if (index !== -1) {
+      patients[index] = { ...patients[index], ...req.body, id }; // Ensure ID stays same
+    } else {
+      patients.push({ ...req.body, id });
+    }
+
+    fs.writeFileSync(patientsDbPath, JSON.stringify(patients, null, 2));
+    console.log(`[API] Synced patient ${id} from mobile/app to database.`);
+    res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
+  } catch (err: any) {
+    console.error('[API] Error syncing patient to database:', err);
+    res.status(500).json({ error: 'Internal server error while syncing patient' });
+  }
+});
+
+// Serve Astro Study Docs independently of Swagger and Angular SSR
+app.use('/docs/study', (req, res, next) => {
+  const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
+  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
+    const indexPath = join(browserDistFolder, 'docs', 'study', cleanPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+  }
+  next();
+});
+app.use('/docs/study', express.static(join(browserDistFolder, 'docs', 'study')));
+
 /**
  * Serve static files from /.
  */
@@ -598,7 +760,8 @@ app.use((req, res, next) => {
       if (contentType.includes('text/html') && key) {
         let html = await response.text();
         const safeKey = key.replace(/[^a-zA-Z0-9_\-]/g, '');
-        const scriptTag = '<script px-api-key="true">window.GEMINI_API_KEY = "' + safeKey + '";</script>\n</head>';
+        const nonce = res.locals['nonce'] || '';
+        const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${safeKey}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
 
         const modRes = new Response(html, {

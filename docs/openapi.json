@@ -189,6 +189,35 @@
         }
       }
     },
+    "/api/orcid/{id}": {
+      "get": {
+        "summary": "ORCID Profile Proxy",
+        "description": "Fetches a public ORCID researcher profile by their ORCID ID (e.g. 0000-0002-1825-0097).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The 16-character ORCID ID",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[0-9X]$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of ORCID profile record"
+          },
+          "400": {
+            "description": "Invalid format or missing ID"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/patients": {
       "get": {
         "summary": "Get All Patients",

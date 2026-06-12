@@ -130,3 +130,7 @@ build/
 deploy_log.txt
 firebase-debug.log
 firebase-debug.*.log
+
+# --- Billing & Stripe Configs ---
+*billing*
+*stripe*

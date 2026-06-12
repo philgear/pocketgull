@@ -23,13 +23,12 @@ import { ClinicalTrendComponent } from './clinical-trend.component';
 import { AiCacheService } from '../services/ai-cache.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { RevealDirective } from '../directives/reveal.directive';
-import { MemoryPalaceComponent } from './memory-palace.component';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, MemoryPalaceComponent, NodeAgentDialogComponent],
+  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, NodeAgentDialogComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
@@ -100,15 +99,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
             class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
             Patient Education
           </pocket-gull-button>
-          <pocket-gull-button (click)="changeLens('Memory Palace')"
-            variant="ghost"
-            size="sm"
-            [class.border-b-2]="activeLens() === 'Memory Palace'"
-            [class.border-transparent]="activeLens() !== 'Memory Palace'"
-            [ngClass]="activeLens() === 'Memory Palace' ? activeTabClasses() : 'text-gray-500 dark:text-zinc-400'"
-            class="rounded-none px-4 -mb-px shadow-none shrink-0 whitespace-nowrap transition-all duration-200">
-            Memory Palace
-          </pocket-gull-button>
+
           @if (state.isEmergencyMode()) {
             <pocket-gull-button (click)="changeLens('EMT Handoff')"
               variant="ghost"
@@ -133,7 +124,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
         
         <!-- Active Medicine Mode Info Banner -->
-        @if (hasAnyReport() && activeLens() !== 'Memory Palace' && activeLens() !== 'EMT Handoff') {
+        @if (hasAnyReport() && activeLens() !== 'EMT Handoff') {
           <div class="mb-6 p-4 rounded-xl border transition-all duration-300"
                [class.bg-sky-50\/40]="state.activePhilosophy() === 'western'"
                [class.border-sky-200\/60]="state.activePhilosophy() === 'western'"
@@ -148,12 +139,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
                [class.bg-amber-50\/40]="state.activePhilosophy() === 'ayurvedic'"
                [class.border-amber-200\/60]="state.activePhilosophy() === 'ayurvedic'"
                [class.dark:bg-amber-950\/10]="state.activePhilosophy() === 'ayurvedic'"
-               [class.dark:border-amber-900\/30]="state.activePhilosophy() === 'ayurvedic'"
-               
-               [class.bg-indigo-50\/40]="state.activePhilosophy() === 'grow-thy-self'"
-               [class.border-indigo-200\/60]="state.activePhilosophy() === 'grow-thy-self'"
-               [class.dark:bg-indigo-950\/10]="state.activePhilosophy() === 'grow-thy-self'"
-               [class.dark:border-indigo-900\/30]="state.activePhilosophy() === 'grow-thy-self'">
+               [class.dark:border-amber-900\/30]="state.activePhilosophy() === 'ayurvedic'">
             
             <div class="flex items-center gap-3">
               <!-- Animated Accent Indicator Dot -->
@@ -161,13 +147,11 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
                       [class.bg-sky-400]="state.activePhilosophy() === 'western'"
                       [class.bg-emerald-400]="state.activePhilosophy() === 'eastern'"
-                      [class.bg-amber-400]="state.activePhilosophy() === 'ayurvedic'"
-                      [class.bg-indigo-400]="state.activePhilosophy() === 'grow-thy-self'"></span>
+                      [class.bg-amber-400]="state.activePhilosophy() === 'ayurvedic'"></span>
                 <span class="relative inline-flex rounded-full h-2.5 w-2.5"
                       [class.bg-sky-500]="state.activePhilosophy() === 'western'"
                       [class.bg-emerald-500]="state.activePhilosophy() === 'eastern'"
-                      [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"
-                      [class.bg-indigo-500]="state.activePhilosophy() === 'grow-thy-self'"></span>
+                      [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"></span>
               </span>
               
               <div class="flex-1 min-w-0">
@@ -178,14 +162,11 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
                         [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
                         [class.dark:text-emerald-400]="state.activePhilosophy() === 'eastern'"
                         [class.text-amber-700]="state.activePhilosophy() === 'ayurvedic'"
-                        [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'"
-                        [class.text-indigo-700]="state.activePhilosophy() === 'grow-thy-self'"
-                        [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'">
+                        [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'">
                     Active Paradigm: 
                     @if (state.activePhilosophy() === 'western') { Western (Allopathic) }
                     @else if (state.activePhilosophy() === 'eastern') { Eastern (Traditional Chinese Medicine) }
                     @else if (state.activePhilosophy() === 'ayurvedic') { Ayurvedic Medicine }
-                    @else if (state.activePhilosophy() === 'grow-thy-self') { Grow Thy Self (Preventive & Longevity) }
                   </span>
 
                   <!-- Dynamic Agent Pill -->
@@ -195,14 +176,11 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
                        [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
                        [class.dark:text-emerald-400]="state.activePhilosophy() === 'eastern'"
                        [class.text-amber-700]="state.activePhilosophy() === 'ayurvedic'"
-                       [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'"
-                       [class.text-indigo-700]="state.activePhilosophy() === 'grow-thy-self'"
-                       [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'">
+                       [class.dark:text-amber-400]="state.activePhilosophy() === 'ayurvedic'">
                     <span class="flex h-1.5 w-1.5 rounded-full"
                           [class.bg-sky-500]="state.activePhilosophy() === 'western'"
                           [class.bg-emerald-500]="state.activePhilosophy() === 'eastern'"
-                          [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"
-                          [class.bg-indigo-500]="state.activePhilosophy() === 'grow-thy-self'"></span>
+                          [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"></span>
                     Expert: {{ activeAgentName() }}
                   </div>
                 </div>
@@ -214,8 +192,6 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
                     Synthesizing patient history, symptoms, and vitals through TCM organ disharmonies, meridian flow, and energetic herbal/dietary dynamics.
                   } @else if (state.activePhilosophy() === 'ayurvedic') {
                     Mapping biomarkers and constitutional trends to the Tridosha framework (Vata/Pitta/Kapha), evaluating Agni (digestive fire) and Ama (cellular load).
-                  } @else if (state.activePhilosophy() === 'grow-thy-self') {
-                    Optimizing functional longevity, cell vitality, and circadian alignment by integrating 13 historical and contemporary global wisdom frameworks.
                   }
                 </p>
               </div>
@@ -224,7 +200,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
         }
 
         <!--Clinical Overview Dashboard-->
-        @if (activeLens() !== 'Memory Palace' && activeLens() !== 'EMT Handoff' && intel.analysisMetrics(); as metrics) {
+        @if (activeLens() !== 'EMT Handoff' && intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
             <div class="col-span-full mb-2">
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
@@ -283,10 +259,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
           </div>
         }
 
-        <!-- Memory Palace Component -->
-        @if (activeLens() === 'Memory Palace') {
-          <app-memory-palace></app-memory-palace>
-        }
+
 
         <!-- EMT Handoff Component/Layout -->
         @if (activeLens() === 'EMT Handoff') {
@@ -399,7 +372,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
         }
 
         <!--AI Report Section-->
-        @if (activeLens() !== 'Memory Palace' && activeLens() !== 'EMT Handoff' && reportSections(); as sections) {
+        @if (activeLens() !== 'EMT Handoff' && reportSections(); as sections) {
           <div class="flex flex-col gap-4 sm:gap-6 pb-4 w-full min-w-0">
             @for (section of sections; track section.title; let i = $index) {
               <div [id]="i === 0 ? 'tour-report-node' : null" appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
@@ -421,7 +394,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
                   <div class="rams-typography" (mouseover)="onTooltipOver($event)" (mouseout)="onTooltipOut($event)">
                     @for (node of section.nodes; track node.id) {
                       @if (node.type === 'raw') {
-                        <div [innerHTML]="node.rawHtml | safeHtml" class="mb-4"></div>
+                        <div [innerHTML]="(node.rawHtml || '') | safeHtml" class="mb-4"></div>
                       } @else if (node.type === 'paragraph') {
                         <app-summary-node
                           [node]="node"
@@ -506,7 +479,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
           <!-- Spectral severity icon: P1-Critical (640nm red) vs P2-Urgent (585nm amber) -->
           <div class="mt-0.5 shrink-0"
                [style.color]="tooltip.severity === 'high' ? 'var(--spectral-critical)' : 'var(--spectral-urgent)'"
-               [innerHTML]="tooltip.severity === 'high' ? ClinicalIcons.Risk : ClinicalIcons.Warning | safeHtml">
+               [innerHTML]="(tooltip.severity === 'high' ? ClinicalIcons.Risk : ClinicalIcons.Risk) | safeHtml">
           </div>
           <div>
             <div class="text-[10px] font-bold uppercase tracking-wider mb-1"
@@ -579,18 +552,18 @@ export class AnalysisReportComponent implements OnDestroy {
     this.historyEntries.set(entries.filter(e => e.value?._isSnapshot));
   }
 
-  activeLens = signal<AnalysisLens | 'Memory Palace' | 'EMT Handoff'>('Summary Overview');
+  activeLens = signal<AnalysisLens | 'EMT Handoff'>('Summary Overview');
   showRawFhir = signal(false);
 
   activeAgentName = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return '';
+    if (lens === 'EMT Handoff') return '';
     return this.intel.getAgentNameForLens(lens as AnalysisLens);
   });
 
   activeAgentRole = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return '';
+    if (lens === 'EMT Handoff') return '';
     return this.intel.getAgentRoleForLens(lens as AnalysisLens);
   });
 
@@ -601,9 +574,6 @@ export class AnalysisReportComponent implements OnDestroy {
     }
     if (phil === 'ayurvedic') {
       return 'border-amber-500 dark:border-amber-400 text-amber-600 dark:text-amber-400 font-bold';
-    }
-    if (phil === 'grow-thy-self') {
-      return 'border-indigo-500 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 font-bold';
     }
     return 'border-sky-500 dark:border-sky-400 text-sky-600 dark:text-sky-400 font-bold';
   });
@@ -832,7 +802,7 @@ export class AnalysisReportComponent implements OnDestroy {
   hasAnyReport = computed(() => Object.keys(this.intel.analysisResults()).length > 0);
   activeReport = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return '';
+    if (lens === 'EMT Handoff') return '';
     return getSafeProperty(this.intel.analysisResults(), lens) || '';
   });
   contentArea = viewChild<ElementRef<HTMLDivElement>>('contentArea');
@@ -847,7 +817,7 @@ export class AnalysisReportComponent implements OnDestroy {
 
   verificationStatus(sectionTitle: string): string | null {
     const lens = this.activeLens();
-    if (lens === 'Memory Palace' || lens === 'EMT Handoff') return null;
+    if (lens === 'EMT Handoff') return null;
     const res = getSafeProperty(this.intel.verificationResults(), lens);
     return res?.status || null;
   }
@@ -1296,7 +1266,7 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   }
 
-  changeLens(lens: AnalysisLens | 'Memory Palace' | 'EMT Handoff') {
+  changeLens(lens: AnalysisLens | 'EMT Handoff') {
     this.audit.logAction('VIEW_LENS', this.patientManager.selectedPatientId(), { lens });
     this.flushAutoSave();
     this.activeLens.set(lens);

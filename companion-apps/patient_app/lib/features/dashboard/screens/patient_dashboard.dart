@@ -14,7 +14,7 @@ class _PatientDashboardState extends State<PatientDashboard> {
   final ApiClient _apiClient = ApiClient();
   late Patient _currentPatient;
   bool _isLoading = false;
-  bool _isSyncing = false;
+  String _syncStatus = 'idle'; // 'idle', 'syncing', 'success', 'error'
 
   @override
   void initState() {
@@ -38,8 +38,8 @@ class _PatientDashboardState extends State<PatientDashboard> {
   }
 
   Future<void> _simulateHealthSync() async {
-    if (_currentPatient == null) return;
-    setState(() => _isSyncing = true);
+    if (_syncStatus != 'idle') return;
+    setState(() => _syncStatus = 'syncing');
 
     // Simulate connecting to Apple Health / Health Connect
     // and pushing new vitals back to the web API
@@ -50,21 +50,19 @@ class _PatientDashboardState extends State<PatientDashboard> {
       'lastSync': DateTime.now().toIso8601String(),
     };
 
-    final updates = {
-      'vitals': newVitals,
-    };
-
     // Keep existing state, just update vitals
-    final fullState = _currentPatient!.state.toJson();
-    fullState['vitals'] = {..._currentPatient!.state.vitals, ...newVitals};
+    final fullState = _currentPatient.state.toJson();
+    fullState['vitals'] = {..._currentPatient.state.vitals, ...newVitals};
 
-    final success = await _apiClient.syncPatientData(_currentPatient!.id, {
+    final success = await _apiClient.syncPatientData(_currentPatient.id, {
       'vitals': fullState['vitals'],
     });
 
-    setState(() => _isSyncing = false);
-
     if (mounted) {
+      setState(() {
+        _syncStatus = success ? 'success' : 'error';
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(success 
@@ -73,9 +71,17 @@ class _PatientDashboardState extends State<PatientDashboard> {
           backgroundColor: success ? Colors.green : Colors.red,
         ),
       );
+
       if (success) {
         _loadData(); // Reload to show updated data
       }
+
+      // Revert back to idle after 2.5 seconds
+      Future.delayed(const Duration(milliseconds: 2500), () {
+        if (mounted) {
+          setState(() => _syncStatus = 'idle');
+        }
+      });
     }
   }
 
@@ -112,107 +118,151 @@ class _PatientDashboardState extends State<PatientDashboard> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _currentPatient == null
-              ? Center(child: Text('No patient data found.', style: TextStyle(color: textColor)))
-              : RefreshIndicator(
-                  onRefresh: _loadData,
-                  child: ListView(
-                    padding: EdgeInsets.all(outerPadding),
-                    children: [
-                      Text(
-                        'Hello, ${_currentPatient!.name.split(' ').first}',
-                        style: TextStyle(fontSize: welcomeFontSize, fontWeight: FontWeight.bold, color: textColor),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Here is your latest clinical summary.',
-                        style: TextStyle(fontSize: subtitleFontSize, color: subColor),
-                      ),
-                      SizedBox(height: sectionSpacing),
-                      
-                      // Active Issues
-                      _buildSectionTitle('ACTIVE CONCERNS', textColor, sectionTitleFontSize),
-                      const SizedBox(height: 16),
-                      ..._currentPatient!.state.issues.entries.map((entry) {
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: EdgeInsets.all(cardPadding),
-                          decoration: BoxDecoration(
-                            color: cardColor,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7)),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                entry.key.toUpperCase(),
-                                style: TextStyle(fontSize: isWatch ? 9.0 : 12.0, fontWeight: FontWeight.bold, letterSpacing: 1, color: subColor),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '${entry.value.length} flagged node(s)',
-                                style: TextStyle(color: textColor, fontSize: infoFontSize),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-
-                      SizedBox(height: sectionSpacing),
-
-                      // Chart Update Recommendations (Patient Nudges)
-                      _buildSectionTitle('RECOMMENDED ACTIONS', textColor, sectionTitleFontSize),
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: EdgeInsets.all(isWatch ? 12.0 : 20.0),
+          : RefreshIndicator(
+              onRefresh: _loadData,
+              child: ListView(
+                padding: EdgeInsets.all(outerPadding),
+                children: [
+                  Text(
+                    'Hello, ${_currentPatient.name.split(' ').first}',
+                    style: TextStyle(fontSize: welcomeFontSize, fontWeight: FontWeight.bold, color: textColor),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Here is your latest clinical summary.',
+                    style: TextStyle(fontSize: subtitleFontSize, color: subColor),
+                  ),
+                  SizedBox(height: sectionSpacing),
+                  
+                  // Active Issues
+                  _buildSectionTitle('ACTIVE CONCERNS', textColor, sectionTitleFontSize),
+                  const SizedBox(height: 16),
+                  ..._currentPatient.state.issues.entries.toList().asMap().entries.map((item) {
+                    final index = item.key;
+                    final entry = item.value;
+                    return StaggeredEntrance(
+                      delay: Duration(milliseconds: index * 120),
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: EdgeInsets.all(cardPadding),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF27272A).withOpacity(0.5) : const Color(0xFFF3F4F6),
+                          color: cardColor,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Text(
+                              entry.key.toUpperCase(),
+                              style: TextStyle(fontSize: isWatch ? 9.0 : 12.0, fontWeight: FontWeight.bold, letterSpacing: 1, color: subColor),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${entry.value.length} flagged node(s)',
+                              style: TextStyle(color: textColor, fontSize: infoFontSize),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+
+                  SizedBox(height: sectionSpacing),
+
+                  // Chart Update Recommendations (Patient Nudges)
+                  _buildSectionTitle('RECOMMENDED ACTIONS', textColor, sectionTitleFontSize),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: EdgeInsets.all(isWatch ? 12.0 : 20.0),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF27272A).withValues(alpha: 0.5) : const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFE4E4E7)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.favorite_border, color: textColor, size: isWatch ? 16 : 20),
+                            SizedBox(width: isWatch ? 8 : 12),
+                            Expanded(
+                              child: Text(
+                                'Connect Health App',
+                                style: TextStyle(fontWeight: FontWeight.bold, color: textColor, fontSize: infoFontSize),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Your doctor lacks recent activity data. Sync Apple Health or Google Health Connect to update your clinical chart automatically.',
+                          style: TextStyle(height: 1.5, color: subColor, fontSize: isWatch ? 9 : 14),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _syncStatus == 'success'
+                                  ? Colors.green
+                                  : (_syncStatus == 'error'
+                                      ? Colors.red
+                                      : (_syncStatus == 'syncing'
+                                          ? textColor.withValues(alpha: 0.7)
+                                          : textColor)),
+                              foregroundColor: (_syncStatus == 'success' || _syncStatus == 'error')
+                                  ? Colors.white
+                                  : bgColor,
+                              padding: EdgeInsets.symmetric(vertical: buttonVerticalPadding),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            ),
+                            onPressed: _syncStatus == 'idle' ? _simulateHealthSync : null,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.favorite_border, color: textColor, size: isWatch ? 16 : 20),
-                                SizedBox(width: isWatch ? 8 : 12),
-                                Expanded(
-                                  child: Text(
-                                    'Connect Health App',
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: textColor, fontSize: infoFontSize),
+                                if (_syncStatus == 'syncing') ...[
+                                  SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                      color: bgColor,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                ] else if (_syncStatus == 'success') ...[
+                                  const Icon(Icons.check, size: 16),
+                                  const SizedBox(width: 8),
+                                ] else if (_syncStatus == 'error') ...[
+                                  const Icon(Icons.close, size: 16),
+                                  const SizedBox(width: 8),
+                                ],
+                                Text(
+                                  _syncStatus == 'success'
+                                      ? 'BIOMETRICS SYNCED'
+                                      : (_syncStatus == 'error'
+                                          ? 'SYNC FAILED'
+                                          : (_syncStatus == 'syncing'
+                                              ? 'SYNCING DATA...'
+                                              : 'SYNC BIOMETRICS')),
+                                  style: TextStyle(
+                                    fontSize: isWatch ? 10 : 12,
+                                    letterSpacing: 1.5,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Your doctor lacks recent activity data. Sync Apple Health or Google Health Connect to update your clinical chart automatically.',
-                              style: TextStyle(height: 1.5, color: subColor, fontSize: isWatch ? 9 : 14),
-                            ),
-                            const SizedBox(height: 16),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: textColor,
-                                  foregroundColor: bgColor,
-                                  padding: EdgeInsets.symmetric(vertical: buttonVerticalPadding),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                                ),
-                                onPressed: _isSyncing ? null : _simulateHealthSync,
-                                child: _isSyncing 
-                                  ? SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: bgColor, strokeWidth: 2))
-                                  : Text('SYNC BIOMETRICS', style: TextStyle(fontSize: isWatch ? 10 : 12, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -225,6 +275,73 @@ class _PatientDashboardState extends State<PatientDashboard> {
         letterSpacing: 2.0,
         color: color,
       ),
+    );
+  }
+}
+
+class StaggeredEntrance extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+
+  const StaggeredEntrance({
+    super.key,
+    required this.child,
+    required this.delay,
+  });
+
+  @override
+  State<StaggeredEntrance> createState() => _StaggeredEntranceState();
+}
+
+class _StaggeredEntranceState extends State<StaggeredEntrance>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _opacityAnimation;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+    );
+
+    _slideAnimation = Tween<double>(begin: 15.0, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+
+    Future.delayed(widget.delay, () {
+      if (mounted) {
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _slideAnimation.value),
+          child: Opacity(
+            opacity: _opacityAnimation.value,
+            child: child,
+          ),
+        );
+      },
+      child: widget.child,
     );
   }
 }

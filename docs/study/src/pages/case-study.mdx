@@ -8,13 +8,13 @@ description: "A professional case study evaluating the performance, architecture
 
 > Insight beneath the surface.
 
-**By Phil Gear** · [g.dev/philgear](https://g.dev/philgear) · [Repository](https://github.com/philgear/pocket-gull)
+**By Phil Gear** · [g.dev/philgear](https://g.dev/philgear) · [Repository](https://github.com/philgear/pocketgull)
 
 ---
 
 ## Executive Summary
 
-This case study evaluates the performance and workflow improvements achieved by integrating **Pocket Gull**—the live-agent clinical co-pilot—into a mid-size outpatient practice. By following the implementation guidance in the [Installation & Setup](https://github.com/philgear/pocket-gull#public-code-repository--spin-up-instructions) section and adhering to the project's [Responsible AI](https://github.com/philgear/pocket-gull#responsible-ai-statement) principles, the practice realized a **42% reduction in patient intake time** while maintaining 100% compliance with FHIR data-export standards.
+This case study evaluates the performance and workflow improvements achieved by integrating **Pocket Gull**—the live-agent clinical co-pilot—into a mid-size outpatient practice. By following the implementation guidance in the [Installation & Setup](https://github.com/philgear/pocketgull#public-code-repository--spin-up-instructions) section and adhering to the project's [Responsible AI](https://github.com/philgear/pocketgull#responsible-ai-statement) principles, the practice realized a **42% reduction in patient intake time** while maintaining 100% compliance with FHIR data-export standards.
 
 Pocket Gull streamlines patient intake through an interactive 3D body map and AI-powered clinical intelligence, acting as an interruptible voice-first clinical co-pilot. Built for the **Gemini Live Agent Challenge**, it tackles a dense intersection of real-time multi-agent orchestration, high-fidelity anatomical visualization, and strict clinical data privacy—all within a performance-optimized Angular application achieving a perfect **Lighthouse score of 100**.
 
@@ -30,7 +30,7 @@ The clinic's legacy intake system suffered from well-documented pain points:
 | No visual symptom mapping | Missed anatomical context |
 | No AI-assisted synthesis | Clinicians spent additional 5 min reviewing notes |
 
-Pocket Gull was selected because its **real-time AI consult**, **3D body map**, and **FHIR-compatible export** directly addressed these gaps (see [Product Highlights](https://github.com/philgear/pocket-gull#product-highlights) in the README).
+Pocket Gull was selected because its **real-time AI consult**, **3D body map**, and **FHIR-compatible export** directly addressed these gaps (see [Product Highlights](https://github.com/philgear/pocketgull#product-highlights) in the README).
 
 ---
 
@@ -92,8 +92,8 @@ Research integrations with **NCBI PubMed E-utilities** and **Google Programmable
 - Recorded **average total intake time**: **8.3 minutes** per patient.
 
 ### 2. Pocket Gull Integration
-- Followed the [Installation](https://github.com/philgear/pocket-gull#public-code-repository--spin-up-instructions) steps (`npm install`, `npm run dev`).
-- Enabled **Web Speech API** and **Three.js body viewer** as described in the [Real-Time Clinical Experience](https://github.com/philgear/pocket-gull#real-time-clinical-experience) section.
+- Followed the [Installation](https://github.com/philgear/pocketgull#public-code-repository--spin-up-instructions) steps (`npm install`, `npm run dev`).
+- Enabled **Web Speech API** and **Three.js body viewer** as described in the [Real-Time Clinical Experience](https://github.com/philgear/pocketgull#real-time-clinical-experience) section.
 - Configured the **ADK InMemoryRunner** (see `src/services/clinical-intelligence.service.ts`) to orchestrate the Gemini-2.5-Flash model.
 
 ### 3. Performance Testing
@@ -131,9 +131,9 @@ Research integrations with **NCBI PubMed E-utilities** and **Google Programmable
 
 ## Discussion
 
-- **Scalability**: Pocket Gull's ADK multi-agent orchestration eliminated bottlenecks in symptom synthesis, matching the scalability claims in the [Architecture Diagram](https://github.com/philgear/pocket-gull#architecture-diagram).
-- **Usability**: The 3D body map reduced transcription errors, directly supporting the [Data Card](https://github.com/philgear/pocket-gull#data-card) claim of "precise anatomical selection."
-- **Compliance**: All exported care plans were validated as FHIR Bundles, satisfying the [Responsible AI Statement](https://github.com/philgear/pocket-gull#responsible-ai-statement) requirement for data portability.
+- **Scalability**: Pocket Gull's ADK multi-agent orchestration eliminated bottlenecks in symptom synthesis, matching the scalability claims in the [Architecture Diagram](https://github.com/philgear/pocketgull#architecture-diagram).
+- **Usability**: The 3D body map reduced transcription errors, directly supporting the [Data Card](https://github.com/philgear/pocketgull#data-card) claim of "precise anatomical selection."
+- **Compliance**: All exported care plans were validated as FHIR Bundles, satisfying the [Responsible AI Statement](https://github.com/philgear/pocketgull#responsible-ai-statement) requirement for data portability.
 - **Performance**: A perfect Lighthouse 100 was achieved through diligent layout unblocking, dynamic asset loading, and Angular Signals-first state management—not incidental but a core engineering requirement.
 - **Accessibility**: Cognition and Child Export Modes translate Care Plans into dyslexia-friendly or pediatric PDF formats. Box Breathing UX and Interactive Task Bracketing (double-click state machine) further reduce clinician cognitive load.
 
@@ -141,9 +141,9 @@ Research integrations with **NCBI PubMed E-utilities** and **Google Programmable
 
 ## Recommendations
 
-1. **Adopt Pocket Gull** for all new intake workflows; reference the [Deployment Proof](https://github.com/philgear/pocket-gull#google-cloud-deployment-proof) for production rollout.
-2. **Integrate automated benchmarking** into CI (see the README's [Kaizen Philosophy](https://github.com/philgear/pocket-gull#kaizen-philosophy)) to catch regressions early.
-3. **Contribute enhancements** (e.g., additional specialty agents) following the [License](https://github.com/philgear/pocket-gull#license) and open-source contribution guidelines.
+1. **Adopt Pocket Gull** for all new intake workflows; reference the [Deployment Proof](https://github.com/philgear/pocketgull#google-cloud-deployment-proof) for production rollout.
+2. **Integrate automated benchmarking** into CI (see the README's [Kaizen Philosophy](https://github.com/philgear/pocketgull#kaizen-philosophy)) to catch regressions early.
+3. **Contribute enhancements** (e.g., additional specialty agents) following the [License](https://github.com/philgear/pocketgull#license) and open-source contribution guidelines.
 
 ---
 

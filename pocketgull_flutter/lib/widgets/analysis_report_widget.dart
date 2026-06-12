@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/patient/patient_bloc.dart';
 import '../blocs/analysis/analysis_cubit.dart';
 import '../services/clinical_intelligence_service.dart';
+import '../services/orcid_service.dart';
 import '../services/export_service.dart';
 import '../models/patient_types.dart';
 import 'report_tabs_widget.dart';
@@ -16,7 +17,7 @@ class AnalysisReportWidget extends StatefulWidget {
   @override
   State<AnalysisReportWidget> createState() => _AnalysisReportWidgetState();
 }
-
+// ... [rest of UI states remain unchanged] ...
 class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
   bool _isChatOpen = false;
   ExportMode _exportMode = ExportMode.standard;
@@ -290,13 +291,16 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
     final patientState = context.read<PatientBloc>().state;
     final data = "Goals: ${patientState.patientGoals}";
     
+    final orcidService = context.read<OrcidService>();
+    final orcidProfile = orcidService.profile;
+    
     // Start AI Chat Session
     final intelService = context.read<ClinicalIntelligenceService>();
-    await intelService.startChatSession(data);
+    await intelService.startChatSession(data, orcidProfile: orcidProfile);
     
     // Generate Report
     if (context.mounted) {
-      context.read<AnalysisCubit>().generateComprehensiveReport(data);
+      context.read<AnalysisCubit>().generateComprehensiveReport(data, orcidProfile: orcidProfile);
     }
   }
 

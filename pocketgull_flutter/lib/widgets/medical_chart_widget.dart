@@ -34,8 +34,6 @@ class _MedicalChartWidgetState extends State<MedicalChartWidget> {
   Widget build(BuildContext context) {
     return BlocBuilder<PatientBloc, PatientState>(
       builder: (context, state) {
-        // Patient doesn't have a history property right now in state, but let's mock it
-        final history = state.scans.isEmpty ? [] : []; // Replace with actual history when available
         final scans = state.scans;
 
         return Column(

@@ -168,7 +168,6 @@ export class ImportService {
           let westernName = '';
           let tcmPattern = '';
           let ayurvedicImbalance = '';
-          let growThySelfFocus = '';
 
           codings.forEach((c: any) => {
             const system = (c.system || '').toLowerCase();
@@ -177,8 +176,6 @@ export class ImportService {
               tcmPattern = display;
             } else if (system.includes('ayur') || system.includes('namaste')) {
               ayurvedicImbalance = display;
-            } else if (system.includes('grow-thy-self') || system.includes('longevity') || system.includes('functional')) {
-              growThySelfFocus = display;
             } else {
               if (!westernName) westernName = display;
             }
@@ -214,7 +211,6 @@ export class ImportService {
           if (existingIssue) {
             if (tcmPattern) existingIssue.tcmPattern = tcmPattern;
             if (ayurvedicImbalance) existingIssue.ayurvedicImbalance = ayurvedicImbalance;
-            if (growThySelfFocus) existingIssue.growThySelfFocus = growThySelfFocus;
           } else {
             currentPatient.issues[bodyPartId].push({
               id: bodyPartId,
@@ -224,8 +220,7 @@ export class ImportService {
               description: resource.note?.[0]?.text || resource.code?.text || `Imported condition: ${westernName}`,
               symptoms: [],
               tcmPattern,
-              ayurvedicImbalance,
-              growThySelfFocus
+              ayurvedicImbalance
             });
             conditionsAdded++;
           }
@@ -234,7 +229,7 @@ export class ImportService {
           currentPatient.history.push({
             type: 'PatientSummaryUpdate',
             date: new Date().toISOString().split('T')[0],
-            summary: `Imported multi-coded FHIR Condition: ${westernName} (TCM: ${tcmPattern || 'None'}, Ayurveda: ${ayurvedicImbalance || 'None'}, Longevity: ${growThySelfFocus || 'None'})`
+            summary: `Imported multi-coded FHIR Condition: ${westernName} (TCM: ${tcmPattern || 'None'}, Ayurveda: ${ayurvedicImbalance || 'None'})`
           });
           break;
         }

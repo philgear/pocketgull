@@ -1,4 +1,4 @@
-import 'package:ditredi/ditredi.dart';
+import 'package:flutter/foundation.dart';
 void main() {
-  print(Cube3D);
+  debugPrint('Cube3D');
 }

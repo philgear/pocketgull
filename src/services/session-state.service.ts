@@ -10,6 +10,7 @@ export class SessionStateService {
    * Defaulting to true so they must "login" on boot.
    */
   readonly isLocked = signal(true);
+  readonly isOnboardingComplete = signal(false);
   private auth = inject(AuthService);
 
   /**
@@ -32,8 +33,13 @@ export class SessionStateService {
     return false;
   }
 
+  async verifyBiometrics(): Promise<boolean> {
+    return await this.auth.promptLocalBiometric();
+  }
+
   lock() {
     this.isLocked.set(true);
+    this.isOnboardingComplete.set(false);
     if (this.timeoutId) {
       clearTimeout(this.timeoutId);
     }

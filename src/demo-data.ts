@@ -325,18 +325,21 @@ Assessment reveals structural and metabolic strain linked to Qi stagnation and p
 - **Vitamin D3 Toxicity**: Monitor 25(OH)D levels at 12 weeks; hypercalcemia risk above 10,000 IU/day chronic dosing.
 - **Zinc + Copper**: Supplementing 25mg+ zinc daily for >8 weeks requires copper monitoring (1mg copper/day co-supplement).
 - **Curcumin Blood Thinning**: Curcumin has mild anti-platelet effects; caution if patient initiates anticoagulant therapy.
-`
+- **Ashwagandha + Thyroid Medications**: Ashwagandha may alter thyroid hormone levels; monitor TSH if co-administered with levothyroxine.
+- **Boswellia + Anticoagulants**: Mild anti-platelet activity reported; caution with concurrent NSAID use (already prescribed).
+- **Magnesium + Digestive Sensitivity**: Magnesium glycinate is the gentlest form but loose stool can occur above 500mg; titrate slowly.
+- **Vitamin D3 Monitoring**: Recheck 25(OH)D at 12 weeks to prevent sub-toxic hypercalcemia.`
 };
 
 export const DEMO_ANALYSIS_REPORT_AYURVEDIC: Partial<Record<AnalysisLens, string>> = {
     'Summary Overview': `### Clinical Assessment
-Sarah Jenkins is a 42-year-old female presenting with chronic lower back pain (Kati Shoola/radiculopathy) stemming from a severe Vata Vyadhi (neurological/movement imbalance) with localized Ama accumulation at the L4-L5 level. Her OUD history and depression are addressed as a Manovaha Srotas (mind-channel) imbalance characterized by high Rajas and low Sattva.
+Sarah Jenkins is a 42-year-old female presenting with chronic lower back pain (Kati Shoola/radiculopathy) stemming from a severe Vata Vyadhi (neurological/movement imbalance) with localized Ama accumulation at the L4-L5 level. Her pathology has penetrated the **Asthi Dhatu** (bone/cartilage) and **Majja Dhatu** (nervous system), resulting in blockages in the **Asthivaha** and **Majjavaha Srotas** (channels). Her OUD history and depression are addressed as a Manovaha Srotas (mind-channel) imbalance characterized by high Rajas and low Sattva.
 
 ### Priority List
-- **Pacify Vata**: Reduce nervous system excitability, pain, and dryness in the joints.
-- **Rekindle Agni and Digest Ama**: Improve metabolic fire to clear toxicity at L4-L5.
+- **Pacify Vata (Ruksha/Sheeta Gunas)**: Reduce nervous system excitability, pain, and dryness in the joints.
+- **Rekindle Agni (Vishama Agni)**: Normalize the irregular metabolic fire to prevent further Ama production.
+- **Digest Ama (Sama State)**: Clear the undigested toxic residue clogging the spinal channels.
 - **Strengthen Ojas (Vitality)**: Elevate resilience, immune capacity, and psychological balance.
-- **Promote Sattva (Clarity)**: Support mental stability, coping skills, and relapse prevention.
 
 ### Plan of Care
 - **Immediate**: Initiate warm sesame oil massage (Abhyanga) to calm Vata. Set up Kati Basti local oil pooling.
@@ -365,9 +368,11 @@ Sarah Jenkins is a 42-year-old female presenting with chronic lower back pain (K
 
 ### Nutrition & Lifestyle
 - **Vata-Pacifying Diet**: Eat warm, cooked, moist foods (e.g. kitchari). Use ghee to lubricate joints and tissues internally.
-- **Dinacharya**: Keep a consistent daily routine. Wake early, scrape the tongue, and practice oil pulling.
+- **Dinacharya (Circadian Routines)**: Keep a consistent daily routine:
+  * *Gandusha* (oil pulling) with warm sesame oil to strengthen the jaw and support sensory health.
+  * *Nasya* (nasal oil drops) using Anu Taila to soothe nervous pathways and Manovaha Srotas.
+  * *Udvartana* (dry powder massage) or warm *Abhyanga* self-massage with sesame oil to balance Vata's dry/cold qualities.
 - **Avoid Cold & Dryness**: Dress warmly, drink only warm liquids, and avoid raw salads or dry crackers.
-- **Abhyanga**: Daily self-massage with warm sesame oil before bathing.
 
 ### Supplementation
 | Supplement | Dose | Frequency | Rationale |
@@ -386,7 +391,7 @@ Sarah Jenkins is a 42-year-old female presenting with chronic lower back pain (K
 - **Sattvic Meditations**: Focus on gratitude and grounding to cultivate mental stability.`,
 
     'Nutrition': `### Biochemical Assessment
-Suboptimal digestive fire (Mandagni) leading to accumulation of undigested toxic bioproducts (Ama) that clog the tissue channels (Srotas).
+Irregular digestive fire (Vishama Agni) leading to accumulation of undigested toxic bioproducts (Ama) that clog the tissue channels (Srotas).
 
 ### Nutrition Targets
 - **Kindling Agni (Digestion)**: Use warming digestive spices to rekindle metabolic fire.
@@ -394,11 +399,11 @@ Suboptimal digestive fire (Mandagni) leading to accumulation of undigested toxic
 - **Lubricating Tissues**: Incorporate healthy lipids (ghee) to resolve systemic dryness.
 
 ### Nutritional Interventions
-| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |
+| Nutrient/Compound | Energetic Qualities (Rasa/Virya/Vipaka) | Therapeutic Dose | Targeted Pathway |
 |---|---|---|---|
-| Ginger Rhizome | 1g | Daily steeped tea | Digestive enzyme stimulation & Agni |
-| Turmeric Powder | 1.5g | Golden milk (warm) | Antioxidant and anti-inflammatory |
-| Cumin, Coriander, Fennel | equal parts | Seed tea daily | Agni support & gas/bloating relief |
+| Ginger Rhizome | Katu / Ushna / Madhura | 1g steeped tea | Kindles Agni, digests Ama |
+| Turmeric Powder | Tikta-Katu / Ushna / Katu | 1.5g golden milk | NF-kB inhibition, blood cleansing |
+| Cumin, Coriander, Fennel | Madhura-Tikta / Warm / Madhura | Seed tea daily | Agni support, gas/bloating relief |
 
 ### Dietary Adjustments
 - **Moist Cooked Foods**: Focus on stews, soups, and cooked grains.
@@ -472,169 +477,12 @@ The patient shows signs of structural dryness (Vata aggravation) and Ama accumul
 | Magnesium Glycinate | 350mg | Oral, nightly with warm milk | NMDA / Nerve lubrication / Sleep |
 | Vitamin D3 + K2 | 4000 IU D3 / 100mcg MK-7 | Oral with ghee (fat) | Asthi Dhatu nourishment / Ca homeostasis |
 | Boswellia (Shallaki) Extract | 500mg | Oral BID with food | 5-LOX inhibition / Joint inflammation |
-| Ashwagandha (KSM-66) | 600mg | Oral, nightly with warm milk | Cortisol modulation / Nervous system Vata |
+| Ashwagandha (KSM-66) | 600mg | Oral, nightly with warm milk | Cortisol modulation / HPA-axis regulation |
 | Zinc Glycinate | 25mg | Oral with food | Ojas / Immune / Collagen synthesis |
 
 ### Cautions & Interactions
 - **Ashwagandha + Thyroid Medications**: Ashwagandha may alter thyroid hormone levels; monitor TSH if co-administered with levothyroxine.
 - **Boswellia + Anticoagulants**: Mild anti-platelet activity reported; caution with concurrent NSAID use (already prescribed).
 - **Magnesium + Digestive Sensitivity**: Magnesium glycinate is the gentlest form but loose stool can occur above 500mg; titrate slowly.
-- **Vitamin D3 Monitoring**: Recheck 25(OH)D at 12 weeks to prevent sub-toxic hypercalcemia.
-`
-};
-
-export const DEMO_ANALYSIS_REPORT_GROW_THY_SELF: Partial<Record<AnalysisLens, string>> = {
-    'Summary Overview': `### Clinical Assessment
-Sarah Jenkins is a 42-year-old female presenting with chronic L4-L5 lumbar pain, OUD in remission, and co-morbid depression. In the Grow Thy Self paradigm, we target cellular longevity, neuro-resilience, and holistic stress co-regulation using secularized world wisdom frameworks to restore metabolic and emotional homeostasis.
-
-### Priority List
-- **Mitochondrial & Cellular Pacing**: Maximize ATP synthesis and tissue repair cofactors.
-- **Autonomic Nervous System Co-Regulation**: Restore HRV and vagal tone to down-regulate pain.
-- **Existential Alignment (Ikigai)**: Leverage daily activity to support long-term life purpose.
-- **Environmental Harmonization (Bagua & Hygge)**: Structure daily spaces and sleep hygiene for recovery.
-
-### Plan of Care
-- **Orthomolecular Support**: Optimizing micronutrients (Magnesium, D3, Methylation cofactors).
-- **Circadian Pacing**: Strictly aligned light exposure and sleep timing.
-- **Mind-Body Integration**: Enso (mindfulness of chronic state) and Hygge (somatic comfort).
-
-| Intervention | Target | Frequency |
-|---|---|---|
-| HRV Biofeedback | Vagal tone & stress down-regulation | 10 mins BID |
-| Circadian Light Pacing | Melatonin/cortisol rhythms | 15 mins morning |
-| Ergonomic Ergology (Ikigai) | Purposeful posture & movement | Ongoing at work |
-
-### Goals
-- **Short-term (2 weeks)**: Improve sleep efficiency, increase HRV, and reduce pain VAS to <=5/10.
-- **Long-term (3 months)**: Restore cellular energy, achieve emotional resilience, and active community engagement.
-
-### References
-- **Pauling, L.** (1968). *Orthomolecular Psychiatry*. Science, 160(3825), 265-271. Peer-Reviewed.`,
-
-    'Functional Protocols': `### Diagnostic Workup
-| Test | Rationale | Priority |
-|---|---|---|
-| HRV baseline tracing | Assess resting vagal tone and autonomic balance | High |
-| Organic Acids Panel | Monitor mitochondrial energy metabolites | High |
-| Circadian saliva cortisol | Track adrenal rhythm and HPA axis status | Medium |
-
-### Nutrition & Lifestyle
-- **Circadian Pacing (Bagua)**: Get 10-15 minutes of direct sunlight within 1 hour of waking. Limit blue light exposure after sunset.
-- **Somatic Comfort (Hygge)**: Create a quiet, cozy recovery zone in the bedroom. Avoid high-stress tasks late at night.
-- **Resilience Work (Enso)**: Practice non-striving acceptance of pain flares to reduce distress.
-- **Standing Workstation**: Alternate postures every 30 minutes to reduce lumbar load.
-
-### Supplementation
-| Supplement | Dose | Frequency | Rationale |
-|---|---|---|---|
-| Magnesium Glycinate | 400mg | Oral (nightly) | NMDA block, sleep architecture |
-| Vitamin D3 + K2 | 5000 IU / 100mcg | Oral (morning with fat) | Calcium homeostasis & immune function |
-| Coenzyme Q10 (Ubiquinol) | 100mg | Oral (morning) | Mitochondrial electron transport |
-
-### Movement & Rehabilitation
-- **HRV-Coordinated Breathing**: Diaphragmatic breathing at 6 cycles per minute to stimulate the vagus nerve.
-- **McGill Spine stabilization**: McGill Bird-dog and Side-plank to strengthen lumbar support.
-- **Movement Integration (Ikigai)**: Short daily walks aligned with personal passions and nature.
-- **Avoid**: Pain-provoking stretches and long periods of static sitting.
-
-### Mind-Body
-- **Resonance Frequency Breathing**: Slow, regular breathing to maximize autonomic heart rate variability.
-- **Mindful Acceptance**: Shift focus from pain elimination to physical adaptability.`,
-
-    'Nutrition': `### Biochemical Assessment
-Systemic inflammatory signaling and suboptimal cellular methylation capacity. Energy production pathways in mitochondria are operating at lower efficiency.
-
-### Nutrition Targets
-- **Supporting Cellular Methylation**: Replenish folate and B-vitamin cofactors.
-- **Reducing Systemic Cytokines**: Increase dietary anti-inflammatory compounds.
-- **Promoting Mitochondrial Health**: Supply key cellular nutrients.
-
-### Nutritional Interventions
-| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |
-|---|---|---|---|
-| Omega-3 (EPA/DHA) | 3g total | Oral with lunch | Cell membrane fluidization & anti-inflammation |
-| L-Methylfolate (B9) | 400mcg | Oral daily | Methylation cycle support & BH4 pathway |
-| Resveratrol | 250mg | Oral with breakfast | Sirtuin-1 activation & cellular longevity |
-
-### Dietary Adjustments
-- **High-Polyphenol Diet**: Focus on colorful berries, leafy greens, green tea, and raw cacao.
-- **Low Glycemic Load**: Eliminate simple sugars and white flour to prevent insulin and cytokine spikes.
-- **Pre-Sleep Fasting**: Complete all calorie intake at least 3 hours before going to sleep.`,
-
-    'Monitoring & Follow-up': `### Immediate (24-72 hours)
-- Sync wearable sensor for HRV and sleep efficiency tracking.
-- Set up morning sunlight and workspace layouts.
-- Initiate baseline magnesium supplementation.
-
-### Short-Term (Week 1-2)
-- Monitor sleep efficiency trend.
-- Check HRV values for weekly average improvement.
-- Follow-up call at Week 2 for pain VAS score.
-
-### Ongoing (Month 1-3)
-| Parameter | Target | Frequency | Escalation Trigger |
-|---|---|---|---|
-| HRV (Heart Rate Var.) | Increase by >=15% | Daily (wearable) | Drop below baseline for 3 consecutive days |
-| Pain VAS | <=4/10 | Monthly | Pain >7/10 or muscle spasms |
-| Sleep Efficiency | >=85% | Weekly average | Under 75% efficiency -> adjust sleep hygiene |
-
-### Red Flags
-> WARNING: **Seek Immediate Clinical Attention if:**
-> - Sudden decrease in sleep duration below 4 hours
-> - New numbness in saddle region or leg weakness
-> - Severe spike in pain VAS score to 9-10/10
-> - Relapse cravings or severe depressive episode`,
-
-    'Patient Education': `### Understanding Your Condition
-Under the Grow Thy Self paradigm, we view your lower back pain and mood changes as interconnected signs that your body's cellular energy and nervous system are out of balance. By focusing on cell energy, sleep, and life purpose, we help you build resilience and heal.
-
-### What Was Found
-- **L4-L5 Lumbar Pain**: Localized back strain with nerve radiation, aggravated by posture and stress.
-- **Mitochondrial Stress**: Cellular energy pathways operating below optimal levels.
-- **Autonomic Imbalance**: High sympathetic nervous system activity (stress response) lowering your pain threshold.
-
-### Current Plan
-- **Cellular Support**: Magnesium, vitamin D3, and B-complex vitamins to restore nerve health and cellular energy.
-- **Stress Calming**: Breathwork and cozy, comfortable environments (Hygge) to soothe your nervous system.
-- **Purposeful Habits**: Scheduling your day around natural light and engaging in movement that brings joy (Ikigai).
-
-### Important Notes
-> Note: **Please be aware of the following:**
-> - Avoid extreme biohacking or extreme exercise routines; choose gentle, sustainable steps.
-> - Ensure your sleep environment is quiet, completely dark, and comfortable.
-> - Let your team know immediately if you feel warning signs of depression or opioid cravings.`,
-
-    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
-Cellular methylation and mitochondrial energy pathways require specific cofactor replenishment to reduce stress load and neural hypersensitivity. The patient's HRV depression and sleep inefficiency are consistent with mitochondrial substrate depletion and chronic HPA axis dysregulation.
-
-\`\`\`json
-[
-  { "name": "Magnesium", "level": "Sub-optimal", "pathway": "ATP Synthesis / NMDA" },
-  { "name": "Vitamin D3", "level": "Sub-optimal", "pathway": "Immune / Bone" },
-  { "name": "Vitamin B12", "level": "Optimal", "pathway": "Methylation" },
-  { "name": "Zinc", "level": "Sub-optimal", "pathway": "Immune / Hormones" }
-]
-\`\`\`
-
-### Detected Deficiencies
-- **Magnesium (Sub-optimal)**: Mitochondrial ATP synthase requires magnesium as a cofactor; depletion directly reduces cellular energy output and worsens HRV.
-- **Vitamin D3 (Sub-optimal)**: Low D3 correlates with reduced serotonin synthesis, impaired circadian signaling, and greater depression severity.
-- **Zinc (Sub-optimal)**: Zinc is required for SOD (superoxide dismutase) antioxidant activity; depletion accelerates oxidative stress.
-- **Potential Coenzyme Q10 Deficit**: Not measurable via standard labs but clinically implied by mitochondrial stress; CoQ10 is the primary electron transport carrier.
-
-### Orthomolecular Protocol
-| Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway |
-|---|---|---|---|
-| Magnesium Glycinate | 400mg | Oral, nightly | ATP Synthesis / NMDA block / Sleep architecture |
-| Vitamin D3 + K2 | 5000 IU D3 / 100mcg MK-7 | Oral with fat | Calcium homeostasis / Serotonin / Immune |
-| Coenzyme Q10 (Ubiquinol) | 200mg | Oral with fat, AM | Mitochondrial Complex I–III / HRV support |
-| L-Methylfolate (5-MTHF) | 400mcg | Oral | BH4 pathway / Methylation / Serotonin |
-| Zinc Picolinate | 30mg | Oral with food | SOD antioxidant / Hormonal balance |
-
-### Cautions & Interactions
-- **CoQ10 + Anticoagulants**: CoQ10 has structural similarity to Vitamin K2; may mildly potentiate warfarin effects — monitor INR if relevant.
-- **5-MTHF + SSRIs/SNRIs**: Active folate may enhance serotonergic effects; if duloxetine is initiated concurrently, monitor for serotonin syndrome signs.
-- **Magnesium + Renal Impairment**: Given NSAID use (potential nephrotoxicity), baseline and periodic renal function checks are essential; avoid high-dose Mg if eGFR <30.
-- **Vitamin D3 Toxicity**: Recheck 25(OH)D at 12 weeks; stay below 100 ng/mL serum level to prevent hypercalcemia.
-`
+- **Vitamin D3 Monitoring**: Recheck 25(OH)D at 12 weeks to prevent sub-toxic hypercalcemia.`
 };

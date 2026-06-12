@@ -9,10 +9,12 @@ class OrigamiSeagull extends StatefulWidget {
 }
 
 class _OrigamiSeagullState extends State<OrigamiSeagull>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
+  late AnimationController _bobController;
   late Animation<double> _slideAnimation;
   late Animation<double> _fadeAnimation;
+  late Animation<double> _bobAnimation;
 
   final String _seagullSvg = '''
   <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -41,6 +43,11 @@ class _OrigamiSeagullState extends State<OrigamiSeagull>
       duration: const Duration(milliseconds: 1200),
     );
 
+    _bobController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    );
+
     // Slide up from bottom
     _slideAnimation = Tween<double>(begin: 80.0, end: 0.0).animate(
       CurvedAnimation(
@@ -57,23 +64,37 @@ class _OrigamiSeagullState extends State<OrigamiSeagull>
       ),
     );
 
-    // Start animation on load
-    _controller.forward();
+    // Bobbing up and down gently (idle floating)
+    _bobAnimation = Tween<double>(begin: 0.0, end: -6.0).animate(
+      CurvedAnimation(
+        parent: _bobController,
+        curve: Curves.easeInOutSine,
+      ),
+    );
+
+    // Start entrance animation, then start bobbing when complete
+    _controller.forward().then((_) {
+      if (mounted) {
+        _bobController.repeat(reverse: true);
+      }
+    });
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _bobController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: Listenable.merge([_controller, _bobController]),
       builder: (context, child) {
+        final double totalYOffset = _slideAnimation.value + _bobAnimation.value;
         return Transform.translate(
-          offset: Offset(0, _slideAnimation.value),
+          offset: Offset(0, totalYOffset),
           child: Opacity(
             opacity: _fadeAnimation.value,
             child: child,

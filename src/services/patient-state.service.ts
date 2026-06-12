@@ -11,7 +11,8 @@ import {
   HistoryEntry,
   IBookmark,
   BODY_PART_NAMES,
-  BODY_PART_MAPPING
+  BODY_PART_MAPPING,
+  IAyurvedicStatus
 } from './patient.types';
 
 export type { IPatientState };
@@ -47,7 +48,7 @@ export class PatientStateService {
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
-  readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'>('western');
+  readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
 
   // --- AVS Neuro-Therapy Synchronized State ---
   readonly isAvsSessionActive = signal<boolean>(false);
@@ -94,6 +95,7 @@ export class PatientStateService {
   readonly checklist = signal<IChecklistItem[]>([]);
   readonly shoppingList = signal<IShoppingListItem[]>([]);
   readonly biometricHistory = signal<IBiometricEntry[]>([]);
+  readonly ayurvedicStatus = signal<IAyurvedicStatus>({});
 
   // A trigger to force the UI to expand the analysis panel when an item is selected/clicked
   readonly uiExpandTrigger = signal<number>(0);
@@ -133,6 +135,172 @@ export class PatientStateService {
     Object.keys(this.issues()).length > 0 || this.patientGoals().length > 0
   );
 
+  readonly inferredAyurvedicTriage = computed(() => {
+    const manual = this.ayurvedicStatus();
+    const inferred = this.runAyurvedicInference(this.issues(), this.vitals(), this.patientGoals(), this.dietaryProtocol());
+    return {
+      prakriti: manual.prakriti || inferred.prakriti,
+      vikriti: manual.vikriti || inferred.vikriti,
+      agniStatus: manual.agniStatus || inferred.agniStatus,
+      amaStatus: manual.amaStatus || inferred.amaStatus,
+      affectedDhatus: manual.affectedDhatus?.length ? manual.affectedDhatus : inferred.affectedDhatus,
+      blockedSrotas: manual.blockedSrotas?.length ? manual.blockedSrotas : inferred.blockedSrotas,
+      dominantGunas: manual.dominantGunas?.length ? manual.dominantGunas : inferred.dominantGunas
+    };
+  });
+
+  runAyurvedicInference(
+    issues: Record<string, IBodyPartIssue[]>,
+    vitals: IPatientVitals,
+    goals: string,
+    diet: string
+  ): IAyurvedicStatus {
+    const goalsLower = goals.toLowerCase();
+    const dietLower = diet.toLowerCase();
+    const allNotes = Object.values(issues).flat();
+    const notesLower = allNotes.map(i => i.description.toLowerCase()).join(' ');
+
+    const hrNum = parseInt(vitals.hr, 10) || 0;
+    const tempNum = parseFloat(vitals.temp) || 0;
+    const systolic = parseInt(vitals.bp.split('/')[0], 10) || 0;
+
+    let vataScore = 0;
+    let pittaScore = 0;
+    let kaphaScore = 0;
+
+    // Vata Triggers
+    if (hrNum > 90) vataScore += 2;
+    if (allNotes.some(i => i.painLevel >= 6)) vataScore += 2;
+    const vataKeywords = ['dry', 'stiffness', 'neuropathic', 'sciatic', 'insomnia', 'anxiety', 'constipation', 'cracking', 'pain', 'dryness', 'roughness'];
+    vataKeywords.forEach(kw => {
+      if (goalsLower.includes(kw)) vataScore += 1;
+      if (notesLower.includes(kw)) vataScore += 1;
+      if (dietLower.includes(kw)) vataScore += 1;
+    });
+
+    // Pitta Triggers
+    if (tempNum > 99 || (tempNum > 37.2 && tempNum < 45)) pittaScore += 2;
+    if (systolic > 130) pittaScore += 2;
+    const pittaKeywords = ['burning', 'inflammation', 'acid', 'reflux', 'fever', 'redness', 'rash', 'sharp', 'heartburn', 'heat', 'acidity', 'loose stool'];
+    pittaKeywords.forEach(kw => {
+      if (goalsLower.includes(kw)) pittaScore += 1;
+      if (notesLower.includes(kw)) pittaScore += 1;
+      if (dietLower.includes(kw)) pittaScore += 1;
+    });
+
+    // Kapha Triggers
+    if (vitals.weight && parseInt(vitals.weight, 10) > 200) kaphaScore += 2;
+    const kaphaKeywords = ['sluggish', 'edema', 'heavy', 'congestion', 'swelling', 'mucus', 'lethargy', 'retention', 'heaviness', 'slow', 'moist'];
+    kaphaKeywords.forEach(kw => {
+      if (goalsLower.includes(kw)) kaphaScore += 1;
+      if (notesLower.includes(kw)) kaphaScore += 1;
+      if (dietLower.includes(kw)) kaphaScore += 1;
+    });
+
+    // Determine Vikriti (Imbalance)
+    let vikriti = '';
+    const scores = [{ dosha: 'Vata', score: vataScore }, { dosha: 'Pitta', score: pittaScore }, { dosha: 'Kapha', score: kaphaScore }];
+    scores.sort((a, b) => b.score - a.score);
+    if (scores[0].score === 0) {
+      vikriti = 'Tridosha (Balanced)';
+    } else if (scores[0].score - scores[1].score <= 1 && scores[1].score > 0) {
+      vikriti = `${scores[0].dosha}-${scores[1].dosha} Aggravation`;
+    } else {
+      vikriti = `${scores[0].dosha} Aggravation`;
+    }
+
+    // Determine Agni Status
+    let agniStatus: 'Sama' | 'Vishama' | 'Tikshna' | 'Manda' = 'Sama';
+    if (vataScore > pittaScore && vataScore > kaphaScore && vataScore > 0) {
+      agniStatus = 'Vishama';
+    } else if (pittaScore > vataScore && pittaScore > kaphaScore && pittaScore > 0) {
+      agniStatus = 'Tikshna';
+    } else if (kaphaScore > vataScore && kaphaScore > pittaScore && kaphaScore > 0) {
+      agniStatus = 'Manda';
+    }
+
+    // Determine Ama Status
+    let amaStatus: 'Nirama' | 'Sama' = 'Nirama';
+    const amaKeywords = ['stiffness', 'fatigue', 'coated tongue', 'sluggishness', 'brain fog', 'heaviness', 'constipation', 'mucus'];
+    let amaMatches = 0;
+    amaKeywords.forEach(kw => {
+      if (goalsLower.includes(kw) || notesLower.includes(kw)) amaMatches++;
+    });
+    if (amaMatches >= 2 || kaphaScore > 4) {
+      amaStatus = 'Sama';
+    }
+
+    // Determine affected Dhatus
+    const affectedDhatus: ('Rasa' | 'Rakta' | 'Mamsa' | 'Medas' | 'Asthi' | 'Majja' | 'Shukra')[] = [];
+    if (notesLower.includes('skin') || notesLower.includes('fatigue') || notesLower.includes('lymph') || goalsLower.includes('energy')) {
+      affectedDhatus.push('Rasa');
+    }
+    if (notesLower.includes('blood') || notesLower.includes('pressure') || notesLower.includes('rash') || notesLower.includes('inflammation') || notesLower.includes('redness')) {
+      affectedDhatus.push('Rakta');
+    }
+    if (notesLower.includes('muscle') || notesLower.includes('spasm') || notesLower.includes('wasting') || notesLower.includes('shoulder') || notesLower.includes('arm')) {
+      affectedDhatus.push('Mamsa');
+    }
+    if (notesLower.includes('weight') || notesLower.includes('fat') || notesLower.includes('metabolism') || notesLower.includes('cholesterol')) {
+      affectedDhatus.push('Medas');
+    }
+    if (notesLower.includes('joint') || notesLower.includes('bone') || notesLower.includes('sciatic') || notesLower.includes('back') || notesLower.includes('stiffness')) {
+      affectedDhatus.push('Asthi');
+    }
+    if (notesLower.includes('nerve') || notesLower.includes('neuropathic') || notesLower.includes('sleep') || notesLower.includes('insomnia') || notesLower.includes('anxiety')) {
+      affectedDhatus.push('Majja');
+    }
+    if (notesLower.includes('hormone') || notesLower.includes('libido') || notesLower.includes('vitality') || notesLower.includes('fertility')) {
+      affectedDhatus.push('Shukra');
+    }
+
+    // Determine blocked Srotas
+    const blockedSrotas: string[] = [];
+    if (notesLower.includes('cough') || notesLower.includes('breath') || notesLower.includes('lungs') || notesLower.includes('congestion')) {
+      blockedSrotas.push('Pranavaha Srotas (Respiratory)');
+    }
+    if (notesLower.includes('stomach') || notesLower.includes('acid') || notesLower.includes('reflux') || notesLower.includes('digestion') || notesLower.includes('nausea') || notesLower.includes('bloating')) {
+      blockedSrotas.push('Annavaha Srotas (Digestive)');
+    }
+    if (notesLower.includes('swelling') || notesLower.includes('edema') || notesLower.includes('water') || notesLower.includes('retention')) {
+      blockedSrotas.push('Udakavaha Srotas (Water regulation)');
+    }
+    if (affectedDhatus.includes('Rasa')) {
+      blockedSrotas.push('Rasavaha Srotas (Plasma/Lymphatic)');
+    }
+    if (affectedDhatus.includes('Rakta')) {
+      blockedSrotas.push('Raktavaha Srotas (Circulatory)');
+    }
+    if (affectedDhatus.includes('Asthi')) {
+      blockedSrotas.push('Asthivaha Srotas (Skeletal)');
+    }
+    if (affectedDhatus.includes('Majja')) {
+      blockedSrotas.push('Majjavaha Srotas (Nervous)');
+    }
+
+    // Determine dominant Gunas
+    const dominantGunas: string[] = [];
+    if (vataScore > 2) {
+      dominantGunas.push('Ruksha (Dry)', 'Sheeta (Cold)', 'Chala (Mobile)');
+    }
+    if (pittaScore > 2) {
+      dominantGunas.push('Ushna (Hot)', 'Tikshna (Sharp)', 'Sara (Spreading)');
+    }
+    if (kaphaScore > 2) {
+      dominantGunas.push('Guru (Heavy)', 'Manda (Slow)', 'Sheeta (Cold)');
+    }
+
+    return {
+      prakriti: 'Tridosha',
+      vikriti,
+      agniStatus,
+      amaStatus,
+      affectedDhatus,
+      blockedSrotas,
+      dominantGunas
+    };
+  }
+
   readonly selectedPartName = computed(() => {
     const id = this.selectedPartId();
     if (!id) return null;
@@ -170,7 +338,7 @@ export class PatientStateService {
     this.selectedNoteId.set(noteId);
   }
 
-  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self') {
+  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
     this.activePhilosophy.set(philosophy);
     this.requestAnalysisUpdate();
   }
@@ -436,6 +604,7 @@ export class PatientStateService {
     this.requestedSearchEngine.set(null);
     this.viewingPastVisit.set(null);
     this.activePhilosophy.set('western');
+    this.ayurvedicStatus.set({});
   }
 
   /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
@@ -474,6 +643,7 @@ export class PatientStateService {
     this.shoppingList.set(state.shoppingList || []);
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
     if (state.activePhilosophy) this.activePhilosophy.set(state.activePhilosophy);
+    if (state.ayurvedicStatus) this.ayurvedicStatus.set(state.ayurvedicStatus);
   }
 
   /** Returns the current patient state for saving. */
@@ -491,6 +661,7 @@ export class PatientStateService {
             checklist: this.checklist(),
             shoppingList: this.shoppingList(),
             activePhilosophy: this.activePhilosophy(),
+            ayurvedicStatus: this.ayurvedicStatus(),
         };
   }
 
@@ -550,6 +721,18 @@ Pain Areas:   `;
       `- [${b.cited ? 'CITED' : 'Reference'}] ${b.title}: ${b.url}${b.authors ? ` (Authors: ${b.authors})` : ''}${b.doi ? ` (DOI: ${b.doi})` : ''}`
     ).join('\n');
 
+    const ayurvedicTriage = this.inferredAyurvedicTriage();
+    const ayurvedicText = `
+    Inferred Ayurvedic Diagnostic Matrix:
+    - Base Constitution (Prakriti): ${ayurvedicTriage.prakriti || 'N/A'}
+    - Imbalance/Current State (Vikriti): ${ayurvedicTriage.vikriti || 'N/A'}
+    - Digestion/Metabolic Fire (Agni): ${ayurvedicTriage.agniStatus || 'N/A'}
+    - Toxic Load (Ama): ${ayurvedicTriage.amaStatus || 'N/A'}
+    - Compromised Tissue Layers (Dhatus): ${ayurvedicTriage.affectedDhatus?.join(', ') || 'None inferred'}
+    - Compromised Channels (Srotas): ${ayurvedicTriage.blockedSrotas?.join(', ') || 'None inferred'}
+    - Active Qualities (Gunas): ${ayurvedicTriage.dominantGunas?.join(', ') || 'None inferred'}
+    `;
+
     let prompt = `
     Patient Goals/Chief Complaint: ${this.patientGoals()}
     
@@ -560,6 +743,8 @@ Pain Areas:   `;
 
     Reported Body Issues (Current):
     ${partsText || 'None selected'}
+
+    ${ayurvedicText}
 
     Recent History & Context:
     ${recentHistory || 'No recent history available.'}

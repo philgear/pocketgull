@@ -77,23 +77,6 @@ import { GamificationService } from '../services/gamification.service';
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
               Ayurvedic
             </button>
-            <button (click)="selectPhilosophy('grow-thy-self')"
-              class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
-              [class.bg-white]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.dark:bg-zinc-800]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.text-indigo-600]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.dark:text-indigo-400]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.shadow-sm]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.border]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.border-gray-200/50]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.dark:border-zinc-700/50]="state.activePhilosophy() === 'grow-thy-self'"
-              [class.text-gray-500]="state.activePhilosophy() !== 'grow-thy-self'"
-              [class.dark:text-zinc-400]="state.activePhilosophy() !== 'grow-thy-self'"
-              [class.hover:text-gray-700]="state.activePhilosophy() !== 'grow-thy-self'"
-              [class.dark:hover:text-indigo-200]="state.activePhilosophy() !== 'grow-thy-self'">
-              <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
-              Grow Thy Self
-            </button>
           </div>
 
           <!-- Export Actions & Status -->
@@ -178,7 +161,7 @@ export class AnalysisContainerComponent {
     }
   }
 
-  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self') {
+  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
     this.state.selectPhilosophy(philosophy);
   }
 

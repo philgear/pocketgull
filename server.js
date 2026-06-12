@@ -6,6 +6,7 @@ import { dirname, join } from 'path';
 import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import swaggerUi from 'swagger-ui-express';
+import crypto from 'crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -155,6 +156,10 @@ if (fs.existsSync(distFolder)) {
 
 // Add security headers
 app.use((req, res, next) => {
+  const nonce = crypto.randomBytes(16).toString('base64');
+  res.locals = res.locals || {};
+  res.locals.nonce = nonce;
+
   // Strict Transport Security - preloaded via HSTS preload list
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   
@@ -168,12 +173,14 @@ app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
     "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
+    `script-src 'self' 'nonce-${nonce}'; ` +
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
     "img-src 'self' https: data:; " +
     "font-src 'self' https://fonts.gstatic.com; " +
-    "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com; " +
+    "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; " +
+    "frame-src 'self' https://www.ncbi.nlm.nih.gov https://insightspark-82c75.web.app; " +
     "frame-ancestors 'self'; " +
+    "object-src 'none'; " +
     "base-uri 'self'; " +
     "form-action 'self'"
   );
@@ -185,7 +192,7 @@ app.use((req, res, next) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   
   // Cross-Origin Resource Policy
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
   
   // Permissions-Policy (formerly Feature-Policy)
   res.setHeader(
@@ -221,6 +228,102 @@ app.get('/api/pubmed/summary', async (req, res) => {
   } catch (err) {
     console.error('PubMed Summary Proxy Error:', err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ORCID Proxy Endpoint
+app.get('/api/orcid/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: 'ORCID iD is required' });
+    
+    // Clean and validate format
+    const cleanId = id.trim().replace(/https?:\/\/orcid\.org\//, '');
+    if (!/^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/.test(cleanId)) {
+      return res.status(400).json({ error: 'Invalid ORCID iD format. Expected: 0000-0002-1825-0097' });
+    }
+
+    // Mock Developer Fallback Profile for Phil Gear
+    if (cleanId === '0009-0008-1372-5381') {
+      console.log('[ORCID Proxy] Serving local mock profile for developer: Phil Gear');
+      return res.json({
+        person: {
+          name: {
+            'given-names': { value: 'Phil' },
+            'family-name': { value: 'Gear' }
+          },
+          keywords: {
+            keyword: [
+              { content: 'Software' },
+              { content: 'Clinical Intelligence' },
+              { content: 'Care Consultation' }
+            ]
+          },
+          'researcher-urls': {
+            'researcher-url': [
+              {
+                'url-name': 'InsightSpark',
+                url: { value: 'https://github.com/philgear/InsightSpark' }
+              }
+            ]
+          }
+        },
+        'activities-summary': {
+          works: {
+            group: [
+              {
+                'work-summary': [
+                  {
+                    title: {
+                      title: { value: 'Pivot & Pulse' }
+                    },
+                    url: { value: 'https://github.com/philgear/InsightSpark' },
+                    type: 'software',
+                    'publication-date': {
+                      year: { value: '2026' }
+                    }
+                  }
+                ]
+              },
+              {
+                'work-summary': [
+                  {
+                    title: {
+                      title: { value: 'PocketGull Care Consultation Protocol' }
+                    },
+                    type: 'research-tool',
+                    'publication-date': {
+                      year: { value: '2026' }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      });
+    }
+
+    const orcidUrl = `https://pub.orcid.org/v3.0/${cleanId}/record`;
+    const response = await fetch(orcidUrl, {
+      headers: {
+        'Accept': 'application/vnd.orcid+json, application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error(`ORCID API returned status ${response.status}`);
+      if (response.status === 404) {
+        return res.status(404).json({ error: 'ORCID profile not found. Please verify the ID.' });
+      }
+      return res.status(response.status).json({ error: `ORCID API returned error: ${response.statusText || 'Unknown Error'}` });
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error('ORCID Proxy Error:', err);
+    res.status(500).json({ error: 'Failed to fetch profile from ORCID.' });
   }
 });
 
@@ -329,7 +432,8 @@ app.get(/(.*)/, (req, res) => {
       let html = fs.readFileSync(indexPath, 'utf8');
       if (geminiApiKeyCached) {
         // Inject script immediately before closing </head>
-        const scriptTag = `<script px-api-key="true">window.GEMINI_API_KEY = "${geminiApiKeyCached}";</script>\n</head>`;
+        const nonce = res.locals.nonce || '';
+        const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${geminiApiKeyCached}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
       }
       res.setHeader('Content-Type', 'text/html');

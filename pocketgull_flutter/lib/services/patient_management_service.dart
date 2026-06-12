@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +17,7 @@ class PatientManagementService {
         final List<dynamic> decodedList = jsonDecode(box.get('patients') as String);
         return decodedList.map((json) => _patientFromJson(json)).toList();
       } catch (e) {
-        print('Failed to parse patients from Hive: $e');
+        debugPrint('Failed to parse patients from Hive: $e');
         return _getDefaultPatients();
       }
     }
@@ -26,13 +27,13 @@ class PatientManagementService {
     final jsonString = prefs.getString(_storageKey);
     
     if (jsonString != null) {
-      print('[Hive Migration] Migrating existing patients from SharedPreferences to Hive...');
+      debugPrint('[Hive Migration] Migrating existing patients from SharedPreferences to Hive...');
       await box.put('patients', jsonString);
       try {
         final List<dynamic> decodedList = jsonDecode(jsonString);
         return decodedList.map((json) => _patientFromJson(json)).toList();
       } catch (e) {
-        print('Failed to parse migrated patients: $e');
+        debugPrint('Failed to parse migrated patients: $e');
         return _getDefaultPatients();
       }
     }
@@ -146,14 +147,14 @@ class PatientManagementService {
         body: jsonEncode(jsonList),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('[PatientManagementService] Successfully synced to cloud');
+        debugPrint('[PatientManagementService] Successfully synced to cloud');
         return true;
       } else {
-        print('[PatientManagementService] Failed to sync. Status: ${response.statusCode}');
+        debugPrint('[PatientManagementService] Failed to sync. Status: ${response.statusCode}');
         return false;
       }
     } catch (e) {
-      print('[PatientManagementService] Error syncing to cloud: $e');
+      debugPrint('[PatientManagementService] Error syncing to cloud: $e');
       return false;
     }
   }

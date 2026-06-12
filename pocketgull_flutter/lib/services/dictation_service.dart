@@ -20,7 +20,7 @@ class DictationService {
           isListeningNotifier.value = false;
         }
       },
-      onError: (errorNotification) => print('Speech Error: $errorNotification'),
+      onError: (errorNotification) => debugPrint('Speech Error: $errorNotification'),
     );
     return _isAvailable;
   }
@@ -33,9 +33,11 @@ class DictationService {
         interimText.value = result.recognizedWords;
         onResult(result.recognizedWords, result.finalResult);
       },
-      listenFor: const Duration(seconds: 30),
-      pauseFor: const Duration(seconds: 5),
-      partialResults: true,
+      listenOptions: stt.SpeechListenOptions(
+        listenFor: const Duration(seconds: 30),
+        pauseFor: const Duration(seconds: 5),
+        partialResults: true,
+      ),
     );
   }
 
@@ -119,8 +121,6 @@ class DictationService {
   }
 
   String _extractRemaining(String original, String contentAfterPrefix, String partId) {
-    // This is a rough heuristic to get the text after the body part name
-    final lowerOriginal = original.toLowerCase();
     // We need to find the part name used (it might be "right knee" or "right arm")
     // For now, return empty or implement a more complex split if needed
     return ''; 

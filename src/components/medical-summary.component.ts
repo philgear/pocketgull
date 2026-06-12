@@ -49,7 +49,6 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </svg>
                     <div class="text-left">
                       <div class="text-xs font-bold text-emerald-800 dark:text-emerald-300">Clinician: {{ profile.name }}</div>
-                      <div class="text-[10px] text-emerald-600 dark:text-emerald-500 font-mono">ORCID: {{ profile.orcidId }}</div>
                     </div>
                     <pocket-gull-button variant="ghost" size="xs" (click)="orcidService.disconnect()" title="Disconnect ORCID" icon="M6 18L18 6M6 6l12 12"></pocket-gull-button>
                   </div>

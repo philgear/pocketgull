@@ -10,6 +10,10 @@ class ApiClient {
       final origin = Uri.base.origin;
       return '$origin/api';
     }
+    const apiOverride = String.fromEnvironment('API_URL');
+    if (apiOverride.isNotEmpty) {
+      return apiOverride;
+    }
     return 'http://127.0.0.1:3000/api';
   }
 

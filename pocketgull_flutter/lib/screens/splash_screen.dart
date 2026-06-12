@@ -337,7 +337,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                   Switch(
                     value: _usePubGemma,
                     onChanged: (val) => setState(() => _usePubGemma = val),
-                    activeColor: const Color(0xFF416B1F),
+                    activeThumbColor: const Color(0xFF416B1F),
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ],
