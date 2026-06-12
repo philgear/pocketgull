@@ -18,6 +18,7 @@ export type { IPatientState };
 export { BODY_PART_NAMES };
 import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
+import { ThemeService } from './theme.service';
 
 
 @Injectable({
@@ -99,6 +100,9 @@ export class PatientStateService {
 
   private storage = inject(StorageService);
   private game = inject(GamificationService);
+  private themeService = inject(ThemeService);
+
+  readonly isSparkModeActive = computed(() => this.themeService.currentTheme() === 'spark');
 
   constructor() {
     if (typeof window !== 'undefined') {

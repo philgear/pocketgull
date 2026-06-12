@@ -30,6 +30,7 @@ import { WalkthroughTourService } from './services/walkthrough-tour.service';
 import { SecureSplashComponent } from './components/secure-splash.component';
 import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
+import { PocketGullInputComponent } from './components/shared/pocket-gull-input.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 import { PetAuditoryService } from './services/pet-auditory.service';
@@ -58,7 +59,8 @@ import { FitbitService } from './services/fitbit.service';
     SecureSplashComponent,
     PatientDirectoryComponent,
     CollaborationDockComponent,
-    FhirCallbackComponent
+    FhirCallbackComponent,
+    PocketGullInputComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -86,7 +88,7 @@ import { FitbitService } from './services/fitbit.service';
       <!-- Collaboration Dock -->
       <app-collaboration-dock></app-collaboration-dock>
       
-      @if ((session.isLocked() || !hasApiKey()) && !state.isEmergencyMode()) {
+      @if ((session.isLocked() || !hasApiKey() || !session.isOnboardingComplete()) && !state.isEmergencyMode()) {
         <app-secure-splash
           [apiKeyError]="apiKeyError()"
           [hasApiKey]="hasApiKey()"
@@ -1217,7 +1219,7 @@ export class AppComponent implements OnDestroy {
   private ngZone = inject(NgZone);
 
 
-  private patientMgmt = inject(PatientManagementService);
+  public patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
   network = inject(NetworkStateService);
   hardware = inject(HardwareTelemetryService);
