@@ -22,7 +22,7 @@
     "url": "https://github.com/philgear/pocketgull.git"
   },
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "type": "module",
   "browser": {
