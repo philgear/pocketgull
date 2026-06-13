@@ -1,21 +1,51 @@
-FROM python:3.12-alpine
+# ==========================================
+# Stage 1: Builder
+# ==========================================
+FROM python:3.12-slim-bookworm AS builder
 
 WORKDIR /app
 
-
-
-# Update base OS packages to resolve vulnerabilities and install dependencies
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+# Install build dependencies (these will NOT be in the final image)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+# Create a virtual environment to cleanly isolate installed packages
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# ==========================================
+# Stage 2: Runtime
+# ==========================================
+FROM python:3.12-slim-bookworm
+
+# Create a non-root user and group for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+WORKDIR /app
+
+# Update base OS packages to resolve vulnerabilities
+RUN apt-get update && apt-get upgrade -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy application code and assets
 COPY main.py .
 COPY data/ ./data/
 COPY models/ ./models/
+
+# Grant ownership of the /app directory to the non-root user
+RUN chown -R appuser:appuser /app
+
+# Switch to the non-root user
+USER appuser
 
 EXPOSE 8080
 ENV PORT=8080

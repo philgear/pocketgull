@@ -171,7 +171,7 @@
     "vitest": "^4.1.6"
   },
   "overrides": {
-    "esbuild": "0.25.0",
+    "esbuild": "0.28.1",
     "hono": ">=4.12.5",
     "@hono/node-server": ">=1.19.10",
     "express-rate-limit": ">=8.3.0",
@@ -194,7 +194,7 @@
     "@parcel/watcher@2.5.6": true,
     "@scarf/scarf@1.4.0": true,
     "core-js@3.49.0": true,
-    "esbuild@0.25.0": true,
+    "esbuild@0.28.1": true,
     "lmdb@3.5.1": true,
     "msgpackr-extract@3.0.4": true,
     "protobufjs@7.6.3": true,

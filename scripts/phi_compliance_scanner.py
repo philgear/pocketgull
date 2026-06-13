@@ -168,8 +168,8 @@ def main():
     json_issues_count = 0
     
     for root, dirs, files in os.walk(workspace_dir):
-        # Scan all directories in-place (do not ignore or prune any directories)
-        dirs[:] = [d for d in dirs]
+        # Prune build/third party directories to speed up os.walk
+        dirs[:] = [d for d in dirs if not is_third_party_or_build(os.path.relpath(os.path.join(root, d), workspace_dir))]
         
         for file in files:
             # Skip environment files and lock files

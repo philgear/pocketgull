@@ -44,6 +44,7 @@ This document maps the components and services from the live Angular site to the
 | **fhir callback** | `src/components/fhir-callback.component.ts` | - | ❌ Missing in Flutter |
 | **fhir integration** | `src/services/fhir-integration.service.ts` | - | ❌ Missing in Flutter |
 | **firestore sync** | `src/services/firestore-sync.service.ts` | - | ❌ Missing in Flutter |
+| **fitbit** | `src/services/fitbit.service.ts` | - | ❌ Missing in Flutter |
 | **gamification** | `src/services/gamification.service.ts` | - | ❌ Missing in Flutter |
 | **gemini.provider** | `src/services/ai/gemini.provider.ts` | - | ❌ Missing in Flutter |
 | **hardware telemetry** | `src/services/hardware-telemetry.service.ts` | - | ❌ Missing in Flutter |
@@ -60,12 +61,10 @@ This document maps the components and services from the live Angular site to the
 | **live agent** | `src/components/live-agent.component.ts` | - | ❌ Missing in Flutter |
 | **live agent visuals** | `src/components/live-agent-visuals.component.ts` | - | ❌ Missing in Flutter |
 | **local intelligence service** | - | `pocketgull_flutter/lib/services/local_intelligence_service.dart` | ⚠️ Flutter Only |
-| **loci palace** | `src/services/loci-palace.service.ts` | - | ❌ Missing in Flutter |
 | **markdown** | `src/services/markdown.service.ts` | - | ❌ Missing in Flutter |
 | **medical 3d viewer** | `src/components/medical-3d-viewer.component.ts` | - | ❌ Missing in Flutter |
 | **medical chart** | `src/components/medical-chart.component.ts` | `pocketgull_flutter/lib/widgets/medical_chart_widget.dart` | ✅ Parity |
 | **medical summary** | `src/components/medical-summary.component.ts` | `pocketgull_flutter/lib/widgets/medical_summary_widget.dart` | ✅ Parity |
-| **memory palace** | `src/components/memory-palace.component.ts` | - | ❌ Missing in Flutter |
 | **metric card** | `src/components/shared/metric-card.component.ts` | - | ❌ Missing in Flutter |
 | **mobile local intelligence** | - | `pocketgull_flutter/lib/services/mobile_local_intelligence.dart` | ⚠️ Flutter Only |
 | **nano.provider** | `src/services/ai/nano.provider.ts` | - | ❌ Missing in Flutter |
@@ -73,6 +72,8 @@ This document maps the components and services from the live Angular site to the
 | **network state** | `src/services/network-state.service.ts` | - | ❌ Missing in Flutter |
 | **node agent dialog** | `src/components/node-agent-dialog.component.ts` | - | ❌ Missing in Flutter |
 | **ohif viewer** | `src/components/ohif-viewer.component.ts` | - | ❌ Missing in Flutter |
+| **orcid** | `src/services/orcid.service.ts` | - | ❌ Missing in Flutter |
+| **orcid service** | - | `pocketgull_flutter/lib/services/orcid_service.dart` | ⚠️ Flutter Only |
 | **origami seagull** | - | `pocketgull_flutter/lib/widgets/origami_seagull.dart` | ⚠️ Flutter Only |
 | **patient** | - | `pocketgull_flutter/lib/blocs/patient/patient_bloc.dart` | ⚠️ Flutter Only |
 | **patient directory** | `src/components/patient-directory.component.ts` | - | ❌ Missing in Flutter |
@@ -122,4 +123,4 @@ This document maps the components and services from the live Angular site to the
 ## Summary
 - **Matched Features**: 15
 - **Missing in Flutter (Needs Migration)**: 75
-- **Flutter Only (New Features/Architecture)**: 24
+- **Flutter Only (New Features/Architecture)**: 25

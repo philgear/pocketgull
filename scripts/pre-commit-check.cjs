@@ -2,8 +2,19 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// Helper to resolve workspace root with uppercase drive letter on Windows to prevent Vitest config issues
+function getWorkspaceRoot() {
+  let root = path.resolve(__dirname, '..');
+  if (root.match(/^[a-z]:/)) {
+    root = root[0].toUpperCase() + root.slice(1);
+  }
+  return root;
+}
+
+const workspaceRoot = getWorkspaceRoot();
+
 // Programmatically switch process working directory to workspace root
-process.chdir(path.resolve(__dirname, '..'));
+process.chdir(workspaceRoot);
 
 console.log('🚀 Running Shift-Left Pre-Commit Validation...\n');
 
@@ -11,7 +22,7 @@ console.log('🚀 Running Shift-Left Pre-Commit Validation...\n');
 function runCommand(command, description) {
   console.log(`🔹 Running: ${description}...`);
   try {
-    execSync(command, { stdio: 'inherit', cwd: path.resolve(__dirname, '..') });
+    execSync(command, { stdio: 'inherit', cwd: workspaceRoot });
     console.log(`✅ ${description} passed.\n`);
     return true;
   } catch (error) {
