@@ -15,7 +15,6 @@ class _ResearchFrameWidgetState extends State<ResearchFrameWidget> {
   late final WebViewController _controller;
   final TextEditingController _searchController = TextEditingController();
   String _currentEngine = 'google';
-  final bool _isLoading = false;
 
   @override
   void initState() {

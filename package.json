@@ -1,6 +1,6 @@
 {
   "name": "pocket-gull",
-  "version": "0.10.0",
+  "version": "1.0.0-rc6",
   "description": "Insight beneath the surface. Real-time medical Care Plan Strategy and Live AI Consult engine powered by Google Gemini.",
   "author": "Phil Gear",
   "keywords": [
@@ -14,12 +14,15 @@
   ],
   "license": "MIT",
   "private": true,
+  "bin": {
+    "gull": "./scripts/gull.js"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/philgear/pocket-gull.git"
+    "url": "https://github.com/philgear/pocketgull.git"
   },
   "engines": {
-    "node": ">=24.0.0"
+    "node": "24.x"
   },
   "type": "module",
   "browser": {
@@ -72,7 +75,7 @@
     "lint": "tsc --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
-    "deploy": "npm run build && gcloud run deploy pocket-gull --source . --region=us-west1 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --update-env-vars=OTEL_SDK_DISABLED=true --quiet",
+    "deploy": "npm run build && gcloud run deploy pocket-gull --source . --project gen-lang-client-0540208645 --region=us-west1 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --update-env-vars=OTEL_SDK_DISABLED=true --quiet",
     "serve:ssr:app": "node dist/server/server.mjs",
     "start": "node dist/server/server.mjs",
     "gcp-build": "npm run build && npm prune --production",
@@ -106,6 +109,7 @@
     "@aws-sdk/protocol-http": "^3.370.0",
     "@aws-sdk/signature-v4": "^3.370.0",
     "@genkit-ai/googleai": "^1.28.0",
+    "@genkit-ai/vertexai": "^1.37.0",
     "@google-cloud/bigquery": "^8.3.1",
     "@google-cloud/secret-manager": "^6.1.1",
     "@google/adk": "^0.5.0",
@@ -168,7 +172,7 @@
     "vitest": "^4.1.6"
   },
   "overrides": {
-    "esbuild": "0.25.0",
+    "esbuild": "0.28.1",
     "hono": ">=4.12.5",
     "@hono/node-server": ">=1.19.10",
     "express-rate-limit": ">=8.3.0",
@@ -178,10 +182,24 @@
     "yargs": "^17.7.2",
     "@opentelemetry/sdk-node": ">=0.217.0",
     "@opentelemetry/auto-instrumentations-node": ">=0.75.0",
-    "uuid": "^11.1.1"
+    "uuid": "^11.1.1",
+    "qs": ">=6.15.2"
   },
   "lint-staged": {
     "*.ts": "npm run lint",
     "package.json": "npm audit --audit-level=high"
+  },
+  "allowScripts": {
+    "@firebase/util@1.12.1": true,
+    "@firebase/util@1.15.1": true,
+    "@google/genai@1.52.0": true,
+    "@parcel/watcher@2.5.6": true,
+    "@scarf/scarf@1.4.0": true,
+    "core-js@3.49.0": true,
+    "esbuild@0.28.1": true,
+    "lmdb@3.5.1": true,
+    "msgpackr-extract@3.0.4": true,
+    "protobufjs@7.6.3": true,
+    "puppeteer@24.43.1": true
   }
 }

@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "dart-code.dart-code",
+    "dart-code.flutter",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "googlecloudtools.cloudcode",
+    "github.vscode-github-actions",
+    "redhat.vscode-yaml",
+    "ms-azuretools.vscode-docker",
+    "christian-kohler.npm-intellisense"
+  ]
+}

@@ -14,12 +14,13 @@
  * Policy:    https://developers.google.com/health/policies/health-api-user-data-and-research-policy
  */
 
-import { Router, Request } from 'express';
+import { Router, Request, json } from 'express';
 import crypto from 'node:crypto';
 import { createWriteStream, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const fitbitRouter = Router();
+fitbitRouter.use(json());
 
 // ── Audit log setup ───────────────────────────────────────────────────────────
 const LOG_DIR = join(process.cwd(), 'logs');

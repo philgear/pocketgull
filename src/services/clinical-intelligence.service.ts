@@ -7,11 +7,11 @@ import { IntelligenceProviderToken } from './ai/intelligence.provider.token';
 import { NetworkStateService } from './network-state.service';
 import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
+import { OrcidService } from './orcid.service';
 import {
     DEMO_ANALYSIS_REPORT_WESTERN,
     DEMO_ANALYSIS_REPORT_EASTERN,
-    DEMO_ANALYSIS_REPORT_AYURVEDIC,
-    DEMO_ANALYSIS_REPORT_GROW_THY_SELF
+    DEMO_ANALYSIS_REPORT_AYURVEDIC
 } from '../demo-data';
 
 export interface ITranscriptEntry {
@@ -43,6 +43,7 @@ export class ClinicalIntelligenceService {
     private network = inject(NetworkStateService);
     private rules = inject(RulesEngineService);
     private patientState = inject(PatientStateService);
+    private orcid = inject(OrcidService);
 
     readonly isLoading = signal<boolean>(false);
     readonly error = signal<string | null>(null);
@@ -58,38 +59,46 @@ export class ClinicalIntelligenceService {
 
     readonly recentNodes = signal<INodeContext[]>([]);
 
+    readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | null>(null);
     readonly lastPatientData = signal<string | null>(null);
-    readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self' | null>(null);
 
+    /**
+     * Maps each diagnostic lens to its Gull Squadron persona.
+     * @see DESIGN.md §7 — Avian Personas
+     */
     public getAgentNameForLens(lens: AnalysisLens): string {
         switch (lens) {
             case 'Summary Overview':
-                return 'Dr. Larus';
+                return 'Gulliver';
             case 'Functional Protocols':
             case 'Nutrition':
             case 'Orthomolecular Profiling':
-                return 'Dr. Swoop';
+                return 'Swoop';
             case 'Monitoring & Follow-up':
-                return 'Dr. Heron';
+                return 'Sentinel';
             case 'Patient Education':
-                return 'Dr. Nestor';
+                return 'Scribes';
             default:
-                return 'Dr. Larus';
+                return 'Gulliver';
         }
     }
 
+    /**
+     * Returns the role description for each Gull Squadron member.
+     * @see DESIGN.md §7.1 — The Four Diagnostic Agents
+     */
     public getAgentRoleForLens(lens: AnalysisLens): string {
         switch (lens) {
             case 'Summary Overview':
-                return 'Overview & Chart Synthesis Expert';
+                return 'Overview & Chart Synthesis Expert — "I see the whole ocean from up here."';
             case 'Functional Protocols':
             case 'Nutrition':
             case 'Orthomolecular Profiling':
-                return 'Therapeutic & Dosing Interventionist';
+                return 'Interventions & Precision Dosing Specialist — "Spotted. Locked. Delivering."';
             case 'Monitoring & Follow-up':
-                return 'Vigilance & Patient Tracking Monitor';
+                return 'Recovery Vigilance & Trend Monitor — "I never blink. I never look away."';
             case 'Patient Education':
-                return 'Patient Translation & Compliance Educator';
+                return 'Patient Translation & Education Specialist — "Let me explain that in a way that actually helps."';
             default:
                 return 'Clinical Co-Pilot';
         }
@@ -127,44 +136,56 @@ ANNOTATION SYNTAX (place on a NEW LINE after the relevant paragraph or list item
 [[proposed: Full replacement text for the paragraph above]]
 `;
 
-    private readonly PHILOSOPHY_INSTRUCTIONS: Record<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self', string> = {
+    private readonly PHILOSOPHY_INSTRUCTIONS: Record<'western' | 'eastern' | 'ayurvedic', string> = {
         western: `CLINICAL PARADIGM: Western (Allopathic) Medicine.
 - Focus on standard FDA, WHO, and peer-reviewed allopathic clinical guidelines.
 - Target conventional pharmacology, evidence-based diagnostics, standard metabolic pathways, and structured healthcare interventions.
 - Ensure recommendations are backed by randomized controlled trials (RCTs) and clinical reference models.`,
 
         eastern: `CLINICAL PARADIGM: Eastern (Traditional Chinese Medicine - TCM).
-- Frame the clinical assessment and care plan using TCM diagnostic paradigms: identify organ system disharmonies, Zang-Fu patterns, Qi and blood flow status, Yin/Yang balances, and potential tongue/pulse markers where applicable.
-- Tailor lifestyle, nutrition, and therapies toward acupressure/acupoints, meridians, moxibustion guidelines, and traditional herbal formulations (e.g., cooling vs. warming foods, Qi-tonifying herbs).
-- LINK BIOCHEMISTRY TO TRADITIONAL ORGAN CHANNELS: Connect Western biomarker trends and minerals directly to Meridian/Zang-Fu systems (e.g., map Zinc to Kidney Essence/Jing, Magnesium to Heart/Liver Qi regulation, Vitamin D3 to Yang Vitality, and B12/Iron to Spleen Blood generation).
-- Always translate these concepts into clean clinical contexts that blend with modern physiological understanding (e.g. referencing autonomic nervous system or microcirculation alongside Qi/blood stasis).`,
+- FRAME WORK & 8 PRINCIPLES: Frame the clinical assessment and care plan using TCM diagnostic paradigms: identify Zang-Fu organ system imbalances and categorize them according to the Eight Principles (Yin/Yang, Interior/Exterior, Cold/Heat, Deficiency/Excess).
+- ZANG-FU PATTERN ANALYSIS: Detail specific Zang-Fu organ disharmonies relevant to the patient's symptoms (e.g., Liver Qi Stagnation for stress/pain, Spleen Qi Deficiency for fatigue/digestive issues, Kidney Yin or Yang Deficiency for chronic vitality depletion, Lung Qi Deficiency for respiratory weakness).
+- WU XING (FIVE ELEMENTS) DYNAMICS: Utilize Five Elements theory to analyze generating (Sheng) and controlling (Ke) relationships (e.g., Wood overacting on Earth causing Liver-Spleen disharmony, or Earth failing to generate Metal).
+- MERIDIANS & CLINICAL ACUPOINTS: Suggest targeted stimulation of specific acupoints and meridians to restore homeostasis:
+  * ST36 (Zusanli) for Spleen/Stomach tonification, digestive health, and building Wei Qi.
+  * LI4 (Hegu) and LV3 (Taichong) in combination (the "Four Gates") to circulate Qi and blood, relieve pain, and alleviate stagnation.
+  * SP6 (Sanyinjiao) to nourish Yin and Blood, regulate the Kidney/Liver/Spleen channels.
+  * Du 20 (Baihui) for raising Yang Qi and calming the Shen.
+- TONGUE & PULSE DIAGNOSTIC INDICATORS: Provide expected diagnostic markers (e.g., pale tongue with thin white coat indicating Qi/Blood deficiency; red body with yellow greasy coat indicating Damp-Heat; Pulse qualities like Wiry [Xian] indicating Liver disharmony or pain, Slippery [Hua] indicating Dampness/Phlegm, or Weak/Thready [Xi/Ruo] indicating deficiency).
+- THERAPEUTIC MODALITIES: Integrate personalized lifestyle, nutrition, and therapies: acupressure, meridian therapy, moxibustion guidelines, and traditional herbal formulations (categorized by energetic temperatures: cooling vs. warming foods, Yin-nourishing vs. Yang-tonifying herbs).
+- LINK BIOCHEMISTRY TO TRADITIONAL ORGAN CHANNELS: Connect Western biomarker trends and minerals directly to Meridian/Zang-Fu systems:
+  * Map Zinc and Vitamin D3 to Kidney Essence (Jing) and Yang Vitality.
+  * Map Magnesium to Liver/Heart Qi regulation and smoothing Qi flow.
+  * Map Vitamin B12, Iron, and Folate to Spleen Qi and Blood generation (Spleen's function of transformation and transportation).
+  * Map Vitamin C and antioxidants to Lung Qi and the strength of Wei Qi (protective exterior).
+- MODERN PHYSIOLOGICAL TRANSLATION: Always translate these traditional concepts into clean clinical contexts that blend with modern physiological understanding (e.g., referencing autonomic nervous system regulation, hypothalamic-pituitary-adrenal (HPA) axis balance, and microcirculation alongside Qi and blood stasis).`,
 
         ayurvedic: `CLINICAL PARADIGM: Ayurvedic Medicine.
-- Frame the clinical assessment and care plan using Ayurvedic medicine principles: evaluate the patient's likely Tridosha constitution or imbalances (Vata, Pitta, Kapha).
-- Analyze metabolic and cellular health through the concepts of Agni (digestive and metabolic fire) and Ama (accumulated toxicity/undigested metabolic byproducts).
-- LINK BIOCHEMISTRY TO DHATUS & OJAS: Map specific nutrients and vitamins to the seven traditional Dhatus (tissues) and Ojas vitality (e.g., Vitamin D3 and Calcium to Asthi Dhatu/bone tissue, Iron and B12 to Rakta Dhatu/blood tissue, Zinc and Magnesium to Majja Dhatu/nervous tissue, and overall antioxidant markers to Ojas replenishment).
-- Direct lifestyle and nutrition toward Dinacharya (daily circadian alignment/routines), seasonal regimens, spice/herb energetics (Rasayana), and balancing sensory inputs.
-- Translate these concepts into clear clinical advice that aligns with modern metabolic, gut microbiome, and circadian biology.`,
-
-        'grow-thy-self': `CLINICAL PARADIGM: Grow Thy Self (Preventive, Holistic & Longevity Medicine).
-- Focus on cellular optimization, Linus Pauling orthomolecular principles (supplying the right molecules in the right amounts), circadian rhythms, sleep architecture, and stress resilience.
-- LINK BIOCHEMISTRY TO ANCESTRAL LONGEVITY FRAMEWORKS: Tie mitochondrial health, biochemical telemetry (like CoQ10, glutathione, Vitamin D3), and metabolic markers to evolutionary/ancestral longevity principles (such as Cell Danger Response (CDR), calorie restriction mimetics, hormesis, and xenohormesis).
-- SECULAR & HUMANIST FRAMING: Ensure all recommendations and wisdom lenses are framed in a completely secular and inclusive manner. For patients who do not identify with religious or spiritual traditions, translate all concepts (such as Purusharthas, Mizan, or Tikkun Olam) into physiological, psychological, and sociological frameworks (e.g. mapping spiritual harmony to autonomic balance, homeostatic regulation, existential purpose, emotional resilience, and active civic/communal engagement).
-- INTEGRATED WISDOM LENSES: Adapt the care strategy dynamically by applying the most relevant of these 13 world wisdom systems based on the patient's clinical situation and stressors:
-  1. Bagua (Taoist Energy Matrix): Harmonize daily routines, environmental/spatial habits, and circadian zones with specific life sectors.
-  2. Enso (Zen Wabi-Sabi): Practice self-compassion and acceptance of chronic symptoms or physical limitations, shifting from aggressive hyper-striving to gentle mindfulness.
-  3. Four Cardinal Values (Classical Virtues): Integrate Prudence (balanced pacing), Temperance (restraint in extreme biohacking/dieting), Fortitude (resilience during flares), and Justice (self-care as a fundamental responsibility).
-  4. Four Purusharthas (Hindu Life Goals): Align metabolic health with Dharma (ethical duty/body rhythms), Artha (vocation and work boundaries), Kama (sensory pleasure/wholesome foods), and Moksha (stress liberation/psychological freedom).
-  5. Golden Mean (Aristotelian Balance): Counsel the patient on moderation, avoiding extreme health regimes or hyper-supplements.
-  6. Hygge (Danish Comfort): Advocate for cozy, safe rest environments, somatic comfort, and warm relationships to down-regulate the sympathetic nervous system.
-  7. Ikigai (Japanese Purpose): Leverage daily activation, diet, and movement to fuel the patient's long-term passions, vocation, and longevity.
-  8. Lagom (Swedish Sufficiency): Focus on "just enough"—minimalist, highly sustainable supplementation, and balanced rest-activity ratios.
-  9. Medicine Wheel (Indigenous Sacred Circle): Structure and categorize lifestyle advice across Physical, Mental, Emotional, and Spiritual spheres (translating the spiritual sphere to existential meaning, deep connection to nature, and personal core values).
-  10. Mizan (Islamic Balance): Advocate for systemic bodily equilibrium, homeostatic moderation, and clean, wholesome (Tayyib) nutrition.
-  11. Wheel of Life (Coaching Dimensions): Track multidimensional lifestyle wellness (romance, home, career, fun, health) during follow-ups.
-  12. Tikkun Olam (Jewish World-Repair): Frame personal healing and recovery as a prerequisite for active altruism, community service, and world-repair.
-  13. Ubuntu (African Relational Wellness): Leverage collaborative healing, family support networks, and community co-regulation.
-- Always translate these philosophical structures into clear, practical clinical advice (e.g. referencing mitochondrial health, cortisol dynamics, autonomic tone, or sleep hygiene).`
+- FRAMEWORK & 3 DOSHAS: Frame the clinical assessment and care plan using Ayurvedic diagnostic paradigms: evaluate the patient's likely Tridosha constitution (Prakriti) and current imbalances (Vikriti - Vata, Pitta, Kapha).
+- METABOLISM, TOXICITY & DIGESTIVE FIRE: Analyze cellular health through the concepts of Agni (digestive and metabolic fire: Sama, Vishama, Tikshna, Manda) and Ama (accumulated toxic residue: Sama vs. Nirama status).
+- DHATUS (7 TISSUE LAYERS) PENETRATION: Map pathology and symptoms to affected Dhatus:
+  * Rasa (Plasma/Lymph): Dry skin, fatigue, lymphatic congestion.
+  * Rakta (Blood/Oxygenation): Rashes, inflammation, blood pressure.
+  * Mamsa (Muscle): Muscle pain, spasms, wasting.
+  * Medas (Fat/Adipose): Metabolic and weight issues.
+  * Asthi (Bone/Cartilage): Skeletal/joint issues, bone density.
+  * Majja (Nervous/Marrow): Neuropathic pain, sleep/anxiety, nervous system.
+  * Shukra (Reproductive/Vitality): Hormonal and vigor depletion.
+- SROTAS (PHYSIOLOGICAL CHANNELS): Identify compromised channels and blockages (Srotas dusti), e.g., Pranavaha (Respiratory), Annavaha (Digestive), Rasavaha (Plasma), Raktavaha (Circulatory), Asthivaha (Skeletal), Majjavaha (Nervous).
+- TONGUE & PULSE DIAGNOSIS (JIHVA & NADI PARIKSHA):
+  * Vata indicators: Rapid, irregular pulse (Nadi: Snake-like/Tarpana); thin, dry tongue with cracking.
+  * Pitta indicators: Strong, bounding pulse (Nadi: Frog-like/Manduka); red tongue body, yellowish coat.
+  * Kapha indicators: Slow, steady, deep pulse (Nadi: Swan-like/Hamsa); pale, swollen tongue with thick white coating (indicating high Ama).
+- BOTANICAL-TO-BIOCHEMICAL TRANSLATION: Map traditional Ayurvedic Rasayanas to both their energetic qualities (Rasa/Taste, Virya/Potency, Vipaka/Post-digestive effect) and modern biochemical pathways:
+  * Ashwagandha (Withania somnifera) -> Ushna Virya, Madhura Vipaka; mediates HPA-axis regulation, cortisol reduction, and GABAergic modulation.
+  * Curcumin/Shallaki (Boswellia serrata) -> Tikta/Katu Rasa, Ushna Virya; inhibits 5-LOX, downregulates NF-kB, and reduces pro-inflammatory cytokines.
+  * Triphala (Amalaki, Bibhitaki, Haritaki) -> Pancharasa (5 tastes), warm/neutral; stimulates short-chain fatty acid (SCFA) production, maintains gut barrier integrity, and optimizes microbiome diversity.
+- LINK BIOCHEMISTRY TO DHATUS & OJAS: Map Western biomarker trends (minerals, vitamins) to Dhatus and Ojas:
+  * Map Vitamin D3 and Calcium to Asthi Dhatu (bone tissue).
+  * Map Iron, B12, and Folate to Rakta Dhatu (blood tissue).
+  * Map Zinc and Magnesium to Majja Dhatu (nervous tissue).
+  * Map general antioxidants and immune markers to Ojas replenishment.
+- THERAPEUTIC REGIMEN (DINACHARYA): Detail circadian lifestyle alignment, including oil pulling (Gandusha), nasal therapy (Nasya), dry powder massage (Udvartana), and warm self-massage (Abhyanga), along with dietary guidelines based on the dominant Gunas (qualities).`
     };
 
     private systemInstructions: Record<AnalysisLens, string> = {
@@ -329,17 +350,15 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         }
     }
 
-    private getDemoReportForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'): Partial<Record<AnalysisLens, string>> {
+    private getDemoReportForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic'): Partial<Record<AnalysisLens, string>> {
         if (philosophy === 'eastern') return DEMO_ANALYSIS_REPORT_EASTERN;
         if (philosophy === 'ayurvedic') return DEMO_ANALYSIS_REPORT_AYURVEDIC;
-        if (philosophy === 'grow-thy-self') return DEMO_ANALYSIS_REPORT_GROW_THY_SELF;
         return DEMO_ANALYSIS_REPORT_WESTERN;
     }
 
-    private getDemoMetricsForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'): IClinicalMetrics {
+    private getDemoMetricsForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic'): IClinicalMetrics {
         if (philosophy === 'eastern') return { complexity: 7, stability: 6, certainty: 7 };
         if (philosophy === 'ayurvedic') return { complexity: 8, stability: 5, certainty: 7 };
-        if (philosophy === 'grow-thy-self') return { complexity: 5, stability: 8, certainty: 9 };
         return { complexity: 6, stability: 7, certainty: 8 };
     }
 
@@ -426,6 +445,18 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
                 const agentIdentity = `You are ${agentName}, the ${agentRole} for the Pocket Gull Clinical Intelligence Platform. Speak and write from this professional clinical expert persona.`;
 
                 let sysInstruction = agentIdentity + '\n\n' + philosophyInstruction + '\n\n' + this.systemInstructions[lens];
+                
+                const orcidProfile = this.orcid.orcidProfile();
+                if (orcidProfile) {
+                    sysInstruction += `\n\nCLINICIAN RESEARCH CONTEXT (ORCID ID: ${orcidProfile.orcidId}):
+The consulting clinician is ${orcidProfile.name}.
+Their research keywords include: ${orcidProfile.keywords.join(', ')}.
+Their published works and projects:
+${orcidProfile.works.map(w => `- "${w.title}" (${w.year || 'N/A'}) - ${w.type || 'publication'}${w.url ? ' (URL: ' + w.url + ')' : ''}`).join('\n')}
+
+When formulating recommendations, you should dynamically draw inspiration from their research areas and published works if they are clinically relevant to the patient's state.`;
+                }
+
                 if (isEmergency) {
                     sysInstruction = `EMERGENCY FIRST AID MODE: You are assisting a bystander under the Good Samaritan law.
 CRITICAL EMERGENCY RULES:
@@ -522,12 +553,22 @@ CRITICAL SAFETY CONSTRAINTS:
                 context += `\n\nActive Medicine Mode: Eastern (Traditional Chinese Medicine). Frame your dialogue using TCM perspectives, including Zang-Fu imbalances, Qi and blood dynamics, Yin/Yang harmony, and traditional holistic advice, while keeping the interface and language accessible to modern clinicians.`;
             } else if (philosophy === 'ayurvedic') {
                 context += `\n\nActive Medicine Mode: Ayurvedic Medicine. Frame your dialogue using Ayurvedic perspectives, including Doshas (Vata, Pitta, Kapha), Agni, Ama, Dinacharya daily rhythms, and Rasayana support, while translating concepts to align with modern functional medicine and metabolic science.`;
-            } else if (philosophy === 'grow-thy-self') {
-                context += `\n\nActive Medicine Mode: Grow Thy Self (Preventive & Longevity Medicine). Frame your dialogue using preventive wellness paradigms, cellular health, and the 13 world wisdom lenses: Bagua, Enso, Four Cardinal Values, Four Purusharthas, Golden Mean, Hygge, Ikigai, Lagom, Medicine Wheel, Mizan, Wheel of Life, Tikkun Olam, and Ubuntu. Ensure that if the patient is non-religious or secular, you present these lenses without theological or dogmatic language, framing them instead as models for physiological homeostasis, emotional integration, existential purpose, and community connection.`;
             } else {
                 context += `\n\nActive Medicine Mode: Western (Allopathic) Medicine. Frame your dialogue using conventional clinical guidelines, pharmacology, and standard global medical baselines.`;
             }
         }
+
+        const orcidProfile = this.orcid.orcidProfile();
+        if (orcidProfile) {
+            context += `\n\nCLINICIAN RESEARCH CONTEXT (ORCID ID: ${orcidProfile.orcidId}):
+The consulting clinician is ${orcidProfile.name}.
+Their research keywords include: ${orcidProfile.keywords.join(', ')}.
+Their published works and projects:
+${orcidProfile.works.map(w => `- "${w.title}" (${w.year || 'N/A'}) - ${w.type || 'publication'}${w.url ? ' (URL: ' + w.url + ')' : ''}`).join('\n')}
+
+Feel free to reference their research areas and publications if it supports the clinical advice.`;
+        }
+
         await this.ai.startChat(patientData, context);
     }
 

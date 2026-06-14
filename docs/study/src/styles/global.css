@@ -19,6 +19,35 @@
   --pg-radius: 12px;
 }
 
+/* ─── Themes ─── */
+html.theme-western,
+:root.theme-western {
+  --pg-accent: #38bdf8;
+  --pg-accent-light: #7dd3fc;
+  --pg-accent-dark: #0284c7;
+}
+
+html.theme-eastern,
+:root.theme-eastern {
+  --pg-accent: #10b981;
+  --pg-accent-light: #34d399;
+  --pg-accent-dark: #059669;
+}
+
+html.theme-ayurvedic,
+:root.theme-ayurvedic {
+  --pg-accent: #f59e0b;
+  --pg-accent-light: #fbbf24;
+  --pg-accent-dark: #d97706;
+}
+
+html.theme-longevity,
+:root.theme-longevity {
+  --pg-accent: #a1a1aa;
+  --pg-accent-light: #d4d4d8;
+  --pg-accent-dark: #52525b;
+}
+
 * {
   margin: 0;
   padding: 0;

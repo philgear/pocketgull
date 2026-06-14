@@ -2,13 +2,27 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
+// Helper to resolve workspace root with uppercase drive letter on Windows to prevent Vitest config issues
+function getWorkspaceRoot() {
+  let root = path.resolve(__dirname, '..');
+  if (root.match(/^[a-z]:/)) {
+    root = root[0].toUpperCase() + root.slice(1);
+  }
+  return root;
+}
+
+const workspaceRoot = getWorkspaceRoot();
+
+// Programmatically switch process working directory to workspace root
+process.chdir(workspaceRoot);
+
 console.log('🚀 Running Shift-Left Pre-Commit Validation...\n');
 
 // Helper to run commands and print output/errors nicely
 function runCommand(command, description) {
   console.log(`🔹 Running: ${description}...`);
   try {
-    execSync(command, { stdio: 'inherit' });
+    execSync(command, { stdio: 'inherit', cwd: workspaceRoot });
     console.log(`✅ ${description} passed.\n`);
     return true;
   } catch (error) {
@@ -71,7 +85,7 @@ if (fs.existsSync(brainDir)) {
 
 // Add files modified in Git (staged or unstaged markdown files)
 try {
-  const gitStatus = execSync('git status --porcelain', { encoding: 'utf8' });
+  const gitStatus = execSync('git status --porcelain', { encoding: 'utf8', cwd: path.resolve(__dirname, '..') });
   const lines = gitStatus.split('\n');
   for (const line of lines) {
     if (line.trim()) {
@@ -169,7 +183,7 @@ const secretPatterns = [
 // Gather files modified/staged in git to scan for secrets
 const filesToScanSecrets = [];
 try {
-  const gitStaged = execSync('git diff --cached --name-only --diff-filter=d', { encoding: 'utf8' });
+  const gitStaged = execSync('git diff --cached --name-only --diff-filter=d', { encoding: 'utf8', cwd: path.resolve(__dirname, '..') });
   gitStaged.split('\n').forEach(f => {
     if (f.trim() && fs.existsSync(f.trim())) {
       filesToScanSecrets.push(path.resolve(f.trim()));
@@ -177,7 +191,7 @@ try {
   });
 
   // Also scan unstaged modified files as a safety net
-  const gitUnstaged = execSync('git diff --name-only --diff-filter=d', { encoding: 'utf8' });
+  const gitUnstaged = execSync('git diff --name-only --diff-filter=d', { encoding: 'utf8', cwd: path.resolve(__dirname, '..') });
   gitUnstaged.split('\n').forEach(f => {
     if (f.trim() && fs.existsSync(f.trim()) && !filesToScanSecrets.includes(path.resolve(f.trim()))) {
       filesToScanSecrets.push(path.resolve(f.trim()));
@@ -193,6 +207,13 @@ try {
 const skipExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.zip', '.sqlite', '.db', '.keystore', '.jks', '.lock'];
 
 for (const file of filesToScanSecrets) {
+  if (!fs.existsSync(file)) {
+    continue;
+  }
+  const stat = fs.statSync(file);
+  if (stat.isDirectory()) {
+    continue;
+  }
   const ext = path.extname(file).toLowerCase();
   if (skipExtensions.includes(ext)) {
     continue;

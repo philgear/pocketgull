@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+---
+
+## [1.0.0-rc6] - 2026-06-14
+
+### Fixed
+- **[CodeQL] SSRF Critical × 5 (dicom.ts)**: Added `sanitiseDicomParam()` (allowlist: `[a-zA-Z0-9._-]`) and `validateDicomUid()` (digits and dots only, per DICOM standard) helpers. All five route handlers (`/studies`, `/rendered`, `/store`, `/raw`, `/delete`) now sanitise every user-provided query param before URL construction — no raw `req.query` value reaches `fetch()`.
+- **[CodeQL] SSRF (server.ts)**: Sanitised `projectId` + `location` Vertex AI URL construction with char-allowlist regex; `rawModel` is strictly allowlisted via `normalizeAndValidateModel()`.
+- **[CodeQL] Missing Rate Limiting × 4 (server.ts)**: Replaced custom in-memory `rateLimiter()` with `express-rate-limit`'s `rateLimit()` on all flagged routes (`GET/POST /api/patients`, `PUT /api/patients/:id`, `/docs/study`).
+- **[CodeQL] Path Traversal × 2 (server.ts `/docs/study`)**: Removed custom `resolve()`-based path handler entirely. `/docs/study` now served exclusively via `express.static(studyDocsRoot)` — no user-controlled value reaches any file path computation.
+- **[CodeQL] Clear-Text Logging (phi_compliance_scanner.py)**: Discarded the tainted tuple element with `_` and removed it from the `print()` format string entirely. Only violation type, file path, line number, and description are logged — no regex match data reaches any log sink.
+- **[Pre-emptive] Rate Limiting on DICOM + Healthcare Routers**: Applied `express-rate-limit` to all routes in `dicom.ts` (60 req/min) and `healthcare.ts` (30 req/min) before CodeQL flags them in a subsequent scan.
+
+## [1.0.0-rc5] - 2026-06-14
+
+### Added
+- **`angular.json` CommonJS Allowlist**: Added `@google-cloud/vertexai` and `@google-cloud/vertexai/build/src/resources/index.js` to `allowedCommonJsDependencies` to suppress recurring build-time optimization warnings from `@genkit-ai/vertexai`.
+
+### Changed
+- **Documentation Sync**: Rewrote `README.md` with categorized features (Security, AI, Clinical UX, Data), updated architecture diagram to show Vertex AI Enterprise and WebSocket proxy, corrected `pocketgall.app` URL typo, and synced all `docs/study/` MDX pages (`architecture.mdx`, `features.mdx`, `changelog.mdx`) with the rc4 state.
+- **`DESIGN.md` Squadron Expansion**: Added three new Gull Squadron personas — `Stratosphere` (Vertex AI Enterprise layer), `Relay` (WebSocket live proxy), and `Samaritan` (Good Samaritan emergency care mode).
+- **`angular.json` Host Cleanup**: Removed three stale Cloud Run hostnames (`pocket-gall-444980566010`, `understory-315235665910`, `pocket-gall-315235665910`) from `allowedHosts`.
+
+### Fixed
+- **`qs` Security Patch**: Pinned `qs` transitive dependency to `>=6.15.2` via `package.json` overrides, patching GHSA-q8mj-m7cp-5q26 (DoS via `qs.stringify` on null entries in comma-format arrays).
+- **`package.json` Version**: Bumped from `0.10.0` to `1.0.0-rc4` to align with CHANGELOG release state.
+
+---
+
+## [1.0.0-rc4] - 2026-06-14
+
+### Added
+- **[2026-06-14] Vertex AI Enterprise Migration**: Upgraded the AI intelligence layer from the developer Gemini API to regional Google Cloud Vertex AI Enterprise, implementing automatic Google Application Default Credentials (ADC) token resolution, regional endpoints, and custom safety thresholds.
+- **[2026-06-14] Bidirectional WebSocket Live Proxy**: Implemented a secure WebSocket proxy route (`/ws/gemini-live`) featuring recursive camelCase to snake_case translations and setup model resource path rewrites to support full-duplex live audio streaming over Vertex AI.
+- **[2026-06-14] Lightweight API Rate Limiting**: Built a custom, in-memory IP-based rate limiter middleware (`rateLimiter`) to mitigate denial-of-service and resource exhaustion on file-accessing routes.
+
+### Changed
+- **[2026-06-14] Improved Custom Search Engine**: Updated the Google Custom/Programmable Search Engine (CSE) script config in `search.html` to load a new instance (`648e5d0ad53ae49a6`) providing wider clinical and medical school domain indexing.
+
+### Security / Fixed
+- **[2026-06-14] CodeQL SSRF Remediation**: Patched Server-Side Request Forgery vulnerabilities in stream/chat endpoints by adding strict model selection validation (`normalizeAndValidateModel`).
+- **[2026-06-14] CodeQL Path Traversal Protection**: Guarded the study docs static router against directory escape by using `path.resolve` and strict parent-directory containment verification.
+- **[2026-06-14] CodeQL Clear-Text Logging Fix**: Redacted matching secrets and PII values in `phi_compliance_scanner.py` console logs to prevent exposure in CI workflows.
+
 ## [1.0.0-rc3] - 2026-06-08
 
 ### Added
@@ -72,6 +117,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[2026-05-18] Philips Hue Local Relay Proxy**: Added a local `hue-relay.js` Node proxy to resolve HTTPS mixed-content restrictions when the PWA communicates with local Philips Hue hubs.
 
 ## [0.7.0] - 2026-05-17
+
+### Added
 - **[2026-05-17] Circadian UI & AVS Coregulation**: Replaced static UI themes with a continuous, hardware-accelerated circadian CSS variable system (`CircadianSleepinessService`) that smoothly transitions ambient UI colors based on the time of day.
 - **[2026-05-17] KSS Readiness Gateway**: Integrated the 9-point Karolinska Sleepiness Scale (KSS) into the secure splash screen, allowing manual readiness overrides of the circadian theme.
 - **[2026-05-17] DOC Stimulation Protocols**: Implemented `DocProtocolService` to provide structured auditory and vibroacoustic stimulation guidelines for Disorders of Consciousness (Coma, VS/UWS, MCS).

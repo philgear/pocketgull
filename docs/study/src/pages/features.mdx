@@ -15,7 +15,7 @@ Every feature in Pocket Gull serves a clinical purpose. Nothing decorative, noth
 
 ### Live AI Consult & Multi-Agent Orchestration
 
-Powered by <DocNode term="@google/adk" category="Google · Agent Development Kit" hint="Open-source TypeScript/Python framework for building multi-agent AI systems. Supports LlmAgent, SequentialAgent, and LoopAgent patterns with tool management." link="https://google.github.io/adk-docs/" linkLabel="ADK Docs →" icon="https://ai.google.dev/favicon.ico">`@google/adk`</DocNode> and the <DocNode term="Web Speech API" category="W3C · Web Platform" hint="W3C specification for speech recognition and synthesis in browsers. Chrome implementation by Google." link="https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API" linkLabel="MDN Reference →" icon="https://developer.mozilla.org/favicon-48x48.png">Web Speech API</DocNode>. Specialized <DocNode term="LlmAgent" category="Google · Agent Development Kit" hint="Core agent class from @google/adk. Configured with a Gemini model, system prompt, and optional tools. Each focuses on a diagnostic lens." link="https://google.github.io/adk-docs/agents/" linkLabel="Agent Reference →" icon="https://ai.google.dev/favicon.ico">`LlmAgent`</DocNode> experts — each focused on a diagnostic lens (Overview, Interventions, Monitoring, Education) — synthesize clinical data into actionable insights through an interruptible, natural conversational UI.
+Powered by <DocNode term="@google/adk" category="Google · Agent Development Kit" hint="Open-source TypeScript/Python framework for building multi-agent AI systems. Supports LlmAgent, SequentialAgent, and LoopAgent patterns with tool management." link="https://google.github.io/adk-docs/" linkLabel="ADK Docs →" icon="https://ai.google.dev/favicon.ico">`@google/adk`</DocNode> and the <DocNode term="Web Speech API" category="W3C · Web Platform" hint="W3C specification for speech recognition and synthesis in browsers. Chrome implementation by Google." link="https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API" linkLabel="MDN Reference →" icon="https://developer.mozilla.org/favicon-48x48.png">Web Speech API</DocNode> via <DocNode term="Vertex AI Enterprise" category="Google Cloud" hint="Google Cloud's enterprise-grade AI platform. Provides regional endpoints, IAM-based authentication (ADC), custom safety thresholds, and SLA-backed infrastructure." link="https://cloud.google.com/vertex-ai" linkLabel="Vertex AI Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">Vertex AI Enterprise</DocNode>. Specialized <DocNode term="LlmAgent" category="Google · Agent Development Kit" hint="Core agent class from @google/adk. Configured with a Gemini model, system prompt, and optional tools. Each focuses on a diagnostic lens." link="https://google.github.io/adk-docs/agents/" linkLabel="Agent Reference →" icon="https://ai.google.dev/favicon.ico">`LlmAgent`</DocNode> experts — each focused on a diagnostic lens (Overview, Interventions, Monitoring, Education) — synthesize clinical data into actionable insights through an interruptible, natural conversational UI.
 
 The system maintains **context-aware memory** of recently discussed report nodes, enabling inline follow-up queries without re-stating context.
 
@@ -34,6 +34,14 @@ A real-time multiplayer workspace integrated directly into the patient's view. C
 ### Hands-Free Voice Dictation & Controls
 
 Speak the wake word **"Gull"** followed by actions (e.g., *"Gull, highlight head"*, *"Gull, sync data"*) during active dictation. The application intelligently intercepts these commands without modifying the transcript, mapping them directly to UI actions. Clinicians can also use the integrated dictation modal to add tasks or chat messages completely hands-free.
+
+### Good Samaritan Emergency Care
+
+An offline emergency override mode that requires zero network connectivity. Activating it enables a **110 BPM chest-compression metronome**, Basic Life Support (BLS) guidance safety-gated through on-device Gemini Nano (`window.ai`), local <DocNode term="FHIR R4" category="HL7 International" hint="Fast Healthcare Interoperability Resources — the current standard for electronic health data exchange." link="https://hl7.org/fhir/R4/" linkLabel="HL7 FHIR R4 →" icon="https://hl7.org/favicon.ico">FHIR-compliant</DocNode> EMT QR code serialization via `lean-qr`, and full global telemetry (OTel) suppression to eliminate network latency. Designed for Good Samaritan scenarios where a clinician may be first on scene without system access.
+
+### Client-Side Speech Barge-In
+
+Local `onspeechstart` interruption tuning across all clinical dialog and voice assistant panels. When the clinician begins speaking or typing, audio playback is immediately muted and the response queue is cleared — eliminating the need to wait for the AI to finish speaking before asking a follow-up question.
 
 ### Cognition & Multilingual Care Plans
 
@@ -129,3 +137,34 @@ Direct integration with <DocNode term="NCBI PubMed" category="NIH · National Li
 Surfaces relevant differential diagnostic information and treatment pathways from indexed medical domains via <DocNode term="Google CSE" category="Google" hint="Google Programmable Search Engine — a customizable search engine for specific domains. Renders results in a sandboxed Research Frame." link="https://programmablesearchengine.google.com/" linkLabel="CSE Console →" icon="https://www.google.com/favicon.ico">Google CSE</DocNode>. Rendered in a dedicated Research Frame within the application.
 
 > All queries sent to external research sources are anonymized and stripped of protected health information (PHI) prior to transmission.
+
+---
+
+## Security & Compliance
+
+### Vertex AI Enterprise Migration
+
+The AI intelligence layer runs on regional <DocNode term="Vertex AI Enterprise" category="Google Cloud" hint="Google Cloud's enterprise-grade AI platform with IAM/ADC authentication, regional endpoints, custom safety thresholds, and SLA guarantees." link="https://cloud.google.com/vertex-ai" linkLabel="Vertex AI Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">Google Cloud Vertex AI Enterprise</DocNode>, replacing the developer Gemini API. This provides automatic Application Default Credentials (ADC) token resolution, configurable safety thresholds above the default API limits, and enterprise-grade IAM-backed access control.
+
+### Tink Envelope Cryptography & Post-Quantum Safeguards
+
+Local patient records are encrypted at rest using **Google Tink AEAD** cryptographic envelopment. Transport security includes Quantum-Safe Cryptography (QSC) Kyber/Dilithium protocol fallbacks as a HIPAA-compliant future-proofing layer against post-quantum threats.
+
+### Smiley Gesture Authentication & WebAuthn
+
+A secure, intuitive access control screen replacing legacy numeric PIN entries. Clinicians draw a "smiley face" gesture on an interactive Canvas interface to unlock the workspace. To maintain multi-platform compatibility, the system features **device-supported biometric checks**, rendering a WebAuthn biometric unlock option only when the client device supports hardware-level biometric sensors.
+
+### Shift-Left Pre-Commit Security Pipeline
+
+A Husky pre-commit hook runs before every commit: TypeScript type checking, Vitest unit tests, markdown image reference scanning, and a credential/API key leak scanner that blocks commits containing secrets. This enforces security at the point of authorship rather than at deployment.
+
+### IP-Based API Rate Limiting
+
+A custom in-memory `rateLimiter` middleware on the Express backend mitigates denial-of-service and resource exhaustion on patient data and documentation endpoints, without requiring an external service.
+
+### CodeQL-Hardened Routes
+
+- **SSRF Prevention:** Strict model selection whitelist (`normalizeAndValidateModel`) blocks server-side request forgery in stream and chat paths.
+- **Path Traversal Prevention:** `path.resolve` checks with strict parent-directory containment guard the static study docs router.
+- **Clear-Text Logging Redaction:** PII and secret values are redacted from all console/CI log outputs in the HIPAA compliance scanner.
+

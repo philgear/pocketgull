@@ -17,8 +17,11 @@ def extract_basename(filename):
     base = re.sub(r'(-|_)', ' ', base)
     return base.lower().strip()
 
-angular_root = '/home/phil/Documents/pocketgull/pocketgull/src'
-flutter_root = '/home/phil/Documents/pocketgull/pocketgull/pocketgull_flutter/lib'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+
+angular_root = os.path.join(project_root, 'src')
+flutter_root = os.path.join(project_root, 'pocketgull_flutter', 'lib')
 
 angular_dirs = ['components', 'services', 'directives', 'pipes']
 flutter_dirs = ['widgets', 'screens', 'services', 'blocs']
@@ -36,13 +39,13 @@ angular_map = {}
 for f in angular_files:
     base = extract_basename(f)
     if base not in angular_map: angular_map[base] = []
-    angular_map[base].append(os.path.relpath(f, '/home/phil/Documents/pocketgull/pocketgull'))
+    angular_map[base].append(os.path.relpath(f, project_root).replace('\\', '/'))
 
 flutter_map = {}
 for f in flutter_files:
     base = extract_basename(f)
     if base not in flutter_map: flutter_map[base] = []
-    flutter_map[base].append(os.path.relpath(f, '/home/phil/Documents/pocketgull/pocketgull'))
+    flutter_map[base].append(os.path.relpath(f, project_root).replace('\\', '/'))
 
 all_keys = sorted(list(set(angular_map.keys()) | set(flutter_map.keys())))
 
@@ -79,8 +82,8 @@ markdown += f"- **Matched Features**: {match_count}\n"
 markdown += f"- **Missing in Flutter (Needs Migration)**: {missing_flutter}\n"
 markdown += f"- **Flutter Only (New Features/Architecture)**: {flutter_only}\n"
 
-output_path = '/home/phil/.gemini/antigravity/brain/b883b284-ec31-43d4-9170-b0cbf0864499/parity_matrix.md'
-with open(output_path, 'w') as f:
+output_path = os.path.join(project_root, 'parity_matrix.md')
+with open(output_path, 'w', encoding='utf-8') as f:
     f.write(markdown)
 
 print(f"Parity matrix generated at {output_path}")

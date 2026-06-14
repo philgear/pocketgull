@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../services/clinical_intelligence_service.dart';
 import '../../models/chat_message.dart';
+import '../../models/orcid_profile.dart';
 
 class AnalysisState {
   final bool isLoading;
@@ -47,7 +48,7 @@ class AnalysisCubit extends Cubit<AnalysisState> {
     emit(state.copyWith(activeLens: lens));
   }
 
-  Future<void> generateComprehensiveReport(String patientData) async {
+  Future<void> generateComprehensiveReport(String patientData, {OrcidProfile? orcidProfile}) async {
     emit(state.copyWith(isLoading: true, error: null, reports: {}));
 
     final lenses = [
@@ -60,7 +61,7 @@ class AnalysisCubit extends Cubit<AnalysisState> {
     try {
       final futures = lenses.map((lens) async {
         String accumulated = '';
-        await for (final chunk in _intelligenceService.generateReportStream(patientData, lens)) {
+        await for (final chunk in _intelligenceService.generateReportStream(patientData, lens, orcidProfile: orcidProfile)) {
           accumulated += chunk;
           
           final currentReports = Map<AnalysisLens, String>.from(state.reports);

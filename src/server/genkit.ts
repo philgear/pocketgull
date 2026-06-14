@@ -1,5 +1,5 @@
 import { genkit, z } from 'genkit';
-import { googleAI } from '@genkit-ai/googleai';
+import { vertexAI } from '@genkit-ai/vertexai';
 
 // Polyfill fetch to append our referer and bypass strict API key restrictions
 const originalFetch = globalThis.fetch;
@@ -27,8 +27,13 @@ globalThis.fetch = async (url: any, options: any = {}) => {
 
 // Initialize Genkit
 export const ai = genkit({
-  plugins: [googleAI()],
-  model: 'googleai/gemini-2.5-flash',
+  plugins: [
+    vertexAI({
+      projectId: process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645',
+      location: process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1',
+    })
+  ],
+  model: 'vertexai/gemini-2.5-flash',
 });
 
 // 1. Generate Metrics Flow
@@ -283,7 +288,7 @@ Please provide:
 Note: This is an AI preliminary analysis for decision-support, not an official diagnostic read. Respond with clear, structured Markdown.`;
 
       const response = await ai.generate({
-        model: 'googleai/gemini-2.5-pro', // Using pro for better multimodal reading
+        model: 'vertexai/gemini-2.5-pro', // Using pro for better multimodal reading
         messages: [
           {
             role: 'user',

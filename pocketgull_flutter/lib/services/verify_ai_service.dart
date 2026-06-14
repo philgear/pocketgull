@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class VerificationIssue {
@@ -101,7 +102,7 @@ Return ONLY the JSON.
       final resultMap = jsonDecode(response.text!) as Map<String, dynamic>;
       return VerificationResult.fromJson(resultMap);
     } catch (e) {
-      print('AI Verification failed: $e');
+      debugPrint('AI Verification failed: $e');
       return VerificationResult(
         status: 'warning',
         issues: [

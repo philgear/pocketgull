@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:convert';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -270,7 +271,7 @@ class ExportService {
     final jsonString = jsonEncode(bundle);
     final blob = html.Blob([jsonString], 'application/json');
     final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
+    html.AnchorElement(href: url)
       ..setAttribute("download", "PocketGull_FHIR_${patient.name.replaceAll(' ', '_')}.json")
       ..click();
     html.Url.revokeObjectUrl(url);

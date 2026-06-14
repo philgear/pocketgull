@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AiCacheService {
@@ -27,7 +28,7 @@ class AiCacheService {
 
       return decoded['data'] as T;
     } catch (e) {
-      print('Cache decryption/parse failed: $e');
+      debugPrint('Cache decryption/parse failed: $e');
       return null;
     }
   }

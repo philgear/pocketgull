@@ -7,16 +7,43 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import { Server as SocketIOServer } from 'socket.io';
 import compression from 'compression';
-import { dirname, join, normalize, resolve } from 'node:path';
+import { dirname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import crypto from 'node:crypto';
+import { GoogleAuth } from 'google-auth-library';
+import { WebSocketServer, WebSocket } from 'ws';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const browserDistFolder = join(__dirname, '..').replace(/\\/g, '/'); // root dir of dist when built
+
+const studyDocsRoot = resolve(browserDistFolder, 'docs', 'study');
+
+// No custom rate limiter — use express-rate-limit (recognised by CodeQL)
+
+const ALLOWED_GEMINI_MODELS = new Set([
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
+  'gemini-2.0-flash-exp',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro'
+]);
+
+function normalizeAndValidateModel(model: unknown): string {
+  if (typeof model !== 'string' || !model.trim()) {
+    return 'gemini-2.5-flash';
+  }
+  const normalized = model.trim().replace(/^models\//, '');
+  if (!ALLOWED_GEMINI_MODELS.has(normalized)) {
+    throw new Error('Invalid model selection.');
+  }
+  return normalized;
+}
 
 const app = express();
 const angularApp = new AngularNodeAppEngine({
@@ -112,6 +139,49 @@ async function fetchGeminiApiKey() {
   }
 }
 
+const googleAuth = new GoogleAuth({
+  scopes: 'https://www.googleapis.com/auth/cloud-platform'
+});
+
+async function getGcpAccessToken(): Promise<string | null> {
+  try {
+    const client = await googleAuth.getClient();
+    const tokenResponse = await client.getAccessToken();
+    return tokenResponse.token || null;
+  } catch (err: any) {
+    console.warn('[WARN] Failed to retrieve GCP OAuth access token:', err.message);
+    return null;
+  }
+}
+
+function translateToSnake(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(translateToSnake);
+  } else if (obj !== null && typeof obj === 'object') {
+    const newObj: any = {};
+    for (const key of Object.keys(obj)) {
+      const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+      newObj[snakeKey] = translateToSnake(obj[key]);
+    }
+    return newObj;
+  }
+  return obj;
+}
+
+function translateToCamel(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(translateToCamel);
+  } else if (obj !== null && typeof obj === 'object') {
+    const newObj: any = {};
+    for (const key of Object.keys(obj)) {
+      const camelKey = key.replace(/(_\w)/g, (m) => m[1].toUpperCase());
+      newObj[camelKey] = translateToCamel(obj[key]);
+    }
+    return newObj;
+  }
+  return obj;
+}
+
 let geminiApiKeyCached: string | null = null;
 let fetchPromise: Promise<string> | null = null;
 
@@ -150,12 +220,19 @@ await getApiKey().catch(console.error);
 
 // Security headers
 app.use((req, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  const nonce = crypto.randomBytes(16).toString('base64');
+  res.locals = res.locals || {};
+  res.locals['nonce'] = nonce;
+
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
 
   const isProd = process.env['NODE_ENV'] === 'production';
-  let csp = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://fonts.gstatic.com; frame-src 'self' https://www.ncbi.nlm.nih.gov; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';";
+  let csp = `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://fonts.gstatic.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -280,6 +357,101 @@ app.get('/api/config', async (req, res) => {
   }
 });
 
+app.get('/api/orcid/:orcid', async (req, res) => {
+  try {
+    const { orcid } = req.params;
+    if (!orcid) return res.status(400).json({ error: 'ORCID iD is required' });
+    
+    // Clean and validate format
+    const cleanId = orcid.trim().replace(/https?:\/\/orcid\.org\//, '');
+    if (!/^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/.test(cleanId)) {
+      return res.status(400).json({ error: 'Invalid ORCID iD format. Expected: 0000-0002-1825-0097' });
+    }
+
+    // Mock Developer Fallback Profile for Phil Gear
+    if (cleanId === '0009-0008-1372-5381') {
+      console.log('[ORCID Proxy] Serving SSR mock profile for developer: Phil Gear');
+      return res.json({
+        person: {
+          name: {
+            'given-names': { value: 'Phil' },
+            'family-name': { value: 'Gear' }
+          },
+          keywords: {
+            keyword: [
+              { content: 'Software' },
+              { content: 'Clinical Intelligence' },
+              { content: 'Care Consultation' }
+            ]
+          },
+          'researcher-urls': {
+            'researcher-url': [
+              {
+                'url-name': 'InsightSpark',
+                url: { value: 'https://github.com/philgear/InsightSpark' }
+              }
+            ]
+          }
+        },
+        'activities-summary': {
+          works: {
+            group: [
+              {
+                'work-summary': [
+                  {
+                    title: {
+                      title: { value: 'Pivot & Pulse' }
+                    },
+                    url: { value: 'https://github.com/philgear/InsightSpark' },
+                    type: 'software',
+                    'publication-date': {
+                      year: { value: '2026' }
+                    }
+                  }
+                ]
+              },
+              {
+                'work-summary': [
+                  {
+                    title: {
+                      title: { value: 'PocketGull Care Consultation Protocol' }
+                    },
+                    type: 'research-tool',
+                    'publication-date': {
+                      year: { value: '2026' }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      });
+    }
+
+    const orcidUrl = `https://pub.orcid.org/v3.0/${cleanId}/record`;
+    const response = await fetch(orcidUrl, {
+      headers: {
+        'Accept': 'application/vnd.orcid+json, application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error(`ORCID API returned status ${response.status}`);
+      if (response.status === 404) {
+        return res.status(404).json({ error: 'ORCID profile not found. Please verify the ID.' });
+      }
+      return res.status(response.status).json({ error: `ORCID API returned error: ${response.statusText || 'Unknown Error'}` });
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (err: any) {
+    console.error('ORCID Proxy Error:', err);
+    res.status(500).json({ error: 'Failed to fetch profile from ORCID.' });
+  }
+});
+
 app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
@@ -391,9 +563,18 @@ app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, r
 app.post('/api/ai/stream', express.json(), async (req, res) => {
   try {
     const { patientData, systemInstruction, model, temperature } = req.body;
-    const key = await getApiKey(req);
-    if (!key) {
-      res.status(500).json({ error: 'API key not available on server.' });
+    let rawModel: string;
+    try {
+      rawModel = normalizeAndValidateModel(model);
+    } catch (e: any) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
+
+    const token = await getGcpAccessToken();
+    const key = token ? '' : await getApiKey(req);
+    if (!token && !key) {
+      res.status(500).json({ error: 'API key or GCP credentials not available on server.' });
       return;
     }
 
@@ -402,37 +583,79 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    const rawModel = (model || 'gemini-2.5-flash').replace(/^models\//, '');
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${rawModel}:streamGenerateContent?alt=sse&key=${key}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Referer': 'https://pocketgull.app/'
-      },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: patientData }] }],
-        systemInstruction: { parts: [{ text: systemInstruction }] },
-        generationConfig: { temperature: temperature ?? 0.1 },
-        safetySettings: [
-          {
-            category: 'HARM_CATEGORY_HARASSMENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_HATE_SPEECH',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          }
-        ]
-      })
-    });
+    let response;
+
+    if (token) {
+      // Build Vertex URL from validated environment variables and allowlisted model only.
+      // rawModel is guaranteed to be in ALLOWED_GEMINI_MODELS — no user input reaches the URL.
+      const projectId = (process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645').replace(/[^a-zA-Z0-9-_]/g, '');
+      const location = (process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1').replace(/[^a-zA-Z0-9-]/g, '');
+      const vertexUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${rawModel}:streamGenerateContent?alt=sse`;
+      
+      console.log(`[Vertex AI] Streaming via regional endpoint: ${vertexUrl}`);
+      response = await fetch(vertexUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: patientData }] }],
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          generationConfig: { temperature: temperature ?? 0.1 },
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HARASSMENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            }
+          ]
+        })
+      });
+    } else {
+      console.log(`[Gemini Developer API] Streaming model: ${rawModel}`);
+      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${rawModel}:streamGenerateContent?alt=sse&key=${key}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Referer': 'https://pocketgull.app/'
+        },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: patientData }] }],
+          systemInstruction: { parts: [{ text: systemInstruction }] },
+          generationConfig: { temperature: temperature ?? 0.1 },
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HARASSMENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            }
+          ]
+        })
+      });
+    }
 
     if (!response.ok || !response.body) {
          throw new Error(`Gemini API Error: ${response.statusText}`);
@@ -445,13 +668,9 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        // The REST API already formats as SSE when alt=sse is passed
-        // However, it sends raw chunks that might need parsing if we want to extract text early,
-        // but the frontend is already built to parse standard SSE formatting.
         res.write(chunk);
     }
     
-    // The Gemini REST streams end naturally, but our frontend looks for [DONE]
     res.write('data: [DONE]\n\n');
     res.end();
   } catch (e: any) {
@@ -460,23 +679,30 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
 });
 
 // Server-Side Chat Session Management
-// We manage the conversation history array here instead of a stateful SDK object
 const chatSessions = new Map<string, { history: any[], systemInstruction: string, model: string, temperature: number }>();
 
 app.post('/api/ai/chat/start', express.json(), async (req, res) => {
   try {
     const { sessionId, systemInstruction, model, temperature } = req.body;
-    const key = await getApiKey(req);
-    if (!key) throw new Error('API key not available on server.');
+    let validatedModel: string;
+    try {
+      validatedModel = normalizeAndValidateModel(model);
+    } catch (e: any) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
+
+    const token = await getGcpAccessToken();
+    const key = token ? '' : await getApiKey(req);
+    if (!token && !key) throw new Error('API key or GCP credentials not available on server.');
     
     chatSessions.set(sessionId, {
       history: [],
       systemInstruction,
-      model: model || 'gemini-2.5-flash',
+      model: validatedModel,
       temperature: temperature ?? 0.1
     });
 
-    // Clean up old sessions (keep max 50)
     if (chatSessions.size > 50) {
       const oldestKey = chatSessions.keys().next().value;
       if (oldestKey) chatSessions.delete(oldestKey);
@@ -493,44 +719,92 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     const session = chatSessions.get(sessionId);
     if (!session) throw new Error('Chat session not found. Please refresh and try again.');
     
-    const key = await getApiKey(req);
-    if (!key) throw new Error('API key not available on server.');
+    const token = await getGcpAccessToken();
+    const key = token ? '' : await getApiKey(req);
+    if (!token && !key) throw new Error('API key or GCP credentials not available on server.');
 
-    // Append user message
     session.history.push({ role: 'user', parts: [{ text: message }] });
 
-    // Strip models/ prefix if already there, so we can reliably prepend it
-    const rawModel = session.model.replace(/^models\//, '');
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${rawModel}:generateContent?key=${key}`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Referer': 'https://pocketgull.app/'
-      },
-      body: JSON.stringify({
-        contents: session.history,
-        systemInstruction: { parts: [{ text: session.systemInstruction }] },
-        generationConfig: { temperature: session.temperature },
-        safetySettings: [
-          {
-            category: 'HARM_CATEGORY_HARASSMENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_HATE_SPEECH',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          },
-          {
-            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-          }
-        ]
-      })
-    });
+    let rawModel: string;
+    try {
+      rawModel = normalizeAndValidateModel(session.model);
+    } catch (e: any) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
+    let response;
+
+    if (token) {
+      // Build Vertex URL from validated environment variables and allowlisted model only.
+      // rawModel is guaranteed to be in ALLOWED_GEMINI_MODELS — no user input reaches the URL.
+      const projectId = (process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645').replace(/[^a-zA-Z0-9-_]/g, '');
+      const location = (process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1').replace(/[^a-zA-Z0-9-]/g, '');
+      const vertexUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${rawModel}:generateContent`;
+
+      console.log(`[Vertex AI] Chat message via regional endpoint: ${vertexUrl}`);
+      response = await fetch(vertexUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          contents: session.history,
+          systemInstruction: { parts: [{ text: session.systemInstruction }] },
+          generationConfig: { temperature: session.temperature },
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HARASSMENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            }
+          ]
+        })
+      });
+    } else {
+      console.log(`[Gemini Developer API] Chat message model: ${rawModel}`);
+      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${rawModel}:generateContent?key=${key}`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Referer': 'https://pocketgull.app/'
+        },
+        body: JSON.stringify({
+          contents: session.history,
+          systemInstruction: { parts: [{ text: session.systemInstruction }] },
+          generationConfig: { temperature: session.temperature },
+          safetySettings: [
+            {
+              category: 'HARM_CATEGORY_HARASSMENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_HATE_SPEECH',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            },
+            {
+              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+              threshold: 'BLOCK_MEDIUM_AND_ABOVE'
+            }
+          ]
+        })
+      });
+    }
 
     if (!response.ok) {
        const errText = await response.text();
@@ -540,7 +814,6 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     const data = await response.json();
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    // Append model response
     session.history.push({ role: 'model', parts: [{ text: responseText }] });
 
     res.json({ text: responseText });
@@ -548,6 +821,102 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+
+// JSON File Database Configuration
+const dataDir = join(rootDir, 'data');
+const patientsDbPath = join(dataDir, 'patients.json');
+
+// Ensure data directory and empty DB exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+if (!fs.existsSync(patientsDbPath)) {
+  fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2));
+}
+
+const patientsRateLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
+
+const docsRateLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
+
+// Patients API Endpoints
+app.get('/api/patients', patientsRateLimiter, (req, res) => {
+  try {
+    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    res.setHeader('Content-Type', 'application/json');
+    res.send(data);
+  } catch (err: any) {
+    console.error('[API] Error reading patients database:', err);
+    res.status(500).json({ error: 'Internal server error while reading database' });
+  }
+});
+
+app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
+  try {
+    if (!req.body || !Array.isArray(req.body)) {
+      return res.status(400).json({ error: 'Body must be a JSON array of patients' });
+    }
+
+    // Save exactly what the frontend sends
+    fs.writeFileSync(patientsDbPath, JSON.stringify(req.body, null, 2));
+
+    console.log(`[API] Saved ${req.body.length} patients to database.`);
+    res.status(200).json({ success: true, count: req.body.length });
+  } catch (err: any) {
+    console.error('[API] Error saving patients database:', err);
+    res.status(500).json({ error: 'Internal server error while saving database' });
+  }
+});
+
+app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!req.body || typeof req.body !== 'object') {
+      return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
+    }
+
+    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    const patients = JSON.parse(data);
+    const index = patients.findIndex((p: any) => p.id === id);
+
+    if (index !== -1) {
+      patients[index] = { ...patients[index], ...req.body, id }; // Ensure ID stays same
+    } else {
+      patients.push({ ...req.body, id });
+    }
+
+    fs.writeFileSync(patientsDbPath, JSON.stringify(patients, null, 2));
+    console.log(`[API] Synced patient ${id} from mobile/app to database.`);
+    res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
+  } catch (err: any) {
+    console.error('[API] Error syncing patient to database:', err);
+    res.status(500).json({ error: 'Internal server error while syncing patient' });
+  }
+});
+
+// Serve Astro Study Docs — pure static serving, no user-controlled path computation.
+// express.static resolves paths relative to studyDocsRoot internally and safely.
+// A simple regex redirect handles the trailing-slash convention without touching resolve().
+app.use('/docs/study', docsRateLimiter, (req, res, next) => {
+  // Only redirect directory-style paths that lack a trailing slash and have no file extension.
+  if (req.path !== '/' && !req.path.endsWith('/') && !req.path.includes('.')) {
+    const safePath = req.path.replace(/[^a-zA-Z0-9\-_\/]/g, '');
+    return res.redirect(301, `/docs/study${safePath}/`);
+  }
+  next();
+});
+app.use('/docs/study', docsRateLimiter, express.static(studyDocsRoot, { index: 'index.html', extensions: ['html'] }));
 
 /**
  * Serve static files from /.
@@ -577,7 +946,8 @@ app.use((req, res, next) => {
       if (contentType.includes('text/html') && key) {
         let html = await response.text();
         const safeKey = key.replace(/[^a-zA-Z0-9_\-]/g, '');
-        const scriptTag = '<script px-api-key="true">window.GEMINI_API_KEY = "' + safeKey + '";</script>\n</head>';
+        const nonce = res.locals['nonce'] || '';
+        const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${safeKey}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
 
         const modRes = new Response(html, {
@@ -609,6 +979,130 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
     
     // Auto-provision Cloud Healthcare API datasets and stores
     ensureHealthcareStoresExist().catch(console.error);
+
+    // Setup secure WebSocket proxy for Vertex AI Multimodal Live API
+    const wss = new WebSocketServer({ noServer: true });
+    
+    server.on('upgrade', (request, socket, head) => {
+      const { pathname } = new URL(request.url || '', `http://${request.headers.host || 'localhost'}`);
+      if (pathname === '/ws/gemini-live') {
+        wss.handleUpgrade(request, socket, head, (ws) => {
+          wss.emit('connection', ws, request);
+        });
+      }
+    });
+
+    wss.on('connection', async (wsClient, request) => {
+      console.log('[WS Proxy] Client connected to /ws/gemini-live');
+      
+      let vertexClient: WebSocket | null = null;
+      const messageQueue: string[] = [];
+      let isConnecting = true;
+      let token: string | null = null;
+
+      try {
+        const projectId = process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645';
+        const location = process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1';
+        
+        token = await getGcpAccessToken();
+        
+        if (!token) {
+          const urlObj = new URL(request.url || '', 'http://localhost');
+          const keyParam = urlObj.searchParams.get('key') || process.env['GEMINI_API_KEY'] || '';
+          const devUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?key=${keyParam}`;
+          
+          console.log('[WS Proxy] Falling back to Developer Live WS API');
+          vertexClient = new WebSocket(devUrl);
+        } else {
+          const vertexUrl = `wss://${location}-aiplatform.googleapis.com/ws/google.cloud.aiplatform.v1.LlmBidiService/BidiGenerateContent`;
+          console.log(`[WS Proxy] Connecting to Vertex AI Live WS: ${vertexUrl}`);
+          
+          vertexClient = new WebSocket(vertexUrl, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+        }
+
+        vertexClient.on('open', () => {
+          console.log('[WS Proxy] Backend Live WS connection established');
+          isConnecting = false;
+          while (messageQueue.length > 0) {
+            const msg = messageQueue.shift();
+            if (msg) vertexClient?.send(msg);
+          }
+        });
+
+        vertexClient.on('message', (data) => {
+          try {
+            const text = data.toString();
+            const json = JSON.parse(text);
+            const camelJson = translateToCamel(json);
+            wsClient.send(JSON.stringify(camelJson));
+          } catch (err) {
+            wsClient.send(data);
+          }
+        });
+
+        vertexClient.on('close', (code, reason) => {
+          console.log(`[WS Proxy] Backend Live WS closed: ${code} - ${reason.toString()}`);
+          wsClient.close(code, reason);
+        });
+
+        vertexClient.on('error', (err) => {
+          console.error('[WS Proxy] Backend Live WS error:', err);
+          wsClient.close(1011, 'Backend connection error');
+        });
+
+      } catch (err: any) {
+        console.error('[WS Proxy] Initialization failed:', err.message);
+        wsClient.close(1011, err.message);
+        return;
+      }
+
+      wsClient.on('message', (message) => {
+        try {
+          const text = message.toString();
+          let json = JSON.parse(text);
+          
+          if (json.setup && token) {
+            const rawModel = (json.setup.model || 'gemini-2.0-flash-exp').replace(/^models\//, '');
+            const projectId = process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645';
+            const location = process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1';
+            json.setup.model = `projects/${projectId}/locations/${location}/publishers/google/models/${rawModel}`;
+          }
+
+          const snakeJson = translateToSnake(json);
+          const payload = JSON.stringify(snakeJson);
+
+          if (isConnecting) {
+            messageQueue.push(payload);
+          } else {
+            vertexClient?.send(payload);
+          }
+        } catch (err) {
+          if (isConnecting) {
+            messageQueue.push(message.toString());
+          } else {
+            vertexClient?.send(message);
+          }
+        }
+      });
+
+      wsClient.on('close', (code, reason) => {
+        console.log(`[WS Proxy] Client Live WS closed: ${code} - ${reason.toString()}`);
+        if (vertexClient && vertexClient.readyState === WebSocket.OPEN) {
+          vertexClient.close();
+        }
+      });
+
+      wsClient.on('error', (err) => {
+        console.error('[WS Proxy] Client Live WS error:', err);
+        if (vertexClient && vertexClient.readyState === WebSocket.OPEN) {
+          vertexClient.close();
+        }
+      });
+    });
 
     // Explicitly keep the process alive, as something is closing the event loop
     setInterval(() => {}, 1000 * 60 * 60 * 24);

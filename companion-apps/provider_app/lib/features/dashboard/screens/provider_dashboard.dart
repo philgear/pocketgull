@@ -81,6 +81,21 @@ class _ProviderDashboardState extends State<ProviderDashboard> {
                     itemBuilder: (context, index) {
                       final patient = _patients[index];
                       return ListTile(
+                        leading: Hero(
+                          tag: 'avatar-${patient.id}',
+                          child: CircleAvatar(
+                            backgroundColor: getPatientAvatarColor(patient.id, isDark),
+                            radius: isWatch ? 12 : 20,
+                            child: Text(
+                              getPatientInitials(patient.name),
+                              style: TextStyle(
+                                color: getPatientAvatarTextColor(patient.id, isDark),
+                                fontWeight: FontWeight.bold,
+                                fontSize: isWatch ? 9 : 14,
+                              ),
+                            ),
+                          ),
+                        ),
                         contentPadding: EdgeInsets.symmetric(horizontal: tileHorizontalPadding, vertical: tileVerticalPadding),
                         title: Text(
                           patient.name,
@@ -105,4 +120,53 @@ class _ProviderDashboardState extends State<ProviderDashboard> {
                 ),
     );
   }
+}
+
+String getPatientInitials(String name) {
+  if (name.isEmpty) return '';
+  final parts = name.trim().split(' ');
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return parts[0][0].toUpperCase();
+}
+
+Color getPatientAvatarColor(String id, bool isDark) {
+  final int hash = id.hashCode;
+  final List<Color> darkColors = [
+    const Color(0xFF1E3A8A), // Blue
+    const Color(0xFF065F46), // Green
+    const Color(0xFF701A75), // Purple
+    const Color(0xFF7C2D12), // Orange/Rust
+    const Color(0xFF1F2937), // Dark Gray
+  ];
+  final List<Color> lightColors = [
+    const Color(0xFFDBEAFE), // Light Blue
+    const Color(0xFFD1FAE5), // Light Green
+    const Color(0xFFF3E8FF), // Light Purple
+    const Color(0xFFFFEDD5), // Light Orange
+    const Color(0xFFF3F4F6), // Light Gray
+  ];
+  final list = isDark ? darkColors : lightColors;
+  return list[hash.abs() % list.length];
+}
+
+Color getPatientAvatarTextColor(String id, bool isDark) {
+  final int hash = id.hashCode;
+  final List<Color> darkTextColors = [
+    const Color(0xFF93C5FD),
+    const Color(0xFF6EE7B7),
+    const Color(0xFFF5D0FE),
+    const Color(0xFFFDBA74),
+    const Color(0xFFE5E7EB),
+  ];
+  final List<Color> lightTextColors = [
+    const Color(0xFF1E40AF),
+    const Color(0xFF065F46),
+    const Color(0xFF6B21A8),
+    const Color(0xFF9A3412),
+    const Color(0xFF374151),
+  ];
+  final list = isDark ? darkTextColors : lightTextColors;
+  return list[hash.abs() % list.length];
 }

@@ -96,7 +96,6 @@ export interface IBodyPartIssue {
     // Tri-Paradigm Diagnostic Matrix (TDM) Extensions
     tcmPattern?: string;          // TCM disharmony mapping (e.g., Qi Stagnation)
     ayurvedicImbalance?: string;  // Ayurvedic dosha imbalance (e.g., Vata Aggravation)
-    growThySelfFocus?: string;    // Secular/functional longevity category
 }
 
 export interface IPatientVitals {
@@ -165,10 +164,21 @@ export interface IShoppingListItem {
     referenceNotion?: string;
 }
 
+export interface IAyurvedicStatus {
+    prakriti?: 'Vata' | 'Pitta' | 'Kapha' | 'Vata-Pitta' | 'Pitta-Kapha' | 'Vata-Kapha' | 'Tridosha';
+    vikriti?: string;      // Current doshic imbalance state
+    agniStatus?: 'Sama' | 'Vishama' | 'Tikshna' | 'Manda';
+    amaStatus?: 'Nirama' | 'Sama'; // Toxic accumulation status
+    affectedDhatus?: ('Rasa' | 'Rakta' | 'Mamsa' | 'Medas' | 'Asthi' | 'Majja' | 'Shukra')[];
+    blockedSrotas?: string[];
+    dominantGunas?: string[];
+}
+
 export interface IPatientState {
     issues: Record<string, IBodyPartIssue[]>;
     patientGoals: string;
     vitals: IPatientVitals;
+    ayurvedicStatus?: IAyurvedicStatus;
     dynamicNutrients?: IDynamicMarker[];
     oxidativeStressMarkers?: IDynamicMarker[];
     antioxidantSources?: IDynamicMarker[];
@@ -189,7 +199,7 @@ export interface IPatientState {
     /** Current AI-generated AVS co-regulation protocol. */
     avsProtocol?: IAvsProtocol;
     /** Selected medical paradigm / philosophy mode. */
-    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self';
+    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic';
 }
 
 /**
@@ -360,8 +370,7 @@ export interface IBookmark {
     publisher?: string;
     isPeerReviewed?: boolean;
     cited?: boolean; // If true, should be included in references
-    // Tri-Paradigm Diagnostic Matrix (TDM) Extensions
-    paradigms?: ('western' | 'eastern' | 'ayurvedic' | 'grow-thy-self')[];
+    paradigms?: ('western' | 'eastern' | 'ayurvedic')[];
     tcmMeridians?: string[];
     ayurvedicDoshas?: ('Vata' | 'Pitta' | 'Kapha')[];
 }

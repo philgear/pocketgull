@@ -8,6 +8,7 @@ import 'blocs/patient/patient_bloc.dart';
 import 'blocs/analysis/analysis_cubit.dart';
 import 'services/clinical_intelligence_service.dart';
 import 'services/local_intelligence_service.dart';
+import 'services/orcid_service.dart';
 import 'services/export_service.dart';
 import 'screens/splash_screen.dart';
 
@@ -16,14 +17,14 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
-  print("Handling a background message: ${message.messageId}");
+  debugPrint("Handling a background message: ${message.messageId}");
 }
 
 void main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // TODO: Uncomment after running 'flutterfire configure'
+    // Note: Uncomment after running 'flutterfire configure'
     /*
     try {
       await Firebase.initializeApp();
@@ -43,7 +44,7 @@ void main() async {
       print("Note: You must run 'flutterfire configure' to generate native config files.");
     }
     */
-    print("Firebase initialization skipped. Run 'flutterfire configure' first.");
+    debugPrint("Firebase initialization skipped. Run 'flutterfire configure' first.");
     
     // Initialize Hive local offline database
     await Hive.initFlutter();
@@ -55,22 +56,26 @@ void main() async {
       // Add a timeout to prevent initialization from hanging the entire app
       await localAI.initialize().timeout(
         const Duration(seconds: 5),
-        onTimeout: () => print('Local AI initialization timed out.'),
+        onTimeout: () => debugPrint('Local AI initialization timed out.'),
       );
     } catch (e) {
-      print('Critical error during Local AI initialization: $e');
+      debugPrint('Critical error during Local AI initialization: $e');
     }
+
+    final orcidService = OrcidService();
+    await orcidService.initialize();
     
-    runApp(PocketGullApp(localAI: localAI));
+    runApp(PocketGullApp(localAI: localAI, orcidService: orcidService));
   }, (error, stack) {
-    print('GLOBAL ERROR: $error');
-    print(stack);
+    debugPrint('GLOBAL ERROR: $error');
+    debugPrint(stack.toString());
   });
 }
 
 class PocketGullApp extends StatelessWidget {
   final LocalIntelligenceService localAI;
-  const PocketGullApp({super.key, required this.localAI});
+  final OrcidService orcidService;
+  const PocketGullApp({super.key, required this.localAI, required this.orcidService});
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +86,9 @@ class PocketGullApp extends StatelessWidget {
       providers: [
         RepositoryProvider<ClinicalIntelligenceService>(
           create: (_) => ClinicalIntelligenceService(apiKey: apiKey),
+        ),
+        RepositoryProvider<OrcidService>.value(
+          value: orcidService,
         ),
         RepositoryProvider<LocalIntelligenceService>.value(
           value: localAI,

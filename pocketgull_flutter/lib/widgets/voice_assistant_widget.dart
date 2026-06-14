@@ -34,9 +34,9 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
   void _startListening() async {
     await _speechToText.listen(
       onResult: _onSpeechResult,
-      listenFor: const Duration(seconds: 30),
-      pauseFor: const Duration(seconds: 5),
       listenOptions: SpeechListenOptions(
+        listenFor: const Duration(seconds: 30),
+        pauseFor: const Duration(seconds: 5),
         partialResults: true,
         cancelOnError: true,
         listenMode: ListenMode.dictation,
@@ -204,30 +204,6 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
           _isListening ? Icons.mic_off : Icons.mic,
           color: _isListening ? Colors.white : Colors.black,
           size: 24,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRippleAnimation() {
-    return Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white.withValues(alpha: _isListening ? 0.5 : 0.1),
-          width: 2,
-        ),
-      ),
-      child: Center(
-        child: Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withValues(alpha: _isListening ? 0.2 : 0.05),
-          ),
         ),
       ),
     );

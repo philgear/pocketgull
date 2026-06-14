@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./docs/images/transparent-banner.svg" alt="PocketGull Banner" width="100%">
+</p>
+
 # 🕊️ POCKET GULL
 **Aerial Perspective for the Clinical Ocean**
 
@@ -7,17 +11,37 @@
 **Google Gemini Live Agent Challenge** / Hackathon 2026
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)
-![Angular](https://img.shields.io/badge/Angular-v21.1-DD0031?logo=angular)
+![Angular](https://img.shields.io/badge/Angular-v21.2-DD0031?logo=angular)
 ![Three.js](https://img.shields.io/badge/Three.js-v0.183-000000?logo=three.js)
 ![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Version](https://img.shields.io/badge/version-0.10.0-blue)
+![Version](https://img.shields.io/badge/version-1.0.0--rc4-blue)
+[![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
+[![DOI](https://zenodo.org/badge/1161259215.svg)](https://doi.org/10.5281/zenodo.20647513)
+[![ACM Code of Ethics](https://img.shields.io/badge/ACM-Ethics%20%26%20Conduct-006699?logo=associationforcomputingmachinery&logoColor=white)](https://www.acm.org/code-of-ethics)
+[![IEEE Code of Ethics](https://img.shields.io/badge/IEEE-Advancing%20Technology-00629B?logo=ieee&logoColor=white)](https://www.ieee.org/about/corporate/governance/p7-8.html)
+[![AnitaB.org](https://img.shields.io/badge/AnitaB.org-Diversity%20in%20Tech-FF007F)](https://anitab.org)
+[![PDXWIT](https://img.shields.io/badge/PDXWIT-Inclusion%20%26%20Equity-00A896)](https://www.pdxwit.org)
+[![Calagator](https://img.shields.io/badge/Calagator-PDX%20Tech-ED5A3B)](http://calagator.org)
+[![Oregon Care Partners](https://img.shields.io/badge/Oregon%20Care%20Partners-Caregiver%20Training-4F86C6)](https://oregoncarepartners.com)
+[![American Psychological Association](https://img.shields.io/badge/APA-Psychological%20Standards-003366)](https://www.apa.org)
+[![American Academy of Arts and Sciences](https://img.shields.io/badge/AAA%26S-Arts%20%26%20Sciences-7A1C1C)](https://www.amacad.org)
+
+
 
 ### CATEGORY
 **Live Agents 🗣️** (Multimodal Synthesis & Agent Orchestration)
 
 ### VISION
 *"To provide practitioners with the 'Gull's Eye View'—the ability to rise above the turbulent sea of medical data and see the clear, actionable patterns beneath."*
+
+---
+
+## 🎨 BRAND IDENTITY & SOCIAL MEDIA CARD
+
+Pocket Gull's brand identity, structured logo, and custom marketing QR code (pointing to [pocketgull.app](https://pocketgull.app)) are showcased in our final paper-folded origami diorama social card. 
+
+![Pocket Gull Social Preview](./social-preview.png)
 
 ---
 
@@ -39,7 +63,7 @@ Like its namesake, the agent is **agile**, **interruptible**, and **highly obser
 Pocket Gull eliminates "Black Box" AI anxiety. Every recommendation is anchored by an **Evidence Trail** generated through real-time integration with **Google Programmable Search** and **NCBI PubMed**. The agent doesn't just suggest; it cites.
 
 #### 🎙️ MULTIMODAL SYNTHESIS & ORCHESTRATION
-Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts operate in a "InMemoryRunner" environment, maintaining **context-aware memory** of report nodes, allowing for fluid, multi-turn reasoning across voice and visual UI.
+Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts operate in an `InMemoryRunner` environment, maintaining **context-aware memory** of report nodes, allowing for fluid, multi-turn reasoning across voice and visual UI.
 
 #### 📐 PRECISION 3D ANATOMICAL MODELING
 Using Three.js, we provide a procedurally detailed skeletal and surface model. Severity is visualized through dynamic particle systems, translating abstract pain descriptions into **spatial clinical data**.
@@ -67,40 +91,63 @@ A highly interactive, aesthetically minimal user interface (Industrial Grace) de
 ## 📃 Text Description
 
 **What it does:**
-Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-time human-in-the-loop web speech interaction with a diagnostic 3D surface model and Gemini's deep reasoning (`gemini-2.5-flash` natively and via `@google/adk`), it processes a patient's multimodal symptom data to instantly produce synthesized, actionable clinical strategies.
+Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-time human-in-the-loop web speech interaction with a diagnostic 3D surface model and Gemini's deep reasoning (`gemini-2.5-flash` via Vertex AI Enterprise and `@google/adk`), it processes a patient's multimodal symptom data to instantly produce synthesized, actionable clinical strategies.
 
-**Core Features:**
+---
+
+### 🔒 Security & Compliance
+
+- **Vertex AI Enterprise Backend**: Upgraded from the developer Gemini API to regional Google Cloud Vertex AI Enterprise, with automatic ADC token resolution, regional endpoints, and custom safety thresholds.
+- **Bidirectional WebSocket Live Proxy**: Secure `/ws/gemini-live` proxy route on Express with recursive camelCase↔snake_case translation for full-duplex live audio streaming.
+- **Tink Envelope Cryptography & PQC**: Google Tink AEAD cryptographic envelopment for local patient records with Quantum-Safe Cryptography Kyber/Dilithium transport fallbacks for HIPAA transit compliance.
+- **Draw-to-Unlock Secure Gateway**: Premium Canvas drawing pad verifying a smiley face gesture pattern, replacing the legacy numeric PIN screen. Includes WebAuthn biometric conditional UI where device-supported.
+- **Security Hardening & MFA Gateways**: Firebase Google Login flow with domain whitelists and multi-factor authentication (MFA) parameters.
+- **Shift-Left Pre-Commit Hook**: Husky pre-commit pipeline checking TypeScript types, running Vitest unit tests, scanning for credential/API key leaks, and verifying markdown image references.
+- **IP-Based API Rate Limiting**: Custom in-memory `rateLimiter` middleware to mitigate denial-of-service and resource exhaustion on patient data endpoints.
+- **CodeQL-Hardened Routes**: SSRF patching via `normalizeAndValidateModel`, path traversal prevention on static routes, and PII redaction from CI logs.
+
+### 🤖 AI & Intelligence
+
 - **Live AI Consult & Multi-Agent Orchestration:** Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts synthesize clinical data into actionable insights through an interruptible, natural conversational UI with **context-aware memory** of recently discussed report nodes.
 - **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
 - **Orthomolecular Profiling & Biomarker Matrix:** Automatically extracts and visualizes biochemical markers (e.g., Magnesium, B12) from AI-generated functional protocols into a glassmorphic diagnostic dashboard.
+- **Multi-Paradigm Philosophy Dashboards:** Full system support for Western, Eastern, Ayurvedic, or "Grow Thy Self" longevity medicine paradigms, with automated report regeneration and a secular translation engine mapping 13 world philosophies into psychological and physiological domains.
+- **Offline PWA Intelligence:** Built-in `window.ai` (Gemini Nano) routing for on-device fallback and token-free local processing in the Progressive Web App.
+- **WebMCP Schema Mapping:** Registered Model Context Protocol (MCP) standards schemas for seamless integration of external clinical knowledge databases.
+
+### 🏥 Clinical UX
+
+- **Good Samaritan Emergency Care:** Offline emergency override mode featuring a 110 BPM chest-compression metronome, BLS safety-gated Gemini Nano local routing, local FHIR-compliant EMT QR code serialization (`lean-qr`), and global telemetry suppression.
 - **Cognition & Multilingual Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly, pediatric formats, or professionally translate them into **Spanish, German, French, or Mandarin**. Outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
 - **Colleague Collaboration Room (TaskFlow):** A real-time multiplayer workspace integrated directly into the patient's view for clinicians to share states, dictate notes, and chat collaboratively.
 - **Hands-Free Voice Dictation & Controls:** Voice command interception during dictation allows hands-free UI control, task addition, and message composition.
+- **Client-Side Barge-In Interruption:** Local `onspeechstart` barge-in tuning across clinical dialog and voice assistant panels, with instant audio muting when the clinician begins speaking.
 - **Printable Clinical Stationery:** CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis, with user-selectable toggles for clinical summaries and history.
-- **Minimalist Dieter Rams Design:** A premium, minimalist UI prioritizing clarity, neutrality, functional excellence, and seamless mobile responsive layouts (`100dvh`). Includes dark-mode agent conversations.
-- **Detailed 3D Medical Imagery:** Precise anatomical selection using a Three.js-powered skeletal and surface model (including detailed procedural spine geometry) with dynamic particle systems highlighting diagnostic severity.
-- **Smartwatch & Mobile Optimization:** Responsive Two-Column Grid UI scaling down to extremely constrained viewports (e.g., Pixel Watch 2 at 286px width) for ultra-portable clinical referencing.
 - **Circadian UI & AVS Coregulation:** Seamless integration of continuous, time-based circadian CSS themes with the clinical interface to promote ambient rhythm alignment and offset clinician fatigue.
 - **IoT Smart Lighting Sync:** `AmbientLightingService` mathematically mapping UI circadian HSL values directly to local physical Philips Hue hardware to physically coregulate the clinical environment.
-- **Offline PWA Intelligence:** Built-in `window.ai` (Gemini Nano) routing for on-device fallback and token-free local processing in the Progressive Web App.
 - **KSS Readiness Gateway:** 9-point Karolinska Sleepiness Scale integration for real-time clinician alertness checks overriding the ambient circadian theme.
-- **Scans & Diagnostics Library:** Integrated visual gallery within the patient profile for organizing and analyzing medical imagery (e.g., MRI, X-Rays), complete with dynamic Wikimedia Commons linking.
-- **Evidence Focus Iconography:** Custom medical iconography enhancing the interactive Task Bracketing and inline chat systems.
+- **Sentinel Gamification & Cognitive Triage:** Clinician alertness and fatigue-tracking dashboard to monitor practitioner cognitive load in high-stress triage environments.
 - **Box Breathing UX:** Focused 16-second box breathing visual animations integrated into primary intake text areas to promote practitioner mindfulness.
-- **Interactive Task Bracketing:** Rapidly markup generated care plans using a double-click state machine (Normal, Added, Removed) to vet and customize AI recommendations.
-- **FHIR-Standard Data Portability & Localized Auto-Save:** Real-time persistence with visual "Saving..." / "Saved ✔" indicators, exported via Unicode-safe Base64 encoded FHIR Bundles.
+
+### 📊 Visualization & Data
+
+- **Detailed 3D Medical Imagery:** Precise anatomical selection using a Three.js-powered skeletal and surface model (including detailed procedural spine geometry) with dynamic particle systems highlighting diagnostic severity.
 - **Method of Loci (Memory Palace):** Anchor clinical chat entries to spatial memory loci across the 3D anatomical model, facilitating rapid spatial recall of complex patient histories.
-- **Secure Splash Authentication:** Gesture-based "smiley face" unlock mechanism with WebAuthn-compatible biometric conditional UI for robust and accessible clinical entry.
-- **Patient Management System:** Full CRUD capabilities for patient records, including historical visit review and permanent record removal.
+- **3D Anatomical Extensions:** Pluggable mesh loaders (GLTF, USDZ, OBJ) on the Three.js viewport for customized skeletal modeling.
+- **Scans & Diagnostics Library:** Integrated visual gallery within the patient profile for organizing and analyzing medical imagery (e.g., MRI, X-Rays), complete with dynamic Wikimedia Commons linking.
+- **FHIR-Standard Data Portability & Localized Auto-Save:** Real-time persistence with visual "Saving..." / "Saved ✔" indicators, exported via Unicode-safe Base64 encoded FHIR Bundles.
+- **Smartwatch & Mobile Optimization:** Responsive Two-Column Grid UI scaling down to extremely constrained viewports (e.g., Pixel Watch 2 at 286px width) for ultra-portable clinical referencing.
+- **Multi-Vendor GPU Telemetry:** Windows CIM/WMI adapters querying AMD/Intel/NVIDIA graphics, macOS system profiles, unified memory estimation, and dynamic WebGPU routing recommendations.
+
 **Technologies Used:**
-- **Framework:** Angular v21.1 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
+- **Framework:** Angular v21.2 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
 - **Visualization:** Three.js (3D Anatomical Modeling)
-- **Intelligence:** Google GenAI SDK (`gemini-2.5-flash`) & Google Agent Development Kit (`@google/adk`)
+- **Intelligence:** Google GenAI SDK (`gemini-2.5-flash` via Vertex AI Enterprise) & Google Agent Development Kit (`@google/adk`)
 - **Research Integrations:** Google Programmable Search Engine (CSE) & NIH PubMed E-utilities
 - **Export Engine:** jsPDF & FHIR Bundle standard
 - **Styling:** Tailwind CSS & Dieter Rams Design System
 - **Speech Control:** Web Speech API (Bi-directional voice interaction)
-- **Deployment & Infrastructure:** Google Cloud Run, Express.js Backend
+- **Deployment & Infrastructure:** Google Cloud Run, Express.js Backend with Vertex AI regional endpoints
 
 **Data Sources:**
 Primary inputs consist of manual demographics, biometric body map interaction, and voice-to-text dictation. Auxiliary real-time clinical context is gathered securely without persistent DB tracking using Google Programmable Search Engine API and NCBI PubMed E-utilities XML parsing algorithms. Patient state data is strictly locally persisted between active sessions.
@@ -123,20 +170,21 @@ Full engineering documentation is available in the [`docs/study/`](./docs/study/
 - **[Getting Started](./docs/study/src/pages/getting-started.mdx)** — Installation, development, and deployment
 - **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
 - **[Valuation & Positioning](./docs/valuation_and_positioning.md)** — Business case, target audience, and valuation framework
+- **[Design System & Avian Personas](./DESIGN.md)** — Dieter Rams design language, brand identity, and the Gull Squadron AI agent personas
 
 ---
 
 ## 👨‍💻 Public Code Repository & Spin-Up Instructions
 
 **Developer Profile:** [g.dev/philgear](https://g.dev/philgear)  
-**Repository:** [github.com/philgear/pocket-gull](https://github.com/philgear/pocket-gull)
+**Repository:** [github.com/philgear/pocketgull](https://github.com/philgear/pocketgull)
 
 To run this project in a local development environment:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/philgear/pocket-gull.git
-    cd pocket-gull
+    git clone https://github.com/philgear/pocketgull.git
+    cd pocketgull
     ```
 
 2.  **Install dependencies:**
@@ -161,15 +209,15 @@ To run this project in a local development environment:
 
 Pocket Gull's backend service and Express proxy layer is architecturally designed to deploy directly to **Google Cloud Run**.
 
-- **Proof of Action:** Successfully deployed to Google Cloud Run! The live application is available at: [https://pocketgall.app](https://pocketgall.app) (and [https://understory-315235665910.us-west1.run.app](https://understory-315235665910.us-west1.run.app))
+- **Proof of Action:** Successfully deployed to Google Cloud Run! The live application is available at: [https://pocketgull.app](https://pocketgull.app)
 - **Repository Proof:** See `./server.js` and `./src/services/clinical-intelligence.service.ts` for Google Cloud infrastructure integrations.
 
 ---
 
 ## 🏗️ Architecture Diagram
 
-Built with a **Signals-First (Zoneless)** architecture in Angular v21.1 for 100/100 Lighthouse performance and deterministic state management.
-The application leverages a modern, reactive architecture utilizing Angular Signals, Cloud Run orchestration, and the Google GenAI API stack. *(Note: This conceptual map is available in high resolution within the hackathon image carousel.)*
+Built with a **Signals-First (Zoneless)** architecture in Angular v21.2 for 100/100 Lighthouse performance and deterministic state management.
+The application leverages a modern, reactive architecture utilizing Angular Signals, Cloud Run orchestration, and the Google Vertex AI Enterprise stack. *(Note: This conceptual map is available in high resolution within the hackathon image carousel.)*
 
 ```mermaid
 graph TD
@@ -179,7 +227,10 @@ graph TD
     subgraph "INTELLIGENCE LAYER"
         State -->|Context Injection| Adk[ADK InMemoryRunner]
         Adk -->|Orchestrates| Agents[Specialized Agents]
-        Agents -->|REST/SSE| Gemini[Gemini 2.5 Flash]
+        Agents -->|HTTPS REST/SSE| Proxy[Express.js Backend]
+        Proxy -->|WebSocket /ws/gemini-live| VertexAI[Vertex AI Enterprise]
+        Proxy -->|REST Completions| VertexAI
+        VertexAI -->|Streams| Gemini[gemini-2.5-flash]
     end
 
     subgraph "EVIDENCE FOUNDATION"
@@ -202,7 +253,7 @@ graph TD
 
 #### 1. REPRODUCIBILITY
 ```bash
-git clone https://github.com/philgear/pocket-gull.git
+git clone https://github.com/philgear/pocketgull.git
 npm install
 npm run dev
 ```
@@ -219,6 +270,17 @@ Pocket Gull adheres to the **Human-in-the-Loop** (HITL) principle and is hardene
 - **Automated Red Teaming:** A built-in Vitest test suite (`tests/safety.spec.ts`) actively verifies the Google Gemini `BLOCK_MEDIUM_AND_ABOVE` boundaries against adversarial prompts targeting the live proxy.
 - **Explainability:** The agent surfaces its reasoning lens (Intervention, Monitoring, Education, Orthomolecular) for every output.
 - **Privacy Core:** Zero PII persistence. All patient state is transient or locally-stored.
+
+### Professional Standards & Communities
+We align our engineering practices and ethical standards with these guidelines and professional organizations:
+- **[ACM Code of Ethics](https://www.acm.org/code-of-ethics)**: Ensuring honesty, trustworthiness, and data integrity.
+- **[IEEE Code of Ethics](https://www.ieee.org/about/corporate/governance/p7-8.html)**: Commitment to public safety, privacy, and technical competence.
+- **[AnitaB.org](https://anitab.org)**: Supporting gender diversity and parity in technology.
+- **[PDXWIT](https://www.pdxwit.org)**: Fostering inclusion, education, and representation within the Portland, OR tech ecosystem.
+- **[Calagator](http://calagator.org)**: Connecting with local open-source technology events and community dev forums.
+- **[Oregon Care Partners](https://oregoncarepartners.com)**: Accessing high-quality caregiver training and evidence-based education to support local Oregon eldercare and community wellness.
+- **[American Psychological Association](https://www.apa.org)**: Promoting psychological science and professional standards in behavior, mental health, and clinical assessment.
+- **[American Academy of Arts and Sciences](https://www.amacad.org)**: Aligning clinical strategy with independent research and multidisciplinary studies in the arts, humanities, and sciences.
 
 ---
 

@@ -4,9 +4,13 @@
 Pocket-Gull is a real-time medical Care Plan Strategy and Live AI Consult engine powered by Google Gemini. The application is designed to provide actionable clinical intelligence, manage patient state, and offer real-time streaming AI consultations for symptom management and functional medicine.
 
 ## Tech Stack
-- **Frontend**: Angular 18 (Standalone Components, Signals)
+- **Frontend**: Angular 22 (Standalone Components, Signals)
 - **Backend/SSR**: Node.js, Express, Angular Server-Side Rendering
-- **AI Integration**: Google Gemini (via native REST, `@google/adk`, `@google/genai`, and Genkit)
+- **AI Integration**: Google Gemini (via native REST, `@google/adk` `InMemoryRunner`, `@google/genai`, and Genkit)
+- **Interactive 3D Anatomy**: Three.js for procedural skeletal and surface modeling
+- **Voice / Speech**: Web Speech API for bi-directional voice interaction
+- **Privacy & Export**: DOMPurify for HIPAA-compatible sanitization, FHIR R4 Bundle standard, jsPDF
+- **Companion Apps**: Python FastAPI sidecar (ML scoring), Flutter/Dart (Mobile Suite)
 - **Styling**: TailwindCSS
 
 ## Key Architecture Concepts
@@ -34,6 +38,8 @@ Pocket-Gull is a real-time medical Care Plan Strategy and Live AI Consult engine
 - Start the development server using `npm run dev` (this handles both the client and the integrated SSR Express server).
 - To verify a build, execute `npm run build`.
 - Deployment is to Google Cloud Run via `npm run deploy`.
+- **Deployment Strategy**: All deployments MUST target the `gen-lang-client-0540208645` Google Cloud project.
+- **Cloud Bill & Cost Strategy**: Always monitor the cloud bill and ensure services scale to zero to minimize costs.
 
 ## Perfect Component Example
 ```typescript

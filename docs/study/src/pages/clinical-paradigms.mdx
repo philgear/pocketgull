@@ -56,13 +56,18 @@ When a clinician toggles the paradigm selectors, the system instructions in <Doc
   - **B12 / Iron** $\rightarrow$ mapped to **Spleen Blood generation**.
 
 ### 🟡 Ayurvedic Medicine Mode
-* **Diagnostic Lenses**: Evaluates Tridosha constitutions/imbalances (Vata, Pitta, Kapha) along with metabolic digestive fire (**Agni**) and undigested cellular toxicity (**Ama**).
-* **Interventions**: Incorporates *Dinacharya* (circadian daily regimens), spice energetics (Rasayana), and balancing sensory routines.
+* **Diagnostic Lenses**: Evaluates Tridosha imbalances (Vata, Pitta, Kapha), metabolic fire (**Agni**), undigested metabolic toxicity (**Ama**), core vitality (**Ojas**), and attributes (**Gunas**).
+* **Channel & Tissue Penetration**: Assesses system blockages within the bodily channels (**Srotas**, such as *Asthivaha* and *Majjavaha*) and tissue layers (**Dhatus**, including *Asthi* and *Majja*).
+* **Reactive Clinical Triage Logic**: Automatically maps clinical status updates (vitals, symptoms, goals) to energetic imbalances:
+  - **Vata (Ruksha/Sheeta Gunas)**: Triggered by neurological symptoms, radiculopathy, pain, and irregular heart rates.
+  - **Pitta (Ushna/Tikshna Gunas)**: Triggered by fever, inflammatory markers, and hypertension.
+  - **Kapha (Guru/Manda Gunas)**: Triggered by sluggishness or congestion.
+* **Interventions**: Integrates customized *Dinacharya* (daily circadian regimens like *Gandusha* oil pulling, *Nasya* drops, and *Abhyanga* warm massage), local therapies (such as *Kati Basti* oil pooling), spice energetics, and alternate nostril breathing (*Nadi Shodhana*).
 * **Biomarker-to-Dhatu Bridge**: Maps micronutrients to the seven traditional bodily tissues (**Dhatus**) and core vitality (**Ojas**):
-  - **Calcium / Vitamin D3** $\rightarrow$ mapped to **Asthi Dhatu** (bone tissue).
-  - **Iron / B12** $\rightarrow$ mapped to **Rakta Dhatu** (blood tissue).
-  - **Zinc / Magnesium** $\rightarrow$ mapped to **Majja Dhatu** (nervous tissue).
-  - **Antioxidant capacity** $\rightarrow$ mapped to **Ojas replenishment**.
+  - **Calcium / Vitamin D3** $\rightarrow$ mapped to **Asthi Dhatu** (bone/cartilage tissue) and *Asthivaha Srotas*.
+  - **Iron / B12** $\rightarrow$ mapped to **Rakta Dhatu** (blood tissue) and *Raktavaha Srotas*.
+  - **Zinc / Magnesium** $\rightarrow$ mapped to **Majja Dhatu** (nervous tissue) and *Majjavaha Srotas*.
+  - **Antioxidant capacity** $\rightarrow$ mapped to **Ojas replenishment** and *Manovaha Srotas* (mind channel).
 
 ---
 
@@ -82,3 +87,32 @@ Pocket Gull actively strips theological or dogmatic language from clinical findi
 - **Mizan (Islamic)** $\rightarrow$ Translates to systemic bodily homeostasis and clean, wholesome (Tayyib) nutrition.
 - **Ubuntu (African)** $\rightarrow$ Translates to family co-regulation and communal support circles to lower isolation stress.
 - **Tikkun Olam (Jewish)** $\rightarrow$ Translates to personal physical healing as a prerequisite for community service.
+
+---
+
+## 🎨 4. Aesthetic Design & Theme Tokens
+
+The application's **Industrial Grace** design language uses distinct color accents and typography to represent each clinical paradigm. When a paradigm is toggled, it dynamically transforms the color palette, visual hierarchy, and borders of active cards and status components.
+
+These same themes can be toggled dynamically at the top right of this documentation page:
+
+### 🔵 Western (Allopathic) Theme / Sky Accent
+* **Theme class**: `theme-western`
+* **Accents**: Sky Blue (`sky-50/40`, `sky-200/60`, `sky-950/10`, `sky-900/30`, `sky-400`, `sky-500`, `sky-700`)
+* **Design Philosophy**: Denotes crisp, clear, clinical efficiency and standard allopathic evidence. It uses a high-contrast layout to focus on modern lab biomarkers and standard vital metrics.
+
+### 🟢 Eastern (TCM) Theme / Emerald Accent
+* **Theme class**: `theme-eastern`
+* **Accents**: Emerald Green (`emerald-600`, `emerald-500`, `emerald-400`, etc.)
+* **Design Philosophy**: Emphasizes balance, herbal growth, and natural Qi meridian channels. The softer organic green borders reduce clinician fatigue and visually signal holistic/systemic harmony.
+
+### 🟡 Ayurvedic Theme / Amber Accent
+* **Theme class**: `theme-ayurvedic`
+* **Accents**: Amber/Orange (`amber-950/20`, `amber-900/30`, `amber-500`, `amber-400`, `amber-300/80`)
+* **Design Philosophy**: Represents metabolic fire (Agni), vitality (Ojas), and traditional warm herbs/spices. The warm background gradients create a welcoming, ancient-world grounding element.
+
+### 🔘 Secular Longevity Theme / Zinc Accent
+* **Theme class**: `theme-longevity`
+* **Accents**: Neutral Slate/Zinc (`zinc-800`, `zinc-700`, `zinc-500`, `zinc-400`, etc.)
+* **Design Philosophy**: A minimalist, high-contrast monochrome design focus. Designed for data-heavy preventive wellness and cellular optimization analysis without extraneous color distractions.
+

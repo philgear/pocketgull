@@ -31,6 +31,18 @@ paths:
       responses:
         '200':
           description: Successful article summary
+  /orcid/{id}:
+    get:
+      summary: Get public ORCID record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful ORCID record retrieval
   /patients:
     post:
       summary: Sync patients to cloud

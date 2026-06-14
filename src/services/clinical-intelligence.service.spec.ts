@@ -6,6 +6,7 @@ import { AiCacheService } from './ai-cache.service';
 import { NetworkStateService } from './network-state.service';
 import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
+import { OrcidService } from './orcid.service';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 describe('ClinicalIntelligenceService - Philosophy Modes', () => {
@@ -13,14 +14,15 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
   let mockPatientState: any;
   let mockIntelligenceProvider: any;
   let mockAiCache: any;
+  let mockOrcidService: any;
   let injector: Injector;
 
   beforeEach(() => {
     mockPatientState = {
-      activePhilosophy: signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'>('western'),
+      activePhilosophy: signal<'western' | 'eastern' | 'ayurvedic'>('western'),
       isEmergencyMode: signal<boolean>(false),
       isDemoMode: signal<boolean>(false),
-      selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self') {
+      selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
         this.activePhilosophy.set(philosophy);
       }
     };
@@ -46,12 +48,18 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
       set: vi.fn().mockResolvedValue(undefined)
     };
 
+    mockOrcidService = {
+      orcidProfile: signal<any>(null),
+      fetchRecord: vi.fn().mockResolvedValue({})
+    };
+
     injector = Injector.create({
       providers: [
         { provide: ClinicalIntelligenceService, useClass: ClinicalIntelligenceService },
         { provide: PatientStateService, useValue: mockPatientState },
         { provide: IntelligenceProviderToken, useValue: mockIntelligenceProvider },
         { provide: AiCacheService, useValue: mockAiCache },
+        { provide: OrcidService, useValue: mockOrcidService },
         { provide: NetworkStateService, useValue: {
             isOnline: () => true,
             useLocalInference: () => false
@@ -69,7 +77,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
 
   it('should prepend western philosophy instructions by default', async () => {
     await runInInjectionContext(injector, async () => {
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -80,7 +88,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
   it('should prepend eastern philosophy instructions when selected', async () => {
     await runInInjectionContext(injector, async () => {
       mockPatientState.activePhilosophy.set('eastern');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -91,7 +99,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
   it('should prepend ayurvedic philosophy instructions when selected', async () => {
     await runInInjectionContext(injector, async () => {
       mockPatientState.activePhilosophy.set('ayurvedic');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -99,26 +107,13 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
     });
   });
 
-  it('should prepend grow-thy-self philosophy instructions when selected', async () => {
-    await runInInjectionContext(injector, async () => {
-      mockPatientState.activePhilosophy.set('grow-thy-self');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
 
-      expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
-      const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
-      expect(systemInstructionArg).toContain('CLINICAL PARADIGM: Grow Thy Self (Preventive, Holistic & Longevity Medicine)');
-      expect(systemInstructionArg).toContain('Bagua');
-      expect(systemInstructionArg).toContain('Ikigai');
-      expect(systemInstructionArg).toContain('Ubuntu');
-      expect(systemInstructionArg).toContain('SECULAR & HUMANIST FRAMING');
-    });
-  });
 
   it('should give emergency first aid mode absolute precedence over philosophy instructions', async () => {
     await runInInjectionContext(injector, async () => {
       mockPatientState.isEmergencyMode.set(true);
       mockPatientState.activePhilosophy.set('eastern');
-      await service.generateComprehensiveReport('Patient age 45', ['Summary Overview']);
+      await service.generateComprehensiveReport('Patient age 45');
 
       expect(mockIntelligenceProvider.generateReportStream$).toHaveBeenCalled();
       const systemInstructionArg = mockIntelligenceProvider.generateReportStream$.mock.calls[0][2];
@@ -160,17 +155,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
     });
   });
 
-  it('should inject correct chat context based on grow-thy-self philosophy', async () => {
-    await runInInjectionContext(injector, async () => {
-      mockPatientState.activePhilosophy.set('grow-thy-self');
-      await service.startChatSession('Patient age 45');
 
-      expect(mockIntelligenceProvider.startChat).toHaveBeenCalled();
-      const contextArg = mockIntelligenceProvider.startChat.mock.calls[0][1];
-      expect(contextArg).toContain('Active Medicine Mode: Grow Thy Self');
-      expect(contextArg).toContain('if the patient is non-religious or secular');
-    });
-  });
 
   it('should inject emergency context in chat session if emergency mode is active', async () => {
     await runInInjectionContext(injector, async () => {
@@ -205,10 +190,6 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
       await runInInjectionContext(injector, async () => {
         mockPatientState.isDemoMode.set(true);
         
-        mockPatientState.activePhilosophy.set('grow-thy-self');
-        await service.generateComprehensiveReport('Patient age 45');
-        expect(service.analysisMetrics()).toEqual({ complexity: 5, stability: 8, certainty: 9 });
-
         mockPatientState.activePhilosophy.set('ayurvedic');
         await service.generateComprehensiveReport('Patient age 45');
         expect(service.analysisMetrics()).toEqual({ complexity: 8, stability: 5, certainty: 7 });

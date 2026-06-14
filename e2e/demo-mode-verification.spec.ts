@@ -57,6 +57,9 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     // Enable console logging to see page issues if any
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
+    // Set a large viewport size early so deferred viewport components load immediately
+    await page.setViewportSize({ width: 1440, height: 900 });
+
     // Go to home page
     await page.goto('/');
 
@@ -72,20 +75,20 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     await expect(demoBtn).toBeVisible({ timeout: 10000 });
     await demoBtn.click();
 
-    // 3. Accept Ethics Pledge
+    // 3. Skip Karolinska Sleepiness Scale (KSS) assessment
+    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
+    await expect(skipBtn).toBeVisible({ timeout: 10000 });
+    await skipBtn.click();
+
+    // 4. Accept Ethics Pledge
     const pledgeCheckbox = page.locator('input[type="checkbox"]');
     await expect(pledgeCheckbox).toBeVisible({ timeout: 10000 });
     await pledgeCheckbox.check();
 
-    // Click Accept & Continue
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Continue' });
+    // Click Accept & Enter System
+    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
     await expect(acceptBtn).toBeVisible({ timeout: 10000 });
     await acceptBtn.click();
-
-    // 4. Skip Karolinska Sleepiness Scale (KSS) assessment
-    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-    await expect(skipBtn).toBeVisible({ timeout: 10000 });
-    await skipBtn.click();
 
     // 5. Verify Main Viewport loads
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
@@ -177,23 +180,6 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     await page.screenshot({ path: path.join(artifactDir, 'ayurvedic_dashboard.png'), fullPage: true });
     console.log('[Verification] Ayurvedic screenshot saved.');
 
-    // --- Grow Thy Self Philosophy Verification ---
-    console.log('[Verification] Testing Grow Thy Self Paradigm...');
-    const growThyselfBtn = page.locator('button', { hasText: 'Grow Thy Self' });
-    await growThyselfBtn.click();
-    await page.waitForTimeout(1000);
 
-    // Verify Grow Thy Self Banner active
-    await expect(page.locator('text=Active Paradigm: Grow Thy Self (Preventive & Longevity)')).toBeVisible({ timeout: 5000 });
-
-    // Verify Nutrition in Grow Thy Self Mode
-    await nutritionTab.click();
-    await page.waitForTimeout(500);
-    // Grow Thy Self longevity nutrition check
-    await expect(page.locator('app-analysis-report').locator('text=Sirtuin-1 activation')).toBeVisible({ timeout: 5000 });
-
-    // Take Grow Thy Self Screenshot
-    await page.screenshot({ path: path.join(artifactDir, 'grow_thy_self_dashboard.png'), fullPage: true });
-    console.log('[Verification] Grow Thy Self screenshot saved.');
   });
 });

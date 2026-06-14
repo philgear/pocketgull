@@ -460,7 +460,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 
       <!-- ─── Main Node Content ──────────────── -->
       @if (type() === 'paragraph') {
-        <p [innerHTML]="node().rawHtml | safeHtml"
+        <p [innerHTML]="rawHtml() | safeHtml"
            [class.bracket-removed]="node().bracketState === 'removed'"
            [class.bracket-added]="node().bracketState === 'added'"
            (dblclick)="onDoubleClick()"></p>
@@ -577,7 +577,14 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
               [severity]="node().verificationStatus === 'error' ? 'error' : 'warning'" [hasIcon]="true">
               <div badge-icon [innerHTML]="ClinicalIcons.Risk | safeHtml"></div>
             </pocket-gull-badge>
-            <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Medical Audit Result</span>
+            @if (hasAcmViolation()) {
+              <pocket-gull-badge
+                [label]="'ACM 1.3 Ethics Flag'"
+                [severity]="'error'" [hasIcon]="true">
+                <div badge-icon [innerHTML]="ClinicalIcons.Risk | safeHtml"></div>
+              </pocket-gull-badge>
+            }
+            <span class="text-xs font-bold text-gray-555 dark:text-zinc-400 uppercase tracking-widest">Medical Audit Result</span>
           </div>
           <div class="pl-1 flex flex-col gap-1">
             @for (issue of node().verificationIssues; track issue.message) {
@@ -951,10 +958,12 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
     `,
 })
 export class SummaryNodeComponent implements AfterViewChecked {
-  node = input.required<ISummaryNode>();
+  node = input.required<ISummaryNode | ISummaryNodeItem>();
   nodeItem = input<ISummaryNodeItem>({} as any);
   type = input<'paragraph' | 'list-item'>('paragraph');
   sectionTitle = input<string>('');
+  saveStatus = input<string | undefined>();
+  protocolInsights = input<string[]>([]);
 
   update = output<{ key: string; note?: string; showNote?: boolean; bracketState?: 'normal' | 'added' | 'removed'; acceptedProposal?: string }>();
   dictationToggle = output<void>();
@@ -978,7 +987,13 @@ export class SummaryNodeComponent implements AfterViewChecked {
 
   proposalAccepted = signal(false);
   isRejected = signal(false);
-  listItemHtml = computed(() => this.node().rawHtml || (this.node() as any).html || '');
+  rawHtml = computed(() => (this.node() as any).rawHtml || '');
+  listItemHtml = computed(() => (this.node() as any).rawHtml || (this.node() as any).html || '');
+  hasAcmViolation = computed(() => {
+    const issues = this.node().verificationIssues;
+    if (!issues) return false;
+    return issues.some(issue => issue.message && issue.message.includes('ACM 1.3'));
+  });
 
   // ─── Inline chat ─────────────────────────────
   showChat = signal(false);
@@ -1131,7 +1146,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   }
 
   private executeSearch(engine: 'google' | 'pubmed') {
-    const rawContent = this.type() === 'list-item' ? this.listItemHtml() : this.node().rawHtml;
+    const rawContent = this.type() === 'list-item' ? this.listItemHtml() : (this.node() as any).rawHtml || '';
     // Strip HTML to get queryable text
     const textContent = rawContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     if (textContent) {

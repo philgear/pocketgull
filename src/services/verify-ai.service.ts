@@ -41,38 +41,39 @@ export class VerifyAiService {
     ): Promise<{ status: 'verified' | 'warning' | 'error', issues: IVerificationIssue[] }> {
 
         const prompt = `
-      You are a Medical Auditor AI.Your task is to verify an AI - generated clinical report section against the source patient transcript.
+      You are a Medical Auditor AI. Your task is to verify an AI-generated clinical report section against the source patient transcript.
       
       SOURCE TRANSCRIPT:
       ${sourceTranscript}
       
       REPORT SECTION[${sectionTitle}]:
       ${sectionContent}
-
-INSTRUCTIONS:
-1. Cross - reference every clinical claim in the report with the source transcript.
+      
+      INSTRUCTIONS:
+      1. Cross-reference every clinical claim in the report with the source transcript.
       2. Identify any:
-- Hallucinations(claims not found in transcript)
-    - Inaccuracies(claims that distort transcript facts)
-    - Critical Omissions(if the section title implies something that was missed)
-3. Rate the overall verification status as:
-- "verified": All claims are supported by the transcript.
+         - Hallucinations (claims not found in transcript)
+         - Inaccuracies (claims that distort transcript facts)
+         - Critical Omissions (if the section title implies something that was missed)
+      3. Enforce the ACM Code of Ethics Principle 1.3 (Honesty and Trustworthiness - Prohibition of Falsified or Fabricated Data). If the report section contains any fabricated clinical vitals, lab values, or patient history not present in the source transcript, flag them as high-severity data integrity violations. For these violations, start the 'message' with "ACM 1.3 Ethics Violation: ".
+      4. Rate the overall verification status as:
+         - "verified": All claims are supported by the transcript.
          - "warning": Minor inaccuracies or unsupported claims that don't change clinical intent.
-    - "error": Major hallucinations or contradictory information.
+         - "error": Major hallucinations, fabricated data, or contradictory information.
       
       OUTPUT FORMAT:
       Return a JSON object with the following structure:
-{
-    "status": "verified" | "warning" | "error",
+      {
+        "status": "verified" | "warning" | "error",
         "issues": [
-            {
-                "severity": "low" | "medium" | "high",
-                "message": "Description of the issue",
-                "suggestedFix": "Corrected text based on transcript",
-                "claim": "The exact substring from the generated report that is problematic"
-            }
+          {
+            "severity": "low" | "medium" | "high",
+            "message": "Description of the issue",
+            "suggestedFix": "Corrected text based on transcript",
+            "claim": "The exact substring from the generated report that is problematic"
+          }
         ]
-}
+      }
       
       Return ONLY the JSON.
     `;

@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import '../models/orcid_profile.dart';
 
 enum AnalysisLens {
   summaryOverview('Summary Overview'),
@@ -26,15 +28,9 @@ class ClinicalMetrics {
 class ClinicalIntelligenceService {
   final GenerativeModel _model;
   ChatSession? _chatSession;
-  Map<String, String>? _archivedReport;
 
   void resetAIState() {
     _chatSession = null;
-    _archivedReport = null;
-  }
-
-  void loadArchivedAnalysis(Map<String, String> report) {
-    _archivedReport = report;
   }
 
   ClinicalIntelligenceService({required String apiKey}) 
@@ -105,7 +101,7 @@ $_formattingRules''';
 
   bool get _isMockMode => true; // Forced for demonstration
 
-  Stream<String> generateReportStream(String patientData, AnalysisLens lens) async* {
+  Stream<String> generateReportStream(String patientData, AnalysisLens lens, {OrcidProfile? orcidProfile}) async* {
     if (_isMockMode) {
       await Future.delayed(const Duration(milliseconds: 10));
       yield '### [Mock Report] ${lens.title}\n\n';
@@ -119,8 +115,23 @@ $_formattingRules''';
       return;
     }
 
+    String sysInst = _getSystemInstruction(lens);
+    if (orcidProfile != null) {
+      final worksList = orcidProfile.works.map((w) {
+        final year = w.year ?? 'N/A';
+        final type = w.type ?? 'publication';
+        final urlStr = w.url != null ? ' (URL: ${w.url!})' : '';
+        return '- "${w.title}" ($year) - $type$urlStr';
+      }).join('\n');
+
+      sysInst += '\n\nCLINICIAN RESEARCH CONTEXT (ORCID ID: ${orcidProfile.orcidId}):\n'
+          'The consulting clinician is ${orcidProfile.name}.\n'
+          'Their research keywords include: ${orcidProfile.keywords.join(', ')}.\n'
+          '$worksList';
+    }
+
     final prompt = [
-      Content.text('SYSTEM INSTRUCTIONS:\n${_getSystemInstruction(lens)}\n\nPATIENT DATA:\n$patientData')
+      Content.text('SYSTEM INSTRUCTIONS:\n$sysInst\n\nPATIENT DATA:\n$patientData')
     ];
     
     final responseStream = _model.generateContentStream(prompt);
@@ -132,16 +143,28 @@ $_formattingRules''';
     }
   }
 
-  Future<void> startChatSession(String patientData) async {
+  Future<void> startChatSession(String patientData, {OrcidProfile? orcidProfile}) async {
     if (_isMockMode) {
       _chatSession = null; // We'll handle mock chat separately
       return;
     }
-    final context = '''You are a collaborative care plan co-pilot named "Cerebella". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient's data. Keep your answers brief, actionable, and focused on strategic holistic care.
-    
-PATIENT DATA CONTEXT:
-$patientData
-''';
+    String context = 'You are a collaborative care plan co-pilot named "Cerebella". You are assisting a doctor in refining a strategy for their patient. You have already reviewed the finalized patient overview and the current recommendations. Your role is to help the doctor iterate on the care plan, explore functional protocols, structure follow-ups, or answer specific questions about the patient\'s data. Keep your answers brief, actionable, and focused on strategic holistic care.\n\n'
+        'PATIENT DATA CONTEXT:\n'
+        '$patientData\n';
+        
+    if (orcidProfile != null) {
+      final worksList = orcidProfile.works.map((w) {
+        final year = w.year ?? 'N/A';
+        final type = w.type ?? 'publication';
+        final urlStr = w.url != null ? ' (URL: ${w.url!})' : '';
+        return '- "${w.title}" ($year) - $type$urlStr';
+      }).join('\n');
+
+      context += '\n\nCLINICIAN RESEARCH CONTEXT (ORCID ID: ${orcidProfile.orcidId}):\n'
+          'The consulting clinician is ${orcidProfile.name}.\n'
+          'Their research keywords include: ${orcidProfile.keywords.join(', ')}.\n'
+          '$worksList';
+    }
     
     _chatSession = _model.startChat(history: [
       Content.model([TextPart('Understood. I am ready to assist.')])
@@ -254,7 +277,7 @@ $patientData
         return ClinicalIntelligenceResult.fromJson(decoded);
       }
     } catch (e) {
-      print('Gemini API Error: $e');
+      debugPrint('Gemini API Error: $e');
     }
 
     return ClinicalIntelligenceResult(symptoms: transcription);

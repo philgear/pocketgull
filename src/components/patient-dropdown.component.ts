@@ -21,13 +21,13 @@ import { GamificationService } from '../services/gamification.service';
           variant="secondary" 
           size="sm"
           [trailingIcon]="isOpen() ? 'M19 15l-7-7-7 7' : 'M5 9l7 7 7-7'">
-          {{ currentPatientName() }}
+          <span class="max-w-[110px] min-[400px]:max-w-[180px] sm:max-w-none truncate block">{{ currentPatientName() }}</span>
         </pocket-gull-button>
       </div>
       </div>
 
       @if (isOpen()) {
-        <div class="origin-top-right absolute right-0 mt-2 w-72 rounded-sm shadow-xl bg-white dark:bg-[#09090b] ring-1 ring-black dark:ring-white/10 ring-opacity-5 focus:outline-none overflow-hidden flex flex-col max-h-[60dvh]">
+        <div class="origin-top-left absolute left-0 mt-2 w-72 max-w-[calc(100vw-24px)] rounded-sm shadow-xl bg-white dark:bg-[#09090b] ring-1 ring-black dark:ring-white/10 ring-opacity-5 focus:outline-none overflow-hidden flex flex-col max-h-[60dvh]">
           
           <div class="bg-gray-50 dark:bg-zinc-900 px-4 py-2 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
              <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Active Roster</span>

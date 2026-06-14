@@ -30,6 +30,7 @@ import { WalkthroughTourService } from './services/walkthrough-tour.service';
 import { SecureSplashComponent } from './components/secure-splash.component';
 import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
+import { PocketGullInputComponent } from './components/shared/pocket-gull-input.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 import { PetAuditoryService } from './services/pet-auditory.service';
@@ -58,7 +59,8 @@ import { FitbitService } from './services/fitbit.service';
     SecureSplashComponent,
     PatientDirectoryComponent,
     CollaborationDockComponent,
-    FhirCallbackComponent
+    FhirCallbackComponent,
+    PocketGullInputComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -86,7 +88,7 @@ import { FitbitService } from './services/fitbit.service';
       <!-- Collaboration Dock -->
       <app-collaboration-dock></app-collaboration-dock>
       
-      @if ((session.isLocked() || !hasApiKey()) && !state.isEmergencyMode()) {
+      @if (showSplash()) {
         <app-secure-splash
           [apiKeyError]="apiKeyError()"
           [hasApiKey]="hasApiKey()"
@@ -343,20 +345,20 @@ import { FitbitService } from './services/fitbit.service';
           <div class="flex items-center gap-4">
               <div class="flex items-center gap-3">
                   <svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
-                      <!-- Far Wing -->
-                      <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Tail -->
-                      <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Body Base -->
+                      <!-- Far Wing (Teal) -->
+                      <polygon points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Tail (Light gray paper) -->
+                      <polygon points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Body Base (White paper) -->
                       <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Near Wing (Upper) -->
-                      <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Near Wing (Fold) -->
-                      <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Neck/Head -->
+                      <!-- Near Wing Upper (Coral) -->
+                      <polygon points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Near Wing Fold (Darker Coral) -->
+                      <polygon points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Neck/Head (White paper) -->
                       <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round" />
-                      <!-- Beak - Functional Braun Orange Accent -->
-                      <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round" />
+                      <!-- Beak (Golden-Amber Orange) -->
+                      <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
                   </svg>
                   <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
               </div>
@@ -613,23 +615,23 @@ import { FitbitService } from './services/fitbit.service';
         </nav>
 
         <!-- New Patient Navigation Bar -->
-        <nav class="h-12 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center px-3 sm:px-6 shrink-0 bg-gray-50 dark:bg-[#09090b] z-40 no-print gap-4">
+        <nav class="h-12 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center px-3 sm:px-6 shrink-0 bg-gray-50 dark:bg-[#09090b] z-40 no-print gap-2 sm:gap-4">
            <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:block">INTAKE MODULE 01</div>
            <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
            <div id="tour-patient-dropdown"><app-patient-dropdown></app-patient-dropdown></div>
 
-           <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1">
+           <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1 ml-auto">
              <!-- EXPORT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="exportMenuOpen.set(true)" (mouseleave)="exportMenuOpen.set(false)">
                <button
                        class="snap-start shrink-0 flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                 <span>Export</span>
-                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                 <span class="hidden sm:inline">Export</span>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </button>
                
                @if (exportMenuOpen()) {
-                 <div class="absolute top-full left-0 mt-1 w-40 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                 <div class="absolute top-full right-0 mt-1 w-40 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                    <button (click)="exportPdf(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg> As PDF
                    </button>
@@ -643,42 +645,42 @@ import { FitbitService } from './services/fitbit.service';
                }
              </div>
 
-             <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1"></div>
+             <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1 hidden sm:block"></div>
 
              <!-- CONNECT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="connectMenuOpen.set(true)" (mouseleave)="connectMenuOpen.set(false)">
                <button
                        class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                 <span>Integrations</span>
-                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                 <span class="hidden sm:inline">Integrations</span>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </button>
 
                @if (connectMenuOpen()) {
-                 <div class="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                 <div class="absolute top-full right-0 mt-1 w-48 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-lg overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
                    <button (click)="connectEpic(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#E33B44] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> epic®
                    </button>
                     @if (!fitbit.isConnected()) {
-                      <button id="btn-fitbit-connect" (click)="fitbit.initiateAuth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                      <button id="btn-fitbit-connect" (click)="fitbit.initiateAuth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
                         Google Health Connect
                       </button>
                     } @else {
-                      <button id="btn-fitbit-sync" (click)="fitbit.sync(); connectMenuOpen.set(false)" [disabled]="fitbit.isSyncing()" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800 disabled:opacity-50">
+                      <button id="btn-fitbit-sync" (click)="fitbit.sync(); connectMenuOpen.set(false)" [disabled]="fitbit.isSyncing()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#00B0B9] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800 disabled:opacity-50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" [class.animate-spin]="fitbit.isSyncing()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6"/><path d="M2.5 22v-6h6"/><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"/></svg>
                         {{ fitbit.isSyncing() ? 'Syncing...' : 'Google Health Sync' }}
                       </button>
-                      <button id="btn-fitbit-disconnect" (click)="fitbit.revoke(false); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-amber-600 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                      <button id="btn-fitbit-disconnect" (click)="fitbit.revoke(false); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-amber-600 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64A9 9 0 0 1 20.77 15"/><path d="M6.16 6.16a9 9 0 1 0 12.68 12.68"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
                         Disconnect
                       </button>
-                      <button id="btn-fitbit-purge" (click)="fitbit.revoke(true); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-rose-500 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                      <button id="btn-fitbit-purge" (click)="fitbit.revoke(true); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-rose-500 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                         Disconnect & Erase Data
                       </button>
                     }
-                    <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" (mouseenter)="avsUi.playHover()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                    <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> AWS HealthLake
                     </button>
                     <button (click)="connectSwaggerHub(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#85EA2D] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
@@ -694,14 +696,14 @@ import { FitbitService } from './services/fitbit.service';
                }
              </div>
 
-             <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1"></div>
+             <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1 hidden sm:block"></div>
 
              <button (click)="finalizeRecord()"
                     
                      id="tour-finalize-btn"
                      class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#689F38]/20 dark:border-[#689F38]/30 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 text-[#689F38] dark:text-[#689F38] bg-[#689F38]/5 dark:bg-[#689F38]/10 hover:bg-[#689F38]/10 dark:hover:bg-[#689F38]/20 rounded-md">
                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-               <span>Finalize & Archive</span>
+               <span class="hidden sm:inline">Finalize & Archive</span>
              </button>
            </div>
         </nav>
@@ -1211,13 +1213,14 @@ export class AppComponent implements OnDestroy {
   public readonly petAuditory = inject(PetAuditoryService);
   private readonly stressIntervention = inject(StressInterventionService);
   public readonly collaboration = inject(CollaborationService);
+  patientDropdown = viewChild(PatientDropdownComponent);
   state = inject(PatientStateService);
   public theme = inject(ThemeService);
   public game = inject(GamificationService);
   private ngZone = inject(NgZone);
 
 
-  private patientMgmt = inject(PatientManagementService);
+  public patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
   network = inject(NetworkStateService);
   hardware = inject(HardwareTelemetryService);
@@ -1225,6 +1228,15 @@ export class AppComponent implements OnDestroy {
   private aiConfig = inject(AI_CONFIG, { optional: true });
   today = new Date();
   hasApiKey = signal<boolean>(!!this.aiConfig?.apiKey);
+  showSplash = computed(() => {
+    const locked = this.session.isLocked();
+    const hasKey = this.hasApiKey();
+    const onboard = this.session.isOnboardingComplete();
+    const emergency = this.state.isEmergencyMode();
+    const show = (locked || !hasKey || !onboard) && !emergency;
+    console.log('[DEBUG SHOW SPLASH]', { locked, hasKey, onboard, emergency, show });
+    return show;
+  });
   isDemoMode = this.state.isDemoMode;
   apiKeyInput = signal<string>('');
   showPassword = signal<boolean>(false);
@@ -1529,8 +1541,18 @@ export class AppComponent implements OnDestroy {
   }
 
   uploadData() {
-    // Usually this triggers file upload dialog from patient-dropdown, but for now we'll trigger an alert or sync.
-    alert("Upload data modal placeholder");
+    const dropdown = this.patientDropdown();
+    if (dropdown) {
+      dropdown.triggerImport();
+    } else {
+      const fileInput = document.querySelector('app-patient-dropdown input[type="file"]') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+      } else {
+        alert("Upload data modal placeholder");
+      }
+    }
   }
 
   openFinalizePreview() {
