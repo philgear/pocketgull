@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 import '../services/adk_live_service.dart';
 
 /// Live Consult Screen — mirrors Angular's live-consult component.
@@ -22,6 +24,9 @@ class _LiveConsultScreenState extends State<LiveConsultScreen> {
   StreamSubscription<AdkLiveTurn>? _turnSub;
 
   bool _isConnecting = false;
+  final SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  bool _isListening = false;
 
   @override
   void initState() {
@@ -31,11 +36,13 @@ class _LiveConsultScreenState extends State<LiveConsultScreen> {
     _turnSub = _adkLive.turnStream.listen((_) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     });
+    _initSpeech();
   }
 
   @override
   void dispose() {
     _turnSub?.cancel();
+    _speechToText.stop();
     _textController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -166,7 +173,7 @@ class _LiveConsultScreenState extends State<LiveConsultScreen> {
                           style: const TextStyle(color: Colors.white, fontSize: 14),
                           cursorColor: const Color(0xFF6366F1),
                           decoration: InputDecoration(
-                            hintText: 'Ask Cerebella…',
+                            hintText: _isListening ? 'Listening…' : 'Ask Cerebella…',
                             hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                             filled: true,
                             fillColor: const Color(0xFF1A1A2E),
@@ -183,6 +190,12 @@ class _LiveConsultScreenState extends State<LiveConsultScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
+
+                      // Dictation Mic Toggle
+                      if (_speechEnabled) ...[
+                        _buildMicButton(),
+                        const SizedBox(width: 8),
+                      ],
 
                       // Send
                       _buildIconAction(
@@ -207,6 +220,92 @@ class _LiveConsultScreenState extends State<LiveConsultScreen> {
           ),
         );
       },
+    );
+  }
+
+  void _initSpeech() async {
+    try {
+      _speechEnabled = await _speechToText.initialize(
+        onError: (val) => debugPrint('[LiveConsultScreen] Speech init error: $val'),
+        onStatus: (val) {
+          if (val == 'done' || val == 'notListening') {
+            setState(() => _isListening = false);
+          }
+        },
+      );
+      setState(() {});
+    } catch (e) {
+      debugPrint('[LiveConsultScreen] Speech init exception: $e');
+    }
+  }
+
+  void _startListening() async {
+    if (!_speechEnabled) return;
+    try {
+      await _speechToText.listen(
+        onResult: _onSpeechResult,
+        listenOptions: SpeechListenOptions(
+          listenFor: const Duration(seconds: 30),
+          pauseFor: const Duration(seconds: 5),
+          partialResults: true,
+          cancelOnError: true,
+          listenMode: ListenMode.dictation,
+        ),
+      );
+      setState(() => _isListening = true);
+    } catch (e) {
+      debugPrint('[LiveConsultScreen] Start listening exception: $e');
+    }
+  }
+
+  void _stopListening() async {
+    try {
+      await _speechToText.stop();
+      setState(() => _isListening = false);
+    } catch (e) {
+      debugPrint('[LiveConsultScreen] Stop listening exception: $e');
+    }
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      _textController.text = result.recognizedWords;
+      _textController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _textController.text.length),
+      );
+    });
+  }
+
+  void _toggleListening() {
+    if (_isListening) {
+      _stopListening();
+    } else {
+      _startListening();
+    }
+  }
+
+  Widget _buildMicButton() {
+    final activeColor = const Color(0xFFEF4444);
+    final idleColor = const Color(0xFF8B5CF6);
+    
+    return Material(
+      color: (_isListening ? activeColor : idleColor).withValues(alpha: 0.15),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: _toggleListening,
+        borderRadius: BorderRadius.circular(12),
+        child: Tooltip(
+          message: _isListening ? 'Stop listening' : 'Start dictating',
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Icon(
+              _isListening ? Icons.mic : Icons.mic_none_outlined,
+              color: _isListening ? activeColor : idleColor,
+              size: 20,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
