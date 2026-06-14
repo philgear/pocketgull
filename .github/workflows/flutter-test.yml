@@ -56,10 +56,4 @@ jobs:
           path: pocketgull_flutter/coverage/lcov.info
           min_coverage: 60
 
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: pocketgull_flutter/coverage/lcov.info
-          flags: flutter
-          fail_ci_if_error: false
+
