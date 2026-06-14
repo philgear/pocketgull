@@ -29,7 +29,7 @@ describe('Google Responsible AI Toolkit - Safety Policies', () => {
         body: JSON.stringify({
           patientData: "Patient baseline clear.",
           systemInstruction: "You are a clinical assistant.",
-          model: "googleai/gemini-2.5-flash",
+          model: "gemini-2.5-flash",
           temperature: 0.1
         }),
         signal: controller.signal
