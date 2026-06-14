@@ -11,12 +11,15 @@ import '../widgets/task_flow_widget.dart';
 import '../widgets/native_body_viewer.dart';
 import '../widgets/origami_seagull.dart';
 import '../widgets/research_frame_widget.dart';
+import '../widgets/patient_selector_widget.dart';
 import '../blocs/patient/patient_bloc.dart';
 import '../models/patient_types.dart';
 import '../blocs/patient/patient_event.dart';
 import '../widgets/visit_review_widget.dart';
+import '../services/theme_service.dart';
 import 'documentation_screen.dart';
 import 'triage_board_screen.dart';
+import 'live_consult_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -68,6 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                   ],
                 ),
+                if (!isMobile) ...[
+                  const SizedBox(width: 16),
+                  const PatientSelectorWidget(),
+                ],
               ],
             ),
             backgroundColor: Colors.white,
@@ -75,17 +82,32 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: [
               if (!isMobile) _buildSystemStatus(),
               const SizedBox(width: 12),
+              // Theme toggle
+              ValueListenableBuilder<ThemeMode>(
+                valueListenable: context.read<ThemeService>(),
+                builder: (context, _, child) {
+                  final ts = context.read<ThemeService>();
+                  return IconButton(
+                    icon: Icon(ts.icon, size: 18, color: Colors.grey),
+                    tooltip: 'Theme: ${ts.label}',
+                    onPressed: ts.toggle,
+                  );
+                },
+              ),
               SizedBox(
                 height: 32,
                 child: OutlinedButton.icon(
-                  icon: const Icon(Icons.mic, size: 14),
-                  label: Text(isMobile ? 'AI' : 'AGENT'),
+                  icon: const Icon(Icons.psychology_alt_outlined, size: 14),
+                  label: Text(isMobile ? 'AI' : 'CEREBELLA'),
                   onPressed: () {
-                    context.read<PatientBloc>().add(const ToggleLiveAgent(true));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LiveConsultScreen()),
+                    );
                   },
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF1C1C1C),
-                    side: const BorderSide(color: Color(0xFFE5E7EB)),
+                    foregroundColor: const Color(0xFF6366F1),
+                    side: const BorderSide(color: Color(0xFF6366F1)),
                     textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                   ),

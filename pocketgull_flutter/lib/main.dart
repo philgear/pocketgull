@@ -14,6 +14,7 @@ import 'screens/splash_screen.dart';
 import 'services/patient_state_service.dart';
 import 'services/fhir_integration_service.dart';
 import 'services/adk_live_service.dart';
+import 'services/theme_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -67,8 +68,10 @@ void main() async {
 
     final orcidService = OrcidService();
     await orcidService.initialize();
+
+    final themeService = ThemeService();
     
-    runApp(PocketGullApp(localAI: localAI, orcidService: orcidService));
+    runApp(PocketGullApp(localAI: localAI, orcidService: orcidService, themeService: themeService));
   }, (error, stack) {
     debugPrint('GLOBAL ERROR: $error');
     debugPrint(stack.toString());
@@ -78,7 +81,8 @@ void main() async {
 class PocketGullApp extends StatelessWidget {
   final LocalIntelligenceService localAI;
   final OrcidService orcidService;
-  const PocketGullApp({super.key, required this.localAI, required this.orcidService});
+  final ThemeService themeService;
+  const PocketGullApp({super.key, required this.localAI, required this.orcidService, required this.themeService});
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +112,9 @@ class PocketGullApp extends StatelessWidget {
         RepositoryProvider<AdkLiveService>(
           create: (_) => AdkLiveService(),
         ),
+        RepositoryProvider<ThemeService>.value(
+          value: themeService,
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -116,35 +123,38 @@ class PocketGullApp extends StatelessWidget {
             create: (context) => AnalysisCubit(context.read<ClinicalIntelligenceService>()),
           ),
         ],
-        child: MaterialApp(
-          title: 'Pocket Gull',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: Brightness.light,
-            primaryColor: const Color(0xFF1A1A1A),
-            scaffoldBackgroundColor: const Color(0xFFF9F9F9),
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF1A1A1A),
-              secondary: Color(0xFFE2E2E2),
-              surface: Colors.white,
+        child: ValueListenableBuilder<ThemeMode>(
+          valueListenable: themeService,
+          builder: (context, themeMode, _) => MaterialApp(
+            title: 'Pocket Gull',
+            debugShowCheckedModeBanner: false,
+            themeMode: themeMode,
+            theme: ThemeData(
+              brightness: Brightness.light,
+              primaryColor: const Color(0xFF1A1A1A),
+              scaffoldBackgroundColor: const Color(0xFFF9F9F9),
+              colorScheme: const ColorScheme.light(
+                primary: Color(0xFF1A1A1A),
+                secondary: Color(0xFFE2E2E2),
+                surface: Colors.white,
+              ),
+              fontFamily: 'Inter',
+              useMaterial3: true,
             ),
-            fontFamily: 'Inter',
-            useMaterial3: true,
-          ),
-          darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            primaryColor: Colors.white,
-            scaffoldBackgroundColor: const Color(0xFF121212),
-            colorScheme: const ColorScheme.dark(
-              primary: Colors.white,
-              secondary: Color(0xFF333333),
-              surface: Color(0xFF1E1E1E),
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
+              primaryColor: Colors.white,
+              scaffoldBackgroundColor: const Color(0xFF121212),
+              colorScheme: const ColorScheme.dark(
+                primary: Colors.white,
+                secondary: Color(0xFF333333),
+                surface: Color(0xFF1E1E1E),
+              ),
+              fontFamily: 'Inter',
+              useMaterial3: true,
             ),
-            fontFamily: 'Inter',
-            useMaterial3: true,
+            home: const SplashScreen(),
           ),
-          themeMode: ThemeMode.system,
-          home: const SplashScreen(),
         ),
       ),
     );
