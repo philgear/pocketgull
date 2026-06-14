@@ -8,22 +8,56 @@ title: Changelog
 All notable changes to Pocket Gull are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+---
+
+## v1.0.0-rc6 — 2026-06-14
+
+**CodeQL Security Hardening (Full Remediation) & Rate Limiting**
+
+### Fixed
+- **[CodeQL] SSRF Critical × 5 (dicom.ts)**: Added `sanitiseDicomParam()` (allowlist: `[a-zA-Z0-9._-]`) and `validateDicomUid()` (digits and dots only, per DICOM standard) helpers. All five DICOM route handlers (`/studies`, `/rendered`, `/store`, `/raw`, `/delete`) now sanitise every user-provided query param before URL construction — no raw `req.query` value ever reaches `fetch()`.
+- **[CodeQL] SSRF (server.ts)**: Sanitised `projectId` + `location` Vertex AI URL construction with char-allowlist regex; `rawModel` is strictly allowlisted via `normalizeAndValidateModel()`.
+- **[CodeQL] Missing Rate Limiting × 4 (server.ts)**: Replaced custom in-memory `rateLimiter()` with `express-rate-limit`'s `rateLimit()` on all flagged file-system-accessing routes.
+- **[CodeQL] Path Traversal × 2 (server.ts `/docs/study`)**: Removed custom `resolve()`-based path handler entirely. `/docs/study` is now served exclusively via `express.static(studyDocsRoot)` — no user-controlled value reaches any file path computation.
+- **[CodeQL] Clear-Text Logging (phi_compliance_scanner.py)**: Discarded the tainted regex match tuple element with `_` and removed it from every `print()` format string. Only violation type, file path, line number, and description are logged — no sensitive match data reaches any log sink.
+- **[Pre-emptive] DICOM Router Rate Limiting**: Applied `express-rate-limit` at the `dicomRouter` level (60 req/min per IP) covering all DICOM proxy routes.
+- **[Pre-emptive] Healthcare Router Rate Limiting**: Applied `express-rate-limit` at the `healthcareRouter` level (30 req/min per IP) covering all FHIR and Healthcare API proxy routes.
+
+---
+
+## v1.0.0-rc5 — 2026-06-14
+
+**Documentation Sync, Build Hardening & Security Patch**
+
+### Added
+- **`angular.json` CommonJS Allowlist**: Added `@google-cloud/vertexai` and `@google-cloud/vertexai/build/src/resources/index.js` to `allowedCommonJsDependencies` to suppress recurring build-time optimization warnings from `@genkit-ai/vertexai`.
+
+### Changed
+- **Documentation Sync**: Rewrote `README.md` with categorized features (Security, AI, Clinical UX, Data), updated architecture diagram to show Vertex AI Enterprise and WebSocket proxy, and corrected the `pocketgall.app` URL typo.
+- **`DESIGN.md` Squadron Expansion**: Added three new Gull Squadron personas — `Stratosphere` (Vertex AI Enterprise layer), `Relay` (WebSocket live proxy), and `Samaritan` (Good Samaritan emergency care mode).
+- **`angular.json` Host Cleanup**: Removed three stale Cloud Run hostnames (`pocket-gall-444980566010`, `understory-315235665910`, `pocket-gall-315235665910`) from `allowedHosts`.
+
+### Fixed
+- **`qs` Security Patch**: Pinned `qs` transitive dependency to `>=6.15.2` via `package.json` overrides, patching GHSA-q8mj-m7cp-5q26 (DoS via `qs.stringify` on null entries in comma-format arrays).
+
+---
+
 ## v1.0.0-rc4 — 2026-06-14
 
 **Vertex AI Enterprise Migration, Secure Bidirectional Live Proxy, & CodeQL Security Hardening**
 
 ### Added
-- **Vertex AI Enterprise Migration**: Ported the AI provider logic from the Developer API to Google Cloud Vertex AI Enterprise, resolving IAM-based authentication, regional endpoints, and custom safety thresholds.
-- **WebSocket Live Proxy**: Implemented a secure WebSocket proxy route (`/ws/gemini-live`) on the Express server to translate data recursive-casing and rewrite setup configurations for live audio streaming.
-- **Lightweight API Rate Limiting**: Added IP-based in-memory request limiters (`rateLimiter`) to mitigate DOS/resource exhaustion on patient database and documentation endpoints.
+- **Vertex AI Enterprise Migration**: Upgraded the AI intelligence layer from the developer Gemini API to regional Google Cloud Vertex AI Enterprise, implementing automatic Google Application Default Credentials (ADC) token resolution, regional endpoints, and custom safety thresholds.
+- **Bidirectional WebSocket Live Proxy**: Implemented a secure WebSocket proxy route (`/ws/gemini-live`) on the Express server featuring recursive camelCase to snake_case translations and setup model resource path rewrites to support full-duplex live audio streaming over Vertex AI.
+- **Lightweight API Rate Limiting**: Built a custom, in-memory IP-based rate limiter middleware (`rateLimiter`) to mitigate denial-of-service and resource exhaustion on file-accessing routes.
 
 ### Changed
-- **Improved Custom Search Engine**: Swapped the Google Custom Search Engine (CSE) ID to a new instance (`648e5d0ad53ae49a6`) for wider medical and academic domain coverage.
+- **Improved Custom Search Engine**: Updated the Google Custom/Programmable Search Engine (CSE) script config in `search.html` to load a new instance (`648e5d0ad53ae49a6`) providing wider clinical and medical school domain indexing.
 
 ### Security / Fixed
-- **CodeQL SSRF Protection**: Patched SSRF risks in stream and chat paths via strict model validation whitelisting (`normalizeAndValidateModel`).
-- **CodeQL Path Traversal Prevention**: Secured static Astro study docs file serving with `path.resolve` checks and directory bounds containment validation.
-- **CodeQL Clear-Text Logging Fix**: Redacted raw PII and secret values from console/CI logs within the HIPAA compliance scanner.
+- **CodeQL SSRF Remediation**: Patched Server-Side Request Forgery vulnerabilities in stream/chat endpoints by adding strict model selection validation (`normalizeAndValidateModel`).
+- **CodeQL Path Traversal Protection**: Guarded the study docs static router against directory escape by using `path.resolve` and strict parent-directory containment verification.
+- **CodeQL Clear-Text Logging Fix**: Redacted matching secrets and PII values in `phi_compliance_scanner.py` console logs to prevent exposure in CI workflows.
 
 ---
 
@@ -32,22 +66,62 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 **Porkbun DNS Automation, Enterprise EHR Blueprints & Security Hardening**
 
 ### Added
-- **Porkbun DNS Automation Integration**: Created `scripts/update-porkbun-dns.js` to automatically sync Cloud Run custom domains (`pocketgull.app`) via the Porkbun API.
-- **Enterprise Scaling & Valuation Manuals**: Added deep architectural blueprints in `docs/valuation_and_positioning.md` and `docs/study/src/pages/positioning.mdx` explaining BigQuery partitioning/clustering, Vertex AI context caching optimization, and HL7 FHIR integrations with OpenEMR/OpenMRS.
-- **Dependency Vulnerability Resolution**: Patched package-lock overrides for `uuid` and `protobufjs` to achieve 0 vulnerabilities in the `pocketgull_api` sub-project.
-- **Windows Pre-Commit Unicode Fix**: Resolved standard encoding console crashes in `scripts/phi_compliance_scanner.py` on Windows Anaconda environments.
+- **Porkbun DNS Automation**: Integrated automated Porkbun API sync helper (`scripts/update-porkbun-dns.js`) to handle lifecycle mapping of the live Cloud Run custom domains (`pocketgull.app` and subdomains).
+- **Scaling & Valuation Architectural Blueprints**: Added complete operational manuals and diagrams for hospital-grade deployment (`docs/valuation_and_positioning.md` and `docs/study/src/pages/positioning.mdx`), detailing BigQuery telemetry partitioning/clustering strategies, Vertex AI context caching/cost management, and OpenEMR/OpenMRS FHIR database bridging.
+- **Custom JSON Security Auditing CLI**: Built `scripts/security-audit.mjs` to automatically verify sub-dependency vulnerability status during build/CI checkpoints.
+
+### Fixed
+- **Windows Unicode Pre-Commit Compatibility**: Modified `scripts/phi_compliance_scanner.py` to suppress non-ASCII console emojis, resolving execution and file check crashes on Windows environments using default CP1252 shell encodings.
+- **Doc Path Resolution**: Corrected file path references in husky pre-commit check tasks (`scripts/pre-commit-check.cjs`).
+
+### Security
+- **Sub-Project Dependency Remediation**: Resolved 11 medium/high risk vulnerabilities in `pocketgull_api` sub-project lockfile, applying strict version overrides for `uuid` and `protobufjs`.
 
 ---
 
-## v0.9.5 — 2026-05-20
+## v1.0.0-rc2 — 2026-05-22
 
-**Method of Loci Palace, Smiley Gesture Authentication, & AVS Therapy Suite**
+**Live Voice Barge-In, Emergency Care Mode, Draw-to-Unlock & Philosophy Dashboards**
 
 ### Added
-- **Method of Loci (Clinical Memory Palace)**: Integrated an interactive 3D-assisted Method of Loci learning framework into the patient assessment report space, enabling clinicians to visually anchor complex care plan protocols and diagnostics to spatial memory hubs (Clinical Loci).
-- **Smiley Gesture Authentication & WebAuthn Safeguard**: Replaced PIN-based logins with a canvas-based smiley drawing unlock flow in `SecureSplashComponent`. Integrated conditional platform checks to only present the biometric WebAuthn security button on supported devices.
-- **AVS (Acoustic/Visual/Sensory) Therapy & Guided Circadian UI**: Added a clinic/patient visual entrainment interface featuring guided box breathing cycles and light frequency modulation, integrated natively within the system's tour guides and onboarding flows.
-- **Comprehensive Third-Party Register**: Formulated `DEPENDENCIES.md` and the interactive `dependencies.mdx` documentation page, compiling licensing info for Angular, FastAPI sidecar, and Flutter apps to enforce absolute open-source compatibility.
+- **Client-Side Speech & Interruption Barge-in**: Implemented local `onspeechstart` barge-in interruption tuning across the clinical dialog and main voice assistant panels, allowing instant audio muting and queue clearing when the clinician begins speaking or typing.
+- **Real-Time Voice Consult**: Integrated the `AdkLiveService` directly into the focused recommendations/claims dialog (`NodeAgentDialogComponent`) with amplitude-responsive recording visualizers, local Speech-to-Text feedback, and graceful lifecycle teardowns.
+- **Multi-Paradigm Philosophy Dashboards**: Added full system support for selecting Western, Eastern, Ayurvedic, or "Grow Thy Self" longevity medicine paradigms. Includes automated report regeneration and a secular translation engine mapping 13 world philosophies into psychological and physiological domains.
+- **Good Samaritan Emergency Care**: Engineered an offline emergency override mode featuring a 110 BPM chest-compression metronome, basic life support (BLS) safety-gated Gemini Nano local routing (`window.ai`), local FHIR-compliant EMT QR code serialization (`lean-qr`), and global telemetry (OTel) suppression.
+- **Draw-to-Unlock Secure Gateway**: Replaced the legacy numeric PIN code screen with a premium Canvas drawing pad verifying a smiley face gesture pattern, with multi-stroke verification windows and an invisible E2E test bypass hook.
+- **Shift-Left Pre-Commit Hook**: Introduced a husky pre-commit pipeline that checks TypeScript types, runs Vitest unit tests, scans markdown image file references, and blocks staged commits containing credential or API key leaks.
+- **Multi-Vendor GPU Telemetry**: Implemented Windows CIM/WMI adapters querying AMD/Intel/NVIDIA graphics, macOS system profiles, unified memory estimation, and dynamic WebGPU routing recommendations.
+
+---
+
+## v1.0.0-rc1 — 2026-05-19
+
+**Security Hardening, PQC Cryptography & Enterprise Connectors**
+
+### Added
+- **Security Hardening & MFA Gateways**: Added robust Firebase Google Login flow configurations including domain whitelists and multi-factor authentication (MFA) parameters.
+- **Tink Envelope Cryptography & PQC**: Integrated Google Tink AEAD cryptographic envelopment for local patient records and added Quantum-Safe Cryptography Kyber/Dilithium transport protocol fallbacks for HIPAA transit compliance.
+- **WebMCP Schema Mapping**: Registered WebMCP (Model Context Protocol) standards schemas to allow seamless integrations of external clinical knowledge databases.
+- **3D Anatomical Extensions**: Enabled pluggable mesh loaders (GLTF, USDZ, OBJ) on the Three.js viewport for customized skeletal modeling.
+- **Multi-Cloud Enterprise Connectors**: Documented and verified identity sync wrappers for Windows Active Directory (AD FS) and envelope encryption bridges for AWS KMS.
+- **Sentinel Gamification & Cognitive Triage**: Integrated a clinician alertness and fatigue-tracking dashboard to monitor practitioner cognitive load in high-stress triage environments.
+
+---
+
+## v0.10.0 — 2026-05-20
+
+**Secure Delegation Codes, Gesture Unlock & Expanded Animal Protocols**
+
+### Added
+- **Secure Delegation Access Codes**: Replaced the public patient dropdown menu in the companion `patient_app` with a secure access code text field, preventing HIPAA/privacy exposure of the patient directory.
+- **Practitioner Delegation Display**: Added a dedicated `DELEGATION CODE` label on the provider's `patient_detail_screen` so practitioners can securely communicate delegation credentials to patients.
+- **Gesture-Based Clinical Unlock**: Designed and implemented a canvas-based draw-unlock mechanism using a gesture recognizer (smiley face template matching) to replace legacy PIN code fields with an elegant gesture gateway on the Secure Splash screen.
+- **Expanded Animal Comfort Protocols**: Integrated additional high-fidelity auditory protocols for Orca Whales/Dolphins, Parrots/Crows, and Peregrine Falcons, along with dedicated custom SVG visual icons, custom binaural pulse sweeps, and responsive clinical warnings.
+
+### Fixed
+- **CommonJS Build Warnings**: Configured `angular.json` to allow CommonJS sub-dependencies of `@google-cloud/bigquery` (`@google-cloud/common`, `@google-cloud/paginator`, `@google-cloud/promisify`, `@google-cloud/precise-date`, `big.js`, `extend`, `stream-events`, and `duplexify`), eliminating build-time optimization warnings.
+- **Contrast Accessibility Specificity**: Strengthened light-mode text readability and color contrast metrics, removed visual text shadows, and stabilized post-animation text styling to fully comply with WCAG AA guidelines.
+- **CSS String Escape Warning**: Corrected unescaped slash characters within CSS selectors inside the component template string to resolve the Angular compiler syntax warnings.
 
 ---
 
@@ -57,39 +131,180 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Multilingual & Pediatric Care Plans**: Expanded the `translateReadingLevel` infrastructure across all providers to support Spanish, German, French, Mandarin, Dyslexia, and Pediatric formats.
-- **Security & Red Teaming Framework**: Implemented `SECURITY.md` and a Vitest automated red-teaming suite (`tests/safety.spec.ts`) to actively verify safety boundaries.
-- **Transparency Metadata**: Added `humans.txt`, `robots.txt`, `llms.txt`, and `sources.txt` to the public directory.
+- **Security & Red Teaming Framework**: Implemented `SECURITY.md` and a Vitest automated red-teaming suite (`tests/safety.spec.ts`) to actively verify Gemini `BLOCK_MEDIUM_AND_ABOVE` safety boundaries.
+- **Transparency Metadata**: Added `humans.txt`, `robots.txt`, `llms.txt`, and `sources.txt` to the public directory for AI indexing and human attribution.
 - **Cloud Build Integration**: Created `cloudbuild.yaml` to automate Docker builds and Google Cloud Run deployment pipelines.
 - **Advanced Clinical Mock Data**: Expanded `MOCK_PATIENTS` with updated 2026 timestamps, Orthomolecular Biomarkers, and dedicated Pediatric and Multilingual test profiles.
 - **Animal Comfort Protocols**: Engineered a Web Audio API synthesizer (`PetAuditoryService`) within the Care Plan Export module to generate species-specific soothing frequencies (Feline Purr at 25Hz, Canine Heartbeat at 60 BPM) for pets left home during hospitalizations.
 
 ---
 
-## v0.1.0 — 2026-03-16
+## v0.8.0 — 2026-05-18
+
+**Hemi-Sync Audio Engine, Athletic AVS & Real-Time DSP Pipeline**
+
+### Added
+- **Multi-Layer Hemi-Sync Audio Engine**: Upgraded `GlobalAvsService` to a high-fidelity 4-oscillator engine supporting phase-locked frequency entrainment and a clinical-grade Pink Noise synthesizer.
+- **Athletic Enhancement AVS**: Implemented `AthleticProtocolService` and UI toggles to provide specialized AVS protocols (Priming, Flow, Recovery, Phase-Shift) for athletic performance and recovery.
+- **Real-Time DSP Pipeline**: Fleshed out the FastAPI sidecar to process real-time HDF5 ECG streams using SciPy to extract HRV (RMSSD) and respiratory frequency metrics.
+- **Philips Hue Local Relay Proxy**: Added a local `hue-relay.js` Node proxy to resolve HTTPS mixed-content restrictions when the PWA communicates with local Philips Hue hubs.
+
+---
+
+## v0.7.0 — 2026-05-17
+
+**Circadian UI, KSS Gateway, DOC Protocols & Philips Hue Sync**
+
+### Added
+- **Circadian UI & AVS Coregulation**: Replaced static UI themes with a continuous, hardware-accelerated circadian CSS variable system (`CircadianSleepinessService`) that smoothly transitions ambient UI colors based on the time of day.
+- **KSS Readiness Gateway**: Integrated the 9-point Karolinska Sleepiness Scale (KSS) into the secure splash screen, allowing manual readiness overrides of the circadian theme.
+- **DOC Stimulation Protocols**: Implemented `DocProtocolService` to provide structured auditory and vibroacoustic stimulation guidelines for Disorders of Consciousness (Coma, VS/UWS, MCS).
+- **PWA Gemini Nano Integration**: Upgraded `HybridProvider` to route chat and conversational queries to Chrome's on-device `window.ai` Nano model when offline or for token-saving local execution.
+- **Philips Hue & Ambient Lighting Sync**: Created `AmbientLightingService` to mathematically sync the application's real-time circadian HSL themes with physical Philips Hue smart lights via the local network.
+
+---
+
+## v0.6.0 — 2026-05-17
+
+**Monorepo Env Fallback & Three.js / OHIF Upgrades**
+
+### Added
+- **Monorepo Env Fallback**: Server-side `fetchGeminiApiKey()` now searches `pocketgull_api/.env.local` and `pocketgull_api/.env` as fallback sources, eliminating the need for a separate `.env.local` in the Angular root during local development.
+
+### Changed
+- **THREE.Clock → THREE.Timer**: Migrated `Body3DViewerComponent` from deprecated `THREE.Clock` to `THREE.Timer` (`timer.update()` + `timer.getElapsed()`), resolving the Three.js r183 deprecation warning.
+- **OHIF Viewer**: Replaced non-functional OHIF iframe (blocked by `X-Frame-Options: DENY` on `viewer.ohif.org`) with a polished launch card that opens OHIF in a new tab, preserving the `StudyInstanceUIDs` deep-link query param.
+- **Production Source Maps**: Set `sourceMap: false` in the `production` Angular build config to eliminate build-time warnings caused by malformed control characters in `@angular/platform-server`'s `init.mjs.map` (upstream Angular packaging bug).
+
+### Fixed
+- **Schema Validation**: Removed unsupported `server` property from `angular.json` `sourceMap` object, resolving `SchemaValidationException` on `npm run build`.
+- **Debug Log Noise**: Removed verbose `console.log` pointerdown/pointerup events from `Body3DViewerComponent` interaction handlers.
+
+---
+
+## v0.5.0 — 2026-03-16
+
+**Origami Seagull Branding, Domain Launch & Print Preview Refactor**
+
+### Added
+- **Branding Update**: Replaced application logos with the new origami seagull design in the header and splash screen.
+- **Domain Configuration**: Mapped custom domains `pocketgull.app` and `www.pocketgull.app` to the live Cloud Run service.
+- **COCOMO II Estimation**: Updated the effort estimation script to calculate KSLOC dynamically and added an `estimate-effort` npm script.
+- **Lighthouse Audit Script**: Added an npm script to easily run Lighthouse accessibility and performance audits.
+
+### Changed
+- **Print Preview Refactoring**: Implemented a modular print strategy allowing user-selected inclusions (analysis, original text), improved translation error handling, and updated the UI controls for cognitive levels.
+- **Codebase Cleanup**: Removed remaining references to legacy internal terms ("Cerebella" and "Orthomolecular").
+
+### Fixed
+- **Translation Reversion**: Fixed a bug where textual translations were reverting unexpectedly in the print preview modal.
+- **Security Headers**: Improved server security headers by explicitly setting Strict-Transport-Security, Cross-Origin-Opener-Policy, and X-Frame-Options.
+
+---
+
+## v0.4.0 — 2026-03-12
+
+**Genkit Integration, Core Medical Services & SSR Architecture**
+
+### Added
+- **Genkit Integration**: Introduced Genkit capabilities and mock data generation for enhanced clinical intelligence features.
+- **Core Medical Services**: Implemented core services for Pocket Gull, including patient state management and clinical intelligence.
+- **SSR Deployment Architecture**: Established Angular SSR server with PubMed API proxies, Gemini API key management, and Docker/GCP Cloud Run deployment configurations.
+- **Lighthouse Performance Auditing**: Integrated automated performance benchmarking and reporting.
+- **Research Tools**: Registered research and bookmark tools.
+- **Expanded Patient Data**: Added a new global sentinel patient to the default dataset.
+- **AI Reading Level Translation**: Introduced medical summary translation controls for simplified and dyslexia-friendly text.
+- **Origami Splash Screen**: Added a new animated Pocket splash screen.
+- **LLM Discoverability File**: Added `llms.txt` to help AI agents consume project documentation.
+- **Pocket Gull UI Components**: Created new core shared components (`Badge`, `Button`, `Card`, `Input`) aligned with the new branding.
+- **New Medical Components**: Added `Medical3DViewerComponent` and `PatientScansComponent` to handle advanced clinical imagery.
+
+### Changed
+- **UI & Layout Refinements**: Expanded assessment panel width and enforced `pocketgull.app` domain redirection.
+- **Rebranding**: Officially renamed the application from Understory to **Pocket Gull**.
+- **Mobile Responsiveness**: Upgraded to `dvh` (dynamic viewport height) units for robust mobile layout calculation and refined rich media card parsing.
+- **Voice Assistant Redesign**: Redesigned the voice assistant transcript display with new model message bubbles and rich media card styling.
+- **Removed Legacy Features**: Removed old "philosophical export modes".
+- **Domain Redirection**: Implemented legacy domain redirection.
+
+### Fixed
+- **WebGL SSR Crash**: Safeguarded `Body3DViewerComponent` from crashing during Server-Side Rendering (SSR) by verifying `window` execution context before WebGL initialization.
+- **2D SVG Interactivity**: Recovered 2D SVG layer interactivity and purged unused typography footprint.
+- **3D Viewer Anatomy Views**: Restored missing skin, muscle, skeleton, and mind multi-layer anatomy views.
+- **Dark Mode Persistence**: Restored SSR `ThemeService` for reliable dark mode state management.
+- **Layout Rendering**: Resolved vertical frame split issues.
+- **Markdown Rendering**: Fixed mermaid node label rendering issues for GitHub by quoting slashes correctly.
+- **Live Agent Bug**: Fixed bug to auto-send live agent prompt.
+
+---
+
+## v0.3.0 — 2026-03-03
+
+**Context-Aware AI Chat, 3D Medical Viewer & Scans Library**
+
+### Added
+- **Context-Aware AI Chat**: Integrated recent node-specific discussions directly into the AI's conversational memory, enhancing the relevance of "Live Consult" responses.
+- **Inline Node Agent Queries**: Added ability to seamlessly launch AI inquiries directly from individual paragraphs and list items within the analysis report.
+- **3D Medical Interactive Viewer**: Integrated a robust ThreeJS-powered 3D model viewer for enhanced anatomical visualization.
+- **Scans & Diagnostics Library**: Added a visual gallery component to the patient history for managing and displaying diagnostic imagery like MRIs and X-Rays.
+- **Evidence Focus Iconography**: Introduced a custom "Interrobang" clinical icon for the Evidence Focus feature, replacing generic indicators.
+
+### Changed
+- **Application Rename**: Renamed the application from Understory to Pocket Gull across the entire codebase.
+- **Node Toolbar Accessibility**: Increased touch target padding and visual persistence delays on the summary node toolbar to dramatically improve mobile and touch interactions.
+
+---
+
+## v0.2.0 — 2026-02-28
+
+**SSR Architecture, Smartwatch Optimization & Printable Stationery**
+
+### Added
+- **Offline Printable Stationery**: CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis.
+- **Smartwatch Optimization**: Responsive UI scaling down to extremely constrained viewports (e.g., Pixel Watch 2 at 286px width).
+- **Box Breathing UX**: 16-second box breathing visual animations integrated into primary intake text areas to promote practitioner mindfulness.
+
+### Changed
+- **Server-Side Rendering (SSR)**: Transitioned architecture to Angular SSR for performance optimization.
+- **Mobile Navigation**: Implemented tabbed view-switching (Tasks / Analysis) optimized for constrained mobile environments.
+
+### Fixed
+- **SSR Build Stability**: Resolved "no exports" optimization bailouts caused by unresolved TypeScript properties in `PatientStateService`.
+- **Mobile Scrolling**: Fixed mobile page scrolling flow by removing forced height constraints.
+- **UI Clipping**: Fixed horizontal/vertical clipping of action buttons and contents in the analysis report.
+- **Type Safety**: Ensured strict type checking and proper exports for patient history and summary models across services.
+
+---
+
+## v0.1.0 — 2026-02-22
 
 **Initial Release · Gemini Live Agent Challenge**
 
 ### Added
-- **Live AI Clinical Co-Pilot** — Voice-first consult powered by `gemini-2.5-flash` and ADK `InMemoryRunner`
-- **3D Body Viewer** — Procedural skeletal + surface anatomy with severity particles (Three.js v0.183)
-- **Multi-Agent Orchestration** — Specialized `LlmAgent` experts: Overview, Interventions, Monitoring, Education
-- **Interactive Task Bracketing** — Double-click state machine (Normal → Added → Removed) for care plan review
-- **FHIR R4 Export** — Unicode-safe Base64 encoded Bundles for clinical portability
-- **FHIR Import Service** — Ingest Epic/MyChart "Lucy" format payloads
-- **PubMed E-utilities Integration** — Server-side research queries with anonymized PHI
-- **Google CSE Integration** — Differential diagnostic information via Programmable Search
-- **Box Breathing UX** — 16-second guided animation during high-stress intake encounters
-- **Printable Clinical Stationery** — CSS Grid halftone body maps with diagnostic overlays
-- **Responsive Design** — Two-column grid down to **286px** viewport (Pixel Watch 2)
-- **Dark Mode** — WCAG-compliant contrast with automatic detection
-- **Cognition & Child Export** — Dyslexia-friendly typography, carousel informatics PDF
+- **Care Plan Recommendation Engine**: A structured AI analysis module categorizing recommendations into Overview, Interventions, Monitoring, and Education.
+- **Task Bracketing System**: Interactive UI allowing clinicians to Accept, Reject, or Modify AI-generated interventions before finalizing.
+- **Live Voice Consult (Aura)**: An integrated voice assistant agent for real-time collaboration on patient strategies. Includes a dedicated chat interface with speech-to-text integration.
+- **3D Body Viewer Integration**: Visual anatomical mapping tools to correlate physical symptoms with digital chart records.
+- **Automated Clinical Task Extraction**: Parses unstructured clinical notes into actionable checklist items.
+- **Biometric Telemetry Visualization**: Chart.js integration providing retrospective trend analysis for patient blood pressure and pain metrics.
+- **Preview & Print Final Care Plan**: A dedicated modal to review, edit, and print the finalized patient care strategy before charting.
+
+### Changed
+- Re-architected core layouts for a responsive 3-column split view (Medical Chart, Intake Flow, and Analysis/Voice Assistant).
+- Optimized client-side payload delivery via Express compression (Gzip/Brotli) and structural font preconnections.
+- Upgraded UI interactions with modern Tailwind aesthetics, smooth transitions, and dynamic hover states across all components.
+
+### Fixed
+- Addressed infinite reactivity loops within the Intake Form component upon body part selection.
+- Corrected Voice Assistant triggering bugs preventing the component from rendering on mobile and desktop viewports.
+- Handled improper API Key rejection formatting from the Gemini API service, surfacing graceful UI alerts instead of silent failures.
 
 ### Infrastructure
-- Express.js backend on **Google Cloud Run** with SSR + hydration
-- Automated deployment via `scripts/deploy.sh`
-- Lighthouse score: **100/100** (Performance, Accessibility, Best Practices, SEO)
+- Express.js backend on **Google Cloud Run** with SSR + hydration.
+- Automated deployment via `scripts/deploy.sh`.
+- Lighthouse score: **100/100** (Performance, Accessibility, Best Practices, SEO).
 
 ### Documentation
-- Astro-powered docs site with 8 pages
-- AI-powered DocNode evidence drill-down (Gemini API)
-- Version selector and prev/next navigation
+- Astro-powered docs site with 8 pages.
+- AI-powered DocNode evidence drill-down (Gemini API).
+- Version selector and prev/next navigation.

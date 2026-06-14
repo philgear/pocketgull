@@ -71,7 +71,9 @@
               "duplexify",
               "@grpc/grpc-js",
               "@grpc/proto-loader",
-              "xmlhttprequest-ssl"
+              "xmlhttprequest-ssl",
+              "@google-cloud/vertexai",
+              "@google-cloud/vertexai/build/src/resources/index.js"
             ],
             "externalDependencies": [
               "@mikro-orm/sqlite",
@@ -96,9 +98,6 @@
             "security": {
               "allowedHosts": [
                 "localhost",
-                "pocket-gall-444980566010.us-west1.run.app",
-                "understory-315235665910.us-west1.run.app",
-                "pocket-gall-315235665910.us-west1.run.app",
                 "pocket-gull-793190615625.us-west1.run.app",
                 "pocketgull.app",
                 "pocketgull.com",

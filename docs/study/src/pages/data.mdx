@@ -39,9 +39,9 @@ Surfaces relevant differential diagnostic information via <DocNode term="Google 
 
 Pocket Gull follows a **Privacy by Design** architecture:
 
-- **Local Persistence** — All patient states, clinical brackets, and historical visit notes are stored strictly within the client's local browser session.
-- **No Remote Database** — There is no centralized server or cloud database storing persistent patient records.
-- **Transient AI Processing** — Clinical context transmitted to <DocNode term="Gemini 2.5 Flash" category="Google DeepMind" hint="Fast, cost-efficient multimodal model. Data is used solely for immediate inference and is not retained." link="https://ai.google.dev/gemini-api/docs/models#gemini-2.5-flash" linkLabel="Model Reference →" icon="https://ai.google.dev/favicon.ico">Gemini</DocNode> and <DocNode term="@google/adk" category="Google · Agent Development Kit" hint="Multi-agent orchestration framework. Agents process clinical context in-memory; no remote persistence." link="https://google.github.io/adk-docs/" linkLabel="ADK Docs →" icon="https://ai.google.dev/favicon.ico">ADK</DocNode> agents is used solely for immediate generation. Data is not retained by the application backend.
+- **Local Persistence** — All patient states, clinical brackets, and historical visit notes are stored within the client's local browser session and optionally synced to a server-side `data/patients.json` file via the `/api/patients` endpoint.
+- **No Remote Cloud Database** — There is no third-party or centralized cloud database. The optional server-side persistence is scoped to the Cloud Run instance's ephemeral filesystem.
+- **Transient AI Processing** — Clinical context transmitted to <DocNode term="Vertex AI Enterprise" category="Google Cloud" hint="Regional Vertex AI endpoint. Patient context is used for immediate inference only — no data retained for model training." link="https://cloud.google.com/vertex-ai/docs" linkLabel="Vertex AI Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">Vertex AI</DocNode> and <DocNode term="@google/adk" category="Google · Agent Development Kit" hint="Multi-agent orchestration framework. Agents process clinical context in-memory; no remote persistence." link="https://google.github.io/adk-docs/" linkLabel="ADK Docs →" icon="https://ai.google.dev/favicon.ico">ADK</DocNode> agents is used solely for immediate generation. Data is not retained by the application backend.
 - **Real-time Indicators** — Visual "Saving…" / "Saved ✔" feedback confirms local persistence status.
 
 ---
@@ -69,10 +69,10 @@ To protect patient records and maintain high-efficiency serverless environments,
 ## Data Export & Portability
 
 ### FHIR Bundles
-Patient data is exportable as standard <DocNode term="FHIR R6" category="HL7 International" hint="Fast Healthcare Interoperability Resources Release 6 — the next-generation HL7 standard for electronic health data exchange, adding specialized EBM and AI attribution models." link="http://hl7.org/fhir/R6/" linkLabel="HL7 FHIR R6 →" icon="https://hl7.org/favicon.ico">**FHIR R6 JSON Bundles**</DocNode>, Unicode-safe and Base64-encoded. This ensures open data portability across any FHIR-compliant healthcare system.
+Patient data is exportable as standard <DocNode term="FHIR R4" category="HL7 International" hint="Fast Healthcare Interoperability Resources Release 4 — the current HL7 standard for electronic health data exchange. Pocket Gull implements full R4 Patient, Condition, and Observation resources." link="http://hl7.org/fhir/R4/" linkLabel="HL7 FHIR R4 →" icon="https://hl7.org/favicon.ico">**FHIR R4 JSON Bundles**</DocNode>, Unicode-safe and Base64-encoded. This ensures open data portability across any FHIR-compliant healthcare system.
 
 ### FHIR Import
-The Import Service accepts FHIR payloads — including **Epic/MyChart "Lucy" format** and upgraded FHIR R6 datasets — mapping external `DiagnosticReport`, `Observation`, `Condition`, `Device` (AI engine credentials), and `Evidence` (PubMed evidence trails) resources into Pocket Gull's native models.
+The Import Service accepts FHIR payloads — including **Epic/MyChart "Lucy" format** — mapping external `DiagnosticReport`, `Observation`, `Condition`, and `Evidence` (PubMed evidence trails) resources into Pocket Gull's native models. Patient records are also directly synchronizable with the **Google Cloud Healthcare FHIR Store** via the `/api/healthcare/fhir/export` and `/api/healthcare/fhir/import/:id` endpoints.
 
 ### Printable Stationery
 Generated insights can be physically printed via CSS-optimized layouts featuring Halftone diagnostic maps. Sensitive records can be kept **strictly on offline paper** when required.
@@ -83,9 +83,9 @@ Generated insights can be physically printed via CSS-optimized layouts featuring
 
 | Property | Value |
 |---|---|
-| **Processor type** | Local clinical data processor |
-| **Remote storage** | None |
+| **Processor type** | Local clinical data processor + optional Cloud Run persistence |
+| **Remote storage** | None (GCP Healthcare FHIR Store optional) |
 | **PHI in transit** | Stripped before any external request |
-| **AI data retention** | Transient inference only |
-| **Export formats** | FHIR R6 Bundle (JSON), PDF |
-| **Import formats** | FHIR R6, FHIR R4, Epic/Lucy |
+| **AI data retention** | Transient inference only (Vertex AI Enterprise) |
+| **Export formats** | FHIR R4 Bundle (JSON), PDF |
+| **Import formats** | FHIR R4, Epic/Lucy, Google Cloud Healthcare FHIR Store |

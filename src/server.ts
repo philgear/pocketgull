@@ -7,6 +7,7 @@ import {
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
 import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import { Server as SocketIOServer } from 'socket.io';
 import compression from 'compression';
 import { dirname, join, normalize, resolve, sep } from 'node:path';
@@ -23,31 +24,7 @@ const browserDistFolder = join(__dirname, '..').replace(/\\/g, '/'); // root dir
 
 const studyDocsRoot = resolve(browserDistFolder, 'docs', 'study');
 
-// Simple in-memory rate limiter to prevent DOS / resource exhaustion
-const ipRequestCounts = new Map<string, { count: number, resetTime: number }>();
-
-function rateLimiter(maxRequests: number, windowMs: number) {
-  return (req: any, res: any, next: any) => {
-    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
-    const now = Date.now();
-    const clientData = ipRequestCounts.get(ip);
-
-    if (!clientData || now > clientData.resetTime) {
-      ipRequestCounts.set(ip, {
-        count: 1,
-        resetTime: now + windowMs
-      });
-      return next();
-    }
-
-    if (clientData.count >= maxRequests) {
-      return res.status(429).json({ error: 'Too many requests. Please try again later.' });
-    }
-
-    clientData.count++;
-    next();
-  };
-}
+// No custom rate limiter — use express-rate-limit (recognised by CodeQL)
 
 const ALLOWED_GEMINI_MODELS = new Set([
   'gemini-2.5-flash',
@@ -609,8 +586,10 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
     let response;
 
     if (token) {
-      const projectId = process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645';
-      const location = process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1';
+      // Build Vertex URL from validated environment variables and allowlisted model only.
+      // rawModel is guaranteed to be in ALLOWED_GEMINI_MODELS — no user input reaches the URL.
+      const projectId = (process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645').replace(/[^a-zA-Z0-9-_]/g, '');
+      const location = (process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1').replace(/[^a-zA-Z0-9-]/g, '');
       const vertexUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${rawModel}:streamGenerateContent?alt=sse`;
       
       console.log(`[Vertex AI] Streaming via regional endpoint: ${vertexUrl}`);
@@ -756,8 +735,10 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     let response;
 
     if (token) {
-      const projectId = process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645';
-      const location = process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1';
+      // Build Vertex URL from validated environment variables and allowlisted model only.
+      // rawModel is guaranteed to be in ALLOWED_GEMINI_MODELS — no user input reaches the URL.
+      const projectId = (process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645').replace(/[^a-zA-Z0-9-_]/g, '');
+      const location = (process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1').replace(/[^a-zA-Z0-9-]/g, '');
       const vertexUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${rawModel}:generateContent`;
 
       console.log(`[Vertex AI] Chat message via regional endpoint: ${vertexUrl}`);
@@ -853,8 +834,21 @@ if (!fs.existsSync(patientsDbPath)) {
   fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2));
 }
 
-const patientsRateLimiter = rateLimiter(100, 60000); // 100 requests per minute
-const docsRateLimiter = rateLimiter(300, 60000); // 300 requests per minute
+const patientsRateLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
+
+const docsRateLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
 
 // Patients API Endpoints
 app.get('/api/patients', patientsRateLimiter, (req, res) => {
@@ -911,28 +905,18 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
   }
 });
 
-// Serve Astro Study Docs independently of Swagger and Angular SSR
+// Serve Astro Study Docs — pure static serving, no user-controlled path computation.
+// express.static resolves paths relative to studyDocsRoot internally and safely.
+// A simple regex redirect handles the trailing-slash convention without touching resolve().
 app.use('/docs/study', docsRateLimiter, (req, res, next) => {
-  if (req.path !== '/' && req.path !== '' && !req.path.endsWith('/') && !req.path.includes('.')) {
-    return res.redirect(301, `/docs/study${req.path}/`);
-  }
-
-  const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
-  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = resolve(studyDocsRoot, `.${cleanPath}`, 'index.html');
-    const isWithinStudyDocsRoot = indexPath.startsWith(studyDocsRoot + sep) || indexPath === studyDocsRoot;
-    
-    if (!isWithinStudyDocsRoot) {
-      return res.status(403).send('Forbidden');
-    }
-
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
+  // Only redirect directory-style paths that lack a trailing slash and have no file extension.
+  if (req.path !== '/' && !req.path.endsWith('/') && !req.path.includes('.')) {
+    const safePath = req.path.replace(/[^a-zA-Z0-9\-_\/]/g, '');
+    return res.redirect(301, `/docs/study${safePath}/`);
   }
   next();
 });
-app.use('/docs/study', express.static(studyDocsRoot));
+app.use('/docs/study', docsRateLimiter, express.static(studyDocsRoot, { index: 'index.html', extensions: ['html'] }));
 
 /**
  * Serve static files from /.

@@ -16,7 +16,7 @@ import DocNode from '../components/DocNode.astro';
 
 - <DocNode term="Node.js" category="OpenJS Foundation" hint="JavaScript runtime built on Chrome's V8 engine. Originally created by Ryan Dahl in 2009. Pocket Gull requires v20+." link="https://nodejs.org/en/docs" linkLabel="nodejs.org →" icon="https://nodejs.org/favicon.ico">Node.js</DocNode> ≥ 20.0.0
 - npm
-- A <DocNode term="Gemini API Key" category="Google DeepMind" hint="Personal API key from Google AI Studio. Required for live AI consult, multi-agent analysis, and chat features." link="https://aistudio.google.com/apikey" linkLabel="Get API Key →" icon="https://ai.google.dev/favicon.ico">Gemini API key</DocNode> (for live AI features)
+- A <DocNode term="Gemini API Key" category="Google DeepMind" hint="Personal API key from Google AI Studio. Used for local development. In production, Vertex AI Enterprise via Application Default Credentials is used instead." link="https://aistudio.google.com/apikey" linkLabel="Get API Key →" icon="https://ai.google.dev/favicon.ico">Gemini API key</DocNode> for local development — **or** <DocNode term="Google Cloud ADC" category="Google Cloud" hint="Application Default Credentials. In production and Cloud Run, Pocket Gull authenticates to Vertex AI Enterprise automatically via ADC — no API key required." link="https://cloud.google.com/docs/authentication/application-default-credentials" linkLabel="ADC Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">Google Cloud ADC</DocNode> for production/Cloud Run
 
 ---
 
@@ -89,32 +89,27 @@ Pocket Gull is architecturally designed to deploy to <DocNode term="Google Cloud
 ### Live Deployment
 
 - **Primary URL:** [pocketgull.app](https://pocketgull.app)
-- **Cloud Run URL:** [understory-315235665910.us-west1.run.app](https://understory-315235665910.us-west1.run.app)
+- **Cloud Run URL:** [pocket-gull-793190615625.us-west1.run.app](https://pocket-gull-793190615625.us-west1.run.app)
 
-### Automated Deployment Script
+### Automated Deployment
 
-The repository includes a one-click deployment script at `scripts/deploy.sh`:
+A single npm script builds, containerises, and deploys to Cloud Run:
 
 ```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-gcloud builds submit --tag gcr.io/$PROJECT_ID/pocket-gull
-gcloud run deploy pocket-gull \
-  --image gcr.io/$PROJECT_ID/pocket-gull \
-  --platform managed \
-  --region us-west1 \
-  --allow-unauthenticated
+npm run deploy
 ```
+
+This runs `npm run build` followed by `gcloud run deploy` targeting the `gen-lang-client-0540208645` project in `us-west1`. The container authenticates to Vertex AI Enterprise via GCP Service Account — no API key injection required in production.
 
 ### Key Infrastructure Files
 
 | File | Purpose |
 |---|---|
 | <DocNode term="Dockerfile" category="Docker · Solomon Hykes" hint="Container build configuration. Docker was created by Solomon Hykes at dotCloud (now Docker, Inc.)." link="https://docs.docker.com/reference/dockerfile/" linkLabel="Dockerfile Reference →" icon="https://www.docker.com/favicon.ico">`Dockerfile`</DocNode> | Container build — Node.js production image |
-| `server.js` | <DocNode term="Express.js" category="OpenJS Foundation" hint="Minimal Node.js web framework by TJ Holowaychuk. Handles SSR, API proxy, and static serving." link="https://expressjs.com/" linkLabel="expressjs.com →" icon="https://expressjs.com/images/favicon.png">Express.js</DocNode> backend — SSR, API proxy, static serving |
-| `scripts/deploy.sh` | Automated Cloud Run rollout |
-| `Procfile` | Process declaration for the container |
+| `src/server.ts` | <DocNode term="Express.js" category="OpenJS Foundation" hint="Minimal Node.js web framework by TJ Holowaychuk. Handles SSR, API proxy, WebSocket live streaming, and static serving." link="https://expressjs.com/" linkLabel="expressjs.com →" icon="https://expressjs.com/images/favicon.png">Express.js</DocNode> backend — SSR, Vertex AI proxy, WebSocket live audio, static serving |
+| `src/server/dicom.ts` | DICOM proxy router (QIDO-RS / WADO-RS / STOW-RS) |
+| `src/server/healthcare.ts` | FHIR R4 Healthcare API router |
+| `src/server/fitbit.ts` | Google Health API OAuth + biometric sync router |
 | `scripts/update-porkbun-dns.js` | Porkbun DNS API automation |
 
 ---
@@ -148,14 +143,17 @@ This script will:
 pocketgull/
 ├── src/
 │   ├── app.component.ts          # Root component, MCP tools
+│   ├── server.ts                 # Express.js backend (SSR, API proxy, WebSocket)
+│   ├── server/                   # Modular backend routers
+│   │   ├── dicom.ts              # DICOM proxy (QIDO-RS / WADO-RS)
+│   │   ├── healthcare.ts         # FHIR R4 Healthcare API
+│   │   └── fitbit.ts             # Google Health API + OAuth
 │   ├── components/               # UI components
 │   ├── services/                 # State, AI, patient management
 │   └── directives/               # Animation directives
 ├── docs/
 │   ├── images/                   # Product screenshots
 │   └── study/                    # This documentation site
-├── server.js                     # Express.js backend
 ├── Dockerfile                    # Container config
-├── scripts/deploy.sh             # Cloud Run deployment
 └── package.json
 ```

@@ -287,7 +287,48 @@ Each agent represents a specialized diagnostic lens within the `@google/adk` `In
 
 ---
 
-### 7.4 The Squadron at a Glance
+### 7.4 Enterprise & Safety Personas
+
+#### 🏥 **Stratosphere** — *Vertex AI Enterprise Layer*
+> *"I fly at a higher altitude. Better coverage, stricter rules."*
+
+| Attribute | Detail |
+|:---|:---|
+| **Role** | The Vertex AI Enterprise migration — regional ADC-authenticated endpoints, custom safety thresholds, and enterprise-grade IAM |
+| **Props** | Corporate flight suit with Google Cloud logo patch, dual-antenna radio headset, altitude altimeter clipped to a belt |
+| **Personality** | Precise, compliance-aware, authoritative. Speaks in formal SLAs and never takes shortcuts on security. |
+| **Visual Accent** | Cloud blue — `#1A73E8` |
+| **Fun Fact** | Stratosphere is the layer above where ordinary seagulls fly — fitting for a model that runs above the standard developer API ceiling. |
+
+---
+
+#### 🌊 **Relay** — *The WebSocket Live Proxy*
+> *"Every message gets through. Perfectly translated. Every time."*
+
+| Attribute | Detail |
+|:---|:---|
+| **Role** | The bidirectional `/ws/gemini-live` Express WebSocket proxy — camelCase↔snake_case translation, setup path rewrites, full-duplex live audio streaming |
+| **Props** | Vintage switchboard headset with both earpieces active, a spiral-bound translation dictionary tucked under one wing, two-way radio in the other |
+| **Personality** | Tireless, precise, never drops a packet. Quietly translates between worlds without anyone noticing the seams. |
+| **Visual Accent** | Signal green — `#34A853` |
+| **Fun Fact** | Named after the *relay race* — Relay never runs the whole race alone, just passes the baton perfectly between the browser and the cloud. |
+
+---
+
+#### 🚨 **Samaritan** — *Good Samaritan Emergency Care Mode*
+> *"I don't wait for Wi-Fi. Lives don't wait for Wi-Fi."*
+
+| Attribute | Detail |
+|:---|:---|
+| **Role** | The offline emergency override — 110 BPM chest-compression metronome, BLS safety-gated Gemini Nano local routing, FHIR-compliant EMT QR code serialization, global telemetry suppression |
+| **Props** | Red cross armband, a defibrillator paddle in one wing and a `lean-qr` QR code printout in the other, a stopwatch around the neck counting compressions |
+| **Personality** | Calm under pressure, decisive, zero hesitation. Doesn't need the cloud to save a life. |
+| **Visual Accent** | Emergency red — `#EA4335` with a pulse animation |
+| **Fun Fact** | The name is a direct nod to the Good Samaritan laws that protect bystanders who provide emergency care — Samaritan acts first and asks questions later. |
+
+---
+
+### 7.5 The Squadron at a Glance
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -303,10 +344,19 @@ Each agent represents a specialized diagnostic lens within the `@google/adk` `In
 │                        │                                    │
 │                   ⚡ Skimmer                                │
 │              (gemini-2.5-flash)                              │
+│                   ┌──────────┐                              │
+│                   │ 🌊 Relay │                              │
+│                   │ (WS Proxy│                              │
+│                   └────┬─────┘                              │
+│                   ┌────▼─────┐                              │
+│                   │ 🏥       │                              │
+│                   │ Strato.  │                              │
+│                   │(Vertex AI│                              │
+│                   └──────────┘                              │
 └─────────────────────────────────────────────────────────────┘
 
-        🌊 Breeze          💀 Mariner
-     (Box Breathing)     (3D Body Map)
+        🌊 Breeze          💀 Mariner         🚨 Samaritan
+     (Box Breathing)     (3D Body Map)     (Emergency Care)
 ```
 
 ---

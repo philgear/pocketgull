@@ -1,8 +1,18 @@
 import { Router } from 'express';
 import { GoogleAuth } from 'google-auth-library';
+import { rateLimit } from 'express-rate-limit';
 import express from 'express';
 
 export const healthcareRouter = Router();
+
+// Rate limiting: 30 requests per minute per IP for all Healthcare API proxy routes
+healthcareRouter.use(rateLimit({
+  windowMs: 60_000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many Healthcare API requests. Please try again later.' }
+}));
 
 // Initialize Google Auth with the Healthcare API scope
 const auth = new GoogleAuth({

@@ -119,13 +119,16 @@ Research integrations with **NCBI PubMed E-utilities** and **Google Programmable
 | Layer | Technology | Role |
 |---|---|---|
 | **Framework** | Angular v22.0 (Signals, Zoneless) + SSR/CSR | Ultra-reactive UI, minimal change-detection overhead |
+| **AI — Streaming** | Vertex AI Enterprise (`gemini-2.5-flash`, `gemini-2.5-pro`) | Regional multi-agent orchestration via ADK InMemoryRunner |
+| **AI — Live Audio** | Vertex AI Multimodal Live API (WebSocket) | Full-duplex voice streaming via `/ws/gemini-live` proxy |
 | **Visualization** | Three.js v0.183 | Real-time 3D anatomy |
-| **Intelligence** | Google GenAI SDK (`gemini-2.5-flash`) + `@google/adk` | Multi-agent orchestration |
+| **Clinical Data** | Google Cloud Healthcare API (FHIR R4, DICOM) | Patient record sync, DICOM imaging proxy |
+| **Biometrics** | Google Health API (OAuth 2.0 + PKCE) | Heart rate, SpO2, sleep — 30-day window |
 | **Search** | Google Programmable Search Engine, NIH PubMed E-utilities | Evidence-based augmentation |
-| **Export** | jsPDF, FHIR Bundle | Clinically-compliant data portability |
+| **Export** | jsPDF, FHIR R4 Bundle | Clinically-compliant data portability |
 | **Styling** | Tailwind CSS + custom Dieter Rams design system | Consistent, performance-first UI |
 | **Speech** | Web Speech API | Bi-directional voice interaction |
-| **Deployment** | Google Cloud Run + Express.js backend | Serverless, auto-scaling |
+| **Deployment** | Google Cloud Run + Express.js backend | Serverless, auto-scaling, scale-to-zero |
 
 ---
 
@@ -147,4 +150,4 @@ Research integrations with **NCBI PubMed E-utilities** and **Google Programmable
 
 ---
 
-*Prepared by Phil Gear — March 2026*
+*Prepared by Phil Gear — June 2026*

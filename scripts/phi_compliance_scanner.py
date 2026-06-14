@@ -194,8 +194,8 @@ def main():
             # File content scanning
             violations = scan_file(filepath)
             if violations:
-                for v_type, line_no, matched, desc in violations:
-                    print(f"[FAIL] [{v_type}] {relative_path}:{line_no} -> Found {desc} (redacted match: '{matched}')")
+                for v_type, line_no, _, desc in violations:
+                    print(f"[FAIL] [{v_type}] {relative_path}:{line_no} -> Found {desc} [match redacted]")
                     if v_type == "PII/PHI":
                         pii_violations_count += 1
                     else:
