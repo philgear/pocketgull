@@ -49,7 +49,7 @@ IGNORE_FILES = {
 
 # Known safe placeholders that regex might flag (like mock variables in tests)
 SAFE_PLACEHOLDERS = {
-    "fake_", "mock_", "dummy_", "test_", "placeholder", "example.com", "555-0199", "12345"
+    "fake_", "mock_", "dummy_", "test_", "placeholder", "example.com", "555-0199", "12345", "philgear"
 }
 
 def is_safe_placeholder(text: str) -> bool:

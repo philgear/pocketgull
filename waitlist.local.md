@@ -11,7 +11,7 @@ This document tracks target practitioners and pilot clinics for the private beta
 | :--- | :--- | :--- | :--- | :--- |
 | **Pacific Functional Medicine** | Dr. Sarah Jenkins | s.jenkins@pacfuncmed.example.com | Athenahealth | Contacted (Interested in 3D Anatomy) |
 | **Cascade Integrative Health** | Dr. Marcus Chen | m.chen@cascadehealth.example.com | Elation Health | Embargoed Beta Demo Scheduled |
-| **Bandon Clinical Group** | Ph.G. Phil Gear | philgear@example.com | Custom Sandbox | Active (Internal Developer Account) |
+| **Bandon Clinical Group** | Ph.G. Phil Gear | philgear@gmail.com | Custom Sandbox | Active (Internal Developer Account) |
 | **Metro Wellness Center** | Dr. Elena Rostova | e.rostova@metrowellness.example.com | Epic Systems | Waiting for SOC2 verification |
 
 ---
