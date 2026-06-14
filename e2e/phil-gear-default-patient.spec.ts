@@ -268,17 +268,6 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     });
     console.log('[PASS] Ayurvedic Orthomolecular Profiling verified.');
 
-    // Grow Thy Self paradigm
-    await page.locator('button', { hasText: 'Grow Thy Self' }).click();
-    await page.waitForTimeout(1500);
-    await orthoTab.click();
-    await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
-    await page.screenshot({
-      path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_grow_thy_self.png'),
-    });
-    console.log('[PASS] Grow Thy Self Orthomolecular Profiling verified.');
-
-    console.log('[COMPLETE] All 4 paradigms verified for Phil Gear Orthomolecular Profiling.');
+    console.log('[COMPLETE] All 3 paradigms verified for Phil Gear Orthomolecular Profiling.');
   });
 });

@@ -335,6 +335,22 @@ import { PatientStateService } from '../services/patient-state.service';
                 </p>
               </div>
 
+              <!-- ACM Code of Ethics (No False Data) Details -->
+              <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
+                <div class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-blue-600 dark:text-brand-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                  </svg>
+                  <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">ACM Code of Ethics (No False Data)</span>
+                </div>
+                <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
+                  In compliance with ACM Principle 1.3: We prohibit fabrication or falsification of data. Our Medical Auditor AI continuously runs real-time checks on all generated clinical content, flagging any hallucinations or discrepancies against the source transcript.
+                </p>
+              </div>
+
               <!-- Ethics Pledge Checkbox -->
               <label class="flex items-start gap-2.5 p-1 cursor-pointer group">
                 <input type="checkbox"
@@ -342,7 +358,7 @@ import { PatientStateService } from '../services/patient-state.service';
                        (change)="pledgeAccepted.set(!pledgeAccepted())"
                        class="w-3.5 h-3.5 mt-0.5 shrink-0 rounded border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-black text-[#ef6658] focus:ring-[#ef6658]/30 cursor-pointer transition-colors">
                 <span class="text-[9px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors leading-normal uppercase tracking-wide">
-                  I pledge to uphold doctor-patient confidentiality and Good Samaritan values under professional ethical codes.
+                  I pledge to uphold doctor-patient confidentiality, the ACM Code of Ethics (Principle 1.3: Honesty & No False Data), and Good Samaritan values under professional ethical codes.
                 </span>
               </label>
 

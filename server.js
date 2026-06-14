@@ -39,6 +39,10 @@ console.log(`[SERVER] Expected dist folder: ${distFolder}`);
 
 // Serve Astro Study Docs independently of Swagger
 app.use('/docs/study', (req, res, next) => {
+  if (req.path !== '/' && req.path !== '' && !req.path.endsWith('/') && !req.path.includes('.')) {
+    return res.redirect(301, `/docs/study${req.path}/`);
+  }
+
   const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
   if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
     const indexPath = join(distFolder, 'docs', 'study', cleanPath, 'index.html');

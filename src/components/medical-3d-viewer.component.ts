@@ -127,8 +127,9 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         this.scene.background = new THREE.Color(this.PALETTE.background);
         this.scene.fog = new THREE.FogExp2(this.PALETTE.background, 0.05);
 
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
         this.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-        this.camera.position.set(0, 0, 10);
+        this.camera.position.set(0, 0, isMobile ? 12 : 10);
 
         if (!this.isWebGLAvailable()) {
             throw new Error('WebGL is not supported in this environment.');
@@ -136,7 +137,7 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         this.renderer.setSize(container.clientWidth, container.clientHeight);
-        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(this.renderer.domElement);
 
         // Lighting - Industrial Grace (Harsh, directional)
@@ -159,10 +160,18 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         this.controls.autoRotateSpeed = 1.0; // Slower, more premium idle rotation
         this.controls.enablePan = false;
         
+        // Touch interaction fixes for mobile
+        if (isMobile) {
+            this.controls.enableZoom = false;
+            this.renderer.domElement.style.touchAction = 'pan-y';
+        }
+        
         // Post-Processing (Bloom)
         const renderScene = new RenderPass(this.scene, this.camera);
-        // Resolution, strength, radius, threshold
-        const bloomPass = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 1.2, 0.5, 0.2);
+        // Resolution, strength, radius, threshold - downsampled on mobile
+        const bloomWidth = isMobile ? container.clientWidth / 2 : container.clientWidth;
+        const bloomHeight = isMobile ? container.clientHeight / 2 : container.clientHeight;
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(bloomWidth, bloomHeight), 1.2, 0.5, 0.2);
         
         this.composer = new EffectComposer(this.renderer);
         this.composer.addPass(renderScene);
@@ -180,11 +189,32 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         const height = container.clientHeight;
         if (width === 0 || height === 0) return;
 
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
         this.camera.aspect = width / height;
+
+        // Prevent layout clipping on narrow screens
+        const baseDistance = isMobile ? 12 : 10;
+        const aspectLimit = 1.0;
+        if (this.camera.aspect < aspectLimit) {
+            this.camera.position.z = baseDistance * (aspectLimit / this.camera.aspect);
+        } else {
+            this.camera.position.z = baseDistance;
+        }
+
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+        
         if (this.composer) {
+            const bloomWidth = isMobile ? width / 2 : width;
+            const bloomHeight = isMobile ? height / 2 : height;
             this.composer.setSize(width, height);
+            
+            // Re-configure bloom composer resolution
+            this.composer.passes.forEach(pass => {
+                if (pass instanceof UnrealBloomPass) {
+                    pass.setSize(bloomWidth, bloomHeight);
+                }
+            });
         }
     }
 

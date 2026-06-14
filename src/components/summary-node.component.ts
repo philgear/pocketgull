@@ -577,7 +577,14 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
               [severity]="node().verificationStatus === 'error' ? 'error' : 'warning'" [hasIcon]="true">
               <div badge-icon [innerHTML]="ClinicalIcons.Risk | safeHtml"></div>
             </pocket-gull-badge>
-            <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Medical Audit Result</span>
+            @if (hasAcmViolation()) {
+              <pocket-gull-badge
+                [label]="'ACM 1.3 Ethics Flag'"
+                [severity]="'error'" [hasIcon]="true">
+                <div badge-icon [innerHTML]="ClinicalIcons.Risk | safeHtml"></div>
+              </pocket-gull-badge>
+            }
+            <span class="text-xs font-bold text-gray-555 dark:text-zinc-400 uppercase tracking-widest">Medical Audit Result</span>
           </div>
           <div class="pl-1 flex flex-col gap-1">
             @for (issue of node().verificationIssues; track issue.message) {
@@ -982,6 +989,11 @@ export class SummaryNodeComponent implements AfterViewChecked {
   isRejected = signal(false);
   rawHtml = computed(() => (this.node() as any).rawHtml || '');
   listItemHtml = computed(() => (this.node() as any).rawHtml || (this.node() as any).html || '');
+  hasAcmViolation = computed(() => {
+    const issues = this.node().verificationIssues;
+    if (!issues) return false;
+    return issues.some(issue => issue.message && issue.message.includes('ACM 1.3'));
+  });
 
   // ─── Inline chat ─────────────────────────────
   showChat = signal(false);

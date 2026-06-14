@@ -18,7 +18,7 @@ const auth = new GoogleAuth({
 dicomRouter.get('/studies', async (req, res) => {
   try {
     const projectId = req.query['project'] || process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
-    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-west1';
+    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-central2';
     const datasetId = req.query['dataset'] || process.env['HC_DATASET'];
     const dicomStoreId = req.query['dicomStore'] || process.env['HC_DICOM_STORE'];
 
@@ -66,7 +66,7 @@ dicomRouter.get('/studies', async (req, res) => {
 dicomRouter.get('/rendered', async (req, res) => {
   try {
     const projectId = req.query['project'] || process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
-    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-west1';
+    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-central2';
     const datasetId = req.query['dataset'] || process.env['HC_DATASET'];
     const dicomStoreId = req.query['dicomStore'] || process.env['HC_DICOM_STORE'];
     
@@ -115,7 +115,7 @@ dicomRouter.get('/rendered', async (req, res) => {
 dicomRouter.post('/store', express.raw({ type: 'application/dicom', limit: '100mb' }), async (req, res) => {
   try {
     const projectId = req.query['project'] || process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
-    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-west1';
+    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-central2';
     const datasetId = req.query['dataset'] || process.env['HC_DATASET'];
     const dicomStoreId = req.query['dicomStore'] || process.env['HC_DICOM_STORE'];
     
@@ -156,7 +156,7 @@ dicomRouter.post('/store', express.raw({ type: 'application/dicom', limit: '100m
 dicomRouter.get('/raw', async (req, res) => {
   try {
     const projectId = req.query['project'] || process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
-    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-west1';
+    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-central2';
     const datasetId = req.query['dataset'] || process.env['HC_DATASET'];
     const dicomStoreId = req.query['dicomStore'] || process.env['HC_DICOM_STORE'];
     
@@ -204,7 +204,7 @@ dicomRouter.get('/raw', async (req, res) => {
 dicomRouter.delete('/delete', async (req, res) => {
   try {
     const projectId = req.query['project'] || process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'];
-    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-west1';
+    const location = req.query['location'] || process.env['HC_LOCATION'] || 'us-central2';
     const datasetId = req.query['dataset'] || process.env['HC_DATASET'];
     const dicomStoreId = req.query['dicomStore'] || process.env['HC_DICOM_STORE'];
     

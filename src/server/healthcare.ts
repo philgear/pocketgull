@@ -27,7 +27,7 @@ export async function getProjectId(): Promise<string> {
   return cachedProjectId;
 }
 
-const defaultLocation = process.env['HC_LOCATION'] || 'us-west1';
+const defaultLocation = process.env['HC_LOCATION'] || 'us-central2';
 const defaultDatasetId = process.env['HC_DATASET'] || 'pocket_gull_clinical';
 const dicomStoreId = process.env['HC_DICOM_STORE'] || 'dicom_primary';
 const fhirStoreId = process.env['HC_FHIR_STORE'] || 'fhir_primary';

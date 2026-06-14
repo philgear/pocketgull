@@ -75,7 +75,7 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
 
     // 4. Button descriptive names (WCAG 2.4.6 / 4.1.2)
     // Ensure the Google SSO button contains visible text or an aria-label
-    const ssoBtn = page.locator('button', { hasText: 'Google Clinician Sign-In' });
+    const ssoBtn = page.locator('button', { hasText: 'Clinician Sign-in' });
     await expect(ssoBtn).toBeVisible();
 
     // Now mock the clinician authorization to test the PIN and API Key entry flow

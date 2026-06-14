@@ -204,6 +204,7 @@ export interface IChatEntry {
                                                  <button (click)="actionCopy(entry.text)" class="hover:text-black dark:hover:text-white" title="Copy">[COPY]</button>
                                                  @if (entry.role === 'model') {
                                                     <button (click)="actionInsert(entry.text)" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
+                                                    <button (click)="actionAnchor(entry.text)" class="hover:text-black dark:hover:text-white" title="Anchor to Memory Palace">[ANCHOR]</button>
                                                  }
                                             </div>
                                         </div>
@@ -313,6 +314,48 @@ export interface IChatEntry {
                 </div>
             }
 
+            <!-- Anchor Modal -->
+            @if (isAnchorModalOpen()) {
+              <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                <form (submit)="submitAnchor($event)" class="bg-white dark:bg-zinc-950 rounded-lg shadow-2xl border border-gray-200 dark:border-zinc-800 w-full max-w-md overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+                  <!-- Header -->
+                  <div class="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-900/50">
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wide">Anchor to Memory Palace</h3>
+                    <button type="button" (click)="isAnchorModalOpen.set(false)" class="text-gray-400 hover:text-gray-500">✕</button>
+                  </div>
+
+                  <!-- Content -->
+                  <div class="p-6 space-y-4 text-left">
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Chamber</label>
+                      <select name="anchorRoom" [(ngModel)]="anchorRoom" class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-sm focus:outline-none focus:border-green-500">
+                        <option value="Library">Library</option>
+                        <option value="Hall of Records">Hall of Records</option>
+                        <option value="Somatic Chamber">Somatic Chamber</option>
+                        <option value="Apothecary">Apothecary</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Locus (Physical Anchor Point)</label>
+                      <input type="text" name="anchorLocus" [(ngModel)]="anchorLocus" placeholder="e.g. Archive Shelf A" class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-sm focus:outline-none focus:border-green-500">
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mb-1">Memory Content</label>
+                      <textarea name="anchorContent" [(ngModel)]="anchorContent" rows="4" class="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg bg-transparent text-sm focus:outline-none focus:border-green-500"></textarea>
+                    </div>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="px-6 py-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 flex justify-end gap-3">
+                    <button type="button" (click)="isAnchorModalOpen.set(false)" class="px-4 py-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold uppercase tracking-wider bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 rounded-lg hover:bg-black dark:hover:bg-white transition">Anchor Memory</button>
+                  </div>
+                </form>
+              </div>
+            }
+
         </div>
     `
 })
@@ -340,6 +383,12 @@ export class VoiceAssistantComponent implements OnDestroy {
     chatHistory = signal<IChatEntry[]>([]);
     selectedFiles = signal<File[]>([]);
     isResearchMode = signal(false);
+
+    // --- Anchor Modal State ---
+    isAnchorModalOpen = signal(false);
+    anchorContent = signal('');
+    anchorRoom = signal('Library');
+    anchorLocus = signal('');
 
     protected readonly ClinicalIcons = ClinicalIcons;
     public live = inject(AdkLiveService);
@@ -377,6 +426,36 @@ export class VoiceAssistantComponent implements OnDestroy {
             date: new Date().toISOString()
         };
         this.state.addClinicalNote(newNote);
+    }
+
+    actionAnchor(text: string) {
+        const cleanText = text.replace(/[*_~`#]/g, '');
+        this.anchorContent.set(cleanText);
+        this.anchorRoom.set('Library');
+        this.anchorLocus.set('');
+        this.isAnchorModalOpen.set(true);
+    }
+
+    async submitAnchor(event: Event) {
+        event.preventDefault();
+        try {
+            const response = await fetch('/api/loci/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patient_id: 'current_patient',
+                    room: this.anchorRoom(),
+                    locus: this.anchorLocus(),
+                    content: this.anchorContent()
+                })
+            });
+            if (response.ok) {
+                console.log("Memory anchored successfully!");
+            }
+        } catch (e) {
+            console.error("Failed to save locus:", e);
+        }
+        this.isAnchorModalOpen.set(false);
     }
 
 

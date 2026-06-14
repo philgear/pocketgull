@@ -18,6 +18,14 @@
 ![Version](https://img.shields.io/badge/version-0.10.0-blue)
 [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
 [![DOI](https://zenodo.org/badge/1161259215.svg)](https://doi.org/10.5281/zenodo.20647513)
+[![ACM Code of Ethics](https://img.shields.io/badge/ACM-Ethics%20%26%20Conduct-006699?logo=associationforcomputingmachinery&logoColor=white)](https://www.acm.org/code-of-ethics)
+[![IEEE Code of Ethics](https://img.shields.io/badge/IEEE-Advancing%20Technology-00629B?logo=ieee&logoColor=white)](https://www.ieee.org/about/corporate/governance/p7-8.html)
+[![AnitaB.org](https://img.shields.io/badge/AnitaB.org-Diversity%20in%20Tech-FF007F)](https://anitab.org)
+[![PDXWIT](https://img.shields.io/badge/PDXWIT-Inclusion%20%26%20Equity-00A896)](https://www.pdxwit.org)
+[![Calagator](https://img.shields.io/badge/Calagator-PDX%20Tech-ED5A3B)](http://calagator.org)
+[![Oregon Care Partners](https://img.shields.io/badge/Oregon%20Care%20Partners-Caregiver%20Training-4F86C6)](https://oregoncarepartners.com)
+[![American Psychological Association](https://img.shields.io/badge/APA-Psychological%20Standards-003366)](https://www.apa.org)
+[![American Academy of Arts and Sciences](https://img.shields.io/badge/AAA%26S-Arts%20%26%20Sciences-7A1C1C)](https://www.amacad.org)
 
 
 
@@ -236,6 +244,17 @@ Pocket Gull adheres to the **Human-in-the-Loop** (HITL) principle and is hardene
 - **Automated Red Teaming:** A built-in Vitest test suite (`tests/safety.spec.ts`) actively verifies the Google Gemini `BLOCK_MEDIUM_AND_ABOVE` boundaries against adversarial prompts targeting the live proxy.
 - **Explainability:** The agent surfaces its reasoning lens (Intervention, Monitoring, Education, Orthomolecular) for every output.
 - **Privacy Core:** Zero PII persistence. All patient state is transient or locally-stored.
+
+### Professional Standards & Communities
+We align our engineering practices and ethical standards with these guidelines and professional organizations:
+- **[ACM Code of Ethics](https://www.acm.org/code-of-ethics)**: Ensuring honesty, trustworthiness, and data integrity.
+- **[IEEE Code of Ethics](https://www.ieee.org/about/corporate/governance/p7-8.html)**: Commitment to public safety, privacy, and technical competence.
+- **[AnitaB.org](https://anitab.org)**: Supporting gender diversity and parity in technology.
+- **[PDXWIT](https://www.pdxwit.org)**: Fostering inclusion, education, and representation within the Portland, OR tech ecosystem.
+- **[Calagator](http://calagator.org)**: Connecting with local open-source technology events and community dev forums.
+- **[Oregon Care Partners](https://oregoncarepartners.com)**: Accessing high-quality caregiver training and evidence-based education to support local Oregon eldercare and community wellness.
+- **[American Psychological Association](https://www.apa.org)**: Promoting psychological science and professional standards in behavior, mental health, and clinical assessment.
+- **[American Academy of Arts and Sciences](https://www.amacad.org)**: Aligning clinical strategy with independent research and multidisciplinary studies in the arts, humanities, and sciences.
 
 ---
 

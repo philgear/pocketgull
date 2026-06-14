@@ -120,6 +120,12 @@ To prevent accidental check-ins of patient data or sensitive parameters, we inte
 *   **HIPAA Model Heuristics**: Recursively analyzes patient record JSON models, detecting patient profile properties (like age, gender, history) linked to potential real-world names while allowing verified mock profiles.
 *   **Secret & Key Interdiction**: Inspects all staged/modified workspace files for plaintext Google API keys (`AIzaSy...`) or private key headers, preventing credential leaks before code leaves the local machine.
 
+**F. ACM Code of Ethics Verification (Principle 1.3: Honesty & No False Data)**
+To uphold professional ethical standards and prevent data fabrication or hallucination:
+*   **Medical Auditor AI Prompt Enforcement**: The \`VerifyAiService\` explicitly instructs the Gemini Medical Auditor AI to cross-reference every clinical claim against the source patient transcript.
+*   **Fabricated Data Interdiction**: If any vitals, lab values, or medical history details are hallucinated by the clinical engine (unsupported by the source transcript), the Auditor flags them as high-severity data integrity violations and prefixes the issue message with \`"ACM 1.3 Ethics Violation: "\`.
+*   **Ethics Warning Badging**: The UI (\`summary-node.component.ts\`) catches these flags and renders a prominent \`"ACM 1.3 Ethics Flag"\` badge directly on the clinician's interface to alert them to fabricated data.
+
 ### 4. Advanced Toolkit Adaptations
 
 **1. ShieldGemma Integration**

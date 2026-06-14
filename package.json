@@ -109,6 +109,7 @@
     "@aws-sdk/protocol-http": "^3.370.0",
     "@aws-sdk/signature-v4": "^3.370.0",
     "@genkit-ai/googleai": "^1.28.0",
+    "@genkit-ai/vertexai": "^1.37.0",
     "@google-cloud/bigquery": "^8.3.1",
     "@google-cloud/secret-manager": "^6.1.1",
     "@google/adk": "^0.5.0",
