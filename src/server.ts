@@ -9,7 +9,7 @@ import {
 import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
 import compression from 'compression';
-import { dirname, join, normalize, resolve } from 'node:path';
+import { dirname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
@@ -20,6 +20,53 @@ import { WebSocketServer, WebSocket } from 'ws';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const browserDistFolder = join(__dirname, '..').replace(/\\/g, '/'); // root dir of dist when built
+
+const studyDocsRoot = resolve(browserDistFolder, 'docs', 'study');
+
+// Simple in-memory rate limiter to prevent DOS / resource exhaustion
+const ipRequestCounts = new Map<string, { count: number, resetTime: number }>();
+
+function rateLimiter(maxRequests: number, windowMs: number) {
+  return (req: any, res: any, next: any) => {
+    const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    const clientData = ipRequestCounts.get(ip);
+
+    if (!clientData || now > clientData.resetTime) {
+      ipRequestCounts.set(ip, {
+        count: 1,
+        resetTime: now + windowMs
+      });
+      return next();
+    }
+
+    if (clientData.count >= maxRequests) {
+      return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+    }
+
+    clientData.count++;
+    next();
+  };
+}
+
+const ALLOWED_GEMINI_MODELS = new Set([
+  'gemini-2.5-flash',
+  'gemini-2.5-pro',
+  'gemini-2.0-flash-exp',
+  'gemini-1.5-flash',
+  'gemini-1.5-pro'
+]);
+
+function normalizeAndValidateModel(model: unknown): string {
+  if (typeof model !== 'string' || !model.trim()) {
+    return 'gemini-2.5-flash';
+  }
+  const normalized = model.trim().replace(/^models\//, '');
+  if (!ALLOWED_GEMINI_MODELS.has(normalized)) {
+    throw new Error('Invalid model selection.');
+  }
+  return normalized;
+}
 
 const app = express();
 const angularApp = new AngularNodeAppEngine({
@@ -539,6 +586,14 @@ app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, r
 app.post('/api/ai/stream', express.json(), async (req, res) => {
   try {
     const { patientData, systemInstruction, model, temperature } = req.body;
+    let rawModel: string;
+    try {
+      rawModel = normalizeAndValidateModel(model);
+    } catch (e: any) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
+
     const token = await getGcpAccessToken();
     const key = token ? '' : await getApiKey(req);
     if (!token && !key) {
@@ -551,7 +606,6 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    const rawModel = (model || 'gemini-2.5-flash').replace(/^models\//, '');
     let response;
 
     if (token) {
@@ -651,6 +705,14 @@ const chatSessions = new Map<string, { history: any[], systemInstruction: string
 app.post('/api/ai/chat/start', express.json(), async (req, res) => {
   try {
     const { sessionId, systemInstruction, model, temperature } = req.body;
+    let validatedModel: string;
+    try {
+      validatedModel = normalizeAndValidateModel(model);
+    } catch (e: any) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
+
     const token = await getGcpAccessToken();
     const key = token ? '' : await getApiKey(req);
     if (!token && !key) throw new Error('API key or GCP credentials not available on server.');
@@ -658,7 +720,7 @@ app.post('/api/ai/chat/start', express.json(), async (req, res) => {
     chatSessions.set(sessionId, {
       history: [],
       systemInstruction,
-      model: model || 'gemini-2.5-flash',
+      model: validatedModel,
       temperature: temperature ?? 0.1
     });
 
@@ -684,7 +746,13 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
 
     session.history.push({ role: 'user', parts: [{ text: message }] });
 
-    const rawModel = session.model.replace(/^models\//, '');
+    let rawModel: string;
+    try {
+      rawModel = normalizeAndValidateModel(session.model);
+    } catch (e: any) {
+      res.status(400).json({ error: e.message });
+      return;
+    }
     let response;
 
     if (token) {
@@ -785,8 +853,11 @@ if (!fs.existsSync(patientsDbPath)) {
   fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2));
 }
 
+const patientsRateLimiter = rateLimiter(100, 60000); // 100 requests per minute
+const docsRateLimiter = rateLimiter(300, 60000); // 300 requests per minute
+
 // Patients API Endpoints
-app.get('/api/patients', (req, res) => {
+app.get('/api/patients', patientsRateLimiter, (req, res) => {
   try {
     const data = fs.readFileSync(patientsDbPath, 'utf8');
     res.setHeader('Content-Type', 'application/json');
@@ -797,7 +868,7 @@ app.get('/api/patients', (req, res) => {
   }
 });
 
-app.post('/api/patients', express.json({ limit: '50mb' }), (req, res) => {
+app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
   try {
     if (!req.body || !Array.isArray(req.body)) {
       return res.status(400).json({ error: 'Body must be a JSON array of patients' });
@@ -814,7 +885,7 @@ app.post('/api/patients', express.json({ limit: '50mb' }), (req, res) => {
   }
 });
 
-app.put('/api/patients/:id', express.json({ limit: '50mb' }), (req, res) => {
+app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
   try {
     const { id } = req.params;
     if (!req.body || typeof req.body !== 'object') {
@@ -841,21 +912,27 @@ app.put('/api/patients/:id', express.json({ limit: '50mb' }), (req, res) => {
 });
 
 // Serve Astro Study Docs independently of Swagger and Angular SSR
-app.use('/docs/study', (req, res, next) => {
+app.use('/docs/study', docsRateLimiter, (req, res, next) => {
   if (req.path !== '/' && req.path !== '' && !req.path.endsWith('/') && !req.path.includes('.')) {
     return res.redirect(301, `/docs/study${req.path}/`);
   }
 
   const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
   if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(browserDistFolder, 'docs', 'study', cleanPath, 'index.html');
+    const indexPath = resolve(studyDocsRoot, `.${cleanPath}`, 'index.html');
+    const isWithinStudyDocsRoot = indexPath.startsWith(studyDocsRoot + sep) || indexPath === studyDocsRoot;
+    
+    if (!isWithinStudyDocsRoot) {
+      return res.status(403).send('Forbidden');
+    }
+
     if (fs.existsSync(indexPath)) {
       return res.sendFile(indexPath);
     }
   }
   next();
 });
-app.use('/docs/study', express.static(join(browserDistFolder, 'docs', 'study')));
+app.use('/docs/study', express.static(studyDocsRoot));
 
 /**
  * Serve static files from /.

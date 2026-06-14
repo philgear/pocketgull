@@ -20,7 +20,7 @@ from typing import List, Dict, Tuple
 # Regex Patterns for PII / PHI
 PII_PATTERNS = {
     "Social Security Number (SSN)": re.compile(r"\b(?!000|666|9\d{2})\d{3}-(?!00)\d{2}-(?!0000)\d{4}\b"),
-    "Email Address": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
+    "Email Address": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b"),
     "US Phone Number": re.compile(r"\b(?:\+?1[-. ]?)?\(?([2-9][0-8][0-9])\)?[-. ]?([2-9][0-9]{2})[-. ]?([0-9]{4})\b"),
     "Zip Code": re.compile(r"\b\d{5}(?:-\d{4})?\b")
 }
@@ -56,6 +56,11 @@ def is_safe_placeholder(text: str) -> bool:
     text_lower = text.lower()
     return any(p in text_lower for p in SAFE_PLACEHOLDERS)
 
+def mask_sensitive_match(match_text: str) -> str:
+    if len(match_text) > 10:
+        return match_text[:6] + "..." + match_text[-4:]
+    return "******"
+
 def scan_file(filepath: str) -> List[Tuple[str, int, str, str]]:
     """
     Scans a single file for PII/PHI and Secrets.
@@ -78,7 +83,7 @@ def scan_file(filepath: str) -> List[Tuple[str, int, str, str]]:
                         for match in pattern.finditer(line):
                             match_text = match.group(0)
                             if not is_safe_placeholder(match_text):
-                                violations.append(("PII/PHI", line_no, match_text, label))
+                                violations.append(("PII/PHI", line_no, mask_sensitive_match(match_text), label))
                 
                 # 2. Scan for Secrets (exclude this scanner script to avoid false positives)
                 if "phi_compliance_scanner" not in filepath:
@@ -86,8 +91,7 @@ def scan_file(filepath: str) -> List[Tuple[str, int, str, str]]:
                         for match in pattern.finditer(line):
                             match_text = match.group(0)
                             if not is_safe_placeholder(match_text):
-                                # Mask match text for safety in logs
-                                masked = match_text[:6] + "..." + match_text[-4:] if len(match_text) > 10 else "******"
+                                masked = mask_sensitive_match(match_text)
                                 violations.append(("SECRET", line_no, masked, label))
                                 
     except Exception as e:
@@ -191,7 +195,7 @@ def main():
             violations = scan_file(filepath)
             if violations:
                 for v_type, line_no, matched, desc in violations:
-                    print(f"[FAIL] [{v_type}] {relative_path}:{line_no} -> Found {desc} matching '{matched}'")
+                    print(f"[FAIL] [{v_type}] {relative_path}:{line_no} -> Found {desc} (redacted match: '{matched}')")
                     if v_type == "PII/PHI":
                         pii_violations_count += 1
                     else:
