@@ -11,6 +11,9 @@ import 'services/local_intelligence_service.dart';
 import 'services/orcid_service.dart';
 import 'services/export_service.dart';
 import 'screens/splash_screen.dart';
+import 'services/patient_state_service.dart';
+import 'services/fhir_integration_service.dart';
+import 'services/adk_live_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -95,6 +98,15 @@ class PocketGullApp extends StatelessWidget {
         ),
         RepositoryProvider<ExportService>(
           create: (_) => ExportService(),
+        ),
+        RepositoryProvider<PatientStateService>(
+          create: (_) => PatientStateService(),
+        ),
+        RepositoryProvider<FhirIntegrationService>(
+          create: (_) => FhirIntegrationService(),
+        ),
+        RepositoryProvider<AdkLiveService>(
+          create: (_) => AdkLiveService(),
         ),
       ],
       child: MultiBlocProvider(

@@ -4,7 +4,7 @@ This document maps the components and services from the live Angular site to the
 
 | Feature / Base Name | Angular (Live) | Flutter (Migration) | Status |
 | :--- | :--- | :--- | :--- |
-| **adk live** | `src/services/ai/adk-live.service.ts` | - | ❌ Missing in Flutter |
+| **adk live** | `src/services/ai/adk-live.service.ts` | `pocketgull_flutter/lib/services/adk_live_service.dart` | ✅ Parity |
 | **ai cache** | `src/services/ai-cache.service.ts` | - | ❌ Missing in Flutter |
 | **ai cache service** | - | `pocketgull_flutter/lib/services/ai_cache_service.dart` | ⚠️ Flutter Only |
 | **ai provider.types** | `src/services/ai-provider.types.ts` | - | ❌ Missing in Flutter |
@@ -42,7 +42,7 @@ This document maps the components and services from the live Angular site to the
 | **export** | `src/services/export.service.ts` | - | ❌ Missing in Flutter |
 | **export service** | - | `pocketgull_flutter/lib/services/export_service.dart` | ⚠️ Flutter Only |
 | **fhir callback** | `src/components/fhir-callback.component.ts` | - | ❌ Missing in Flutter |
-| **fhir integration** | `src/services/fhir-integration.service.ts` | - | ❌ Missing in Flutter |
+| **fhir integration** | `src/services/fhir-integration.service.ts` | `pocketgull_flutter/lib/services/fhir_integration_service.dart` | ✅ Parity |
 | **firestore sync** | `src/services/firestore-sync.service.ts` | - | ❌ Missing in Flutter |
 | **fitbit** | `src/services/fitbit.service.ts` | - | ❌ Missing in Flutter |
 | **gamification** | `src/services/gamification.service.ts` | - | ❌ Missing in Flutter |
@@ -83,7 +83,7 @@ This document maps the components and services from the live Angular site to the
 | **patient management** | `src/services/patient-management.service.ts` | - | ❌ Missing in Flutter |
 | **patient management service** | - | `pocketgull_flutter/lib/services/patient_management_service.dart` | ⚠️ Flutter Only |
 | **patient scans** | `src/components/patient-scans.component.ts` | `pocketgull_flutter/lib/widgets/patient_scans_widget.dart` | ✅ Parity |
-| **patient state** | `src/services/patient-state.service.ts` | - | ❌ Missing in Flutter |
+| **patient state** | `src/services/patient-state.service.ts` | `pocketgull_flutter/lib/services/patient_state_service.dart` | ✅ Parity |
 | **patient vitals chart** | `src/components/patient-vitals-chart.component.ts` | - | ❌ Missing in Flutter |
 | **patient.types** | `src/services/patient.types.ts` | - | ❌ Missing in Flutter |
 | **pet auditory** | `src/services/pet-auditory.service.ts` | - | ❌ Missing in Flutter |
@@ -121,6 +121,6 @@ This document maps the components and services from the live Angular site to the
 | **webllm.provider** | `src/services/ai/webllm.provider.ts` | - | ❌ Missing in Flutter |
 
 ## Summary
-- **Matched Features**: 15
-- **Missing in Flutter (Needs Migration)**: 75
+- **Matched Features**: 18
+- **Missing in Flutter (Needs Migration)**: 72
 - **Flutter Only (New Features/Architecture)**: 25

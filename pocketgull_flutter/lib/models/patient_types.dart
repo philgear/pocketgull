@@ -504,4 +504,53 @@ class Patient extends PatientState {
         recommendedGuidelines,
         ...super.props,
       ];
+
+  @override
+  Patient copyWith({
+    String? id,
+    String? name,
+    int? age,
+    String? gender,
+    String? lastVisit,
+    List<String>? preexistingConditions,
+    List<HistoryEntry>? history,
+    List<Bookmark>? bookmarks,
+    int? triageScore,
+    String? kaizenColor,
+    int? activeTimerSeconds,
+    List<Map<String, String>>? recommendedGuidelines,
+    // PatientState params
+    Map<String, List<BodyPartIssue>>? issues,
+    String? patientGoals,
+    PatientVitals? vitals,
+    List<DiagnosticScan>? scans,
+    AnatomicalViewMode? viewMode,
+    String? selectedPartId,
+    String? selectedNoteId,
+    String? viewingPastVisitDate,
+    List<ClinicalNote>? clinicalNotes,
+    List<ChecklistItem>? checklist,
+    bool? isLiveAgentActive,
+    bool? isResearchFrameVisible,
+  }) {
+    return Patient(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      age: age ?? this.age,
+      gender: gender ?? this.gender,
+      lastVisit: lastVisit ?? this.lastVisit,
+      preexistingConditions: preexistingConditions ?? this.preexistingConditions,
+      history: history ?? this.history,
+      bookmarks: bookmarks ?? this.bookmarks,
+      triageScore: triageScore ?? this.triageScore,
+      kaizenColor: kaizenColor ?? this.kaizenColor,
+      activeTimerSeconds: activeTimerSeconds ?? this.activeTimerSeconds,
+      recommendedGuidelines: recommendedGuidelines ?? this.recommendedGuidelines,
+      issues: issues ?? this.issues,
+      patientGoals: patientGoals ?? this.patientGoals,
+      vitals: vitals ?? this.vitals,
+      scans: scans ?? this.scans,
+      viewMode: viewMode ?? this.viewMode,
+    );
+  }
 }

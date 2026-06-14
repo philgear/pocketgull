@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../models/orcid_profile.dart';
 
@@ -29,12 +30,20 @@ class ClinicalIntelligenceService {
   final GenerativeModel _model;
   ChatSession? _chatSession;
 
+  /// Cloud Run proxy base URL — routes to Vertex AI Enterprise.
+  /// Set to empty string to fall back to direct Gemini SDK (demo mode).
+  final String _proxyBaseUrl;
+
   void resetAIState() {
     _chatSession = null;
   }
 
-  ClinicalIntelligenceService({required String apiKey}) 
-      : _model = GenerativeModel(
+  ClinicalIntelligenceService({
+    required String apiKey,
+    String? proxyBaseUrl,
+  })  : _proxyBaseUrl =
+            proxyBaseUrl ?? 'https://pocket-gull-793190615625.us-west1.run.app',
+        _model = GenerativeModel(
           model: 'gemini-1.5-flash',
           apiKey: apiKey,
           generationConfig: GenerationConfig(
@@ -99,7 +108,8 @@ $_formattingRules''';
     }
   }
 
-  bool get _isMockMode => true; // Forced for demonstration
+  /// Returns true only when no proxy is configured AND no valid API key exists.
+  bool get _isMockMode => _proxyBaseUrl.isEmpty && _model.toString().contains('YOUR_API_KEY');
 
   Stream<String> generateReportStream(String patientData, AnalysisLens lens, {OrcidProfile? orcidProfile}) async* {
     if (_isMockMode) {
@@ -130,6 +140,39 @@ $_formattingRules''';
           '$worksList';
     }
 
+    // Route through Cloud Run proxy → Vertex AI Enterprise
+    if (_proxyBaseUrl.isNotEmpty) {
+      final prompt = '$sysInst\n\nPATIENT DATA:\n$patientData';
+      final response = await http.post(
+        Uri.parse('$_proxyBaseUrl/api/ai/stream'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'prompt': prompt}),
+      ).timeout(const Duration(seconds: 60));
+
+      if (response.statusCode == 200) {
+        // Stream line-by-line SSE chunks
+        final lines = response.body.split('\n');
+        for (final line in lines) {
+          if (line.startsWith('data: ')) {
+            final chunk = line.substring(6);
+            if (chunk.isNotEmpty && chunk != '[DONE]') {
+              try {
+                final decoded = jsonDecode(chunk) as Map<String, dynamic>;
+                final text = decoded['text'] as String?;
+                if (text != null) yield text;
+              } catch (_) {
+                yield chunk;
+              }
+            }
+          }
+        }
+        return;
+      } else {
+        debugPrint('[ClinicalIntelligenceService] Proxy error ${response.statusCode}, falling back to SDK.');
+      }
+    }
+
+    // Fallback: direct Gemini SDK
     final prompt = [
       Content.text('SYSTEM INSTRUCTIONS:\n$sysInst\n\nPATIENT DATA:\n$patientData')
     ];
