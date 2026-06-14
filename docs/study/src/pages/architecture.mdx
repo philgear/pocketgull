@@ -82,6 +82,38 @@ Pocket Gull leverages a modern, reactive architecture utilizing <DocNode term="A
 
 ---
 
+## Service Orchestration & Multi-Agent Parallelism
+
+Pocket Gull coordinates complex clinical synthesis through a structured, multi-agent orchestration layer designed for low-latency feedback and clinical modularity:
+
+### 1. Parallel Lens Generation
+Rather than relying on a single, monolithic LLM request, the `ClinicalIntelligenceService` partitions the Care Plan into six independent clinical dimensions (lenses). These lenses are processed concurrently in the background using `Promise.allSettled()` orchestration:
+* **Summary Overview** — Unified clinical assessment, urgency priority list, and measurable timeline goals.
+* **Functional Protocols** — Biochemical pathway targets, precision molecule dosing matrices, and HPA axis/circadian guidelines.
+* **Nutrition** — Micronutrient deficiency correction, cellular oxidative stress, and whole-food adjustments.
+* **Orthomolecular Profiling** — Methylation blocks, heavy metal depletions, and structured JSON biomarker output mapping.
+* **Monitoring & Follow-up** — Time-horizon next steps, tracking parameters, and threshold escalation triggers.
+* **Patient Education** — Empathetic, de-identified plain-language translations of all recommended strategies.
+
+### 2. Avian Agent Personas
+Each clinical lens is orchestrated by a dedicated specialist agent from the *Gull Squadron* with customized prompt boundaries:
+* `Gulliver` (Summary Overview) — Synthesis and big-picture overview lead.
+* `Swoop` (Functional Protocols, Nutrition, Orthomolecular Profiling) — Precision pathway and dosing specialist.
+* `Sentinel` (Monitoring & Follow-up) — Care coordination and vigilance monitor.
+* `Scribes` (Patient Education) — Patient-facing plain language translation specialist.
+
+### 3. Dynamic Prompt Compounding
+The system compiles system instructions dynamically at runtime by stitching together several layers:
+1. **Agent Identity** — Persona role, voice, and diagnostic boundaries.
+2. **Clinical Paradigm** — Standard Western guidelines, Eastern (Zang-Fu, 8 Principles, acupoints, pulse), or Ayurvedic (Dosha constitutions, Agni/Ama metabolism, Dhatu tissue mapping) paradigms.
+3. **ORCID Research Integration** — Dynamically appends the clinician's publications and research keywords to align AI insights with the practitioner's scholarly background.
+4. **Formatting Constraints** — Strict Markdown layouts, citation parameters, and HIPAA de-identification masks.
+
+### 4. Real-time Reactive Streaming
+Each parallel agent execution maps directly to a chunked generator stream (`generateReportStream$`). Chunks are consumed as they arrive from Vertex AI and immediately update the respective Angular Signals. This drives fine-grained UI updates card-by-card in real-time, keeping the interface responsive and alive.
+
+---
+
 ## Key Infrastructure Files
 
 | File | Responsibility |

@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-rc4] - 2026-06-14
+
+### Added
+- **[2026-06-14] Vertex AI Enterprise Migration**: Upgraded the AI intelligence layer from the developer Gemini API to regional Google Cloud Vertex AI Enterprise, implementing automatic Google Application Default Credentials (ADC) token resolution, regional endpoints, and custom safety thresholds.
+- **[2026-06-14] Bidirectional WebSocket Live Proxy**: Implemented a secure WebSocket proxy route (`/ws/gemini-live`) featuring recursive camelCase to snake_case translations and setup model resource path rewrites to support full-duplex live audio streaming over Vertex AI.
+- **[2026-06-14] Lightweight API Rate Limiting**: Built a custom, in-memory IP-based rate limiter middleware (`rateLimiter`) to mitigate denial-of-service and resource exhaustion on file-accessing routes.
+
+### Changed
+- **[2026-06-14] Improved Custom Search Engine**: Updated the Google Custom/Programmable Search Engine (CSE) script config in `search.html` to load a new instance (`648e5d0ad53ae49a6`) providing wider clinical and medical school domain indexing.
+
+### Security / Fixed
+- **[2026-06-14] CodeQL SSRF Remediation**: Patched Server-Side Request Forgery vulnerabilities in stream/chat endpoints by adding strict model selection validation (`normalizeAndValidateModel`).
+- **[2026-06-14] CodeQL Path Traversal Protection**: Guarded the study docs static router against directory escape by using `path.resolve` and strict parent-directory containment verification.
+- **[2026-06-14] CodeQL Clear-Text Logging Fix**: Redacted matching secrets and PII values in `phi_compliance_scanner.py` console logs to prevent exposure in CI workflows.
+
 ## [1.0.0-rc3] - 2026-06-08
 
 ### Added

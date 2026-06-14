@@ -55,6 +55,17 @@ To protect patient confidentiality and comply with HIPAA guidelines, Pocket Gull
 
 ---
 
+## Google Cloud Compliance & Data Minimization
+
+To protect patient records and maintain high-efficiency serverless environments, Pocket Gull adheres to strict **GCP Data Minimization** protocols:
+
+- **Zero-PHI Logging** — Standard endpoint handlers in `server.ts` log exclusively transport metadata (e.g., patient mock UUIDs, parsed count values) to Stackdriver/Cloud Logging. Raw HTTP request/response payloads containing patient chart information are never logged.
+- **Artifact Registry Lifecycles** — Deployed serverless containers are managed by Artifact Registry lifecycle rules, which automatically destroy untagged or historical images older than 30 days to limit storage footprint.
+- **Scale-to-Zero Enforcement** — Cloud Run container instances are configured with a minimum scale value of `0` (`--min-instances=0`), ensuring all computing instances scale to zero during idle periods to manage cost.
+- **Secret Manager Hygiene** — Cryptographic API keys and credentials are bound to GCP Secret Manager. Historical or inactive secret versions are destroyed permanently rather than kept disabled to eliminate credential exposure vectors.
+
+---
+
 ## Data Export & Portability
 
 ### FHIR Bundles

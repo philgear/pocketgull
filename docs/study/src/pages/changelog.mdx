@@ -8,6 +8,25 @@ title: Changelog
 All notable changes to Pocket Gull are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## v1.0.0-rc4 — 2026-06-14
+
+**Vertex AI Enterprise Migration, Secure Bidirectional Live Proxy, & CodeQL Security Hardening**
+
+### Added
+- **Vertex AI Enterprise Migration**: Ported the AI provider logic from the Developer API to Google Cloud Vertex AI Enterprise, resolving IAM-based authentication, regional endpoints, and custom safety thresholds.
+- **WebSocket Live Proxy**: Implemented a secure WebSocket proxy route (`/ws/gemini-live`) on the Express server to translate data recursive-casing and rewrite setup configurations for live audio streaming.
+- **Lightweight API Rate Limiting**: Added IP-based in-memory request limiters (`rateLimiter`) to mitigate DOS/resource exhaustion on patient database and documentation endpoints.
+
+### Changed
+- **Improved Custom Search Engine**: Swapped the Google Custom Search Engine (CSE) ID to a new instance (`648e5d0ad53ae49a6`) for wider medical and academic domain coverage.
+
+### Security / Fixed
+- **CodeQL SSRF Protection**: Patched SSRF risks in stream and chat paths via strict model validation whitelisting (`normalizeAndValidateModel`).
+- **CodeQL Path Traversal Prevention**: Secured static Astro study docs file serving with `path.resolve` checks and directory bounds containment validation.
+- **CodeQL Clear-Text Logging Fix**: Redacted raw PII and secret values from console/CI logs within the HIPAA compliance scanner.
+
+---
+
 ## v1.0.0-rc3 — 2026-06-08
 
 **Porkbun DNS Automation, Enterprise EHR Blueprints & Security Hardening**
