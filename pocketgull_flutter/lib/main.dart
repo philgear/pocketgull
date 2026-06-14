@@ -15,6 +15,11 @@ import 'services/patient_state_service.dart';
 import 'services/fhir_integration_service.dart';
 import 'services/adk_live_service.dart';
 import 'services/theme_service.dart';
+import 'services/auth_service.dart';
+import 'services/gamification_service.dart';
+import 'services/fitbit_service.dart';
+import 'services/firestore_sync_service.dart';
+import 'services/audit_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -70,8 +75,20 @@ void main() async {
     await orcidService.initialize();
 
     final themeService = ThemeService();
+    final gamificationService = GamificationService();
+    await gamificationService.initialize();
+    final auditService = AuditService();
+    await auditService.initialize();
+    // Audit app start (ACM §1.7 Honor Confidentiality — audit trail begins at boot)
+    auditService.logAuth(action: 'app_started', outcome: 'success');
     
-    runApp(PocketGullApp(localAI: localAI, orcidService: orcidService, themeService: themeService));
+    runApp(PocketGullApp(
+      localAI: localAI,
+      orcidService: orcidService,
+      themeService: themeService,
+      gamificationService: gamificationService,
+      auditService: auditService,
+    ));
   }, (error, stack) {
     debugPrint('GLOBAL ERROR: $error');
     debugPrint(stack.toString());
@@ -82,7 +99,16 @@ class PocketGullApp extends StatelessWidget {
   final LocalIntelligenceService localAI;
   final OrcidService orcidService;
   final ThemeService themeService;
-  const PocketGullApp({super.key, required this.localAI, required this.orcidService, required this.themeService});
+  final GamificationService gamificationService;
+  final AuditService auditService;
+  const PocketGullApp({
+    super.key,
+    required this.localAI,
+    required this.orcidService,
+    required this.themeService,
+    required this.gamificationService,
+    required this.auditService,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +140,22 @@ class PocketGullApp extends StatelessWidget {
         ),
         RepositoryProvider<ThemeService>.value(
           value: themeService,
+        ),
+        RepositoryProvider<GamificationService>.value(
+          value: gamificationService,
+        ),
+        RepositoryProvider<AuthService>(
+          create: (_) => AuthService(),
+        ),
+        RepositoryProvider<FitbitService>(
+          create: (_) => FitbitService(),
+        ),
+        RepositoryProvider<FirestoreSyncService>(
+          create: (_) => FirestoreSyncService(),
+        ),
+        RepositoryProvider<AuditService>.value(
+          // Item #1: AuditService globally available (ACM §1.7 Honor Confidentiality)
+          value: auditService,
         ),
       ],
       child: MultiBlocProvider(

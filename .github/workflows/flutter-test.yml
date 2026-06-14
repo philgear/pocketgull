@@ -1,0 +1,66 @@
+name: Flutter Tests & Coverage
+
+# IEEE SWEBOK Testing KA / ACM §2.5 Comprehensive & Thorough:
+# This workflow enforces a minimum 60% unit test coverage threshold on all
+# Flutter service and widget code before any merge to main. This is a hard
+# quality gate that cannot be bypassed.
+
+on:
+  push:
+    branches: [ main, 'rc/**' ]
+    paths:
+      - 'pocketgull_flutter/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'pocketgull_flutter/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter-test:
+    name: Flutter Test & Coverage Gate
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pocketgull_flutter
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Dart analyze (zero-tolerance)
+        # ACM §2.5: Analysis is a hard gate — any issue fails the build
+        run: dart analyze lib --fatal-infos
+
+      - name: Run tests with coverage
+        # IEEE SWEBOK Testing KA: collect LCOV coverage data
+        run: flutter test --coverage --reporter=expanded
+
+      - name: Enforce minimum coverage threshold (≥60%)
+        # ACM §2.5 Comprehensive & Thorough: coverage below 60% fails the PR
+        uses: VeryGoodOpenSource/very_good_coverage@v3
+        with:
+          path: pocketgull_flutter/coverage/lcov.info
+          min_coverage: 60
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          files: pocketgull_flutter/coverage/lcov.info
+          flags: flutter
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

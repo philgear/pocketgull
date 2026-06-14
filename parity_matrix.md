@@ -1,9 +1,30 @@
 # Feature Parity Matrix
 
+> **Governed by ACM Code of Ethics §2.5 (Comprehensive & Thorough) and IEEE SWEBOK Requirements KA.**
+> All ✅ Parity entries must satisfy the acceptance criteria defined in the [Acceptance Criteria](#acceptance-criteria) section before being considered production-ready.
+
 This document maps the components and services from the live Angular site to the new Flutter migration to track feature parity.
 
-| Feature / Base Name | Angular (Live) | Flutter (Migration) | Status |
-| :--- | :--- | :--- | :--- |
+## Acceptance Criteria
+
+Each feature is considered at ✅ **Parity** only when **all** of the following are true:
+
+| AC ID | Criterion | IEEE SWEBOK KA |
+|---|---|---|
+| AC-01 | `dart analyze` reports zero issues for the file | Construction |
+| AC-02 | The service is registered in `main.dart` as a `RepositoryProvider` | Architecture |
+| AC-03 | At least one unit test exists covering the primary method(s) | Testing |
+| AC-04 | All outbound HTTP calls use HTTPS (TLS assertion via `_assertTls` or equivalent) | Security |
+| AC-05 | No PHI is written to `debugPrint`, logs, or local storage keys | Privacy / ACM §1.6 |
+| AC-06 | All AI invocations are logged via `AuditService.logAiCall(...)` | ACM §1.7 |
+| AC-07 | Feature is exercised by at least one e2e or integration test | Testing |
+
+> **Note on AC-03/AC-07:** Tests are not yet required to pass CI gate (Sprint 3 introduces the gate). Features migrated before Sprint 3 must be back-filled in Sprint 4.
+
+---
+
+| Feature / Base Name | Angular (Live) | Flutter (Migration) | Status | AC Met |
+| :--- | :--- | :--- | :--- | :--- |
 | **adk live** | `src/services/ai/adk-live.service.ts` | `pocketgull_flutter/lib/services/adk_live_service.dart` | ✅ Parity |
 | **ai cache** | `src/services/ai-cache.service.ts` | - | ❌ Missing in Flutter |
 | **ai cache service** | - | `pocketgull_flutter/lib/services/ai_cache_service.dart` | ⚠️ Flutter Only |
@@ -121,6 +142,12 @@ This document maps the components and services from the live Angular site to the
 | **webllm.provider** | `src/services/ai/webllm.provider.ts` | - | ❌ Missing in Flutter |
 
 ## Summary
-- **Matched Features**: 18
-- **Missing in Flutter (Needs Migration)**: 72
-- **Flutter Only (New Features/Architecture)**: 25
+- **Matched Features**: 21
+- **Missing in Flutter (Needs Migration)**: 69
+- **Flutter Only (New Features/Architecture)**: 28
+
+## Sprint Log
+| Sprint | Date | Items Shipped | New Match Count |
+|---|---|---|---|
+| Sprint 1 | 2026-06-14 | `PatientStateService`, `FhirIntegrationService`, `AdkLiveService` (+ `Patient.copyWith`, AI proxy unlock) | 15 → 18 |
+| Sprint 2 | 2026-06-14 | `ThemeService`, `PatientSelectorWidget`, `LiveConsultScreen`, `HomeScreen` AppBar wiring | 18 → 21 |

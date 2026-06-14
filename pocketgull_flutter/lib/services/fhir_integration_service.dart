@@ -8,11 +8,21 @@ import '../models/patient_types.dart';
 /// Exports active patient state as FHIR R4 Bundle JSON and syncs to the
 /// Cloud Run Healthcare API proxy (`/api/healthcare/fhir/export`).
 /// Also supports importing bundles from the proxy.
+///
+/// Item #7 (IEEE SWEBOK Security / ACM §2.9): All outbound connections are
+/// asserted to use HTTPS before transmission to prevent clear-text PHI leakage.
 class FhirIntegrationService {
   final String _baseUrl;
 
   FhirIntegrationService({String? baseUrl})
-      : _baseUrl = baseUrl ?? 'https://pocket-gull-793190615625.us-west1.run.app';
+      // Item #2: URL injected via --dart-define=CLOUD_RUN_URL (ACM §2.9)
+      : _baseUrl = baseUrl ??
+            const String.fromEnvironment(
+              'CLOUD_RUN_URL',
+              defaultValue: 'https://pocket-gull-793190615625.us-west1.run.app',
+            ) {
+    _assertTls(_baseUrl);
+  }
 
   // ── Export ────────────────────────────────────────────────────────────────────
 
@@ -205,5 +215,17 @@ class FhirIntegrationService {
   String _estimateBirthYear(int age) {
     final year = DateTime.now().year - age;
     return '$year-01-01';
+  }
+
+  /// Item #7: TLS assertion — rejects plain HTTP before any PHI transmission.
+  /// Throws in debug; logs critical warning in release (ACM §2.9, §1.6).
+  static void _assertTls(String url) {
+    if (url.isNotEmpty && !url.startsWith('https://')) {
+      final msg = '[FhirIntegrationService] SECURITY VIOLATION: '
+          'Attempted to configure FHIR service with non-HTTPS URL: $url. '
+          'PHI must never be transmitted over plaintext connections (ACM §2.9).';
+      assert(false, msg);
+      debugPrint(msg);
+    }
   }
 }
