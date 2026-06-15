@@ -44,6 +44,7 @@ export class ExportService {
    */
   async downloadAsPdf(data: any, patientName: string = 'Patient'): Promise<void> {
     console.log('[ExportService] Opening styled print report for:', patientName);
+    const nonce = typeof document !== 'undefined' ? (document.querySelector('script[nonce]')?.getAttribute('nonce') || '') : '';
 
     // Ensure marked is loaded
     let parser = this.markdownService.parser();
@@ -452,8 +453,8 @@ export class ExportService {
   <div class="print-bar">
     <span class="print-bar-title">Pocket Gull Clinical Report — ${patientName}</span>
     <div class="print-bar-actions">
-      <button class="btn-close" onclick="window.close()">Close</button>
-      <button class="btn-print" onclick="window.print()">Save as PDF / Print</button>
+      <button class="btn-close" id="pgCloseBtn">Close</button>
+      <button class="btn-print" id="pgPrintBtn">Save as PDF / Print</button>
     </div>
   </div>
 
@@ -520,6 +521,10 @@ export class ExportService {
 
     </div>
   </div>
+  <script nonce="${nonce}">
+    document.getElementById('pgCloseBtn')?.addEventListener('click', () => window.close());
+    document.getElementById('pgPrintBtn')?.addEventListener('click', () => window.print());
+  </script>
 </body>
 </html>`;
 
@@ -557,6 +562,7 @@ export class ExportService {
     }
   ): Promise<void> {
     console.log('[ExportService] Opening styled Care Plan print report for:', patientName);
+    const nonce = typeof document !== 'undefined' ? (document.querySelector('script[nonce]')?.getAttribute('nonce') || '') : '';
 
     let parser = this.markdownService.parser();
     if (!parser) {
@@ -1147,8 +1153,8 @@ export class ExportService {
   <div class="print-bar">
     <span class="print-bar-title">Pocket Gull Care Plan — ${patientName}</span>
     <div class="print-bar-actions">
-      <button class="btn-close" onclick="window.close()">Close</button>
-      <button class="btn-print" onclick="window.print()">Save as PDF / Print</button>
+      <button class="btn-close" id="pgCloseBtn">Close</button>
+      <button class="btn-print" id="pgPrintBtn">Save as PDF / Print</button>
     </div>
   </div>
 
@@ -1225,6 +1231,10 @@ export class ExportService {
 
     </div>
   </div>
+  <script nonce="${nonce}">
+    document.getElementById('pgCloseBtn')?.addEventListener('click', () => window.close());
+    document.getElementById('pgPrintBtn')?.addEventListener('click', () => window.print());
+  </script>
 </body>
 </html>`;
 

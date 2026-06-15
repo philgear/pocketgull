@@ -434,12 +434,21 @@ app.get(/(.*)/, (req, res) => {
   if (fs.existsSync(indexPath)) {
     try {
       let html = fs.readFileSync(indexPath, 'utf8');
+      const nonce = res.locals.nonce || '';
       if (geminiApiKeyCached) {
         // Inject script immediately before closing </head>
-        const nonce = res.locals.nonce || '';
         const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${geminiApiKeyCached}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
       }
+
+      // Inject nonce into all script tags that don't have one
+      html = html.replace(/<script\b([^>]*)>/gi, (match, attrs) => {
+        if (attrs.includes('nonce=')) {
+          return match;
+        }
+        return `<script nonce="${nonce}"${attrs}>`;
+      });
+
       res.setHeader('Content-Type', 'text/html');
       return res.status(200).send(html);
     } catch (err) {

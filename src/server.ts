@@ -940,15 +940,26 @@ app.use((req, res, next) => {
         return next();
       }
 
-      // If the response is HTML and we have an API key, inject it
+      // If the response is HTML, inject Gemini API key and add CSP nonces to all script tags
       const contentType = response.headers.get('content-type') || '';
-      const key = await getApiKey(req);
-      if (contentType.includes('text/html') && key) {
+      if (contentType.includes('text/html')) {
         let html = await response.text();
-        const safeKey = key.replace(/[^a-zA-Z0-9_\-]/g, '');
         const nonce = res.locals['nonce'] || '';
-        const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${safeKey}";</script>\n</head>`;
-        html = html.replace('</head>', scriptTag);
+        const key = await getApiKey(req);
+        
+        if (key) {
+          const safeKey = key.replace(/[^a-zA-Z0-9_\-]/g, '');
+          const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${safeKey}";</script>\n</head>`;
+          html = html.replace('</head>', scriptTag);
+        }
+
+        // Ensure all script tags have the CSP nonce
+        html = html.replace(/<script\b([^>]*)>/gi, (match, attrs) => {
+          if (attrs.includes('nonce=')) {
+            return match;
+          }
+          return `<script nonce="${nonce}"${attrs}>`;
+        });
 
         const modRes = new Response(html, {
           status: response.status,
