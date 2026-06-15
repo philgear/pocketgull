@@ -40,7 +40,7 @@
     "typescript": "^5.9.3"
   },
   "overrides": {
-    "esbuild": "0.25.0",
+    "esbuild": "0.28.1",
     "tar": ">=7.5.10",
     "picomatch": ">=4.0.4",
     "postcss": "^8.5.15",
