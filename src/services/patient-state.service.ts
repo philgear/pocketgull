@@ -12,7 +12,8 @@ import {
   IBookmark,
   BODY_PART_NAMES,
   BODY_PART_MAPPING,
-  IAyurvedicStatus
+  IAyurvedicStatus,
+  ICaregiverTrainingLog
 } from './patient.types';
 
 export type { IPatientState };
@@ -20,6 +21,42 @@ export { BODY_PART_NAMES };
 import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
 import { ThemeService } from './theme.service';
+
+export const DEFAULT_CAREGIVER_LOGS: ICaregiverTrainingLog[] = [
+  {
+    id: 'log_001',
+    courseName: 'Oregon Annual HCBS Core Training',
+    category: 'HCBS Core',
+    hours: 12,
+    completedDate: '2025-11-14',
+    provider: 'Oregon APD Academy',
+    status: 'Completed',
+    verificationHash: 'ea63836d50ff998a4cb02081d6d87cb3df24ef84c2f6d54bc9f1c7f99ee300a1',
+    certificateId: 'OR-HCBS-2025-9831'
+  },
+  {
+    id: 'log_002',
+    courseName: 'Oregon Biennial Inclusive Care Certification',
+    category: 'Inclusive Care',
+    hours: 6,
+    completedDate: '2026-04-10',
+    provider: 'OHA Equity Office',
+    status: 'Completed',
+    verificationHash: 'd3f6a2b8e5c14f09d83b567a12bcde45ef01ab8c34df568a1290fbe224a5690b',
+    certificateId: 'OR-INC-2026-4412'
+  },
+  {
+    id: 'log_003',
+    courseName: 'Advanced Dementia and Autonomy Support',
+    category: 'Professional Development',
+    hours: 8,
+    completedDate: '2026-05-20',
+    provider: 'Care Oregon Education',
+    status: 'Completed',
+    verificationHash: 'f4b3a2e1d0c9b8a798f0e0d0c0b0a0908070605040302010e0f0a0b0c0d0e0f0',
+    certificateId: 'OR-PD-2026-1189'
+  }
+];
 
 
 @Injectable({
@@ -49,6 +86,8 @@ export class PatientStateService {
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
   readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
+  readonly isCaregiverMode = signal<boolean>(false);
+  readonly caregiverTrainingLogs = signal<ICaregiverTrainingLog[]>([...DEFAULT_CAREGIVER_LOGS]);
 
   // --- AVS Neuro-Therapy Synchronized State ---
   readonly isAvsSessionActive = signal<boolean>(false);
@@ -605,6 +644,8 @@ export class PatientStateService {
     this.viewingPastVisit.set(null);
     this.activePhilosophy.set('western');
     this.ayurvedicStatus.set({});
+    this.isCaregiverMode.set(false);
+    this.caregiverTrainingLogs.set([...DEFAULT_CAREGIVER_LOGS]);
   }
 
   /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
@@ -644,6 +685,8 @@ export class PatientStateService {
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
     if (state.activePhilosophy) this.activePhilosophy.set(state.activePhilosophy);
     if (state.ayurvedicStatus) this.ayurvedicStatus.set(state.ayurvedicStatus);
+    if (state.isCaregiverMode !== undefined) this.isCaregiverMode.set(state.isCaregiverMode);
+    if (state.caregiverTrainingLogs) this.caregiverTrainingLogs.set(state.caregiverTrainingLogs);
   }
 
   /** Returns the current patient state for saving. */
@@ -662,6 +705,8 @@ export class PatientStateService {
             shoppingList: this.shoppingList(),
             activePhilosophy: this.activePhilosophy(),
             ayurvedicStatus: this.ayurvedicStatus(),
+            isCaregiverMode: this.isCaregiverMode(),
+            caregiverTrainingLogs: this.caregiverTrainingLogs()
         };
   }
 

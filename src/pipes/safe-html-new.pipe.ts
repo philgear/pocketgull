@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform, Inject, PLATFORM_ID } from '@angular/core';
+import { Pipe, PipeTransform, inject, PLATFORM_ID } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 import * as DOMPurify from 'dompurify';
@@ -8,14 +8,11 @@ import * as DOMPurify from 'dompurify';
     standalone: true
 })
 export class SafeHtmlPipe implements PipeTransform {
-    private isBrowser: boolean;
+    private sanitizer = inject(DomSanitizer);
+    private platformId = inject(PLATFORM_ID);
+    private isBrowser = isPlatformBrowser(this.platformId);
 
-    constructor(
-        private sanitizer: DomSanitizer,
-        @Inject(PLATFORM_ID) platformId: Object
-    ) {
-        this.isBrowser = isPlatformBrowser(platformId);
-    }
+    constructor() {}
 
     transform(value: string): SafeHtml {
         if (!value) return value;

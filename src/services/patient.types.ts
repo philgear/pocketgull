@@ -174,6 +174,18 @@ export interface IAyurvedicStatus {
     dominantGunas?: string[];
 }
 
+export interface ICaregiverTrainingLog {
+    id: string;
+    courseName: string;
+    category: 'HCBS Core' | 'Inclusive Care' | 'Professional Development' | 'Specialty';
+    hours: number;
+    completedDate: string;
+    provider: string;
+    status: 'Completed' | 'Pending' | 'Expired';
+    verificationHash: string;
+    certificateId: string;
+}
+
 export interface IPatientState {
     issues: Record<string, IBodyPartIssue[]>;
     patientGoals: string;
@@ -200,6 +212,8 @@ export interface IPatientState {
     avsProtocol?: IAvsProtocol;
     /** Selected medical paradigm / philosophy mode. */
     activePhilosophy?: 'western' | 'eastern' | 'ayurvedic';
+    caregiverTrainingLogs?: ICaregiverTrainingLog[];
+    isCaregiverMode?: boolean;
 }
 
 /**

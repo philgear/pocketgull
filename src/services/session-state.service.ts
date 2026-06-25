@@ -1,4 +1,4 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -12,6 +12,8 @@ export class SessionStateService {
   readonly isLocked = signal(true);
   readonly isOnboardingComplete = signal(false);
   private auth = inject(AuthService);
+
+  readonly isBiometricSupported = computed(() => this.auth.isBiometricSupported());
 
   /**
    * Represents the inactivity timer in seconds.
@@ -58,3 +60,4 @@ export class SessionStateService {
     }
   }
 }
+

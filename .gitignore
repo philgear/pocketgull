@@ -136,3 +136,12 @@ firebase-debug.*.log
 # --- Billing & Stripe Configs ---
 *billing*
 *stripe*
+
+# --- Local Developer Test Scripts & Reports ---
+test-api.js
+test-cse.js
+test-cse2.js
+test-raw-ws.mjs
+test-ws.mjs
+chromewebdata_*.html
+

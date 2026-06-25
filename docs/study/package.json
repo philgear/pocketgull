@@ -13,10 +13,12 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.1",
-    "astro": "^6.0.5"
+    "astro": "^6.0.6"
   },
   "overrides": {
-    "esbuild": "0.28.1"
+    "esbuild": "0.28.1",
+    "vite": ">=5.4.15 || >=6.0.12 || >=7.0.0",
+    "launch-editor": ">=2.14.1"
   },
   "devDependencies": {
     "defu": "^6.1.7",

@@ -1,4 +1,4 @@
-import { Injectable, signal, effect, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
@@ -7,11 +7,12 @@ export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
   providedIn: 'root'
 })
 export class ThemeService {
+  private platformId = inject(PLATFORM_ID);
   public currentTheme = signal<AppTheme>('light');
   public activeTheme = signal<'light' | 'dark'>('light');
   public reduceMotion = signal<boolean>(false);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.initTheme();
       

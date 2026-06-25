@@ -1,14 +1,31 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private platformId = inject(PLATFORM_ID);
+
   // Tracks whether the user has successfully passed the biometric check
   readonly isBiometricallyVerified = signal(false);
   readonly authError = signal('');
+  readonly isBiometricSupported = signal(false);
 
-  constructor() {}
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      if (typeof window !== 'undefined' && typeof window.PublicKeyCredential !== 'undefined') {
+        window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+          .then(supported => {
+            this.isBiometricSupported.set(supported);
+          })
+          .catch(err => {
+            console.error('[Security] Error checking platform authenticator availability:', err);
+            this.isBiometricSupported.set(false);
+          });
+      }
+    }
+  }
 
   /**
    * Triggers a local WebAuthn (Passkey) prompt to verify the user's biometric
@@ -17,11 +34,15 @@ export class AuthService {
   async promptLocalBiometric(): Promise<boolean> {
     try {
       this.authError.set('');
+
+      if (!this.isBiometricSupported()) {
+        throw new Error('Biometric authentication not supported on this device.');
+      }
       
       // Native Web Authentication API (WebAuthn) for User Verification
       // This requests a local "User Verification" (UV) without hitting the network,
       // proving the user is physically present at the device.
-      if (typeof navigator !== 'undefined' && navigator.credentials) {
+      if (isPlatformBrowser(this.platformId) && typeof navigator !== 'undefined' && navigator.credentials) {
          // Create a random challenge for the local assertion
          const challenge = new Uint8Array(32);
          crypto.getRandomValues(challenge);
@@ -64,3 +85,4 @@ export class AuthService {
     this.isBiometricallyVerified.set(false);
   }
 }
+
