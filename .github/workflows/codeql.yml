@@ -6,11 +6,12 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
+    # Run every Thursday at 8:30 PM UTC
     - cron: '30 20 * * 4'
 
 jobs:
   analyze:
-    name: Analyze
+    name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -20,19 +21,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript-typescript', 'python' ]
+        include:
+          - language: 'javascript-typescript'
+            build-mode: 'none'
+          - language: 'python'
+            build-mode: 'none'
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        
+        # security-extended catches ~50% more CWEs than default
+        queries: security-extended
+        # Category ensures proper SARIF deduplication across matrix runs
+        config: |
+          query-filters:
+            - include:
+                tags contain: security
+            - include:
+                tags contain: correctness
+
     - name: Autobuild
       uses: github/codeql-action/autobuild@v3
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{ matrix.language }}"

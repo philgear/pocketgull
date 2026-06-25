@@ -51,8 +51,7 @@ interface INotesByPart {
                                     class="w-full text-left">
                                 <div class="flex justify-between items-center w-full">
                                     <p class="font-medium text-gray-800 dark:text-zinc-100 flex-1 pr-4 text-xs text-left normal-case tracking-normal">{{ note.description || 'No description provided.' }}</p>
-                                    <pocket-gull-badge [severity]="note.painLevel > 7 ? 'danger' : note.painLevel > 4 ? 'warning' : 'neutral'" size="sm">
-                                        {{ note.painLevel }}/10
+                                    <pocket-gull-badge [label]="note.painLevel + '/10'" [severity]="note.painLevel > 7 ? 'error' : note.painLevel > 4 ? 'warning' : 'neutral'" size="sm">
                                     </pocket-gull-badge>
                                 </div>
                             </pocket-gull-button>

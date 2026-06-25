@@ -40,6 +40,8 @@ import { CollaborationDockComponent } from './components/collaboration-dock.comp
 import { GamificationService } from './services/gamification.service';
 import { SwUpdate } from '@angular/service-worker';
 import { FitbitService } from './services/fitbit.service';
+import { ConsentService } from './services/consent.service';
+import { ConsentModalComponent } from './components/consent-modal.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -60,12 +62,17 @@ import { FitbitService } from './services/fitbit.service';
     PatientDirectoryComponent,
     CollaborationDockComponent,
     FhirCallbackComponent,
-    PocketGullInputComponent
+    PocketGullInputComponent,
+    ConsentModalComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
 
+    <!-- ACM §1.6: First-run informed consent -->
+    @if (!consentService.hasConsented()) {
+      <app-consent-modal></app-consent-modal>
+    }
 
     @if (showFhirCallback()) {
       <app-fhir-callback></app-fhir-callback>
@@ -1223,6 +1230,7 @@ export class AppComponent implements OnDestroy {
   public patientMgmt = inject(PatientManagementService);
   private clinicalIntelligence = inject(ClinicalIntelligenceService);
   network = inject(NetworkStateService);
+  consentService = inject(ConsentService);
   hardware = inject(HardwareTelemetryService);
   readonly rules = inject(RulesEngineService);
   private aiConfig = inject(AI_CONFIG, { optional: true });

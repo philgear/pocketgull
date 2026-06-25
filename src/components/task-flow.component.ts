@@ -359,9 +359,10 @@ export class TaskFlowComponent {
     this.state.removeClinicalNote(id);
   }
 
-  handleEnter(event: KeyboardEvent, el: HTMLTextAreaElement) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault(); // Prevent default newline
+  handleEnter(event: Event, el: HTMLTextAreaElement) {
+    const kbEvent = event as KeyboardEvent;
+    if (kbEvent.key === 'Enter' && !kbEvent.shiftKey) {
+      kbEvent.preventDefault(); // Prevent default newline
       if (this.activeView() === 'tasks') {
         this.submitTask(el);
       } else {

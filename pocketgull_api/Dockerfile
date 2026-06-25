@@ -1,10 +1,13 @@
 # Stage 1: Build
-FROM node:22-alpine3.21 AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /usr/src/app
 
 # Update system packages to resolve vulnerabilities
 RUN apk update && apk upgrade --no-cache
+
+# Update npm to resolve bundled package vulnerabilities (picomatch, tar, etc.)
+RUN npm install -g npm@latest
 
 # Install dependencies
 COPY package*.json ./
@@ -15,13 +18,16 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production
-FROM node:22-alpine3.21
+FROM node:24-alpine
 
 
 WORKDIR /usr/src/app
 
 # Update system packages to resolve vulnerabilities in production stage
 RUN apk update && apk upgrade --no-cache
+
+# Update npm to resolve bundled package vulnerabilities (picomatch, tar, etc.)
+RUN npm install -g npm@latest
 
 # Set Node to production environment
 ENV NODE_ENV=production

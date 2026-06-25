@@ -26,7 +26,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Orthomolecular Profiling';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
@@ -72,7 +72,7 @@ export class ClinicalIntelligenceService {
                 return 'Gulliver';
             case 'Functional Protocols':
             case 'Nutrition':
-            case 'Orthomolecular Profiling':
+            case 'Precision Nutrients':
                 return 'Swoop';
             case 'Monitoring & Follow-up':
                 return 'Sentinel';
@@ -93,7 +93,7 @@ export class ClinicalIntelligenceService {
                 return 'Overview & Chart Synthesis Expert — "I see the whole ocean from up here."';
             case 'Functional Protocols':
             case 'Nutrition':
-            case 'Orthomolecular Profiling':
+            case 'Precision Nutrients':
                 return 'Interventions & Precision Dosing Specialist — "Spotted. Locked. Delivering."';
             case 'Monitoring & Follow-up':
                 return 'Recovery Vigilance & Trend Monitor — "I never blink. I never look away."';
@@ -275,7 +275,7 @@ Bullet list of ONLY the treatments, medications, or interventions that are expli
 If a section has no relevant source data, output the heading followed by: "*No specific information documented — please discuss with your care team.*"
 ` + this.FORMATTING_RULES,
 
-        'Orthomolecular Profiling': `You are an expert in Orthomolecular Medicine and functional psychiatry for a clinical decision-support tool.
+        'Precision Nutrients': `You are an expert in Orthomolecular Medicine and functional psychiatry for a clinical decision-support tool.
 
 Analyze the patient overview, specifically hunting for lab metrics, micronutrient imbalances, or symptom profiles that suggest underlying biochemical deficiencies (e.g., methylation cycle blocks, pyroluria, oxidative stress, heavy metal toxicity). Structure as follows:
 
@@ -325,7 +325,7 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
             return;
         }
 
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'Patient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Precision Nutrients', 'Monitoring & Follow-up', 'Patient Education'];
         const reportText = lenses.map(lens => report[lens]).filter(Boolean).join('\n\n');
         const cacheKey = await this.cache.generateKey([reportText, 'visual-metrics-v2']);
 
@@ -386,7 +386,7 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
             this.analysisMetrics.set(metrics);
 
             // Mock verification results
-            const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'Patient Education'];
+            const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Precision Nutrients', 'Monitoring & Follow-up', 'Patient Education'];
             const mockVerification = { status: 'verified', issues: [] };
             const newVerificationResults: Partial<Record<AnalysisLens, { status: string, issues: IVerificationIssue[] }>> = {};
             for (const lens of lenses) {
@@ -408,7 +408,7 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
 
-        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Orthomolecular Profiling', 'Monitoring & Follow-up', 'Patient Education'];
+        const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Precision Nutrients', 'Monitoring & Follow-up', 'Patient Education'];
         const newReport: Partial<Record<AnalysisLens, string>> = {};
 
         if (!isEmergency && this.lastPatientData() && this.lastActivePhilosophy() === currentPhilosophy) {

@@ -1,20 +1,56 @@
-FROM node:24-alpine
+# ==========================================
+# Stage 1: Build
+# ==========================================
+FROM node:24-alpine AS builder
 
-# Create app directory
 WORKDIR /app
 
-# Install app dependencies
+# Patch OS-level vulnerabilities
+RUN apk update && apk upgrade --no-cache
+
+# Update npm to resolve bundled package vulnerabilities (picomatch, tar, etc.)
+RUN npm install -g npm@latest
+
+# Install ALL dependencies (including devDependencies needed for ng build)
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 
-# Bundle app source
+# Copy source and build the docs/study Astro sub-project + Angular SSR app
 COPY . .
-
-# Build the Angular application
 RUN npm run build
 
-# Expose port and run
+# ==========================================
+# Stage 2: Production
+# ==========================================
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Patch OS-level vulnerabilities in production image
+RUN apk update && apk upgrade --no-cache
+
+# Update npm to resolve bundled package vulnerabilities
+RUN npm install -g npm@latest
+
+# Set Node to production mode
+ENV NODE_ENV=production
+
+# Install only production dependencies
+COPY package*.json ./
+RUN npm ci --legacy-peer-deps --omit=dev
+
+# Copy compiled output from builder (includes browser, server, docs/study, data/)
+COPY --from=builder /app/dist ./dist
+
+# Copy runtime assets the server loads from the project root at startup
+COPY --from=builder /app/docs/openapi.json ./docs/openapi.json
+
+# Run as non-root user for security
+USER node
+
+# Expose the default Cloud Run port
 EXPOSE 8080
 ENV PORT=8080
 ENV OTEL_SDK_DISABLED=true
+
 CMD ["node", "dist/server/server.mjs"]

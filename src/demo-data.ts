@@ -138,7 +138,7 @@ Your lower back pain is coming from the area between two vertebrae called L4 and
 > - If you develop weakness in both legs, or have trouble controlling your bladder or bowels, go to the emergency room immediately.
 > - Your opioid-free status is a major health achievement. Let your care team know immediately if you experience cravings - this is not a failure, it is clinical information that helps us help you.`,
 
-    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
+    'Precision Nutrients': `### Biochemical & Biomarker Matrix
 The patient exhibits moderate systemic stress combined with suboptimal cellular energy production cofactors. Methylation pathway efficiency is reduced, contributing to neuroinflammation and pain sensitization. Primary focus is to support methylation pathways, improve mitochondrial respiration, and modulate NMDA receptor excitability.
 
 \`\`\`json
@@ -293,7 +293,7 @@ In Eastern medicine, pain is viewed as a blockage of energy (Qi) and blood flow 
 > - Avoid cold, raw food and iced drinks; choose cooked, warm meals.
 > - Notify your care team immediately if you experience sharp radiating pain or numbness.`,
 
-    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
+    'Precision Nutrients': `### Biochemical & Biomarker Matrix
 Assessment reveals structural and metabolic strain linked to Qi stagnation and poor microcirculation at the tissue level. Cellular cofactor requirements must be satisfied to promote local tissue repair and restore Jing essence.
 
 \`\`\`json
@@ -453,7 +453,7 @@ In Ayurveda, your pain is viewed as an imbalance in the "Vata" energy (governed 
 > - Stick to a regular sleep schedule; Vata needs routine to calm down.
 > - Reach out immediately if you experience sharp shooting pain or weakness in your leg.`,
 
-    'Orthomolecular Profiling': `### Biochemical & Biomarker Matrix
+    'Precision Nutrients': `### Biochemical & Biomarker Matrix
 The patient shows signs of structural dryness (Vata aggravation) and Ama accumulation. Supporting bone mineral density and neural transmission via orthomolecular approaches is the primary metabolic goal, with care taken to preserve the digestive tract (Agni) as the delivery vehicle.
 
 \`\`\`json

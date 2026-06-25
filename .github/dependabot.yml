@@ -1,9 +1,73 @@
 version: 2
 updates:
+  # NPM — Root Angular/Express app
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+      day: "monday"
+    open-pull-requests-limit: 15
     allow:
       - dependency-type: "all"
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(dev-deps)"
+    reviewers:
+      - "philgear"
+    groups:
+      # Group all Angular packages into a single PR
+      angular:
+        patterns:
+          - "@angular/*"
+      # Group all OpenTelemetry packages together
+      opentelemetry:
+        patterns:
+          - "@opentelemetry/*"
+      # Group AWS SDK packages together
+      aws-sdk:
+        patterns:
+          - "@aws-sdk/*"
+          - "@aws-crypto/*"
+      # Group Google/Gemini packages together
+      google-ai:
+        patterns:
+          - "@google/*"
+          - "@genkit-ai/*"
+          - "genkit"
+          - "google-auth-library"
+          - "firebase"
+          - "@angular/fire"
+
+  # GitHub Actions — Catch compromised or outdated actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci(deps)"
+    reviewers:
+      - "philgear"
+
+  # Docker — Base image security updates
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "chore(docker)"
+    reviewers:
+      - "philgear"
+
+  # Pip — Python FastAPI sidecar
+  - package-ecosystem: "pip"
+    directory: "/pocketgull_api"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(py-deps)"
+    reviewers:
+      - "philgear"
