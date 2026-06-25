@@ -18,6 +18,11 @@ export default {
       changeOrigin: true,
       ws: true
     },
+    "/docs": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
     "/api": {
       target: "http://localhost:4000",
       secure: false,
