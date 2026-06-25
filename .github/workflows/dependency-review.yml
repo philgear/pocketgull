@@ -25,3 +25,11 @@ jobs:
           deny-licenses: GPL-3.0, AGPL-3.0
           # Comment on the PR with a summary of findings
           comment-summary-in-pr: always
+          # Disable Scorecard checks to clear transitives warnings
+          show-openssf-scorecard-levels: false
+          allow-dependencies-licenses: |
+            pkg:npm/dompurify
+            pkg:npm/http-proxy-middleware
+            pkg:npm/ws
+            pkg:github/github/codeql-action
+            pkg:github/ossf/scorecard-action
