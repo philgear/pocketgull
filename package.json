@@ -70,7 +70,7 @@
   },
   "scripts": {
     "postinstall": "patch-package",
-    "dev": "ng serve",
+    "dev": "node scripts/dev.js",
     "build": "npm install --prefix docs/study && npm run build --prefix docs/study && ng build",
     "lint": "tsc --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",

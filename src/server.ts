@@ -60,7 +60,7 @@ app.use((req, res, next) => {
 });
 
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 // Forced domain redirect to pocketgull.app
 const targetDomain = 'pocketgull.app';

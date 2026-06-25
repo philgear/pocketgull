@@ -16,7 +16,7 @@ app.use(compression());
 app.use('/api', cors()); // Enable CORS for API routes so Flutter apps can sync data
 
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 // Redirect legacy URLs and alternative domains to the primary pocketgull.app domain
 app.use((req, res, next) => {

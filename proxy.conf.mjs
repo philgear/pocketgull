@@ -12,6 +12,12 @@ export default {
         proxyReq.setHeader('Referer', 'https://pocketgull.app/');
       }
     },
+    "/socket.io": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true,
+      ws: true
+    },
     "/api": {
       target: "http://localhost:4000",
       secure: false,
