@@ -497,34 +497,36 @@ import { FitbitService } from './services/fitbit.service';
               <span class="hidden sm:inline">Research</span>
             </button>
 
-            <!-- Caregiver Portal Toggle -->
-            <button (click)="state.isCaregiverMode.set(!state.isCaregiverMode())"
-                    id="btn-caregiver-portal-toggle"
-                    aria-label="Toggle Caregiver Portal"
-                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
-                    [class.bg-gray-800]="state.isCaregiverMode()"
-                    [class.dark:bg-white]="state.isCaregiverMode()"
-                    [class.border-gray-800]="state.isCaregiverMode()"
-                    [class.dark:border-white]="state.isCaregiverMode()"
-                    [class.text-white]="state.isCaregiverMode()"
-                    [class.dark:text-[#111111]]="state.isCaregiverMode()"
-                    [class.bg-transparent]="!state.isCaregiverMode()"
-                    [class.border-gray-300]="!state.isCaregiverMode()"
-                    [class.dark:border-zinc-700]="!state.isCaregiverMode()"
-                    [class.text-gray-700]="!state.isCaregiverMode()"
-                    [class.dark:text-zinc-300]="!state.isCaregiverMode()"
-                    [class.hover:bg-[#EEEEEE]]="!state.isCaregiverMode()"
-                    [class.dark:hover:bg-zinc-800]="!state.isCaregiverMode()"
-                    [class.hover:border-gray-400]="!state.isCaregiverMode()"
-                    [class.dark:hover:border-zinc-500]="!state.isCaregiverMode()">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-              <span class="hidden sm:inline">Caregiver Portal</span>
-            </button>
+            <!-- Caregiver Portal Toggle (Clinician only) -->
+            @if (!session.isLocked()) {
+              <button (click)="state.isCaregiverMode.set(!state.isCaregiverMode())"
+                      id="btn-caregiver-portal-toggle"
+                      aria-label="Toggle Caregiver Portal"
+                      class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
+                      [class.bg-gray-800]="state.isCaregiverMode()"
+                      [class.dark:bg-white]="state.isCaregiverMode()"
+                      [class.border-gray-800]="state.isCaregiverMode()"
+                      [class.dark:border-white]="state.isCaregiverMode()"
+                      [class.text-white]="state.isCaregiverMode()"
+                      [class.dark:text-[#111111]]="state.isCaregiverMode()"
+                      [class.bg-transparent]="!state.isCaregiverMode()"
+                      [class.border-gray-300]="!state.isCaregiverMode()"
+                      [class.dark:border-zinc-700]="!state.isCaregiverMode()"
+                      [class.text-gray-700]="!state.isCaregiverMode()"
+                      [class.dark:text-zinc-300]="!state.isCaregiverMode()"
+                      [class.hover:bg-[#EEEEEE]]="!state.isCaregiverMode()"
+                      [class.dark:hover:bg-zinc-800]="!state.isCaregiverMode()"
+                      [class.hover:border-gray-400]="!state.isCaregiverMode()"
+                      [class.dark:hover:border-zinc-500]="!state.isCaregiverMode()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span class="hidden sm:inline">Caregiver Portal</span>
+              </button>
+            }
             
             <a href="/docs/study/" target="_blank" rel="noopener"
               
@@ -2223,6 +2225,15 @@ export class AppComponent implements OnDestroy {
         untracked(() => {
           this.isAnalysisCollapsed.set(false);
           this.isChartCollapsed.set(false);
+        });
+      }
+    });
+
+    // Enforce privacy: reset caregiver portal mode when the session locks
+    effect(() => {
+      if (this.session.isLocked()) {
+        untracked(() => {
+          this.state.isCaregiverMode.set(false);
         });
       }
     });
