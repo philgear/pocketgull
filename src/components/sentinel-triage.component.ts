@@ -5,6 +5,7 @@ import { PatientManagementService } from '../services/patient-management.service
 import { GamificationService } from '../services/gamification.service';
 import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
 import { IPatientSymptom } from '../services/patient.types';
+import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 
 interface ISentinelNode {
   id: string;
@@ -142,22 +143,66 @@ interface ISentinelPacket {
           </div>
 
           <!-- Containment Protocol & AI Synthesis Recommendation -->
-          <div class="p-4 bg-blue-500/5 dark:bg-blue-500/10 rounded-xl border border-blue-500/20">
+          <div class="p-4 bg-blue-500/5 dark:bg-blue-500/10 rounded-xl border border-blue-500/20 relative">
             <div class="flex justify-between items-center mb-2">
               <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.952 11.952 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                 AI Containment & Action Directive
               </h4>
               <button (click)="generateEpidemiologyProtocols()" 
-                      [disabled]="isGeneratingProtocol()"
+                      [disabled]="isGeneratingProtocol() || isTranslatingLevel()"
                       class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50">
                 {{ isGeneratingProtocol() ? 'Generating...' : 'Refresh AI Protocol' }}
               </button>
             </div>
             
-            <p class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-mono whitespace-pre-line">
-              {{ containmentRecommendation() }}
-            </p>
+            <!-- Cognitive Switching Tabs -->
+            <div class="flex flex-wrap items-center gap-2 mb-3 border-b border-blue-500/20 pb-2">
+              <span class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mr-1">
+                Cognitive Level:
+              </span>
+              <div class="flex flex-wrap gap-1">
+                <button (click)="changeLevel('standard')" 
+                        [disabled]="isTranslatingLevel() || isGeneratingProtocol()"
+                        class="px-2.5 py-1 text-[9px] uppercase tracking-wider font-extrabold transition-all border rounded"
+                        [class]="selectedLevel() === 'standard' ? 'bg-blue-600 text-white border-transparent' : 'bg-transparent text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 border-zinc-200 dark:border-zinc-800'">
+                  Standard
+                </button>
+                <button (click)="changeLevel('simplified')" 
+                        [disabled]="isTranslatingLevel() || isGeneratingProtocol()"
+                        class="px-2.5 py-1 text-[9px] uppercase tracking-wider font-extrabold transition-all border rounded"
+                        [class]="selectedLevel() === 'simplified' ? 'bg-blue-600 text-white border-transparent' : 'bg-transparent text-zinc-555 dark:text-zinc-450 hover:bg-zinc-100 dark:hover:bg-zinc-900 border-zinc-200 dark:border-zinc-800'">
+                  Simplified
+                </button>
+                <button (click)="changeLevel('dyslexia')" 
+                        [disabled]="isTranslatingLevel() || isGeneratingProtocol()"
+                        class="px-2.5 py-1 text-[9px] uppercase tracking-wider font-extrabold transition-all border rounded"
+                        [class]="selectedLevel() === 'dyslexia' ? 'bg-blue-600 text-white border-transparent' : 'bg-transparent text-zinc-555 dark:text-zinc-450 hover:bg-zinc-100 dark:hover:bg-zinc-900 border-zinc-200 dark:border-zinc-800'">
+                  Cognition
+                </button>
+                <button (click)="changeLevel('child')" 
+                        [disabled]="isTranslatingLevel() || isGeneratingProtocol()"
+                        class="px-2.5 py-1 text-[9px] uppercase tracking-wider font-extrabold transition-all border rounded"
+                        [class]="selectedLevel() === 'child' ? 'bg-blue-600 text-white border-transparent' : 'bg-transparent text-zinc-555 dark:text-zinc-450 hover:bg-zinc-100 dark:hover:bg-zinc-900 border-zinc-200 dark:border-zinc-800'">
+                  Pediatric
+                </button>
+              </div>
+            </div>
+
+            <!-- Recommendation Text / Spinner Overlay -->
+            <div class="relative">
+              <p class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-mono whitespace-pre-line"
+                 [class.opacity-25]="isTranslatingLevel()">
+                {{ containmentRecommendation() }}
+              </p>
+              
+              @if (isTranslatingLevel()) {
+                <div class="absolute inset-0 flex flex-col items-center justify-center bg-transparent gap-2">
+                  <div class="w-5 h-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  <span class="text-[9px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest font-mono animate-pulse">Translating...</span>
+                </div>
+              }
+            </div>
           </div>
 
         </div>
@@ -174,6 +219,7 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
   state = inject(PatientStateService);
   patientManager = inject(PatientManagementService);
   game = inject(GamificationService);
+  clinicalIntelligence = inject(ClinicalIntelligenceService);
   platformId = inject(PLATFORM_ID);
 
   mapCanvas = viewChild<ElementRef<HTMLCanvasElement>>('mapCanvas');
@@ -184,8 +230,16 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
   activeNodesCount = signal(5);
   activeBps = signal(128);
   isGeneratingProtocol = signal(false);
+  isTranslatingLevel = signal(false);
+  selectedLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
 
   // Active containment protocol
+  originalRecommendation = signal<string>(
+    '1. Establish respiratory isolation ward immediately.\n' +
+    '2. Set up local surveillance telemetry nodes within 5km radius.\n' +
+    '3. Initiate diagnostic PCR tests for suspected respiratory cases.\n' +
+    '4. Queue national stockpile inventory allocation for critical antiviral agents.'
+  );
   containmentRecommendation = signal<string>(
     '1. Establish respiratory isolation ward immediately.\n' +
     '2. Set up local surveillance telemetry nodes within 5km radius.\n' +
@@ -460,30 +514,68 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
     this.isGeneratingProtocol.set(true);
     
     // Request epidemiological instructions from Gemini simulation
-    setTimeout(() => {
+    setTimeout(async () => {
       const patient = this.selectedPatient();
+      let rawRec = '';
       if (patient?.id === 'p006') {
-        this.containmentRecommendation.set(
+        rawRec = 
           '1. Deploy pediatric rehydration caches to regions showing elevated enteric caseloads.\n' +
           '2. Formulate public health notice recommending mosquito net deployments in catchment sectors.\n' +
-          '3. Trigger Sentinel alert notification to local community health workers.'
-        );
+          '3. Trigger Sentinel alert notification to local community health workers.';
       } else if (patient?.id === 'p007') {
-        this.containmentRecommendation.set(
+        rawRec = 
           '1. Direct emergency blood banks to maintain hyper-responsive protocols.\n' +
           '2. Setup intensive sepsis monitoring checks at local birth registries.\n' +
-          '3. Dispatch specialized maternal support telemetry packs to outlying field clinics.'
-        );
+          '3. Dispatch specialized maternal support telemetry packs to outlying field clinics.';
       } else {
-        this.containmentRecommendation.set(
+        rawRec = 
           '1. Enforce quarantine and border isolation restrictions in Sector 4.\n' +
           '2. Escalate regional clinical coordination channels with local CDC partners.\n' +
-          '3. Trigger daily telemetry telemetry sync protocol for active hospital records.'
-        );
+          '3. Trigger daily telemetry telemetry sync protocol for active hospital records.';
       }
+
+      this.originalRecommendation.set(rawRec);
+
+      const currentLevel = this.selectedLevel();
+      if (currentLevel === 'standard') {
+        this.containmentRecommendation.set(rawRec);
+      } else {
+        this.isTranslatingLevel.set(true);
+        try {
+          const translated = await this.clinicalIntelligence.translateReadingLevel(rawRec, currentLevel);
+          this.containmentRecommendation.set(translated);
+        } catch (e) {
+          console.error('Failed to auto-translate sentinel triage level:', e);
+          this.containmentRecommendation.set(rawRec);
+        } finally {
+          this.isTranslatingLevel.set(false);
+        }
+      }
+      
       this.isGeneratingProtocol.set(false);
       this.game.completeQuest('explore_evidence'); // award points for exploring clinical details
     }, 1200);
+  }
+
+  async changeLevel(level: 'standard' | 'simplified' | 'dyslexia' | 'child') {
+    this.selectedLevel.set(level);
+    if (level === 'standard') {
+      this.containmentRecommendation.set(this.originalRecommendation());
+      return;
+    }
+
+    this.isTranslatingLevel.set(true);
+    try {
+      const translated = await this.clinicalIntelligence.translateReadingLevel(
+        this.originalRecommendation(),
+        level
+      );
+      this.containmentRecommendation.set(translated);
+    } catch (e) {
+      console.error('Failed to translate sentinel triage level:', e);
+    } finally {
+      this.isTranslatingLevel.set(false);
+    }
   }
 
   private playSyncAudioSignature() {

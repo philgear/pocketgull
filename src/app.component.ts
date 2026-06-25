@@ -28,7 +28,7 @@ import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
 import { WalkthroughTourService } from './services/walkthrough-tour.service';
 import { SecureSplashComponent } from './components/secure-splash.component';
-import { CaregiverPortalComponent } from './components/caregiver-portal.component';
+import { FirestoreSyncService } from './services/firestore-sync.service';
 import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
 import { PocketGullInputComponent } from './components/shared/pocket-gull-input.component';
@@ -58,7 +58,6 @@ import { FitbitService } from './services/fitbit.service';
     RevealDirective,
     WalkthroughTourComponent,
     SecureSplashComponent,
-    CaregiverPortalComponent,
     PatientDirectoryComponent,
     CollaborationDockComponent,
     FhirCallbackComponent,
@@ -496,37 +495,6 @@ import { FitbitService } from './services/fitbit.service';
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
               <span class="hidden sm:inline">Research</span>
             </button>
-
-            <!-- Caregiver Portal Toggle (Clinician only) -->
-            @if (!session.isLocked()) {
-              <button (click)="state.isCaregiverMode.set(!state.isCaregiverMode())"
-                      id="btn-caregiver-portal-toggle"
-                      aria-label="Toggle Caregiver Portal"
-                      class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
-                      [class.bg-gray-800]="state.isCaregiverMode()"
-                      [class.dark:bg-white]="state.isCaregiverMode()"
-                      [class.border-gray-800]="state.isCaregiverMode()"
-                      [class.dark:border-white]="state.isCaregiverMode()"
-                      [class.text-white]="state.isCaregiverMode()"
-                      [class.dark:text-[#111111]]="state.isCaregiverMode()"
-                      [class.bg-transparent]="!state.isCaregiverMode()"
-                      [class.border-gray-300]="!state.isCaregiverMode()"
-                      [class.dark:border-zinc-700]="!state.isCaregiverMode()"
-                      [class.text-gray-700]="!state.isCaregiverMode()"
-                      [class.dark:text-zinc-300]="!state.isCaregiverMode()"
-                      [class.hover:bg-[#EEEEEE]]="!state.isCaregiverMode()"
-                      [class.dark:hover:bg-zinc-800]="!state.isCaregiverMode()"
-                      [class.hover:border-gray-400]="!state.isCaregiverMode()"
-                      [class.dark:hover:border-zinc-500]="!state.isCaregiverMode()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-                <span class="hidden sm:inline">Caregiver Portal</span>
-              </button>
-            }
             
             <a href="/docs/study/" target="_blank" rel="noopener"
               
@@ -742,12 +710,7 @@ import { FitbitService } from './services/fitbit.service';
 
 
         <!-- Main Grid Layout -->
-        @if (state.isCaregiverMode()) {
-          <div class="flex-1 p-2 md:p-6 bg-[#F9FAFB] dark:bg-[#09090b] min-h-0 overflow-hidden no-print">
-            <app-caregiver-portal></app-caregiver-portal>
-          </div>
-        } @else {
-          <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
+        <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
 
 
           
@@ -963,7 +926,6 @@ import { FitbitService } from './services/fitbit.service';
             }
 
         </div>
-        }
         
         @if(state.isResearchFrameVisible()) {
             @defer (on immediate) {
@@ -1248,6 +1210,7 @@ import { FitbitService } from './services/fitbit.service';
 })
 export class AppComponent implements OnDestroy {
   public tour = inject(WalkthroughTourService);
+  syncService = inject(FirestoreSyncService);
   public readonly petAuditory = inject(PetAuditoryService);
   private readonly stressIntervention = inject(StressInterventionService);
   public readonly collaboration = inject(CollaborationService);
@@ -2229,11 +2192,12 @@ export class AppComponent implements OnDestroy {
       }
     });
 
-    // Enforce privacy: reset caregiver portal mode when the session locks
+    // Clinicians logged in via Google Auth bypass client-side key requirement
     effect(() => {
-      if (this.session.isLocked()) {
+      const email = this.syncService.currentUserEmail();
+      if (email === 'philgear@gmail.com') {
         untracked(() => {
-          this.state.isCaregiverMode.set(false);
+          this.hasApiKey.set(true);
         });
       }
     });
@@ -2286,7 +2250,14 @@ export class AppComponent implements OnDestroy {
 
   submitApiKey() {
     const key = this.apiKeyInput().trim();
-    if (!key) return;
+    if (!key) {
+      if (this.syncService.currentUserEmail() === 'philgear@gmail.com') {
+        this.apiKeyError.set(null);
+        this.isDemoMode.set(false);
+        this.hasApiKey.set(true);
+      }
+      return;
+    }
     if (!key.startsWith('AI') || key.length < 20) {
       this.apiKeyError.set('This does not look like a valid Gemini API key. Keys typically start with "AI".');
       return;
