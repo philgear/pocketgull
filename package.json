@@ -92,7 +92,7 @@
     "@angular/build": "~21.2.0",
     "@angular/cli": "^21.2.2",
     "@angular/common": "^21.2.3",
-    "@angular/compiler": "^21.2.3",
+    "@angular/compiler": "^22.0.4",
     "@angular/compiler-cli": "^21.2.3",
     "@angular/core": "^21.2.3",
     "@angular/fire": "^20.0.1",
