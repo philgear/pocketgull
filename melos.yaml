@@ -1,0 +1,15 @@
+name: pocketgull_workspace
+
+packages:
+  - pocketgull_flutter
+  - companion-apps/patient_app
+  - companion-apps/provider_app
+
+scripts:
+  analyze:
+    run: melos exec -- "flutter analyze"
+    description: Run flutter analyze across all Dart/Flutter packages.
+
+  test:
+    run: melos exec -- "flutter test"
+    description: Run flutter test across all Dart/Flutter packages.

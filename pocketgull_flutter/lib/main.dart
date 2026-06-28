@@ -10,6 +10,8 @@ import 'services/clinical_intelligence_service.dart';
 import 'services/local_intelligence_service.dart';
 import 'services/orcid_service.dart';
 import 'services/export_service.dart';
+import 'services/circadian_sleepiness_service.dart';
+import 'services/ambient_lighting_service.dart';
 import 'screens/splash_screen.dart';
 
 @pragma('vm:entry-point')
@@ -65,7 +67,15 @@ void main() async {
     final orcidService = OrcidService();
     await orcidService.initialize();
     
-    runApp(PocketGullApp(localAI: localAI, orcidService: orcidService));
+    final circadianService = CircadianSleepinessService();
+    final ambientLighting = AmbientLightingService(circadianService);
+    
+    runApp(PocketGullApp(
+      localAI: localAI, 
+      orcidService: orcidService,
+      circadianService: circadianService,
+      ambientLighting: ambientLighting,
+    ));
   }, (error, stack) {
     debugPrint('GLOBAL ERROR: $error');
     debugPrint(stack.toString());
@@ -75,7 +85,16 @@ void main() async {
 class PocketGullApp extends StatelessWidget {
   final LocalIntelligenceService localAI;
   final OrcidService orcidService;
-  const PocketGullApp({super.key, required this.localAI, required this.orcidService});
+  final CircadianSleepinessService circadianService;
+  final AmbientLightingService ambientLighting;
+  
+  const PocketGullApp({
+    super.key, 
+    required this.localAI, 
+    required this.orcidService,
+    required this.circadianService,
+    required this.ambientLighting,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +114,12 @@ class PocketGullApp extends StatelessWidget {
         ),
         RepositoryProvider<ExportService>(
           create: (_) => ExportService(),
+        ),
+        RepositoryProvider<CircadianSleepinessService>.value(
+          value: circadianService,
+        ),
+        RepositoryProvider<AmbientLightingService>.value(
+          value: ambientLighting,
         ),
       ],
       child: MultiBlocProvider(

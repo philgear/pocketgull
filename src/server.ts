@@ -47,7 +47,7 @@ function normalizeAndValidateModel(model: unknown): string {
 
 const app = express();
 const angularApp = new AngularNodeAppEngine({
-  allowedHosts: ['localhost', '0.0.0.0', 'pocketgull.app', '*.pocketgull.app', 'pocketgall.com', 'pocketgall.app', 'pocketgal.app', 'pocketgull.com', 'pocketgal.ai', '*.run.app']
+  allowedHosts: ['localhost', '127.0.0.1', '0.0.0.0', 'pocketgull.app', '*.pocketgull.app', 'pocketgall.com', 'pocketgall.app', 'pocketgal.app', 'pocketgull.com', 'pocketgal.ai', '*.run.app', '*.cloudworkstations.dev']
 });
 app.use(compression());
 

@@ -31,6 +31,7 @@ test.describe('Mobile Sub-Navbar Responsiveness', () => {
     await page.addInitScript(() => {
       window.localStorage.setItem('pg_tour_seen', '1');
       window.localStorage.setItem('pg_mock_clinician', '1');
+      window.localStorage.setItem('pg_data_consent_v1', 'true');
       
       // Disable service worker during tests so Playwright can run smoothly
       try {

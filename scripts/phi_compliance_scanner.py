@@ -154,7 +154,7 @@ def is_third_party_or_build(relative_path: str) -> bool:
     vendor_dirs = {
         "node_modules", ".git", ".angular", "dist", "playwright-report",
         "test-results", ".husky", "build", ".dart_tool", "ios", "android",
-        "windows", "linux", "macos", "web", "sandbox"
+        "windows", "linux", "macos", "web", "sandbox", "flutter", "venv", ".venv"
     }
     if any(part in vendor_dirs for part in parts):
         return True

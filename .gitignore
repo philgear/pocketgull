@@ -73,7 +73,8 @@ test-results/
 venv/
 env/
 ENV/
-lib/
+venv/lib/
+.venv/lib/
 pip-selfcheck.json
 
 # Python Bytecode & Cache
@@ -109,11 +110,12 @@ gcp-*.json
 *.db
 
 # --- Mobile/Native Build Overrides (Safety Net) ---
-.dart_tool/
-.pub-cache/
-.flutter-plugins
-.flutter-plugins-dependencies
-build/
+**/build/
+**/.dart_tool/
+**/.fvm/
+**/.pub-cache/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
 
 # --- Local PHI & Hive Database Security ---
 *.hive

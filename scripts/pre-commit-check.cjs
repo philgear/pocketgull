@@ -62,8 +62,8 @@ function walkDir(dir, filter, list) {
     const filePath = path.join(dir, file);
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
-      // Avoid traversing node_modules and dot-directories
-      if (file !== 'node_modules' && !file.startsWith('.') && file !== 'dist') {
+      // Avoid traversing node_modules, build, dist and dot-directories
+      if (file !== 'node_modules' && file !== 'build' && file !== 'dist' && !file.startsWith('.')) {
         walkDir(filePath, filter, list);
       }
     } else if (filePath.endsWith(filter)) {
@@ -104,8 +104,15 @@ try {
   }
 }
 
-// Remove duplicates
-const uniqueFilesToCheck = [...new Set(filesToCheck)];
+// Remove duplicates and filter out build, dist, node_modules, and dot-directories
+const uniqueFilesToCheck = [...new Set(filesToCheck)].filter(file => {
+  const parts = file.split(path.sep);
+  return !parts.includes('node_modules') &&
+         !parts.includes('build') &&
+         !parts.includes('dist') &&
+         !parts.includes('.fvm') &&
+         !parts.some(p => p.startsWith('.'));
+});
 
 // Validate each markdown file
 for (const file of uniqueFilesToCheck) {
@@ -216,6 +223,12 @@ for (const file of filesToScanSecrets) {
   }
   const ext = path.extname(file).toLowerCase();
   if (skipExtensions.includes(ext)) {
+    continue;
+  }
+
+  // Skip compiled build outputs, submodules, and dependency directories to avoid false positives on minified assets
+  const pathParts = file.split(path.sep);
+  if (pathParts.includes('build') || pathParts.includes('dist') || pathParts.includes('.dart_tool') || pathParts.includes('node_modules')) {
     continue;
   }
 

@@ -1,6 +1,11 @@
 {
   "name": "pocket-gull",
   "version": "1.0.0-rc6",
+  "workspaces": [
+    "docs/study",
+    "companion-apps/avs-therapy",
+    "pocketgull_api"
+  ],
   "description": "Insight beneath the surface. Real-time medical Care Plan Strategy and Live AI Consult engine powered by Google Gemini.",
   "author": "Phil Gear",
   "keywords": [

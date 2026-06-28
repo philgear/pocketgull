@@ -46,6 +46,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
         <div class="max-w-4xl mx-auto min-w-0 relative">
           <div id="tour-lens-tabs" class="flex overflow-x-auto hide-scrollbar items-center gap-1 border-b border-gray-300 dark:border-zinc-700 w-full relative z-10">
           <pocket-gull-button (click)="changeLens('Summary Overview')"
+            testId="tab-overview"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Summary Overview'"
@@ -55,6 +56,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
             Overview
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Functional Protocols')"
+            testId="tab-functional-protocols"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Functional Protocols'"
@@ -64,6 +66,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
             Functional Protocols
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Nutrition')"
+            testId="tab-nutrition"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Nutrition'"
@@ -73,6 +76,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
             Nutrition
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Precision Nutrients')"
+            testId="tab-precision-nutrients"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Precision Nutrients'"
@@ -82,6 +86,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
             Precision Nutrients
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Monitoring & Follow-up')"
+            testId="tab-monitoring-follow-up"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Monitoring & Follow-up'"
@@ -91,6 +96,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
             Monitoring & Follow-up
           </pocket-gull-button>
           <pocket-gull-button (click)="changeLens('Patient Education')"
+            testId="tab-patient-education"
             variant="ghost"
             size="sm"
             [class.border-b-2]="activeLens() === 'Patient Education'"
