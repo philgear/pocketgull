@@ -9,7 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.0-rc6] - 2026-06-14
+## [1.0.0-rc7] - 2026-06-28
+
+**Companion App Lint Hardening & Mocked Widget Test Suite**
+
+### Fixed
+- **[Linter] Unnecessary Underscores (provider_dashboard.dart)**: Fixed unnecessary multiple underscores (`__`) in `separatorBuilder` for `ListView.separated` to satisfy the `unnecessary_underscores` lint rule.
+
+### Added
+- **[Testing] Mocked Widget Test Suite (provider_app)**: Replaced the boilerplate counter widget test with a fully mocked, robust integration test in `widget_test.dart` using `package:http/testing` and `http.runWithClient` to mock API responses and verify patient directory loading and detail screen navigation.
+
+### Changed
+- **[Safety] Safety Threshold Hardening**: Upgraded safety settings filters in `src/server.ts`, `src/server/genkit.ts`, and `src/services/verify-ai.service.ts` from `BLOCK_MEDIUM_AND_ABOVE` to `BLOCK_LOW_AND_ABOVE` across harassment, hate speech, sexual content, and dangerous content categories, enforcing the highest safety standard for clinical apps.
 
 ### Fixed
 - **[CodeQL] SSRF Critical × 5 (dicom.ts)**: Added `sanitiseDicomParam()` (allowlist: `[a-zA-Z0-9._-]`) and `validateDicomUid()` (digits and dots only, per DICOM standard) helpers. All five route handlers (`/studies`, `/rendered`, `/store`, `/raw`, `/delete`) now sanitise every user-provided query param before URL construction — no raw `req.query` value reaches `fetch()`.

@@ -1,6 +1,6 @@
 {
   "name": "pocket-gull",
-  "version": "1.0.0-rc6",
+  "version": "1.0.0-rc7",
   "workspaces": [
     "docs/study",
     "companion-apps/avs-therapy",

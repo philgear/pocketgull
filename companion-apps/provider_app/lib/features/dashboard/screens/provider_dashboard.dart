@@ -74,7 +74,7 @@ class _ProviderDashboardState extends State<ProviderDashboard> {
                   child: ListView.separated(
                     padding: EdgeInsets.symmetric(vertical: listPadding),
                     itemCount: _patients.length,
-                    separatorBuilder: (_, __) => Divider(
+                    separatorBuilder: (_, _) => Divider(
                       height: 1, 
                       color: isDark ? const Color(0xFF27272A) : const Color(0xFFE4E4E7)
                     ),
