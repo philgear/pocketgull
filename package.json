@@ -132,7 +132,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.6",
-    "@types/three": "^0.183.1",
+    "@types/three": "^0.185.0",
     "autoprefixer": "^10.4.27",
     "chart.js": "^4.5.1",
     "compression": "^1.8.1",
@@ -155,7 +155,7 @@
     "socket.io-client": "^4.2.0",
     "swagger-ui-express": "^5.0.1",
     "tailwindcss": "^3.4.19",
-    "three": "^0.183.2",
+    "three": "^0.185.0",
     "ws": "^8.21.0",
     "zod": "^4.3.6"
   },
