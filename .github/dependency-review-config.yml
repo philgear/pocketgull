@@ -1,0 +1,25 @@
+# .github/dependency-review-config.yml
+
+# Only allow these licenses
+allow-licenses:
+  - MIT
+  - Apache-2.0
+  - BSD-3-Clause
+  - BSD-2-Clause
+  - ISC
+  - Unlicense
+  - CC0-1.0
+  - BlueOak-1.0.0
+  - 0BSD
+
+# Exclude specific dependencies from license checks (using purl format)
+allow-dependencies-licenses:
+  - pkg:npm/dompurify
+  - pkg:npm/http-proxy-middleware
+  - pkg:npm/ws
+  - pkg:github/github/codeql-action
+  - pkg:github/ossf/scorecard-action
+  - pkg:npm/@axe-core/puppeteer
+  - pkg:npm/axe-core
+  - pkg:npm/@img/sharp-libvips-linux-x64
+  - pkg:npm/pako

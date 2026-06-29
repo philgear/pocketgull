@@ -21,12 +21,11 @@ jobs:
         with:
           # Block PRs that introduce high or critical severity vulnerabilities
           fail-on-severity: high
-          # Only allow permissive open-source licenses
-          allow-licenses: MIT, Apache-2.0, BSD-3-Clause, BSD-2-Clause, ISC, Unlicense, CC0-1.0, BlueOak-1.0.0, 0BSD
+          # Use dedicated config file
+          config-file: '.github/dependency-review-config.yml'
           # Comment on the PR with a summary of findings
           comment-summary-in-pr: always
           # Enable Scorecard checks to show metadata details
           show-openssf-scorecard: true
           # Lower warning threshold to 1.5 to clean up warnings on standard packages
           warn-on-openssf-scorecard-level: 1.5
-          allow-dependencies-licenses: pkg:npm/dompurify, pkg:npm/http-proxy-middleware, pkg:npm/ws, pkg:github/github/codeql-action, pkg:github/ossf/scorecard-action, pkg:npm/@axe-core/puppeteer, pkg:npm/axe-core, pkg:npm/@img/sharp-libvips-linux-x64, pkg:npm/pako
