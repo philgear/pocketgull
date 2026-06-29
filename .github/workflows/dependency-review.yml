@@ -29,12 +29,4 @@ jobs:
           show-openssf-scorecard: true
           # Lower warning threshold to 1.5 to clean up warnings on standard packages
           warn-on-openssf-scorecard-level: 1.5
-          allow-dependencies-licenses: |
-            pkg:npm/dompurify
-            pkg:npm/http-proxy-middleware
-            pkg:npm/ws
-            pkg:github/github/codeql-action
-            pkg:github/ossf/scorecard-action
-            pkg:npm/@axe-core/puppeteer
-            pkg:npm/axe-core
-            pkg:npm/@img/sharp-libvips-linux-x64
+          allow-dependencies-licenses: pkg:npm/dompurify, pkg:npm/http-proxy-middleware, pkg:npm/ws, pkg:github/github/codeql-action, pkg:github/ossf/scorecard-action, pkg:npm/@axe-core/puppeteer, pkg:npm/axe-core, pkg:npm/@img/sharp-libvips-linux-x64, pkg:npm/pako
