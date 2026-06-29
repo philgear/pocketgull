@@ -164,7 +164,7 @@
     "@aws-sdk/client-healthlake": "^3.1050.0",
     "@aws-sdk/credential-provider-node": "^3.972.43",
     "@aws-sdk/protocol-http": "^3.370.0",
-    "@aws-sdk/signature-v4": "^3.370.0",
+    "@aws-sdk/signature-v4": "^3.374.0",
     "@axe-core/puppeteer": "^4.11.1",
     "@genkit-ai/googleai": "^1.28.0",
     "@genkit-ai/vertexai": "^1.37.0",
