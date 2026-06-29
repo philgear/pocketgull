@@ -35,3 +35,6 @@ jobs:
             pkg:npm/ws
             pkg:github/github/codeql-action
             pkg:github/ossf/scorecard-action
+            pkg:npm/@axe-core/puppeteer
+            pkg:npm/axe-core
+            pkg:npm/@img/sharp-libvips-linux-x64
