@@ -47,7 +47,7 @@ export interface IPubMedSearchResult {
       <div class="p-3 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 shrink-0">
         <div class="flex flex-wrap items-center gap-2 md:flex-nowrap">
           <!-- Search Engine Toggle -->
-          <div class="flex items-center bg-gray-200 dark:bg-zinc-800 rounded-md p-0.5">
+          <div class="flex flex-wrap items-center bg-gray-200 dark:bg-zinc-800 rounded-md p-0.5 gap-0.5">
             <button (click)="setSearchEngine('google')"
                     class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'google'"
@@ -68,6 +68,30 @@ export interface IPubMedSearchResult {
                     [class.dark:text-zinc-400]="searchEngine() !== 'pubmed'">
               PubMed
             </button>
+            @if (patientState.activePhilosophy() === 'ayurvedic') {
+              <button (click)="setSearchEngine('ayurveda')"
+                      class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
+                      [class.bg-white]="searchEngine() === 'ayurveda'"
+                      [class.dark:bg-zinc-600]="searchEngine() === 'ayurveda'"
+                      [class.text-amber-700]="searchEngine() === 'ayurveda'"
+                      [class.dark:text-amber-400]="searchEngine() === 'ayurveda'"
+                      [class.text-gray-500]="searchEngine() !== 'ayurveda'"
+                      [class.dark:text-zinc-400]="searchEngine() !== 'ayurveda'">
+                Ayurveda
+              </button>
+            }
+            @if (patientState.activePhilosophy() === 'eastern') {
+              <button (click)="setSearchEngine('tcm')"
+                      class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
+                      [class.bg-white]="searchEngine() === 'tcm'"
+                      [class.dark:bg-zinc-600]="searchEngine() === 'tcm'"
+                      [class.text-emerald-700]="searchEngine() === 'tcm'"
+                      [class.dark:text-emerald-400]="searchEngine() === 'tcm'"
+                      [class.text-gray-500]="searchEngine() !== 'tcm'"
+                      [class.dark:text-zinc-400]="searchEngine() !== 'tcm'">
+                TCM
+              </button>
+            }
           </div>
           <!-- Search Input -->
           <div class="w-full md:flex-1 order-last md:order-none mt-2 md:mt-0">
@@ -164,7 +188,7 @@ export interface IPubMedSearchResult {
             </iframe>
         }
 
-        @if (searchEngine() === 'pubmed' && (pubmedResults() !== null || isLoadingPubmed())) {
+        @if ((searchEngine() === 'pubmed' || searchEngine() === 'ayurveda' || searchEngine() === 'tcm') && (pubmedResults() !== null || isLoadingPubmed())) {
           <div class="p-4 space-y-4 max-w-3xl mx-auto relative z-20">
             @if (isLoadingPubmed()) {
               <div class="flex items-center justify-center p-8 text-gray-500 dark:text-zinc-400">
@@ -267,7 +291,7 @@ export class ResearchFrameComponent {
   patientState = inject(PatientStateService);
 
   isMobile = signal(false);
-  searchEngine = signal<'google' | 'pubmed'>('google');
+  searchEngine = signal<'google' | 'pubmed' | 'ayurveda' | 'tcm'>('google');
   searchText = signal<string>('');
 
   private currentUrl = signal<string | null>(null);
@@ -451,7 +475,7 @@ export class ResearchFrameComponent {
   }
 
   // --- Browser Actions ---
-  setSearchEngine(engine: 'google' | 'pubmed') {
+  setSearchEngine(engine: 'google' | 'pubmed' | 'ayurveda' | 'tcm') {
     this.searchEngine.set(engine);
     if (this.searchText().trim()) {
       this.search();
@@ -485,6 +509,12 @@ export class ResearchFrameComponent {
       setTimeout(() => { 
         if (this.isLoadingGoogle()) this.isLoadingGoogle.set(false); 
       }, 8000);
+    } else if (this.searchEngine() === 'ayurveda') {
+      const ayurvedaQuery = `(${query}) AND (Ayurveda OR Ayurvedic OR Boswellia OR Ashwagandha OR Curcumin OR Triphala OR Bhasma OR Rasayana OR "AYUSH Research Portal")`;
+      this.searchPubmed(ayurvedaQuery);
+    } else if (this.searchEngine() === 'tcm') {
+      const tcmQuery = `(${query}) AND ("Traditional Chinese Medicine" OR TCM OR Acupuncture OR Moxibustion OR Acupoints OR "Zang-Fu" OR "Qi and blood" OR "Yin Yang")`;
+      this.searchPubmed(tcmQuery);
     } else {
       this.searchPubmed(query);
     }

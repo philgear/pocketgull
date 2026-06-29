@@ -58,3 +58,9 @@ Use the following checks when verifying work:
 3. **Responsive Flow**: Check how panels behave when collapsed or maximized.
 4. **Build Cleanliness**: Run `npm run build` — zero errors expected, `sourceMap: false` in production suppresses Angular's `init.mjs.map` warnings.
 
+## Node.js & Dependency Overrides
+- **Node.js**: The project strictly uses **Node.js v24.x**. Ensure `.node-version`, `.nvmrc`, and root `package.json` engines are kept in sync.
+- **esbuild version mismatch**: Due to npm workspace link boundaries ignoring nested overrides, we lock `esbuild` (and platform `@esbuild/*` packages) globally to `0.27.2` at the root overrides, except for `@angular/build` and `@angular-devkit/build-angular` which are overridden specifically to `0.28.1`.
+- **Astro root promotion**: To ensure the global overrides are respected for the Astro `docs-study` workspace package, `astro` and `@astrojs/mdx` are installed as direct `devDependencies` in the root `package.json`.
+
+
