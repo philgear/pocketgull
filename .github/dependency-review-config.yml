@@ -1,6 +1,6 @@
 # .github/dependency-review-config.yml
 
-# Only allow these licenses
+# Only allow standard permissive licenses
 allow-licenses:
   - MIT
   - Apache-2.0
@@ -9,8 +9,6 @@ allow-licenses:
   - ISC
   - Unlicense
   - CC0-1.0
-  - BlueOak-1.0.0
-  - 0BSD
 
 # Exclude specific dependencies from license checks (using purl format)
 allow-dependencies-licenses:
@@ -23,3 +21,20 @@ allow-dependencies-licenses:
   - pkg:npm/axe-core
   - pkg:npm/@img/sharp-libvips-linux-x64
   - pkg:npm/pako
+  - pkg:npm/argparse
+  - pkg:npm/caniuse-lite
+  - pkg:npm/chownr
+  - pkg:npm/common-ancestor-path
+  - pkg:npm/glob
+  - pkg:npm/jackspeak
+  - pkg:npm/jsonify
+  - pkg:npm/minipass
+  - pkg:npm/minipass-flush
+  - pkg:npm/package-json-from-dist
+  - pkg:npm/path-scurry
+  - pkg:npm/sax
+  - pkg:npm/spdx-exceptions
+  - pkg:npm/tar
+  - pkg:npm/tslib
+  - pkg:npm/uri-templates
+  - pkg:npm/url-template
