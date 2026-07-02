@@ -2313,10 +2313,13 @@ export class AppComponent implements OnDestroy {
 
     // Snappy behavior: if released near the center (55%), snap to it
     const containerWidth = this.mainContainer()?.nativeElement.offsetWidth ?? window.innerWidth;
-    const currentPercent = (this.inputPanelWidth() / containerWidth) * 100;
+    const width = this.inputPanelWidth();
+    if (width !== undefined) {
+      const currentPercent = (width / containerWidth) * 100;
 
-    if (Math.abs(currentPercent - 50) < 5) {
-      this.inputPanelWidth.set(containerWidth * 0.50);
+      if (Math.abs(currentPercent - 50) < 5) {
+        this.inputPanelWidth.set(containerWidth * 0.50);
+      }
     }
   }
 

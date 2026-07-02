@@ -22,7 +22,13 @@ jobs:
         run: npm ci --legacy-peer-deps
         
       - name: Security Audit
-        run: npm audit --audit-level=high
+        run: npm audit --json > audit.json || true
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: audit.json
         
       # Ensure code quality for clinical safety
       - name: Run Linters

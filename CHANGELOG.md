@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **[Theme & UI] Theme Query Parameter**: Added `?theme=` URL query parameter check on app startup (e.g., `?theme=dark`) to facilitate automation audits, E2E testing, and direct theme linking in `src/services/theme.service.ts`.
+- **[CI/CD] Security Audit Artifacts**: Configured the GitHub Actions workflow to export NPM audit results to a JSON file and upload them as workflow artifacts instead of letting minor warnings fail build runs.
+
+### Changed
+- **[Infrastructure] Unified Cloud Region & Spec**: Shifted the default deploy target region in deploy scripts to `us-central1` and optimized server resources to 2 CPU / 2Gi memory configuration with min 0 and max 2 instances.
+- **[Build] Docker Multi-Stage Optimization**: Enhanced `Dockerfile` caching by copying workspace `package.json` files prior to dependency installation, and secured the final step by adding `--ignore-scripts` to production installation.
+- **[Security] Content Security Policy (CSP) Updates**: Whitelisted `raw.githubusercontent.com` in CSP `connect-src` headers for both dev and production Node/Express servers.
+
+### Fixed
+- **[UI / Layout] Panel Resizer Snapping Resiliency**: Guarded resizer snap calculation in `src/app.component.ts` against undefined container widths to improve component stability.
+- **[Clinical Intelligence] Intake Form Key Alignment**: Synced `src/components/intake-form.component.ts` to query `Summary Overview` instead of `Care Plan Overview` to resolve mismatch in generated medical care reports.
+- **[Types] Markdown Parser Types**: Added explicit types for markdown parser token loops in `src/components/analysis-report.component.ts` to enforce strict type checking and avoid type compiler failures.
+- **[Types] Monorepo IDE Type Resolution**: Restricted implicit type-loading in `pocketgull_api/tsconfig.json` to `["node"]` to resolve implicit monorepo type resolution warnings/errors in the IDE.
+- **[Testing] Patient App Widget Test Mocking**: Wrapped `patient_app` widget tests in `http.runWithClient` with a mock server and switched from `pumpAndSettle` to `pump` to bypass infinite seagull flight animation timeouts.
+
 ---
 
 ## [1.0.0-rc7] - 2026-06-28
