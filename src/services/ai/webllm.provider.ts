@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Observable } from 'rxjs';
 import { IIntelligenceProvider } from './intelligence.provider';
@@ -13,10 +13,14 @@ export class WebLLMProvider implements IIntelligenceProvider {
   private isLoaded = false;
   private platformId = inject(PLATFORM_ID);
   
+  readonly loadingProgress = signal<string>('');
+  readonly isLoadingProgress = signal<boolean>(false);
+  
   async loadEngine() {
       if (!isPlatformBrowser(this.platformId)) return;
       if (this.isLoaded && this.engine) return;
       
+      this.isLoadingProgress.set(true);
       console.log('[WebLLM] Initializing WebGPU Local Inference Engine via WebWorker...');
       const webllm = await import('@mlc-ai/web-llm');
       
@@ -26,10 +30,12 @@ export class WebLLMProvider implements IIntelligenceProvider {
         {
            initProgressCallback: (progress) => {
              console.log('[WebLLM Sync]', progress.text);
+             this.loadingProgress.set(progress.text);
            }
-        }
+         }
       );
       this.isLoaded = true;
+      this.isLoadingProgress.set(false);
       console.log('[WebLLM] Engine Ready.');
   }
 

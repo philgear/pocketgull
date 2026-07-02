@@ -269,14 +269,22 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
         @if (intel.isLoading() && !hasAnyReport()) {
           <div class="h-64 flex flex-col items-center justify-center opacity-50 no-print">
             <div class="w-8 h-8 border-2 border-[#EEEEEE] dark:border-zinc-800 border-t-[#1C1C1C] dark:border-t-zinc-100 rounded-full animate-spin mb-4"></div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs uppercase tracking-widest text-[#689F38] dark:text-[#8bc34a] font-bold">{{ activeLens() }}</span>
-              @if (intel.isLoading() && isTextEmpty(activeReport())) {
-                <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
-                <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">{{ activeAgentName() }} is synthesizing...</span>
+            <div class="flex flex-col items-center gap-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs uppercase tracking-widest text-[#689F38] dark:text-[#8bc34a] font-bold">{{ activeLens() }}</span>
+                @if (intel.isLoading() && isTextEmpty(activeReport())) {
+                  <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
+                  <span class="text-[8px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">{{ activeAgentName() }} is synthesizing...</span>
+                }
+              </div>
+              @if (intel.webgpuIsLoading() && intel.webgpuProgress()) {
+                <div class="text-[10px] text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/80 px-3 py-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-700/50 flex items-center gap-2 max-w-sm text-center animate-pulse">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-zinc-500 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span class="font-mono">{{ intel.webgpuProgress() }}</span>
+                </div>
               }
             </div>
-            <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-200">Processing Comprehensive Analysis</p>
+            <p class="text-xs font-bold uppercase tracking-widest text-[#1C1C1C] dark:text-zinc-200 mt-2">Processing Comprehensive Analysis</p>
           </div>
         }
         
