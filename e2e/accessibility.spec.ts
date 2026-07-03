@@ -30,6 +30,7 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     // Prevent the walkthrough tour from launching automatically on load
     await page.addInitScript(() => {
       window.localStorage.setItem('pg_tour_seen', '1');
+      window.localStorage.setItem('pg_data_consent_v1', 'true');
       // Disable service worker during tests so Playwright can intercept API requests
       try {
         const mockSW = {

@@ -43,6 +43,7 @@ async function setupPage(page: import('@playwright/test').Page) {
     // Skip walkthrough tour
     window.localStorage.setItem('pg_tour_seen', '1');
     window.localStorage.setItem('pg_mock_clinician', '1');
+    window.localStorage.setItem('pg_data_consent_v1', 'true');
 
     // Disable service worker during tests
     try {
