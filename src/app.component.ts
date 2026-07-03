@@ -281,59 +281,6 @@ import { ConsentModalComponent } from './components/consent-modal.component';
           </div>
         }
 
-        <!-- SwaggerHub Syncing Toast -->
-        @if (isSwaggerSyncing()) {
-          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/50 animate-pulse">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" class="opacity-25"></circle>
-                  <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-blue-800 dark:text-blue-300">Synchronizing to SwaggerHub</h3>
-                <p class="text-[11px] text-blue-600 dark:text-blue-400/80">Updating OpenAPI schema with Phil Gear's patient structure and exporting to SwaggerHub Portal...</p>
-              </div>
-            </div>
-          </div>
-        }
-
-        <!-- SwaggerHub Sync Success Toast -->
-        @if (showSwaggerSuccess()) {
-          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
-              </div>
-              <div>
-                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">SwaggerHub Sync Successful</h3>
-                <p class="text-[11px] text-green-600 dark:text-green-500/80">OpenAPI schema and clinical data model for Phil Gear successfully synchronized to SwaggerHub Catalog (orgId: 736f055e-8bbe-4a40-9c16-36e58d88d9c8).</p>
-              </div>
-            </div>
-            <button (click)="showSwaggerSuccess.set(false)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors text-green-700 dark:text-green-400">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </div>
-        }
-
-        <!-- SwaggerHub Sync Error Toast -->
-        @if (showSwaggerError(); as errorMsg) {
-          <div class="border-b px-6 py-3 flex items-center justify-between no-print shrink-0 bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-800/50 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              </div>
-              <div>
-                <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-red-800 dark:text-red-300">SwaggerHub Sync Failed</h3>
-                <p class="text-[11px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
-              </div>
-            </div>
-            <button (click)="showSwaggerError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </div>
-        }
         <!-- Spectral P2-Urgent (585nm amber) demo mode banner -->
         @if (isDemoMode()) {
           <div class="border-b px-4 py-2 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 no-print shrink-0"
@@ -690,9 +637,7 @@ import { ConsentModalComponent } from './components/consent-modal.component';
                     <button (click)="connectAwsHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#FF9900] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> AWS HealthLake
                     </button>
-                    <button (click)="connectSwaggerHub(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#85EA2D] hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
-                       <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> SwaggerHub Catalog
-                    </button>
+
                    <button (click)="connectAppleHealth(); connectMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path></svg> Apple Health
                    </button>
@@ -1269,10 +1214,7 @@ export class AppComponent implements OnDestroy {
   showAwsSuccess = signal<boolean>(false);
   showAwsError = signal<string | null>(null);
 
-  // SwaggerHub Sync State
-  isSwaggerSyncing = signal<boolean>(false);
-  showSwaggerSuccess = signal<boolean>(false);
-  showSwaggerError = signal<string | null>(null);
+
 
   // Finalize & Archive State
   showPreviewModal = signal(false);
@@ -1518,30 +1460,7 @@ export class AppComponent implements OnDestroy {
     }
   }
 
-  async connectSwaggerHub() {
-    const patient = this.patientMgmt.selectedPatient();
-    if (!patient) {
-      alert("No patient selected to sync to SwaggerHub Catalog.");
-      return;
-    }
 
-    this.isSwaggerSyncing.set(true);
-    this.showSwaggerSuccess.set(false);
-    this.showSwaggerError.set(null);
-
-    try {
-      const result = await this.export.exportToSwaggerHub(patient);
-      console.log('[SwaggerHub Sync] Success:', result);
-      this.showSwaggerSuccess.set(true);
-      setTimeout(() => this.showSwaggerSuccess.set(false), 5000);
-    } catch (e: any) {
-      console.error('[SwaggerHub Sync] Error:', e);
-      this.showSwaggerError.set(e.message || 'An error occurred during SwaggerHub synchronization.');
-      setTimeout(() => this.showSwaggerError.set(null), 8000);
-    } finally {
-      this.isSwaggerSyncing.set(false);
-    }
-  }
 
 
   connectAppleHealth() {
@@ -2394,10 +2313,13 @@ export class AppComponent implements OnDestroy {
 
     // Snappy behavior: if released near the center (55%), snap to it
     const containerWidth = this.mainContainer()?.nativeElement.offsetWidth ?? window.innerWidth;
-    const currentPercent = (this.inputPanelWidth() / containerWidth) * 100;
+    const width = this.inputPanelWidth();
+    if (width !== undefined) {
+      const currentPercent = (width / containerWidth) * 100;
 
-    if (Math.abs(currentPercent - 50) < 5) {
-      this.inputPanelWidth.set(containerWidth * 0.50);
+      if (Math.abs(currentPercent - 50) < 5) {
+        this.inputPanelWidth.set(containerWidth * 0.50);
+      }
     }
   }
 

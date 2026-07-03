@@ -7,24 +7,51 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:patient_app/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const PocketGullApp());
+  const String mockPatientsResponse = '''
+  [
+    {
+      "id": "patient-1",
+      "name": "Jane Doe",
+      "age": 45,
+      "gender": "Female",
+      "lastVisit": "2026-06-15",
+      "preexistingConditions": ["Hypertension"],
+      "vitals": {
+        "heartRate": 72,
+        "systolic": 120,
+        "diastolic": 80
+      },
+      "patientGoals": "Manage blood pressure",
+      "biometricHistory": [],
+      "issues": {},
+      "checklist": [],
+      "clinicalNotes": []
+    }
+  ]
+  ''';
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('Splash login screen loads and displays title', (WidgetTester tester) async {
+    await http.runWithClient(() async {
+      // Build our app and trigger a frame.
+      await tester.pumpWidget(const PocketGullApp());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      // Verify that the title and portal texts are shown.
+      expect(find.text('POCKET GULL'), findsOneWidget);
+      expect(find.text('PATIENT CARE PLAN PORTAL'), findsOneWidget);
+    }, () => MockClient((request) async {
+      if (request.url.path.endsWith('/patients')) {
+        return http.Response(mockPatientsResponse, 200, headers: {
+          'content-type': 'application/json; charset=utf-8',
+        });
+      }
+      return http.Response('Not found', 404);
+    }));
   });
 }

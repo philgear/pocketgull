@@ -17,10 +17,18 @@ This document provides guidance for AI agents working on the Pocket Gull project
 - **Minimalist Dieter Rams Design Mandate**: All UI updates must prioritize a premium, minimalist design with clarity, neutrality, and functional excellence.
 - **Mobile Responsiveness**: Enforce seamless mobile responsive layouts using `100dvh` to ensure perfect fit on mobile devices (e.g., Pixel Watch, smartphones). Avoid hardcoded pixel heights where `100dvh` and CSS grid/flexbox provide better responsive scaling.
 
-## Local Environment & Secrets
+## Local Environment, Cluster, & Data Science workflows
 - **No `.env.local` required in Angular root**: `fetchGeminiApiKey()` in `src/server.ts` automatically falls back to `pocketgull_api/.env` and `pocketgull_api/.env.local`. Add `GEMINI_API_KEY=<key>` to either file for local dev/preview.
 - **Run locally**: `npm run dev` (dev server) or `npm run preview` (production build + SSR server on port 4200).
-- **Access via `localhost:4200`**, not `0.0.0.0:4200` — browsers enforce COOP/COEP headers only on trusted origins (`localhost` qualifies; `0.0.0.0` does not).
+- **Run in local Kubernetes Cluster**: Use [Skaffold](file:///home/user/pocketgull/skaffold.yaml) and [Kubernetes manifests](file:///home/user/pocketgull/k8s) for local container orchestration:
+  - `npm run kube:start` — Boot local Minikube cluster.
+  - `npm run kube:dev` — Start Skaffold dev loop with file syncing, live rebuilding, and automatic port forwarding for frontend (:4000) and API (:8000).
+  - `npm run kube:stop` — Stop local Minikube cluster.
+- **Machine Learning & Data Science**: Guide for training and evaluating clinical models can be found in [ml-pipeline.md](file:///home/user/pocketgull/.agents/workflows/ml-pipeline.md):
+  - Train model: `python3 pocketgull_api/train_contest_model.py`
+  - Evaluate & log report: `python3 pocketgull_api/evaluate_model.py` (updates [model_evaluation_report.md](file:///home/user/pocketgull/pocketgull_api/reports/model_evaluation_report.md)).
+  - Run python tests: `npm run test:python` (runs [test_dsp.py](file:///home/user/pocketgull/pocketgull_api/test_dsp.py) math validations).
+- **Access via `localhost:4200`** (or `localhost:4000` on k8s), not `0.0.0.0` — browsers enforce COOP/COEP headers only on trusted origins (`localhost` qualifies; `0.0.0.0` does not).
 
 ## Layout System
 The layout is managed in `AppComponent` with a multi-directional resizable grid:
@@ -49,4 +57,10 @@ Use the following checks when verifying work:
 2. **State Sync**: Verify that selections in the 3D viewer correctly update `selectedPartId` and trigger relevant UI transitions.
 3. **Responsive Flow**: Check how panels behave when collapsed or maximized.
 4. **Build Cleanliness**: Run `npm run build` — zero errors expected, `sourceMap: false` in production suppresses Angular's `init.mjs.map` warnings.
+
+## Node.js & Dependency Overrides
+- **Node.js**: The project strictly uses **Node.js v24.x**. Ensure `.node-version`, `.nvmrc`, and root `package.json` engines are kept in sync.
+- **esbuild version mismatch**: Due to npm workspace link boundaries ignoring nested overrides, we lock `esbuild` (and platform `@esbuild/*` packages) globally to `0.27.2` at the root overrides, except for `@angular/build` and `@angular-devkit/build-angular` which are overridden specifically to `0.28.1`.
+- **Astro root promotion**: To ensure the global overrides are respected for the Astro `docs-study` workspace package, `astro` and `@astrojs/mdx` are installed as direct `devDependencies` in the root `package.json`.
+
 

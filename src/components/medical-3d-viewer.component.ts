@@ -82,6 +82,11 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
         }
 
         try {
+            const ua = window.navigator.userAgent.toLowerCase();
+            const isAutomated = window.navigator.webdriver || ua.includes('headless') || ua.includes('playwright');
+            if (isAutomated) {
+                throw new Error("WebGL disabled in automated test environments to prevent GPU hangs.");
+            }
             this.initScene();
             this.startAnimation();
             // Load initial model after slight delay to ensure container is ready

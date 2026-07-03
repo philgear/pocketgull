@@ -13,6 +13,9 @@ RUN npm install -g npm@latest
 
 # Install ALL dependencies (including devDependencies needed for ng build)
 COPY package*.json ./
+COPY docs/study/package.json ./docs/study/
+COPY companion-apps/avs-therapy/package.json ./companion-apps/avs-therapy/
+COPY pocketgull_api/package.json ./pocketgull_api/
 RUN npm ci --legacy-peer-deps
 
 # Copy source and build the docs/study Astro sub-project + Angular SSR app
@@ -37,7 +40,10 @@ ENV NODE_ENV=production
 
 # Install only production dependencies
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps --omit=dev
+COPY docs/study/package.json ./docs/study/
+COPY companion-apps/avs-therapy/package.json ./companion-apps/avs-therapy/
+COPY pocketgull_api/package.json ./pocketgull_api/
+RUN npm ci --legacy-peer-deps --omit=dev --ignore-scripts
 
 # Copy compiled output from builder (includes browser, server, docs/study, data/)
 COPY --from=builder /app/dist ./dist

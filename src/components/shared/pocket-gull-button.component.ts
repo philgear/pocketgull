@@ -16,6 +16,7 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
       [class]="buttonClasses()"
       [attr.aria-label]="ariaLabel() || null"
       [attr.data-tooltip]="ariaLabel() || null"
+      [attr.data-testid]="testId() || null"
       (click)="onClick($event)"
     >
       @if (loading()) {
@@ -265,6 +266,7 @@ export class PocketGullButtonComponent implements AfterContentChecked {
   trailingIcon = input<string>('');
   type = input<'button' | 'submit' | 'reset'>('button');
   ariaLabel = input<string>('');
+  testId = input<string>('');
 
   clicked = output<MouseEvent>();
 

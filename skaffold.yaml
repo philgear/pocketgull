@@ -1,0 +1,36 @@
+apiVersion: skaffold/v4beta14
+kind: Config
+metadata:
+  name: pocketgull
+build:
+  artifacts:
+    - image: pocketgull-web
+      context: .
+      dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*'
+            dest: .
+    - image: pocketgull-api
+      context: pocketgull_api
+      dockerfile: Dockerfile.python
+      sync:
+        manual:
+          - src: '*.py'
+            dest: .
+manifests:
+  rawYaml:
+    - k8s/configmap.yaml
+    - k8s/secrets.yaml
+    - k8s/api.yaml
+    - k8s/web.yaml
+    - k8s/hue-relay.yaml
+portForward:
+  - resourceType: service
+    resourceName: web-service
+    port: 8080
+    localPort: 4000
+  - resourceType: service
+    resourceName: api-service
+    port: 8080
+    localPort: 8000

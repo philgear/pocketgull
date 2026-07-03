@@ -1,6 +1,5 @@
 /* Pocket Gull — Industrial Grace Design System (Docs) */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;700&display=swap');
 
 :root {
   --pg-bg: #09090b;
@@ -168,13 +167,7 @@ code {
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-size: 0.85em;
-  color: var(--pg-accent-dark);
-}
-
-@media (prefers-color-scheme: dark) {
-  :not(pre) > code {
-    color: var(--pg-accent-light);
-  }
+  color: var(--pg-accent-light);
 }
 
 /* ─── Tables ─── */

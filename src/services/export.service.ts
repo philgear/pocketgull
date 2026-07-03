@@ -1729,24 +1729,7 @@ export class ExportService {
     }
   }
 
-  /**
-   * Syncs/exports the patient record to the SwaggerHub API Registry Catalog.
-   */
-  async exportToSwaggerHub(patient: IPatient): Promise<any> {
-    console.log('[ExportService] Initiating SwaggerHub Catalog sync for:', patient.id);
-    const response = await fetch('/api/export/swaggerhub', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patient)
-    });
-    
-    if (!response.ok) {
-      const errJson = await response.json();
-      throw new Error(errJson.error || 'Unknown Server Error');
-    }
-    
-    return await response.json();
-  }
+
 
 
   // ─── Helpers ──────────────────────────────────────────────

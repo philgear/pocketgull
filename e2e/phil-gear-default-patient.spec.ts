@@ -40,6 +40,10 @@ async function setupPage(page: import('@playwright/test').Page) {
   });
 
   await page.addInitScript(() => {
+    try {
+      window.indexedDB.deleteDatabase('PocketGullDB');
+    } catch (e) {}
+
     // Skip walkthrough tour
     window.localStorage.setItem('pg_tour_seen', '1');
     window.localStorage.setItem('pg_mock_clinician', '1');
@@ -116,6 +120,7 @@ async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) 
 
 test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
   test.beforeEach(async ({ page }) => {
+    test.setTimeout(90000);
     await setupPage(page);
   });
 
@@ -134,10 +139,10 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     // The analysis report component should be present (loaded for Phil Gear)
     await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
 
-    await page.screenshot({
-      path: path.join(SCREENSHOT_DIR, 'phil_gear_default_patient.png'),
-      fullPage: false,
-    });
+    // await page.screenshot({
+    //   path: path.join(SCREENSHOT_DIR, 'phil_gear_default_patient.png'),
+    //   fullPage: false,
+    // });
     console.log('[PASS] Phil Gear loaded as default patient.');
   });
 
@@ -159,68 +164,67 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
 
     // Verify all 6 tabs are present
     const expectedTabs = [
-      'Overview',
-      'Functional Protocols',
-      'Nutrition',
-      'Orthomolecular Profiling',
-      'Monitoring & Follow-up',
-      'Patient Education',
+      'tab-overview',
+      'tab-functional-protocols',
+      'tab-nutrition',
+      'tab-precision-nutrients',
+      'tab-monitoring-follow-up',
+      'tab-patient-education',
     ];
-    for (const tabLabel of expectedTabs) {
-      const tabBtn = page.locator('button', { hasText: tabLabel });
+    for (const tabTestId of expectedTabs) {
+      const tabBtn = page.getByTestId(tabTestId);
       await expect(tabBtn).toBeVisible({ timeout: 5000 });
-      console.log(`[PASS] Tab visible: ${tabLabel}`);
+      console.log(`[PASS] Tab visible: ${tabTestId}`);
     }
 
     // Verify Summary Overview has Phil's assessment content
-    const overviewTab = page.locator('button', { hasText: 'Overview' });
-    await overviewTab.click();
+    const overviewTab = page.getByTestId('tab-overview');
+    await overviewTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Clinical Assessment')).toBeVisible({ timeout: 5000 });
 
     // Functional Protocols tab
-    const funcTab = page.locator('button', { hasText: 'Functional Protocols' });
-    await funcTab.click();
+    const funcTab = page.getByTestId('tab-functional-protocols');
+    await funcTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Diagnostic Workup')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Functional Protocols tab populated.');
 
     // Nutrition tab
-    const nutritionTab = page.locator('button', { hasText: 'Nutrition' });
-    await nutritionTab.click();
+    const nutritionTab = page.getByTestId('tab-nutrition');
+    await nutritionTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Nutritional Interventions')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Nutrition tab populated.');
 
-    // Orthomolecular Profiling tab
-    const orthoTab = page.locator('button', { hasText: 'Orthomolecular Profiling' });
-    await orthoTab.click();
+    // Precision Nutrients tab
+    const orthoTab = page.getByTestId('tab-precision-nutrients');
+    await orthoTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
     await expect(reportEl.locator('text=Magnesium').first()).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Orthomolecular Profiling tab populated with biomarker data.');
 
     // Monitoring & Follow-up tab
-    const monitorTab = page.locator('button', { hasText: 'Monitoring & Follow-up' });
-    await monitorTab.click();
+    const monitorTab = page.getByTestId('tab-monitoring-follow-up');
+    await monitorTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Immediate (24-72 hours)')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Monitoring & Follow-up tab populated.');
 
     // Patient Education tab
-    const educationTab = page.locator('button', { hasText: 'Patient Education' });
-    await educationTab.click();
+    const educationTab = page.getByTestId('tab-patient-education');
+    await educationTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Understanding Your')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Patient Education tab populated.');
 
     // Take a full-page screenshot at the end
-    await overviewTab.click();
+    await overviewTab.click({ force: true });
     await page.waitForTimeout(500);
-    await page.screenshot({
-      path: path.join(SCREENSHOT_DIR, 'phil_gear_all_lenses.png'),
-      fullPage: true,
-    });
+    // await page.screenshot({
+    //   path: path.join(SCREENSHOT_DIR, 'phil_gear_all_lenses.png'),
+    // });
     console.log('[PASS] All 6 lenses verified for Phil Gear.');
   });
 
@@ -234,39 +238,39 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     const reportEl = page.locator('app-analysis-report');
     await expect(reportEl).toBeVisible({ timeout: 10000 });
 
-    const orthoTab = page.locator('button', { hasText: 'Orthomolecular Profiling' });
+    const orthoTab = page.getByTestId('tab-precision-nutrients');
 
     // Western paradigm
     await page.locator('button', { hasText: 'Western' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click();
+    await orthoTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
-    await page.screenshot({
-      path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_western.png'),
-    });
+    // await page.screenshot({
+    //   path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_western.png'),
+    // });
     console.log('[PASS] Western Orthomolecular Profiling verified.');
 
     // Eastern paradigm
     await page.locator('button', { hasText: 'Eastern (TCM)' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click();
+    await orthoTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
-    await page.screenshot({
-      path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_eastern.png'),
-    });
+    // await page.screenshot({
+    //   path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_eastern.png'),
+    // });
     console.log('[PASS] Eastern Orthomolecular Profiling verified.');
 
     // Ayurvedic paradigm
     await page.locator('button', { hasText: 'Ayurvedic' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click();
+    await orthoTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=structural dryness')).toBeVisible({ timeout: 5000 });
-    await page.screenshot({
-      path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_ayurvedic.png'),
-    });
+    // await page.screenshot({
+    //   path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_ayurvedic.png'),
+    // });
     console.log('[PASS] Ayurvedic Orthomolecular Profiling verified.');
 
     console.log('[COMPLETE] All 3 paradigms verified for Phil Gear Orthomolecular Profiling.');

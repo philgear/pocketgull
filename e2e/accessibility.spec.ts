@@ -82,6 +82,7 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     // Now mock the clinician authorization to test the PIN and API Key entry flow
     await page.evaluate(() => {
       window.localStorage.setItem('pg_mock_clinician', '1');
+      window.localStorage.setItem('pg_data_consent_v1', 'true');
     });
     await page.reload();
 
@@ -113,6 +114,7 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
   test('main clinical dashboard accessibility audit', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('pg_mock_clinician', '1');
+      window.localStorage.setItem('pg_data_consent_v1', 'true');
     });
     await page.goto('/');
     
@@ -231,6 +233,7 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     // 2. Load dashboard
     await page.addInitScript(() => {
       window.localStorage.setItem('pg_mock_clinician', '1');
+      window.localStorage.setItem('pg_data_consent_v1', 'true');
     });
     await page.goto('/');
     

@@ -8,7 +8,7 @@ This document maps the components and services from the live Angular site to the
 | **ai cache** | `src/services/ai-cache.service.ts` | - | ❌ Missing in Flutter |
 | **ai cache service** | - | `pocketgull_flutter/lib/services/ai_cache_service.dart` | ⚠️ Flutter Only |
 | **ai provider.types** | `src/services/ai-provider.types.ts` | - | ❌ Missing in Flutter |
-| **ambient lighting** | `src/services/ambient-lighting.service.ts` | - | ❌ Missing in Flutter |
+| **ambient lighting** | `src/services/ambient-lighting.service.ts` | `pocketgull_flutter/lib/services/ambient_lighting_service.dart` | ✅ Parity |
 | **analysis container** | `src/components/analysis-container.component.ts` | - | ❌ Missing in Flutter |
 | **analysis cubit** | - | `pocketgull_flutter/lib/blocs/analysis/analysis_cubit.dart` | ⚠️ Flutter Only |
 | **analysis report** | `src/components/analysis-report.component.ts` | `pocketgull_flutter/lib/widgets/analysis_report_widget.dart` | ✅ Parity |
@@ -22,7 +22,7 @@ This document maps the components and services from the live Angular site to the
 | **body 3d viewer** | `src/components/body-3d-viewer.component.ts` | - | ❌ Missing in Flutter |
 | **body viewer** | `src/components/body-viewer.component.ts` | `pocketgull_flutter/lib/widgets/body_viewer_widget.dart` | ✅ Parity |
 | **box breathing wrapper** | - | `pocketgull_flutter/lib/widgets/box_breathing_wrapper.dart` | ⚠️ Flutter Only |
-| **circadian sleepiness** | `src/services/circadian-sleepiness.service.ts` | - | ❌ Missing in Flutter |
+| **circadian sleepiness** | `src/services/circadian-sleepiness.service.ts` | `pocketgull_flutter/lib/services/circadian_sleepiness_service.dart` | ✅ Parity |
 | **clinical gauge** | `src/components/clinical-gauge.component.ts` | `pocketgull_flutter/lib/widgets/clinical_gauge_widget.dart` | ✅ Parity |
 | **clinical intelligence** | `src/services/clinical-intelligence.service.ts` | - | ❌ Missing in Flutter |
 | **clinical intelligence service** | - | `pocketgull_flutter/lib/services/clinical_intelligence_service.dart` | ⚠️ Flutter Only |
@@ -65,7 +65,7 @@ This document maps the components and services from the live Angular site to the
 | **medical 3d viewer** | `src/components/medical-3d-viewer.component.ts` | - | ❌ Missing in Flutter |
 | **medical chart** | `src/components/medical-chart.component.ts` | `pocketgull_flutter/lib/widgets/medical_chart_widget.dart` | ✅ Parity |
 | **medical summary** | `src/components/medical-summary.component.ts` | `pocketgull_flutter/lib/widgets/medical_summary_widget.dart` | ✅ Parity |
-| **metric card** | `src/components/shared/metric-card.component.ts` | - | ❌ Missing in Flutter |
+| **metric card** | `src/components/shared/metric-card.component.ts` | `pocketgull_flutter/lib/widgets/metric_card_widget.dart` | ✅ Parity |
 | **mobile local intelligence** | - | `pocketgull_flutter/lib/services/mobile_local_intelligence.dart` | ⚠️ Flutter Only |
 | **nano.provider** | `src/services/ai/nano.provider.ts` | - | ❌ Missing in Flutter |
 | **native body viewer** | - | `pocketgull_flutter/lib/widgets/native_body_viewer.dart` | ⚠️ Flutter Only |
@@ -87,10 +87,10 @@ This document maps the components and services from the live Angular site to the
 | **patient vitals chart** | `src/components/patient-vitals-chart.component.ts` | - | ❌ Missing in Flutter |
 | **patient.types** | `src/services/patient.types.ts` | - | ❌ Missing in Flutter |
 | **pet auditory** | `src/services/pet-auditory.service.ts` | - | ❌ Missing in Flutter |
-| **pocket gull badge** | `src/components/shared/pocket-gull-badge.component.ts` | - | ❌ Missing in Flutter |
-| **pocket gull button** | `src/components/shared/pocket-gull-button.component.ts` | - | ❌ Missing in Flutter |
-| **pocket gull card** | `src/components/shared/pocket-gull-card.component.ts` | - | ❌ Missing in Flutter |
-| **pocket gull input** | `src/components/shared/pocket-gull-input.component.ts` | - | ❌ Missing in Flutter |
+| **pocket gull badge** | `src/components/shared/pocket-gull-badge.component.ts` | `pocketgull_flutter/lib/widgets/pocket_gull_badge_widget.dart` | ✅ Parity |
+| **pocket gull button** | `src/components/shared/pocket-gull-button.component.ts` | `pocketgull_flutter/lib/widgets/pocket_gull_button_widget.dart` | ✅ Parity |
+| **pocket gull card** | `src/components/shared/pocket-gull-card.component.ts` | `pocketgull_flutter/lib/widgets/pocket_gull_card_widget.dart` | ✅ Parity |
+| **pocket gull input** | `src/components/shared/pocket-gull-input.component.ts` | `pocketgull_flutter/lib/widgets/pocket_gull_input_widget.dart` | ✅ Parity |
 | **pubgemma.provider** | `src/services/ai/pubgemma.provider.ts` | - | ❌ Missing in Flutter |
 | **python bridge** | `src/services/python-bridge.service.ts` | - | ❌ Missing in Flutter |
 | **radiology.agent** | `src/services/ai/agents/radiology.agent.ts` | - | ❌ Missing in Flutter |
@@ -121,6 +121,6 @@ This document maps the components and services from the live Angular site to the
 | **webllm.provider** | `src/services/ai/webllm.provider.ts` | - | ❌ Missing in Flutter |
 
 ## Summary
-- **Matched Features**: 15
-- **Missing in Flutter (Needs Migration)**: 75
+- **Matched Features**: 22
+- **Missing in Flutter (Needs Migration)**: 68
 - **Flutter Only (New Features/Architecture)**: 25

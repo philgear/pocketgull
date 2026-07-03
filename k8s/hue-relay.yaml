@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hue-relay-deployment
+  labels:
+    app: hue-relay
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hue-relay
+  template:
+    metadata:
+      labels:
+        app: hue-relay
+    spec:
+      containers:
+        - name: hue-relay
+          image: pocketgull-web
+          command: ["node", "scripts/hue-relay.js"]
+          ports:
+            - containerPort: 8080
+          env:
+            - name: NODE_ENV
+              value: "production"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 512Mi
+            requests:
+              cpu: "50m"
+              memory: 128Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hue-relay-service
+spec:
+  selector:
+    app: hue-relay
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

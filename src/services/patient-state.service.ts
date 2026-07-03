@@ -35,7 +35,7 @@ export class PatientStateService {
   readonly analysisUpdateRequest = signal(0);
   readonly requestedResearchUrl = signal<string | null>(null);
   readonly requestedResearchQuery = signal<string | null>(null);
-  readonly requestedSearchEngine = signal<'google' | 'pubmed' | null>(null);
+  readonly requestedSearchEngine = signal<'google' | 'pubmed' | 'ayurveda' | 'tcm' | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
   readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
@@ -559,7 +559,7 @@ export class PatientStateService {
     this.requestedResearchUrl.set(url);
   }
 
-  requestResearchSearch(query: string, engine?: 'google' | 'pubmed') {
+  requestResearchSearch(query: string, engine?: 'google' | 'pubmed' | 'ayurveda' | 'tcm') {
     if (engine) {
       this.requestedSearchEngine.set(engine);
     }

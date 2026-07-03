@@ -8,6 +8,7 @@ import { NetworkStateService } from './network-state.service';
 import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
 import { OrcidService } from './orcid.service';
+import { WebLLMProvider } from './ai/webllm.provider';
 import {
     DEMO_ANALYSIS_REPORT_WESTERN,
     DEMO_ANALYSIS_REPORT_EASTERN,
@@ -44,8 +45,11 @@ export class ClinicalIntelligenceService {
     private rules = inject(RulesEngineService);
     private patientState = inject(PatientStateService);
     private orcid = inject(OrcidService);
+    private webgpu = inject(WebLLMProvider);
 
     readonly isLoading = signal<boolean>(false);
+    readonly webgpuProgress = this.webgpu.loadingProgress;
+    readonly webgpuIsLoading = this.webgpu.isLoadingProgress;
     readonly error = signal<string | null>(null);
 
     // Store analysis reports for each lens
