@@ -1,74 +1,10 @@
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
 
-// Screenshot output directory (same as other e2e specs)
-const SCREENSHOT_DIR = 'C:/Users/philg/.gemini/antigravity-ide/brain/c5a2f368-705d-47b8-a137-5d99b37800df';
+import { setupE2ePage } from './utils/setup';
 
-// Shared beforeEach: suppress tour, mock SW, set localStorage
-async function setupPage(page: import('@playwright/test').Page) {
-  // Intercept config endpoint to return empty API key so splash screen shows Demo Mode
-  await page.route('**/api/config', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ apiKey: '' })
-    });
-  });
-
-  // Intercept hardware telemetry to prevent 500 error warnings
-  await page.route('**/api/hardware/telemetry', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        gpus: [],
-        cpuName: 'Mock CPU',
-        cpuLoadPercent: 12,
-        systemMemoryUsedGb: 4.5,
-        systemMemoryTotalGb: 16.0
-      })
-    });
-  });
-
-  // Intercept current patient loci endpoint to avoid 503 sidecar errors
-  await page.route('**/api/loci/current_patient', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([])
-    });
-  });
-
-  await page.addInitScript(() => {
-    try {
-      window.indexedDB.deleteDatabase('PocketGullDB');
-    } catch (e) {}
-
-    // Skip walkthrough tour
-    window.localStorage.setItem('pg_tour_seen', '1');
-    window.localStorage.setItem('pg_mock_clinician', '1');
-    window.localStorage.setItem('pg_data_consent_v1', 'true');
-
-    // Disable service worker during tests
-    try {
-      const mockSW = {
-        register: () => Promise.reject(new Error('SW disabled for testing')),
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        getRegistration: () => Promise.resolve(undefined),
-        getRegistrations: () => Promise.resolve([]),
-        controller: null,
-        ready: new Promise(() => {}),
-      };
-      Object.defineProperty(navigator, 'serviceWorker', {
-        get() { return mockSW; },
-        configurable: true,
-      });
-    } catch (e) {
-      console.error('Failed to mock service worker:', e);
-    }
-  });
-}
+// Screenshot output directory
+const SCREENSHOT_DIR = path.join(__dirname, '..', 'test-results', 'screenshots');
 
 /** Shared login + demo mode entry flow */
 async function enterDemoMode(page: import('@playwright/test').Page) {
@@ -121,7 +57,7 @@ async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) 
 test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(90000);
-    await setupPage(page);
+    await setupE2ePage(page);
   });
 
   test('Phil Gear can be selected and loaded', async ({ page }) => {

@@ -22,7 +22,6 @@ export default {
       secure: false,
       changeOrigin: true
     },
-
     "/api/python": {
       target: "http://localhost:8001",
       secure: false,
@@ -30,4 +29,3 @@ export default {
       pathRewrite: { "^/api/python": "" }
     }
   };
-

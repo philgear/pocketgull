@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/patient/patient_event.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/patient_provider.dart';
 import 'box_breathing_wrapper.dart';
 import 'history_timeline_widget.dart';
 import '../models/patient_types.dart';
 import '../services/dictation_service.dart';
 import 'dictation_modal_widget.dart';
 
-class IntakeFormWidget extends StatefulWidget {
+class IntakeFormWidget extends ConsumerStatefulWidget {
   const IntakeFormWidget({super.key});
 
   @override
-  State<IntakeFormWidget> createState() => _IntakeFormWidgetState();
+  ConsumerState<IntakeFormWidget> createState() => _IntakeFormWidgetState();
 }
 
-class _IntakeFormWidgetState extends State<IntakeFormWidget> {
+class _IntakeFormWidgetState extends ConsumerState<IntakeFormWidget> {
   final TextEditingController _goalsController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _recController = TextEditingController();
@@ -25,7 +24,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
   @override
   void initState() {
     super.initState();
-    final patientState = context.read<PatientBloc>().state;
+    final patientState = ref.read(patientProvider);
     _goalsController.text = patientState.patientGoals;
     _dictationService.initialize();
   }
@@ -94,7 +93,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
           break;
         case CommandAction.switchAndNote:
           if (command.partId != null) {
-            context.read<PatientBloc>().add(SelectPartEvent(command.partId));
+            ref.read(patientProvider.notifier).selectPart(command.partId!);
           }
           break;
         case CommandAction.setPain:
@@ -109,7 +108,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
                 recommendation: note.recommendation,
                 date: note.date,
               );
-              context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
+              ref.read(patientProvider.notifier).updateIssue(note.id, updatedNote);
           }
           break;
       }
@@ -153,7 +152,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
       deltaSummary: resolvedDeltaSummary,
       escalationFlag: resolvedEscalationFlag,
     );
-    context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
+    ref.read(patientProvider.notifier).updateIssue(note.id, updatedNote);
   }
 
   Widget _buildTrajectoryAlert(BodyPartIssue note) {
@@ -298,15 +297,16 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
               controller: _goalsController,
               maxLines: 4,
               onChanged: (value) {
-                context.read<PatientBloc>().add(UpdateGoals(value));
+                ref.read(patientProvider.notifier).updateGoals(value);
               },
               decoration: _inputDecoration('Enter patient goals or symptoms...'),
             ),
           ),
           const SizedBox(height: 32),
           
-          BlocBuilder<PatientBloc, PatientState>(
-            builder: (context, state) {
+          Consumer(
+            builder: (context, ref, child) {
+              final state = ref.watch(patientProvider);
               if (state.selectedPartId == null) {
                 return _buildEmptyState();
               }
@@ -501,7 +501,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
                 recommendation: note.recommendation,
                 date: note.date,
               );
-              context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
+              ref.read(patientProvider.notifier).updateIssue(note.id, updatedNote);
             },
           ),
         ),
@@ -548,7 +548,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
                 deltaSummary: note.deltaSummary,
                 escalationFlag: note.escalationFlag,
               );
-              context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
+              ref.read(patientProvider.notifier).updateIssue(note.id, updatedNote);
             },
             decoration: _inputDecoration('Describe symptoms, triggers, and observations...').copyWith(
               suffixIcon: Builder(
@@ -590,7 +590,7 @@ class _IntakeFormWidgetState extends State<IntakeFormWidget> {
               deltaSummary: note.deltaSummary,
               escalationFlag: note.escalationFlag,
             );
-            context.read<PatientBloc>().add(UpdateIssueEvent(note.id, updatedNote));
+            ref.read(patientProvider.notifier).updateIssue(note.id, updatedNote);
           },
           decoration: _inputDecoration('Suggested treatments, referrals, or next steps...').copyWith(
             suffixIcon: Builder(

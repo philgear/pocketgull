@@ -73,6 +73,26 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   }
                 }
               </div>
+              
+              <!-- EHR Interoperability Panel -->
+              <div class="flex items-center gap-2 mt-2">
+                <pocket-gull-button 
+                  variant="secondary" 
+                  size="xs" 
+                  (click)="exportToEpic()" 
+                  icon="M12 4v16m8-8H4"
+                  title="Export to Epic">
+                  Export to Epic
+                </pocket-gull-button>
+                <pocket-gull-button 
+                  variant="secondary" 
+                  size="xs" 
+                  (click)="exportToCerner()" 
+                  icon="M12 4v16m8-8H4"
+                  title="Export to Cerner">
+                  Export to Cerner
+                </pocket-gull-button>
+              </div>
             </div>
             
             <!-- Transient SMART on FHIR Success Notification -->
@@ -1210,6 +1230,22 @@ export class MedicalChartSummaryComponent {
     if (!patient) return;
     this.exportService.downloadAsFhirBundle(patient);
     this.showExportMenu.set(false);
+  }
+
+  exportToEpic() {
+    const patient = this.patient();
+    if (!patient) return;
+    this.exportService.exportToEHR(patient, 'Epic');
+    this.showEpicSuccess.set(true);
+    setTimeout(() => this.showEpicSuccess.set(false), 3000);
+  }
+
+  exportToCerner() {
+    const patient = this.patient();
+    if (!patient) return;
+    this.exportService.exportToEHR(patient, 'Cerner');
+    this.showEpicSuccess.set(true);
+    setTimeout(() => this.showEpicSuccess.set(false), 3000);
   }
 
   discardDrafts() {

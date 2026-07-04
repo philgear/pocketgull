@@ -32,6 +32,7 @@ export class PatientStateService {
   readonly isLiveAgentActive = signal<boolean>(false);
   readonly liveAgentInput = signal<string>('');
   readonly isResearchFrameVisible = signal<boolean>(false);
+  readonly isSynthesisDashboardVisible = signal<boolean>(false);
   readonly analysisUpdateRequest = signal(0);
   readonly requestedResearchUrl = signal<string | null>(null);
   readonly requestedResearchQuery = signal<string | null>(null);
@@ -359,6 +360,14 @@ export class PatientStateService {
       if (visible) {
         this.game.completeQuest('explore_evidence');
       }
+    }
+  }
+
+  toggleSynthesisDashboard(visible?: boolean) {
+    if (visible === undefined) {
+      this.isSynthesisDashboardVisible.update(v => !v);
+    } else {
+      this.isSynthesisDashboardVisible.set(visible);
     }
   }
 

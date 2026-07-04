@@ -1,5 +1,6 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { AuthService } from './auth.service';
+import { PatientManagementService } from './patient-management.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class SessionStateService {
   readonly isLocked = signal(true);
   readonly isOnboardingComplete = signal(false);
   private auth = inject(AuthService);
+  private patientMgmt = inject(PatientManagementService, { optional: true });
 
   /**
    * Represents the inactivity timer in seconds.
@@ -38,6 +40,9 @@ export class SessionStateService {
   }
 
   lock() {
+    if (this.patientMgmt) {
+      this.patientMgmt.triggerImmediateSaveAndSync();
+    }
     this.isLocked.set(true);
     this.isOnboardingComplete.set(false);
     if (this.timeoutId) {

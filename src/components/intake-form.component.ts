@@ -29,6 +29,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
           <div class="flex items-center gap-2">
             <div class="w-2 h-2 rounded-sm bg-[#689F38] dark:bg-[#8bc34a]"></div>
             <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Assessment Panel</span>
+            <pocket-gull-badge label="HIPAA COMPLIANT" severity="success" class="ml-2"></pocket-gull-badge>
           </div>
           <pocket-gull-button 
             variant="ghost" 

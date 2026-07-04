@@ -60,6 +60,7 @@ export class ClinicalIntelligenceService {
 
     // For live agent chat
     readonly transcript = signal<ITranscriptEntry[]>([]);
+    readonly researchHits = signal<any[] | null>(null);
 
     readonly recentNodes = signal<INodeContext[]>([]);
 
@@ -486,6 +487,15 @@ CRITICAL EMERGENCY RULES:
                     } else {
                         // Stream-based generation using native AsyncIterables
                         for await (const chunk of this.ai.generateReportStream$(patientData, lens, sysInstruction)) {
+                            if (chunk.startsWith('__TOOL_CALL__:')) {
+                                try {
+                                    const parsedToolCall = JSON.parse(chunk.substring(14));
+                                    if (parsedToolCall.name === 'protein_sequence_similarity_search') {
+                                        this.researchHits.set(parsedToolCall.result.hits);
+                                    }
+                                } catch(e) {}
+                                continue;
+                            }
                             responseText += chunk;
                             newReport[lens] = responseText;
                             this.analysisResults.update(all => ({ ...all, [lens]: responseText }));
@@ -645,7 +655,7 @@ Feel free to reference their research areas and publications if it supports the 
         await this.cache.clear();
     }
 
-    async translateReadingLevel(text: string, targetLevel: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
+    async translateReadingLevel(text: string, targetLevel: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
         if (!this.network.isOnline() && !this.network.useLocalInference()) {
             const errorMsg = "You are currently offline. Please reconnect to translate text.";
             this.error.set(errorMsg);

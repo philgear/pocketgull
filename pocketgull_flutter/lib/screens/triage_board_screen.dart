@@ -3,19 +3,18 @@ import 'package:flutter/material.dart';
 import '../models/patient_types.dart';
 import '../services/patient_management_service.dart';
 import '../widgets/native_body_viewer.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/patient/patient_event.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/patient_provider.dart';
 import 'home_screen.dart';
 
-class TriageBoardScreen extends StatefulWidget {
+class TriageBoardScreen extends ConsumerStatefulWidget {
   const TriageBoardScreen({super.key});
 
   @override
-  State<TriageBoardScreen> createState() => _TriageBoardScreenState();
+  ConsumerState<TriageBoardScreen> createState() => _TriageBoardScreenState();
 }
 
-class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTickerProviderStateMixin {
+class _TriageBoardScreenState extends ConsumerState<TriageBoardScreen> with SingleTickerProviderStateMixin {
   final PatientManagementService _service = PatientManagementService();
   List<Patient> _patients = [];
   bool _isLoading = true;
@@ -190,7 +189,7 @@ class _TriageBoardScreenState extends State<TriageBoardScreen> with SingleTicker
               
               return GestureDetector(
                 onTap: () {
-                  context.read<PatientBloc>().add(LoadPatient(patient));
+                  ref.read(patientProvider.notifier).loadPatient(patient);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const HomeScreen()),

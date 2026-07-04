@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/dictation_service.dart';
 import '../services/clinical_intelligence_service.dart';
+import '../providers/services_providers.dart';
 
-class DictationModalWidget extends StatefulWidget {
+class DictationModalWidget extends ConsumerStatefulWidget {
   final DictationService dictationService;
   final String partId;
   final String historicalContext;
@@ -20,10 +21,10 @@ class DictationModalWidget extends StatefulWidget {
   });
 
   @override
-  State<DictationModalWidget> createState() => _DictationModalWidgetState();
+  ConsumerState<DictationModalWidget> createState() => _DictationModalWidgetState();
 }
 
-class _DictationModalWidgetState extends State<DictationModalWidget> {
+class _DictationModalWidgetState extends ConsumerState<DictationModalWidget> {
   late ClinicalIntelligenceService _aiService;
   bool _isSynthesizing = false;
   String? _clarificationQuestion;
@@ -32,7 +33,7 @@ class _DictationModalWidgetState extends State<DictationModalWidget> {
   @override
   void initState() {
     super.initState();
-    _aiService = context.read<ClinicalIntelligenceService>();
+    _aiService = ref.read(clinicalIntelligenceProvider);
   }
 
   Future<void> _handleSynthesize() async {

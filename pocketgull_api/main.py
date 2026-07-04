@@ -415,8 +415,10 @@ def _explain_factors(req: RiskScoreRequest, score: float) -> list[str]:
     return factors
 
 
-@app.post("/ml/risk-score", response_model=RiskScoreResponse, tags=["ML"])
-async def ml_risk_score(req: RiskScoreRequest) -> RiskScoreResponse:
+from models.fhir import Bundle, create_risk_score_bundle
+
+@app.post("/ml/risk-score", response_model=Bundle, tags=["ML"])
+async def ml_risk_score(req: RiskScoreRequest) -> Bundle:
     """
     Run clinical risk scoring. Model inference is server-side only —
     the joblib pickle never leaves this process.
@@ -443,12 +445,16 @@ async def ml_risk_score(req: RiskScoreRequest) -> RiskScoreResponse:
         score = min(score, 1.0)
         note = "Heuristic (no model loaded)"
 
-    return RiskScoreResponse(
-        risk_level=_classify_risk(score),
-        risk_score=round(score, 3),
-        confidence=0.87 if _risk_model else 0.60,
-        contributing_factors=_explain_factors(req, score),
-        note=note,
+    risk_level = _classify_risk(score)
+    confidence = 0.87 if _risk_model else 0.60
+    factors = _explain_factors(req, score)
+
+    return create_risk_score_bundle(
+        score=score,
+        risk_level=risk_level,
+        confidence=confidence,
+        factors=factors,
+        note=note
     )
 
 

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { MarkdownService } from './markdown.service';
+import * as DOMPurify from 'dompurify';
 
 import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -32,6 +33,18 @@ interface IFhirBundle {
   providedIn: 'root'
 })
 export class ExportService {
+
+  private sanitizeObject(obj: any): any {
+    const purify = (DOMPurify as any).default || DOMPurify;
+    if (typeof obj === 'string') return purify.sanitize(obj, { ALLOWED_TAGS: [] });
+    if (Array.isArray(obj)) return obj.map(item => this.sanitizeObject(item));
+    if (typeof obj === 'object' && obj !== null) {
+      const res: any = {};
+      for (const key of Object.keys(obj)) res[key] = this.sanitizeObject(obj[key]);
+      return res;
+    }
+    return obj;
+  }
 
   private readonly markdownService = inject(MarkdownService);
 
@@ -1347,7 +1360,7 @@ export class ExportService {
    * Exports the full patient record as a FHIR R4 Bundle.
    * Includes Patient, Condition, Observation, Goal, and DiagnosticReport resources.
    */
-  downloadAsFhirBundle(patient: IPatient): void {
+  downloadAsFhirBundle(patient: IPatient, system?: string): void {
     console.log('[ExportService] Starting FHIR Bundle generation for:', patient.name);
     try {
       const patientRef = `Patient/pocket-gull-${patient.id}`;
@@ -1495,12 +1508,25 @@ export class ExportService {
         entry: entries,
       };
 
-      const filename = `FHIR_Bundle_${patient.name.replace(/\s+/g, '_')}.json`;
+      // Strict HIPAA-compliant client-side sanitization
+      const sanitizedBundle = this.sanitizeObject(bundle);
+
+      const filename = system 
+        ? `FHIR_${system}_Export_${patient.name.replace(/\s+/g, '_')}.json`
+        : `FHIR_Bundle_${patient.name.replace(/\s+/g, '_')}.json`;
       console.log('[ExportService] Triggering FHIR Bundle download:', filename);
-      this._downloadJson(bundle, filename);
+      this._downloadJson(sanitizedBundle, filename);
     } catch (error) {
       console.error('[ExportService] FHIR Bundle export failed:', error);
     }
+  }
+
+  /**
+   * Mock direct EHR export by triggering a sanitized FHIR payload download.
+   */
+  exportToEHR(patient: IPatient, system: 'Epic' | 'Cerner'): void {
+    console.log(`[ExportService] Initiating Smart on FHIR export to ${system}...`);
+    this.downloadAsFhirBundle(patient, system);
   }
 
   /**

@@ -121,6 +121,10 @@ export class WebLLMProvider implements IIntelligenceProvider {
       return res.choices[0]?.message?.content || "Offline mode inference error.";
   }
   
+  async synthesizeKnowledge(inputText: string): Promise<any> {
+    throw new Error("WebGPU synthesis deferred downward.");
+  }
+
   async getInitialGreeting(prompt: string): Promise<string> { 
       return "Hello, I am processing securely within your local hardware using WebGPU. How can I assist you with this protocol?"; 
   }

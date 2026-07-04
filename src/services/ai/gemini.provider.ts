@@ -74,10 +74,11 @@ export class GeminiProvider implements IIntelligenceProvider {
                         throw new Error(typeof parsed.error === 'string' ? parsed.error : JSON.stringify(parsed.error));
                     }
                     
-                    // Standard Gemini REST API shape
                     const geminiText = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (geminiText) {
                         yield geminiText;
+                    } else if (parsed.toolCall) {
+                        yield `__TOOL_CALL__:${JSON.stringify(parsed.toolCall)}`;
                     } else if (parsed.text) {
                         // Custom/Legacy wrapper shape
                         yield parsed.text;
@@ -124,7 +125,7 @@ export class GeminiProvider implements IIntelligenceProvider {
         return await this.verifier.verifyReportSection(lens as any, content, sourceData);
     }
 
-    async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
+    async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
         const response = await fetch('/api/ai/translate', {
             method: 'POST',
             headers: this.getHeaders(),
@@ -157,6 +158,16 @@ export class GeminiProvider implements IIntelligenceProvider {
         return data.analysis;
     }
 
+    async synthesizeKnowledge(inputText: string): Promise<any> {
+        const response = await fetch('/api/ai/synthesize', {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ text: inputText })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        const data = await response.json();
+        return data;
+    }
 
     async startChat(patientData: string, context: string): Promise<void> {
         const systemInstruction = `${context}\n\nPatient Data:\n${patientData}`;

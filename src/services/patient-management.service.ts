@@ -6,9 +6,11 @@ import {
   WritableSignal,
   computed,
   untracked,
+  OnDestroy,
 } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, Subject, Subscription } from "rxjs";
+import { debounceTime } from "rxjs/operators";
 import { PatientStateService } from "./patient-state.service";
 import { StorageService } from "./storage.service";
 import {
@@ -322,12 +324,14 @@ const MOCK_PATIENTS: IPatient[] = [
 @Injectable({
   providedIn: "root",
 })
-export class PatientManagementService {
+export class PatientManagementService implements OnDestroy {
   private patientState = inject(PatientStateService);
   private geminiService = inject(ClinicalIntelligenceService);
   private network = inject(NetworkStateService);
   private http = inject(HttpClient);
   public storage = inject(StorageService);
+  private autoSave$ = new Subject<void>();
+  private autoSaveSub?: Subscription;
 
   readonly patients = signal<IPatient[]>(MOCK_PATIENTS);
   readonly selectedPatientId: WritableSignal<string | null> = signal(
@@ -372,6 +376,32 @@ export class PatientManagementService {
         untracked(() => {
             currentData.forEach(p => this.storage.savePatient(p));
         });
+    });
+
+    // Auto-save & cloud sync on state or summary changes
+    effect(() => {
+      // Monitor current state and summary changes
+      this.patientState.getCurrentState();
+      this.patientState.activePatientSummary();
+      const patientId = this.selectedPatientId();
+      untracked(() => {
+        if (patientId) {
+          this.autoSave$.next();
+        }
+      });
+    });
+
+    // Handle debouncing and sync outside of Angular change detection cycle
+    this.autoSaveSub = this.autoSave$.pipe(
+      debounceTime(3000)
+    ).subscribe({
+      next: async () => {
+        const patientId = untracked(() => this.selectedPatientId());
+        if (patientId) {
+          this.saveCurrentPatientState();
+          await this.syncToCloud();
+        }
+      }
     });
 
     // This effect runs whenever the selected patient changes.
@@ -865,14 +895,59 @@ export class PatientManagementService {
     }
   }
 
+  private saveCarePlanDraft() {
+    const patientId = this.selectedPatientId();
+    if (!patientId) return;
+
+    const draftText = this.patientState.activePatientSummary();
+    if (!draftText) return;
+
+    const currentPatients = this.patients();
+    const patient = currentPatients.find(p => p.id === patientId);
+    if (!patient) return;
+
+    const lastEntry = patient.history[0];
+    if (lastEntry && lastEntry.type === 'PatientSummaryUpdate' && lastEntry.summary === draftText) {
+      return;
+    }
+
+    const newEntry = {
+      type: 'PatientSummaryUpdate' as const,
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+      summary: draftText
+    };
+
+    if (lastEntry && lastEntry.type === 'PatientSummaryUpdate') {
+      const updatedHistory = [newEntry, ...patient.history.slice(1)];
+      this.patients.update(list =>
+        list.map(p => p.id === patientId ? { ...p, history: updatedHistory } : p)
+      );
+    } else {
+      this.addHistoryEntry(patientId, newEntry);
+    }
+  }
+
+  triggerImmediateSaveAndSync() {
+    this.saveCurrentPatientState();
+    this.syncToCloud().catch(err => console.error("Immediate sync failed", err));
+  }
+
   /** Persists the current form state to the patient object in the list. */
   private saveCurrentPatientState() {
     const currentId = this.selectedPatientId();
     if (!currentId) return;
 
+    this.saveCarePlanDraft();
+
     const currentState = this.patientState.getCurrentState();
     this.patients.update((patients) =>
       patients.map((p) => (p.id === currentId ? { ...p, ...currentState } : p)),
     );
+  }
+
+  ngOnDestroy() {
+    if (this.autoSaveSub) {
+      this.autoSaveSub.unsubscribe();
+    }
   }
 }

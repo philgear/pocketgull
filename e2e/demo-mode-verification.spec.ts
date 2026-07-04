@@ -1,62 +1,11 @@
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
+import { setupE2ePage } from './utils/setup';
 
 test.describe('Demo Mode Medicine Paradigms Verification', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(90000);
-    // Intercept config endpoint to return empty API key so splash screen shows Demo Mode
-    await page.route('**/api/config', async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ apiKey: '' })
-      });
-    });
-
-    // Intercept hardware telemetry to prevent 500 error warnings
-    await page.route('**/api/hardware/telemetry', async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          gpus: [],
-          cpuName: 'Mock CPU',
-          cpuLoadPercent: 12,
-          systemMemoryUsedGb: 4.5,
-          systemMemoryTotalGb: 16.0
-        })
-      });
-    });
-
-    // Prevent the walkthrough tour from launching automatically on load
-    await page.addInitScript(() => {
-      try {
-        window.indexedDB.deleteDatabase('PocketGullDB');
-      } catch (e) {}
-
-      window.localStorage.setItem('pg_tour_seen', '1');
-      window.localStorage.setItem('pg_mock_clinician', '1');
-      window.localStorage.setItem('pg_data_consent_v1', 'true');
-      
-      // Disable service worker during tests so Playwright can run smoothly
-      try {
-        const mockSW = {
-          register: () => Promise.reject(new Error('Service worker disabled for testing')),
-          addEventListener: () => {},
-          removeEventListener: () => {},
-          getRegistration: () => Promise.resolve(undefined),
-          getRegistrations: () => Promise.resolve([]),
-          controller: null,
-          ready: new Promise(() => {})
-        };
-        Object.defineProperty(navigator, 'serviceWorker', {
-          get() { return mockSW; },
-          configurable: true
-        });
-      } catch (e) {
-        console.error('Failed to disable service worker:', e);
-      }
-    });
+    await setupE2ePage(page);
   });
 
   test('should unlock, cycle through 4 paradigms, check lenses, and save screenshots', async ({ page }) => {
@@ -73,8 +22,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 10000 });
     await pinInput.fill('1234');
-    // Auto-submits on length 4, wait for transition
-    await page.waitForTimeout(300);
+    // Auto-submits on length 4, wait for transition to next screen
 
     // 2. Select Demo Mode
     const demoBtn = page.locator('button', { hasText: 'Demo Mode' });

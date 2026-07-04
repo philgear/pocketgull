@@ -8,6 +8,76 @@ export class PetAuditoryService {
   private nodes: any[] = [];
   private isPlaying = false;
   private activeMode: 'feline' | 'canine' | 'cetacean' | 'avian' | null = null;
+  private recognition: any = null;
+  private isListening = false;
+
+  constructor() {
+    this.initWakeWordListening();
+  }
+
+  public initWakeWordListening() {
+    if (typeof window === 'undefined') return;
+    if (this.recognition) return;
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn('Speech Recognition not supported in this browser.');
+      return;
+    }
+
+    try {
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = true;
+      this.recognition.interimResults = false;
+      this.recognition.lang = 'en-US';
+
+      this.recognition.onresult = (event: any) => {
+        const lastResultIndex = event.resultIndex;
+        const transcript = event.results[lastResultIndex][0].transcript.toLowerCase().trim();
+        console.log('[Pet Auditory Wake Word STT]', transcript);
+
+        if (transcript.includes('canine comfort') || transcript.includes('canine')) {
+          this.playCanineHeartbeat();
+        } else if (transcript.includes('feline comfort') || transcript.includes('feline') || transcript.includes('purr')) {
+          this.playFelinePurr();
+        } else if (transcript.includes('cetacean comfort') || transcript.includes('cetacean')) {
+          this.playCetaceanTherapy();
+        } else if (transcript.includes('avian comfort') || transcript.includes('avian') || transcript.includes('bird')) {
+          this.playAvianTherapy();
+        } else if (transcript.includes('stop comfort') || transcript.includes('stop audio') || transcript.includes('stop')) {
+          this.stop();
+        }
+      };
+
+      this.recognition.onerror = (err: any) => {
+        console.warn('Pet Auditory STT error', err);
+      };
+
+      this.recognition.onend = () => {
+        if (this.isListening) {
+          try {
+            this.recognition.start();
+          } catch (e) {
+            console.error('Failed to restart Pet Auditory STT', e);
+          }
+        }
+      };
+
+      this.isListening = true;
+      this.recognition.start();
+    } catch (e) {
+      console.error('Failed to initialize Pet Auditory STT', e);
+    }
+  }
+
+  public stopWakeWordListening() {
+    this.isListening = false;
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch (e) {}
+    }
+  }
 
   private initContext() {
     if (!this.audioCtx) {

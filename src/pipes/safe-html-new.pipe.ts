@@ -21,11 +21,14 @@ export class SafeHtmlPipe implements PipeTransform {
         if (!value) return value;
         
         let cleanHtml = value;
-        const purify = (DOMPurify as any).default || DOMPurify;
+        // Safely resolve DOMPurify without falling back to Object.prototype.default during prototype pollution attacks
+        const hasOwnDefault = Object.prototype.hasOwnProperty.call(DOMPurify, 'default');
+        const purify = hasOwnDefault ? (DOMPurify as any).default : DOMPurify;
         
         if (this.isBrowser && typeof purify.sanitize === 'function') {
             cleanHtml = purify.sanitize(value, {
-                ADD_TAGS: ['svg', 'path', 'g', 'circle', 'line', 'polygon', 'rect'],
+                USE_PROFILES: { html: true, svg: true },
+                SANITIZE_NAMED_PROPS: true,
                 ADD_ATTR: ['viewBox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd']
             });
         }

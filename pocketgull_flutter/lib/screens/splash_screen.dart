@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/origami_seagull.dart';
-import 'triage_board_screen.dart';
+import 'dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -81,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     // In a production app, we would validate the PIN and securely store the API Key / PubGemma config here.
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, _, _) => const TriageBoardScreen(),
+        pageBuilder: (_, _, _) => const DashboardScreen(),
         transitionsBuilder: (_, a, _, c) => FadeTransition(opacity: a, child: c),
         transitionDuration: const Duration(milliseconds: 800),
       ),

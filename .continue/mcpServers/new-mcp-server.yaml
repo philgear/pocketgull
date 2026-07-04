@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://json-schema.org/draft-07/schema#
+name: PocketGull MCP Configuration
+version: 0.0.1
+schema: v1
+mcpServers:
+  - name: context7
+    command: npx
+    args:
+      - -y
+      - "@upstash/mcp-context7"
+    env:
+      UPSTASH_REDIS_REST_URL: "<your-upstash-redis-rest-url>"
+      UPSTASH_REDIS_REST_TOKEN: "<your-upstash-redis-rest-token>"
+
+  - name: deepwiki
+    command: npx
+    args:
+      - -y
+      - "deepwiki-mcp"
+    env:
+      GITHUB_TOKEN: "<your-github-personal-access-token>"

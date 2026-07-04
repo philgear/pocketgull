@@ -24,14 +24,14 @@ export class HybridProvider implements IIntelligenceProvider {
 
   /**
    * Builds the dynamically optimized chain of intelligence providers based on
-   * user preferences, network status, and detected local hardware telemetry.
+   * user preferences, network status, task complexity, and detected local hardware telemetry.
    */
-  private getProviderChain(): IIntelligenceProvider[] {
+  private getProviderChain(taskComplexity: 'simple' | 'complex' = 'complex'): IIntelligenceProvider[] {
     if (this.patientState.isEmergencyMode() && !this.network.isOnline()) {
       return [this.nano];
     }
     const path = this.telemetry.recommendedExecutionPath();
-    const useLocal = this.network.useLocalInference();
+    const useLocal = this.network.useLocalInference() || taskComplexity === 'simple';
     const chain: IIntelligenceProvider[] = [];
 
     if (useLocal) {
@@ -84,7 +84,13 @@ export class HybridProvider implements IIntelligenceProvider {
         const name = provider.constructor.name.replace('Provider', '');
         console.warn(`Provider [${name}] failed:`, err);
         errors.push(`${name}: ${err.message || err}`);
-        yield `\n\n_⚡ AI node ${name} unavailable. Routing to fallback..._\n\n`;
+        
+        // Fast-fail if network dropped while using a cloud provider
+        if (name === 'Gemini' && !this.network.isOnline()) {
+           yield `\n\n_⚡ Network connection lost. Rerouting to local offline engine..._\n\n`;
+        } else {
+           yield `\n\n_⚡ AI node ${name} unavailable. Routing to fallback..._\n\n`;
+        }
       }
     }
 
@@ -118,7 +124,7 @@ export class HybridProvider implements IIntelligenceProvider {
   }
 
   async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> {
-    const chain = this.getProviderChain();
+    const chain = this.getProviderChain('simple');
     for (const provider of chain) {
       try {
         return await provider.verifySection(lens, content, sourceData);
@@ -129,8 +135,8 @@ export class HybridProvider implements IIntelligenceProvider {
     return { status: 'Verification bypassed due to engine limits', issues: [] };
   }
 
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
-    const chain = this.getProviderChain();
+  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
+    const chain = this.getProviderChain('simple');
     for (const provider of chain) {
       try {
         return await provider.translateReadingLevel(text, level);
@@ -142,7 +148,7 @@ export class HybridProvider implements IIntelligenceProvider {
   }
 
   async analyzeTranslation(original: string, translated: string): Promise<string> {
-    const chain = this.getProviderChain();
+    const chain = this.getProviderChain('simple');
     for (const provider of chain) {
       try {
         return await provider.analyzeTranslation(original, translated);
@@ -190,6 +196,18 @@ export class HybridProvider implements IIntelligenceProvider {
       }
     }
     throw new Error('All local/cloud chat engines failed to respond.');
+  }
+
+  async synthesizeKnowledge(inputText: string): Promise<any> {
+    const chain = this.getProviderChain();
+    for (const provider of chain) {
+      try {
+        return await provider.synthesizeKnowledge(inputText);
+      } catch (e) {
+        console.warn(`synthesizeKnowledge failed on ${provider.constructor.name}, trying next...`);
+      }
+    }
+    throw new Error('All engines failed to synthesize knowledge.');
   }
 
   async getInitialGreeting(prompt: string): Promise<string> {

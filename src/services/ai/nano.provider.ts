@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IIntelligenceProvider } from './intelligence.provider';
 import { IClinicalMetrics } from '../clinical-intelligence.service';
 import { IVerificationIssue } from '../../components/analysis-report.types';
+import { AiCacheService } from '../ai-cache.service';
 
 // Declare experimental Chrome AI API types
 declare global {
@@ -36,6 +37,7 @@ declare global {
 })
 export class NanoProvider implements IIntelligenceProvider {
   private chatSession: any = null;
+  private cache = inject(AiCacheService);
 
   private async ensureAiAvailable() {
     if (typeof window === 'undefined') {
@@ -94,11 +96,26 @@ export class NanoProvider implements IIntelligenceProvider {
     const prompt = `Patient Data:\n${patientData}\n\nTask: Generate a highly clinical report specifically for the following scope: [${lens}]. Formulate it purely as markdown.`;
     
     let previousChunk = '';
-    const stream = await session.promptStreaming(prompt);
-    for await (const chunk of stream) {
-      const newText = chunk.startsWith(previousChunk) ? chunk.substring(previousChunk.length) : chunk;
-      previousChunk = chunk;
-      yield newText;
+    try {
+      const stream = await session.promptStreaming(prompt);
+      for await (const chunk of stream) {
+        const newText = chunk.startsWith(previousChunk) ? chunk.substring(previousChunk.length) : chunk;
+        previousChunk = chunk;
+        yield newText;
+      }
+    } catch (error: any) {
+      console.warn('[NanoProvider] Generation failed, attempting to fallback to local cache:', error);
+      
+      const cacheKey = await this.cache.generateKey([patientData, lens, systemInstruction]);
+      const cached = await this.cache.get<{text: string}>(cacheKey);
+      
+      if (cached && cached.text) {
+        yield `_⚡ Notice: Falling back to securely cached guidelines._\n\n`;
+        yield cached.text;
+        return;
+      }
+      
+      throw new Error(`Nano model failed and no cache available: ${error.message}`);
     }
   }
 
@@ -114,14 +131,15 @@ export class NanoProvider implements IIntelligenceProvider {
     return { status: 'Verified efficiently by Gemini Nano (On-Device)', issues: [] };
   }
 
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
+  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
     try {
       // 1. Try native Translation API
       const langCodes: Record<string, string> = {
         spanish: 'es',
         french: 'fr',
         german: 'de',
-        mandarin: 'zh'
+        mandarin: 'zh',
+        hindi: 'hi'
       };
       const targetLang = langCodes[level];
       if (targetLang && typeof translation !== 'undefined') {
@@ -201,6 +219,19 @@ export class NanoProvider implements IIntelligenceProvider {
     } catch (error) {
       console.error("Gemini Nano Error:", error);
       return "On-device inference engine could not process the request.";
+    }
+  }
+
+  async synthesizeKnowledge(inputText: string): Promise<any> {
+    try {
+      await this.ensureAiAvailable();
+      const session = await ai!.languageModel!.create({
+        systemPrompt: "Synthesize the provided text into key clinical insights and structure them clearly."
+      });
+      const text = await session.prompt(inputText);
+      return { synthesis: text };
+    } catch (e) {
+      throw new Error(`NanoProvider synthesizeKnowledge failed: ${e}`);
     }
   }
 

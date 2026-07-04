@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../models/patient_types.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/patient_provider.dart';
 import 'body_viewer_widget.dart';
 import 'medical_summary_widget.dart';
 import 'patient_history_timeline_widget.dart';
 import 'patient_scans_widget.dart';
 
-class MedicalChartWidget extends StatefulWidget {
+class MedicalChartWidget extends ConsumerStatefulWidget {
   const MedicalChartWidget({super.key});
 
   @override
-  State<MedicalChartWidget> createState() => _MedicalChartWidgetState();
+  ConsumerState<MedicalChartWidget> createState() => _MedicalChartWidgetState();
 }
 
-class _MedicalChartWidgetState extends State<MedicalChartWidget> {
+class _MedicalChartWidgetState extends ConsumerState<MedicalChartWidget> {
   // Store which sections are expanded. 
   // By default, let's expand the 3D Anatomical Map.
   final Map<String, bool> _expandedSections = {
@@ -32,11 +31,10 @@ class _MedicalChartWidgetState extends State<MedicalChartWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
-        final scans = state.scans;
+    final state = ref.watch(patientProvider);
+    final scans = state.scans;
 
-        return Column(
+    return Column(
           children: [
             _buildAccordionSection(
               key: 'map',
@@ -70,8 +68,6 @@ class _MedicalChartWidgetState extends State<MedicalChartWidget> {
             ),
           ],
         );
-      },
-    );
   }
 
   Widget _buildAccordionSection({

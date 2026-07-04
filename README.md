@@ -8,7 +8,7 @@
 ---
 
 ### PREPARED FOR
-**Google Gemini Live Agent Challenge** / Hackathon 2026
+**Google Gemini Live Agent Challenge** / 2026
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)
 ![Angular](https://img.shields.io/badge/Angular-v21.2-DD0031?logo=angular)
@@ -36,10 +36,6 @@
 *"To provide practitioners with the 'Gull's Eye View'—the ability to rise above the turbulent sea of medical data and see the clear, actionable patterns beneath."*
 
 ---
-
-## 🎨 BRAND IDENTITY & SOCIAL MEDIA CARD
-
-Pocket Gull's brand identity, structured logo, and custom marketing QR code (pointing to [pocketgull.app](https://pocketgull.app)) are showcased in our final paper-folded origami diorama social card. 
 
 ![Pocket Gull Social Preview](./social-preview.png)
 
@@ -79,6 +75,8 @@ A highly interactive, aesthetically minimal user interface (Industrial Grace) de
 *For a full demonstration, press the `Demo` button in the top-right of the application to load the patient simulation.*
 
 ### Product Highlights
+
+![Pocket Gull App Screenshot](./screenshot.png)
 
 ![Dashboard Snapshot](./docs/images/dashboard.png)
 

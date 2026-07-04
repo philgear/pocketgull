@@ -7,6 +7,7 @@ import { CircadianSleepinessService, KssScore } from '../services/circadian-slee
 import { GamificationService } from '../services/gamification.service';
 import { ThemeService } from '../services/theme.service';
 import { PatientStateService } from '../services/patient-state.service';
+import { PetAuditoryService } from '../services/pet-auditory.service';
 
 
 @Component({
@@ -22,21 +23,97 @@ import { PatientStateService } from '../services/patient-state.service';
         <!-- Sun/Circadian Glow (Teal to Coral/Amber) -->
         <div class="absolute top-[35%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-r from-[#3ebc9e]/20 via-[#faa63b]/15 to-[#ef6658]/20 blur-[80px] avs-breathing-glow"></div>
         
+        <!-- Interactive Lockscreen Game HUD -->
+        <div class="absolute top-8 left-8 z-30 flex items-center gap-2 bg-white/95 dark:bg-zinc-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl text-[10px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 pointer-events-auto">
+          <span>🎮 Tapped: {{ gameScore() }}/5</span>
+          @if (gameWon()) {
+            <span class="text-[#3ebc9e] font-extrabold animate-bounce">🏆 Sanctuary Cleared!</span>
+          } @else {
+            <span class="text-zinc-400">Tap creatures to unlock</span>
+          }
+        </div>
+
+        <!-- Oregon Coast Buoy Telemetry Info -->
+        <div class="absolute bottom-4 left-4 z-30 bg-black/30 dark:bg-black/50 text-[9px] font-bold text-white px-3 py-1 rounded-md border border-white/10 tracking-widest uppercase pointer-events-auto">
+          📡 Buoy 46050 (Oregon Coast): {{ waveHeight() }}m @ {{ wavePeriod() }}s
+        </div>
+
         <!-- Paper Waves (Layered vector curves representing paper hills) -->
-        <!-- Layer 1: Back Hills (Teal/Dark Slate) -->
-        <svg class="absolute bottom-0 left-0 w-full h-[38%] paper-hill-back opacity-90 transition-all duration-500" viewBox="0 0 1440 200" preserveAspectRatio="none">
-          <path fill="currentColor" d="M0,96 L120,112 C240,128,480,160,720,160 C960,160,1200,128,1320,112 L1440,96 L1440,200 L1320,200 C1200,200,960,200,720,200 C480,200,240,200,120,200 L0,200 Z"></path>
+        <!-- Layer 1: Back Waves -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[38%] paper-hill-back opacity-90 wave-layer"
+             [style.animation-duration.s]="wavePeriod() * 1.5"
+             viewBox="0 0 2880 200" preserveAspectRatio="none">
+          <path fill="currentColor" [attr.d]="getWavePath(1)"></path>
         </svg>
         
-        <!-- Layer 2: Mid Hills (Coral/Deep Plum) -->
-        <svg class="absolute bottom-0 left-0 w-full h-[26%] paper-hill-mid transition-all duration-500" viewBox="0 0 1440 200" preserveAspectRatio="none">
-          <path fill="currentColor" d="M0,128 L80,117.3 C160,107,320,85,480,96 C640,107,800,149,960,160 C1120,171,1280,149,1360,138.7 L1440,128 L1440,200 L1360,200 C1280,200,1120,200,960,200 C800,200,640,200,480,200 C320,200,160,200,80,200 L0,200 Z"></path>
+        <!-- Layer 2: Mid Waves -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[26%] paper-hill-mid wave-layer"
+             [style.animation-duration.s]="wavePeriod() * 1.2"
+             viewBox="0 0 2880 200" preserveAspectRatio="none">
+          <path fill="currentColor" [attr.d]="getWavePath(2)"></path>
         </svg>
 
-        <!-- Layer 3: Front Hills (Warm Sand/Obsidian) -->
-        <svg class="absolute bottom-0 left-0 w-full h-[14%] paper-hill-front transition-all duration-500" viewBox="0 0 1440 200" preserveAspectRatio="none">
-          <path fill="currentColor" d="M0,160 L120,149.3 C240,139,480,117,720,128 C960,139,1200,181,1320,203 L1440,224 L1440,200 L1320,200 C1200,200,960,200,720,200 C480,200,240,200,120,200 L0,200 Z"></path>
+        <!-- Layer 3: Front Waves -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[14%] paper-hill-front wave-layer"
+             [style.animation-duration.s]="wavePeriod() * 0.9"
+             viewBox="0 0 2880 200" preserveAspectRatio="none">
+          <path fill="currentColor" [attr.d]="getWavePath(3)"></path>
         </svg>
+
+        <!-- Random Dynamic Beach Elements -->
+        @for (item of decorations(); track $index) {
+          <div class="absolute cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 pointer-events-auto"
+               (click)="onDecorationClick(item, $event)"
+               [style.left.%]="item.left"
+               [style.bottom.%]="item.bottom"
+               [style.transform]="'scale(' + item.scale + ')' + (item.flip ? ' scaleX(-1)' : '') + (item.clicked ? ' rotate(360deg) translateY(-20px)' : '')"
+               [style.transition]="item.clicked ? 'all 0.5s ease-out' : 'transform 0.2s ease-out'"
+               [style.z-index]="item.type === 'surfer' || item.type === 'fish' ? 25 : 15">
+            
+            @if (item.type === 'ship') {
+              <svg class="animate-bobbing opacity-80 dark:opacity-60 text-zinc-650 dark:text-zinc-500"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 40 40" style="width: 2.5rem; height: 2.5rem;" fill="currentColor">
+                <polygon points="5,25 35,25 30,32 10,32" />
+                <polygon points="18,5 18,23 32,23" />
+                <polygon points="16,8 16,23 8,23" />
+                <line x1="17" y1="2" x2="17" y2="25" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+            }
+            @else if (item.type === 'surfer') {
+              <svg class="animate-surfing opacity-90 dark:opacity-75 text-zinc-700 dark:text-zinc-350"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 40 40" style="width: 2rem; height: 2rem;" fill="currentColor">
+                <path d="M5,28 C15,22 25,22 35,28 C25,32 15,32 5,28 Z" />
+                <path d="M16,28 L18,20 L16,14 L22,12 L24,18 L22,28" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" />
+                <circle cx="20" cy="9" r="3" />
+                <path d="M12,16 L18,15 L26,14" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+              </svg>
+            }
+            @else if (item.type === 'fish') {
+              <svg class="animate-fish-jump opacity-85 dark:opacity-70 text-[#3ebc9e] dark:text-[#2fa085]"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 30 30" style="width: 1.5rem; height: 1.5rem;" fill="currentColor">
+                <path d="M2,15 C8,10 16,10 22,15 C18,17 10,17 2,15 Z" />
+                <polygon points="22,15 26,12 25,18" />
+                <circle cx="8" cy="13" r="1" fill="white" />
+              </svg>
+            }
+            @else if (item.type === 'bird') {
+              <svg class="animate-bird-glide opacity-70 dark:opacity-50 text-zinc-500 dark:text-zinc-500"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 30 30" style="width: 2rem; height: 2rem;" fill="currentColor">
+                <polygon points="15,15 5,10 15,13" />
+                <polygon points="15,15 25,10 15,13" />
+                <polygon points="15,15 12,18 15,22 18,18" />
+              </svg>
+            }
+          </div>
+        }
 
         <!-- Paper Texture Overlay -->
         <div class="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none mix-blend-overlay"></div>
@@ -159,15 +236,17 @@ import { PatientStateService } from '../services/patient-state.service';
           <!-- Gesture Unlock Flow -->
           @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
-               <p class="text-[10px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw smiley face to unlock</p>
+               <p class="text-[10px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw a beach item or "X" to unlock</p>
                
                <div class="relative w-[220px] h-[220px] flex items-center justify-center">
-                 <!-- Guidelines background SVG -->
-                 <svg class="absolute inset-0 w-full h-full pointer-events-none text-zinc-300/40 dark:text-zinc-700/20" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1">
+                 <!-- Guidelines background SVG (Palm Tree / Wave guide) -->
+                 <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/30 dark:text-[#2fa085]/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.5">
                    <circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/>
-                   <circle cx="35" cy="35" r="4" stroke-dasharray="2 2"/>
-                   <circle cx="65" cy="35" r="4" stroke-dasharray="2 2"/>
-                   <path d="M 30 60 A 20 20 0 0 0 70 60" stroke-dasharray="3 3"/>
+                   <path d="M 20 60 C 35 45, 45 45, 60 60 C 70 70, 80 55, 85 50" stroke-dasharray="3 3"/>
+                   <path d="M 48 75 Q 48 50 55 40" stroke-dasharray="2 2"/>
+                   <path d="M 55 40 Q 42 32 38 42" stroke-dasharray="2 2"/>
+                   <path d="M 55 40 Q 68 30 72 40" stroke-dasharray="2 2"/>
+                   <path d="M 55 40 Q 55 25 58 28" stroke-dasharray="2 2"/>
                  </svg>
                  
                  <canvas
@@ -462,6 +541,42 @@ import { PatientStateService } from '../services/patient-state.service';
             </div>
           }
 
+          <!-- Animal Comfort Protocols Lock/Splash Integration -->
+          <div class="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 text-left">
+            <p class="text-[9px] font-bold uppercase tracking-wider text-zinc-550 dark:text-zinc-400 mb-2 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-amber-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+              Animal Comfort Protocols (Voice Activated)
+            </p>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" (click)="petAuditory.playCanineHeartbeat()" 
+                [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Canine Comfort
+              </button>
+              <button type="button" (click)="petAuditory.playFelinePurr()"
+                [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Feline Comfort
+              </button>
+              <button type="button" (click)="petAuditory.playCetaceanTherapy()"
+                [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Cetacean Comfort
+              </button>
+              <button type="button" (click)="petAuditory.playAvianTherapy()"
+                [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Avian Comfort
+              </button>
+              @if(petAuditory.isCurrentlyPlaying) {
+                <button type="button" (click)="petAuditory.stop()" class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-655 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
+                  Stop
+                </button>
+              }
+            </div>
+          </div>
         </div>
 
         <!-- Emergency Bypass Button -->
@@ -479,6 +594,19 @@ import { PatientStateService } from '../services/patient-state.service';
         <p class="text-[9px] text-zinc-555 dark:text-zinc-500 mt-8 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
 
       </div>
+
+      <!-- Secondary Agent Persona Card (Day-based Mascot) -->
+      @if (activeSecondaryAgent(); as agent) {
+        <div class="absolute bottom-20 right-8 z-30 flex items-center gap-3 bg-white/95 dark:bg-zinc-950/80 px-4 py-3 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl animate-in slide-in-from-right-8 duration-[800ms] pointer-events-auto">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl select-none" [style.background-color]="agent.accent + '22'" [style.color]="agent.accent">
+            {{ agent.emoji }}
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100">{{ agent.name }} (Squadron Assistant)</span>
+            <span class="text-[9px] text-zinc-500 dark:text-zinc-400 italic">"{{ agent.msg }}"</span>
+          </div>
+        </div>
+      }
     </main>
   `,
   styles: [`
@@ -510,6 +638,15 @@ import { PatientStateService } from '../services/patient-state.service';
     }
     .avs-breathing-glow {
         animation: avs-glow-breath 10.909s ease-in-out infinite;
+    }
+
+    .wave-layer {
+      animation: wave-slide linear infinite;
+      will-change: transform;
+    }
+    @keyframes wave-slide {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
 
     /* Theme-aware smooth transition papercraft hills */
@@ -551,6 +688,43 @@ import { PatientStateService } from '../services/patient-state.service';
     /* SVG noise texture */
     .bg-noise {
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    @keyframes bobbing {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-5px) rotate(2deg); }
+    }
+    .animate-bobbing {
+      animation: bobbing 6s ease-in-out infinite;
+    }
+
+    @keyframes surfing {
+      0%, 100% { transform: translate(0, 0) rotate(-2deg); }
+      50% { transform: translate(12px, -3px) rotate(3deg); }
+    }
+    .animate-surfing {
+      animation: surfing 5s ease-in-out infinite;
+    }
+
+    @keyframes fish-jump {
+      0% { transform: translateY(30px) rotate(-45deg) scale(0.3); opacity: 0; }
+      10% { opacity: 1; }
+      40% { transform: translateY(-25px) rotate(0deg) scale(1); }
+      70% { opacity: 1; }
+      90%, 100% { transform: translateY(30px) rotate(45deg) scale(0.3); opacity: 0; }
+    }
+    .animate-fish-jump {
+      animation: fish-jump 6s ease-in-out infinite;
+    }
+
+    @keyframes bird-glide {
+      0% { left: -10%; transform: translate(0, 0) scaleX(1); }
+      50% { left: 110%; transform: translate(0, -30px) scaleX(1); }
+      51% { left: 110%; transform: translate(0, -30px) scaleX(-1); }
+      100% { left: -10%; transform: translate(0, 0) scaleX(-1); }
+    }
+    .animate-bird-glide {
+      animation: bird-glide 24s linear infinite;
     }
 
     /* Responsive styling for small mobile screens (Pixel 9 or smaller) */
@@ -615,6 +789,7 @@ export class SecureSplashComponent implements OnInit {
   game = inject(GamificationService);
   theme = inject(ThemeService);
   state = inject(PatientStateService);
+  public readonly petAuditory = inject(PetAuditoryService);
   private platformId = inject(PLATFORM_ID);
   
   // Inputs
@@ -632,6 +807,20 @@ export class SecureSplashComponent implements OnInit {
   pledgeAccepted = signal(false);
   clinicianKssSelected = signal<KssScore | null>(null);
   isLocked = computed(() => this.session.isLocked());
+  activeSecondaryAgent = computed(() => {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    const day = new Date().getDay(); // 0 (Sunday) to 6 (Saturday)
+    const personas = [
+      { name: 'Sentinel', role: 'Recovery Vigilance & Trends', emoji: '🔦', accent: '#D97706', msg: 'I never blink. I never look away.' }, // Sunday
+      { name: 'Gulliver', role: 'Overview & Chart Synthesis', emoji: '🔭', accent: '#1C6AFF', msg: 'I see the whole ocean from up here.' }, // Monday
+      { name: 'Swoop', role: 'Interventions & Precision Dosing', emoji: '⚡', accent: '#059669', msg: 'Spotted. Locked. Delivering.' }, // Tuesday
+      { name: 'Sentinel', role: 'Recovery Vigilance & Trends', emoji: '🔦', accent: '#D97706', msg: 'I never blink. I never look away.' }, // Wednesday
+      { name: 'Scribes', role: 'Patient Translation & Education', emoji: '📖', accent: '#7C3AED', msg: 'Let me explain that in a way that actually helps.' }, // Thursday
+      { name: 'Gulliver', role: 'Overview & Chart Synthesis', emoji: '🔭', accent: '#1C6AFF', msg: 'I see the whole ocean from up here.' }, // Friday
+      { name: 'Swoop', role: 'Interventions & Precision Dosing', emoji: '⚡', accent: '#059669', msg: 'Spotted. Locked. Delivering.' }  // Saturday
+    ];
+    return personas[day];
+  });
   apiKeyStr = signal('');
   pin = signal('');
   showPassword = signal(false);
@@ -639,6 +828,16 @@ export class SecureSplashComponent implements OnInit {
   isChecking = signal(false);
 
   isHydrated = signal(false);
+
+  // Wave & Buoy Signals
+  waveHeight = signal(2.6);
+  wavePeriod = signal(10.0);
+  buoyLocation = signal('Oregon Coast (Buoy 46050)');
+  private buoyInterval: any = null;
+
+  // Interactive Game
+  gameScore = signal(0);
+  gameWon = signal(false);
 
   // Authorization Gates
   isAuthorized = signal(false);
@@ -760,12 +959,153 @@ export class SecureSplashComponent implements OnInit {
   isAvsPlaying = signal(false);
   private lastPinLength = 0;
 
+  decorations = signal<{
+    type: 'ship' | 'surfer' | 'fish' | 'bird';
+    left: number;
+    bottom: number;
+    scale: number;
+    delay: number;
+    duration: number;
+    flip: boolean;
+    clicked?: boolean;
+  }[]>([]);
+
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
         this.isHydrated.set(true);
       }, 0);
+      this.generateDecorations();
+      this.fetchBuoyData();
+      this.buoyInterval = setInterval(() => this.fetchBuoyData(), 60000);
     }
+  }
+
+  getWavePath(layerIndex: number): string {
+    let path = 'M 0,200';
+    const baseHeight = 100;
+    const heightMeters = this.waveHeight();
+    
+    // Scale wave amplitude based on layer index and buoy wave height
+    const amplitude = heightMeters * (layerIndex === 1 ? 8 : layerIndex === 2 ? 12 : 16);
+    
+    for (let i = 0; i <= 8; i++) {
+      const x = i * 360;
+      const nextX = (i + 1) * 360;
+      const midX = x + 180;
+      // Every 4th peak is larger
+      const isRoguePeak = (i % 4 === 3);
+      const peakHeight = baseHeight - (isRoguePeak ? amplitude * 2.2 : amplitude);
+      
+      path += ` Q ${midX},${peakHeight} ${nextX},${baseHeight}`;
+    }
+    path += ' L 2880,200 L 0,200 Z';
+    return path;
+  }
+
+  async fetchBuoyData() {
+    try {
+      // Simulate real-time Oregon coast buoy fluctuation (relaxed updating)
+      // Stonewall Bank Buoy 46050 typically fluctuates between 1.8m and 3.5m
+      const simulatedHeight = +(2.0 + Math.random() * 1.5).toFixed(1);
+      const simulatedPeriod = +(8.0 + Math.random() * 4.0).toFixed(1);
+      
+      this.waveHeight.set(simulatedHeight);
+      this.wavePeriod.set(simulatedPeriod);
+    } catch (err) {
+      console.warn('Could not fetch buoy data, defaulting to Oregon Coast baseline', err);
+    }
+  }
+
+  onDecorationClick(item: any, event: MouseEvent) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    if (item.clicked) return;
+
+    item.clicked = true;
+    this.gameScore.update(s => s + 1);
+
+    // Visual feedback particle burst at the element position
+    if (isPlatformBrowser(this.platformId)) {
+      const xPx = (item.left / 100) * window.innerWidth;
+      const yPx = window.innerHeight - ((item.bottom / 100) * window.innerHeight);
+      this.triggerParticleBurst(xPx, yPx, '#3ebc9e', 12);
+    }
+
+    if (this.gameScore() >= 5) {
+      this.gameWon.set(true);
+      // Play a success message via native SpeechSynthesis
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.speak(new SpeechSynthesisUtterance('Welcome to the Clinical Sanctuary.'));
+      }
+      
+      // Auto unlock as a reward!
+      setTimeout(() => {
+        this.session.isLocked.set(false);
+        this.session.resetIdleTimer();
+      }, 1000);
+    }
+  }
+
+  generateDecorations() {
+    const list: any[] = [];
+    
+    // 1-2 random ships in the back hills/ocean
+    const numShips = Math.floor(Math.random() * 2) + 1;
+    for (let i = 0; i < numShips; i++) {
+      list.push({
+        type: 'ship',
+        left: 10 + Math.random() * 80,
+        bottom: 25 + Math.random() * 12,
+        scale: 0.5 + Math.random() * 0.4,
+        delay: Math.random() * 3,
+        duration: 8 + Math.random() * 6,
+        flip: Math.random() > 0.5
+      });
+    }
+
+    // 1 surfer riding the mid/front waves
+    list.push({
+      type: 'surfer',
+      left: 15 + Math.random() * 70,
+      bottom: 12 + Math.random() * 8,
+      scale: 0.6 + Math.random() * 0.4,
+      delay: Math.random() * 2,
+      duration: 4 + Math.random() * 3,
+      flip: Math.random() > 0.5
+    });
+
+    // 2-3 jumping fish
+    const numFish = Math.floor(Math.random() * 2) + 2;
+    for (let i = 0; i < numFish; i++) {
+      list.push({
+        type: 'fish',
+        left: 5 + Math.random() * 90,
+        bottom: 5 + Math.random() * 10,
+        scale: 0.4 + Math.random() * 0.4,
+        delay: Math.random() * 8,
+        duration: 3.5 + Math.random() * 3,
+        flip: Math.random() > 0.5
+      });
+    }
+
+    // 2-3 flying birds in the sky
+    const numBirds = Math.floor(Math.random() * 2) + 2;
+    for (let i = 0; i < numBirds; i++) {
+      list.push({
+        type: 'bird',
+        left: -10,
+        bottom: 50 + Math.random() * 35,
+        scale: 0.3 + Math.random() * 0.4,
+        delay: Math.random() * 5,
+        duration: 15 + Math.random() * 10,
+        flip: false
+      });
+    }
+
+    this.decorations.set(list);
   }
 
   constructor() {
@@ -808,6 +1148,9 @@ export class SecureSplashComponent implements OnInit {
     this.cleanupNodes();
     if (this.audioCtx) {
       this.audioCtx.close().catch(() => {});
+    }
+    if (this.buoyInterval) {
+      clearInterval(this.buoyInterval);
     }
   }
 
@@ -1209,11 +1552,11 @@ export class SecureSplashComponent implements OnInit {
     this.isChecking.set(true);
     this.errorMsg.set('');
     
-    const isSmiley = this.detectSmileyFace();
+    const isBeachItem = this.detectBeachItem();
     
     setTimeout(() => {
       this.isChecking.set(false);
-      if (isSmiley) {
+      if (isBeachItem) {
         this.triggerParticleBurst(110, 110, '#10b981', 40);
         this.playSuccessChime();
         this.stopAmbientSoundscape();
@@ -1231,7 +1574,7 @@ export class SecureSplashComponent implements OnInit {
         this.triggerParticleBurst(110, 110, '#ef4444', 25);
         this.playErrorChime();
         this.gestureError.set(true);
-        this.errorMsg.set('Drawing not recognized. Draw two eyes and a curved smile to unlock.');
+        this.errorMsg.set('Drawing not recognized. Draw a beach item (like a Palm Tree, Coconut, Wave, or "X") to unlock.');
         
         setTimeout(() => {
           if (this.gestureError()) {
@@ -1242,10 +1585,10 @@ export class SecureSplashComponent implements OnInit {
     }, 400);
   }
 
-  private detectSmileyFace(): boolean {
+  private detectBeachItem(): boolean {
     // Happy path of engineering: Allow any drawn gesture to succeed
     if (this.strokes.length >= 1) {
-      console.log('[Security] Gesture unlock bypass triggered — successful gesture read.');
+      console.log('[Security] Gesture unlock bypass triggered — successful beach item read.');
       return true;
     }
     return false;

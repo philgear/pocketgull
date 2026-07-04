@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ditredi/ditredi.dart';
 import 'package:vector_math/vector_math_64.dart' as v;
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/patient/patient_event.dart';
+import '../providers/patient_provider.dart';
 import '../models/body_part_geometry.dart';
 import '../models/patient_types.dart';
 
-class NativeBodyViewer extends StatefulWidget {
+class NativeBodyViewer extends ConsumerStatefulWidget {
   final PatientState? staticPatient;
   final bool interactive;
 
@@ -18,10 +17,10 @@ class NativeBodyViewer extends StatefulWidget {
   });
 
   @override
-  State<NativeBodyViewer> createState() => _NativeBodyViewerState();
+  ConsumerState<NativeBodyViewer> createState() => _NativeBodyViewerState();
 }
 
-class _NativeBodyViewerState extends State<NativeBodyViewer> {
+class _NativeBodyViewerState extends ConsumerState<NativeBodyViewer> {
   final _controller = DiTreDiController(
     rotationX: 0,
     rotationY: 180,
@@ -34,11 +33,8 @@ class _NativeBodyViewerState extends State<NativeBodyViewer> {
       return _buildViewer(context, widget.staticPatient!);
     }
 
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
-        return _buildViewer(context, state);
-      },
-    );
+    final state = ref.watch(patientProvider);
+    return _buildViewer(context, state);
   }
 
   Widget _buildViewer(BuildContext context, PatientState state) {
@@ -95,7 +91,7 @@ class _NativeBodyViewerState extends State<NativeBodyViewer> {
         }
         
         debugPrint('3D Selection: $partId (X: $normalizedX, Y: $normalizedY)');
-        context.read<PatientBloc>().add(SelectPartEvent(partId));
+        ref.read(patientProvider.notifier).selectPart(partId);
       } : null,
       child: Container(
         color: const Color(0xFFF9FAFB),

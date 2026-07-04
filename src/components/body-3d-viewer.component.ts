@@ -266,8 +266,61 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         const mindMaterial = new THREE.MeshStandardMaterial({
             color: 0x8b5cf6, roughness: 0.2, metalness: 0.4, transparent: true, emissive: 0x8b5cf6, emissiveIntensity: 0.1, opacity: 0.0, depthWrite: false
         });
-        const molecularMaterial = new THREE.MeshStandardMaterial({
-            color: 0x00ffff, wireframe: true, transparent: true, emissive: 0x008888, emissiveIntensity: 0.2, opacity: 0.0, depthWrite: false
+        
+        // Procedural Shader Material for Heatmaps
+        const molecularMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uPainLevel: { value: 0.0 },
+                uTime: { value: 0.0 },
+                uColor: { value: new THREE.Color(0x00ffff) },
+                uHeatColor: { value: new THREE.Color(0xff0066) }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                uniform float uTime;
+                uniform float uPainLevel;
+                void main() {
+                    vUv = uv;
+                    vNormal = normalize(normalMatrix * normal);
+                    
+                    vec3 pos = position;
+                    // Pulsing displacement based on pain
+                    if (uPainLevel > 0.0) {
+                        float pulse = sin(uTime * 6.0) * 0.5 + 0.5;
+                        pos += normal * pulse * uPainLevel * 0.05;
+                    }
+                    
+                    vPosition = (modelViewMatrix * vec4(pos, 1.0)).xyz;
+                    gl_Position = projectionMatrix * vec4(vPosition, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float uPainLevel;
+                uniform float uTime;
+                uniform vec3 uColor;
+                uniform vec3 uHeatColor;
+                varying vec2 vUv;
+                varying vec3 vNormal;
+                varying vec3 vPosition;
+                void main() {
+                    float pulse = (sin(uTime * 6.0) * 0.5 + 0.5) * uPainLevel;
+                    
+                    // Fresnel/Rim effect
+                    vec3 viewDir = normalize(-vPosition);
+                    float rim = 1.0 - max(dot(viewDir, vNormal), 0.0);
+                    rim = smoothstep(0.4, 1.0, rim);
+                    
+                    vec3 baseColor = mix(uColor, uHeatColor, uPainLevel);
+                    vec3 finalColor = mix(baseColor, vec3(1.0, 1.0, 1.0), pulse * 0.7 + rim * uPainLevel);
+                    
+                    gl_FragColor = vec4(finalColor, mix(0.1, 0.9, uPainLevel));
+                }
+            `,
+            transparent: true,
+            depthWrite: false,
+            wireframe: true
         });
 
         // Procedural construction functions for contoured/biological shapes
@@ -408,51 +461,44 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 // Color Logic overrides
                 if (maxPain > 0) {
                     const intensity = maxPain / 10;
-                    if (layer === 'skin') material.color.setRGB(1, 1 - intensity * 0.6, 1 - intensity * 0.6);
-                    if (layer === 'muscle') material.color.setRGB(0.9, 0.2 - intensity * 0.2, 0.2 - intensity * 0.2);
-                    if (layer === 'bone') material.color.setRGB(0.9, 0.7 - intensity * 0.5, 0.7 - intensity * 0.5);
-                    if (layer === 'mind') material.color.setRGB(0.9, 0.2 - intensity * 0.2, 0.9);
-                    if (layer === 'molecular') {
-                        material.color.setHex(0xff00ff); // Hot pink to signify pain/inflammation
-                        material.emissive.setHex(0xff0066);
+                    if (layer === 'skin') (material as THREE.MeshStandardMaterial).color.setRGB(1, 1 - intensity * 0.6, 1 - intensity * 0.6);
+                    if (layer === 'muscle') (material as THREE.MeshStandardMaterial).color.setRGB(0.9, 0.2 - intensity * 0.2, 0.2 - intensity * 0.2);
+                    if (layer === 'bone') (material as THREE.MeshStandardMaterial).color.setRGB(0.9, 0.7 - intensity * 0.5, 0.7 - intensity * 0.5);
+                    if (layer === 'mind') (material as THREE.MeshStandardMaterial).color.setRGB(0.9, 0.2 - intensity * 0.2, 0.9);
+                    if (layer === 'molecular' && (material as any).uniforms) {
+                        (material as any).uniforms['uPainLevel'].value = intensity;
                     }
                 } else {
                     // Reset to Base Colors
-                    if (layer === 'skin') material.color.setHex(0xfdfdfd);
-                    if (layer === 'muscle') material.color.setHex(0xc95353);
-                    if (layer === 'bone') material.color.setHex(0xe0e0e0);
-                    if (layer === 'mind') material.color.setHex(0x8b5cf6);
-                    if (layer === 'molecular') {
-                        material.color.setHex(0x00ffff);
-                        material.emissive.setHex(0x008888);
+                    if (layer === 'skin') (material as THREE.MeshStandardMaterial).color.setHex(0xfdfdfd);
+                    if (layer === 'muscle') (material as THREE.MeshStandardMaterial).color.setHex(0xc95353);
+                    if (layer === 'bone') (material as THREE.MeshStandardMaterial).color.setHex(0xe0e0e0);
+                    if (layer === 'mind') (material as THREE.MeshStandardMaterial).color.setHex(0x8b5cf6);
+                    if (layer === 'molecular' && (material as any).uniforms) {
+                        (material as any).uniforms['uPainLevel'].value = 0.0;
                     }
                 }
 
                 if (isSelected) {
                     if (layer === 'skin') {
-                        material.color.setHex(0x1C1C1C);
-                        material.emissive.setHex(0x76B362);
-                        material.emissiveIntensity = 0.2;
-                    } else if (layer === 'molecular') {
-                        material.emissive.setHex(0xffffff);
-                        material.emissiveIntensity = 0.4;
-                    } else {
-                        material.emissive.setHex(0x76B362);
-                        material.emissiveIntensity = 0.3;
+                        (material as THREE.MeshStandardMaterial).color.setHex(0x1C1C1C);
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.2;
+                    } else if (layer === 'molecular' && (material as any).uniforms) {
+                        // Highlight logic for shaders can be left simple, handled by uniforms
+                    } else if (layer !== 'molecular') {
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.3;
                     }
                 } else {
                     if (layer === 'mind') {
-                        material.emissive.setHex(0x8b5cf6);
-                        material.emissiveIntensity = 0.1;
-                    } else if (layer === 'molecular' && maxPain === 0) {
-                        material.emissive.setHex(0x008888);
-                        material.emissiveIntensity = 0.2;
-                    } else if (layer === 'molecular' && maxPain > 0) {
-                        material.emissive.setHex(0xff0066);
-                        material.emissiveIntensity = 0.2 + (maxPain / 40); // Scale emissive with pain softly
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x8b5cf6);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.1;
+                    } else if (layer === 'molecular') {
+                        // Shader uniform uPainLevel dictates emission/glow
                     } else {
-                        material.emissive.setHex(0x000000);
-                        material.emissiveIntensity = 0;
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0;
                     }
                 }
             });
@@ -597,6 +643,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 
                 // 2. Gentle floating
                 this.mannequinGroup.position.y = Math.sin(time * 1.5) * 0.02;
+                
+                // 3. Update Shader Uniforms for Heatmaps
+                this.parts.forEach((group) => {
+                    group.children.forEach(child => {
+                        if (child instanceof THREE.Mesh && child.userData['layer'] === 'molecular') {
+                            if (child.material instanceof THREE.ShaderMaterial) {
+                                child.material.uniforms['uTime'].value = time;
+                            }
+                        }
+                    });
+                });
                 
                 // 3. Mind Core & Neural Pathway Entrainment
                 this.mannequinGroup.children.forEach(child => {

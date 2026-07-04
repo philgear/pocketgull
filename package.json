@@ -76,9 +76,9 @@
   "scripts": {
     "postinstall": "patch-package",
     "dev": "ng serve",
-    "dev:backend": "PORT=4000 node dist/server/server.mjs",
-    "dev:python": "cd pocketgull_api && ../venv/bin/uvicorn main:app --reload --port 8001",
-    "dev:all": "npm run dev:backend & npm run dev:python & npm run dev",
+    "dev:backend": "npx cross-env PORT=4000 node dist/server/server.mjs",
+    "dev:python": "cd pocketgull_api && C:\\Users\\philg\\.conda\\envs\\gemini-env\\python.exe -m uvicorn main:app --reload --port 8001 --use-colors",
+    "dev:all": "npx concurrently \"npm run dev:backend\" \"npm run dev:python\" \"npm run dev\"",
     "build": "npm install --prefix docs/study && npm run build --prefix docs/study && ng build",
     "lint": "node node_modules/typescript/lib/tsc.js --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",

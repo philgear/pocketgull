@@ -270,7 +270,7 @@ export interface IPubMedSearchResult {
     </div>
   `
 })
-export class ResearchFrameComponent {
+export class ResearchFrameComponent implements OnDestroy {
   @ViewChild('iframeEl') iframeEl?: ElementRef<HTMLIFrameElement>;
 
   @HostListener('window:message', ['$event'])
@@ -324,6 +324,7 @@ export class ResearchFrameComponent {
   private boundStopDrag = this.stopDrag.bind(this);
   private boundDoResize = this.doResize.bind(this);
   private boundStopResize = this.stopResize.bind(this);
+  private checkMobileListener = () => this.isMobile.set(window.innerWidth < 768);
 
   selectedPatient = computed(() => {
     const id = this.patientManager.selectedPatientId();
@@ -340,9 +341,8 @@ export class ResearchFrameComponent {
       const h = window.innerHeight;
       this.position.set({ x: w * 0.45, y: 100 });
       
-      const checkMobile = () => this.isMobile.set(window.innerWidth < 768);
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
+      this.checkMobileListener();
+      window.addEventListener('resize', this.checkMobileListener);
     }
 
     // --- Special Reference Trigger ---
@@ -691,5 +691,15 @@ export class ResearchFrameComponent {
 
   removeBookmark(url: string) {
     this.patientManager.removeBookmark(url);
+  }
+
+  ngOnDestroy() {
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('resize', this.checkMobileListener);
+    }
+    document.removeEventListener('mousemove', this.boundDoDrag);
+    document.removeEventListener('mouseup', this.boundStopDrag);
+    document.removeEventListener('mousemove', this.boundDoResize);
+    document.removeEventListener('mouseup', this.boundStopResize);
   }
 }

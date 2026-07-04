@@ -42,6 +42,8 @@ import { SwUpdate } from '@angular/service-worker';
 import { FitbitService } from './services/fitbit.service';
 import { ConsentService } from './services/consent.service';
 import { ConsentModalComponent } from './components/consent-modal.component';
+import { SynthesisDashboardComponent } from './components/synthesis/synthesis-dashboard.component';
+import { ResearchTabComponent } from './components/research-tab.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -54,6 +56,7 @@ import { ConsentModalComponent } from './components/consent-modal.component';
     DictationModalComponent,
     TaskFlowComponent,
     ResearchFrameComponent,
+    ResearchTabComponent,
     IntakeFormComponent,
     VoiceAssistantComponent,
     RevealDirective,
@@ -63,7 +66,8 @@ import { ConsentModalComponent } from './components/consent-modal.component';
     CollaborationDockComponent,
     FhirCallbackComponent,
     PocketGullInputComponent,
-    ConsentModalComponent
+    ConsentModalComponent,
+    SynthesisDashboardComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -449,6 +453,15 @@ import { ConsentModalComponent } from './components/consent-modal.component';
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
               <span class="hidden sm:inline">Research</span>
             </button>
+
+            <button (click)="state.toggleSynthesisDashboard()"
+                    aria-label="Toggle Synthesis"
+                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+              </svg>
+              <span class="hidden sm:inline">Synthesize</span>
+            </button>
             
             <a href="/docs/study/" target="_blank" rel="noopener"
               
@@ -800,6 +813,12 @@ import { ConsentModalComponent } from './components/consent-modal.component';
                        <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Core AI Synthesis...</div>
                      }
                  </div>
+                 
+                 @if (intelligence.researchHits()) {
+                   <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md h-[300px] shrink-0">
+                     <app-research-tab class="block h-full" [hits]="intelligence.researchHits()"></app-research-tab>
+                   </div>
+                 }
             </div>
 
             <!-- Pocket: Floating Voice Assistant -->
@@ -885,6 +904,12 @@ import { ConsentModalComponent } from './components/consent-modal.component';
             }
         }
 
+        @if(state.isSynthesisDashboardVisible()) {
+            @defer (on immediate) {
+              <app-synthesis-dashboard></app-synthesis-dashboard>
+            }
+        }
+
 
     <!-- Preview & Print Modal (Dieter Rams Style) -->
     @if (showPreviewModal()) {
@@ -962,6 +987,11 @@ import { ConsentModalComponent } from './components/consent-modal.component';
                     class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
                     [ngClass]="selectedReadingLevel() === 'mandarin' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
                     Mandarin
+                  </button>
+                  <button (click)="changeReadingLevel('hindi')" [disabled]="isTranslating()"
+                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
+                    [ngClass]="selectedReadingLevel() === 'hindi' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
+                    Hindi
                   </button>
                 </div>
 
@@ -1161,6 +1191,27 @@ import { ConsentModalComponent } from './components/consent-modal.component';
   `]
 })
 export class AppComponent implements OnDestroy {
+  private _translateTimer: any = null;
+
+  private debouncedTranslate(text: string, level: any) {
+    if (this._translateTimer) {
+      clearTimeout(this._translateTimer);
+    }
+    this._translateTimer = setTimeout(async () => {
+      this.isTranslating.set(true);
+      try {
+        const translated = await this.clinicalIntelligence.translateReadingLevel(text, level);
+        this.previewText.set(translated);
+        await this.analyzeCurrentTranslation();
+      } catch (error) {
+        console.error("Auto-translation failed", error);
+        this.translationError.set("Failed to translate plan. Please retry.");
+      } finally {
+        this.isTranslating.set(false);
+      }
+    }, 600);
+  }
+
   public tour = inject(WalkthroughTourService);
   public readonly petAuditory = inject(PetAuditoryService);
   private readonly stressIntervention = inject(StressInterventionService);
@@ -1220,7 +1271,7 @@ export class AppComponent implements OnDestroy {
   showPreviewModal = signal(false);
   previewText = signal('');
   originalPreviewText = signal('');
-  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'>('standard');
+  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'>('standard');
   isTranslating = signal<boolean>(false);
   translationAnalysis = signal<string>('');
   isAnalyzingTranslation = signal(false);
@@ -1556,11 +1607,11 @@ export class AppComponent implements OnDestroy {
   }
 
   async changeReadingLevel(levelOrEvent: string | Event) {
-    let level: 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin';
+    let level: 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi';
     if (typeof levelOrEvent === 'string') {
-      level = levelOrEvent as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin';
+      level = levelOrEvent as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi';
     } else {
-      level = (levelOrEvent.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin';
+      level = (levelOrEvent.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi';
     }
     
     this.selectedReadingLevel.set(level);
@@ -1625,7 +1676,8 @@ export class AppComponent implements OnDestroy {
       const levelNames: Record<string, string> = {
         'simplified': 'Simplified (6th Grade)',
         'dyslexia': 'Cognition (Dyslexia-Friendly)',
-        'child': 'Child (Pediatric)'
+        'child': 'Child (Pediatric)',
+        'hindi': 'Hindi Translation'
       };
       
       const translationMatrix = {
@@ -1762,6 +1814,7 @@ export class AppComponent implements OnDestroy {
 
   readonly session = inject(SessionStateService);
   readonly fitbit = inject(FitbitService);
+  readonly intelligence = inject(ClinicalIntelligenceService);
 
   @HostListener('document:mousemove')
   @HostListener('document:keydown')
@@ -1776,6 +1829,23 @@ export class AppComponent implements OnDestroy {
   private mcpControllers: { name: string, controller: AbortController }[] = [];
 
   constructor() {
+    effect(() => {
+      const text = this.originalPreviewText();
+      const level = this.selectedReadingLevel();
+      if (level !== 'standard') {
+        untracked(() => {
+          this.debouncedTranslate(text, level);
+        });
+      }
+    });
+
+    effect(() => {
+      const text = this.originalPreviewText();
+      untracked(() => {
+        this.state.activePatientSummary.set(text || null);
+      });
+    });
+
     const swUpdate = inject(SwUpdate, { optional: true });
     if (swUpdate && swUpdate.isEnabled) {
       swUpdate.versionUpdates.subscribe((evt: any) => {
@@ -2133,6 +2203,9 @@ export class AppComponent implements OnDestroy {
     }
     if (this.resizeDebounceTimer) {
       clearTimeout(this.resizeDebounceTimer);
+    }
+    if (this._translateTimer) {
+      clearTimeout(this._translateTimer);
     }
   }
 

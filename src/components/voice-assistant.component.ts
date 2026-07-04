@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientStateService } from '../services/patient-state.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
+import { BODY_PART_MAPPING } from '../services/patient.types';
 import { DictationService } from '../services/dictation.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
@@ -752,6 +753,34 @@ Only include a rich-media block when the user explicitly requests visual or rese
                    try {
                        JSON.parse(jsonStr.trim()); // ensures JSON is complete before network requests
                        this._liveCardsResolved = true;
+                       
+                       // 3D Visual Grounding: tie afflictionHighlight to selectedPartId
+                       const modelCard = richCards.find(c => c.kind === 'model-3d' && c.afflictionHighlight);
+                       if (modelCard && modelCard.afflictionHighlight) {
+                           const highlight = modelCard.afflictionHighlight.toLowerCase();
+                           let partId: string | undefined;
+                           // Find exact match first, then partial match
+                           if (BODY_PART_MAPPING[highlight]) {
+                               partId = BODY_PART_MAPPING[highlight];
+                           } else {
+                               const keys = Object.keys(BODY_PART_MAPPING).sort((a, b) => b.length - a.length);
+                               for (const key of keys) {
+                                   if (highlight.includes(key)) {
+                                       partId = BODY_PART_MAPPING[key];
+                                       break;
+                                   }
+                               }
+                           }
+                           
+                           if (partId) {
+                               // Schedule the state update outside the reactive context to avoid loops
+                               setTimeout(() => {
+                                   this.state.selectedPartId.set(partId!);
+                                   this.state.bodyViewerMode.set('3d');
+                               }, 0);
+                           }
+                       }
+                       
                        Promise.all(richCards.map(card => this.richMedia.resolveCard(card))).then(resolved => {
                            this.chatHistory.update(history => {
                                const updated = [...history];

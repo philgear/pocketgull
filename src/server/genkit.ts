@@ -101,7 +101,7 @@ export const detectClinicalChangesFlow = ai.defineFlow(
 
     const response = await ai.generate({
       prompt,
-      config: { 
+      config: {
         temperature: 0,
         safetySettings: [
           { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
@@ -122,7 +122,7 @@ export const translateReadingLevelFlow = ai.defineFlow(
       name: 'translateReadingLevelFlow',
       inputSchema: z.object({
         text: z.string(),
-        level: z.enum(['simplified', 'dyslexia', 'child', 'spanish', 'german', 'french', 'mandarin'])
+        level: z.enum(['simplified', 'dyslexia', 'child', 'spanish', 'german', 'french', 'mandarin', 'hindi'])
       }),
       outputSchema: z.string(),
     },
@@ -198,10 +198,19 @@ CRITICAL RULES:
 3. Do not add or remove any medical information.
 4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
 5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
+      } else if (level === 'hindi') {
+          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into Hindi.
+
+CRITICAL RULES:
+1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
+2. Use professional, culturally appropriate medical Hindi. Keep specific medication names and complex dosages in standard English or transliterated pronunciations if commonly used to ensure patient safety.
+3. Do not add or remove any medical information.
+4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
+5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
       }
-  
+
       const prompt = `Please rewrite the following care plan text according to your system instructions:\n\n<clinical_text>\n${text}\n</clinical_text>`;
-  
+
       const response = await ai.generate({
         prompt,
         system: systemInstruction,
@@ -310,5 +319,56 @@ Note: This is an AI preliminary analysis for decision-support, not an official d
       });
       
       return response.text;
+    }
+);
+
+// 6. Synthesize Knowledge Flow
+export const synthesizeKnowledgeFlow = ai.defineFlow(
+    {
+      name: 'synthesizeKnowledgeFlow',
+      inputSchema: z.object({
+        inputText: z.string()
+      }),
+      outputSchema: z.array(z.object({
+        id: z.string(),
+        title: z.string(),
+        content: z.string(),
+        type: z.enum(['Urgent Signal', 'Action Item', 'Context', 'Unknown']),
+        confidence: z.number().min(0).max(100)
+      })),
+    },
+    async ({ inputText }) => {
+      const prompt = `Analyze the following clinical intake text and distill it into structured insights.
+For each distinct insight, determine its type:
+- "Urgent Signal" for critical risks, red flags, or severe distress.
+- "Action Item" for things that require follow-up, scheduling, or immediate clinical tasks.
+- "Context" for relevant background info (e.g. social history, diet).
+- "Unknown" if it doesn't fit the others.
+
+Assign a confidence score (0-100) based on how explicit the information is.
+
+Intake Text:
+${inputText.substring(0, 5000)}
+
+Return ONLY a JSON array of objects with this exact structure:
+[
+  { "id": "unique-id", "title": "Short Title", "content": "Detailed explanation", "type": "...", "confidence": 95 }
+]`;
+
+      const response = await ai.generate({
+        prompt,
+        config: {
+          temperature: 0.1,
+          responseMimeType: 'application/json',
+          safetySettings: [
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' }
+          ]
+        }
+      });
+
+      return JSON.parse(response.text);
     }
 );

@@ -148,7 +148,7 @@ export class PubGemmaProvider implements IIntelligenceProvider {
   /**
    * Translates clinical text to the specified reading/cognition level using local inference.
    */
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
+  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
     const levelDescriptions: Record<typeof level, string> = {
       simplified: 'a simplified 6th-grade reading level, using plain language and short sentences',
       dyslexia: 'a dyslexia-friendly format with simple words, short paragraphs, and no complex medical jargon',
@@ -156,7 +156,8 @@ export class PubGemmaProvider implements IIntelligenceProvider {
       spanish: 'a professional clinical Spanish translation, culturally localized',
       german: 'a professional clinical German translation, culturally localized',
       french: 'a professional clinical French translation, culturally localized',
-      mandarin: 'a professional clinical Mandarin translation, culturally localized'
+      mandarin: 'a professional clinical Mandarin translation, culturally localized',
+      hindi: 'a professional clinical Hindi translation, culturally localized'
     };
     const prompt =
       `Rewrite the following clinical care plan text for ${levelDescriptions[level]}.\n` +
@@ -209,6 +210,10 @@ export class PubGemmaProvider implements IIntelligenceProvider {
       console.error('[PubGemma] sendMessage error:', error);
       return 'Local PubGemma inference engine could not be reached.';
     }
+  }
+
+  async synthesizeKnowledge(inputText: string): Promise<any> {
+    throw new Error("PubGemma synthesis deferred downward.");
   }
 
   async getInitialGreeting(prompt: string): Promise<string> {
