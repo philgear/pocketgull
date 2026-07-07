@@ -114,7 +114,7 @@ jobs:
 
       - name: Deploy Preview to Cloud Run
         id: deploy-preview
-        uses: google-github-actions/deploy-cloudrun@e62f655d5754bec48078a72edc015367b01ee97b # v2.14.1
+        uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v2.3.0.14.3.0.1
         with:
           service: 'pocket-gull-v2'
           region: 'us-central1'
@@ -217,7 +217,7 @@ jobs:
           docker push $IMAGE_PATH:latest
           
       - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@e62f655d5754bec48078a72edc015367b01ee97b # v2.14.1
+        uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v2.3.0.14.3.0.1
         with:
           service: 'pocket-gull-v2'
           region: 'us-central1'
