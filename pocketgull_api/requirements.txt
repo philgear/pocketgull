@@ -22,7 +22,7 @@ joblib>=1.4.0
 scikit-learn>=1.4.0
 
 # File uploads (multipart/form-data support)
-python-multipart>=0.0.9
+python-multipart>=0.0.32
 
 # Development
 httpx>=0.28.1       # for testing async endpoints
