@@ -1,0 +1,209 @@
+extend type Query {
+  """
+  ✨ Look up a single `CarePlan` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  carePlan(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: CarePlan_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: CarePlan_FirstRow
+  ): CarePlan @fdc_generated(from: "CarePlan", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `Clinician` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  clinician(
+    """
+    The key used to identify the object.
+    """
+    key: Clinician_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Clinician_FirstRow
+  ): Clinician @fdc_generated(from: "Clinician", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `ConsultationSession` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  consultationSession(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: ConsultationSession_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: ConsultationSession_FirstRow
+  ): ConsultationSession @fdc_generated(from: "ConsultationSession", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `Patient` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  patient(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Patient_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Patient_FirstRow
+  ): Patient @fdc_generated(from: "Patient", purpose: QUERY_SINGLE)
+  """
+  ✨ List `CarePlan` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  carePlans(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: CarePlan_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [CarePlan_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: CarePlan_Having
+  ): [CarePlan!]! @fdc_generated(from: "CarePlan", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `Clinician` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  clinicians(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: Clinician_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [Clinician_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: Clinician_Having
+  ): [Clinician!]! @fdc_generated(from: "Clinician", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `ConsultationSession` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  consultationSessions(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: ConsultationSession_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [ConsultationSession_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: ConsultationSession_Having
+  ): [ConsultationSession!]! @fdc_generated(from: "ConsultationSession", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `Patient` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  patients(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: Patient_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [Patient_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: Patient_Having
+  ): [Patient!]! @fdc_generated(from: "Patient", purpose: QUERY_MULTIPLE)
+}

@@ -25,6 +25,8 @@ import {
   IDiagnosticScan
 } from "./patient.types";
 import * as CryptoJS from 'crypto-js';
+import { dataConnect } from '../lib/firebase';
+import { listPatients, getPatientWithCarePlan, createPatient } from '../lib/dataconnect';
 
 const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 
@@ -340,6 +342,31 @@ export class PatientManagementService {
 
   private async initRoster() {
     if (typeof window !== 'undefined') {
+        try {
+          const res = await listPatients(dataConnect);
+          if (res.data && res.data.patients && res.data.patients.length > 0) {
+            const dbPatients = res.data.patients.map(p => ({
+              id: p.id,
+              name: `${p.firstName} ${p.lastName}`,
+              age: 0,
+              gender: "Other" as const,
+              lastVisit: new Date(p.updatedAt).toISOString().split('T')[0].replace(/-/g, '.'),
+              preexistingConditions: [],
+              patientGoals: "",
+              vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
+              issues: {},
+              history: [],
+              bookmarks: []
+            }));
+            this.patients.set(dbPatients);
+            const defaultId = dbPatients.find(p => p.name === 'Phil Gear')?.id || dbPatients[0]?.id || null;
+            this.selectedPatientId.set(defaultId);
+            return;
+          }
+        } catch (err) {
+          console.error('Failed to load roster from SQL Connect:', err);
+        }
+
         const loaded = await this.storage.loadPatients();
         if (loaded && loaded.length > 0) {
             let updatedList = [...loaded];
@@ -459,27 +486,48 @@ export class PatientManagementService {
   }
 
   /** Creates a new patient record and selects it. */
-  createNewPatient() {
+  async createNewPatient() {
     this.saveCurrentPatientState();
 
-    const newPatientId = `p_${Date.now()}`;
-    const newPatient: IPatient = {
-      id: newPatientId,
-      name: "New Patient",
-      age: 0,
-      gender: "Other",
-      lastVisit: new Date().toISOString().split("T")[0].replace(/-/g, "."),
-      patientGoals: "",
-      preexistingConditions: [],
-      vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
-      issues: {},
-      history: [],
-      bookmarks: [],
-    };
+    const firstName = "New";
+    const lastName = "Patient";
+    const dob = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
-    // Add to the top of the list for immediate visibility
-    this.patients.update((patients) => [newPatient, ...patients]);
-    this.selectedPatientId.set(newPatientId);
+    try {
+      const res = await createPatient(dataConnect, {
+        firstName,
+        lastName,
+        dateOfBirth: dob,
+        gender: "Other",
+        vitalsHeartRate: 0,
+        vitalsSystolicBP: 0,
+        vitalsDiastolicBP: 0,
+        currentSymptoms: []
+      });
+
+      if (res.data && res.data.patient_insert) {
+        const newPatientId = res.data.patient_insert.id;
+        const newPatient: IPatient = {
+          id: newPatientId,
+          name: `${firstName} ${lastName}`,
+          age: 0,
+          gender: "Other" as const,
+          lastVisit: new Date().toISOString().split("T")[0].replace(/-/g, "."),
+          patientGoals: "",
+          preexistingConditions: [],
+          vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
+          issues: {},
+          history: [],
+          bookmarks: [],
+        };
+
+        // Add to the top of the list for immediate visibility
+        this.patients.update((patients) => [newPatient, ...patients]);
+        this.selectedPatientId.set(newPatientId);
+      }
+    } catch (err) {
+      console.error('Error creating patient in SQL Connect:', err);
+    }
   }
 
   /** Removes a patient record. */

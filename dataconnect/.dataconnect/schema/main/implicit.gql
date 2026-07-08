@@ -1,0 +1,20 @@
+extend type CarePlan {
+  """
+  ✨ Implicit foreign key field based on `CarePlan`.`clinician`. It must match the value of `Clinician`.`uid`. See `@ref` for how to customize it.
+  """
+  clinicianUid: String! @fdc_generated(from: "CarePlan.clinician", purpose: IMPLICIT_REF_FIELD)
+  """
+  ✨ Implicit foreign key field based on `CarePlan`.`patient`. It must match the value of `Patient`.`id`. See `@ref` for how to customize it.
+  """
+  patientId: UUID! @fdc_generated(from: "CarePlan.patient", purpose: IMPLICIT_REF_FIELD)
+}
+extend type ConsultationSession {
+  """
+  ✨ Implicit foreign key field based on `ConsultationSession`.`clinician`. It must match the value of `Clinician`.`uid`. See `@ref` for how to customize it.
+  """
+  clinicianUid: String! @fdc_generated(from: "ConsultationSession.clinician", purpose: IMPLICIT_REF_FIELD)
+  """
+  ✨ Implicit foreign key field based on `ConsultationSession`.`patient`. It must match the value of `Patient`.`id`. See `@ref` for how to customize it.
+  """
+  patientId: UUID! @fdc_generated(from: "ConsultationSession.patient", purpose: IMPLICIT_REF_FIELD)
+}

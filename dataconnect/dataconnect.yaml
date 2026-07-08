@@ -1,0 +1,11 @@
+specVersion: "v1"
+serviceId: "pocketgull-service"
+location: "us-west1"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "pocketgull_db"
+      cloudSql:
+        instanceId: "pocketgull-instance"
+connectorDirs: ["./connector"]

@@ -18,6 +18,8 @@ spec:
           - name: pocketgull-app
             image: gcr.io/philgear-understory/pocketgull:latest
             imagePullPolicy: Always
+            securityContext:
+              allowPrivilegeEscalation: false
             resources:
               requests:
                 memory: "512Mi"

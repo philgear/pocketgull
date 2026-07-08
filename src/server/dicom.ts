@@ -27,9 +27,9 @@ const auth = new GoogleAuth({
  * Returns null if the value is absent or contains illegal characters after stripping.
  */
 function sanitiseDicomParam(value: unknown): string | null {
-  if (typeof value !== 'string' || !value.trim()) return null;
-  const cleaned = value.trim().replace(/[^a-zA-Z0-9._\-]/g, '');
-  return cleaned.length > 0 ? cleaned : null;
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return /^[a-zA-Z0-9._\-]+$/.test(trimmed) ? trimmed : null;
 }
 
 /**
@@ -37,8 +37,8 @@ function sanitiseDicomParam(value: unknown): string | null {
  */
 function validateDicomUid(value: unknown): string | null {
   if (typeof value !== 'string') return null;
-  const cleaned = value.trim().replace(/[^0-9.]/g, '');
-  return /^\d[\d.]{0,63}$/.test(cleaned) ? cleaned : null;
+  const trimmed = value.trim();
+  return /^\d[\d.]{0,63}$/.test(trimmed) ? trimmed : null;
 }
 
 /** Resolve project/location from query param with env var fallback, sanitised. */

@@ -20,6 +20,8 @@ export { BODY_PART_NAMES };
 import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
 import { ThemeService } from './theme.service';
+import { dataConnect } from '../lib/firebase';
+import { createCarePlan, createConsultationSession } from '../lib/dataconnect';
 
 
 @Injectable({
@@ -28,6 +30,7 @@ import { ThemeService } from './theme.service';
 export class PatientStateService {
   // --- UI State ---
   readonly selectedPartId = signal<string | null>(null);
+  readonly loadedPatientId = signal<string | null>(null);
   readonly selectedNoteId = signal<string | null>(null);
   readonly isLiveAgentActive = signal<boolean>(false);
   readonly liveAgentInput = signal<string>('');
@@ -476,6 +479,18 @@ export class PatientStateService {
     }
   updateActivePatientSummary(plan: string | null) {
     this.activePatientSummary.set(plan);
+    const patientId = this.loadedPatientId();
+    if (plan && patientId) {
+      createCarePlan(dataConnect, {
+        patientId: patientId,
+        diagnosis: "Clinical Care Strategy Update",
+        recommendations: [plan]
+      }).then(() => {
+        console.log('[SQL Connect] Care plan successfully saved to database.');
+      }).catch(err => {
+        console.error('Failed to save care plan to SQL Connect:', err);
+      });
+    }
   }
 
   // --- Biometric Data Actions ---
@@ -578,6 +593,7 @@ export class PatientStateService {
   /** Clears all patient data to represent a clean slate. */
   clearState() {
     this.selectedPartId.set(null);
+    this.loadedPatientId.set(null);
     this.selectedNoteId.set(null);
     this.isLiveAgentActive.set(false); // also end any active consult
     this.isResearchFrameVisible.set(false);
@@ -629,8 +645,11 @@ export class PatientStateService {
   }
 
   /** Loads the state of a specific patient. */
-  loadState(state: IPatientState) {
+  loadState(state: any) {
     this.clearState(); // Start from a clean slate
+    if (state && state.id) {
+      this.loadedPatientId.set(state.id);
+    }
     this.issues.set(state.issues);
         if (state.patientGoals) this.patientGoals.set(state.patientGoals);
         if (state.dietaryProtocol) this.dietaryProtocol.set(state.dietaryProtocol);
