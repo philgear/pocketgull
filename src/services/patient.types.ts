@@ -96,6 +96,7 @@ export interface IBodyPartIssue {
     // Tri-Paradigm Diagnostic Matrix (TDM) Extensions
     tcmPattern?: string;          // TCM disharmony mapping (e.g., Qi Stagnation)
     ayurvedicImbalance?: string;  // Ayurvedic dosha imbalance (e.g., Vata Aggravation)
+    growThySelfFocus?: string;
 }
 
 export interface IPatientVitals {
@@ -199,7 +200,7 @@ export interface IPatientState {
     /** Current AI-generated AVS co-regulation protocol. */
     avsProtocol?: IAvsProtocol;
     /** Selected medical paradigm / philosophy mode. */
-    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic';
+    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self';
 }
 
 /**
