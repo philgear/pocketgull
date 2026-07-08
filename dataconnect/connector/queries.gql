@@ -1,0 +1,40 @@
+# queries.gql for Pocket-Gull
+
+query ListPatients @auth(level: USER) {
+  patients(orderBy: [{ updatedAt: DESC }]) {
+    id
+    firstName
+    lastName
+    currentSymptoms
+    updatedAt
+  }
+}
+
+query GetPatientWithCarePlan($patientId: UUID!) @auth(level: USER) {
+  patient(id: $patientId) {
+    id
+    firstName
+    lastName
+    dateOfBirth
+    gender
+    vitalsHeartRate
+    vitalsSystolicBP
+    vitalsDiastolicBP
+    currentSymptoms
+    carePlans_on_patient {
+      id
+      diagnosis
+      recommendations
+      createdAt
+    }
+  }
+}
+
+query GetConsultationHistory($patientId: UUID!) @auth(level: USER) {
+  consultationSessions(where: { patient: { id: { eq: $patientId } } }) {
+    id
+    transcript
+    aiSummary
+    createdAt
+  }
+}
