@@ -398,15 +398,16 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
             return report;
         }
 
-        if (!isEmergency && !this.network.useLocalInference() && !this.network.isOnline()) {
-            this.error.set("You are currently offline and no local inference endpoint is available.");
-            return {};
-        }
-
         this.isLoading.set(true);
         this.error.set(null);
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
+
+        if (!isEmergency && !this.network.useLocalInference() && !this.network.isOnline()) {
+            this.isLoading.set(false);
+            this.error.set("You are currently offline and no local inference endpoint is available.");
+            return {};
+        }
 
         const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Precision Nutrients', 'Monitoring & Follow-up', 'Patient Education'];
         const newReport: Partial<Record<AnalysisLens, string>> = {};
