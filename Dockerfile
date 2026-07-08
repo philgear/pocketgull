@@ -19,6 +19,9 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 RUN npm run build
 
+# Prune devDependencies to keep production container small
+RUN npm prune --omit=dev
+
 # ==========================================
 # Stage 2: Production
 # ==========================================
@@ -35,9 +38,11 @@ RUN npm install -g npm@latest
 # Set Node to production mode
 ENV NODE_ENV=production
 
-# Install only production dependencies
+# Copy package.json files (needed for package resolution / runtime)
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps --omit=dev
+
+# Copy pruned node_modules from builder
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy compiled output from builder (includes browser, server, docs/study, data/)
 COPY --from=builder /app/dist ./dist
