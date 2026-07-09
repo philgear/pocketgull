@@ -22,7 +22,13 @@ export class NetworkStateService {
     readonly isOnline = computed(() => this.browserOnline() && !this.forceOffline());
 
     /** Whether local inference should currently be used (offline OR user prefers it). */
-    readonly useLocalInference = computed(() => !this.isOnline() || this.preferLocalInference());
+    readonly useLocalInference = computed(() => {
+        const path = this.telemetry.recommendedExecutionPath();
+        if (path === 'cloud') {
+            return false;
+        }
+        return !this.isOnline() || this.preferLocalInference();
+    });
 
     /**
      * Reactive label for the active AI provider shown in UI status tooltips.

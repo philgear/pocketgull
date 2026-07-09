@@ -386,6 +386,9 @@ export class PatientManagementService {
             for (const p of MOCK_PATIENTS) {
                 await this.storage.savePatient(p);
             }
+            this.patients.set(MOCK_PATIENTS);
+            const defaultId = MOCK_PATIENTS.find(p => p.id === 'p_phil_gear')?.id || MOCK_PATIENTS[0]?.id || null;
+            this.selectedPatientId.set(defaultId);
         }
     }
   }
