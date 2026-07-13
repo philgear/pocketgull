@@ -18,7 +18,7 @@ h5py>=3.11.0
 scipy>=1.12.0
 
 # ML risk scoring (P3 — only needed when a trained model is present)
-joblib>=1.4.0
+joblib>=1.5.3
 scikit-learn>=1.9.0
 
 # File uploads (multipart/form-data support)
