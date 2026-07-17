@@ -31,14 +31,22 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
+        // Hybrid Routing Strategy:
+        // Use gemini-2.5-pro for heavy reasoning/synthesis lenses,
+        // and gemini-2.5-flash for formatting/educational/structured lenses.
+        const routingModelId = (lens === 'Summary Overview' || lens === 'Functional Protocols')
+            ? 'gemini-2.5-pro'
+            : 'gemini-2.5-flash';
+
         const response = await fetch('/api/ai/stream', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
                 patientData,
                 systemInstruction,
-                model: this.config.defaultModel.modelId,
-                temperature: this.config.defaultModel.temperature
+                model: routingModelId,
+                temperature: this.config.defaultModel.temperature,
+                lens: lens
             })
         });
 
@@ -74,10 +82,11 @@ export class GeminiProvider implements IIntelligenceProvider {
                         throw new Error(typeof parsed.error === 'string' ? parsed.error : JSON.stringify(parsed.error));
                     }
                     
-                    // Standard Gemini REST API shape
                     const geminiText = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (geminiText) {
                         yield geminiText;
+                    } else if (parsed.toolCall) {
+                        yield `__TOOL_CALL__:${JSON.stringify(parsed.toolCall)}`;
                     } else if (parsed.text) {
                         // Custom/Legacy wrapper shape
                         yield parsed.text;
@@ -124,11 +133,16 @@ export class GeminiProvider implements IIntelligenceProvider {
         return await this.verifier.verifyReportSection(lens as any, content, sourceData);
     }
 
-    async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string> {
+    async translateReadingLevel(
+        text: string,
+        level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+        cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+        language?: string
+    ): Promise<string> {
         const response = await fetch('/api/ai/translate', {
             method: 'POST',
             headers: this.getHeaders(),
-            body: JSON.stringify({ text, level })
+            body: JSON.stringify({ text, level, cognitiveLevel, language })
         });
         if (!response.ok) throw new Error(await response.text());
         const data = await response.json();
@@ -157,10 +171,25 @@ export class GeminiProvider implements IIntelligenceProvider {
         return data.analysis;
     }
 
+    async synthesizeKnowledge(inputText: string): Promise<any> {
+        const response = await fetch('/api/ai/synthesize', {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ text: inputText })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        const data = await response.json();
+        return data;
+    }
 
     async startChat(patientData: string, context: string): Promise<void> {
         const systemInstruction = `${context}\n\nPatient Data:\n${patientData}`;
-        this.chatSessionId = `chat_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const randomPart = typeof crypto !== 'undefined' && crypto.randomUUID
+            ? crypto.randomUUID().slice(0, 8)
+            : Array.from(crypto.getRandomValues(new Uint8Array(4)))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        this.chatSessionId = `chat_${Date.now()}_${randomPart}`;
 
         const response = await fetch('/api/ai/chat/start', {
             method: 'POST',

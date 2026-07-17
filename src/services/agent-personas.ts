@@ -76,6 +76,7 @@ export function getPersonaForLens(lens: AnalysisLens): IAgentPersona {
         case 'Functional Protocols':
         case 'Nutrition':
         case 'Precision Nutrients':
+        case 'Treatment Matrix':
             return AGENT_PERSONAS['swoop'];
         case 'Monitoring & Follow-up':
             return AGENT_PERSONAS['sentinel'];

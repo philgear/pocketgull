@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/patient/patient_event.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/patient_provider.dart';
 import '../models/patient_types.dart';
 
-class HistoryTimelineWidget extends StatelessWidget {
+class HistoryTimelineWidget extends ConsumerWidget {
   final String partId;
 
   const HistoryTimelineWidget({super.key, required this.partId});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(patientProvider);
         final issues = state.issues[partId] ?? [];
         // Sort issues by date descending (Current Visit first)
         final sortedIssues = List<BodyPartIssue>.from(issues)..sort((a, b) {
@@ -68,15 +66,13 @@ class HistoryTimelineWidget extends StatelessWidget {
                   isSelected: isSelected,
                   isLast: index == sortedIssues.length - 1,
                   onTap: () {
-                    context.read<PatientBloc>().add(SelectNoteEvent(issue.noteId));
+                    ref.read(patientProvider.notifier).selectNote(issue.noteId);
                   },
                 );
               },
             ),
           ],
         );
-      },
-    );
   }
 }
 

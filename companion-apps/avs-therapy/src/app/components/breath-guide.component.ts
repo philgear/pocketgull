@@ -1,6 +1,7 @@
 import {
   Component, input, computed, signal,
   PLATFORM_ID, inject, OnInit, OnDestroy,
+  effect, untracked
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
@@ -116,10 +117,54 @@ type BreathPhase = 'inhale' | 'hold' | 'exhale';
 export class BreathGuideComponent implements OnInit, OnDestroy {
   readonly size      = input<number>(180);
   readonly showLabel = input<boolean>(true);
+  readonly voicePacingEnabled = input<boolean>(false);
 
   private readonly state     = inject(PatientStateService);
   private readonly pid       = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.pid);
+
+  constructor() {
+    effect(() => {
+      const active = this.state.isAvsSessionActive();
+      const pacing = this.voicePacingEnabled();
+      if (active && pacing) {
+        untracked(() => {
+          const ratio = this.breathRatio();
+          const durations = [ratio.inhale, ratio.hold, ratio.exhale];
+          const curPhase = this.PHASES[this.phaseIdx]!;
+          const durSec = durations[this.phaseIdx]!;
+          const cueText = this.getBreathCueText(curPhase, durSec);
+          this.speakCue(cueText);
+        });
+      }
+    });
+  }
+
+  private getBreathCueText(phase: BreathPhase, seconds: number): string {
+    const phaseWord = phase === 'inhale' ? 'Inhale' : phase === 'hold' ? 'Hold' : 'Exhale';
+    if (seconds <= 2) {
+      return phaseWord;
+    }
+    const countdown = [];
+    for (let i = Math.round(seconds) - 1; i >= 1; i--) {
+      countdown.push(i);
+    }
+    return `${phaseWord}. ${countdown.join(', ')}.`;
+  }
+
+  private speakCue(text: string): void {
+    if (!this.isBrowser || !('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.95;
+    utterance.pitch = 0.95;
+    const voices = window.speechSynthesis.getVoices();
+    const naturalVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Natural') || v.lang === 'en-US');
+    if (naturalVoice) {
+      utterance.voice = naturalVoice;
+    }
+    window.speechSynthesis.speak(utterance);
+  }
 
   // ── Geometry ───────────────────────────────────────────────────────────────
   readonly ARC_LEN = 2 * Math.PI * 80; // r = 80
@@ -195,6 +240,13 @@ export class BreathGuideComponent implements OnInit, OnDestroy {
     if (elapsed >= phaseDur) {
       this.phaseIdx = (this.phaseIdx + 1) % this.PHASES.length;
       this.phaseStartTime = now;
+      
+      const newPhase = this.PHASES[this.phaseIdx]!;
+      const newPhaseDurSec = durations[this.phaseIdx]! / 1000;
+      if (this.state.isAvsSessionActive() && this.voicePacingEnabled()) {
+        const cueText = this.getBreathCueText(newPhase, newPhaseDurSec);
+        this.speakCue(cueText);
+      }
     }
 
     const phaseElapsed  = now - this.phaseStartTime;

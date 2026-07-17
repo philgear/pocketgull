@@ -33,7 +33,12 @@ export interface IIntelligenceProvider {
     /**
      * Translates clinical text to a specific reading, cognition, or philosophical level.
      */
-    translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin'): Promise<string>;
+    translateReadingLevel(
+        text: string,
+        level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+        cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+        language?: string
+    ): Promise<string>;
 
     /**
      * Analyzes translation accuracy and tone.
@@ -45,6 +50,10 @@ export interface IIntelligenceProvider {
      */
     analyzeImage(base64Image: string, context?: string): Promise<string>;
 
+    /**
+     * Synthesizes clinical text into structured insights.
+     */
+    synthesizeKnowledge(inputText: string): Promise<any>;
 
     /**
      * Chat Session Management

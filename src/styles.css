@@ -1466,6 +1466,10 @@ body[data-kss-tier="alert"]:not(.avs-active) .rounded-2xl {
     animation-name: slideInFromTop4;
 }
 
+.animate-in.slide-in-from-top-4-centered {
+    animation-name: slideInFromTop4Centered;
+}
+
 .animate-in.slide-in-from-bottom-2 {
     animation-name: slideInFromBottom2;
 }
@@ -1500,6 +1504,11 @@ body[data-kss-tier="alert"]:not(.avs-active) .rounded-2xl {
 }
 
 @keyframes slideInFromTop4 {
+    from { transform: translateY(-16px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromTop4Centered {
     from { transform: translate(-50%, -16px); opacity: 0; }
     to { transform: translate(-50%, 0); opacity: 1; }
 }
@@ -1555,4 +1564,25 @@ body::after {
 body.cpr-flash::after {
   opacity: 1;
   transition: none; /* Instant on, fade out */
+}
+
+/* ─── Dyslexia-Friendly Reading Styles (Cognitive Accessibility) ─── */
+.dyslexia-textarea textarea,
+textarea.dyslexia-textarea {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+    font-size: 15px !important;
+    line-height: 1.85 !important;
+    letter-spacing: 0.12em !important;
+    word-spacing: 0.18em !important;
+    background-color: #fcf8f2 !important; /* Soft warm cream to minimize glare */
+    color: #242424 !important; /* Soft dark gray for low contrast strain reduction */
+    padding: 1.25rem !important;
+    border-color: #e5bfa0 !important;
+}
+
+html.dark .dyslexia-textarea textarea,
+html.dark textarea.dyslexia-textarea {
+    background-color: #17151a !important; /* Warm dark theme */
+    color: #e3ded6 !important; /* Soft sand-colored text */
+    border-color: #3f3747 !important;
 }

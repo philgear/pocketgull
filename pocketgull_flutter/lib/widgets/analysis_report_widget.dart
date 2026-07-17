@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/analysis/analysis_cubit.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/patient_provider.dart';
+import '../providers/analysis_provider.dart';
+import '../providers/services_providers.dart';
 import '../services/clinical_intelligence_service.dart';
-import '../services/orcid_service.dart';
 import '../services/export_service.dart';
 import '../models/patient_types.dart';
 import 'report_tabs_widget.dart';
@@ -11,38 +11,37 @@ import 'summary_node_widget.dart';
 import 'clinical_gauge_widget.dart';
 import 'clinical_trend_widget.dart';
 
-class AnalysisReportWidget extends StatefulWidget {
+class AnalysisReportWidget extends ConsumerStatefulWidget {
   const AnalysisReportWidget({super.key});
 
   @override
-  State<AnalysisReportWidget> createState() => _AnalysisReportWidgetState();
+  ConsumerState<AnalysisReportWidget> createState() => _AnalysisReportWidgetState();
 }
 // ... [rest of UI states remain unchanged] ...
-class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
+class _AnalysisReportWidgetState extends ConsumerState<AnalysisReportWidget> {
   bool _isChatOpen = false;
   ExportMode _exportMode = ExportMode.standard;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AnalysisCubit, AnalysisState>(
-      builder: (context, state) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
+    final state = ref.watch(analysisProvider);
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Header with Generate button
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header with Generate button
               Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Row(
@@ -128,7 +127,7 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
               ReportTabsWidget(
                 activeLens: state.activeLens,
                 onLensChanged: (lens) {
-                  context.read<AnalysisCubit>().changeLens(lens);
+                  ref.read(analysisProvider.notifier).changeLens(lens);
                   setState(() => _isChatOpen = false);
                 },
               ),
@@ -141,8 +140,6 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
             ],
           ),
         );
-      },
-    );
   }
 
   Widget _buildCognitionToggles(BuildContext context, AnalysisState state) {
@@ -166,7 +163,7 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
   Widget _buildModeIcon(BuildContext context, String mode, IconData icon, bool isActive) {
     return IconButton(
       icon: Icon(icon, size: 16, color: isActive ? const Color(0xFF1C1C1C) : Colors.grey),
-      onPressed: () => context.read<AnalysisCubit>().changeReadingLevel(mode),
+      onPressed: () => ref.read(analysisProvider.notifier).changeReadingLevel(mode),
       padding: const EdgeInsets.symmetric(horizontal: 8),
       constraints: const BoxConstraints(),
       visualDensity: VisualDensity.compact,
@@ -272,13 +269,13 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
           chatMessages: state.chatMessages,
           isChatLoading: state.isLoading && state.reports.isNotEmpty,
           onSendMessage: (msg) {
-            context.read<AnalysisCubit>().askAgent(msg, context: activeReport);
+            ref.read(analysisProvider.notifier).askAgent(msg, context: activeReport);
           },
           onAskAgent: () {
             setState(() => _isChatOpen = !_isChatOpen);
           },
           onClearChat: () {
-            context.read<AnalysisCubit>().clearChat();
+            ref.read(analysisProvider.notifier).clearChat();
             setState(() => _isChatOpen = false);
           },
           onExportFhir: () => _handleFhirExport(context),
@@ -288,24 +285,24 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
   }
 
   void _handleGenerate(BuildContext context) async {
-    final patientState = context.read<PatientBloc>().state;
+    final patientState = ref.read(patientProvider);
     final data = "Goals: ${patientState.patientGoals}";
     
-    final orcidService = context.read<OrcidService>();
+    final orcidService = ref.read(orcidServiceProvider);
     final orcidProfile = orcidService.profile;
     
     // Start AI Chat Session
-    final intelService = context.read<ClinicalIntelligenceService>();
+    final intelService = ref.read(clinicalIntelligenceProvider);
     await intelService.startChatSession(data, orcidProfile: orcidProfile);
     
     // Generate Report
     if (context.mounted) {
-      context.read<AnalysisCubit>().generateComprehensiveReport(data, orcidProfile: orcidProfile);
+      ref.read(analysisProvider.notifier).generateComprehensiveReport(data, orcidProfile: orcidProfile);
     }
   }
 
   void _handleExport(BuildContext context, AnalysisState state) {
-    final patientState = context.read<PatientBloc>().state;
+    final patientState = ref.read(patientProvider);
     
     // Create a Patient object for the export
     final patient = Patient(
@@ -322,7 +319,7 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
       bookmarks: const [],
     );
 
-    context.read<ExportService>().downloadAsPdf(
+    ref.read(exportServiceProvider).downloadAsPdf(
           patient: patient,
           reports: state.reports,
           mode: _exportMode,
@@ -330,7 +327,7 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
   }
 
   void _handleFhirExport(BuildContext context) {
-    final patientState = context.read<PatientBloc>().state;
+    final patientState = ref.read(patientProvider);
     
     final patient = Patient(
       id: 'p001',
@@ -344,7 +341,7 @@ class _AnalysisReportWidgetState extends State<AnalysisReportWidget> {
       issues: patientState.issues,
     );
 
-    context.read<ExportService>().exportToFhirBundle(patient);
+    ref.read(exportServiceProvider).exportToFhirBundle(patient);
   }
 
   Widget _buildModeChip(String label, ExportMode mode) {

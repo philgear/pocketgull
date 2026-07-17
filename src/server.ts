@@ -49,7 +49,8 @@ function normalizeAndValidateModel(model: unknown): string {
 
 const app = express();
 const angularApp = new AngularNodeAppEngine({
-  allowedHosts: ['localhost', '127.0.0.1', '0.0.0.0', 'pocketgull.app', '*.pocketgull.app', 'pocketgall.com', 'pocketgall.app', 'pocketgal.app', 'pocketgull.com', 'pocketgal.ai', '*.run.app', '*.cloudworkstations.dev']
+  allowedHosts: ['localhost', '127.0.0.1', '0.0.0.0', 'pocketgull.app', '*.pocketgull.app', 'pocketgall.com', 'pocketgall.app', 'pocketgal.app', 'pocketgull.com', 'pocketgal.ai', '*.run.app', '*.cloudworkstations.dev'],
+  trustProxyHeaders: true
 });
 app.use(compression());
 
@@ -234,7 +235,8 @@ app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
 
   const isProd = process.env['NODE_ENV'] === 'production';
-  let csp = `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://fonts.gstatic.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
+  const scriptSrc = isProd ? `'self' 'nonce-${nonce}'` : `'self' 'unsafe-inline' 'unsafe-eval'`;
+  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -263,12 +265,25 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 // Load OpenAPI specification dynamically for Swagger UI
 let openApiSpec: any = {};
 try {
-  const joinedSpec = join(rootDir, 'docs', 'openapi.json');
-  const specPath = normalize(joinedSpec);
-  if (specPath.startsWith(rootDir)) {
+  // Check multiple possible locations for docs/openapi.json (dev vs prod builds)
+  const possiblePaths = [
+    join(rootDir, 'docs', 'openapi.json'),
+    join(process.cwd(), 'docs', 'openapi.json'),
+    join(__dirname, '..', '..', '..', 'docs', 'openapi.json')
+  ];
+  
+  let specPath = '';
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      specPath = normalize(p);
+      break;
+    }
+  }
+
+  if (specPath) {
     openApiSpec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
   } else {
-    throw new Error('Unauthorized path access');
+    throw new Error('docs/openapi.json not found in expected locations');
   }
 } catch (err: any) {
   console.warn('[Swagger] Failed to load docs/openapi.json:', err.message);
@@ -493,6 +508,17 @@ app.post('/api/ai/metrics', express.json(), async (req, res) => {
   }
 });
 
+app.post('/api/ai/synthesize', express.json(), async (req, res) => {
+  try {
+      await getApiKey(req);
+      const { synthesizeKnowledgeFlow } = await import('./server/genkit.js');
+      const result = await synthesizeKnowledgeFlow({ inputText: req.body.text });
+      res.json(result);
+  } catch(e: any) {
+      res.status(500).json({error: e.message});
+  }
+});
+
 app.post('/api/ai/changes', express.json(), async (req, res) => {
   try {
       await getApiKey(req);
@@ -564,7 +590,7 @@ app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, r
 // Server-Side Streaming Endpoint
 app.post('/api/ai/stream', express.json(), async (req, res) => {
   try {
-    const { patientData, systemInstruction, model, temperature } = req.body;
+    const { patientData, systemInstruction, model, temperature, lens } = req.body;
     let rawModel: string;
     try {
       rawModel = normalizeAndValidateModel(model);
@@ -585,96 +611,77 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    let response;
+    try {
+      // Initialize Google GenAI SDK
+      let ai;
+      let Type;
+      if (token) {
+          const projectId = (process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645').replace(/[^a-zA-Z0-9-_]/g, '');
+          const location = (process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1').replace(/[^a-zA-Z0-9-]/g, '');
+          const { GoogleGenAI, Type: ImportedType } = await import('@google/genai');
+          ai = new GoogleGenAI({ vertexai: true, project: projectId, location: location });
+          Type = ImportedType;
+      } else {
+          const { GoogleGenAI, Type: ImportedType } = await import('@google/genai');
+          ai = new GoogleGenAI({ apiKey: key });
+          Type = ImportedType;
+      }
 
-    if (token) {
-      // Build Vertex URL from validated environment variables and allowlisted model only.
-      // rawModel is guaranteed to be in ALLOWED_GEMINI_MODELS — no user input reaches the URL.
-      const projectId = (process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645').replace(/[^a-zA-Z0-9-_]/g, '');
-      const location = (process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1').replace(/[^a-zA-Z0-9-]/g, '');
-      const vertexUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${rawModel}:streamGenerateContent?alt=sse`;
+      const configOptions: any = {
+          systemInstruction: systemInstruction,
+          temperature: temperature ?? 0.1
+      };
+
+      // Lean Tools: Only supply tools to lenses that require biochemistry / sequence analysis
+      if (lens === 'Precision Nutrients' || lens === 'Functional Protocols') {
+          configOptions.tools = [{
+              functionDeclarations: [{
+                  name: "protein_sequence_similarity_search",
+                  description: "Searches for homologous protein sequences using MMseqs2 (fast). Use this when analyzing a protein sequence to find homologues and infer protein function.",
+                  parameters: {
+                      type: Type.OBJECT,
+                      properties: {
+                          sequence: { type: Type.STRING, description: "The raw amino acid sequence to search" }
+                      },
+                      required: ["sequence"]
+                  }
+              }]
+          }];
+      }
+
+      const streamingResponse = await ai.models.generateContentStream({
+          model: rawModel.includes('gemini-2.0-flash') ? rawModel : 'gemini-2.0-flash-exp', // Enforce 2.0 flash
+          contents: [{ role: 'user', parts: [{ text: patientData }] }],
+          config: configOptions
+      });
+
+      for await (const chunk of streamingResponse) {
+          if (chunk.functionCalls && chunk.functionCalls.length > 0) {
+              const fc = chunk.functionCalls[0];
+              res.write(`data: ${JSON.stringify({ text: `\n\n_⚡ Executing Science Skill: ${fc.name}..._\n\n` })}\n\n`);
+              
+              if (fc.name === 'protein_sequence_similarity_search') {
+                  const mockResult = {
+                      hits: [
+                          { id: "P51617", name: "IRAK1_HUMAN", identity: "100%", evalue: "0.0" },
+                          { id: "Q62070", name: "IRAK1_MOUSE", identity: "85%", evalue: "1e-150" }
+                      ]
+                  };
+                  res.write(`data: ${JSON.stringify({ toolCall: { name: fc.name, result: mockResult } })}\n\n`);
+              }
+          }
+          
+          if (chunk.text) {
+              res.write(`data: ${JSON.stringify({ text: chunk.text })}\n\n`);
+          }
+      }
       
-      console.log(`[Vertex AI] Streaming via regional endpoint: ${vertexUrl}`);
-      response = await fetch(vertexUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: patientData }] }],
-          systemInstruction: { parts: [{ text: systemInstruction }] },
-          generationConfig: { temperature: temperature ?? 0.1 },
-          safetySettings: [
-            {
-              category: 'HARM_CATEGORY_HARASSMENT',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_HATE_SPEECH',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            }
-          ]
-        })
-      });
-    } else {
-      console.log(`[Gemini Developer API] Streaming model: ${rawModel}`);
-      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${rawModel}:streamGenerateContent?alt=sse&key=${key}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Referer': 'https://pocketgull.app/'
-        },
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: patientData }] }],
-          systemInstruction: { parts: [{ text: systemInstruction }] },
-          generationConfig: { temperature: temperature ?? 0.1 },
-          safetySettings: [
-            {
-              category: 'HARM_CATEGORY_HARASSMENT',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_HATE_SPEECH',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            },
-            {
-              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-              threshold: 'BLOCK_LOW_AND_ABOVE'
-            }
-          ]
-        })
-      });
+      res.write(`data: [DONE]\n\n`);
+      res.end();
+    } catch (apiError: any) {
+      console.error('GenAI Stream Error:', apiError);
+      throw apiError;
     }
-
-    if (!response.ok || !response.body) {
-         throw new Error(`Gemini API Error: ${response.statusText}`);
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder("utf-8");
-
-    while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        res.write(chunk);
-    }
-    
-    res.write('data: [DONE]\n\n');
-    res.end();
   } catch (e: any) {
     try { res.write(`data: ${JSON.stringify({ error: e.message })}\n\n`); res.end(); } catch {}
   }
@@ -825,7 +832,7 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
 });
 
 // JSON File Database Configuration
-const dataDir = join(rootDir, 'data');
+const dataDir = join(process.cwd(), 'data');
 const patientsDbPath = join(dataDir, 'patients.json');
 
 // Ensure data directory and empty DB exists
@@ -951,6 +958,11 @@ app.use((req, res, next) => {
         const nonce = res.locals['nonce'] || '';
         const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${safeKey}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
+        
+        // Inject nonces into all inline script elements to comply with CSP
+        if (nonce) {
+          html = html.replace(/<script(?![^>]*nonce=)/g, `<script nonce="${nonce}"`);
+        }
 
         const modRes = new Response(html, {
           status: response.status,

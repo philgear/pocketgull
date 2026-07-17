@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../models/patient_types.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/patient_provider.dart';
 import '../services/orcid_service.dart';
+import '../providers/services_providers.dart';
+import '../providers/risk_score_provider.dart';
+import '../services/clinical_risk_calculator.dart';
 
-class MedicalSummaryWidget extends StatefulWidget {
+class MedicalSummaryWidget extends ConsumerStatefulWidget {
   const MedicalSummaryWidget({super.key});
 
   @override
-  State<MedicalSummaryWidget> createState() => _MedicalSummaryWidgetState();
+  ConsumerState<MedicalSummaryWidget> createState() => _MedicalSummaryWidgetState();
 }
 
-class _MedicalSummaryWidgetState extends State<MedicalSummaryWidget> {
+class _MedicalSummaryWidgetState extends ConsumerState<MedicalSummaryWidget> {
   final TextEditingController _orcidController = TextEditingController();
 
   @override
@@ -22,7 +24,7 @@ class _MedicalSummaryWidgetState extends State<MedicalSummaryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final orcidService = context.watch<OrcidService>();
+    final orcidService = ref.watch(orcidServiceProvider);
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -38,6 +40,7 @@ class _MedicalSummaryWidgetState extends State<MedicalSummaryWidget> {
           const SizedBox(height: 24),
           _buildSectionTitle(context, 'Biometric Telemetry'),
           _buildVitalsGrid(context),
+          _buildClinicalRiskCard(context, ref),
           const SizedBox(height: 24),
           _buildSectionTitle(context, 'Active Strategy Overview'),
           _buildActiveCarePlan(context),
@@ -222,49 +225,43 @@ class _MedicalSummaryWidgetState extends State<MedicalSummaryWidget> {
   }
 
   Widget _buildChiefComplaint(BuildContext context) {
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            state.patientGoals.isEmpty ? 'No chief complaint recorded.' : state.patientGoals,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-          ),
-        );
-      },
+    final state = ref.watch(patientProvider);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        state.patientGoals.isEmpty ? 'No chief complaint recorded.' : state.patientGoals,
+        style: const TextStyle(fontSize: 14, color: Colors.black87),
+      ),
     );
   }
 
   Widget _buildVitalsGrid(BuildContext context) {
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
-        final vitals = state.vitals;
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            final crossAxisCount = constraints.maxWidth > 600 ? 6 : (constraints.maxWidth > 400 ? 3 : 2);
-            return GridView.count(
-              crossAxisCount: crossAxisCount,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.5,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              children: [
-                _buildVitalCell('BP', vitals.bp, ''),
-                _buildVitalCell('HR', vitals.hr, 'BPM'),
-                _buildVitalCell('SpO2', vitals.spO2, '%'),
-                _buildVitalCell('Temp', vitals.temp, '°F'),
-                _buildVitalCell('Weight', vitals.weight, 'LBS'),
-                _buildVitalCell('Height', vitals.height, 'FT'),
-              ],
-            );
-          },
+    final state = ref.watch(patientProvider);
+    final vitals = state.vitals;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final crossAxisCount = constraints.maxWidth > 600 ? 6 : (constraints.maxWidth > 400 ? 3 : 2);
+        return GridView.count(
+          crossAxisCount: crossAxisCount,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: 1.5,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          children: [
+            _buildVitalCell('BP', vitals.bp, ''),
+            _buildVitalCell('HR', vitals.hr, 'BPM'),
+            _buildVitalCell('SpO2', vitals.spO2, '%'),
+            _buildVitalCell('Temp', vitals.temp, '°F'),
+            _buildVitalCell('Weight', vitals.weight, 'LBS'),
+            _buildVitalCell('Height', vitals.height, 'FT'),
+          ],
         );
       },
     );
@@ -310,22 +307,217 @@ class _MedicalSummaryWidgetState extends State<MedicalSummaryWidget> {
   }
 
   Widget _buildActiveCarePlan(BuildContext context) {
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey.shade200),
-            borderRadius: BorderRadius.circular(8),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Text(
+        'Care plan generated by AI will appear here based on the patient history and intake notes.',
+        style: TextStyle(fontSize: 14, color: Colors.black87, fontStyle: FontStyle.italic),
+      ),
+    );
+  }
+
+  Widget _buildClinicalRiskCard(BuildContext context, WidgetRef ref) {
+    final risk = ref.watch(riskScoreProvider);
+    
+    // Determine colors based on risk level
+    Color cardBgColor;
+    Color borderColor;
+    Color badgeBgColor;
+    Color textColor;
+    Color indicatorColor;
+    
+    switch (risk.riskLevel) {
+      case RiskLevel.low:
+        cardBgColor = Colors.green.shade50.withValues(alpha: 0.3);
+        borderColor = Colors.green.shade100;
+        badgeBgColor = Colors.green.shade50;
+        textColor = Colors.green.shade700;
+        indicatorColor = Colors.green;
+        break;
+      case RiskLevel.moderate:
+        cardBgColor = Colors.amber.shade50.withValues(alpha: 0.3);
+        borderColor = Colors.amber.shade100;
+        badgeBgColor = Colors.amber.shade50;
+        textColor = Colors.amber.shade700;
+        indicatorColor = Colors.amber;
+        break;
+      case RiskLevel.high:
+        cardBgColor = Colors.orange.shade50.withValues(alpha: 0.3);
+        borderColor = Colors.orange.shade100;
+        badgeBgColor = Colors.orange.shade50;
+        textColor = Colors.orange.shade700;
+        indicatorColor = Colors.orange;
+        break;
+      case RiskLevel.critical:
+        cardBgColor = Colors.red.shade50.withValues(alpha: 0.3);
+        borderColor = Colors.red.shade100;
+        badgeBgColor = Colors.red.shade50;
+        textColor = Colors.red.shade700;
+        indicatorColor = Colors.red;
+        break;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBgColor,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'CLINICAL TRIAGE RISK',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    textBaseline: TextBaseline.alphabetic,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    children: [
+                      Text(
+                        '${(risk.score * 100).toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w300,
+                          color: Color(0xFF1C1C1C),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'score',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: badgeBgColor,
+                      border: Border.all(color: borderColor),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: indicatorColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          risk.riskLevel.name.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'CONFIDENCE: ${(risk.confidence * 100).toStringAsFixed(0)}%',
+                    style: const TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          child: const Text(
-            'Care plan generated by AI will appear here based on the patient history and intake notes.',
-            style: TextStyle(fontSize: 14, color: Colors.black87, fontStyle: FontStyle.italic),
+          if (risk.contributingFactors.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Container(
+              height: 1,
+              color: borderColor.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'CONTRIBUTING FACTORS',
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const SizedBox(height: 6),
+            ...risk.contributingFactors.map((factor) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '• ',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      Expanded(
+                        child: Text(
+                          factor,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w300,
+                            color: Color(0xFF333333),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ],
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'SOURCE: ${risk.note}',
+                style: const TextStyle(
+                  fontSize: 8,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

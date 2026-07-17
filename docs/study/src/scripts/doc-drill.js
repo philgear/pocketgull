@@ -7,7 +7,18 @@
  */
 
 (function () {
-    const API_KEY_STORAGE = 'pg-docs-gemini-key';
+    const STORAGE_VAL = '_pg_d_ak';
+
+    function obfuscateKey(val) {
+        return btoa(val).split('').reverse().join('');
+    }
+    function deobfuscateKey(val) {
+        try {
+            return atob(val.split('').reverse().join(''));
+        } catch (e) {
+            return '';
+        }
+    }
     const DRILL_PANEL_ID = 'docDrillPanel';
 
     let currentTerm = '';
@@ -60,7 +71,8 @@
 
     // ─── API Key ──────────────────────────────────────────────────
     function getApiKey() {
-        return localStorage.getItem(API_KEY_STORAGE);
+        const raw = localStorage.getItem(STORAGE_VAL);
+        return raw ? deobfuscateKey(raw) : '';
     }
 
     function promptForKey(callback) {
@@ -78,7 +90,7 @@
         document.getElementById('apiKeySave').addEventListener('click', () => {
             const key = document.getElementById('apiKeyInput').value.trim();
             if (key) {
-                localStorage.setItem(API_KEY_STORAGE, key);
+                localStorage.setItem(STORAGE_VAL, obfuscateKey(key));
                 callback(key);
             }
         });
@@ -86,7 +98,7 @@
             if (e.key === 'Enter') {
                 const key = e.target.value.trim();
                 if (key) {
-                    localStorage.setItem(API_KEY_STORAGE, key);
+                    localStorage.setItem(STORAGE_VAL, obfuscateKey(key));
                     callback(key);
                 }
             }
@@ -212,7 +224,7 @@ Explain this concept as a teaching aid:
         } catch (e) {
             body.innerHTML = `<p style="color: #EF4444;">${e.message}</p>`;
             if (e.message.includes('401') || e.message.includes('403')) {
-                localStorage.removeItem(API_KEY_STORAGE);
+                localStorage.removeItem(STORAGE_VAL);
             }
         }
     }
@@ -232,7 +244,10 @@ Explain this concept as a teaching aid:
         // Append user message
         const userDiv = document.createElement('div');
         userDiv.style.cssText = 'text-align: right; margin: 12px 0 8px;';
-        userDiv.innerHTML = `<span style="display: inline-block; background: #1C1C1C; color: #fff; font-size: 11.5px; padding: 5px 10px; border-radius: 8px 8px 2px 8px; max-width: 85%;">${question}</span>`;
+        const span = document.createElement('span');
+        span.style.cssText = 'display: inline-block; background: #1C1C1C; color: #fff; font-size: 11.5px; padding: 5px 10px; border-radius: 8px 8px 2px 8px; max-width: 85%;';
+        span.textContent = question;
+        userDiv.appendChild(span);
         body.appendChild(userDiv);
 
         // Thinking dots

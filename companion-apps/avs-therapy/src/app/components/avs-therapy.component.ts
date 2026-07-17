@@ -348,7 +348,7 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
 
                 <!-- Breath Guide + Patient Message -->
                 <div class="flex flex-col items-center gap-2 py-2">
-                  <app-breath-guide [size]="160" [showLabel]="true" />
+                  <app-breath-guide [size]="160" [showLabel]="true" [voicePacingEnabled]="voicePacingEnabled()" />
                 </div>
 
                 <!-- Session Intent (clinician) -->
@@ -451,6 +451,20 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
               <line x1="12" y1="19" x2="12" y2="22"/>
             </svg>
             Voice: {{ voiceEnabled() ? 'ON' : 'OFF' }}
+          </button>
+
+          <!-- Voice Pacing Enable Toggle -->
+          <button (click)="toggleVoicePacing()"
+                  class="py-3 px-4 rounded-xl font-bold uppercase tracking-wider text-xs border transition-all duration-300 flex items-center justify-center gap-2 select-none cursor-pointer"
+                  [ngClass]="voicePacingEnabled() ? 
+                    'bg-orange-500/10 border-orange-500 text-orange-500' : 
+                    'bg-white dark:bg-zinc-950/10 border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-400'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+              <path d="M19 10v1a7 7 0 0 1-14 0v-1"/>
+              <line x1="12" y1="19" x2="12" y2="22"/>
+            </svg>
+            Pacing Cues: {{ voicePacingEnabled() ? 'ON' : 'OFF' }}
           </button>
 
           <!-- Rhythmic Haptic Vibration Toggle -->
@@ -602,6 +616,7 @@ export class AvsTherapyComponent implements OnDestroy {
   // --- Dynamic Telemetry & Settings Signals ---
   isActive = signal(false);
   voiceEnabled = signal(true);
+  voicePacingEnabled = signal(false);
   vibrationEnabled = signal(false);
   
   targetHr = signal(70);
@@ -639,16 +654,42 @@ export class AvsTherapyComponent implements OnDestroy {
     if (this.isBrowser) {
       this.hasVibrator = !!navigator.vibrate;
       
-      // Auto-adapt practitioner baseline targets dynamically if current patient has telemetry
+      // Closed-loop Gradient Tuning: Adjust targets dynamically based on physiological state deviations (RPP, heart rate)
       effect(() => {
         const liveVitals = this.patientState.vitals();
         if (liveVitals.hr) {
           const hrVal = parseInt(liveVitals.hr, 10);
-          if (!isNaN(hrVal) && hrVal > 85) {
-            // High heart rate, automatically recommend calming Theta waves and slow breathing (5.5 breaths/min)
-            this.targetWave.set('theta');
-            this.targetBreathingRate.set(5.5);
-            this.targetHr.set(70); // Practitioner target is set to guide them down
+          const bpParts = (liveVitals.bp || '120/80').split('/');
+          const sbpVal = bpParts.length > 0 ? parseInt(bpParts[0], 10) : 120;
+          
+          if (!isNaN(hrVal) && !isNaN(sbpVal)) {
+            const rpp = hrVal * sbpVal;
+            
+            // If the session is active, dynamically adjust on-the-fly to guide biometrics to target
+            if (this.isActive()) {
+              if (rpp > 12000 || hrVal > 85) {
+                // High myocardial workload or tachycardia: step down target frequency and respiration rate
+                this.targetWave.set('theta');
+                this.targetBreathingRate.set(5.5);
+                this.colorTemp.set('violet');
+              } else if (hrVal < 55 || sbpVal < 100) {
+                // Bradycardia or Hypotension: step up target frequency to maintain safe alertness
+                this.targetWave.set('alpha');
+                this.targetBreathingRate.set(6.5);
+                this.colorTemp.set('emerald');
+              } else {
+                // Baseline target
+                this.targetWave.set('alpha');
+                this.targetBreathingRate.set(6.0);
+                this.colorTemp.set('indigo');
+              }
+            } else {
+              // Standby default recommendations
+              if (rpp > 12000 || hrVal > 85) {
+                this.targetWave.set('theta');
+                this.targetBreathingRate.set(5.5);
+              }
+            }
           }
         }
       }, { allowSignalWrites: true });
@@ -970,6 +1011,10 @@ export class AvsTherapyComponent implements OnDestroy {
     this.voiceEnabled.update(v => !v);
   }
 
+  toggleVoicePacing() {
+    this.voicePacingEnabled.update(v => !v);
+  }
+
   toggleVibration() {
     if (!this.hasVibrator) return;
     this.vibrationEnabled.update(v => !v);
@@ -1131,7 +1176,7 @@ export class AvsTherapyComponent implements OnDestroy {
     
     let step = 0;
     this.guidanceTimer = setInterval(() => {
-      if (!this.isActive() || !this.voiceEnabled()) return;
+      if (!this.isActive() || !this.voiceEnabled() || this.voicePacingEnabled()) return;
       
       const hrVal = parseInt(this.patientState.vitals().hr || '80', 10);
       step++;

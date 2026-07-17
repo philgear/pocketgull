@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Observable } from 'rxjs';
 import { IIntelligenceProvider } from './intelligence.provider';
@@ -13,10 +13,14 @@ export class WebLLMProvider implements IIntelligenceProvider {
   private isLoaded = false;
   private platformId = inject(PLATFORM_ID);
   
+  readonly loadingProgress = signal<string>('');
+  readonly isLoadingProgress = signal<boolean>(false);
+  
   async loadEngine() {
       if (!isPlatformBrowser(this.platformId)) return;
       if (this.isLoaded && this.engine) return;
       
+      this.isLoadingProgress.set(true);
       console.log('[WebLLM] Initializing WebGPU Local Inference Engine via WebWorker...');
       const webllm = await import('@mlc-ai/web-llm');
       
@@ -26,10 +30,12 @@ export class WebLLMProvider implements IIntelligenceProvider {
         {
            initProgressCallback: (progress) => {
              console.log('[WebLLM Sync]', progress.text);
+             this.loadingProgress.set(progress.text);
            }
-        }
+         }
       );
       this.isLoaded = true;
+      this.isLoadingProgress.set(false);
       console.log('[WebLLM] Engine Ready.');
   }
 
@@ -88,7 +94,12 @@ export class WebLLMProvider implements IIntelligenceProvider {
       throw new Error("WebGPU verification payload too large for current configuration. Deferring downward."); 
   }
   
-  async translateReadingLevel(text: string, level: any): Promise<string> { 
+  async translateReadingLevel(
+      text: string,
+      level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+      cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+      language?: string
+  ): Promise<string> { 
       throw new Error("WebGPU explicit tuning deferred downward."); 
   }
   
@@ -115,6 +126,10 @@ export class WebLLMProvider implements IIntelligenceProvider {
       return res.choices[0]?.message?.content || "Offline mode inference error.";
   }
   
+  async synthesizeKnowledge(inputText: string): Promise<any> {
+    throw new Error("WebGPU synthesis deferred downward.");
+  }
+
   async getInitialGreeting(prompt: string): Promise<string> { 
       return "Hello, I am processing securely within your local hardware using WebGPU. How can I assist you with this protocol?"; 
   }

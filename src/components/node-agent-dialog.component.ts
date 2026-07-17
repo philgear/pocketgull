@@ -11,6 +11,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { AdkLiveService } from '../services/ai/adk-live.service';
+import { getStoredApiKey } from '../services/secure-key';
 
 export interface INodeAgentDialogData {
     nodeKey: string;
@@ -53,7 +54,7 @@ interface IChatEntry {
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C084FC] opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-[#C084FC]"></span>
                         </span>
-                        <span class="text-[9px] font-bold text-[#C084FC] uppercase tracking-wider animate-pulse ml-1">Live Audio</span>
+                        <span class="text-[12px] font-bold text-[#C084FC] uppercase tracking-wider animate-pulse ml-1">Live Audio</span>
                     }
                 </div>
                 <div class="flex items-center gap-1 flex-shrink-0">
@@ -161,7 +162,7 @@ interface IChatEntry {
                         <div class="absolute bottom-full left-14 mb-2 w-72 bg-white dark:bg-[#09090b] rounded-xl shadow-[0_12px_28px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.04)] overflow-hidden z-50 flex flex-col border border-gray-100 dark:border-zinc-800 transform origin-bottom-left transition-all">
                             <div class="px-3 py-2 bg-gray-50 dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 flex items-center gap-2">
                                 <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-3.5 h-3.5 text-indigo-500 flex items-center justify-center"></div>
-                                <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Initial Questions</span>
+                                <span class="text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest">Initial Questions</span>
                             </div>
                             <div class="p-1">
                                 @for (s of suggestedQuestions(); track s) {
@@ -891,7 +892,7 @@ ${patientCtx}`;
         if (!this.live.isConnected()) {
             this.isLoading.set(true);
             try {
-                const apiKey = (window as any).GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY') || '';
+                const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
                 if (!apiKey) {
                     this.appendModelMessage('System Note: Missing API Key. Please configure it to use voice.');
                     this.isLoading.set(false);

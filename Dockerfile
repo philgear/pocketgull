@@ -1,19 +1,19 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:26-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities
 RUN apk update && apk upgrade --no-cache
 
-# Update npm to resolve bundled package vulnerabilities (picomatch, tar, etc.)
-RUN npm install -g npm@latest
-
 # Install ALL dependencies (including devDependencies needed for ng build)
 COPY package*.json ./
-RUN npm ci --legacy-peer-deps
+COPY docs/study/package.json ./docs/study/
+COPY companion-apps/avs-therapy/package.json ./companion-apps/avs-therapy/
+COPY pocketgull_api/package.json ./pocketgull_api/
+RUN npm install --legacy-peer-deps
 
 # Copy source and build the docs/study Astro sub-project + Angular SSR app
 COPY . .
@@ -25,22 +25,18 @@ RUN npm prune --omit=dev
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:26-alpine
+FROM node:24-alpine
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities in production image
 RUN apk update && apk upgrade --no-cache
 
-# Update npm to resolve bundled package vulnerabilities
-RUN npm install -g npm@latest
-
 # Set Node to production mode
 ENV NODE_ENV=production
 
 # Copy package.json files (needed for package resolution / runtime)
 COPY package*.json ./
-
 # Copy pruned node_modules from builder
 COPY --from=builder /app/node_modules ./node_modules
 
@@ -49,6 +45,9 @@ COPY --from=builder /app/dist ./dist
 
 # Copy runtime assets the server loads from the project root at startup
 COPY --from=builder /app/docs/openapi.json ./docs/openapi.json
+
+# Create runtime directories and ensure the non-root 'node' user has write permissions
+RUN mkdir -p /app/logs /app/data && chown -R node:node /app
 
 # Run as non-root user for security
 USER node

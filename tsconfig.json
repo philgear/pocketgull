@@ -18,6 +18,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
+    "noEmit": true,
     "paths": {
       "@/*": [
         "./*"
@@ -35,5 +36,8 @@
   ],
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true
-  }
+  },
+  "exclude": [
+    "src/lib/dataconnect/**"
+  ]
 }

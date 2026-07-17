@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/patient/patient_event.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/patient_provider.dart';
 import '../models/patient_types.dart';
 
-class TaskFlowWidget extends StatefulWidget {
+class TaskFlowWidget extends ConsumerStatefulWidget {
   const TaskFlowWidget({super.key});
 
   @override
-  State<TaskFlowWidget> createState() => _TaskFlowWidgetState();
+  ConsumerState<TaskFlowWidget> createState() => _TaskFlowWidgetState();
 }
 
-class _TaskFlowWidgetState extends State<TaskFlowWidget> {
+class _TaskFlowWidgetState extends ConsumerState<TaskFlowWidget> {
   final TextEditingController _inputController = TextEditingController();
 
   void _submitNote() {
@@ -40,12 +39,11 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
-        final notes = state.clinicalNotes ?? [];
-        final tasks = state.checklist ?? [];
+    final state = ref.watch(patientProvider);
+    final notes = state.clinicalNotes ?? [];
+    final tasks = state.checklist ?? [];
 
-        return Container(
+    return Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -314,8 +312,6 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
             ],
           ),
         );
-      },
-    );
   }
 
   Widget _buildTaskItem(BuildContext context, ChecklistItem task) {
@@ -325,7 +321,7 @@ class _TaskFlowWidgetState extends State<TaskFlowWidget> {
     return GestureDetector(
       onDoubleTap: () {
         HapticFeedback.lightImpact();
-        context.read<PatientBloc>().add(ToggleChecklistStatusEvent(task.id));
+        ref.read(patientProvider.notifier).toggleChecklistStatus(task.id);
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),

@@ -1,7 +1,8 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/clinical_intelligence_service.dart';
 import '../../models/chat_message.dart';
 import '../../models/orcid_profile.dart';
+import 'services_providers.dart';
 
 class AnalysisState {
   final bool isLoading;
@@ -39,17 +40,21 @@ class AnalysisState {
   }
 }
 
-class AnalysisCubit extends Cubit<AnalysisState> {
-  final ClinicalIntelligenceService _intelligenceService;
+class AnalysisNotifier extends Notifier<AnalysisState> {
+  late ClinicalIntelligenceService _intelligenceService;
 
-  AnalysisCubit(this._intelligenceService) : super(const AnalysisState());
+  @override
+  AnalysisState build() {
+    _intelligenceService = ref.watch(clinicalIntelligenceProvider);
+    return const AnalysisState();
+  }
 
   void changeLens(AnalysisLens lens) {
-    emit(state.copyWith(activeLens: lens));
+    state = state.copyWith(activeLens: lens);
   }
 
   Future<void> generateComprehensiveReport(String patientData, {OrcidProfile? orcidProfile}) async {
-    emit(state.copyWith(isLoading: true, error: null, reports: {}));
+    state = state.copyWith(isLoading: true, error: null, reports: {});
 
     final lenses = [
       AnalysisLens.summaryOverview,
@@ -66,22 +71,22 @@ class AnalysisCubit extends Cubit<AnalysisState> {
           
           final currentReports = Map<AnalysisLens, String>.from(state.reports);
           currentReports[lens] = accumulated;
-          emit(state.copyWith(reports: currentReports));
+          state = state.copyWith(reports: currentReports);
         }
       });
 
       await Future.wait(futures);
     } catch (e) {
-      emit(state.copyWith(error: e.toString()));
+      state = state.copyWith(error: e.toString());
     } finally {
-      emit(state.copyWith(isLoading: false));
+      state = state.copyWith(isLoading: false);
     }
   }
 
   Future<void> askAgent(String question, {String? context}) async {
     final userMsg = ChatMessage(role: MessageRole.user, text: question);
     final updatedMessages = List<ChatMessage>.from(state.chatMessages)..add(userMsg);
-    emit(state.copyWith(chatMessages: updatedMessages, isLoading: true));
+    state = state.copyWith(chatMessages: updatedMessages, isLoading: true);
 
     try {
       final prompt = context != null 
@@ -91,42 +96,43 @@ class AnalysisCubit extends Cubit<AnalysisState> {
       final response = await _intelligenceService.sendChatMessage(prompt);
       final agentMsg = ChatMessage(role: MessageRole.agent, text: response);
       
-      emit(state.copyWith(
+      state = state.copyWith(
         chatMessages: List<ChatMessage>.from(state.chatMessages)..add(agentMsg),
         isLoading: false,
-      ));
+      );
     } catch (e) {
-      emit(state.copyWith(error: e.toString(), isLoading: false));
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
 
   void clearChat() {
-    emit(state.copyWith(chatMessages: []));
+    state = state.copyWith(chatMessages: []);
   }
 
   Future<void> changeReadingLevel(String level) async {
     if (state.readingLevel == level) return;
     
-    emit(state.copyWith(readingLevel: level, isLoading: true));
+    state = state.copyWith(readingLevel: level, isLoading: true);
     
     try {
       final updatedReports = Map<AnalysisLens, String>.from(state.reports);
       
       if (level == 'clinical') {
-        // We don't have the original clinical text stored if it was translated?
-        // Actually, we should probably keep the clinical reports as the source of truth.
-        // For now, let's assume 'clinical' means 'regenerate original'.
+        // Assume 'clinical' means 'regenerate original'
       } else {
-        // Translate all existing reports to the new reading level
         for (final entry in state.reports.entries) {
           final translated = await _intelligenceService.translateReadingLevel(entry.value, level);
           updatedReports[entry.key] = translated;
         }
       }
       
-      emit(state.copyWith(reports: updatedReports, isLoading: false));
+      state = state.copyWith(reports: updatedReports, isLoading: false);
     } catch (e) {
-      emit(state.copyWith(error: e.toString(), isLoading: false));
+      state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
 }
+
+final analysisProvider = NotifierProvider<AnalysisNotifier, AnalysisState>(() {
+  return AnalysisNotifier();
+});

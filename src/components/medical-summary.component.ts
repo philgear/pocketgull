@@ -10,6 +10,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
 import { DictationService } from '../services/dictation.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { OrcidService } from '../services/orcid.service';
+import { PythonBridgeService } from '../services/python-bridge.service';
 import { marked } from 'marked';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
@@ -69,9 +70,29 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </pocket-gull-button>
                   </div>
                   @if (orcidService.error(); as err) {
-                    <p class="text-[10px] text-red-500 mt-1 font-medium font-sans">{{ err }}</p>
+                    <p class="text-[12px] text-red-500 mt-1 font-medium font-sans">{{ err }}</p>
                   }
                 }
+              </div>
+              
+              <!-- EHR Interoperability Panel -->
+              <div class="flex items-center gap-2 mt-2">
+                <pocket-gull-button 
+                  variant="secondary" 
+                  size="xs" 
+                  (click)="exportToEpic()" 
+                  icon="M12 4v16m8-8H4"
+                  title="Export to Epic">
+                  Export to Epic
+                </pocket-gull-button>
+                <pocket-gull-button 
+                  variant="secondary" 
+                  size="xs" 
+                  (click)="exportToCerner()" 
+                  icon="M12 4v16m8-8H4"
+                  title="Export to Cerner">
+                  Export to Cerner
+                </pocket-gull-button>
               </div>
             </div>
             
@@ -84,7 +105,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </div>
                   <div>
                     <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Epic MyChart Connected</h3>
-                    <p class="text-[11px] text-green-600 dark:text-green-500/80">SMART on FHIR token securely established.</p>
+                    <p class="text-[12px] text-green-600 dark:text-green-500/80">SMART on FHIR token securely established.</p>
                   </div>
                 </div>
                 <pocket-gull-button variant="ghost" size="xs" (click)="showEpicSuccess.set(false)" icon="M6 18L18 6M6 6l12 12"></pocket-gull-button>
@@ -166,6 +187,72 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     ></app-metric-card>
                   </div>
                 </section>
+
+                <!-- Real-time Clinical Triage Risk Score Card -->
+                @if (pythonBridge.riskScore(); as risk) {
+                  <section class="mb-8 p-5 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-900/50 dark:to-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div>
+                        <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-1">Clinical Triage Risk</h2>
+                        <div class="flex items-center gap-2">
+                          <span class="text-3xl font-light tracking-tight text-gray-900 dark:text-zinc-100">
+                            {{ (risk.risk_score * 100) | number:'1.0-1' }}%
+                          </span>
+                          <span class="text-xs text-gray-400 dark:text-zinc-500 font-medium">score</span>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-col items-end gap-1.5">
+                        <!-- Dynamic Risk Level Badge -->
+                        @if (risk.risk_level === 'low') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                            Low Risk
+                          </span>
+                        } @else if (risk.risk_level === 'moderate') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+                            Moderate Risk
+                          </span>
+                        } @else if (risk.risk_level === 'high') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>
+                            High Risk
+                          </span>
+                        } @else if (risk.risk_level === 'critical') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-100 dark:border-red-900/30 animate-pulse">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-ping"></span>
+                            Critical Risk
+                          </span>
+                        }
+                        
+                        <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest">
+                          Confidence: {{ (risk.confidence * 100) | number:'1.0-0' }}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Contributing Factors list -->
+                    @if (risk.contributing_factors && risk.contributing_factors.length > 0) {
+                      <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800/80">
+                        <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Contributing Factors</h3>
+                        <ul class="space-y-1">
+                          @for (factor of risk.contributing_factors; track factor) {
+                            <li class="flex items-start gap-2 text-xs font-light text-gray-600 dark:text-zinc-300">
+                              <span class="text-gray-400 dark:text-zinc-600 mt-0.5">•</span>
+                              <span>{{ factor }}</span>
+                            </li>
+                          }
+                        </ul>
+                      </div>
+                    }
+
+                    <!-- Attribution note -->
+                    <div class="mt-3 text-[9px] font-bold uppercase tracking-widest text-gray-400/80 dark:text-zinc-600 flex justify-between items-center">
+                      <span>Source: {{ risk.note || 'Clinical Intelligence Classifier' }}</span>
+                    </div>
+                  </section>
+                }
 
                 <!-- IVitals Grid -->
                 <!-- IVitals & Biometrics -->
@@ -573,8 +660,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             <span class="flex items-center gap-1.5">
                               <div class="w-2 h-0.5 bg-[#EA4335]"></div> 
                               BigQuery OMOP 
-                              <span class="text-[9px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
-                              <span class="text-[9px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
+                              <span class="text-[12px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
+                              <span class="text-[12px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
                             </span>
                           </label>
                         </div>
@@ -710,7 +797,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 @if (activeCarePlanHTML(); as html) {
                   <section>
                     <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-4">Active Strategy Overview</h2>
-                    <div class="p-4 sm:p-8 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 rounded prose dark:prose-invert prose-sm max-w-none prose-p:text-[#1C1C1C] dark:prose-p:text-zinc-100 prose-p:font-light prose-headings:text-[11px] prose-headings:font-bold prose-headings:uppercase prose-headings:tracking-[0.1em] prose-headings:text-gray-500 dark:prose-headings:text-zinc-400" [innerHTML]="html | safeHtml"></div>
+                    <div class="p-4 sm:p-8 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 rounded prose dark:prose-invert prose-sm max-w-none prose-p:text-[#1C1C1C] dark:prose-p:text-zinc-100 prose-p:font-light prose-headings:text-[12px] prose-headings:font-bold prose-headings:uppercase prose-headings:tracking-[0.1em] prose-headings:text-gray-500 dark:prose-headings:text-zinc-400" [innerHTML]="html | safeHtml"></div>
                   </section>
                 }
       </div>
@@ -732,6 +819,7 @@ export class MedicalChartSummaryComponent {
   dictation = inject(DictationService);
   clinicalAI = inject(ClinicalIntelligenceService);
   orcidService = inject(OrcidService);
+  pythonBridge = inject(PythonBridgeService);
   http = inject(HttpClient);
   
   today = new Date();
@@ -1240,6 +1328,22 @@ export class MedicalChartSummaryComponent {
     if (!patient) return;
     this.exportService.downloadAsFhirBundle(patient);
     this.showExportMenu.set(false);
+  }
+
+  exportToEpic() {
+    const patient = this.patient();
+    if (!patient) return;
+    this.exportService.exportToEHR(patient, 'Epic');
+    this.showEpicSuccess.set(true);
+    setTimeout(() => this.showEpicSuccess.set(false), 3000);
+  }
+
+  exportToCerner() {
+    const patient = this.patient();
+    if (!patient) return;
+    this.exportService.exportToEHR(patient, 'Cerner');
+    this.showEpicSuccess.set(true);
+    setTimeout(() => this.showEpicSuccess.set(false), 3000);
   }
 
   discardDrafts() {

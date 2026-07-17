@@ -1,4 +1,4 @@
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal, afterNextRender } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 const CONSENT_KEY = 'pg_data_consent_v1';
@@ -15,10 +15,22 @@ export class ConsentService {
     private isBrowser = isPlatformBrowser(this.platformId);
 
     /** Whether the user has acknowledged the data consent modal */
-    readonly hasConsented = signal<boolean>(this.loadConsent());
+    readonly hasConsented = signal<boolean>(true);
 
     /** Timestamp of when consent was given */
-    readonly consentTimestamp = signal<string | null>(this.loadTimestamp());
+    readonly consentTimestamp = signal<string | null>(null);
+
+    constructor() {
+        if (this.isBrowser) {
+            afterNextRender(() => {
+                const consented = this.loadConsent();
+                this.hasConsented.set(consented);
+                if (consented) {
+                    this.consentTimestamp.set(this.loadTimestamp());
+                }
+            });
+        }
+    }
 
     private loadConsent(): boolean {
         if (!this.isBrowser) return true; // SSR bypass

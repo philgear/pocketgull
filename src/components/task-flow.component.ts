@@ -26,8 +26,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
               <button (click)="activeView.set('collab')" [class.text-gray-400]="activeView() !== 'collab'" [class.dark:text-zinc-500]="activeView() !== 'collab'" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100 flex items-center gap-2">
                 Colleague Chat
                 <span class="flex -space-x-2">
-                  <div class="w-6 h-6 rounded-full bg-blue-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[8px] font-bold text-blue-700 z-20 shadow-sm">SC</div>
-                  <div class="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[8px] font-bold text-indigo-700 z-10 shadow-sm">JT</div>
+                  <div class="w-6 h-6 rounded-full bg-blue-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[12px] font-bold text-blue-700 z-20 shadow-sm">SC</div>
+                  <div class="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[12px] font-bold text-indigo-700 z-10 shadow-sm">JT</div>
                 </span>
               </button>
             </div>
@@ -36,9 +36,9 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
         <div class="flex flex-col items-end gap-1 sm:gap-2">
             <div class="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-[#689f38]/10 rounded-full border border-green-100 dark:border-[#689f38]/30">
               <div class="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-[#689f38] animate-pulse"></div>
-              <span class="text-[10px] sm:text-xs font-medium text-green-700 dark:text-[#689f38] uppercase tracking-wide">Live</span>
+              <span class="text-[12px] sm:text-xs font-medium text-green-700 dark:text-[#689f38] uppercase tracking-wide">Live</span>
             </div>
-            <div class="text-[10px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest text-right">
+            <div class="text-[12px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest text-right">
                {{ checklist().length }} Tasks • {{ clinicalNotes().length }} Notes • {{ shoppingList().length }} Items
             </div>
         </div>
@@ -64,8 +64,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
               @if (enhancedChecklist().length > 0) {
                 <div class="mb-2">
                   <div class="flex items-center justify-between pl-8 mb-4">
-                    <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">Tasks</h3>
-                    <select name="taskSortOrderCtrl" id="taskSortOrderCtrl" [value]="taskSortOrder()" (change)="taskSortOrder.set($any($event.target).value)" class="text-[10px] uppercase font-bold text-gray-500 bg-transparent border-none cursor-pointer hover:text-[#1C1C1C] dark:hover:text-zinc-300 focus:ring-0">
+                    <h3 class="text-[12px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest">Tasks</h3>
+                    <select name="taskSortOrderCtrl" id="taskSortOrderCtrl" [value]="taskSortOrder()" (change)="taskSortOrder.set($any($event.target).value)" class="text-[12px] uppercase font-bold text-gray-500 bg-transparent border-none cursor-pointer hover:text-[#1C1C1C] dark:hover:text-zinc-300 focus:ring-0">
                       <option value="default">Sort: Default</option>
                       <option value="pain">Sort: Severity (Pain)</option>
                       <option value="status">Sort: Open</option>
@@ -102,7 +102,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
               <!-- Shopping List Section -->
               @if (shoppingList().length > 0) {
                 <div class="mb-2">
-                  <h3 class="flex items-center gap-1.5 text-[10px] font-bold text-[#E3663B] dark:text-[#ff8a65] uppercase tracking-widest mb-4 pl-8">
+                  <h3 class="flex items-center gap-1.5 text-[12px] font-bold text-[#E3663B] dark:text-[#ff8a65] uppercase tracking-widest mb-4 pl-8">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                     Shopping List
                   </h3>
@@ -138,7 +138,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
               <!-- Clinical Notes Section -->
               @if (clinicalNotes().length > 0) {
                 <div class="mb-2">
-                  <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-4 pl-8">Notes</h3>
+                  <h3 class="text-[12px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-4 pl-8">Notes</h3>
                   <div class="flex flex-col">
                     @for (note of enhancedClinicalNotes(); track note.id; let i = $index) {
                       <div appReveal [revealDelay]="i * 75" class="relative pl-8 pb-6 group">
@@ -148,7 +148,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                         <!-- Data Card -->
                         <div class="bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md group-hover:border-gray-300 dark:group-hover:border-zinc-600 relative">
                           <div class="flex justify-between items-start mb-3">
-                            <span class="text-[10px] font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] bg-[#F1F8E9] dark:bg-[#689f38]/10 px-2 py-1 rounded inline-block">
+                            <span class="text-[12px] font-bold uppercase tracking-widest text-[#416B1F] dark:text-[#689f38] bg-[#F1F8E9] dark:bg-[#689f38]/10 px-2 py-1 rounded inline-block">
                               {{ note.sourceLens }}
                             </span>
                             <button (click)="removeNote(note.id)" class="text-gray-300 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove Note">
@@ -156,7 +156,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             </button>
                           </div>
                           <p class="text-sm text-gray-700 dark:text-zinc-300 font-medium leading-relaxed mb-3 whitespace-pre-wrap" [innerHTML]="note.formattedText | safeHtml"></p>
-                          <div class="flex justify-between items-center text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest pt-2.5 border-t border-gray-50 dark:border-zinc-800/50 mt-1">
+                          <div class="flex justify-between items-center text-[12px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest pt-2.5 border-t border-gray-50 dark:border-zinc-800/50 mt-1">
                             <span>{{ note.date | date:'MMM d, y, h:mm a' }}</span>
                             <span class="text-gray-400 flex items-center gap-1">
                                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-400 disabled" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -185,8 +185,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                @for (msg of collabMessages(); track msg.id) {
                  <div class="flex flex-col max-w-[85%]" [class.self-end]="msg.isSelf" [class.items-end]="msg.isSelf">
                    <div class="flex items-center gap-1.5 mb-1" [class.flex-row-reverse]="msg.isSelf">
-                     <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">{{ msg.sender }}</span>
-                     <span class="text-[10px] font-medium text-gray-400 dark:text-zinc-600">{{ msg.time }}</span>
+                     <span class="text-[12px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500">{{ msg.sender }}</span>
+                     <span class="text-[12px] font-medium text-gray-400 dark:text-zinc-600">{{ msg.time }}</span>
                    </div>
                    <div class="px-4 py-2.5 rounded-2xl text-sm shadow-sm"
                      [class.bg-[#1C1C1C]]="msg.isSelf" [class.text-white]="msg.isSelf" [class.rounded-br-sm]="msg.isSelf" [class.dark:bg-zinc-800]="msg.isSelf"
@@ -300,7 +300,7 @@ export class TaskFlowComponent {
         else if (colorClass.includes('blue')) badgeStyle = 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800';
         else if (colorClass.includes('rose')) badgeStyle = 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800';
         else if (colorClass.includes('indigo')) badgeStyle = 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800';
-        return `<span class="text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeStyle} mx-1">${inner}</span>`;
+        return `<span class="text-[12px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeStyle} mx-1">${inner}</span>`;
       });
 
       return { ...task, painScore, colorClass, formattedText };
@@ -348,7 +348,7 @@ export class TaskFlowComponent {
           else if (colorClass.includes('416B1F')) badgeStyle = 'bg-[#F1F8E9] dark:bg-[#689f38]/30 text-[#416B1F] dark:text-[#689f38] border border-[#416B1F]/30 dark:border-[#689f38]/50';
         }
 
-        return `<span class="text-[10px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeStyle} mx-1 mb-1 inline-block">${inner}</span>`;
+        return `<span class="text-[12px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded ${badgeStyle} mx-1 mb-1 inline-block">${inner}</span>`;
       });
 
       return { ...note, colorClass, formattedText };

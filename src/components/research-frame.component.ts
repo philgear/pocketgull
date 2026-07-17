@@ -49,7 +49,7 @@ export interface IPubMedSearchResult {
           <!-- Search Engine Toggle -->
           <div class="flex flex-wrap items-center bg-gray-200 dark:bg-zinc-800 rounded-md p-0.5 gap-0.5">
             <button (click)="setSearchEngine('google')"
-                    class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
+                    class="px-2 py-0.5 text-[12px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'google'"
                     [class.dark:bg-zinc-600]="searchEngine() === 'google'"
                     [class.text-gray-800]="searchEngine() === 'google'"
@@ -59,7 +59,7 @@ export interface IPubMedSearchResult {
               Google
             </button>
             <button (click)="setSearchEngine('pubmed')"
-                    class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
+                    class="px-2 py-0.5 text-[12px] font-bold rounded-md transition-colors"
                     [class.bg-white]="searchEngine() === 'pubmed'"
                     [class.dark:bg-zinc-600]="searchEngine() === 'pubmed'"
                     [class.text-gray-800]="searchEngine() === 'pubmed'"
@@ -70,7 +70,7 @@ export interface IPubMedSearchResult {
             </button>
             @if (patientState.activePhilosophy() === 'ayurvedic') {
               <button (click)="setSearchEngine('ayurveda')"
-                      class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
+                      class="px-2 py-0.5 text-[12px] font-bold rounded-md transition-colors"
                       [class.bg-white]="searchEngine() === 'ayurveda'"
                       [class.dark:bg-zinc-600]="searchEngine() === 'ayurveda'"
                       [class.text-amber-700]="searchEngine() === 'ayurveda'"
@@ -82,7 +82,7 @@ export interface IPubMedSearchResult {
             }
             @if (patientState.activePhilosophy() === 'eastern') {
               <button (click)="setSearchEngine('tcm')"
-                      class="px-2 py-0.5 text-[11px] font-bold rounded-md transition-colors"
+                      class="px-2 py-0.5 text-[12px] font-bold rounded-md transition-colors"
                       [class.bg-white]="searchEngine() === 'tcm'"
                       [class.dark:bg-zinc-600]="searchEngine() === 'tcm'"
                       [class.text-emerald-700]="searchEngine() === 'tcm'"
@@ -114,7 +114,7 @@ export interface IPubMedSearchResult {
         <!-- Citation Metadata Form -->
         @if (showCitationForm()) {
           <div class="mt-3 p-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-md shadow-inner space-y-2 animate-in fade-in slide-in-from-top-1 w-full order-last">
-            <h4 class="text-[10px] font-bold text-gray-800 dark:text-zinc-100 uppercase tracking-tighter mb-1">Citation Metadata (UKRIO Style)</h4>
+            <h4 class="text-[12px] font-bold text-gray-800 dark:text-zinc-100 uppercase tracking-tighter mb-1">Citation Metadata (UKRIO Style)</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
               <pocket-gull-input [value]="authors()" (valueChange)="authors.set($event)" placeholder="Authors (e.g. Smith et al.)" size="sm"></pocket-gull-input>
               <pocket-gull-input [value]="doi()" (valueChange)="doi.set($event)" placeholder="DOI (e.g. 10.1038/s41586-021-03503-x)" size="sm"></pocket-gull-input>
@@ -122,11 +122,11 @@ export interface IPubMedSearchResult {
             <div class="flex items-center gap-4">
               <label for="peer-reviewed-checkbox" class="flex items-center gap-1.5 cursor-pointer">
                 <input id="peer-reviewed-checkbox" type="checkbox" [checked]="isPeerReviewed()" (change)="isPeerReviewed.set(!isPeerReviewed())" class="w-3 h-3 rounded border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-zinc-100 focus:ring-gray-500 dark:focus:ring-zinc-400 bg-white dark:bg-zinc-900">
-                <span class="text-[11px] text-gray-600 dark:text-zinc-400">Peer Reviewed</span>
+                <span class="text-[12px] text-gray-600 dark:text-zinc-400">Peer Reviewed</span>
               </label>
               <label for="auto-cite-checkbox" class="flex items-center gap-1.5 cursor-pointer">
                 <input id="auto-cite-checkbox" type="checkbox" [checked]="autoCite()" (change)="autoCite.set(!autoCite())" class="w-3 h-3 rounded border-gray-300 dark:border-zinc-700 text-gray-800 dark:text-zinc-100 focus:ring-gray-500 dark:focus:ring-zinc-400 bg-white dark:bg-zinc-900">
-                <span class="text-[11px] text-gray-600 dark:text-zinc-400">Include in Summary References</span>
+                <span class="text-[12px] text-gray-600 dark:text-zinc-400">Include in Summary References</span>
               </label>
             </div>
           </div>
@@ -139,7 +139,7 @@ export interface IPubMedSearchResult {
           @for(bookmark of bookmarks(); track bookmark.url) {
             <div class="group flex items-center">
                 <button (click)="loadUrl(bookmark.url)" 
-                        class="pl-2 pr-1 py-0.5 text-[11px] font-medium rounded-l-md transition-colors max-w-48 truncate flex items-center gap-1.5"
+                        class="pl-2 pr-1 py-0.5 text-[12px] font-medium rounded-l-md transition-colors max-w-48 truncate flex items-center gap-1.5"
                         [class.bg-gray-800]="bookmark.cited"
                         [class.dark:bg-zinc-700]="bookmark.cited"
                         [class.text-white]="bookmark.cited"
@@ -155,7 +155,7 @@ export interface IPubMedSearchResult {
                   {{ bookmark.title }}
                 </button>
                 <button (click)="toggleCite(bookmark)"
-                        class="px-1.5 py-0.5 text-[10px] uppercase font-black transition-colors border-r border-gray-200/20 dark:border-zinc-800/50"
+                        class="px-1.5 py-0.5 text-[12px] uppercase font-black transition-colors border-r border-gray-200/20 dark:border-zinc-800/50"
                         [class.bg-gray-900]="bookmark.cited"
                         [class.dark:bg-zinc-900]="bookmark.cited"
                         [class.text-white]="bookmark.cited"
@@ -203,7 +203,7 @@ export interface IPubMedSearchResult {
                 <div class="bg-white dark:bg-zinc-900 p-4 rounded-md shadow-sm border border-gray-200 dark:border-zinc-800">
                   <h4 class="font-bold text-gray-800 dark:text-zinc-100 text-sm leading-snug mb-1" [innerHTML]="res.title | safeHtml"></h4>
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mb-1 font-medium">{{ res.authors }}</p>
-                  <div class="text-[11px] text-gray-500 dark:text-zinc-400 flex items-center gap-2 mb-3">
+                  <div class="text-[12px] text-gray-500 dark:text-zinc-400 flex items-center gap-2 mb-3">
                     <span class="font-bold">{{ res.source }}</span> • <span>{{ res.pubdate }}</span>
                     @if (res.doi) {
                       <span>• DOI: {{ res.doi }}</span>
@@ -237,7 +237,7 @@ export interface IPubMedSearchResult {
                   <h4 class="font-bold text-gray-800 dark:text-zinc-100 text-[13px] leading-snug mb-1">
                       <a [href]="res.url" target="_blank" class="hover:underline" [innerHTML]="res.title | safeHtml"></a>
                   </h4>
-                  <div class="text-[10px] text-green-700 dark:text-[#8bc34a] font-medium mb-1.5 truncate">{{ res.displayUrl || res.url }}</div>
+                  <div class="text-[12px] text-green-700 dark:text-[#8bc34a] font-medium mb-1.5 truncate">{{ res.displayUrl || res.url }}</div>
                   <p class="text-xs text-gray-600 dark:text-zinc-400 mb-4 leading-relaxed whitespace-pre-line" [innerHTML]="res.snippet | safeHtml"></p>
 
                   <div class="flex items-center gap-2">
@@ -270,7 +270,7 @@ export interface IPubMedSearchResult {
     </div>
   `
 })
-export class ResearchFrameComponent {
+export class ResearchFrameComponent implements OnDestroy {
   @ViewChild('iframeEl') iframeEl?: ElementRef<HTMLIFrameElement>;
 
   @HostListener('window:message', ['$event'])
@@ -324,6 +324,7 @@ export class ResearchFrameComponent {
   private boundStopDrag = this.stopDrag.bind(this);
   private boundDoResize = this.doResize.bind(this);
   private boundStopResize = this.stopResize.bind(this);
+  private checkMobileListener = () => this.isMobile.set(window.innerWidth < 768);
 
   selectedPatient = computed(() => {
     const id = this.patientManager.selectedPatientId();
@@ -340,9 +341,8 @@ export class ResearchFrameComponent {
       const h = window.innerHeight;
       this.position.set({ x: w * 0.45, y: 100 });
       
-      const checkMobile = () => this.isMobile.set(window.innerWidth < 768);
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
+      this.checkMobileListener();
+      window.addEventListener('resize', this.checkMobileListener);
     }
 
     // --- Special Reference Trigger ---
@@ -691,5 +691,15 @@ export class ResearchFrameComponent {
 
   removeBookmark(url: string) {
     this.patientManager.removeBookmark(url);
+  }
+
+  ngOnDestroy() {
+    if (isPlatformBrowser(this.platformId)) {
+      window.removeEventListener('resize', this.checkMobileListener);
+    }
+    document.removeEventListener('mousemove', this.boundDoDrag);
+    document.removeEventListener('mouseup', this.boundStopDrag);
+    document.removeEventListener('mousemove', this.boundDoResize);
+    document.removeEventListener('mouseup', this.boundStopResize);
   }
 }

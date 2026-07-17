@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+pocketgull_flutter/.dart_tool/
+pocketgull_flutter/.pub-cache/
+pocketgull_flutter/build/
+
+# Local Dev/Build caches
+.angular/
+.vite/
+.astro/
+dist/
+build/
+.husky/
+.gcloudignore
+.gemini/
+.agents/
+.continue/
+.vscode/
+
+# Logs and test outputs
+*.log
+logs/
+playwright-report/
+test-results/
+.lighthouseci/
+cov/
+coverage/
+.nyc_output/
+
+# Git
+.git/
+.gitignore
+.github/
+
+# IDE/System files
+.DS_Store
+Thumbs.db
+
+# Documentation / local files
+*.local.md
+docs/study/node_modules/
+docs/study/dist/
+pocketgull_api/venv/
+pocketgull_api/.venv/
+pocketgull_api/.pytest_cache/
+pocketgull_api/__pycache__/

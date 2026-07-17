@@ -28,7 +28,16 @@ export default {
       secure: false,
       changeOrigin: true
     },
-
+    "/docs/study": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
+    "/docs": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
     "/api/python": {
       target: "http://localhost:8001",
       secure: false,
@@ -36,4 +45,3 @@ export default {
       pathRewrite: { "^/api/python": "" }
     }
   };
-

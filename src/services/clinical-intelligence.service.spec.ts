@@ -7,6 +7,7 @@ import { NetworkStateService } from './network-state.service';
 import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
 import { OrcidService } from './orcid.service';
+import { WebLLMProvider } from './ai/webllm.provider';
 import { describe, beforeEach, it, expect, vi } from 'vitest';
 
 describe('ClinicalIntelligenceService - Philosophy Modes', () => {
@@ -22,6 +23,14 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
       activePhilosophy: signal<'western' | 'eastern' | 'ayurvedic'>('western'),
       isEmergencyMode: signal<boolean>(false),
       isDemoMode: signal<boolean>(false),
+      patientId: signal<string | null>(null),
+      patientName: signal<string>(''),
+      patientAge: signal<number>(0),
+      patientGender: signal<string>(''),
+      patientHistory: signal<any[]>([]),
+      vitals: signal<any>({}),
+      patientGoals: signal<string>(''),
+      issues: signal<any>({}),
       selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
         this.activePhilosophy.set(philosophy);
       }
@@ -53,6 +62,12 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
       fetchRecord: vi.fn().mockResolvedValue({})
     };
 
+    const mockWebLLMProvider = {
+      loadingProgress: signal<string>(''),
+      isLoadingProgress: signal<boolean>(false),
+      loadEngine: vi.fn().mockResolvedValue(undefined)
+    };
+
     injector = Injector.create({
       providers: [
         { provide: ClinicalIntelligenceService, useClass: ClinicalIntelligenceService },
@@ -60,6 +75,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
         { provide: IntelligenceProviderToken, useValue: mockIntelligenceProvider },
         { provide: AiCacheService, useValue: mockAiCache },
         { provide: OrcidService, useValue: mockOrcidService },
+        { provide: WebLLMProvider, useValue: mockWebLLMProvider },
         { provide: NetworkStateService, useValue: {
             isOnline: () => true,
             useLocalInference: () => false

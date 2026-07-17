@@ -1,4 +1,4 @@
-import { Injectable, signal, effect, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
@@ -10,8 +10,9 @@ export class ThemeService {
   public currentTheme = signal<AppTheme>('light');
   public activeTheme = signal<'light' | 'dark'>('light');
   public reduceMotion = signal<boolean>(false);
+  private platformId = inject(PLATFORM_ID);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.initTheme();
       
@@ -43,12 +44,20 @@ export class ThemeService {
   }
 
   private initTheme() {
-    const savedTheme = localStorage.getItem('pocket_gull_theme') as AppTheme;
-    // Never default to Spark Mode on load for clinical safety reasons.
-    if (savedTheme && savedTheme !== 'spark') {
-      this.currentTheme.set(savedTheme);
+    // Check URL query parameters first for testing, audits, or direct links
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlTheme = urlParams.get('theme') as AppTheme;
+    if (urlTheme && ['light', 'dark', 'system', 'spark'].includes(urlTheme)) {
+      this.currentTheme.set(urlTheme);
+      this.resolveTheme(urlTheme);
     } else {
-      this.currentTheme.set('light');
+      const savedTheme = localStorage.getItem('pocket_gull_theme') as AppTheme;
+      // Never default to Spark Mode on load for clinical safety reasons.
+      if (savedTheme && savedTheme !== 'spark') {
+        this.currentTheme.set(savedTheme);
+      } else {
+        this.currentTheme.set('light');
+      }
     }
 
     const savedReduceMotion = localStorage.getItem('pocket_gull_reduce_motion');

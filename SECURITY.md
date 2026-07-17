@@ -42,6 +42,13 @@ As a clinical co-pilot, Pocket Gull operates under strict security and data-hand
 - **Secrets Management**: API keys (e.g., `GEMINI_API_KEY`) must never be committed to version control. They are injected strictly via Google Cloud Secret Manager at runtime or via local `.env` files.
 - **No Unsigned Binaries**: The build pipeline only permits verified and audited Node modules.
 
+### 5. GitHub Code Security & Google Cloud Integration
+To align with HIPAA compliance and secure clinical engineering, we integrate GitHub Advanced Security (GHAS) settings in tandem with our Google Cloud Platform (GCP) setup:
+- **Keyless Authentication & Secrets**: Do not store long-lived GCP Service Account JSON keys in GitHub Secrets. We authenticate strictly using keyless **Workload Identity Federation (WIF)** in our CI/CD pipelines. Application secrets (such as the `GEMINI_API_KEY`) are stored securely in **GCP Secret Manager** and bound dynamically to Cloud Run containers at runtime.
+- **Push Protection**: Enforce GitHub's *Secret Scanning Push Protection* to intercept and block commits containing leaked GCP credentials or API keys before they reach the repository.
+- **Continuous Container Scanning**: Dependabot alerts are utilized for early static workspace package warnings. However, the source of truth for runtime safety is **GCP Artifact Registry Container Analysis**, which performs continuous automated CVE scanning on the compiled container layers.
+- **Unified Compliance Dashboard**: For production deployments, CodeQL static analysis alerts are connected to **GCP Security Command Center (SCC)** via security source integrations, presenting a unified dashboard for infrastructure, cloud compliance, and source code health.
+
 ---
 
 ## Clinical Engineering & Risk Management Guidelines

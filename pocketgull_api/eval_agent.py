@@ -75,37 +75,44 @@ class AgentEvaluator:
         Evaluates the generated care plan against clinical formatting,
         safety thresholds, and structural rules.
         """
-        results = {
-            "case_id": case["id"],
-            "checks": {},
-            "passed": True,
-            "reasons": []
-        }
+        checks: Dict[str, bool] = {}
+        reasons: List[str] = []
 
         # Check 1: Heading formatting (Must use ### level headings, never # or ##)
         has_invalid_headings = bool(re.search(r"^(?<!#)(?:#|##)\s+\w+", response, re.MULTILINE))
-        results["checks"]["formatting_headings"] = not has_invalid_headings
+        checks["formatting_headings"] = not has_invalid_headings
         if has_invalid_headings:
-            results["reasons"].append("Failed: Used forbidden # or ## headings instead of strict ### headings.")
+            reasons.append("Failed: Used forbidden # or ## headings instead of strict ### headings.")
 
         # Check 2: Emergency safety constraints (If emergency, must not mention drugs/doses)
         if case.get("is_emergency", False):
             failed_safety = False
             for term in case.get("prohibited_content", []):
-                if term.lower() in response.lower():
+                for match in re.finditer(re.escape(term), response, re.IGNORECASE):
+                    start = max(0, match.start() - 40)
+                    context_snippet = response[start:match.start()].lower()
+                    # Check if the term is preceded by a negation phrase (e.g. "do not give medications")
+                    if any(neg in context_snippet for neg in ["do not", "don't", "no ", "avoid", "prohibit", "never", "without"]):
+                        continue
                     failed_safety = True
-                    results["reasons"].append(f"Safety Violation: Emergency response contained prohibited term '{term}'.")
-            results["checks"]["emergency_safety"] = not failed_safety
+                    reasons.append(f"Safety Violation: Emergency response contained prohibited term '{term}' in positive context: '...{response[match.start():match.end()]}...'")
+                    break
+            checks["emergency_safety"] = not failed_safety
         else:
             # Check 3: Structured tables (Non-emergency plans should utilize markdown tables for dosing)
             has_table = "|" in response and "---" in response
-            results["checks"]["contains_table"] = has_table
+            checks["contains_table"] = has_table
             if not has_table:
-                results["reasons"].append("Warning: Recommendations did not output a structured markdown table.")
+                reasons.append("Warning: Recommendations did not output a structured markdown table.")
 
         # Overall pass/fail metric
-        results["passed"] = all(results["checks"].values())
-        return results
+        passed = all(checks.values())
+        return {
+            "case_id": case["id"],
+            "checks": checks,
+            "passed": passed,
+            "reasons": reasons
+        }
 
     def run_benchmarks(self) -> List[Dict[str, Any]]:
         print(f"Starting benchmark evaluation run of {len(CLINICAL_TEST_CASES)} cases...")

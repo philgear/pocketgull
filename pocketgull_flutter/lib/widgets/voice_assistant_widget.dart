@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/patient/patient_bloc.dart';
-import '../blocs/patient/patient_event.dart';
+import '../providers/patient_provider.dart';
 import '../screens/documentation_screen.dart';
 
-class VoiceAssistantWidget extends StatefulWidget {
+class VoiceAssistantWidget extends ConsumerStatefulWidget {
   const VoiceAssistantWidget({super.key});
 
   @override
-  State<VoiceAssistantWidget> createState() => _VoiceAssistantWidgetState();
+  ConsumerState<VoiceAssistantWidget> createState() => _VoiceAssistantWidgetState();
 }
 
-class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
+class _VoiceAssistantWidgetState extends ConsumerState<VoiceAssistantWidget> {
   final SpeechToText _speechToText = SpeechToText();
   bool _speechEnabled = false;
   bool _isListening = false;
@@ -131,7 +130,7 @@ class _VoiceAssistantWidgetState extends State<VoiceAssistantWidget> {
               IconButton(
                 icon: const Icon(Icons.close, color: Colors.white54, size: 24),
                 onPressed: () {
-                  context.read<PatientBloc>().add(const ToggleLiveAgent(false));
+                  ref.read(patientProvider.notifier).toggleLiveAgent(false);
                 },
               ),
             ],

@@ -2,7 +2,8 @@ import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve, relative, isAbsolute } from 'path';
+import { rateLimit } from 'express-rate-limit';
 import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import swaggerUi from 'swagger-ui-express';
@@ -15,13 +16,31 @@ const app = express();
 app.use(compression());
 app.use('/api', cors()); // Enable CORS for API routes so Flutter apps can sync data
 
+const apiLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
+app.use('/api', apiLimiter);
+
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
 app.set('trust proxy', true);
 
 // Redirect legacy URLs and alternative domains to the primary pocketgull.app domain
+const legacyRedirectHosts = new Set([
+  'pocketgall.com',
+  'pocketgall.app',
+  'pocketgal.app',
+  'pocketgull.com',
+  'pocketgal.ai',
+  'understory'
+]);
+
 app.use((req, res, next) => {
-  const host = req.hostname || '';
-  if (host.includes('understory') || host.includes('pocketgall') || host.includes('pocketgull.com') || (host.includes('pocketgull') && !host.includes('pocketgull.app'))) {
+  const host = (req.hostname || '').toLowerCase().replace(/\.$/, '');
+  if (legacyRedirectHosts.has(host)) {
     return res.redirect(301, `https://pocketgull.app${req.originalUrl}`);
   }
   next();
@@ -39,15 +58,27 @@ console.log(`[SERVER] Expected dist folder: ${distFolder}`);
 
 // Serve Astro Study Docs independently of Swagger
 app.use('/docs/study', (req, res, next) => {
+  const requestUrl = new URL(req.path || '/', 'http://localhost');
+  const requestedPath = requestUrl.pathname;
+  
+  const expectedBase = resolve(distFolder, 'docs', 'study');
+  const candidatePath = resolve(expectedBase, '.' + requestedPath);
+  const relativePath = relative(expectedBase, candidatePath);
+
+  if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
+    return res.status(403).send("Forbidden");
+  }
+
   if (req.path !== '/' && req.path !== '' && !req.path.endsWith('/') && !req.path.includes('.')) {
     return res.redirect(301, `/docs/study${req.path}/`);
   }
 
-  const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
-  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(distFolder, 'docs', 'study', cleanPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
+  const cleanPath = requestedPath.endsWith('/') ? requestedPath : requestedPath + '/';
+  if (requestedPath === '/' || requestedPath === '' || !requestedPath.includes('.')) {
+    const targetPath = join(expectedBase, cleanPath, 'index.html');
+    const resolvedPath = resolve(targetPath);
+    if (resolvedPath.startsWith(expectedBase) && fs.existsSync(resolvedPath)) {
+      return res.sendFile(resolvedPath);
     }
   }
   next();
@@ -177,11 +208,12 @@ app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
     "default-src 'self'; " +
+    "worker-src 'self' blob:; " +
     `script-src 'self' 'nonce-${nonce}'; ` +
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
     "img-src 'self' https: data:; " +
-    "font-src 'self' https://fonts.gstatic.com; " +
-    "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; " +
+    "font-src 'self'; " +
+    "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; " +
     "frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://insightspark-82c75.web.app; " +
     "frame-ancestors 'self'; " +
     "object-src 'none'; " +
@@ -340,7 +372,7 @@ app.get('/health', (req, res) => {
 });
 
 // JSON File Database Configuration
-const dataDir = join(rootDir, 'data');
+const dataDir = join(process.cwd(), 'data');
 const patientsDbPath = join(dataDir, 'patients.json');
 
 // Ensure data directory and empty DB exists
@@ -363,14 +395,95 @@ app.get('/api/patients', (req, res) => {
   }
 });
 
+function validatePatientData(data) {
+  if (!Array.isArray(data)) {
+    throw new Error('Data must be an array');
+  }
+  return data.map(patient => {
+    if (typeof patient !== 'object' || patient === null) {
+      throw new Error('Patient must be an object');
+    }
+    return {
+      id: String(patient.id || ''),
+      name: String(patient.name || ''),
+      age: Number(patient.age || 0),
+      gender: String(patient.gender || ''),
+      lastVisit: String(patient.lastVisit || ''),
+      preexistingConditions: Array.isArray(patient.preexistingConditions) 
+        ? patient.preexistingConditions.map(String) 
+        : [],
+      patientGoals: String(patient.patientGoals || ''),
+      vitals: {
+        bp: String(patient.vitals?.bp || ''),
+        hr: String(patient.vitals?.hr || ''),
+        temp: String(patient.vitals?.temp || ''),
+        spO2: String(patient.vitals?.spO2 || ''),
+        weight: String(patient.vitals?.weight || ''),
+        height: String(patient.vitals?.height || '')
+      },
+      oxidativeStressMarkers: Array.isArray(patient.oxidativeStressMarkers)
+        ? patient.oxidativeStressMarkers.map(m => ({
+            id: String(m.id || ''),
+            name: String(m.name || ''),
+            value: String(m.value || '')
+          }))
+        : [],
+      clinicalLogs: Array.isArray(patient.clinicalLogs)
+        ? patient.clinicalLogs.map(l => ({
+            timestamp: String(l.timestamp || ''),
+            clinician: String(l.clinician || ''),
+            note: String(l.note || '')
+          }))
+        : [],
+      medications: Array.isArray(patient.medications)
+        ? patient.medications.map(m => ({
+            name: String(m.name || ''),
+            dosage: String(m.dosage || ''),
+            frequency: String(m.frequency || '')
+          }))
+        : [],
+      labResults: Array.isArray(patient.labResults)
+        ? patient.labResults.map(r => ({
+            testName: String(r.testName || ''),
+            value: String(r.value || ''),
+            unit: String(r.unit || ''),
+            status: String(r.status || '')
+          }))
+        : [],
+      lifestyleFactors: {
+        sleepHours: Number(patient.lifestyleFactors?.sleepHours || 0),
+        activityLevel: String(patient.lifestyleFactors?.activityLevel || ''),
+        stressScore: Number(patient.lifestyleFactors?.stressScore || 0)
+      },
+      avsHistory: Array.isArray(patient.avsHistory)
+        ? patient.avsHistory.map(h => ({
+            timestamp: String(h.timestamp || ''),
+            wave: String(h.wave || ''),
+            bpm: Number(h.bpm || 0),
+            durationMin: Number(h.durationMin || 0)
+          }))
+        : [],
+      clinicalPhilosophy: String(patient.clinicalPhilosophy || ''),
+      selectedPhilosophy: String(patient.selectedPhilosophy || ''),
+      isEmergencyMode: Boolean(patient.isEmergencyMode),
+      reasonForVisit: String(patient.reasonForVisit || ''),
+      occupation: String(patient.occupation || ''),
+      dietaryProtocol: String(patient.dietaryProtocol || '')
+    };
+  });
+}
+
 app.post('/api/patients', (req, res) => {
   try {
     if (!req.body || !Array.isArray(req.body)) {
       return res.status(400).json({ error: 'Body must be a JSON array of patients' });
     }
 
-    // Save exactly what the frontend sends
-    fs.writeFileSync(patientsDbPath, JSON.stringify(req.body, null, 2));
+    // Sanitize and validate incoming patient data
+    const sanitized = validatePatientData(req.body);
+
+    // Save validated data to file
+    fs.writeFileSync(patientsDbPath, JSON.stringify(sanitized, null, 2));
 
     console.log(`[API] Saved ${req.body.length} patients to database.`);
     res.status(200).json({ success: true, count: req.body.length });
@@ -439,6 +552,10 @@ app.get(/(.*)/, (req, res) => {
         const nonce = res.locals.nonce || '';
         const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${geminiApiKeyCached}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
+      }
+      const nonce = res.locals.nonce || '';
+      if (nonce) {
+        html = html.replace(/<script(?![^>]*nonce=)/g, `<script nonce="${nonce}"`);
       }
       res.setHeader('Content-Type', 'text/html');
       return res.status(200).send(html);

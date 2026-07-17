@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DicomService, IDicomStudy } from '../services/dicom.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
+import { Medical3DViewerComponent } from './medical-3d-viewer.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-dicom-viewer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, Medical3DViewerComponent],
   template: `
-    <div class="h-full flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+    <div class="h-[450px] flex flex-col bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm">
       <div class="px-4 py-3 border-b flex justify-between items-center bg-zinc-50 dark:bg-zinc-900/50">
         <h3 class="font-medium text-sm text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
            <svg class="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,14 +57,14 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
                   <div class="font-medium text-sm text-zinc-900 dark:text-zinc-100 truncate pr-2" title="{{ study.patientName }}">
                     {{ study.patientName }}
                   </div>
-                  <div class="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-mono">
+                  <div class="text-[12px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 font-mono">
                     {{ study.modalities?.join(',') || 'CT' }}
                   </div>
                 </div>
                 <div class="text-xs text-zinc-500 truncate" title="{{ study.studyDescription }}">
                   {{ study.studyDescription || 'No description' }}
                 </div>
-                <div class="text-[10px] text-zinc-400 mt-1">
+                <div class="text-[12px] text-zinc-400 mt-1">
                   {{ formatDate(study.studyDate) }}
                 </div>
               </div>
@@ -71,15 +72,37 @@ import { ClinicalIntelligenceService } from '../services/clinical-intelligence.s
           </div>
         </div>
 
-        <!-- Main viewer panel -->
+        <!-- Main viewer panel: split 2D Slice and 3D Reconstruction -->
         <div class="flex-1 flex flex-col bg-black relative group overflow-hidden">
           @if (currentImageSrc()) {
-            <div class="flex-1 flex items-center justify-center overflow-hidden">
-              <img [src]="currentImageSrc()" alt="DICOM study image" class="max-h-full max-w-full object-contain" />
+            <div class="flex-1 flex overflow-hidden min-h-0">
+              <!-- Left side: 2D DICOM Slice -->
+              <div class="w-1/2 flex flex-col border-r border-zinc-800 relative bg-zinc-950/80">
+                <div class="absolute top-2 left-2 z-10 bg-black/60 px-2 py-1 rounded text-[12px] font-mono text-zinc-400 uppercase tracking-widest">
+                  2D Slice View
+                </div>
+                <div class="flex-1 flex items-center justify-center overflow-hidden p-3">
+                  <img [src]="currentImageSrc()" alt="DICOM study image" class="max-h-full max-w-full object-contain select-none pointer-events-none" />
+                </div>
+              </div>
+
+              <!-- Right side: 3D Reconstruction model -->
+              <div class="w-1/2 flex flex-col relative bg-zinc-950">
+                <div class="absolute top-2 left-2 z-10 bg-black/60 px-2 py-1 rounded text-[12px] font-mono text-zinc-400 uppercase tracking-widest">
+                  3D Reconstruction
+                </div>
+                <div class="flex-1 min-h-0 min-w-0">
+                  <app-medical-3d-viewer
+                    [threejsId]="getThreejsId(selectedStudy())"
+                    [severity]="getStudySeverity(selectedStudy())"
+                    [particles]="true">
+                  </app-medical-3d-viewer>
+                </div>
+              </div>
             </div>
 
             <!-- Analysis Bar -->
-            <div class="p-3 bg-zinc-900 border-t border-zinc-800 flex justify-between items-center">
+            <div class="p-3 bg-zinc-900 border-t border-zinc-800 flex justify-between items-center shrink-0">
               <div class="text-xs text-zinc-400 font-mono truncate max-w-[50%]">
                  Study: {{ selectedStudy()?.studyInstanceUid?.substring(0,20) }}...
               </div>
@@ -145,17 +168,31 @@ export class DicomViewerComponent {
     const seriesUid = 'mock-series-uid';
     const instanceUid = 'mock-instance-uid';
 
-    const isMock = seriesUid.includes('mock');
-    const src = isMock
-       ? 'https://upload.wikimedia.org/wikipedia/commons/6/62/CT_scan_of_the_brain.jpg'
-       : this.dicomService.getRenderedImageUrl(studyUid, seriesUid, instanceUid);
-
+    const src = this.dicomService.getRenderedImageUrl(studyUid, seriesUid, instanceUid);
     this.currentImageSrc.set(src);
   }
 
   formatDate(dateStr?: string): string {
     if (!dateStr || dateStr.length !== 8) return dateStr || 'Unknown Date';
     return `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+  }
+
+  getThreejsId(study: IDicomStudy | null): string {
+    if (!study) return 'generic';
+    const desc = (study.studyDescription || '').toLowerCase();
+    if (desc.includes('spine') || desc.includes('lumbar') || desc.includes('skeletal')) return 'skeletal';
+    if (desc.includes('brain') || desc.includes('neuro') || desc.includes('head')) return 'neurological';
+    if (desc.includes('chest') || desc.includes('lung') || desc.includes('pulmonary')) return 'pulmonary';
+    if (desc.includes('cardiac') || desc.includes('heart')) return 'cardiac';
+    return 'generic';
+  }
+
+  getStudySeverity(study: IDicomStudy | null): 'green' | 'yellow' | 'red' | undefined {
+    if (!study) return undefined;
+    const desc = (study.studyDescription || '').toLowerCase();
+    if (desc.includes('spine') || desc.includes('lumbar')) return 'red';
+    if (desc.includes('brain') || desc.includes('neuro')) return 'yellow';
+    return 'green';
   }
 
   async analyzeImage() {
@@ -177,7 +214,7 @@ export class DicomViewerComponent {
             role: 'model',
             text: `**Radiology Analysis Complete:**
 
-${analysis}`
+\${analysis}`
         }]);
 
         console.log('DICOM Analysis Response:', analysis);

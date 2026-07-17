@@ -29,6 +29,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
           <div class="flex items-center gap-2">
             <div class="w-2 h-2 rounded-sm bg-[#689F38] dark:bg-[#8bc34a]"></div>
             <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Assessment Panel</span>
+            <pocket-gull-badge label="HIPAA COMPLIANT" severity="success" class="ml-2"></pocket-gull-badge>
           </div>
           <pocket-gull-button 
             variant="ghost" 
@@ -166,7 +167,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
                   @if(dictation.permissionError(); as error) {
                       <div class="flex items-center gap-2 text-brand-red-600 dark:text-brand-red-400 bg-brand-red-50 dark:bg-brand-red-900/30 px-3 py-2 rounded-md border border-brand-red-100 dark:border-brand-red-800/50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                        <p class="text-[11px] font-medium">{{ error }}</p>
+                        <p class="text-[12px] font-medium">{{ error }}</p>
                       </div>
                   }
                 </div>
@@ -474,7 +475,7 @@ export class IntakeFormComponent implements OnDestroy {
   private markdownService = inject(MarkdownService);
 
   aiInsights = computed(() => {
-    const report = (this.intel.analysisResults() as any)['Care Plan Overview'];
+    const report = this.intel.analysisResults()['Summary Overview'];
     if (!report) return [];
 
     const partName = this.state.selectedPartId() ? this.state.selectedPartName() : '';
@@ -845,9 +846,19 @@ export class IntakeFormComponent implements OnDestroy {
   adoptInsight(node: any, target: 'desc' | 'rec' = 'desc') {
     let text = '';
     if (node.type === 'paragraph') {
-      text = node.rawHtml.replace(/<[^>]*>/g, '').trim();
+      let raw = node.rawHtml || '';
+      while (/<[^>]*>/.test(raw)) {
+        raw = raw.replace(/<[^>]*>/g, '');
+      }
+      text = raw.trim();
     } else if (node.type === 'list') {
-      text = node.items.map((it: any) => '• ' + it.html.replace(/<[^>]*>/g, '').trim()).join('\n');
+      text = (node.items || []).map((it: any) => {
+        let htmlStr = it.html || '';
+        while (/<[^>]*>/.test(htmlStr)) {
+          htmlStr = htmlStr.replace(/<[^>]*>/g, '');
+        }
+        return '• ' + htmlStr.trim();
+      }).join('\n');
     }
 
     if (target === 'desc') {

@@ -1,6 +1,9 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { IPatientState } from './patient.types';
+import * as CryptoJS from 'crypto-js';
+
+const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 
 @Injectable({ providedIn: 'root' })
 export class StorageService {
@@ -10,6 +13,17 @@ export class StorageService {
   private readonly DB_NAME = 'PocketGullDB';
   private readonly STORE_NAME = 'patients';
   private readonly VERSION = 2;
+
+  private encrypt(data: any): string {
+    const str = JSON.stringify(data);
+    return CryptoJS.AES.encrypt(str, ENCRYPTION_KEY).toString();
+  }
+
+  private decrypt(ciphertext: string): any {
+    const bytes = CryptoJS.AES.decrypt(ciphertext, ENCRYPTION_KEY);
+    const decryptedStr = bytes.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(decryptedStr);
+  }
 
   private initDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -41,12 +55,23 @@ export class StorageService {
         const store = transaction.objectStore(this.STORE_NAME);
         const getReq = store.get(id);
         getReq.onsuccess = () => {
-            const data = getReq.result || { id, chatHistory: [] };
-            data.state = state;
-            data.timestamp = Date.now();
-            const putReq = store.put(data);
-            putReq.onsuccess = () => resolve();
-            putReq.onerror = () => reject(putReq.error);
+          let innerData = { state: null as any, chatHistory: [] as any[] };
+          if (getReq.result && getReq.result.encryptedPayload) {
+            try {
+              innerData = this.decrypt(getReq.result.encryptedPayload);
+            } catch (err) {
+              console.error('Decryption failed on saveState', err);
+            }
+          } else if (getReq.result && getReq.result.state) {
+            // Legacy unencrypted migration fallback
+            innerData.state = getReq.result.state;
+            innerData.chatHistory = getReq.result.chatHistory || [];
+          }
+          innerData.state = state;
+          const encryptedPayload = this.encrypt(innerData);
+          const putReq = store.put({ id, encryptedPayload, timestamp: Date.now() });
+          putReq.onsuccess = () => resolve();
+          putReq.onerror = () => reject(putReq.error);
         };
         getReq.onerror = () => reject(getReq.error);
       });
@@ -64,12 +89,23 @@ export class StorageService {
         const store = transaction.objectStore(this.STORE_NAME);
         const getReq = store.get(id);
         getReq.onsuccess = () => {
-            const data = getReq.result || { id, state: null };
-            data.chatHistory = chatHistory;
-            data.timestamp = Date.now();
-            const putReq = store.put(data);
-            putReq.onsuccess = () => resolve();
-            putReq.onerror = () => reject(putReq.error);
+          let innerData = { state: null as any, chatHistory: [] as any[] };
+          if (getReq.result && getReq.result.encryptedPayload) {
+            try {
+              innerData = this.decrypt(getReq.result.encryptedPayload);
+            } catch (err) {
+              console.error('Decryption failed on saveChatHistory', err);
+            }
+          } else if (getReq.result && getReq.result.state) {
+            // Legacy unencrypted migration fallback
+            innerData.state = getReq.result.state;
+            innerData.chatHistory = getReq.result.chatHistory || [];
+          }
+          innerData.chatHistory = chatHistory;
+          const encryptedPayload = this.encrypt(innerData);
+          const putReq = store.put({ id, encryptedPayload, timestamp: Date.now() });
+          putReq.onsuccess = () => resolve();
+          putReq.onerror = () => reject(putReq.error);
         };
         getReq.onerror = () => reject(getReq.error);
       });
@@ -86,7 +122,29 @@ export class StorageService {
         const transaction = db.transaction(this.STORE_NAME, 'readonly');
         const store = transaction.objectStore(this.STORE_NAME);
         const request = store.get(id);
-        request.onsuccess = () => resolve(request.result ? request.result : null);
+        request.onsuccess = () => {
+          const result = request.result;
+          if (result && result.encryptedPayload) {
+            try {
+              const decrypted = this.decrypt(result.encryptedPayload);
+              resolve({
+                state: decrypted.state,
+                chatHistory: decrypted.chatHistory || []
+              });
+            } catch (err) {
+              console.error('Decryption failed on loadState', err);
+              resolve(null);
+            }
+          } else if (result && result.state) {
+            // Legacy unencrypted fallback
+            resolve({
+              state: result.state,
+              chatHistory: result.chatHistory || []
+            });
+          } else {
+            resolve(null);
+          }
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (e) {
@@ -104,7 +162,21 @@ export class StorageService {
         const transaction = db.transaction('patients_roster', 'readonly');
         const store = transaction.objectStore('patients_roster');
         const request = store.getAll();
-        request.onsuccess = () => resolve(request.result || []);
+        request.onsuccess = () => {
+          const results = request.result || [];
+          const decryptedList = results.map(r => {
+            if (r.encryptedPayload) {
+              try {
+                return this.decrypt(r.encryptedPayload);
+              } catch (err) {
+                console.error('Decryption failed on loadPatients', err);
+                return null;
+              }
+            }
+            return r; // Fallback for legacy unencrypted data
+          }).filter(r => r !== null);
+          resolve(decryptedList);
+        };
         request.onerror = () => reject(request.error);
       });
     } catch (e) {
@@ -117,10 +189,11 @@ export class StorageService {
     if (!this.isBrowser) return;
     try {
       const db = await this.initDB();
+      const encryptedPayload = this.encrypt(patient);
       return new Promise((resolve, reject) => {
         const transaction = db.transaction('patients_roster', 'readwrite');
         const store = transaction.objectStore('patients_roster');
-        const request = store.put(patient);
+        const request = store.put({ id: patient.id, encryptedPayload });
         request.onsuccess = () => resolve();
         request.onerror = () => reject(request.error);
       });

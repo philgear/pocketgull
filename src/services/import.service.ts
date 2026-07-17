@@ -398,7 +398,7 @@ export class ImportService {
     
     // Look for LOINC codes typical in Epic Lucy / MyChart
     // Example: 85354-9 (Blood Pressure), 8867-4 (Heart Rate), 29463-7 (Body Weight)
-    const loincCode = obs.code.coding.find((c: any) => c.system?.includes('loinc.org'))?.code;
+    const loincCode = obs.code.coding.find((c: any) => c.system === 'http://loinc.org')?.code;
     
     if (loincCode === '8867-4' && obs.valueQuantity?.value) {
       // HR
@@ -413,7 +413,7 @@ export class ImportService {
       if (obs.component && obs.component.length >= 2) {
         let sys = '', dia = '';
         obs.component.forEach((comp: any) => {
-          const compCode = comp.code?.coding?.find((c: any) => c.system?.includes('loinc.org'))?.code;
+          const compCode = comp.code?.coding?.find((c: any) => c.system === 'http://loinc.org')?.code;
           if (compCode === '8480-6') sys = comp.valueQuantity?.value; // Systolic
           if (compCode === '8462-4') dia = comp.valueQuantity?.value; // Diastolic
         });

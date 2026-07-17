@@ -1,74 +1,14 @@
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
-// Screenshot output directory (same as other e2e specs)
-const SCREENSHOT_DIR = 'C:/Users/philg/.gemini/antigravity-ide/brain/c5a2f368-705d-47b8-a137-5d99b37800df';
+import { setupE2ePage } from './utils/setup';
 
-// Shared beforeEach: suppress tour, mock SW, set localStorage
-async function setupPage(page: import('@playwright/test').Page) {
-  // Intercept config endpoint to return empty API key so splash screen shows Demo Mode
-  await page.route('**/api/config', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ apiKey: '' })
-    });
-  });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  // Intercept hardware telemetry to prevent 500 error warnings
-  await page.route('**/api/hardware/telemetry', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        gpus: [],
-        cpuName: 'Mock CPU',
-        cpuLoadPercent: 12,
-        systemMemoryUsedGb: 4.5,
-        systemMemoryTotalGb: 16.0
-      })
-    });
-  });
-
-  // Intercept current patient loci endpoint to avoid 503 sidecar errors
-  await page.route('**/api/loci/current_patient', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([])
-    });
-  });
-
-  await page.addInitScript(() => {
-    try {
-      window.indexedDB.deleteDatabase('PocketGullDB');
-    } catch (e) {}
-
-    // Skip walkthrough tour
-    window.localStorage.setItem('pg_tour_seen', '1');
-    window.localStorage.setItem('pg_mock_clinician', '1');
-    window.localStorage.setItem('pg_data_consent_v1', 'true');
-
-    // Disable service worker during tests
-    try {
-      const mockSW = {
-        register: () => Promise.reject(new Error('SW disabled for testing')),
-        addEventListener: () => {},
-        removeEventListener: () => {},
-        getRegistration: () => Promise.resolve(undefined),
-        getRegistrations: () => Promise.resolve([]),
-        controller: null,
-        ready: new Promise(() => {}),
-      };
-      Object.defineProperty(navigator, 'serviceWorker', {
-        get() { return mockSW; },
-        configurable: true,
-      });
-    } catch (e) {
-      console.error('Failed to mock service worker:', e);
-    }
-  });
-}
+// Screenshot output directory
+const SCREENSHOT_DIR = path.join(__dirname, '..', 'test-results', 'screenshots');
 
 /** Shared login + demo mode entry flow */
 async function enterDemoMode(page: import('@playwright/test').Page) {
@@ -111,7 +51,7 @@ async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) 
   const dropdownBtn = page.locator('app-patient-dropdown button').first();
   await dropdownBtn.click();
 
-  const philGearOption = page.locator('button', { hasText: 'Phil Gear' }).first();
+  const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
   await philGearOption.click();
 
   // Wait for selection to load
@@ -121,7 +61,7 @@ async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) 
 test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(90000);
-    await setupPage(page);
+    await setupE2ePage(page);
   });
 
   test('Phil Gear can be selected and loaded', async ({ page }) => {
@@ -179,27 +119,27 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
 
     // Verify Summary Overview has Phil's assessment content
     const overviewTab = page.getByTestId('tab-overview');
-    await overviewTab.click({ force: true });
+    await overviewTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Clinical Assessment')).toBeVisible({ timeout: 5000 });
 
     // Functional Protocols tab
     const funcTab = page.getByTestId('tab-functional-protocols');
-    await funcTab.click({ force: true });
+    await funcTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Diagnostic Workup')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Functional Protocols tab populated.');
 
     // Nutrition tab
     const nutritionTab = page.getByTestId('tab-nutrition');
-    await nutritionTab.click({ force: true });
+    await nutritionTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Nutritional Interventions')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Nutrition tab populated.');
 
     // Precision Nutrients tab
     const orthoTab = page.getByTestId('tab-precision-nutrients');
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
     await expect(reportEl.locator('text=Magnesium').first()).toBeVisible({ timeout: 5000 });
@@ -207,20 +147,20 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
 
     // Monitoring & Follow-up tab
     const monitorTab = page.getByTestId('tab-monitoring-follow-up');
-    await monitorTab.click({ force: true });
+    await monitorTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Immediate (24-72 hours)')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Monitoring & Follow-up tab populated.');
 
     // Patient Education tab
     const educationTab = page.getByTestId('tab-patient-education');
-    await educationTab.click({ force: true });
+    await educationTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Understanding Your')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Patient Education tab populated.');
 
     // Take a full-page screenshot at the end
-    await overviewTab.click({ force: true });
+    await overviewTab.click();
     await page.waitForTimeout(500);
     // await page.screenshot({
     //   path: path.join(SCREENSHOT_DIR, 'phil_gear_all_lenses.png'),
@@ -243,7 +183,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     // Western paradigm
     await page.locator('button', { hasText: 'Western' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
     // await page.screenshot({
@@ -254,7 +194,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     // Eastern paradigm
     await page.locator('button', { hasText: 'Eastern (TCM)' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
     // await page.screenshot({
@@ -265,7 +205,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     // Ayurvedic paradigm
     await page.locator('button', { hasText: 'Ayurvedic' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=structural dryness')).toBeVisible({ timeout: 5000 });
     // await page.screenshot({

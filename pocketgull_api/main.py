@@ -1,5 +1,5 @@
 """
-Pocket Gull — Python Data Bridge
+Pocket Gull — Python Data Bridge (Pyright Refreshed v5)
 FastAPI sidecar v1.0
 
 Runs on :8001. Accessed via the Angular SSR server at /api/python/*.
@@ -19,8 +19,10 @@ Endpoints:
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, AsyncGenerator, Optional
 
@@ -30,12 +32,53 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
+# ══════════════════════════════════════════════════════════════════════════════
+# ML: CLINICAL RISK SCORING (joblib / scikit-learn) STATE & LOADING
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Model loaded once at startup — never per-request, never sent to the client.
+_risk_model: Any = None
+_safety_threshold: float = 0.50
+_MODEL_PATH = Path(__file__).parent / "models" / "clinical_risk_v2.joblib"
+_METADATA_PATH = Path(__file__).parent / "models" / "clinical_risk_v2.metadata.json"
+
+
+async def _load_ml_model() -> None:
+    global _risk_model, _safety_threshold
+    if _MODEL_PATH.exists():
+        try:
+            import joblib
+            import json
+            _risk_model = joblib.load(_MODEL_PATH)
+            print(f"[ML] Loaded clinical risk model from {_MODEL_PATH}")
+            if _METADATA_PATH.exists():
+                try:
+                    with open(_METADATA_PATH, "r", encoding="utf-8") as f:
+                        meta = json.load(f)
+                    _safety_threshold = meta.get("optimal_safety_threshold", 0.50)
+                    print(f"[ML] Loaded optimal safety decision threshold: {_safety_threshold:.3f}")
+                except Exception as meta_exc:
+                    print(f"[ML] Warning: could not parse metadata card ({meta_exc}). Using default threshold.")
+        except Exception as exc:
+            print(f"[ML] Warning: could not load model ({exc}). Risk scoring will be unavailable.")
+    else:
+        print(f"[ML] No model found at {_MODEL_PATH}. Risk scoring endpoint returns demo data.")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load ML model at startup
+    await _load_ml_model()
+    yield
+
+
 # ── App ──────────────────────────────────────────────────────────────────────
 
 app = FastAPI(
     title="Pocket Gull Python Data Bridge",
     version="1.0.0",
     description="Bridges Python medical data (pandas, NumPy, FHIR, HDF5, ML) to the Angular clinical frontend.",
+    lifespan=lifespan,
 )
 
 _ALLOWED_ORIGINS = [
@@ -259,6 +302,7 @@ async def _biosignal_generator(session_id: str) -> AsyncGenerator[str, None]:
         from scipy.signal import find_peaks
         has_scipy = True
     except ImportError:
+        find_peaks = None
         has_scipy = False
 
     # Simulate an HDF5 buffer ring (In reality, this would be a shared memory queue from hardware)
@@ -269,7 +313,7 @@ async def _biosignal_generator(session_id: str) -> AsyncGenerator[str, None]:
         # ── HDF5 DSP Pipeline (Real-Time HRV Extraction) ───────────────
         hrv_rmssd, dominant_freq_hz, breathing_bpm, coherence = None, None, None, None
         
-        if has_scipy and _HDF5_DATA_DIR.exists():
+        if has_scipy and find_peaks is not None and _HDF5_DATA_DIR.exists():
             try:
                 import h5py
                 hdf5_path = _HDF5_DATA_DIR / "session.hdf5"
@@ -320,11 +364,11 @@ async def _biosignal_generator(session_id: str) -> AsyncGenerator[str, None]:
 
         event = {
             "session_id":           session_id,
-            "hrv_rmssd_ms":         round(float(hrv_rmssd), 2),
-            "dominant_frequency_hz": round(float(dominant_freq_hz), 2),
-            "suggested_wave":        _classify_wave(float(dominant_freq_hz)),
-            "breathing_bpm":         round(float(breathing_bpm), 2),
-            "hrv_coherence":         round(float(coherence), 3),
+            "hrv_rmssd_ms":         round(float(hrv_rmssd if hrv_rmssd is not None else 0.0), 2),
+            "dominant_frequency_hz": round(dominant_freq_hz if dominant_freq_hz is not None else 0.0, 2),
+            "suggested_wave":        _classify_wave(dominant_freq_hz if dominant_freq_hz is not None else 0.0),
+            "breathing_bpm":         round(float(breathing_bpm if breathing_bpm is not None else 0.0), 2),
+            "hrv_coherence":         round(coherence if coherence is not None else 0.0, 3),
             "timestamp_ms":          int(t * 1000),
         }
 
@@ -357,27 +401,7 @@ async def stream_biosignal(session_id: str) -> StreamingResponse:
     )
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# ML: CLINICAL RISK SCORING (joblib / scikit-learn)
-# ══════════════════════════════════════════════════════════════════════════════
-
-# Model loaded once at startup — never per-request, never sent to the client.
-_risk_model: Any = None
-_MODEL_PATH = Path(__file__).parent / "models" / "clinical_risk_v2.joblib"
-
-
-@app.on_event("startup")
-async def _load_ml_model() -> None:
-    global _risk_model
-    if _MODEL_PATH.exists():
-        try:
-            import joblib
-            _risk_model = joblib.load(_MODEL_PATH)
-            print(f"[ML] Loaded clinical risk model from {_MODEL_PATH}")
-        except Exception as exc:
-            print(f"[ML] Warning: could not load model ({exc}). Risk scoring will be unavailable.")
-    else:
-        print(f"[ML] No model found at {_MODEL_PATH}. Risk scoring endpoint returns demo data.")
+# ML: CLINICAL RISK SCORING SCHEMAS & UTILS
 
 
 class RiskScoreRequest(BaseModel):
@@ -398,9 +422,14 @@ class RiskScoreResponse(BaseModel):
 
 
 def _classify_risk(score: float) -> str:
-    if score < 0.25: return "low"
-    if score < 0.55: return "moderate"
-    if score < 0.80: return "high"
+    global _safety_threshold
+    th = _safety_threshold if _safety_threshold else 0.50
+    if score < th * 0.5:
+        return "low"
+    if score < th:
+        return "moderate"
+    if score < th + (1.0 - th) * 0.5:
+        return "high"
     return "critical"
 
 
@@ -415,8 +444,10 @@ def _explain_factors(req: RiskScoreRequest, score: float) -> list[str]:
     return factors
 
 
-@app.post("/ml/risk-score", response_model=RiskScoreResponse, tags=["ML"])
-async def ml_risk_score(req: RiskScoreRequest) -> RiskScoreResponse:
+from models.fhir import Bundle, create_risk_score_bundle
+
+@app.post("/ml/risk-score", response_model=Bundle, tags=["ML"])
+async def ml_risk_score(req: RiskScoreRequest) -> Bundle:
     """
     Run clinical risk scoring. Model inference is server-side only —
     the joblib pickle never leaves this process.
@@ -424,7 +455,29 @@ async def ml_risk_score(req: RiskScoreRequest) -> RiskScoreResponse:
     If no trained model is present, returns a rule-based heuristic score
     so the endpoint remains usable during development.
     """
-    features = [req.hr, req.bp_systolic, req.bp_diastolic, req.spo2, float(req.age)]
+    # Calculate derived features: map, pulse_pressure, shock_index
+    map_val = req.bp_diastolic + (req.bp_systolic - req.bp_diastolic) / 3.0
+    pulse_pressure = req.bp_systolic - req.bp_diastolic
+    shock_index = req.hr / req.bp_systolic if req.bp_systolic > 0 else 0.0
+    rate_pressure_product = req.hr * req.bp_systolic
+    age_adjusted_shock_index = (req.hr * req.age) / req.bp_systolic if req.bp_systolic > 0 else 0.0
+    heart_rate_deviation = (req.hr - 75.0) ** 2
+    systolic_bp_deviation = (req.bp_systolic - 120.0) ** 2
+
+    features = [
+        req.hr,
+        req.bp_systolic,
+        req.bp_diastolic,
+        req.spo2,
+        float(req.age),
+        map_val,
+        pulse_pressure,
+        shock_index,
+        rate_pressure_product,
+        age_adjusted_shock_index,
+        heart_rate_deviation,
+        systolic_bp_deviation
+    ]
 
     if _risk_model is not None:
         try:
@@ -443,12 +496,16 @@ async def ml_risk_score(req: RiskScoreRequest) -> RiskScoreResponse:
         score = min(score, 1.0)
         note = "Heuristic (no model loaded)"
 
-    return RiskScoreResponse(
-        risk_level=_classify_risk(score),
-        risk_score=round(score, 3),
-        confidence=0.87 if _risk_model else 0.60,
-        contributing_factors=_explain_factors(req, score),
-        note=note,
+    risk_level = _classify_risk(score)
+    confidence = 0.87 if _risk_model else 0.60
+    factors = _explain_factors(req, score)
+
+    return create_risk_score_bundle(
+        score=score,
+        risk_level=risk_level,
+        confidence=confidence,
+        factors=factors,
+        note=note
     )
 
 
@@ -476,7 +533,19 @@ async def read_hdf5_segment(
     try:
         import h5py
 
-        hdf5_path = _HDF5_DATA_DIR / file
+        # Prevent path traversal and restrict to safe filenames in data/
+        file_path = Path(file)
+        if file_path.name != file:
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+        if not re.fullmatch(r"[A-Za-z0-9._-]+", file_path.name):
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+        if file_path.suffix.lower() != ".hdf5":
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename extension.")
+
+        hdf5_path = (_HDF5_DATA_DIR / file_path.name).resolve()
+        if not hdf5_path.is_relative_to(_HDF5_DATA_DIR.resolve()):
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+
         if not hdf5_path.exists():
             raise HTTPException(status_code=404, detail=f"HDF5 file not found: {file}")
 

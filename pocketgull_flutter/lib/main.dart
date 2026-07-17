@@ -3,16 +3,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'blocs/patient/patient_bloc.dart';
-import 'blocs/analysis/analysis_cubit.dart';
-import 'services/clinical_intelligence_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'theme/app_theme.dart';
 import 'services/local_intelligence_service.dart';
 import 'services/orcid_service.dart';
-import 'services/export_service.dart';
 import 'services/circadian_sleepiness_service.dart';
-import 'services/ambient_lighting_service.dart';
 import 'screens/splash_screen.dart';
+import 'providers/services_providers.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -53,9 +50,7 @@ void main() async {
     await Hive.openBox('pocket_gull_db');
 
     final localAI = LocalIntelligenceService();
-    
     try {
-      // Add a timeout to prevent initialization from hanging the entire app
       await localAI.initialize().timeout(
         const Duration(seconds: 5),
         onTimeout: () => debugPrint('Local AI initialization timed out.'),
@@ -68,13 +63,14 @@ void main() async {
     await orcidService.initialize();
     
     final circadianService = CircadianSleepinessService();
-    final ambientLighting = AmbientLightingService(circadianService);
     
-    runApp(PocketGullApp(
-      localAI: localAI, 
-      orcidService: orcidService,
-      circadianService: circadianService,
-      ambientLighting: ambientLighting,
+    runApp(ProviderScope(
+      overrides: [
+        localIntelligenceProvider.overrideWithValue(localAI),
+        orcidServiceProvider.overrideWithValue(orcidService),
+        circadianSleepinessProvider.overrideWithValue(circadianService),
+      ],
+      child: const PocketGullApp(),
     ));
   }, (error, stack) {
     debugPrint('GLOBAL ERROR: $error');
@@ -83,83 +79,17 @@ void main() async {
 }
 
 class PocketGullApp extends StatelessWidget {
-  final LocalIntelligenceService localAI;
-  final OrcidService orcidService;
-  final CircadianSleepinessService circadianService;
-  final AmbientLightingService ambientLighting;
-  
-  const PocketGullApp({
-    super.key, 
-    required this.localAI, 
-    required this.orcidService,
-    required this.circadianService,
-    required this.ambientLighting,
-  });
+  const PocketGullApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Note: In production, pass this via --dart-define or environment variables
-    const apiKey = String.fromEnvironment('GEMINI_API_KEY', defaultValue: 'YOUR_API_KEY_HERE');
-
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<ClinicalIntelligenceService>(
-          create: (_) => ClinicalIntelligenceService(apiKey: apiKey),
-        ),
-        RepositoryProvider<OrcidService>.value(
-          value: orcidService,
-        ),
-        RepositoryProvider<LocalIntelligenceService>.value(
-          value: localAI,
-        ),
-        RepositoryProvider<ExportService>(
-          create: (_) => ExportService(),
-        ),
-        RepositoryProvider<CircadianSleepinessService>.value(
-          value: circadianService,
-        ),
-        RepositoryProvider<AmbientLightingService>.value(
-          value: ambientLighting,
-        ),
-      ],
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<PatientBloc>(create: (context) => PatientBloc()),
-          BlocProvider<AnalysisCubit>(
-            create: (context) => AnalysisCubit(context.read<ClinicalIntelligenceService>()),
-          ),
-        ],
-        child: MaterialApp(
-          title: 'Pocket Gull',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            brightness: Brightness.light,
-            primaryColor: const Color(0xFF1A1A1A),
-            scaffoldBackgroundColor: const Color(0xFFF9F9F9),
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF1A1A1A),
-              secondary: Color(0xFFE2E2E2),
-              surface: Colors.white,
-            ),
-            fontFamily: 'Inter',
-            useMaterial3: true,
-          ),
-          darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            primaryColor: Colors.white,
-            scaffoldBackgroundColor: const Color(0xFF121212),
-            colorScheme: const ColorScheme.dark(
-              primary: Colors.white,
-              secondary: Color(0xFF333333),
-              surface: Color(0xFF1E1E1E),
-            ),
-            fontFamily: 'Inter',
-            useMaterial3: true,
-          ),
-          themeMode: ThemeMode.system,
-          home: const SplashScreen(),
-        ),
-      ),
+    return MaterialApp(
+      title: 'Pocket Gull',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      home: const SplashScreen(),
     );
   }
 }

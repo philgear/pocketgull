@@ -22,6 +22,16 @@ requests on localhost, and proxies them to the Hue Bridge.
 
 app.put('/api/hue/:bridgeIp/api/:username/lights/:lightId/state', async (req, res) => {
   const { bridgeIp, username, lightId } = req.params;
+
+  // Validate parameters to prevent Server-Side Request Forgery (SSRF)
+  const isValidIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(bridgeIp) || bridgeIp === 'localhost';
+  const isValidUsername = /^[a-zA-Z0-9_\-]+$/.test(username);
+  const isValidLightId = /^[0-9]+$/.test(lightId);
+
+  if (!isValidIp || !isValidUsername || !isValidLightId) {
+    return res.status(400).json({ error: 'Invalid parameters provided. SSRF check failed.' });
+  }
+
   const url = `http://${bridgeIp}/api/${username}/lights/${lightId}/state`;
 
   try {

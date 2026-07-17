@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,33 +11,31 @@ import '../widgets/task_flow_widget.dart';
 import '../widgets/native_body_viewer.dart';
 import '../widgets/origami_seagull.dart';
 import '../widgets/research_frame_widget.dart';
-import '../blocs/patient/patient_bloc.dart';
 import '../models/patient_types.dart';
-import '../blocs/patient/patient_event.dart';
+import '../providers/patient_provider.dart';
 import '../widgets/visit_review_widget.dart';
 import 'documentation_screen.dart';
 import 'triage_board_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedMobileTab = 0; // 0: Map, 1: Chart, 2: Docs
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<PatientBloc, PatientState>(
-      builder: (context, state) {
-        final width = MediaQuery.of(context).size.width;
-        final isWide = width > 1200;
-        final isMedium = width > 800;
-        final isMobile = !isMedium;
+    final state = ref.watch(patientProvider);
+    final width = MediaQuery.of(context).size.width;
+    final isWide = width > 1200;
+    final isMedium = width > 800;
+    final isMobile = !isMedium;
 
-        return Scaffold(
+    return Scaffold(
           backgroundColor: const Color(0xFFF9FAFB),
           appBar: AppBar(
             toolbarHeight: isMobile ? 60 : 70,
@@ -81,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: const Icon(Icons.mic, size: 14),
                   label: Text(isMobile ? 'AI' : 'AGENT'),
                   onPressed: () {
-                    context.read<PatientBloc>().add(const ToggleLiveAgent(true));
+                    ref.read(patientProvider.notifier).toggleLiveAgent(true);
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF1C1C1C),
@@ -203,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 icon: const Icon(Icons.travel_explore, color: Colors.grey, size: 18),
                 onPressed: () {
-                  context.read<PatientBloc>().add(ToggleResearchFrame(!state.isResearchFrameVisible));
+                  ref.read(patientProvider.notifier).toggleResearchFrame(!state.isResearchFrameVisible);
                 },
               ),
               const SizedBox(width: 12),
@@ -246,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (state.isResearchFrameVisible)
                 ResearchFrameWidget(
                   onClose: () {
-                    context.read<PatientBloc>().add(const ToggleResearchFrame(false));
+                    ref.read(patientProvider.notifier).toggleResearchFrame(false);
                   },
                 ),
 
@@ -277,8 +275,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               : null,
         );
-      },
-    );
   }
 
   Widget _buildResponsiveBody(bool isMobile, PatientState state) {
@@ -326,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         IconButton(
           icon: const Icon(Icons.arrow_back_ios, size: 14),
-          onPressed: () => context.read<PatientBloc>().add(const SelectPartEvent(null)),
+          onPressed: () => ref.read(patientProvider.notifier).selectPart(''),
         ),
         const Text(
           'BACK TO BODY MAP',

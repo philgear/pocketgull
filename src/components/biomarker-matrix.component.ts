@@ -30,34 +30,44 @@ interface IBiomarkerStatus {
             </div>
           </div>
 
+          @if (introText()) {
+            <p class="text-xs text-gray-700 dark:text-zinc-300 mb-6 leading-relaxed font-medium">
+              {{ introText() }}
+            </p>
+          }
+
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @for (marker of biomarkers(); track marker.name) {
+              @let isCritical = marker.level === 'Deficient' || marker.level === 'Excess';
+              @let isWarning = marker.level === 'Sub-optimal' || marker.level === 'High';
+              @let isOptimal = marker.level === 'Optimal';
+
               <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md rounded-xl p-4 border transition-all hover:scale-105 shadow-sm"
-                   [class.border-red-200]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                   [class.dark:border-red-900]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                   [class.border-yellow-200]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                   [class.dark:border-yellow-900]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                   [class.border-emerald-200]="marker.level === 'Optimal'"
-                   [class.dark:border-emerald-900]="marker.level === 'Optimal'">
+                   [class.border-red-200]="isCritical"
+                   [class.dark:border-red-900]="isCritical"
+                   [class.border-yellow-200]="isWarning"
+                   [class.dark:border-yellow-900]="isWarning"
+                   [class.border-emerald-200]="isOptimal"
+                   [class.dark:border-emerald-900]="isOptimal">
                 
                 <div class="flex justify-between items-start mb-2">
                   <span class="text-sm font-bold text-gray-900 dark:text-zinc-100 truncate pr-2" [title]="marker.name">{{ marker.name }}</span>
                   <div class="w-2.5 h-2.5 rounded-full mt-1 shrink-0 animate-pulse"
-                       [class.bg-red-500]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                       [class.bg-yellow-500]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                       [class.bg-emerald-500]="marker.level === 'Optimal'"></div>
+                       [class.bg-red-500]="isCritical"
+                       [class.bg-yellow-500]="isWarning"
+                       [class.bg-emerald-500]="isOptimal"></div>
                 </div>
                 
                 <div class="text-xs font-bold uppercase tracking-wider mb-2"
-                     [class.text-red-700]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                     [class.dark:text-red-400]="marker.level === 'Deficient' || marker.level === 'Excess'"
-                     [class.text-amber-700]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                     [class.dark:text-amber-400]="marker.level === 'Sub-optimal' || marker.level === 'High'"
-                     [class.text-emerald-700]="marker.level === 'Optimal'"
-                     [class.dark:text-emerald-400]="marker.level === 'Optimal'">
+                     [class.text-red-700]="isCritical"
+                     [class.dark:text-red-400]="isCritical"
+                     [class.text-amber-700]="isWarning"
+                     [class.dark:text-amber-400]="isWarning"
+                     [class.text-emerald-700]="isOptimal"
+                     [class.dark:text-emerald-400]="isOptimal">
                   {{ marker.level }}
                 </div>
-
+ 
                 <div class="text-xs text-gray-600 dark:text-zinc-400 uppercase tracking-widest truncate" [title]="marker.pathway">
                   {{ marker.pathway }}
                 </div>
@@ -71,6 +81,16 @@ interface IBiomarkerStatus {
 })
 export class BiomarkerMatrixComponent {
   reportText = input<string>('');
+
+  introText = computed(() => {
+    const text = this.reportText();
+    if (!text) return '';
+    const match = text.match(/###\s*(?:Biochemical\s*&\s*)?Biomarker\s*Matrix\s*\n([\s\S]*?)(?:```|###|$)/i);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+    return '';
+  });
 
   // Auto-parse the AI markdown report to find implied biomarker statuses
   biomarkers = computed(() => {
@@ -89,11 +109,21 @@ export class BiomarkerMatrixComponent {
       { name: 'Vitamin C', pathway: 'Collagen / Antioxidant' }
     ];
 
-    // Strategy 1: Look for JSON code blocks
+    // Strategy 1: Look for JSON code blocks or raw JSON arrays
+    let jsonText: string | null = null;
     const jsonMatch = text.match(/```json\s*([\s\S]*?)(?:```|$)/i);
     if (jsonMatch && jsonMatch[1]) {
+      jsonText = jsonMatch[1].trim();
+    } else {
+      const rawArrayMatch = text.match(/(\[\s*\{\s*"name"[\s\S]*?\])/i);
+      if (rawArrayMatch && rawArrayMatch[1]) {
+        jsonText = rawArrayMatch[1].trim();
+      }
+    }
+
+    if (jsonText) {
       try {
-        let jsonStr = jsonMatch[1].trim();
+        let jsonStr = jsonText;
         // Handle potentially incomplete JSON if streaming
         if (!jsonStr.endsWith(']')) {
           const lastCurly = jsonStr.lastIndexOf('}');
@@ -127,7 +157,7 @@ export class BiomarkerMatrixComponent {
         // If parsing fails, try custom regex extraction of individual objects
         const objRegex = /\{\s*"name"\s*:\s*"([^"]+)"\s*,\s*"level"\s*:\s*"([^"]+)"\s*,\s*"pathway"\s*:\s*"([^"]+)"\s*\}/gi;
         let match;
-        while ((match = objRegex.exec(jsonMatch[1])) !== null) {
+        while ((match = objRegex.exec(jsonText)) !== null) {
           const name = match[1];
           const levelStr = match[2].toLowerCase();
           const pathway = match[3];

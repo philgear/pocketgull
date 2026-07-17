@@ -9,6 +9,7 @@ allow-licenses:
   - ISC
   - Unlicense
   - CC0-1.0
+  - MPL-2.0
 
 # Exclude specific dependencies from license checks (using purl format)
 allow-dependencies-licenses:

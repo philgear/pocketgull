@@ -8,14 +8,14 @@
 ---
 
 ### PREPARED FOR
-**Google Gemini Live Agent Challenge** / Hackathon 2026
+**Google Gemini Live Agent Challenge** / 2026
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)
-![Angular](https://img.shields.io/badge/Angular-v21.2-DD0031?logo=angular)
-![Three.js](https://img.shields.io/badge/Three.js-v0.183-000000?logo=three.js)
+![Angular](https://img.shields.io/badge/Angular-v22.0-DD0031?logo=angular)
+![Three.js](https://img.shields.io/badge/Three.js-v0.185-000000?logo=three.js)
 ![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Version](https://img.shields.io/badge/version-1.0.0--rc4-blue)
+![Version](https://img.shields.io/badge/version-1.0.0--rc8-blue)
 [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
 [![DOI](https://zenodo.org/badge/1161259215.svg)](https://doi.org/10.5281/zenodo.20647513)
 [![ACM Code of Ethics](https://img.shields.io/badge/ACM-Ethics%20%26%20Conduct-006699?logo=associationforcomputingmachinery&logoColor=white)](https://www.acm.org/code-of-ethics)
@@ -36,10 +36,6 @@
 *"To provide practitioners with the 'Gull's Eye View'—the ability to rise above the turbulent sea of medical data and see the clear, actionable patterns beneath."*
 
 ---
-
-## 🎨 BRAND IDENTITY & SOCIAL MEDIA CARD
-
-Pocket Gull's brand identity, structured logo, and custom marketing QR code (pointing to [pocketgull.app](https://pocketgull.app)) are showcased in our final paper-folded origami diorama social card. 
 
 ![Pocket Gull Social Preview](./social-preview.png)
 
@@ -80,6 +76,8 @@ A highly interactive, aesthetically minimal user interface (Industrial Grace) de
 
 ### Product Highlights
 
+![Pocket Gull App Screenshot](./screenshot.png)
+
 ![Dashboard Snapshot](./docs/images/dashboard.png)
 
 ![3D Body Viewer](./docs/images/body_viewer.png)
@@ -111,7 +109,7 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 - **Live AI Consult & Multi-Agent Orchestration:** Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts synthesize clinical data into actionable insights through an interruptible, natural conversational UI with **context-aware memory** of recently discussed report nodes.
 - **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
 - **Orthomolecular Profiling & Biomarker Matrix:** Automatically extracts and visualizes biochemical markers (e.g., Magnesium, B12) from AI-generated functional protocols into a glassmorphic diagnostic dashboard.
-- **Multi-Paradigm Philosophy Dashboards:** Full system support for Western, Eastern, Ayurvedic, or "Grow Thy Self" longevity medicine paradigms, with automated report regeneration and a secular translation engine mapping 13 world philosophies into psychological and physiological domains.
+- **Multi-Paradigm Philosophy Dashboards:** Full system support for Western, Eastern, and Ayurvedic medicine paradigms, with automated report regeneration and a secular translation engine mapping 13 world philosophies into psychological and physiological domains.
 - **Offline PWA Intelligence:** Built-in `window.ai` (Gemini Nano) routing for on-device fallback and token-free local processing in the Progressive Web App.
 - **WebMCP Schema Mapping:** Registered Model Context Protocol (MCP) standards schemas for seamless integration of external clinical knowledge databases.
 
@@ -124,7 +122,7 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 - **Client-Side Barge-In Interruption:** Local `onspeechstart` barge-in tuning across clinical dialog and voice assistant panels, with instant audio muting when the clinician begins speaking.
 - **Printable Clinical Stationery:** CSS Grid-optimized, multi-page physical printouts featuring Halftone body maps for visual pain hotspot diagnosis, with user-selectable toggles for clinical summaries and history.
 - **Circadian UI & AVS Coregulation:** Seamless integration of continuous, time-based circadian CSS themes with the clinical interface to promote ambient rhythm alignment. Features an interactive **Circadian Tuning Dashboard** inside the standalone companion app that drives a high-performance `<canvas>` wave visualizer and Web Audio API binaural beat synthesis across presets (`indigo`, `emerald`, `violet`, `rose-earth`) and custom frequencies.
-- **Tri-Paradigm Diagnostic Matrix (TDM UI):** Renders Eastern (TCM `tcmPattern`), Ayurvedic (`ayurvedicImbalance`), and Longevity (`growThySelfFocus`) parameters using themed tags within active anatomical hotspots and patient dashboards.
+- **Multi-Paradigm Diagnostic Matrix (MDM UI):** Renders Eastern (TCM `tcmPattern`) and Ayurvedic (`ayurvedicImbalance`) parameters using themed tags within active anatomical hotspots and patient dashboards.
 - **Agones Stateful Session Orchestration:** Kubernetes-native pod lifecycles managed via `@google-cloud/agones-sdk` to signal readiness, maintain health check pings, and handle graceful shutdown signals (`SIGTERM`) to safeguard active consultations.
 - **IoT Smart Lighting Sync:** `AmbientLightingService` mathematically mapping UI circadian HSL values directly to local physical Philips Hue hardware to physically coregulate the clinical environment.
 - **KSS Readiness Gateway:** 9-point Karolinska Sleepiness Scale integration for real-time clinician alertness checks overriding the ambient circadian theme.
@@ -142,7 +140,7 @@ Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-ti
 - **Multi-Vendor GPU Telemetry:** Windows CIM/WMI adapters querying AMD/Intel/NVIDIA graphics, macOS system profiles, unified memory estimation, and dynamic WebGPU routing recommendations.
 
 **Technologies Used:**
-- **Framework:** Angular v21.2 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
+- **Framework:** Angular v22.0 (Signals-based, Zoneless), Server-Side Rendering (SSR) & Client-Side Hydration
 - **Visualization:** Three.js (3D Anatomical Modeling)
 - **Intelligence:** Google GenAI SDK (`gemini-2.5-flash` via Vertex AI Enterprise) & Google Agent Development Kit (`@google/adk`)
 - **Research Integrations:** Google Programmable Search Engine (CSE) & NIH PubMed E-utilities
@@ -218,7 +216,7 @@ Pocket Gull's backend service and Express proxy layer is architecturally designe
 
 ## 🏗️ Architecture Diagram
 
-Built with a **Signals-First (Zoneless)** architecture in Angular v21.2 for 100/100 Lighthouse performance and deterministic state management.
+Built with a **Signals-First (Zoneless)** architecture in Angular v22.0 for 100/100 Lighthouse performance and deterministic state management.
 The application leverages a modern, reactive architecture utilizing Angular Signals, Cloud Run orchestration, and the Google Vertex AI Enterprise stack. *(Note: This conceptual map is available in high resolution within the hackathon image carousel.)*
 
 ```mermaid

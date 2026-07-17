@@ -31,7 +31,7 @@
                 "output": "/.well-known"
               },
               {
-                "glob": "manifest.webmanifest",
+                "glob": "**/*",
                 "input": "public",
                 "output": "/"
               },
@@ -100,7 +100,7 @@
                 "localhost",
                 "127.0.0.1",
                 "*.cloudworkstations.dev",
-                "pocket-gull-793190615625.us-west1.run.app",
+                "pocket-gull-no4o7fq6xa-uw.a.run.app",
                 "pocketgull.app",
                 "pocketgull.com",
                 "pocketgall.app",
@@ -119,7 +119,14 @@
             "production": {
               "outputHashing": "all",
               "sourceMap": false,
-              "optimization": true,
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": true
+              },
               "serviceWorker": "ngsw-config.json"
             },
             "development": {

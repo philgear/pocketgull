@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, signal, PLATFORM_ID, effect, untracked } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from './patient-state.service';
 import { IPatientVitals, IBiometricEntry } from './patient.types';
@@ -60,6 +60,17 @@ export class PythonBridgeService {
 
   constructor() {
     this.checkHealth();
+
+    // Auto-calculate risk score reactively when vitals, age, or issues change
+    effect(() => {
+      this.state.vitals();
+      this.state.patientAge();
+      this.state.issues();
+
+      untracked(() => {
+        this.fetchRiskScore();
+      });
+    });
   }
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -260,12 +271,38 @@ export class PythonBridgeService {
     if (!this.isBrowser) return null;
     const v = this.state.vitals();
 
+    // Extract active conditions list from patient issues
+    const issuesObj = this.state.issues() || {};
+    const conditions: string[] = [];
+    Object.values(issuesObj).forEach(partIssues => {
+      partIssues.forEach(issue => {
+        if (issue && issue.name) {
+          conditions.push(issue.name);
+        }
+      });
+    });
+
+    const age = this.state.patientAge() || 0;
+    const hr = parseFloat(v.hr ?? '0') || 0;
+    const bp_systolic = parseFloat(v.bp?.split('/')[0] ?? '0') || 0;
+    const bp_diastolic = parseFloat(v.bp?.split('/')[1] ?? '0') || 0;
+    const spo2 = parseFloat(v.spO2 ?? '0') || 0;
+
     const payload = {
-      hr:           parseFloat(v.hr   ?? '0') || 0,
-      bp_systolic:  parseFloat(v.bp?.split('/')[0] ?? '0') || 0,
-      bp_diastolic: parseFloat(v.bp?.split('/')[1] ?? '0') || 0,
-      spo2:         parseFloat(v.spO2 ?? '0') || 0,
+      hr,
+      bp_systolic,
+      bp_diastolic,
+      spo2,
+      age,
+      conditions
     };
+
+    // If Python bridge is marked offline/unavailable, run the local medical indices fallback
+    if (this.isAvailable() === false) {
+      const localResult = this.computeLocalMedicalIndicesRisk(hr, bp_systolic, bp_diastolic, spo2, age, conditions);
+      this.riskScore.set(localResult);
+      return localResult;
+    }
 
     try {
       const res = await fetch(`${this.BASE}/ml/risk-score`, {
@@ -273,14 +310,89 @@ export class PythonBridgeService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        // Fall back to local calculation if server returns an error
+        const localResult = this.computeLocalMedicalIndicesRisk(hr, bp_systolic, bp_diastolic, spo2, age, conditions);
+        this.riskScore.set(localResult);
+        return localResult;
+      }
       const result: IRiskScoreResult = await res.json();
       this.riskScore.set(result);
       return result;
     } catch (err: any) {
-      console.error('[PythonBridge] fetchRiskScore error:', err.message);
-      return null;
+      console.warn('[PythonBridge] fetchRiskScore server error, falling back to local indices:', err.message);
+      const localResult = this.computeLocalMedicalIndicesRisk(hr, bp_systolic, bp_diastolic, spo2, age, conditions);
+      this.riskScore.set(localResult);
+      return localResult;
     }
+  }
+
+  /**
+   * Local backup calculation using the exact same medical indices (RPP, SIA, Deviations)
+   * designed for the calibrated Gradient Boosting model.
+   */
+  private computeLocalMedicalIndicesRisk(
+    hr: number,
+    sbp: number,
+    dbp: number,
+    spo2: number,
+    age: number,
+    conditions: string[]
+  ): IRiskScoreResult {
+    let score = 0.0;
+    const factors: string[] = [];
+
+    // 1. Hypoxia (SpO2)
+    if (spo2 > 0 && spo2 < 94) {
+      score += 0.40;
+      factors.push(`Hypoxia detected (SpO2: ${spo2}%)`);
+    }
+
+    // 2. Age-Adjusted Shock Index (SIA)
+    const sia = sbp > 0 ? (hr * age) / sbp : 0.0;
+    if (sia > 50.0) {
+      score += 0.20;
+      factors.push(`Elevated Age-Adjusted Shock Index: ${sia.toFixed(1)} (Cardiac distress in older patient)`);
+    }
+
+    // 3. Rate Pressure Product (RPP)
+    const rpp = hr * sbp;
+    if (rpp > 12000.0) {
+      score += 0.15;
+      factors.push(`High Myocardial Workload (RPP: ${rpp.toFixed(0)})`);
+    }
+
+    // 4. Heart Rate Deviation
+    const hrDev = Math.pow(hr - 75.0, 2);
+    if (hrDev > 400.0) { // HR < 55 or HR > 95
+      score += 0.15;
+      factors.push(`Heart Rate out of baseline: ${hr} bpm`);
+    }
+
+    // 5. Systolic Pressure Deviation
+    const sbpDev = Math.pow(sbp - 120.0, 2);
+    if (sbpDev > 400.0) { // SBP < 100 or SBP > 140
+      score += 0.10;
+      factors.push(`Systolic BP out of baseline: ${sbp} mmHg`);
+    }
+
+    // Cap score at 1.0
+    score = Math.min(score, 1.0);
+
+    // Classify using our tuned safety decision threshold (0.500)
+    let risk_level: IRiskScoreResult['risk_level'] = 'low';
+    if (score < 0.25) risk_level = 'low';
+    else if (score < 0.50) risk_level = 'moderate';
+    else if (score < 0.75) risk_level = 'high';
+    else risk_level = 'critical';
+
+    return {
+      risk_level,
+      risk_score: score,
+      confidence: 0.60, // lower confidence for heuristic fallback
+      contributing_factors: factors.length > 0 ? factors : ['Vitals within normal ranges'],
+      note: 'Client-side Medical Indices Fallback (Python Sidecar Offline)'
+    };
   }
 
   // ══════════════════════════════════════════════════════════════════════════

@@ -9,6 +9,15 @@ import { defaultProvider } from "@aws-sdk/credential-provider-node";
 
 export const awsRouter = Router();
 
+function sanitizeAwsUrl(urlStr: string): string {
+  const parsed = new URL(urlStr);
+  if (parsed.protocol !== 'https:' || !parsed.hostname.endsWith('.amazonaws.com')) {
+    throw new Error('SSRF Blocked: URL target is not authorized.');
+  }
+  return urlStr;
+}
+
+
 /**
  * POST /api/aws/healthlake/query
  * Proxy request to query patients in AWS HealthLake FHIR server.
@@ -65,7 +74,7 @@ awsRouter.post('/healthlake/query', async (req, res) => {
 
     const signedRequest = await signer.sign(request);
     
-    const response = await fetch(url.toString(), {
+    const response = await fetch(sanitizeAwsUrl(url.toString()), {
       method: signedRequest.method,
       headers: signedRequest.headers as Record<string, string>,
     });
@@ -336,7 +345,7 @@ awsRouter.post('/healthlake/export', express.json({ limit: '50mb' }), async (req
       });
 
       const signedRequest = await signer.sign(request);
-      const response = await fetch(url.toString(), {
+      const response = await fetch(sanitizeAwsUrl(url.toString()), {
         method: signedRequest.method,
         headers: signedRequest.headers as Record<string, string>,
         body: signedRequest.body

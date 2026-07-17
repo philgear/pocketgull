@@ -8,9 +8,18 @@ const __dirname = path.dirname(__filename);
 const distFolder = path.join(__dirname, 'dist');
 
 const server = http.createServer((req, res) => {
-    let filePath = path.join(distFolder, req.url === '/' ? 'index.html' : req.url);
-    
-    // Simple fallback logic since it's an SPA
+    const requestUrl = new URL(req.url || '/', 'http://localhost');
+    const requestedPath = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
+    const candidatePath = path.resolve(distFolder, '.' + requestedPath);
+    const relativePath = path.relative(distFolder, candidatePath);
+
+    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        res.writeHead(403);
+        res.end("Forbidden");
+        return;
+    }
+
+    let filePath = candidatePath;
     if (!fs.existsSync(filePath)) {
         filePath = path.join(distFolder, 'index.html');
     }

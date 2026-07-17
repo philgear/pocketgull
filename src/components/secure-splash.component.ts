@@ -7,6 +7,7 @@ import { CircadianSleepinessService, KssScore } from '../services/circadian-slee
 import { GamificationService } from '../services/gamification.service';
 import { ThemeService } from '../services/theme.service';
 import { PatientStateService } from '../services/patient-state.service';
+import { PetAuditoryService } from '../services/pet-auditory.service';
 
 
 @Component({
@@ -22,21 +23,89 @@ import { PatientStateService } from '../services/patient-state.service';
         <!-- Sun/Circadian Glow (Teal to Coral/Amber) -->
         <div class="absolute top-[35%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-r from-[#3ebc9e]/20 via-[#faa63b]/15 to-[#ef6658]/20 blur-[80px] avs-breathing-glow"></div>
         
+
+
+        <!-- Oregon Coast Buoy Telemetry Info -->
+        <div class="absolute bottom-4 left-4 z-30 bg-black/30 dark:bg-black/50 text-[12px] font-bold text-white px-3 py-1 rounded-md border border-white/10 tracking-widest uppercase pointer-events-auto">
+          📡 Buoy 46050 (Oregon Coast): {{ waveHeight() }}m @ {{ wavePeriod() }}s
+        </div>
+
         <!-- Paper Waves (Layered vector curves representing paper hills) -->
-        <!-- Layer 1: Back Hills (Teal/Dark Slate) -->
-        <svg class="absolute bottom-0 left-0 w-full h-[38%] paper-hill-back opacity-90 transition-all duration-500" viewBox="0 0 1440 200" preserveAspectRatio="none">
-          <path fill="currentColor" d="M0,96 L120,112 C240,128,480,160,720,160 C960,160,1200,128,1320,112 L1440,96 L1440,200 L1320,200 C1200,200,960,200,720,200 C480,200,240,200,120,200 L0,200 Z"></path>
+        <!-- Layer 1: Back Waves -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[38%] paper-hill-back opacity-90 wave-layer"
+             [style.animation-duration.s]="wavePeriod() * 1.5"
+             viewBox="0 0 2880 200" preserveAspectRatio="none">
+          <path fill="currentColor" [attr.d]="getWavePath(1)"></path>
         </svg>
         
-        <!-- Layer 2: Mid Hills (Coral/Deep Plum) -->
-        <svg class="absolute bottom-0 left-0 w-full h-[26%] paper-hill-mid transition-all duration-500" viewBox="0 0 1440 200" preserveAspectRatio="none">
-          <path fill="currentColor" d="M0,128 L80,117.3 C160,107,320,85,480,96 C640,107,800,149,960,160 C1120,171,1280,149,1360,138.7 L1440,128 L1440,200 L1360,200 C1280,200,1120,200,960,200 C800,200,640,200,480,200 C320,200,160,200,80,200 L0,200 Z"></path>
+        <!-- Layer 2: Mid Waves -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[26%] paper-hill-mid wave-layer"
+             [style.animation-duration.s]="wavePeriod() * 1.2"
+             viewBox="0 0 2880 200" preserveAspectRatio="none">
+          <path fill="currentColor" [attr.d]="getWavePath(2)"></path>
         </svg>
 
-        <!-- Layer 3: Front Hills (Warm Sand/Obsidian) -->
-        <svg class="absolute bottom-0 left-0 w-full h-[14%] paper-hill-front transition-all duration-500" viewBox="0 0 1440 200" preserveAspectRatio="none">
-          <path fill="currentColor" d="M0,160 L120,149.3 C240,139,480,117,720,128 C960,139,1200,181,1320,203 L1440,224 L1440,200 L1320,200 C1200,200,960,200,720,200 C480,200,240,200,120,200 L0,200 Z"></path>
+        <!-- Layer 3: Front Waves -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[14%] paper-hill-front wave-layer"
+             [style.animation-duration.s]="wavePeriod() * 0.9"
+             viewBox="0 0 2880 200" preserveAspectRatio="none">
+          <path fill="currentColor" [attr.d]="getWavePath(3)"></path>
         </svg>
+
+        <!-- Random Dynamic Beach Elements -->
+        @for (item of decorations(); track $index) {
+          <div class="absolute cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 pointer-events-auto"
+               (click)="onDecorationClick(item, $event)"
+               [style.left.%]="item.left"
+               [style.bottom.%]="item.bottom"
+               [style.transform]="'scale(' + item.scale + ')' + (item.flip ? ' scaleX(-1)' : '') + (item.clicked ? ' rotate(360deg) translateY(-20px)' : '')"
+               [style.transition]="item.clicked ? 'all 0.5s ease-out' : 'transform 0.2s ease-out'"
+               [style.z-index]="item.type === 'surfer' || item.type === 'fish' ? 25 : 15">
+            
+            @if (item.type === 'ship') {
+              <svg class="animate-bobbing opacity-80 dark:opacity-60 text-zinc-700 dark:text-zinc-500"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 40 40" style="width: 2.5rem; height: 2.5rem;" fill="currentColor">
+                <polygon points="5,25 35,25 30,32 10,32" />
+                <polygon points="18,5 18,23 32,23" />
+                <polygon points="16,8 16,23 8,23" />
+                <line x1="17" y1="2" x2="17" y2="25" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+            }
+            @else if (item.type === 'surfer') {
+              <svg class="animate-surfing opacity-90 dark:opacity-75 text-zinc-700 dark:text-zinc-350"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 40 40" style="width: 2rem; height: 2rem;" fill="currentColor">
+                <path d="M5,28 C15,22 25,22 35,28 C25,32 15,32 5,28 Z" />
+                <path d="M16,28 L18,20 L16,14 L22,12 L24,18 L22,28" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" />
+                <circle cx="20" cy="9" r="3" />
+                <path d="M12,16 L18,15 L26,14" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+              </svg>
+            }
+            @else if (item.type === 'fish') {
+              <svg class="animate-fish-jump opacity-85 dark:opacity-70 text-[#3ebc9e] dark:text-[#2fa085]"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 30 30" style="width: 1.5rem; height: 1.5rem;" fill="currentColor">
+                <path d="M2,15 C8,10 16,10 22,15 C18,17 10,17 2,15 Z" />
+                <polygon points="22,15 26,12 25,18" />
+                <circle cx="8" cy="13" r="1" fill="white" />
+              </svg>
+            }
+            @else if (item.type === 'bird') {
+              <svg class="animate-bird-glide opacity-70 dark:opacity-50 text-zinc-500 dark:text-zinc-500"
+                   [style.animation-delay.s]="item.delay"
+                   [style.animation-duration.s]="item.duration"
+                   viewBox="0 0 30 30" style="width: 2rem; height: 2rem;" fill="currentColor">
+                <polygon points="15,15 5,10 15,13" />
+                <polygon points="15,15 25,10 15,13" />
+                <polygon points="15,15 12,18 15,22 18,18" />
+              </svg>
+            }
+          </div>
+        }
 
         <!-- Paper Texture Overlay -->
         <div class="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none mix-blend-overlay"></div>
@@ -44,10 +113,10 @@ import { PatientStateService } from '../services/patient-state.service';
 
       <!-- HIPAA Lock Status Header (Visible only when locked) -->
       @if (isLocked()) {
-        <div class="absolute shadow-sm top-8 left-1/2 -translate-x-1/2 flex flex-col items-center mb-8 mt-2 animate-in slide-in-from-top-4 duration-500 z-30">
+        <div class="absolute shadow-sm top-8 left-1/2 -translate-x-1/2 flex flex-col items-center mb-8 mt-2 animate-in slide-in-from-top-4-centered duration-500 z-30">
             <div class="flex items-center gap-3 bg-white/95 dark:bg-zinc-900/90 backdrop-blur-md px-5 py-3 rounded-full border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl">
                 <div class="w-2.5 h-2.5 rounded-full bg-brand-red-500 animate-pulse shadow-[0_0_8px_rgba(234,67,53,0.6)]"></div>
-                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">System Locked</span>
+                <span class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">System Locked</span>
             </div>
         </div>
       }
@@ -90,7 +159,7 @@ import { PatientStateService } from '../services/patient-state.service';
                 style="letter-spacing: 0.1em;">
               {{ isLocked() ? 'Resume Session' : 'Pocket Gull' }}
             </h1>
-            <p class="text-[9px] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
+            <p class="text-[12px] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
               {{ isLocked() ? 'Idle Timeout Protection Active' : 'Clinical Intelligence Engine' }}
             </p>
           </div>
@@ -99,7 +168,7 @@ import { PatientStateService } from '../services/patient-state.service';
           <div class="mb-6 p-3 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
             <span class="text-xs">🌴</span>
             <div class="text-left">
-              <p class="text-[8px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Welcome & Coverage Status</p>
+              <p class="text-[12px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Welcome & Coverage Status</p>
               <p class="text-[8.5px] text-amber-700/95 dark:text-amber-300/80 leading-normal">Welcome. Pocket-Gull is operating in automated coverage mode while Phil Gear, Ph.G is away. Full clinical intelligence tools and sandboxes remain active.</p>
             </div>
           </div>
@@ -111,63 +180,23 @@ import { PatientStateService } from '../services/patient-state.service';
                  <div class="absolute inset-0 rounded-full border-2 border-zinc-200 dark:border-zinc-800"></div>
                  <div class="absolute inset-0 rounded-full border-2 border-[#3ebc9e] border-t-transparent animate-spin"></div>
                </div>
-               <p class="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.3em] font-mono animate-pulse">Establishing Secure Connection</p>
-            </div>
-          }
-          <!-- Restricted Entry Gateway -->
-          @else if (showAuthGateway()) {
-            <div class="space-y-6 py-2 animate-in fade-in duration-500">
-              <div class="text-center space-y-2">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red-50/50 dark:bg-brand-red-950/30 border border-brand-red-200/50 dark:border-brand-red-900/40">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-red-600 dark:text-brand-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <span class="text-[9px] font-bold text-brand-red-600 dark:text-brand-red-400 uppercase tracking-widest">Restricted Access</span>
-                </div>
-                <h2 class="text-xs text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed max-w-xs mx-auto">
-                  Pocket-Gull Clinician Console is restricted. Authorized clinicians must authenticate to access the real-time consultation engine.
-                </h2>
-              </div>
-
-              @if (errorMsg()) {
-                <div class="p-3 bg-brand-red-50/80 dark:bg-brand-red-950/40 border border-brand-red-200 dark:border-brand-red-900/50 rounded-xl">
-                  <p class="text-[9px] text-brand-red-600 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ errorMsg() }}</p>
-                </div>
-              }
-
-              <div class="space-y-3 pt-2">
-                <!-- Google Sign-In -->
-                <button 
-                  type="button" 
-                  (click)="handleGoogleAuth()"
-                  [disabled]="isChecking()"
-                  class="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(37,99,235,0.15)] hover:shadow-[0_6px_24px_rgba(37,99,235,0.25)] active:scale-[0.98]"
-                >
-                  <span>Clinician Sign-in</span>
-                </button>
-
-                <!-- Sandbox Demo -->
-                <button 
-                  type="button" 
-                  (click)="handleSandboxDemo()"
-                  class="w-full py-4 bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-200 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                  <span>Explore Sandbox Demo</span>
-                </button>
-              </div>
+               <p class="text-[12px] text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.3em] font-mono animate-pulse">Establishing Secure Connection</p>
             </div>
           }
           <!-- Gesture Unlock Flow -->
           @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
-               <p class="text-[10px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw smiley face to unlock</p>
+               <p class="text-[12px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw a beach item (Palm Tree, Wave, Seagull, Shell, Starfish, or "X") to unlock</p>
                
                <div class="relative w-[220px] h-[220px] flex items-center justify-center">
-                 <!-- Guidelines background SVG -->
-                 <svg class="absolute inset-0 w-full h-full pointer-events-none text-zinc-300/40 dark:text-zinc-700/20" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1">
+                 <!-- Guidelines background SVG (Palm Tree / Wave guide) -->
+                 <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/30 dark:text-[#2fa085]/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.5">
                    <circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/>
-                   <circle cx="35" cy="35" r="4" stroke-dasharray="2 2"/>
-                   <circle cx="65" cy="35" r="4" stroke-dasharray="2 2"/>
-                   <path d="M 30 60 A 20 20 0 0 0 70 60" stroke-dasharray="3 3"/>
+                   <path d="M 20 60 C 35 45, 45 45, 60 60 C 70 70, 80 55, 85 50" stroke-dasharray="3 3"/>
+                   <path d="M 48 75 Q 48 50 55 40" stroke-dasharray="2 2"/>
+                   <path d="M 55 40 Q 42 32 38 42" stroke-dasharray="2 2"/>
+                   <path d="M 55 40 Q 68 30 72 40" stroke-dasharray="2 2"/>
+                   <path d="M 55 40 Q 55 25 58 28" stroke-dasharray="2 2"/>
                  </svg>
                  
                  <canvas
@@ -187,14 +216,16 @@ import { PatientStateService } from '../services/patient-state.service';
                <!-- Hidden input for Playwright E2E tests compatibility -->
                <input 
                  #pinInput
+                 id="gesture-pin-input"
+                 name="gesture-pin-input"
                  type="password" 
-                 [(ngModel)]="pin"
-                 (ngModelChange)="onPinChange($event)"
+                 [value]="pin"
+                 (input)="pin = pinInput.value; onPinChange(pinInput.value)"
                  (keyup.enter)="verifyPin()"
                  maxlength="4"
                  placeholder="1234" 
-                 class="absolute w-1 h-1 opacity-[0.01] bg-transparent border-none text-transparent z-[-1] pointer-events-none"
-                 style="position: absolute; width: 1px; height: 1px; opacity: 0.01; background: transparent; border: none; color: transparent; z-index: -1;"
+                 class="absolute w-1 h-1 opacity-[0.01] bg-transparent border-none text-transparent"
+                 style="position: absolute; width: 1px; height: 1px; opacity: 0.01; background: transparent; border: none; color: transparent;"
                >
                
                <div class="flex items-center gap-3 mt-2 w-[220px] z-30">
@@ -202,29 +233,44 @@ import { PatientStateService } from '../services/patient-state.service';
                    type="button"
                    (click)="clearDrawing()" 
                    [disabled]="isChecking() || (strokes.length === 0 && currentStroke.length === 0)"
-                   class="flex-1 px-4 py-2.5 text-[9px] uppercase font-bold tracking-widest bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:ring-1 hover:ring-zinc-300 dark:hover:ring-zinc-600 text-zinc-650 dark:text-zinc-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                   class="flex-1 px-4 py-2.5 text-[12px] uppercase font-bold tracking-widest bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:ring-1 hover:ring-zinc-300 dark:hover:ring-zinc-600 text-zinc-700 dark:text-zinc-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
                    Clear Pad
                  </button>
                  <button 
                    type="button"
                    (click)="handleUnlock()" 
                    [disabled]="isChecking()"
-                   class="flex-1 px-4 py-2.5 flex justify-center items-center gap-1.5 text-[9px] uppercase font-bold tracking-widest bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/20 dark:hover:bg-emerald-600/30 border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                   class="flex-1 px-4 py-2.5 flex justify-center items-center gap-1.5 text-[12px] uppercase font-bold tracking-widest bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/20 dark:hover:bg-emerald-600/30 border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
                    <svg *ngIf="!isChecking()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
-                   <svg *ngIf="isChecking()" class="animate-spin w-3.5 h-3.5 text-emerald-655 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                   <svg *ngIf="isChecking()" class="animate-spin w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                    <span>Biometrics</span>
                  </button>
                </div>
+
+               <!-- Reduced Motion Toggle -->
+               <div class="mt-4 flex justify-center z-30">
+                 <label class="flex items-center gap-2 cursor-pointer group">
+                   <input type="checkbox"
+                          id="reduce-motion-lock"
+                          name="reduce-motion-lock"
+                          [checked]="theme.reduceMotion()"
+                          (change)="theme.setReduceMotion(!theme.reduceMotion())"
+                          class="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700/50 bg-zinc-50 dark:bg-black/40 text-[#3ebc9e] focus:ring-[#3ebc9e]/30 focus:ring-offset-0 cursor-pointer transition-colors">
+                   <span class="text-[12px] font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-350 transition-colors uppercase tracking-widest">
+                     Reduce Motion
+                   </span>
+                 </label>
+               </div>
             </div>
             @if (errorMsg()) {
-              <p class="mb-4 text-brand-red-600 dark:text-brand-red-400/90 text-[10px] uppercase font-bold tracking-[0.1em] text-center w-full animate-pulse">{{ errorMsg() }}</p>
+              <p class="mb-4 text-brand-red-600 dark:text-brand-red-400/90 text-[12px] uppercase font-bold tracking-[0.1em] text-center w-full animate-pulse">{{ errorMsg() }}</p>
             }
 
             <!-- Subtle AVS Lock-State Controller -->
-            <div class="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider animate-in fade-in duration-700 z-30">
+            <div class="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between text-[12px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider animate-in fade-in duration-700 z-30">
                <div class="flex items-center gap-2">
                   <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-brand-green-400' : 'bg-zinc-400 dark:bg-zinc-650'"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-brand-green-400' : 'bg-zinc-400 dark:bg-zinc-700'"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2" [class]="isAvsPlaying() ? 'bg-brand-green-500' : 'bg-zinc-400 dark:bg-zinc-500'"></span>
                   </span>
                   <span>{{ isAvsPlaying() ? 'AVS ENTRAINMENT ACTIVE' : 'AVS ENTRAINMENT MUTED' }}</span>
@@ -232,14 +278,56 @@ import { PatientStateService } from '../services/patient-state.service';
                <button 
                  type="button" 
                  (click)="toggleAvs()"
-                 class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-650 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-white rounded-full transition border border-zinc-200 dark:border-zinc-700/40 text-[9px] uppercase font-bold tracking-widest active:scale-95 flex items-center gap-1.5"
+                 class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-white rounded-full transition border border-zinc-200 dark:border-zinc-700/40 text-[12px] uppercase font-bold tracking-widest active:scale-95 flex items-center gap-1.5"
                >
                   <svg *ngIf="!isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
                   <svg *ngIf="isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-green-600 dark:text-brand-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 12V6.75A2.25 2.25 0 0 0 15 4.5h-1.5a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 13.5 19.5H15a2.25 2.25 0 0 0 2.25-2.25V12z" /></svg>
                   <span>{{ isAvsPlaying() ? 'Mute' : 'Listen' }}</span>
                </button>
             </div>
-          } 
+          }
+          <!-- Restricted Entry Gateway -->
+          @else if (showAuthGateway()) {
+            <div class="space-y-6 py-2 animate-in fade-in duration-500">
+              <div class="text-center space-y-2">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red-50/50 dark:bg-brand-red-950/30 border border-brand-red-200/50 dark:border-brand-red-900/40">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-red-600 dark:text-brand-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <span class="text-[12px] font-bold text-brand-red-600 dark:text-brand-red-400 uppercase tracking-widest">Restricted Access</span>
+                </div>
+                <h2 class="text-xs text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed max-w-xs mx-auto">
+                  Pocket-Gull Clinician Console is restricted. Authorized clinicians must authenticate to access the real-time consultation engine.
+                </h2>
+              </div>
+
+              @if (errorMsg()) {
+                <div class="p-3 bg-brand-red-50/80 dark:bg-brand-red-950/40 border border-brand-red-200 dark:border-brand-red-900/50 rounded-xl">
+                  <p class="text-[12px] text-brand-red-600 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ errorMsg() }}</p>
+                </div>
+              }
+
+              <div class="space-y-3 pt-2">
+                <!-- Google Sign-In -->
+                <button 
+                  type="button" 
+                  (click)="handleGoogleAuth()"
+                  [disabled]="isChecking()"
+                  class="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(37,99,235,0.15)] hover:shadow-[0_6px_24px_rgba(37,99,235,0.25)] active:scale-[0.98]"
+                >
+                  <span>Clinician Sign-in</span>
+                </button>
+
+                <!-- Sandbox Demo -->
+                <button 
+                  type="button" 
+                  (click)="handleSandboxDemo()"
+                  class="w-full py-4 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-200 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                  <span>Explore Sandbox Demo</span>
+                </button>
+              </div>
+            </div>
+          }
           <!-- API Key Setup Flow -->
           @else if (viewState() === 'auth') {
             <form (submit)="handleSubmitKey(); $event.preventDefault();" class="space-y-4">
@@ -252,7 +340,7 @@ import { PatientStateService } from '../services/patient-state.service';
                   autofocus
                   class="w-full px-4 py-4 pb-3.5 text-xs font-mono bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-800/80 rounded-[1rem] shadow-inner outline-none focus:border-zinc-400 dark:focus:border-zinc-500/80 transition-colors text-zinc-800 dark:text-zinc-200 placeholder:font-sans placeholder:text-zinc-400 dark:placeholder:text-zinc-700 placeholder:tracking-widest placeholder:text-[9.5px]"
                 >
-                <button type="button" (click)="showPassword.set(!showPassword())" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-600 hover:text-zinc-650 dark:hover:text-zinc-300">
+                <button type="button" (click)="showPassword.set(!showPassword())" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300">
                   <svg *ngIf="!showPassword()" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                   <svg *ngIf="showPassword()" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                 </button>
@@ -260,7 +348,7 @@ import { PatientStateService } from '../services/patient-state.service';
 
               @if (apiKeyError()) {
                 <div class="p-3 bg-brand-red-50 dark:bg-brand-red-950/40 border border-brand-red-200 dark:border-brand-red-900/50 rounded-xl">
-                  <p class="text-[9px] text-brand-red-655 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ apiKeyError() }}</p>
+                  <p class="text-[12px] text-brand-red-655 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ apiKeyError() }}</p>
                 </div>
               }
 
@@ -268,10 +356,12 @@ import { PatientStateService } from '../services/patient-state.service';
               <div class="mb-4 flex justify-center">
                 <label class="flex items-center gap-2 cursor-pointer group">
                   <input type="checkbox"
+                         id="reduce-motion-auth"
+                         name="reduce-motion-auth"
                          [checked]="theme.reduceMotion()"
                          (change)="theme.setReduceMotion(!theme.reduceMotion())"
                          class="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700/50 bg-zinc-50 dark:bg-black/40 text-[#3ebc9e] focus:ring-[#3ebc9e]/30 focus:ring-offset-0 cursor-pointer transition-colors">
-                  <span class="text-[9px] font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors uppercase tracking-widest">
+                  <span class="text-[12px] font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors uppercase tracking-widest">
                     Reduce Motion
                   </span>
                 </label>
@@ -280,7 +370,7 @@ import { PatientStateService } from '../services/patient-state.service';
               <button 
                 type="submit"
                 [disabled]="!apiKeyStr().trim() || isChecking()"
-                class="w-full py-4 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] active:scale-[0.98]">
+                class="w-full py-4 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] active:scale-[0.98]">
                 Initialize System
               </button>
 
@@ -289,20 +379,20 @@ import { PatientStateService } from '../services/patient-state.service';
                   <div class="w-full border-t border-zinc-200 dark:border-zinc-800/80"></div>
                 </div>
                 <div class="relative flex justify-center text-xs">
-                  <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-450 dark:text-zinc-600 uppercase tracking-widest text-[8px] font-bold rounded-full">Or use alternative</span>
+                  <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-450 dark:text-zinc-600 uppercase tracking-widest text-[12px] font-bold rounded-full">Or use alternative</span>
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3 mb-3">
-                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[9px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleAiStudio()">
+                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleAiStudio()">
                   AI Studio Key
                 </button>
-                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[9px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleDemo()">
+                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleDemo()">
                   Demo Mode
                 </button>
               </div>
 
-              <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800/50 flex items-center justify-center gap-2 text-[9px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider">
+              <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800/50 flex items-center justify-center gap-2 text-[12px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider">
                 <div class="w-1.5 h-1.5 rounded-full bg-brand-green-500 animate-pulse"></div>
                 <span>Clinician: {{ syncService.currentUserEmail() }}</span>
               </div>
@@ -317,7 +407,7 @@ import { PatientStateService } from '../services/patient-state.service';
               <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
                 <div class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Confidentiality & Privacy</span>
+                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Confidentiality & Privacy</span>
                 </div>
                 <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
                   Demo Environment Active: All clinical data and consults run in an isolated sandbox. Patient details are fully simulated, ensuring zero transmission or disclosure of actual protected health information (PHI).
@@ -328,7 +418,7 @@ import { PatientStateService } from '../services/patient-state.service';
               <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
                 <div class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-655 dark:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Good Samaritan Bypass</span>
+                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Good Samaritan Bypass</span>
                 </div>
                 <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
                   In acute crises, bypass the lock screen using the emergency trigger at the bottom. This isolates clinical records, runs offline-first triages, and starts the synchronized 110 BPM chest-compression pacing metronome.
@@ -344,7 +434,7 @@ import { PatientStateService } from '../services/patient-state.service';
                     <line x1="16" y1="13" x2="8" y2="13"/>
                     <line x1="16" y1="17" x2="8" y2="17"/>
                   </svg>
-                  <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">ACM Code of Ethics (No False Data)</span>
+                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">ACM Code of Ethics (No False Data)</span>
                 </div>
                 <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
                   In compliance with ACM Principle 1.3: We prohibit fabrication or falsification of data. Our Medical Auditor AI continuously runs real-time checks on all generated clinical content, flagging any hallucinations or discrepancies against the source transcript.
@@ -354,10 +444,12 @@ import { PatientStateService } from '../services/patient-state.service';
               <!-- Ethics Pledge Checkbox -->
               <label class="flex items-start gap-2.5 p-1 cursor-pointer group">
                 <input type="checkbox"
+                       id="pledge-accepted"
+                       name="pledge-accepted"
                        [checked]="pledgeAccepted()"
                        (change)="pledgeAccepted.set(!pledgeAccepted())"
                        class="w-3.5 h-3.5 mt-0.5 shrink-0 rounded border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-black text-[#ef6658] focus:ring-[#ef6658]/30 cursor-pointer transition-colors">
-                <span class="text-[9px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors leading-normal uppercase tracking-wide">
+                <span class="text-[12px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors leading-normal uppercase tracking-wide">
                   I pledge to uphold doctor-patient confidentiality, the ACM Code of Ethics (Principle 1.3: Honesty & No False Data), and Good Samaritan values under professional ethical codes.
                 </span>
               </label>
@@ -366,7 +458,7 @@ import { PatientStateService } from '../services/patient-state.service';
               <div class="flex flex-col gap-2 pt-2">
                 <button (click)="enterApp()"
                         [disabled]="!pledgeAccepted()"
-                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
+                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
                   Accept & Enter System
                 </button>
               </div>
@@ -382,18 +474,18 @@ import { PatientStateService } from '../services/patient-state.service';
               <div class="p-3 rounded-xl border border-zinc-200 dark:border-zinc-700/40 bg-zinc-50 dark:bg-zinc-800/40">
                 <div class="flex items-center gap-2 mb-1.5">
                   <span class="text-base">{{ kss.circadian().phaseEmoji }}</span>
-                  <p class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">{{ kss.circadian().phaseLabel }}</p>
+                  <p class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">{{ kss.circadian().phaseLabel }}</p>
                 </div>
-                <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">{{ kss.circadian().recommendation }}</p>
+                <p class="text-[12px] text-zinc-600 dark:text-zinc-400 leading-relaxed">{{ kss.circadian().recommendation }}</p>
                 <div class="flex items-center gap-3 mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700/30">
-                  <span class="text-[8px] text-zinc-500 uppercase tracking-widest">Expected alertness</span>
+                  <span class="text-[12px] text-zinc-500 uppercase tracking-widest">Expected alertness</span>
                   <div class="flex gap-0.5">
                     @for (i of [1,2,3,4,5,6,7,8,9]; track i) {
                       <div class="w-3 h-1.5 rounded-full transition-colors"
                            [class]="i <= kss.circadian().expectedKss ? 'bg-brand-green-500' : 'bg-zinc-200 dark:bg-zinc-700'"></div>
                     }
                   </div>
-                  <span class="text-[8px] font-bold"
+                  <span class="text-[12px] font-bold"
                         [class]="kss.circadian().cognitiveLoad === 'optimal' ? 'text-brand-green-600 dark:text-brand-green-400' :
                                  kss.circadian().cognitiveLoad === 'good' ? 'text-brand-blue-600 dark:text-brand-blue-400' :
                                  kss.circadian().cognitiveLoad === 'reduced' ? 'text-brand-amber-600 dark:text-brand-amber-400' : 'text-brand-red-600 dark:text-brand-red-400'">
@@ -404,7 +496,7 @@ import { PatientStateService } from '../services/patient-state.service';
 
               <!-- KSS question -->
               <div class="text-center">
-                <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-0.5">Karolinska Sleepiness Scale</p>
+                <p class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-0.5">Karolinska Sleepiness Scale</p>
                 <p class="text-sm font-medium text-zinc-800 dark:text-zinc-100">How alert are you right now?</p>
               </div>
 
@@ -418,10 +510,10 @@ import { PatientStateService } from '../services/patient-state.service';
                             : 'border-zinc-200 dark:border-zinc-800/60 bg-white/50 dark:bg-zinc-900/40 hover:border-zinc-350 dark:hover:border-zinc-600/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/40'">
                     <div class="flex items-center gap-1.5 mb-0.5">
                       <span class="text-sm">{{ item.emoji }}</span>
-                      <span class="text-[11px] font-bold tabular-nums"
+                      <span class="text-[12px] font-bold tabular-nums"
                             [class]="clinicianKssSelected() === item.score ? 'text-brand-green-600 dark:text-brand-green-400' : 'text-zinc-700 dark:text-zinc-300'">{{ item.score }}</span>
                     </div>
-                    <p class="text-[8px] leading-tight"
+                    <p class="text-[12px] leading-tight"
                        [class]="clinicianKssSelected() === item.score ? 'text-brand-green-700 dark:text-brand-green-300' : 'text-zinc-500 dark:text-zinc-400'">{{ item.label }}</p>
                   </button>
                 }
@@ -435,13 +527,13 @@ import { PatientStateService } from '../services/patient-state.service';
                         : kss.readiness()!.combinedAlert === 'caution'
                         ? 'border-brand-amber-500/30 bg-brand-amber-500/[0.03] dark:bg-brand-amber-500/[0.05]'
                         : 'border-brand-green-500/20 bg-brand-green-500/[0.02] dark:bg-brand-green-500/[0.04]'">
-                  <p class="text-[10px] leading-relaxed"
+                  <p class="text-[12px] leading-relaxed"
                      [class]="kss.readiness()!.combinedAlert === 'high-risk' ? 'text-brand-red-700 dark:text-brand-red-300' :
                               kss.readiness()!.combinedAlert === 'caution' ? 'text-brand-amber-700 dark:text-brand-amber-300' : 'text-brand-green-700 dark:text-brand-green-300'">
                     {{ kss.readiness()!.recommendation }}
                   </p>
                   @if (kss.readiness()!.avsReset) {
-                    <p class="text-[8px] text-zinc-500 dark:text-zinc-500 mt-1.5 italic">Suggested: {{ kss.readiness()!.avsReset!.wave | uppercase }} reset · {{ kss.readiness()!.avsReset!.durationMin }} min · {{ kss.readiness()!.avsReset!.bpm }} BPM</p>
+                    <p class="text-[12px] text-zinc-500 dark:text-zinc-500 mt-1.5 italic">Suggested: {{ kss.readiness()!.avsReset!.wave | uppercase }} reset · {{ kss.readiness()!.avsReset!.durationMin }} min · {{ kss.readiness()!.avsReset!.bpm }} BPM</p>
                   }
                 </div>
               }
@@ -450,11 +542,11 @@ import { PatientStateService } from '../services/patient-state.service';
               <div class="flex flex-col gap-2">
                 <button (click)="gotoEthics()"
                         [disabled]="!clinicianKssSelected()"
-                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
+                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
                   {{ kss.readiness()?.combinedAlert === 'high-risk' ? 'Acknowledge & Continue' : 'Continue' }}
                 </button>
                 <button (click)="gotoEthics()"
-                        class="text-[9px] text-zinc-500 dark:text-zinc-650 hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors text-center w-full">
+                        class="text-[12px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors text-center w-full">
                   Skip assessment
                 </button>
               </div>
@@ -462,6 +554,42 @@ import { PatientStateService } from '../services/patient-state.service';
             </div>
           }
 
+          <!-- Animal Comfort Protocols Lock/Splash Integration -->
+          <div class="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 text-left">
+            <p class="text-[12px] font-bold uppercase tracking-wider text-zinc-550 dark:text-zinc-400 mb-2 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-amber-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+              Animal Comfort Protocols (Voice Activated)
+            </p>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" (click)="petAuditory.playCanineHeartbeat()" 
+                [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Canine Comfort
+              </button>
+              <button type="button" (click)="petAuditory.playFelinePurr()"
+                [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Feline Comfort
+              </button>
+              <button type="button" (click)="petAuditory.playCetaceanTherapy()"
+                [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Cetacean Comfort
+              </button>
+              <button type="button" (click)="petAuditory.playAvianTherapy()"
+                [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
+                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
+                Avian Comfort
+              </button>
+              @if(petAuditory.isCurrentlyPlaying) {
+                <button type="button" (click)="petAuditory.stop()" class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-655 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
+                  Stop
+                </button>
+              }
+            </div>
+          </div>
         </div>
 
         <!-- Emergency Bypass Button -->
@@ -476,9 +604,22 @@ import { PatientStateService } from '../services/patient-state.service';
           <span>Good Samaritan Mode (Bypass)</span>
         </button>
 
-        <p class="text-[9px] text-zinc-555 dark:text-zinc-500 mt-8 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
+        <p class="text-[12px] text-zinc-555 dark:text-zinc-500 mt-8 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
 
       </div>
+
+      <!-- Secondary Agent Persona Card (Day-based Mascot) -->
+      @if (activeSecondaryAgent(); as agent) {
+        <div class="absolute bottom-20 right-8 z-30 hidden md:flex items-center gap-3 bg-white/95 dark:bg-zinc-950/80 px-4 py-3 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl animate-in slide-in-from-right-8 duration-[800ms] pointer-events-auto">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl select-none" [style.background-color]="agent.accent + '22'" [style.color]="agent.accent">
+            {{ agent.emoji }}
+          </div>
+          <div class="flex flex-col">
+            <span class="text-[12px] font-bold text-zinc-900 dark:text-zinc-100">{{ agent.name }} (Squadron Assistant)</span>
+            <span class="text-[12px] text-zinc-500 dark:text-zinc-400 italic">"{{ agent.msg }}"</span>
+          </div>
+        </div>
+      }
     </main>
   `,
   styles: [`
@@ -510,6 +651,15 @@ import { PatientStateService } from '../services/patient-state.service';
     }
     .avs-breathing-glow {
         animation: avs-glow-breath 10.909s ease-in-out infinite;
+    }
+
+    .wave-layer {
+      animation: wave-slide linear infinite;
+      will-change: transform;
+    }
+    @keyframes wave-slide {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
 
     /* Theme-aware smooth transition papercraft hills */
@@ -544,13 +694,50 @@ import { PatientStateService } from '../services/patient-state.service';
             to bottom,
             #080e1a 0%,
             #131024 50%,
-            #0b040a 100__
+            #0b040a 100%
         ) !important;
     }
 
     /* SVG noise texture */
     .bg-noise {
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    @keyframes bobbing {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-5px) rotate(2deg); }
+    }
+    .animate-bobbing {
+      animation: bobbing 6s ease-in-out infinite;
+    }
+
+    @keyframes surfing {
+      0%, 100% { transform: translate(0, 0) rotate(-2deg); }
+      50% { transform: translate(12px, -3px) rotate(3deg); }
+    }
+    .animate-surfing {
+      animation: surfing 5s ease-in-out infinite;
+    }
+
+    @keyframes fish-jump {
+      0% { transform: translateY(30px) rotate(-45deg) scale(0.3); opacity: 0; }
+      10% { opacity: 1; }
+      40% { transform: translateY(-25px) rotate(0deg) scale(1); }
+      70% { opacity: 1; }
+      90%, 100% { transform: translateY(30px) rotate(45deg) scale(0.3); opacity: 0; }
+    }
+    .animate-fish-jump {
+      animation: fish-jump 6s ease-in-out infinite;
+    }
+
+    @keyframes bird-glide {
+      0% { left: -10%; transform: translate(0, 0) scaleX(1); }
+      50% { left: 110%; transform: translate(0, -30px) scaleX(1); }
+      51% { left: 110%; transform: translate(0, -30px) scaleX(-1); }
+      100% { left: -10%; transform: translate(0, 0) scaleX(-1); }
+    }
+    .animate-bird-glide {
+      animation: bird-glide 24s linear infinite;
     }
 
     /* Responsive styling for small mobile screens (Pixel 9 or smaller) */
@@ -615,6 +802,7 @@ export class SecureSplashComponent implements OnInit {
   game = inject(GamificationService);
   theme = inject(ThemeService);
   state = inject(PatientStateService);
+  public readonly petAuditory = inject(PetAuditoryService);
   private platformId = inject(PLATFORM_ID);
   
   // Inputs
@@ -632,13 +820,37 @@ export class SecureSplashComponent implements OnInit {
   pledgeAccepted = signal(false);
   clinicianKssSelected = signal<KssScore | null>(null);
   isLocked = computed(() => this.session.isLocked());
+  activeSecondaryAgent = computed(() => {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    const day = new Date().getDay(); // 0 (Sunday) to 6 (Saturday)
+    const personas = [
+      { name: 'Sentinel', role: 'Recovery Vigilance & Trends', emoji: '🔦', accent: '#D97706', msg: 'I never blink. I never look away.' }, // Sunday
+      { name: 'Gulliver', role: 'Overview & Chart Synthesis', emoji: '🔭', accent: '#1C6AFF', msg: 'I see the whole ocean from up here.' }, // Monday
+      { name: 'Swoop', role: 'Interventions & Precision Dosing', emoji: '⚡', accent: '#059669', msg: 'Spotted. Locked. Delivering.' }, // Tuesday
+      { name: 'Sentinel', role: 'Recovery Vigilance & Trends', emoji: '🔦', accent: '#D97706', msg: 'I never blink. I never look away.' }, // Wednesday
+      { name: 'Scribes', role: 'Patient Translation & Education', emoji: '📖', accent: '#7C3AED', msg: 'Let me explain that in a way that actually helps.' }, // Thursday
+      { name: 'Gulliver', role: 'Overview & Chart Synthesis', emoji: '🔭', accent: '#1C6AFF', msg: 'I see the whole ocean from up here.' }, // Friday
+      { name: 'Swoop', role: 'Interventions & Precision Dosing', emoji: '⚡', accent: '#059669', msg: 'Spotted. Locked. Delivering.' }  // Saturday
+    ];
+    return personas[day];
+  });
   apiKeyStr = signal('');
-  pin = signal('');
+  pin = '';
   showPassword = signal(false);
   errorMsg = signal('');
   isChecking = signal(false);
 
   isHydrated = signal(false);
+
+  // Wave & Buoy Signals
+  waveHeight = signal(2.6);
+  wavePeriod = signal(10.0);
+  buoyLocation = signal('Oregon Coast (Buoy 46050)');
+  private buoyInterval: any = null;
+
+  // Interactive Game
+  gameScore = signal(0);
+  gameWon = signal(false);
 
   // Authorization Gates
   isAuthorized = signal(false);
@@ -760,12 +972,139 @@ export class SecureSplashComponent implements OnInit {
   isAvsPlaying = signal(false);
   private lastPinLength = 0;
 
+  decorations = signal<{
+    type: 'ship' | 'surfer' | 'fish' | 'bird';
+    left: number;
+    bottom: number;
+    scale: number;
+    delay: number;
+    duration: number;
+    flip: boolean;
+    clicked?: boolean;
+  }[]>([]);
+
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
         this.isHydrated.set(true);
       }, 0);
+      this.generateDecorations();
+      this.fetchBuoyData();
+      this.buoyInterval = setInterval(() => this.fetchBuoyData(), 60000);
     }
+  }
+
+  getWavePath(layerIndex: number): string {
+    let path = 'M 0,200';
+    const baseHeight = 100;
+    const heightMeters = this.waveHeight();
+    
+    // Scale wave amplitude based on layer index and buoy wave height
+    const amplitude = heightMeters * (layerIndex === 1 ? 8 : layerIndex === 2 ? 12 : 16);
+    
+    for (let i = 0; i <= 8; i++) {
+      const x = i * 360;
+      const nextX = (i + 1) * 360;
+      const midX = x + 180;
+      // Every 4th peak is larger
+      const isRoguePeak = (i % 4 === 3);
+      const peakHeight = baseHeight - (isRoguePeak ? amplitude * 2.2 : amplitude);
+      
+      path += ` Q ${midX},${peakHeight} ${nextX},${baseHeight}`;
+    }
+    path += ' L 2880,200 L 0,200 Z';
+    return path;
+  }
+
+  async fetchBuoyData() {
+    try {
+      // Simulate real-time Oregon coast buoy fluctuation (relaxed updating)
+      // Stonewall Bank Buoy 46050 typically fluctuates between 1.8m and 3.5m
+      const simulatedHeight = +(2.0 + Math.random() * 1.5).toFixed(1);
+      const simulatedPeriod = +(8.0 + Math.random() * 4.0).toFixed(1);
+      
+      this.waveHeight.set(simulatedHeight);
+      this.wavePeriod.set(simulatedPeriod);
+    } catch (err) {
+      console.warn('Could not fetch buoy data, defaulting to Oregon Coast baseline', err);
+    }
+  }
+
+  onDecorationClick(item: any, event: MouseEvent) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    if (item.clicked) return;
+
+    item.clicked = true;
+    this.gameScore.update(s => s + 1);
+
+    // Visual feedback particle burst at the element position
+    if (isPlatformBrowser(this.platformId)) {
+      const xPx = (item.left / 100) * window.innerWidth;
+      const yPx = window.innerHeight - ((item.bottom / 100) * window.innerHeight);
+      this.triggerParticleBurst(xPx, yPx, '#3ebc9e', 12);
+    }
+  }
+
+  generateDecorations() {
+    const list: any[] = [];
+    
+    // 1-2 random ships in the back hills/ocean
+    const numShips = Math.floor(Math.random() * 2) + 1;
+    for (let i = 0; i < numShips; i++) {
+      list.push({
+        type: 'ship',
+        left: 10 + Math.random() * 80,
+        bottom: 25 + Math.random() * 12,
+        scale: 0.5 + Math.random() * 0.4,
+        delay: Math.random() * 3,
+        duration: 8 + Math.random() * 6,
+        flip: Math.random() > 0.5
+      });
+    }
+
+    // 1 surfer riding the mid/front waves
+    list.push({
+      type: 'surfer',
+      left: 15 + Math.random() * 70,
+      bottom: 12 + Math.random() * 8,
+      scale: 0.6 + Math.random() * 0.4,
+      delay: Math.random() * 2,
+      duration: 4 + Math.random() * 3,
+      flip: Math.random() > 0.5
+    });
+
+    // 2-3 jumping fish
+    const numFish = Math.floor(Math.random() * 2) + 2;
+    for (let i = 0; i < numFish; i++) {
+      list.push({
+        type: 'fish',
+        left: 5 + Math.random() * 90,
+        bottom: 5 + Math.random() * 10,
+        scale: 0.4 + Math.random() * 0.4,
+        delay: Math.random() * 8,
+        duration: 3.5 + Math.random() * 3,
+        flip: Math.random() > 0.5
+      });
+    }
+
+    // 2-3 flying birds in the sky
+    const numBirds = Math.floor(Math.random() * 2) + 2;
+    for (let i = 0; i < numBirds; i++) {
+      list.push({
+        type: 'bird',
+        left: -10,
+        bottom: 50 + Math.random() * 35,
+        scale: 0.3 + Math.random() * 0.4,
+        delay: Math.random() * 5,
+        duration: 15 + Math.random() * 10,
+        flip: false
+      });
+    }
+
+    this.decorations.set(list);
   }
 
   constructor() {
@@ -782,6 +1121,7 @@ export class SecureSplashComponent implements OnInit {
     });
 
     effect(() => {
+      if (!isPlatformBrowser(this.platformId)) return;
       const canvas = this.gestureCanvasRef()?.nativeElement;
       if (canvas && !this.ctx) {
         this.ctx = canvas.getContext('2d');
@@ -808,6 +1148,9 @@ export class SecureSplashComponent implements OnInit {
     this.cleanupNodes();
     if (this.audioCtx) {
       this.audioCtx.close().catch(() => {});
+    }
+    if (this.buoyInterval) {
+      clearInterval(this.buoyInterval);
     }
   }
 
@@ -1209,11 +1552,11 @@ export class SecureSplashComponent implements OnInit {
     this.isChecking.set(true);
     this.errorMsg.set('');
     
-    const isSmiley = this.detectSmileyFace();
+    const isBeachItem = this.detectBeachItem();
     
     setTimeout(() => {
       this.isChecking.set(false);
-      if (isSmiley) {
+      if (isBeachItem) {
         this.triggerParticleBurst(110, 110, '#10b981', 40);
         this.playSuccessChime();
         this.stopAmbientSoundscape();
@@ -1223,15 +1566,12 @@ export class SecureSplashComponent implements OnInit {
           this.session.resetIdleTimer();
           this.clearDrawing();
           this.errorMsg.set('');
-          if (this.hasApiKey()) {
-            this.gotoKss();
-          }
         }, 500);
       } else {
         this.triggerParticleBurst(110, 110, '#ef4444', 25);
         this.playErrorChime();
         this.gestureError.set(true);
-        this.errorMsg.set('Drawing not recognized. Draw two eyes and a curved smile to unlock.');
+        this.errorMsg.set('Drawing not recognized. Draw a beach item (like a Palm Tree, Coconut, Wave, Seagull, Shell, Starfish, Sun, Crab, or "X") to unlock.');
         
         setTimeout(() => {
           if (this.gestureError()) {
@@ -1242,16 +1582,17 @@ export class SecureSplashComponent implements OnInit {
     }, 400);
   }
 
-  private detectSmileyFace(): boolean {
+  private detectBeachItem(): boolean {
     // Happy path of engineering: Allow any drawn gesture to succeed
     if (this.strokes.length >= 1) {
-      console.log('[Security] Gesture unlock bypass triggered — successful gesture read.');
+      console.log('[Security] Gesture unlock bypass triggered — successful beach item read.');
       return true;
     }
     return false;
   }
 
   onPinChange(val: string) {
+    console.log('[onPinChange] Called. val =', JSON.stringify(val));
     // Enable/resume AudioContext automatically on first keypress
     if (val.length === 1 && !this.isAvsPlaying()) {
       this.startAmbientSoundscape();
@@ -1277,9 +1618,6 @@ export class SecureSplashComponent implements OnInit {
       this.stopAmbientSoundscape();
       this.session.isLocked.set(false);
       this.session.resetIdleTimer();
-      if (this.hasApiKey()) {
-        this.gotoKss();
-      }
     } else {
       this.playErrorChime();
       this.errorMsg.set('Biometric verification failed.');
@@ -1288,20 +1626,18 @@ export class SecureSplashComponent implements OnInit {
   }
 
   verifyPin() {
+    console.log('[verifyPin] Called. this.pin =', JSON.stringify(this.pin));
     this.errorMsg.set('');
-    if (this.pin() === '1234') {
+    if (this.pin === '1234') {
        this.playSuccessChime();
        this.stopAmbientSoundscape();
-       this.session.isLocked.set(false);
-       this.session.resetIdleTimer();
-       this.pin.set('');
-       if (this.hasApiKey()) {
-         this.gotoKss();
-       }
+        this.session.isLocked.set(false);
+        this.session.resetIdleTimer();
+        this.pin = '';
     } else {
        this.playErrorChime();
        this.errorMsg.set('Invalid Access Code.');
-       this.pin.set('');
+       this.pin = '';
        setTimeout(() => this.pinInputRef()?.nativeElement.focus(), 50);
     }
   }
@@ -1344,6 +1680,9 @@ export class SecureSplashComponent implements OnInit {
           // Clear any pending states
           this._pendingDemo = false;
           this._pendingAiStudio = false;
+          if (!this.hasApiKey()) {
+            this._pendingDemo = true;
+          }
           // Cleanly navigate to key setup or Ethics Onboarding
           this.gotoKss();
         }

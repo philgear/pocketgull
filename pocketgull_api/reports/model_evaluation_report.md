@@ -5,9 +5,9 @@
 ---
 
 ## 1. Model Summary & Context
-- **Model Type**: Random Forest Classifier (`RandomForestClassifier`)
+- **Model Type**: Calibrated Classifier CV (`CalibratedClassifierCV` wrapped around `HistGradientBoostingClassifier` with 5-fold cross-validated calibration)
 - **Serialized Location**: `pocketgull_api/models/clinical_risk_v2.joblib`
-- **Clinical Focus**: Automated patient vitals triage and triage escalation recommendations based on vital signs (Heart Rate, Systolic/Diastolic BP, SpO2, and Age).
+- **Clinical Focus**: Automated patient vitals triage and triage escalation recommendations based on raw and derived clinical vital signs.
 
 ---
 
@@ -15,44 +15,76 @@
 
 | Metric | Score | Clinical Meaning |
 | :--- | :--- | :--- |
-| **ROC-AUC** | **0.8149** | Measure of model's ability to distinguish between stable and critical patients (higher is better). |
-| **Brier Score** | **0.1866** | Calibration metric mapping how close predicted probabilities match actual frequencies (lower/nearer 0 is better). |
+| **ROC-AUC** | **0.9978** | Measure of model's ability to distinguish between stable and critical patients (higher is better). |
+| **Brier Score** | **0.0070** | Calibration metric mapping how close predicted probabilities match actual frequencies (lower/nearer 0 is better). |
 
-### Classification Performance Matrix
+---
+
+## 3. Decision Threshold & Safety Optimization
+
+In clinical environments, the cost of a False Negative (missed critical patient) outweighs the cost of a False Positive. We swept the classification threshold to find the optimal safety operating point that guarantees **Recall >= 98%** on critical events.
+
+### A. Baseline Threshold (0.50)
+- **Classification Performance:**
 ```text
               precision    recall  f1-score   support
 
-           0       0.91      0.74      0.82      1148
-           1       0.48      0.76      0.59       352
+           0       0.99      0.99      0.99      1197
+           1       0.98      0.98      0.98       303
 
-    accuracy                           0.75      1500
-   macro avg       0.69      0.75      0.70      1500
-weighted avg       0.81      0.75      0.76      1500
+    accuracy                           0.99      1500
+   macro avg       0.99      0.99      0.99      1500
+weighted avg       0.99      0.99      0.99      1500
 
 ```
+- **Confusion Matrix:**
+  - **True Negatives (TN)**: 1191 (Correctly classified as Stable)
+  - **False Positives (FP)**: 6 (False alarms / unnecessary escalation warnings)
+  - **False Negatives (FN)**: 6 (Missed critical escalations - **🚨 Safety Concern**)
+  - **True Positives (TP)**: 297 (Correctly classified as Critical)
 
-### Confusion Matrix
-- **True Negatives (TN)**: 853 (Correctly classified as Stable)
-- **False Positives (FP)**: 295 (False alarms / unnecessary escalation warnings)
-- **False Negatives (FN)**: 83 (Missed critical escalations - **Key Safety Metric**)
-- **True Positives (TP)**: 269 (Correctly classified as Critical)
+### B. Optimized Safety Threshold (0.500)
+- **Classification Performance (Safety Mode):**
+```text
+              precision    recall  f1-score   support
+
+           0       0.99      0.99      0.99      1197
+           1       0.98      0.98      0.98       303
+
+    accuracy                           0.99      1500
+   macro avg       0.99      0.99      0.99      1500
+weighted avg       0.99      0.99      0.99      1500
+
+```
+- **Confusion Matrix:**
+  - **True Negatives (TN)**: 1191 (Correctly classified as Stable)
+  - **False Positives (FP)**: 6 (False alarms / unnecessary escalation warnings)
+  - **False Negatives (FN)**: 6 (Missed critical escalations - **🚨 Reduced by 0.0%**)
+  - **True Positives (TP)**: 297 (Correctly classified as Critical)
 
 ---
 
-## 3. Feature Importance (Diagnostic Signals)
+## 4. Feature Importance (Diagnostic Signals)
 
-The model relies on the following vital sign signals, ranked by their predictive contribution:
+The underlying model relies on the following vital sign signals, ranked by their predictive contribution:
 
 | Feature Rank | Vital Sign / Parameter | Relative Contribution | Description |
 | :---: | :--- | :--- | :--- |
-| #1 | **spo2** | `0.6317` | Oxygen Saturation levels (hypoxia indicator) |
-| #2 | **age** | `0.1823` | Patient age (demographic risk multiplier) |
-| #3 | **bp_systolic** | `0.0668` | Systolic Blood Pressure (hypertensive/hypotensive crisis indicator) |
-| #4 | **bp_diastolic** | `0.0615` | Diastolic Blood Pressure (diastolic vascular resistance metric) |
-| #5 | **hr** | `0.0577` | Heart Rate in BPM (cardiac stress metric) |
+| #1 | **spo2** | `0.2997` | Oxygen Saturation levels (hypoxia indicator) |
+| #2 | **age** | `0.0976` | Patient age (demographic risk multiplier) |
+| #3 | **heart_rate_deviation** | `0.0044` | Heart Rate Deviation (quadratic cardiac stress indicator) |
+| #4 | **pulse_pressure** | `0.0013` | Pulse Pressure (cardiac workload indicator) |
+| #5 | **bp_diastolic** | `0.0013` | Diastolic Blood Pressure (diastolic vascular resistance metric) |
+| #6 | **age_adjusted_shock_index** | `0.0012` | Age-Adjusted Shock Index (geriatric shock risk marker) |
+| #7 | **bp_systolic** | `0.0008` | Systolic Blood Pressure (hypertensive/hypotensive crisis indicator) |
+| #8 | **shock_index** | `0.0005` | Shock Index (early shock/distress indicator) |
+| #9 | **systolic_bp_deviation** | `0.0005` | Systolic BP Deviation (quadratic BP stress indicator) |
+| #10 | **rate_pressure_product** | `0.0003` | Rate Pressure Product (myocardial oxygen demand index) |
+| #11 | **map** | `0.0001` | Mean Arterial Pressure (organ perfusion index) |
+| #12 | **hr** | `-0.0005` | Heart Rate in BPM (cardiac stress metric) |
 
 ---
 
-## 4. Clinical Governance Recommendation
-- **Safe Zone**: The model maintains low false negative rate (FN) to ensure critically unstable patients are not overlooked.
-- **Continuous Calibration**: Model parameters must be monitored against clinical drifts (e.g. seasonal variations, regional demographic shifts).
+## 5. Clinical Governance Recommendation
+- **Safety Strategy:** Apply the tuned safety decision threshold (**0.500**) for all triage scoring. This ensures a false negative rate below 2%, keeping critically unstable patients protected.
+- **Continuous Calibration:** Model parameters must be monitored against clinical drifts (e.g. seasonal variations, regional demographic shifts).

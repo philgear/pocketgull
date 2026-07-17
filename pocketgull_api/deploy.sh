@@ -5,7 +5,7 @@ echo "=== PocketGull API Deployment Script ==="
 echo ""
 
 # Default variables
-REGION="us-west1"
+REGION="us-central1"
 SERVICE_NAME="pocketgull-api"
 
 # Check if gcloud is installed
@@ -38,7 +38,12 @@ gcloud run deploy $SERVICE_NAME \
     --region $REGION \
     --project $PROJECT_ID \
     --no-allow-unauthenticated \
-    --set-env-vars NODE_ENV=production
+    --set-env-vars NODE_ENV=production \
+    --cpu 1 \
+    --memory 1Gi \
+    --min-instances 0 \
+    --max-instances 2 \
+    --update-labels env=production,team=clinical-squad,component=scoring-api
 
 echo ""
 echo "Deployment Complete!"

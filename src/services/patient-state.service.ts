@@ -21,7 +21,7 @@ import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
 import { ThemeService } from './theme.service';
 import { dataConnect } from '../lib/firebase';
-import { createCarePlan, createConsultationSession } from '../lib/dataconnect';
+import { createCarePlan, createConsultationSession } from '../lib/dataconnect/index.cjs.js';
 
 
 @Injectable({
@@ -35,6 +35,7 @@ export class PatientStateService {
   readonly isLiveAgentActive = signal<boolean>(false);
   readonly liveAgentInput = signal<string>('');
   readonly isResearchFrameVisible = signal<boolean>(false);
+  readonly isSynthesisDashboardVisible = signal<boolean>(false);
   readonly analysisUpdateRequest = signal(0);
   readonly requestedResearchUrl = signal<string | null>(null);
   readonly requestedResearchQuery = signal<string | null>(null);
@@ -52,6 +53,13 @@ export class PatientStateService {
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
   readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
+
+  // --- Patient Metadata State (for Demo Mode and Context) ---
+  readonly patientId = signal<string | null>(null);
+  readonly patientName = signal<string>('');
+  readonly patientAge = signal<number>(0);
+  readonly patientGender = signal<string>('');
+  readonly patientHistory = signal<HistoryEntry[]>([]);
 
   // --- AVS Neuro-Therapy Synchronized State ---
   readonly isAvsSessionActive = signal<boolean>(false);
@@ -366,6 +374,14 @@ export class PatientStateService {
     }
   }
 
+  toggleSynthesisDashboard(visible?: boolean) {
+    if (visible === undefined) {
+      this.isSynthesisDashboardVisible.update(v => !v);
+    } else {
+      this.isSynthesisDashboardVisible.set(visible);
+    }
+  }
+
   updateIssue(partId: string, issue: IBodyPartIssue) {
     this.issues.update(current => {
       const issuesForPart = current[partId] ? [...current[partId]] : [];
@@ -622,6 +638,11 @@ export class PatientStateService {
     this.viewingPastVisit.set(null);
     this.activePhilosophy.set('western');
     this.ayurvedicStatus.set({});
+    this.patientId.set(null);
+    this.patientName.set('');
+    this.patientAge.set(0);
+    this.patientGender.set('');
+    this.patientHistory.set([]);
   }
 
   /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
@@ -647,9 +668,15 @@ export class PatientStateService {
   /** Loads the state of a specific patient. */
   loadState(state: any) {
     this.clearState(); // Start from a clean slate
-    if (state && state.id) {
-      this.loadedPatientId.set(state.id);
+    const patient = state as any;
+    if (patient.id) {
+      this.patientId.set(patient.id);
+      this.loadedPatientId.set(patient.id);
     }
+    if (patient.name) this.patientName.set(patient.name);
+    if (patient.age) this.patientAge.set(patient.age);
+    if (patient.gender) this.patientGender.set(patient.gender);
+    if (patient.history) this.patientHistory.set(patient.history);
     this.issues.set(state.issues);
         if (state.patientGoals) this.patientGoals.set(state.patientGoals);
         if (state.dietaryProtocol) this.dietaryProtocol.set(state.dietaryProtocol);
@@ -664,6 +691,11 @@ export class PatientStateService {
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
     if (state.activePhilosophy) this.activePhilosophy.set(state.activePhilosophy);
     if (state.ayurvedicStatus) this.ayurvedicStatus.set(state.ayurvedicStatus);
+    if ((state as any).biometricHistory) {
+      this.biometricHistory.set((state as any).biometricHistory);
+    } else {
+      this.biometricHistory.set([]);
+    }
   }
 
   /** Returns the current patient state for saving. */
@@ -682,7 +714,8 @@ export class PatientStateService {
             shoppingList: this.shoppingList(),
             activePhilosophy: this.activePhilosophy(),
             ayurvedicStatus: this.ayurvedicStatus(),
-        };
+            biometricHistory: this.biometricHistory(),
+        } as any;
   }
 
 

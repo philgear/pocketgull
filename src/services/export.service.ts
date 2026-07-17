@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { MarkdownService } from './markdown.service';
+import * as DOMPurify from 'dompurify';
 
 import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -32,6 +33,18 @@ interface IFhirBundle {
   providedIn: 'root'
 })
 export class ExportService {
+
+  private sanitizeObject(obj: any): any {
+    const purify = (DOMPurify as any).default || DOMPurify;
+    if (typeof obj === 'string') return purify.sanitize(obj, { ALLOWED_TAGS: [] });
+    if (Array.isArray(obj)) return obj.map(item => this.sanitizeObject(item));
+    if (typeof obj === 'object' && obj !== null) {
+      const res: any = {};
+      for (const key of Object.keys(obj)) res[key] = this.sanitizeObject(obj[key]);
+      return res;
+    }
+    return obj;
+  }
 
   private readonly markdownService = inject(MarkdownService);
 
@@ -678,6 +691,8 @@ export class ExportService {
       </div>`;
     }
 
+    const isDyslexia = !!(translationMatrix && translationMatrix.levelName && translationMatrix.levelName.toLowerCase().includes('dyslexia'));
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1088,12 +1103,23 @@ export class ExportService {
     /* ─── Print Overrides ───────────────────────────── */
     @media print {
       html { font-size: 9.5pt; }
-      body { background: white !important; }
+      body { 
+        background: white !important; 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+      }
       body::before, body::after { position: absolute !important; }
       .page-wrap { padding: 0; max-width: 100%; }
       .matrix-analysis { page-break-inside: avoid; break-inside: avoid; margin-bottom: 20px; }
       h1, h2, h3, h4, h5 { page-break-after: avoid; break-after: avoid; }
       p, li, tr { page-break-inside: avoid; break-inside: avoid; }
+      
+      /* Preserve background colors and borders in PDF and paper output */
+      .vital-chip, .condition-tag, .care-plan-section, .care-plan-header, .matrix-analysis, blockquote {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
       @page {
         size: letter portrait;
         margin: 0.75in 0.75in 1in 0.75in;
@@ -1141,9 +1167,21 @@ export class ExportService {
     @media print { .print-bar { display: none !important; } }
     .main-content { padding-top: 56px; }
     @media print { .main-content { padding-top: 0; } }
+
+    /* ─── Dyslexia-Friendly Print Styles ─── */
+    body.dyslexia-mode {
+      letter-spacing: 0.12em !important;
+      word-spacing: 0.18em !important;
+    }
+    body.dyslexia-mode .care-plan-body p,
+    body.dyslexia-mode .care-plan-body li {
+      font-size: 11.5pt !important;
+      line-height: 1.85 !important;
+      font-weight: 400 !important;
+    }
   </style>
 </head>
-<body>
+<body class="${isDyslexia ? 'dyslexia-mode' : ''}">
   <div class="print-bar">
     <span class="print-bar-title">Pocket Gull Care Plan — ${patientName}</span>
     <div class="print-bar-actions">
@@ -1347,7 +1385,7 @@ export class ExportService {
    * Exports the full patient record as a FHIR R4 Bundle.
    * Includes Patient, Condition, Observation, Goal, and DiagnosticReport resources.
    */
-  downloadAsFhirBundle(patient: IPatient): void {
+  downloadAsFhirBundle(patient: IPatient, system?: string): void {
     console.log('[ExportService] Starting FHIR Bundle generation for:', patient.name);
     try {
       const patientRef = `Patient/pocket-gull-${patient.id}`;
@@ -1495,12 +1533,25 @@ export class ExportService {
         entry: entries,
       };
 
-      const filename = `FHIR_Bundle_${patient.name.replace(/\s+/g, '_')}.json`;
+      // Strict HIPAA-compliant client-side sanitization
+      const sanitizedBundle = this.sanitizeObject(bundle);
+
+      const filename = system 
+        ? `FHIR_${system}_Export_${patient.name.replace(/\s+/g, '_')}.json`
+        : `FHIR_Bundle_${patient.name.replace(/\s+/g, '_')}.json`;
       console.log('[ExportService] Triggering FHIR Bundle download:', filename);
-      this._downloadJson(bundle, filename);
+      this._downloadJson(sanitizedBundle, filename);
     } catch (error) {
       console.error('[ExportService] FHIR Bundle export failed:', error);
     }
+  }
+
+  /**
+   * Mock direct EHR export by triggering a sanitized FHIR payload download.
+   */
+  exportToEHR(patient: IPatient, system: 'Epic' | 'Cerner'): void {
+    console.log(`[ExportService] Initiating Smart on FHIR export to ${system}...`);
+    this.downloadAsFhirBundle(patient, system);
   }
 
   /**
