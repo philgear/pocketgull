@@ -63,10 +63,6 @@ interface INoteTimelineItem extends IBodyPartIssue {
                     <div class="mt-2">
                       <pocket-gull-badge [label]="'Ayurvedic Imbalance: ' + note.ayurvedicImbalance" severity="warning"></pocket-gull-badge>
                     </div>
-                  } @else if (state.activePhilosophy() === 'grow-thy-self' && note.growThySelfFocus) {
-                    <div class="mt-2">
-                      <pocket-gull-badge [label]="'Longevity Focus: ' + note.growThySelfFocus" severity="info"></pocket-gull-badge>
-                    </div>
                   }
                 </div>
                 @if (note.isCurrent) {
@@ -478,7 +474,7 @@ export class IntakeFormComponent implements OnDestroy {
   private markdownService = inject(MarkdownService);
 
   aiInsights = computed(() => {
-    const report = this.intel.analysisResults()['Care Plan Overview'];
+    const report = (this.intel.analysisResults() as any)['Care Plan Overview'];
     if (!report) return [];
 
     const partName = this.state.selectedPartId() ? this.state.selectedPartName() : '';

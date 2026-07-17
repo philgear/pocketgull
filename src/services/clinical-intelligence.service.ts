@@ -59,7 +59,7 @@ export class ClinicalIntelligenceService {
 
     readonly recentNodes = signal<INodeContext[]>([]);
 
-    readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self' | null>(null);
+    readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | null>(null);
     readonly lastPatientData = signal<string | null>(null);
 
     /**
@@ -350,13 +350,13 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         }
     }
 
-    private getDemoReportForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'): Partial<Record<AnalysisLens, string>> {
+    private getDemoReportForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic'): Partial<Record<AnalysisLens, string>> {
         if (philosophy === 'eastern') return DEMO_ANALYSIS_REPORT_EASTERN;
         if (philosophy === 'ayurvedic') return DEMO_ANALYSIS_REPORT_AYURVEDIC;
         return DEMO_ANALYSIS_REPORT_WESTERN;
     }
 
-    private getDemoMetricsForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'): IClinicalMetrics {
+    private getDemoMetricsForPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic'): IClinicalMetrics {
         if (philosophy === 'eastern') return { complexity: 7, stability: 6, certainty: 7 };
         if (philosophy === 'ayurvedic') return { complexity: 8, stability: 5, certainty: 7 };
         return { complexity: 6, stability: 7, certainty: 8 };
@@ -439,7 +439,7 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         try {
             const orchestrationPromises = lenses.map(async (lens) => {
                 const philosophy = this.patientState.activePhilosophy();
-                const philosophyInstruction = this.PHILOSOPHY_INSTRUCTIONS[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
+                const philosophyInstruction = (this.PHILOSOPHY_INSTRUCTIONS as any)[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
                 
                 const agentName = this.getAgentNameForLens(lens);
                 const agentRole = this.getAgentRoleForLens(lens);
