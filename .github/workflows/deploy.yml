@@ -47,8 +47,7 @@ jobs:
       - name: Run Python Dependency Audit
         run: |
           pip install pip-audit
-          pip-audit -r pocketgull_api/requirements.txt --local --ignore-vulns-without-fix
-
+          pip-audit -r pocketgull_api/requirements.txt --local 
       # Run unit tests (safety red-team + service logic)
       - name: Run Unit Tests
         run: npm test
