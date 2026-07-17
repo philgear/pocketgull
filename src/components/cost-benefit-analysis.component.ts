@@ -131,31 +131,33 @@ interface ISentinelContainmentOption {
                      [class.ring-emerald-500/40]="matchScore >= 80"
                      [class.dark:ring-emerald-400/30]="matchScore >= 80">
                   
-                  <!-- Match score badge -->
-                  <div class="absolute top-4 right-4 flex items-center gap-1.5 px-2 py-1 rounded-full text-[12px] font-extrabold tracking-wider uppercase"
-                       [class]="matchScore >= 80 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
-                                matchScore >= 50 ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400' : 'bg-gray-150 text-gray-500 dark:bg-zinc-800 dark:text-zinc-400'">
-                    🎯 {{ matchScore }}% Match
-                  </div>
-
                   <div>
-                    <!-- Lens indicator -->
-                    <div class="flex items-center gap-2 mb-3">
-                      <span class="w-2 h-2 rounded-full"
-                            [class.bg-sky-500]="isWestern"
-                            [class.bg-emerald-500]="isEastern"
-                            [class.bg-amber-500]="isAyurvedic"></span>
-                      <span class="text-[12px] font-bold uppercase tracking-wider"
-                            [class.text-sky-600]="isWestern"
-                            [class.dark:text-sky-400]="isWestern"
-                            [class.text-emerald-600]="isEastern"
-                            [class.dark:text-emerald-400]="isEastern"
-                            [class.text-amber-600]="isAyurvedic"
-                            [class.dark:text-amber-400]="isAyurvedic">{{ opt.paradigm }} Lens</span>
+                    <!-- Header with Lens Indicator & Match Badge -->
+                    <div class="flex items-center justify-between gap-2 mb-3">
+                      <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full"
+                              [class.bg-sky-500]="isWestern"
+                              [class.bg-emerald-500]="isEastern"
+                              [class.bg-amber-500]="isAyurvedic"></span>
+                        <span class="text-[12px] font-bold uppercase tracking-wider"
+                              [class.text-sky-600]="isWestern"
+                              [class.dark:text-sky-400]="isWestern"
+                              [class.text-emerald-600]="isEastern"
+                              [class.dark:text-emerald-400]="isEastern"
+                              [class.text-amber-600]="isAyurvedic"
+                              [class.dark:text-amber-400]="isAyurvedic">{{ opt.paradigm }} Lens</span>
+                      </div>
+                      
+                      <!-- Match score badge -->
+                      <div class="flex items-center gap-1.5 px-2 py-1 rounded-full text-[12px] font-extrabold tracking-wider uppercase whitespace-nowrap"
+                           [class]="matchScore >= 80 ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                                    matchScore >= 50 ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400' : 'bg-gray-150 text-gray-500 dark:bg-zinc-800 dark:text-zinc-400'">
+                        🎯 {{ matchScore }}% Match
+                      </div>
                     </div>
 
                     <!-- Title & Core treatment name -->
-                    <h4 class="text-sm font-bold text-gray-900 dark:text-zinc-100 mb-1 pr-16 leading-tight">{{ opt.name }}</h4>
+                    <h4 class="text-sm font-bold text-gray-900 dark:text-zinc-100 mb-1 leading-tight">{{ opt.name }}</h4>
                     <p class="text-[12px] text-gray-500 dark:text-zinc-400 uppercase tracking-widest mb-4">{{ opt.holisticLabel }}</p>
 
                     <hr class="border-gray-200/60 dark:border-zinc-800/80 mb-4" />

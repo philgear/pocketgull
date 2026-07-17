@@ -54,6 +54,14 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
               class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
               Overview
             </button>
+            <button (click)="changeLens('Treatment Matrix')"
+              data-testid="tab-treatment-matrix"
+              [class.border-b-2]="activeLens() === 'Treatment Matrix'"
+              [class.border-transparent]="activeLens() !== 'Treatment Matrix'"
+              [ngClass]="activeLens() === 'Treatment Matrix' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
+              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              Treatment Matrix
+            </button>
             <button (click)="changeLens('Functional Protocols')"
               data-testid="tab-functional-protocols"
               [class.border-b-2]="activeLens() === 'Functional Protocols'"
@@ -677,8 +685,8 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
           <app-biomarker-matrix [reportText]="activeReport()"></app-biomarker-matrix>
         }
 
-        <!-- Cost-Benefit Analysis (Summary Overview Only) -->
-        @if (activeLens() === 'Summary Overview' && hasAnyReport()) {
+        <!-- Cost-Benefit Analysis (Treatment Matrix Lens Only) -->
+        @if (activeLens() === 'Treatment Matrix' && hasAnyReport()) {
           <app-cost-benefit-analysis [reportText]="activeReport()"></app-cost-benefit-analysis>
         }
 

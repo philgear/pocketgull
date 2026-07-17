@@ -27,7 +27,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
@@ -78,6 +78,7 @@ export class ClinicalIntelligenceService {
             case 'Functional Protocols':
             case 'Nutrition':
             case 'Precision Nutrients':
+            case 'Treatment Matrix':
                 return 'Swoop';
             case 'Monitoring & Follow-up':
                 return 'Sentinel';
@@ -99,6 +100,7 @@ export class ClinicalIntelligenceService {
             case 'Functional Protocols':
             case 'Nutrition':
             case 'Precision Nutrients':
+            case 'Treatment Matrix':
                 return 'Interventions & Precision Dosing Specialist — "Spotted. Locked. Delivering."';
             case 'Monitoring & Follow-up':
                 return 'Recovery Vigilance & Trend Monitor — "I never blink. I never look away."';
@@ -305,7 +307,8 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
 (Generate a Markdown table with columns: Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway. Suggest specific, bioavailable forms (e.g., Methylcobalamin, P-5-P) rather than generic vitamins. Suggest IV therapies if appropriate.)
 
 ### Cautions & Interactions
-(List any critical nutrient-drug interactions or contraindications for the suggested mega-doses based on the patient's pharmaceutical profile.)` + this.FORMATTING_RULES
+(List any critical nutrient-drug interactions or contraindications for the suggested mega-doses based on the patient's pharmaceutical profile.)` + this.FORMATTING_RULES,
+        'Treatment Matrix': ''
     };
 
     public resetAIState() {
