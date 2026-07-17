@@ -439,7 +439,7 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         try {
             const orchestrationPromises = lenses.map(async (lens) => {
                 const philosophy = this.patientState.activePhilosophy();
-                const philosophyInstruction = this.PHILOSOPHY_INSTRUCTIONS[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
+                const philosophyInstruction = (this.PHILOSOPHY_INSTRUCTIONS as any)[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
                 
                 const agentName = this.getAgentNameForLens(lens);
                 const agentRole = this.getAgentRoleForLens(lens);

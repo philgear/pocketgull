@@ -889,7 +889,7 @@ export class AnalysisReportComponent implements OnDestroy {
         const tokens = parser.lexer(cleanMarkdown);
         const nodes: ISummaryNode[] = [];
 
-        tokens.forEach((token, nIdx) => {
+        tokens.forEach((token: any, nIdx: number) => {
           const key = (token as any).text || token.raw || `node- ${sIdx} - ${nIdx}`;
           const activeLensAnns = getSafeProperty(this.lensAnnotations(), this.activeLens());
           const annotation = getSafeProperty(activeLensAnns, key) || { note: '', bracketState: 'normal' };
@@ -957,7 +957,7 @@ export class AnalysisReportComponent implements OnDestroy {
               key,
               type: 'list',
               ordered: token.ordered || false,
-              items: token.items.map((item, iIdx) => {
+              items: (token.items as any[]).map((item: any, iIdx: number) => {
                 const itemKey = item.text;
                 const activeLensAnns3 = getSafeProperty(this.lensAnnotations(), this.activeLens());
                 const itemAnnotation = getSafeProperty(activeLensAnns3, itemKey) || { note: '', bracketState: 'normal' };

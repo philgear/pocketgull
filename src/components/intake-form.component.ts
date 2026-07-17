@@ -478,7 +478,7 @@ export class IntakeFormComponent implements OnDestroy {
   private markdownService = inject(MarkdownService);
 
   aiInsights = computed(() => {
-    const report = this.intel.analysisResults()['Care Plan Overview'];
+    const report = (this.intel.analysisResults() as any)['Care Plan Overview'];
     if (!report) return [];
 
     const partName = this.state.selectedPartId() ? this.state.selectedPartName() : '';
