@@ -69,7 +69,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </pocket-gull-button>
                   </div>
                   @if (orcidService.error(); as err) {
-                    <p class="text-[10px] text-red-500 mt-1 font-medium font-sans">{{ err }}</p>
+                    <p class="text-[12px] text-red-500 mt-1 font-medium font-sans">{{ err }}</p>
                   }
                 }
               </div>
@@ -104,7 +104,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </div>
                   <div>
                     <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Epic MyChart Connected</h3>
-                    <p class="text-[11px] text-green-600 dark:text-green-500/80">SMART on FHIR token securely established.</p>
+                    <p class="text-[12px] text-green-600 dark:text-green-500/80">SMART on FHIR token securely established.</p>
                   </div>
                 </div>
                 <pocket-gull-button variant="ghost" size="xs" (click)="showEpicSuccess.set(false)" icon="M6 18L18 6M6 6l12 12"></pocket-gull-button>
@@ -593,8 +593,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                             <span class="flex items-center gap-1.5">
                               <div class="w-2 h-0.5 bg-[#EA4335]"></div> 
                               BigQuery OMOP 
-                              <span class="text-[9px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
-                              <span class="text-[9px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
+                              <span class="text-[12px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
+                              <span class="text-[12px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
                             </span>
                           </label>
                         </div>
@@ -705,7 +705,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 @if (activeCarePlanHTML(); as html) {
                   <section>
                     <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-4">Active Strategy Overview</h2>
-                    <div class="p-4 sm:p-8 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 rounded prose dark:prose-invert prose-sm max-w-none prose-p:text-[#1C1C1C] dark:prose-p:text-zinc-100 prose-p:font-light prose-headings:text-[11px] prose-headings:font-bold prose-headings:uppercase prose-headings:tracking-[0.1em] prose-headings:text-gray-500 dark:prose-headings:text-zinc-400" [innerHTML]="html | safeHtml"></div>
+                    <div class="p-4 sm:p-8 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 rounded prose dark:prose-invert prose-sm max-w-none prose-p:text-[#1C1C1C] dark:prose-p:text-zinc-100 prose-p:font-light prose-headings:text-[12px] prose-headings:font-bold prose-headings:uppercase prose-headings:tracking-[0.1em] prose-headings:text-gray-500 dark:prose-headings:text-zinc-400" [innerHTML]="html | safeHtml"></div>
                   </section>
                 }
       </div>

@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 import { setupE2ePage } from './utils/setup';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Screenshot output directory
 const SCREENSHOT_DIR = path.join(__dirname, '..', 'test-results', 'screenshots');
@@ -47,7 +51,7 @@ async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) 
   const dropdownBtn = page.locator('app-patient-dropdown button').first();
   await dropdownBtn.click();
 
-  const philGearOption = page.locator('button', { hasText: 'Phil Gear' }).first();
+  const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
   await philGearOption.click();
 
   // Wait for selection to load
@@ -115,27 +119,27 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
 
     // Verify Summary Overview has Phil's assessment content
     const overviewTab = page.getByTestId('tab-overview');
-    await overviewTab.click({ force: true });
+    await overviewTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Clinical Assessment')).toBeVisible({ timeout: 5000 });
 
     // Functional Protocols tab
     const funcTab = page.getByTestId('tab-functional-protocols');
-    await funcTab.click({ force: true });
+    await funcTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Diagnostic Workup')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Functional Protocols tab populated.');
 
     // Nutrition tab
     const nutritionTab = page.getByTestId('tab-nutrition');
-    await nutritionTab.click({ force: true });
+    await nutritionTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Nutritional Interventions')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Nutrition tab populated.');
 
     // Precision Nutrients tab
     const orthoTab = page.getByTestId('tab-precision-nutrients');
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
     await expect(reportEl.locator('text=Magnesium').first()).toBeVisible({ timeout: 5000 });
@@ -143,20 +147,20 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
 
     // Monitoring & Follow-up tab
     const monitorTab = page.getByTestId('tab-monitoring-follow-up');
-    await monitorTab.click({ force: true });
+    await monitorTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Immediate (24-72 hours)')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Monitoring & Follow-up tab populated.');
 
     // Patient Education tab
     const educationTab = page.getByTestId('tab-patient-education');
-    await educationTab.click({ force: true });
+    await educationTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Understanding Your')).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Patient Education tab populated.');
 
     // Take a full-page screenshot at the end
-    await overviewTab.click({ force: true });
+    await overviewTab.click();
     await page.waitForTimeout(500);
     // await page.screenshot({
     //   path: path.join(SCREENSHOT_DIR, 'phil_gear_all_lenses.png'),
@@ -179,7 +183,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     // Western paradigm
     await page.locator('button', { hasText: 'Western' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
     // await page.screenshot({
@@ -190,7 +194,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     // Eastern paradigm
     await page.locator('button', { hasText: 'Eastern (TCM)' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
     // await page.screenshot({
@@ -201,7 +205,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     // Ayurvedic paradigm
     await page.locator('button', { hasText: 'Ayurvedic' }).click();
     await page.waitForTimeout(1500);
-    await orthoTab.click({ force: true });
+    await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=structural dryness')).toBeVisible({ timeout: 5000 });
     // await page.screenshot({

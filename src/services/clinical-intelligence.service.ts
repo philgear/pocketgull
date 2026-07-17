@@ -367,6 +367,165 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
         return { complexity: 6, stability: 7, certainty: 8 };
     }
 
+    private generateDynamicMockReport(name: string, philosophy: 'western' | 'eastern' | 'ayurvedic'): Partial<Record<AnalysisLens, string>> {
+        const age = this.patientState.patientAge();
+        const gender = this.patientState.patientGender();
+        const vitals = this.patientState.vitals();
+        const goals = this.patientState.patientGoals() || 'Optimize general wellness and manage chronic symptoms.';
+        
+        // Flatten issues into a readable list
+        const issuesMap = this.patientState.issues();
+        const issueDescriptions: string[] = [];
+        const issueNames: string[] = [];
+        Object.values(issuesMap).forEach(list => {
+            list.forEach(issue => {
+                issueNames.push(issue.name);
+                if (issue.description) {
+                    issueDescriptions.push(`- **${issue.name}**: ${issue.description} (Pain Level: ${issue.painLevel}/10)`);
+                }
+            });
+        });
+        
+        const issuesStr = issueDescriptions.length > 0 
+            ? issueDescriptions.join('\n') 
+            : '- **General Wellness**: No acute physical issues reported.';
+
+        const vitalsStr = `BP: ${vitals.bp || '120/80'}, HR: ${vitals.hr || '72'} bpm, Temp: ${vitals.temp || '98.6°F'}, SpO2: ${vitals.spO2 || '98%'}`;
+
+        if (philosophy === 'eastern') {
+            const tcmPattern = issueNames.length > 0 
+                ? `${issueNames.join('/')} presenting as Qi and Blood Stasis with underlying Qi Deficiency`
+                : 'Mild Qi Deficiency and minor Shen disturbance';
+            return {
+                'Summary Overview': `### Clinical Assessment (TCM)
+${name} is a ${age}-year-old ${gender.toLowerCase()} presenting with ${tcmPattern}. The primary goal is to restore meridian flow and strengthen Zang-Fu organ systems.
+
+### Priority List
+- **Qi & Blood Circulation**: Resolve stasis in affected channels.
+- **Support Meridian Flow**: Harmonize energetic imbalances related to ${issueNames.join(', ') || 'general constitution'}.
+- **Shen Stabilization**: Reduce systemic stress and calm the spirit.
+
+### Plan of Care (TCM)
+- **Acupuncture**: Target local Ashi points and distal points (e.g., LI4, LV3, ST36) to clear stagnation.
+- **Herbal Therapy**: Consider customized formula (e.g., Xiao Yao San or Shen Tong Zhu Yu Tang) based on tongue and pulse.
+- **Moxibustion**: Apply to warm channels if cold-damp pattern is present.
+
+### Goals
+- **Short-term (2 weeks)**: Stagnation-induced pain reduction. Improved sleep quality and Shen stability.
+- **Long-term (3 months)**: Complete harmonization of Yin-Yang balance and restoration of normal Qi flow.`,
+
+                'Functional Protocols': `### Lifestyle & Qi Gong
+- **Tai Chi or Qi Gong**: 15 minutes daily to promote smooth flow of Liver Qi.
+- **Acupressure self-stimulation**: Focus on LI4 and LV3 daily.
+- **Warmth therapy**: Keep affected areas warm to prevent Cold-Damp invasion.`,
+
+                'Nutrition': `### Dietary Recommendations (TCM)
+- **Thermal Nature**: Emphasize warm and cooked foods; strictly avoid raw/cold foods which deplete Spleen Yang.
+- **Flavors**: Moderate sweet (tonifying) and pungent (dispersing) foods.
+- **Specific Foods**: Add ginger, garlic, scallions, and warm broths.`,
+
+                'Precision Nutrients': `### Herb & Nutrient Matrix
+- **Astragalus (Huang Qi)**: Tonify spleen and lung Qi.
+- **Ginseng (Renshen)**: Rescues primal Qi.
+- **Coenzyme Q10**: For cellular energy and heart Qi support.`,
+
+                'Monitoring & Follow-up': `### Follow-up Protocol
+- Re-evaluate tongue coating and pulse quality bi-weekly.
+- Track pain severity trends.
+- Assess stress levels (Shen stability) monthly.`,
+
+                'Patient Education': `### Understanding Your Balance
+Your symptoms stem from a temporary block in the flow of Qi (life energy) and Blood along the meridians. By warming the channels and dispersing stagnation, we aim to help your body heal itself.`
+            };
+        } else if (philosophy === 'ayurvedic') {
+            const doshaImbalance = issueNames.length > 0 
+                ? `Vata-Pitta imbalance with Ama (toxin) accumulation affecting the ${issueNames.join('/')} channels`
+                : 'Mild Vata imbalance stemming from daily lifestyle stressors';
+            return {
+                'Summary Overview': `### Clinical Assessment (Ayurveda)
+${name} is a ${age}-year-old ${gender.toLowerCase()} presenting with ${doshaImbalance}. The primary objective is to balance Doshas, kindle Agni (digestive fire), and eliminate Ama.
+
+### Priority List
+- **Pacify Vata/Pitta**: Calming nervous system activation and cooling systemic heat.
+- **Kindle Agni**: Optimize digestion to prevent further Ama formation.
+- **Srotas Cleansing**: Unblock metabolic and energy channels.
+
+### Plan of Care (Ayurveda)
+- **Abhyanga (Warm oil massage)**: Use sesame or coconut oil daily to pacify Vata.
+- **Pranayama (Nadi Shodhana)**: Alternate nostril breathing 10 minutes daily for nervous system regulation.
+- **Panchakarma (Detoxification)**: Consider mild home-based cleansing protocol.
+
+### Goals
+- **Short-term (2 weeks)**: Agni normalization and reduction of acute symptoms.
+- **Long-term (3 months)**: Stable Dhatu (tissue) health and complete balance of Vata/Pitta/Kapha.`,
+
+                'Functional Protocols': `### Daily Routine (Dinacharya)
+- **Abhyanga**: Self-massage before bath.
+- **Pranayama**: Daily alternate nostril breathing.
+- **Sleep schedule**: Target bedtime by 10:00 PM (Kapha time).`,
+
+                'Nutrition': `### Ayurvedic Diet
+- **Dosha-specific**: Favor warm, moist, cooked foods. Use warming spices (cumin, coriander, turmeric).
+- **Avoid**: Dry, cold, processed foods, and ice-cold water.
+- **Hydration**: Warm water or herbal ginger tea throughout the day.`,
+
+                'Precision Nutrients': `### Ayurvedic Rasayanas
+- **Ashwagandha**: Pacify Vata, nourish Majja Dhatu, and support stress resilience.
+- **Triphala**: Kindles Agni and supports daily detoxification.
+- **Turmeric & Boswellia**: Anti-inflammatory support.`,
+
+                'Monitoring & Follow-up': `### Clinical Monitoring
+- Recheck pulse diagnosis (Nadi Pariksha) and tongue appearance.
+- Monitor stool consistency (Agni indicator).
+- Track sleep efficiency and energy levels.`,
+
+                'Patient Education': `### Your Constitution & Balance
+In Ayurveda, health is balance of the three energies: Vata (movement), Pitta (transformation), and Kapha (structure). We are calming Vata and clearing minor blockages to allow your life force (Prana) to flow freely.`
+            };
+        } else {
+            // Western
+            return {
+                'Summary Overview': `### Clinical Assessment
+${name} is a ${age}-year-old ${gender.toLowerCase()} presenting for management of active clinical concerns and functional optimization. 
+
+### Current Presentation & Vitals
+- **Vitals**: ${vitalsStr}
+- **Active Concerns**:
+${issuesStr}
+
+### Clinical Priorities
+- **Symptom Management**: Focus on non-pharmacological and targeted interventions for ${issueNames.join(', ') || 'general wellness'}.
+- **Lifestyle Modification**: Circadian alignment, metabolic optimization, and targeted movement.
+- **Patient Goals**: ${goals}
+
+### Plan of Care
+- **Short-term**: Optimize daily movement and address acute stressors/pain.
+- **Long-term**: Functional rehabilitation and systemic health optimization.`,
+
+                'Functional Protocols': `### Lifestyle & Activity
+- **Exercise**: Structured moderate-intensity cardiovascular exercise 3x/week.
+- **Posture & Ergonomics**: Regular movement breaks and ergonomic assessment.
+- **Sleep**: Maintain consistent sleep/wake cycle.`,
+
+                'Nutrition': `### Nutritional Recommendations
+- **Anti-inflammatory Diet**: Emphasize whole foods, lean proteins, omega-3 fats, and high-fiber vegetables.
+- **Hydration**: Target 2-3 liters of filtered water daily.`,
+
+                'Precision Nutrients': `### Suggested Supplements
+- **Magnesium Glycinate**: 300-400mg before bed.
+- **Vitamin D3**: Optimize levels to support immune and bone health.
+- **Omega-3 Fatty Acids**: Anti-inflammatory support.`,
+
+                'Monitoring & Follow-up': `### Clinical Tracking
+- Monitor vitals and symptom logs.
+- Re-assess functional capacity in 4 weeks.`,
+
+                'Patient Education': `### Understanding Your Health Path
+By focusing on nutrition, movement, sleep, and targeted supplementation, we can address the root functional causes of your symptoms and build a foundation for long-term health.`
+            };
+        }
+    }
+
     async generateComprehensiveReport(patientData: string): Promise<Partial<Record<AnalysisLens, string>>> {
         const isEmergency = this.patientState.isEmergencyMode();
         const currentPhilosophy = this.patientState.activePhilosophy();
@@ -380,7 +539,26 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
             // Simulate network latency / parsing time for premium feel
             await new Promise(resolve => setTimeout(resolve, 600));
 
-            const report = this.getDemoReportForPhilosophy(currentPhilosophy);
+            const activeId = this.patientState.patientId();
+            const activeName = this.patientState.patientName() || 'Unknown Patient';
+            
+            let report: Partial<Record<AnalysisLens, string>> = {};
+
+            if (activeId === 'p002') {
+                report = this.getDemoReportForPhilosophy(currentPhilosophy);
+            } else {
+                const history = this.patientState.patientHistory();
+                const prebakedEntry = history.find(entry => 
+                    (entry.type === 'AnalysisRun' || entry.type === 'FinalizedPatientSummary') && 
+                    entry.report && Object.keys(entry.report).length > 0
+                );
+                
+                if (prebakedEntry && (prebakedEntry.type === 'AnalysisRun' || prebakedEntry.type === 'FinalizedPatientSummary') && currentPhilosophy === 'western') {
+                    report = prebakedEntry.report;
+                } else {
+                    report = this.generateDynamicMockReport(activeName, currentPhilosophy);
+                }
+            }
             
             this.analysisResults.set(report);
             this.lastPatientData.set(patientData);
@@ -655,7 +833,12 @@ Feel free to reference their research areas and publications if it supports the 
         await this.cache.clear();
     }
 
-    async translateReadingLevel(text: string, targetLevel: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
+    async translateReadingLevel(
+        text: string,
+        targetLevel?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+        cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+        language?: string
+    ): Promise<string> {
         if (!this.network.isOnline() && !this.network.useLocalInference()) {
             const errorMsg = "You are currently offline. Please reconnect to translate text.";
             this.error.set(errorMsg);
@@ -665,7 +848,7 @@ Feel free to reference their research areas and publications if it supports the 
         this.isLoading.set(true);
         this.error.set(null);
         try {
-            return await this.ai.translateReadingLevel(text, targetLevel);
+            return await this.ai.translateReadingLevel(text, targetLevel, cognitiveLevel, language);
         } catch (e: any) {
             const errorMsg = String(e?.message ?? e);
             this.error.set(errorMsg);

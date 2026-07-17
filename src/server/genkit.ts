@@ -122,92 +122,74 @@ export const translateReadingLevelFlow = ai.defineFlow(
       name: 'translateReadingLevelFlow',
       inputSchema: z.object({
         text: z.string(),
-        level: z.enum(['simplified', 'dyslexia', 'child', 'spanish', 'german', 'french', 'mandarin', 'hindi'])
+        level: z.string().optional(),
+        cognitiveLevel: z.enum(['standard', 'simplified', 'dyslexia', 'child']).optional(),
+        language: z.string().optional()
       }),
       outputSchema: z.string(),
     },
-    async ({ text, level }) => {
+    async ({ text, level, cognitiveLevel, language }) => {
+      let resolvedCognitiveLevel = cognitiveLevel || 'standard';
+      let resolvedLanguage = language || 'english';
+
+      if (level) {
+        if (['simplified', 'dyslexia', 'child'].includes(level)) {
+          resolvedCognitiveLevel = level as 'simplified' | 'dyslexia' | 'child';
+        } else if (['spanish', 'german', 'french', 'mandarin', 'hindi'].includes(level)) {
+          resolvedLanguage = level;
+        }
+      }
+
       let systemInstruction = '';
-      if (level === 'simplified') {
-          systemInstruction = `You are an expert clinical copywriter. Your task is to rewrite the provided medical text to improve its Flesch Reading Ease score and lower its Flesch-Kincaid Grade level (target: Grade 6-8). 
-          
-CRITICAL RULES:
+      let cognitiveInstruction = '';
+
+      if (resolvedCognitiveLevel === 'simplified') {
+        cognitiveInstruction = `You are an expert clinical copywriter. Your task is to rewrite the provided medical text to improve its Flesch Reading Ease score and lower its Flesch-Kincaid Grade level (target: Grade 6-8). 
+        
+CRITICAL SIMPLIFIED RULES:
 1. Preserve ALL clinical facts, diagnoses, medications, and dosages exactly.
 2. Use shorter sentences.
 3. Replace complex medical jargon with simpler terms where possible, but keep the original term in parentheses if it's important (e.g., "high blood pressure (hypertension)").
 4. Use active voice.
-5. Use bullet points for lists.
-6. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-7. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
-      } else if (level === 'dyslexia') {
-          systemInstruction = `You are an expert in accessible communication. Your task is to rewrite the provided medical text to be Dyslexia-friendly and highly readable.
+5. Use bullet points for lists.`;
+      } else if (resolvedCognitiveLevel === 'dyslexia') {
+        cognitiveInstruction = `You are an expert in accessible communication. Your task is to rewrite the provided medical text to be Dyslexia-friendly and highly readable.
 
-CRITICAL RULES:
+CRITICAL DYSLEXIA RULES:
 1. Preserve ALL clinical facts, diagnoses, medications, and dosages exactly.
 2. Structure the text with frequent line breaks and very short paragraphs (1-2 sentences max).
-3. Use plain, everyday language. (Target very high Flesch Reading Ease).
+3. Use plain, everyday language (target very high Flesch Reading Ease).
 4. Use **bold** text to highlight key points instead of italics or underlining.
 5. Provide clear, step-by-step instructions using bullet points or numbered lists.
-6. Avoid medical jargon; explain concepts simply.
-7. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-8. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
-      } else if (level === 'child') {
-          systemInstruction = `You are an expert pediatric communicator and child life specialist. Your task is to rewrite the provided medical text so it is easily understandable, comforting, and engaging for a child (target age: 8-12 years old).
+6. Avoid medical jargon; explain concepts simply.`;
+      } else if (resolvedCognitiveLevel === 'child') {
+        cognitiveInstruction = `You are an expert pediatric communicator and child life specialist. Your task is to rewrite the provided medical text so it is easily understandable, comforting, and engaging for a child (target age: 8-12 years old) to explain what is wrong with the patient.
 
-CRITICAL RULES:
+CRITICAL PEDIATRIC RULES:
 1. Explain medical concepts using simple, everyday analogies (e.g., "white blood cells are like tiny superheroes").
 2. Focus on what the child will experience, how they will feel, and what they can do to help.
 3. Keep the tone encouraging, warm, and not scary.
 4. Preserve the core meaning of diagnoses and treatments, but omit overly complex dosage specifics unless relevant to the child's actions.
-5. Use short sentences and simple formatting.
-6. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-7. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
-      } else if (level === 'spanish') {
-          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into Spanish.
-
-CRITICAL RULES:
-1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
-2. Use professional, culturally appropriate medical Spanish.
-3. Do not add or remove any medical information.
-4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
-      } else if (level === 'german') {
-          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into German.
-
-CRITICAL RULES:
-1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
-2. Use professional, culturally appropriate medical German.
-3. Do not add or remove any medical information.
-4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
-      } else if (level === 'french') {
-          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into French.
-
-CRITICAL RULES:
-1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
-2. Use professional, culturally appropriate medical French.
-3. Do not add or remove any medical information.
-4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
-      } else if (level === 'mandarin') {
-          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into Mandarin Chinese (Simplified).
-
-CRITICAL RULES:
-1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
-2. Use professional, culturally appropriate medical Mandarin.
-3. Do not add or remove any medical information.
-4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
-      } else if (level === 'hindi') {
-          systemInstruction = `You are an expert clinical translator. Your task is to accurately translate the provided medical text into Hindi.
-
-CRITICAL RULES:
-1. Preserve ALL clinical facts, diagnoses, medications, dosages, and markdown formatting exactly.
-2. Use professional, culturally appropriate medical Hindi. Keep specific medication names and complex dosages in standard English or transliterated pronunciations if commonly used to ensure patient safety.
-3. Do not add or remove any medical information.
-4. Return ONLY the rewritten markdown text, with no introductory or concluding remarks.
-5. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
+5. Use short sentences and simple formatting.`;
+      } else {
+        cognitiveInstruction = `You are an expert clinical copywriter. Your task is to write/format the clinical care plan in standard medical detail/structure. Keep the tone professional, clinical, and accurate.`;
       }
+
+      let languageInstruction = '';
+      if (resolvedLanguage.toLowerCase() !== 'english') {
+        languageInstruction = `Translate/write the final output accurately into ${resolvedLanguage}. Use professional, culturally appropriate medical language for ${resolvedLanguage}. Keep specific medication names and complex dosages in standard English or transliterated pronunciations if commonly used to ensure patient safety. Do not add or remove any clinical information.`;
+      } else {
+        languageInstruction = `The final response MUST be written in English.`;
+      }
+
+      systemInstruction = `${cognitiveInstruction}
+
+${languageInstruction}
+
+CRITICAL RULES:
+1. Preserve ALL clinical facts, diagnoses, medications, and dosages exactly.
+2. Return ONLY the rewritten/translated markdown text, with no introductory or concluding remarks.
+3. Begin your output with "### [START CARE PLAN]" and end it with "### [END CARE PLAN]".`;
 
       const prompt = `Please rewrite the following care plan text according to your system instructions:\n\n<clinical_text>\n${text}\n</clinical_text>`;
 
@@ -224,8 +206,14 @@ CRITICAL RULES:
           ]
         }
       });
-  
-      return response.text;
+
+      let cleaned = response.text || '';
+      // Strip starting tags
+      cleaned = cleaned.replace(/^\s*(?:###?\s*)?\[?START CARE PLAN\]?\s*/i, '');
+      // Strip ending tags
+      cleaned = cleaned.replace(/\s*(?:###?\s*)?\[?END CARE PLAN\]?\s*$/i, '');
+      cleaned = cleaned.trim();
+      return cleaned;
     }
 );
 

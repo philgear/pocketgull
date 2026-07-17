@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
       
       <div class="relative z-10 flex flex-col gap-3">
         <div class="flex items-center justify-between">
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50/50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold uppercase tracking-widest border border-blue-100/50 dark:border-blue-800/50">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50/50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[12px] font-bold uppercase tracking-widest border border-blue-100/50 dark:border-blue-800/50">
             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
             {{ type }}
           </span>

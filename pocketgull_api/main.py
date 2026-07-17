@@ -426,7 +426,21 @@ async def ml_risk_score(req: RiskScoreRequest) -> Bundle:
     If no trained model is present, returns a rule-based heuristic score
     so the endpoint remains usable during development.
     """
-    features = [req.hr, req.bp_systolic, req.bp_diastolic, req.spo2, float(req.age)]
+    # Calculate derived features: map, pulse_pressure, shock_index
+    map_val = req.bp_diastolic + (req.bp_systolic - req.bp_diastolic) / 3.0
+    pulse_pressure = req.bp_systolic - req.bp_diastolic
+    shock_index = req.hr / req.bp_systolic if req.bp_systolic > 0 else 0.0
+
+    features = [
+        req.hr,
+        req.bp_systolic,
+        req.bp_diastolic,
+        req.spo2,
+        float(req.age),
+        map_val,
+        pulse_pressure,
+        shock_index
+    ]
 
     if _risk_model is not None:
         try:

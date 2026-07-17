@@ -23,6 +23,14 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
       activePhilosophy: signal<'western' | 'eastern' | 'ayurvedic'>('western'),
       isEmergencyMode: signal<boolean>(false),
       isDemoMode: signal<boolean>(false),
+      patientId: signal<string | null>(null),
+      patientName: signal<string>(''),
+      patientAge: signal<number>(0),
+      patientGender: signal<string>(''),
+      patientHistory: signal<any[]>([]),
+      vitals: signal<any>({}),
+      patientGoals: signal<string>(''),
+      issues: signal<any>({}),
       selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
         this.activePhilosophy.set(philosophy);
       }

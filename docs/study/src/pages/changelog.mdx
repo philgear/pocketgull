@@ -8,6 +8,28 @@ title: Changelog
 All notable changes to Pocket Gull are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## Unreleased
+
+## v1.0.0-rc8 — 2026-07-16
+
+**Dynamic Mock Assessments & Fallback Roster Synchronization**
+
+### Added
+- **[Demo Mode] Dynamic Mock Clinical Assessments**: Tailored mock clinical western, TCM, and Ayurvedic reports dynamically to demographics, vitals, issues, and goals.
+- **[Demo Mode] Fallback Mock Patient Synchronization**: Unified the frontend `MOCK_PATIENTS` fallback list with the backend `data/patients.json` database, ensuring William Henderson and all other patients load with complete clinical profiles offline or during database seeding.
+- **[UI / UX] Double-Click Task Bracketing**: Cyclic validation state machine (`Normal` -> `Added` -> `Removed` -> `Normal`) implemented on care plan summary nodes with immediate visual highlighting (green checkmarks for approved, red crosses for excluded).
+- **[Sentinel Integration] Active Roster Outbreak Highlighting**: High-priority amber outlines, custom Initials Avatar overrides, and dedicated `🔦 Sentinel` tags added for outbreak/epidemiological threat patient profiles.
+- **[Sentinel Integration] Split-Screen Cost-Benefit Matrix**: Introduced a dynamic split-screen containment paradigm (`👤 Individual Health` vs `🔦 Community Containment`) for Sentinel patients, allowing a clean contrast of individual treatments against quarantine and prophylaxis strategies.
+- **[Demo Mode] Chat Mock Fallbacks**: Local intercept of voice/text consult queries when in Demo Mode to return high-fidelity mock clinical responses and resolve API key authentication failures.
+- **[Theme & UI] Theme Query Parameter**: Added `?theme=` URL query parameter check on app startup (e.g., `?theme=dark`) to facilitate automation audits, E2E testing, and direct theme linking in `src/services/theme.service.ts`.
+- **[CI/CD] Security Audit Artifacts**: Configured the GitHub Actions workflow to export NPM audit results to a JSON file and upload them as workflow artifacts instead of letting minor warnings fail build runs.
+
+### Changed
+- **[Typography] App-Wide 12px Font Normalization**: Normalised all templates and styles globally, replacing all sub-12px typography overrides (`text-[8px]`, `text-[9px]`, `text-[10px]`, `text-[11px]`) with a minimum of `text-[12px]` across 29 component files.
+- **[UI / Print] High-Fidelity Print Exports**: Enhanced print CSS (`@media print`) using `print-color-adjust: exact !important` to force the preservation of clinical branding colors, highlights, and borders.
+
+---
+
 ## v1.0.0-rc7 — 2026-06-28
 
 **Companion App Lint Hardening & Mocked Widget Test Suite**

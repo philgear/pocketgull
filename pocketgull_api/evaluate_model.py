@@ -21,7 +21,17 @@ MODEL_PATH = MODELS_DIR / "clinical_risk_v2.joblib"
 REPORTS_DIR = API_DIR / "reports"
 REPORT_PATH = REPORTS_DIR / "model_evaluation_report.md"
 
-def generate_evaluation_data(n_samples: int = 1000, seed: int = 101) -> pd.DataFrame:
+def add_derived_features(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Computes derived clinical indicators from raw vitals.
+    """
+    df = df.copy()
+    df["map"] = df["bp_diastolic"] + (df["bp_systolic"] - df["bp_diastolic"]) / 3.0
+    df["pulse_pressure"] = df["bp_systolic"] - df["bp_diastolic"]
+    df["shock_index"] = df["hr"] / df["bp_systolic"].clip(lower=1.0)
+    return df
+
+def generate_evaluation_data(n_samples: int = 1500, seed: int = 101) -> pd.DataFrame:
     """
     Generates synthetic validation data mimicking patient physiological signals
     under clinical risk scenarios.
@@ -68,9 +78,11 @@ def run_evaluation() -> None:
 
     model = joblib.load(MODEL_PATH)
     
-    print("--- Generating Validation Dataset ---")
-    val_data = generate_evaluation_data(n_samples=1500)
-    features = ["hr", "bp_systolic", "bp_diastolic", "spo2", "age"]
+    print("--- Generating & Engineering Validation Dataset ---")
+    raw_val_data = generate_evaluation_data(n_samples=1500)
+    val_data = add_derived_features(raw_val_data)
+    
+    features = ["hr", "bp_systolic", "bp_diastolic", "spo2", "age", "map", "pulse_pressure", "shock_index"]
     X_val = val_data[features]
     y_val = val_data["outcome"]
     
@@ -87,8 +99,9 @@ def run_evaluation() -> None:
     clf_rep_dict = classification_report(y_val, y_pred, output_dict=True)
     clf_rep_txt = classification_report(y_val, y_pred)
     
-    # Feature importances
-    feature_importances = model.feature_importances_
+    # Unpack underlying random forest for feature importances
+    base_rf = model.estimator
+    feature_importances = base_rf.feature_importances_
     importance_df = pd.DataFrame({
         "Feature": features,
         "Importance": feature_importances
@@ -97,7 +110,7 @@ def run_evaluation() -> None:
     print("\nEvaluation Performance:")
     print(clf_rep_txt)
     print(f"ROC-AUC Score: {roc_auc:.4f}")
-    print(f"Brier Score: {brier:.4f}")
+    print(f"Brier Score (Calibrated): {brier:.4f}")
     
     # Write Markdown Report
     os.makedirs(REPORTS_DIR, exist_ok=True)
@@ -109,9 +122,9 @@ def run_evaluation() -> None:
 ---
 
 ## 1. Model Summary & Context
-- **Model Type**: Random Forest Classifier (`RandomForestClassifier`)
+- **Model Type**: Calibrated Classifier CV (`CalibratedClassifierCV` wrapped around `RandomForestClassifier`)
 - **Serialized Location**: `pocketgull_api/models/clinical_risk_v2.joblib`
-- **Clinical Focus**: Automated patient vitals triage and triage escalation recommendations based on vital signs (Heart Rate, Systolic/Diastolic BP, SpO2, and Age).
+- **Clinical Focus**: Automated patient vitals triage and triage escalation recommendations based on raw and derived clinical vital signs.
 
 ---
 
@@ -137,7 +150,7 @@ def run_evaluation() -> None:
 
 ## 3. Feature Importance (Diagnostic Signals)
 
-The model relies on the following vital sign signals, ranked by their predictive contribution:
+The underlying model relies on the following vital sign signals, ranked by their predictive contribution:
 
 | Feature Rank | Vital Sign / Parameter | Relative Contribution | Description |
 | :---: | :--- | :--- | :--- |
@@ -149,7 +162,10 @@ The model relies on the following vital sign signals, ranked by their predictive
             "age": "Patient age (demographic risk multiplier)",
             "hr": "Heart Rate in BPM (cardiac stress metric)",
             "bp_systolic": "Systolic Blood Pressure (hypertensive/hypotensive crisis indicator)",
-            "bp_diastolic": "Diastolic Blood Pressure (diastolic vascular resistance metric)"
+            "bp_diastolic": "Diastolic Blood Pressure (diastolic vascular resistance metric)",
+            "map": "Mean Arterial Pressure (organ perfusion index)",
+            "pulse_pressure": "Pulse Pressure (cardiac workload indicator)",
+            "shock_index": "Shock Index (early shock/distress indicator)"
         }.get(row.Feature, "Physiological parameter")
         
         report_content += f"| #{idx} | **{row.Feature}** | `{row.Importance:.4f}` | {feature_desc} |\n"

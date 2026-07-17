@@ -109,7 +109,7 @@ import { ConsentService } from '../services/consent.service';
                   class="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-200 active:scale-[0.98] text-sm">
             I Understand — Continue
           </button>
-          <p class="text-[10px] text-center text-gray-400 dark:text-zinc-500">
+          <p class="text-[12px] text-center text-gray-400 dark:text-zinc-500">
             By continuing, you acknowledge this disclosure. Review our
             <a href="/privacy-policy.html" target="_blank" class="underline hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">Privacy Policy</a> and
             <a href="/terms-of-service.html" target="_blank" class="underline hover:text-gray-600 dark:hover:text-zinc-300 transition-colors">Terms of Service</a>

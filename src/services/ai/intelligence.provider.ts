@@ -33,7 +33,12 @@ export interface IIntelligenceProvider {
     /**
      * Translates clinical text to a specific reading, cognition, or philosophical level.
      */
-    translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string>;
+    translateReadingLevel(
+        text: string,
+        level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+        cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+        language?: string
+    ): Promise<string>;
 
     /**
      * Analyzes translation accuracy and tone.

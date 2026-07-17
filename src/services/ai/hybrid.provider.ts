@@ -135,11 +135,16 @@ export class HybridProvider implements IIntelligenceProvider {
     return { status: 'Verification bypassed due to engine limits', issues: [] };
   }
 
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
+  async translateReadingLevel(
+    text: string,
+    level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+    cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+    language?: string
+  ): Promise<string> {
     const chain = this.getProviderChain('simple');
     for (const provider of chain) {
       try {
-        return await provider.translateReadingLevel(text, level);
+        return await provider.translateReadingLevel(text, level, cognitiveLevel, language);
       } catch (e) {
         console.warn(`translateReadingLevel failed on ${provider.constructor.name}, trying next...`);
       }

@@ -1,0 +1,25 @@
+{
+  "model_type": "CalibratedClassifierCV(RandomForestClassifier)",
+  "version": "2.0.0",
+  "training_date": "2026-07-17T03:28:28.728129Z",
+  "features": [
+    "hr",
+    "bp_systolic",
+    "bp_diastolic",
+    "spo2",
+    "age",
+    "map",
+    "pulse_pressure",
+    "shock_index"
+  ],
+  "metrics": {
+    "roc_auc": 0.7876,
+    "brier_score": 0.1229,
+    "best_cv_auc": 0.767
+  },
+  "best_hyperparameters": {
+    "max_depth": 6,
+    "min_samples_split": 5,
+    "n_estimators": 100
+  }
+}

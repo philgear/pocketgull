@@ -1,6 +1,6 @@
 {
   "name": "pocket-gull",
-  "version": "1.0.0-rc7",
+  "version": "1.0.0-rc8",
   "workspaces": [
     "docs/study",
     "companion-apps/avs-therapy",
@@ -84,7 +84,7 @@
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
     "deploy": "echo '⚠️  Production deploys should go through GitHub Actions (deploy.yml). Use npm run deploy:manual if you really need a direct deploy.' && exit 1",
-    "deploy:manual": "npm run build && gcloud run deploy pocket-gull --source . --project gen-lang-client-0540208645 --region=us-central1 --cpu 2 --memory 2Gi --min-instances 0 --max-instances 2 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --update-env-vars=OTEL_SDK_DISABLED=true --quiet",
+    "deploy:manual": "npm run build && gcloud run deploy pocket-gull --source . --project gen-lang-client-0540208645 --region=us-central1 --cpu 1 --memory 1Gi --min-instances 0 --max-instances 2 --concurrency 100 --update-labels env=production,team=clinical-squad,component=web-ssr --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --update-env-vars=OTEL_SDK_DISABLED=true --quiet",
     "serve:ssr:app": "node dist/server/server.mjs",
     "start": "node dist/server/server.mjs",
     "gcp-build": "npm run build && npm prune --production",
@@ -160,7 +160,12 @@
     "tailwindcss": "^3.4.19",
     "three": "^0.183.2",
     "ws": "^8.21.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@genkit-ai/googleai": "^1.28.0",
+    "@genkit-ai/vertexai": "^1.37.0",
+    "@google-cloud/bigquery": "^8.3.1",
+    "@google/adk": "^0.5.0",
+    "@google/genai": "^1.44.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^21.2.17",
@@ -171,11 +176,6 @@
     "@aws-sdk/protocol-http": "^3.370.0",
     "@aws-sdk/signature-v4": "^3.370.0",
     "@axe-core/puppeteer": "^4.11.1",
-    "@genkit-ai/googleai": "^1.28.0",
-    "@genkit-ai/vertexai": "^1.37.0",
-    "@google-cloud/bigquery": "^8.3.1",
-    "@google/adk": "^0.5.0",
-    "@google/genai": "^1.44.0",
     "@playwright/test": "^1.60.0",
     "@types/compression": "^1.8.1",
     "@types/dompurify": "^3.2.0",

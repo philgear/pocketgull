@@ -5,9 +5,9 @@
 ---
 
 ## 1. Model Summary & Context
-- **Model Type**: Random Forest Classifier (`RandomForestClassifier`)
+- **Model Type**: Calibrated Classifier CV (`CalibratedClassifierCV` wrapped around `RandomForestClassifier`)
 - **Serialized Location**: `pocketgull_api/models/clinical_risk_v2.joblib`
-- **Clinical Focus**: Automated patient vitals triage and triage escalation recommendations based on vital signs (Heart Rate, Systolic/Diastolic BP, SpO2, and Age).
+- **Clinical Focus**: Automated patient vitals triage and triage escalation recommendations based on raw and derived clinical vital signs.
 
 ---
 
@@ -15,41 +15,44 @@
 
 | Metric | Score | Clinical Meaning |
 | :--- | :--- | :--- |
-| **ROC-AUC** | **0.8149** | Measure of model's ability to distinguish between stable and critical patients (higher is better). |
-| **Brier Score** | **0.1866** | Calibration metric mapping how close predicted probabilities match actual frequencies (lower/nearer 0 is better). |
+| **ROC-AUC** | **0.8081** | Measure of model's ability to distinguish between stable and critical patients (higher is better). |
+| **Brier Score** | **0.1371** | Calibration metric mapping how close predicted probabilities match actual frequencies (lower/nearer 0 is better). |
 
 ### Classification Performance Matrix
 ```text
               precision    recall  f1-score   support
 
-           0       0.91      0.74      0.82      1148
-           1       0.48      0.76      0.59       352
+           0       0.84      0.93      0.89      1148
+           1       0.66      0.44      0.53       352
 
-    accuracy                           0.75      1500
-   macro avg       0.69      0.75      0.70      1500
-weighted avg       0.81      0.75      0.76      1500
+    accuracy                           0.82      1500
+   macro avg       0.75      0.69      0.71      1500
+weighted avg       0.80      0.82      0.80      1500
 
 ```
 
 ### Confusion Matrix
-- **True Negatives (TN)**: 853 (Correctly classified as Stable)
-- **False Positives (FP)**: 295 (False alarms / unnecessary escalation warnings)
-- **False Negatives (FN)**: 83 (Missed critical escalations - **Key Safety Metric**)
-- **True Positives (TP)**: 269 (Correctly classified as Critical)
+- **True Negatives (TN)**: 1068 (Correctly classified as Stable)
+- **False Positives (FP)**: 80 (False alarms / unnecessary escalation warnings)
+- **False Negatives (FN)**: 197 (Missed critical escalations - **Key Safety Metric**)
+- **True Positives (TP)**: 155 (Correctly classified as Critical)
 
 ---
 
 ## 3. Feature Importance (Diagnostic Signals)
 
-The model relies on the following vital sign signals, ranked by their predictive contribution:
+The underlying model relies on the following vital sign signals, ranked by their predictive contribution:
 
 | Feature Rank | Vital Sign / Parameter | Relative Contribution | Description |
 | :---: | :--- | :--- | :--- |
-| #1 | **spo2** | `0.6317` | Oxygen Saturation levels (hypoxia indicator) |
-| #2 | **age** | `0.1823` | Patient age (demographic risk multiplier) |
-| #3 | **bp_systolic** | `0.0668` | Systolic Blood Pressure (hypertensive/hypotensive crisis indicator) |
-| #4 | **bp_diastolic** | `0.0615` | Diastolic Blood Pressure (diastolic vascular resistance metric) |
-| #5 | **hr** | `0.0577` | Heart Rate in BPM (cardiac stress metric) |
+| #1 | **spo2** | `0.5542` | Oxygen Saturation levels (hypoxia indicator) |
+| #2 | **age** | `0.1788` | Patient age (demographic risk multiplier) |
+| #3 | **bp_diastolic** | `0.0524` | Diastolic Blood Pressure (diastolic vascular resistance metric) |
+| #4 | **bp_systolic** | `0.0457` | Systolic Blood Pressure (hypertensive/hypotensive crisis indicator) |
+| #5 | **pulse_pressure** | `0.0437` | Pulse Pressure (cardiac workload indicator) |
+| #6 | **map** | `0.0436` | Mean Arterial Pressure (organ perfusion index) |
+| #7 | **shock_index** | `0.0420` | Shock Index (early shock/distress indicator) |
+| #8 | **hr** | `0.0397` | Heart Rate in BPM (cardiac stress metric) |
 
 ---
 

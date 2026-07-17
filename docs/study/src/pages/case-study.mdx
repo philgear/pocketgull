@@ -112,6 +112,20 @@ Research integrations with **NCBI PubMed E-utilities** and **Google Programmable
 | **Memory footprint (peak)** | 6.2 GB | 5.4 GB | **−13%** |
 | **Lighthouse performance** | 92 / 100 | **100 / 100** | **+8** |
 
+```mermaid
+graph TD
+    subgraph Legacy [Legacy Intake Workflow: Avg 8.3 min]
+        L1[Manual Chief Complaint Transcription<br/>~3.0 min] --> L2[Manual Vitals Recording & Indexing<br/>~1.5 min]
+        L2 --> L3[Manual Synthesis & Care Plan Review<br/>~3.8 min]
+    end
+
+    subgraph PG [Pocket Gull Intake Workflow: Avg 4.8 min]
+        P1[Hands-Free Voice Dictation<br/>~1.0 min] --> P2[Interactive 3D Body Mapping<br/>~0.8 min]
+        P2 --> P3[Multi-Agent Parallel Synthesis<br/>~1.0 min]
+        P3 --> P4[Double-Click Task Bracketing & Validation<br/>~2.0 min]
+    end
+```
+
 ---
 
 ## Technology Stack

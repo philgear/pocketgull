@@ -19,6 +19,11 @@ export class PetAuditoryService {
     if (typeof window === 'undefined') return;
     if (this.recognition) return;
 
+    if (typeof navigator !== 'undefined' && navigator.webdriver) {
+      console.log('[Pet Auditory] Automated test environment detected. Skipping STT initialization.');
+      return;
+    }
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       console.warn('Speech Recognition not supported in this browser.');
@@ -50,7 +55,12 @@ export class PetAuditoryService {
       };
 
       this.recognition.onerror = (err: any) => {
-        console.warn('Pet Auditory STT error', err);
+        const errType = err.error || '';
+        console.warn('Pet Auditory STT error:', errType || err);
+        if (errType === 'not-allowed' || errType === 'service-not-allowed') {
+          console.warn('[Pet Auditory] Microphone permission denied or service unavailable. Disabling STT.');
+          this.stopWakeWordListening();
+        }
       };
 
       this.recognition.onend = () => {

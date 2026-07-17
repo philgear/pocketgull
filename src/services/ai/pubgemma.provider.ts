@@ -148,19 +148,24 @@ export class PubGemmaProvider implements IIntelligenceProvider {
   /**
    * Translates clinical text to the specified reading/cognition level using local inference.
    */
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
-    const levelDescriptions: Record<typeof level, string> = {
-      simplified: 'a simplified 6th-grade reading level, using plain language and short sentences',
-      dyslexia: 'a dyslexia-friendly format with simple words, short paragraphs, and no complex medical jargon',
-      child: 'a child-friendly (pediatric) level, age 8–12, with analogies and reassuring, simple language',
-      spanish: 'a professional clinical Spanish translation, culturally localized',
-      german: 'a professional clinical German translation, culturally localized',
-      french: 'a professional clinical French translation, culturally localized',
-      mandarin: 'a professional clinical Mandarin translation, culturally localized',
-      hindi: 'a professional clinical Hindi translation, culturally localized'
-    };
+  async translateReadingLevel(
+    text: string,
+    level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+    cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+    language?: string
+  ): Promise<string> {
+    let resolvedCognitive = cognitiveLevel || 'standard';
+    let resolvedLang = language || 'english';
+    if (level) {
+      if (['simplified', 'dyslexia', 'child'].includes(level)) {
+        resolvedCognitive = level as 'simplified' | 'dyslexia' | 'child';
+      } else if (['spanish', 'german', 'french', 'mandarin', 'hindi'].includes(level)) {
+        resolvedLang = level;
+      }
+    }
+
     const prompt =
-      `Rewrite the following clinical care plan text for ${levelDescriptions[level]}.\n` +
+      `Rewrite the following clinical care plan text for a ${resolvedCognitive} cognitive level and in ${resolvedLang} language.\n` +
       `Preserve all medical meaning. Do NOT add new recommendations. Return only the rewritten text.\n\n` +
       `Original:\n${text}`;
     try {

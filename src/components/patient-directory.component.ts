@@ -92,16 +92,39 @@ import { IPatient } from '../services/patient.types';
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (patient of filteredPatients(); track patient.id) {
             <div (click)="selectChart(patient.id)"
-                 class="group relative bg-white dark:bg-[#1C1C1C] rounded-xl p-6 border border-gray-200 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-gray-300 dark:hover:border-zinc-700 cursor-pointer transition-all active:scale-[0.98]">
+                 class="group relative bg-white dark:bg-[#1C1C1C] rounded-xl p-6 border shadow-sm hover:shadow-md cursor-pointer transition-all active:scale-[0.98]"
+                 [class.border-amber-300]="isSentinelCase(patient)"
+                 [class.dark:border-amber-900]="isSentinelCase(patient)"
+                 [class.border-gray-200]="!isSentinelCase(patient)"
+                 [class.dark:border-zinc-800]="!isSentinelCase(patient)"
+                 [class.hover:border-amber-500]="isSentinelCase(patient)"
+                 [class.dark:hover:border-amber-700]="isSentinelCase(patient)"
+                 [class.hover:border-gray-300]="!isSentinelCase(patient)"
+                 [class.dark:hover:border-zinc-700]="!isSentinelCase(patient)">
               <!-- Active Indicator Line -->
-              <div class="absolute left-0 top-6 bottom-6 w-1 rounded-r bg-green-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div class="absolute left-0 top-6 bottom-6 w-1 rounded-r opacity-0 group-hover:opacity-100 transition-opacity"
+                   [class.bg-amber-500]="isSentinelCase(patient)"
+                   [class.bg-green-500]="!isSentinelCase(patient)"></div>
               
               <div class="flex justify-between items-start mb-4">
                 <div>
-                  <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ patient.name }}</h3>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ patient.name }}</h3>
+                    @if (isSentinelCase(patient)) {
+                      <span class="px-2 py-0.5 text-[12px] font-bold text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/50 rounded-sm uppercase tracking-wider">🔦 Sentinel</span>
+                    }
+                  </div>
                   <div class="text-xs font-mono text-gray-500 dark:text-zinc-500 mt-0.5">ID: {{ patient.id }}</div>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 flex items-center justify-center text-sm font-bold shadow-inner">
+                <div class="w-10 h-10 rounded-full text-sm font-bold shadow-inner flex items-center justify-center"
+                     [class.bg-amber-100]="isSentinelCase(patient)"
+                     [class.dark:bg-amber-950/40]="isSentinelCase(patient)"
+                     [class.text-amber-800]="isSentinelCase(patient)"
+                     [class.dark:text-amber-300]="isSentinelCase(patient)"
+                     [class.bg-gray-100]="!isSentinelCase(patient)"
+                     [class.dark:bg-zinc-800]="!isSentinelCase(patient)"
+                     [class.text-gray-600]="!isSentinelCase(patient)"
+                     [class.dark:text-zinc-300]="!isSentinelCase(patient)">
                   {{ patient.name.charAt(0) }}
                 </div>
               </div>
@@ -137,6 +160,10 @@ import { IPatient } from '../services/patient.types';
 })
 export class PatientDirectoryComponent {
   private patientService = inject(PatientManagementService);
+
+  isSentinelCase(patient: any): boolean {
+    return !!patient && (patient.name.toLowerCase().includes('sentinel') || ['p004', 'p005', 'p006', 'p007'].includes(patient.id));
+  }
   
   // Local state
   searchQuery = signal<string>('');

@@ -25,7 +25,7 @@ import { ImageOptimizationService } from '../services/image-optimization.service
                   </button>
                </div>
 
-               <div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm border"
+               <div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[12px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm border"
                  [class.bg-brand-green-50]="scan.status === 'Normal'" [class.text-brand-green-700]="scan.status === 'Normal'" [class.border-brand-green-200]="scan.status === 'Normal'" [class.dark:bg-brand-green-900/40]="scan.status === 'Normal'" [class.dark:text-brand-green-400]="scan.status === 'Normal'" [class.dark:border-brand-green-800/50]="scan.status === 'Normal'"
                  [class.bg-brand-red-50]="scan.status === 'Abnormal'" [class.text-brand-red-700]="scan.status === 'Abnormal'" [class.border-brand-red-200]="scan.status === 'Abnormal'" [class.dark:bg-brand-red-900/40]="scan.status === 'Abnormal'" [class.dark:text-brand-red-400]="scan.status === 'Abnormal'" [class.dark:border-brand-red-800/50]="scan.status === 'Abnormal'"
                  [class.bg-brand-amber-50]="scan.status === 'Pending'" [class.text-brand-amber-700]="scan.status === 'Pending'" [class.border-brand-amber-200]="scan.status === 'Pending'" [class.dark:bg-brand-amber-900/40]="scan.status === 'Pending'" [class.dark:text-brand-amber-400]="scan.status === 'Pending'" [class.dark:border-brand-amber-800/50]="scan.status === 'Pending'"
@@ -39,7 +39,7 @@ import { ImageOptimizationService } from '../services/image-optimization.service
                <div class="w-16 h-16 rounded-full bg-white dark:bg-zinc-900 shadow-sm flex items-center justify-center mb-2">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-gray-300 dark:text-zinc-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
                </div>
-               <div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm border"
+               <div class="absolute top-2 right-2 px-2 py-0.5 rounded text-[12px] font-bold uppercase tracking-wider backdrop-blur-md shadow-sm border"
                  [class.bg-brand-green-50]="scan.status === 'Normal'" [class.text-brand-green-700]="scan.status === 'Normal'" [class.border-brand-green-200]="scan.status === 'Normal'" [class.dark:bg-brand-green-900/40]="scan.status === 'Normal'" [class.dark:text-brand-green-400]="scan.status === 'Normal'" [class.dark:border-brand-green-800/50]="scan.status === 'Normal'"
                  [class.bg-brand-red-50]="scan.status === 'Abnormal'" [class.text-brand-red-700]="scan.status === 'Abnormal'" [class.border-brand-red-200]="scan.status === 'Abnormal'" [class.dark:bg-brand-red-900/40]="scan.status === 'Abnormal'" [class.dark:text-brand-red-400]="scan.status === 'Abnormal'" [class.dark:border-brand-red-800/50]="scan.status === 'Abnormal'"
                  [class.bg-brand-amber-50]="scan.status === 'Pending'" [class.text-brand-amber-700]="scan.status === 'Pending'" [class.border-brand-amber-200]="scan.status === 'Pending'" [class.dark:bg-brand-amber-900/40]="scan.status === 'Pending'" [class.dark:text-brand-amber-400]="scan.status === 'Pending'" [class.dark:border-brand-amber-800/50]="scan.status === 'Pending'"
@@ -52,8 +52,8 @@ import { ImageOptimizationService } from '../services/image-optimization.service
           
           <div class="p-4 flex flex-col flex-1">
             <div class="flex items-center gap-2 mb-2">
-              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-[#09090b] uppercase tracking-[0.15em] shadow-sm">{{ scan.type }}</span>
-              <span class="text-[10px] text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-widest">{{ scan.date }}</span>
+              <span class="px-1.5 py-0.5 rounded text-[12px] font-bold bg-[#1C1C1C] dark:bg-zinc-100 text-white dark:text-[#09090b] uppercase tracking-[0.15em] shadow-sm">{{ scan.type }}</span>
+              <span class="text-[12px] text-gray-500 dark:text-zinc-400 font-bold uppercase tracking-widest">{{ scan.date }}</span>
             </div>
             <h4 class="text-sm font-bold text-[#1C1C1C] dark:text-zinc-100 leading-tight mb-2 uppercase tracking-wide">{{ scan.title }}</h4>
             <p class="text-xs text-gray-600 dark:text-zinc-400 line-clamp-3 leading-relaxed flex-1 font-light">{{ scan.description }}</p>
@@ -63,7 +63,7 @@ import { ImageOptimizationService } from '../services/image-optimization.service
         <div class="col-span-full py-12 flex flex-col items-center justify-center text-gray-500 dark:text-zinc-400 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg bg-gray-50/50 dark:bg-zinc-900/50">
            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-3 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/></svg>
            <p class="text-xs font-bold uppercase tracking-[0.15em] text-gray-500 dark:text-zinc-400">No Scans or Diagnostics Available</p>
-           <p class="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Patient records empty</p>
+           <p class="text-[12px] uppercase tracking-widest text-gray-500 mt-1">Patient records empty</p>
         </div>
       }
     </div>

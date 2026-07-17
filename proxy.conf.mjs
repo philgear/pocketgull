@@ -17,7 +17,23 @@ export default {
       secure: false,
       changeOrigin: true
     },
+    "/socket.io": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true,
+      ws: true
+    },
     "/api-docs": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
+    "/docs/study": {
+      target: "http://localhost:4000",
+      secure: false,
+      changeOrigin: true
+    },
+    "/docs": {
       target: "http://localhost:4000",
       secure: false,
       changeOrigin: true

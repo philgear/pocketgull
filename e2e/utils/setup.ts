@@ -5,6 +5,10 @@ import { Page } from '@playwright/test';
  * Mocks out hardware telemetry, config, and prevents Service Worker registration.
  */
 export async function setupE2ePage(page: Page, options: { mockClinician?: boolean } = { mockClinician: true }) {
+  page.on('console', msg => {
+    console.log(`PAGE LOG [${msg.type()}]:`, msg.text());
+  });
+
   // Intercept config endpoint to return empty API key so splash screen shows Demo Mode
   await page.route('**/api/config', async route => {
     await route.fulfill({

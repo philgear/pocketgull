@@ -20,7 +20,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
                     </svg>
                     <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">3D view unavailable on this device</span>
                     @if (webglError()) {
-                        <span class="text-[10px] text-red-500 mt-2 max-w-xs break-words">{{ webglError() }}</span>
+                        <span class="text-[12px] text-red-500 mt-2 max-w-xs break-words">{{ webglError() }}</span>
                     }
                 </div>
             }

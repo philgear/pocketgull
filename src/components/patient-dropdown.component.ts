@@ -53,19 +53,47 @@ import { GamificationService } from '../services/gamification.service';
 
           <div class="py-1 overflow-y-auto flex-1 group/list">
             @for (patient of filteredPatients(); track patient.id) {
-              <button (click)="selectPatient(patient.id)" class="group w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:bg-[#F8F9FA] dark:hover:bg-zinc-800 hover:text-gray-900 dark:hover:text-white flex items-center gap-3 transition-colors relative border-l-4" [class.bg-brand-blue-50]="patient.id === patientManagement.selectedPatientId()" [class.dark:bg-[#689F38]/10]="patient.id === patientManagement.selectedPatientId()" [class.border-[#689F38]]="patient.id === patientManagement.selectedPatientId()" [class.border-transparent]="patient.id !== patientManagement.selectedPatientId()">
+              <button (click)="selectPatient(patient.id)" 
+                      class="group w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors relative border-l-4" 
+                      [class.bg-brand-blue-50]="patient.id === patientManagement.selectedPatientId() && !isSentinelCase(patient)"
+                      [class.bg-amber-500/5]="patient.id === patientManagement.selectedPatientId() && isSentinelCase(patient)"
+                      [class.dark:bg-[#689F38]/10]="patient.id === patientManagement.selectedPatientId() && !isSentinelCase(patient)"
+                      [class.dark:bg-amber-500/10]="patient.id === patientManagement.selectedPatientId() && isSentinelCase(patient)"
+                      [class.border-[#689F38]]="patient.id === patientManagement.selectedPatientId() && !isSentinelCase(patient)"
+                      [class.border-amber-500]="patient.id === patientManagement.selectedPatientId() && isSentinelCase(patient)"
+                      [class.border-transparent]="patient.id !== patientManagement.selectedPatientId()"
+                      [class.text-gray-700]="!isSentinelCase(patient)"
+                      [class.dark:text-zinc-300]="!isSentinelCase(patient)"
+                      [class.text-amber-800]="isSentinelCase(patient)"
+                      [class.dark:text-amber-300]="isSentinelCase(patient)"
+                      [class.hover:bg-[#F8F9FA]]="!isSentinelCase(patient)"
+                      [class.dark:hover:bg-zinc-800]="!isSentinelCase(patient)"
+                      [class.hover:bg-amber-500/5]="isSentinelCase(patient)"
+                      [class.dark:hover:bg-amber-500/10]="isSentinelCase(patient)">
                 
                 <div class="w-8 h-8 rounded-sm flex items-center justify-center text-xs shrink-0 font-bold shadow-sm"
-                     [class.bg-[#689F38]]="patient.id === patientManagement.selectedPatientId()"
+                     [class.bg-[#689F38]]="patient.id === patientManagement.selectedPatientId() && !isSentinelCase(patient)"
+                     [class.bg-amber-500]="patient.id === patientManagement.selectedPatientId() && isSentinelCase(patient)"
                      [class.text-white]="patient.id === patientManagement.selectedPatientId()"
-                     [class.bg-gray-200]="patient.id !== patientManagement.selectedPatientId()"
-                     [class.dark:bg-zinc-700]="patient.id !== patientManagement.selectedPatientId()"
-                     [class.text-gray-600]="patient.id !== patientManagement.selectedPatientId()"
-                     [class.dark:text-zinc-300]="patient.id !== patientManagement.selectedPatientId()">
+                     [class.bg-amber-100]="patient.id !== patientManagement.selectedPatientId() && isSentinelCase(patient)"
+                     [class.dark:bg-amber-950/40]="patient.id !== patientManagement.selectedPatientId() && isSentinelCase(patient)"
+                     [class.text-amber-800]="patient.id !== patientManagement.selectedPatientId() && isSentinelCase(patient)"
+                     [class.dark:text-amber-300]="patient.id !== patientManagement.selectedPatientId() && isSentinelCase(patient)"
+                     [class.bg-gray-200]="patient.id !== patientManagement.selectedPatientId() && !isSentinelCase(patient)"
+                     [class.dark:bg-zinc-700]="patient.id !== patientManagement.selectedPatientId() && !isSentinelCase(patient)"
+                     [class.text-gray-600]="patient.id !== patientManagement.selectedPatientId() && !isSentinelCase(patient)"
+                     [class.dark:text-zinc-300]="patient.id !== patientManagement.selectedPatientId() && !isSentinelCase(patient)">
                   {{ patient.name.charAt(0) }}
                 </div>
                 <div class="min-w-0 flex-1">
-                  <div class="font-bold text-gray-900 dark:text-zinc-100 text-sm truncate">{{ patient.name }}</div>
+                  <div class="font-bold text-sm truncate flex items-center gap-1.5"
+                       [class.text-gray-900]="!isSentinelCase(patient)"
+                       [class.dark:text-zinc-100]="!isSentinelCase(patient)">
+                    {{ patient.name }}
+                    @if (isSentinelCase(patient)) {
+                      <span class="text-[12px] font-bold text-amber-800 dark:text-amber-400">🔦 Sentinel</span>
+                    }
+                  </div>
                   <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
                      <span class="whitespace-nowrap">{{ patient.age }} YRS</span>
                      <span class="w-1 h-1 bg-gray-300 dark:bg-zinc-600 rounded-sm shrink-0"></span>
@@ -132,6 +160,10 @@ import { GamificationService } from '../services/gamification.service';
 })
 export class PatientDropdownComponent {
   patientManagement = inject(PatientManagementService);
+
+  isSentinelCase(patient: any): boolean {
+    return !!patient && (patient.name.toLowerCase().includes('sentinel') || ['p004', 'p005', 'p006', 'p007'].includes(patient.id));
+  }
   exportService = inject(ExportService);
   game = inject(GamificationService);
   elementRef = inject(ElementRef);
@@ -172,6 +204,7 @@ export class PatientDropdownComponent {
   }
 
   selectPatient(id: string) {
+    console.log('[PatientDropdownComponent] selectPatient called with id:', id);
     this.patientManagement.selectPatient(id);
     this.game.completeQuest('select_patient');
     if (['p004', 'p005', 'p006', 'p007'].includes(id)) {

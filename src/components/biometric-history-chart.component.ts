@@ -18,17 +18,17 @@ Chart.register(...registerables);
           <h3 class="text-sm font-bold tracking-widest uppercase text-gray-500 dark:text-zinc-500">Biometric Trends</h3>
           <!-- Live Telemetry Status Badge -->
           @if (pythonBridge.isAvailable() === true) {
-            <span class="text-[10px] text-green-600 dark:text-green-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5 animate-pulse">
+            <span class="text-[12px] text-green-600 dark:text-green-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5 animate-pulse">
               <span class="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full"></span>
               Live Sidecar Connected (SSE)
             </span>
           } @else if (pythonBridge.isAvailable() === false) {
-            <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
+            <span class="text-[12px] text-zinc-400 dark:text-zinc-500 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
               <span class="w-1.5 h-1.5 bg-zinc-400 dark:bg-zinc-500 rounded-full"></span>
               Sidecar Offline (Demo Mode)
             </span>
           } @else {
-            <span class="text-[10px] text-gray-400 dark:text-zinc-600 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
+            <span class="text-[12px] text-gray-400 dark:text-zinc-600 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
               <span class="w-1.5 h-1.5 bg-gray-400 dark:bg-zinc-600 rounded-full"></span>
               Verifying Telemetry Bridge...
             </span>
@@ -38,7 +38,7 @@ Chart.register(...registerables);
         <!-- View Toggle -->
         <div class="flex flex-wrap bg-gray-100 dark:bg-zinc-900 rounded p-1 gap-1 max-w-full">
           <button (click)="activeMetric.set('hr')"
-                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
+                  class="px-2.5 py-1 text-[12px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'hr'"
                   [class.dark:bg-zinc-800]="activeMetric() === 'hr'"
                   [class.text-gray-900]="activeMetric() === 'hr'"
@@ -47,7 +47,7 @@ Chart.register(...registerables);
                   [class.text-gray-500]="activeMetric() !== 'hr'"
                   [class.dark:text-zinc-500]="activeMetric() !== 'hr'">HR</button>
           <button (click)="activeMetric.set('bp')"
-                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
+                  class="px-2.5 py-1 text-[12px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'bp'"
                   [class.dark:bg-zinc-800]="activeMetric() === 'bp'"
                   [class.text-gray-900]="activeMetric() === 'bp'"
@@ -56,7 +56,7 @@ Chart.register(...registerables);
                   [class.text-gray-500]="activeMetric() !== 'bp'"
                   [class.dark:text-zinc-500]="activeMetric() !== 'bp'">BP</button>
           <button (click)="activeMetric.set('spO2')"
-                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
+                  class="px-2.5 py-1 text-[12px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'spO2'"
                   [class.dark:bg-zinc-800]="activeMetric() === 'spO2'"
                   [class.text-gray-900]="activeMetric() === 'spO2'"
@@ -65,7 +65,7 @@ Chart.register(...registerables);
                   [class.text-gray-500]="activeMetric() !== 'spO2'"
                   [class.dark:text-zinc-500]="activeMetric() !== 'spO2'">SpO2</button>
           <button (click)="activeMetric.set('hrv')"
-                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
+                  class="px-2.5 py-1 text-[12px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'hrv'"
                   [class.dark:bg-zinc-800]="activeMetric() === 'hrv'"
                   [class.text-gray-900]="activeMetric() === 'hrv'"
@@ -74,7 +74,7 @@ Chart.register(...registerables);
                   [class.text-gray-500]="activeMetric() !== 'hrv'"
                   [class.dark:text-zinc-500]="activeMetric() !== 'hrv'">HRV</button>
           <button (click)="activeMetric.set('coherence')"
-                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
+                  class="px-2.5 py-1 text-[12px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'coherence'"
                   [class.dark:bg-zinc-800]="activeMetric() === 'coherence'"
                   [class.text-gray-900]="activeMetric() === 'coherence'"
@@ -83,7 +83,7 @@ Chart.register(...registerables);
                   [class.text-gray-500]="activeMetric() !== 'coherence'"
                   [class.dark:text-zinc-500]="activeMetric() !== 'coherence'">Coherence</button>
           <button (click)="activeMetric.set('breathing')"
-                  class="px-2.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
+                  class="px-2.5 py-1 text-[12px] sm:text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
                   [class.bg-white]="activeMetric() === 'breathing'"
                   [class.dark:bg-zinc-800]="activeMetric() === 'breathing'"
                   [class.text-gray-900]="activeMetric() === 'breathing'"
@@ -114,6 +114,7 @@ export class BiometricHistoryChartComponent implements OnDestroy {
   
   private chartInstance: Chart | null = null;
   activeMetric = signal<'hr' | 'bp' | 'spO2' | 'hrv' | 'coherence' | 'breathing'>('hr');
+  private mockIntervalId: any = null;
 
   // Compute the current patient's history array, fallback to empty array
   biometricHistory = computed(() => {
@@ -140,6 +141,73 @@ export class BiometricHistoryChartComponent implements OnDestroy {
 
       this.renderChart(canvasRef.nativeElement, history, metricType);
     });
+
+    if (typeof window !== 'undefined') {
+      this.startMockSimulation();
+    }
+  }
+
+  private startMockSimulation() {
+    if (this.mockIntervalId) return;
+
+    this.mockIntervalId = setInterval(() => {
+      // Only generate if pythonBridge is offline and isDemoMode is active
+      if (!this.pythonBridge.isAvailable() && this.patientState.isDemoMode()) {
+        const timestamp = new Date().toISOString();
+        const types: ('hr' | 'bp' | 'spO2' | 'hrv' | 'coherence' | 'breathing')[] = ['hr', 'bp', 'spO2', 'hrv', 'coherence', 'breathing'];
+        
+        const newEntries = types.map(t => {
+          let val: string | number = 72;
+          const seconds = new Date().getSeconds();
+          
+          if (t === 'hr') {
+            val = Math.round(72 + 6 * Math.sin(seconds * 0.1) + Math.random() * 2);
+          } else if (t === 'bp') {
+            const sys = Math.round(118 + 5 * Math.sin(seconds * 0.08) + Math.random() * 2);
+            const dia = Math.round(76 + 4 * Math.sin(seconds * 0.08) + Math.random() * 2);
+            val = `${sys}/${dia}`;
+          } else if (t === 'spO2') {
+            val = Math.round(97 + 1.5 * Math.sin(seconds * 0.05) + Math.random() * 0.5);
+            if (val > 100) val = 100;
+          } else if (t === 'hrv') {
+            val = Math.round(55 + 12 * Math.sin(seconds * 0.12) + Math.random() * 4);
+          } else if (t === 'coherence') {
+            val = parseFloat((0.65 + 0.25 * Math.sin(seconds * 0.09) + Math.random() * 0.05).toFixed(2));
+            if (val > 1.0) val = 1.0;
+            if (val < 0.0) val = 0.0;
+          } else if (t === 'breathing') {
+            val = Math.round(14 + 2 * Math.sin(seconds * 0.1) + Math.random() * 1);
+          }
+          
+          return {
+            timestamp,
+            type: t,
+            value: val,
+            source: 'Mock Telemetry Simulator'
+          };
+        });
+
+        // Add to patientState, capping history per type to prevent infinite growth
+        this.patientState.biometricHistory.update(history => {
+          let updated = [...history, ...newEntries];
+          for (const type of types) {
+            const typeEntries = updated.filter(e => e.type === type);
+            if (typeEntries.length > 30) {
+              const toRemove = typeEntries.length - 30;
+              let removedCount = 0;
+              updated = updated.filter(e => {
+                if (e.type === type && removedCount < toRemove) {
+                  removedCount++;
+                  return false;
+                }
+                return true;
+              });
+            }
+          }
+          return updated;
+        });
+      }
+    }, 2000);
   }
 
   private renderChart(canvas: HTMLCanvasElement, allHistory: any[], activeType: string) {
@@ -294,7 +362,11 @@ export class BiometricHistoryChartComponent implements OnDestroy {
     }
   }
 
-  ngOnDestroy() {
+   ngOnDestroy() {
     this.destroyChart();
+    if (this.mockIntervalId) {
+      clearInterval(this.mockIntervalId);
+      this.mockIntervalId = null;
+    }
   }
 }

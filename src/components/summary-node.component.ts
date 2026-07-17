@@ -94,9 +94,9 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   styles: [`
-        :host { display: block; }
-        .bracket-removed { text-decoration: line-through; opacity: 0.5; }
-        .bracket-added   { background-color: #f0fdf4; border-bottom: 1px solid #4ade80; }
+        .bracket-removed { text-decoration: line-through; opacity: 0.5; transition: all 0.3s ease; }
+        .bracket-added   { background-color: #f0fdf4; border-bottom: 1px solid #4ade80; padding-left: 4px; padding-right: 4px; border-radius: 2px; transition: all 0.3s ease; }
+        .dark .bracket-added { background-color: #16a34a20; border-bottom-color: #16a34a; }
 
         /* ─── Evidence Popover ─────────────────── */
         .evidence-popover {
@@ -460,15 +460,28 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 
       <!-- ─── Main Node Content ──────────────── -->
       @if (type() === 'paragraph') {
-        <p [innerHTML]="rawHtml() | safeHtml"
+        <p class="flex items-start gap-2"
            [class.bracket-removed]="node().bracketState === 'removed'"
            [class.bracket-added]="node().bracketState === 'added'"
-           (dblclick)="onDoubleClick()"></p>
+           (dblclick)="toggleBracket()">
+          @if (node().bracketState === 'added') {
+            <span class="inline-flex items-center text-green-600 dark:text-green-400 mt-0.5" [innerHTML]="ClinicalIcons.Verified | safeHtml" title="Approved / Bracketed Claim"></span>
+          } @else if (node().bracketState === 'removed') {
+            <span class="inline-flex items-center text-red-500 dark:text-red-400 mt-0.5" [innerHTML]="ClinicalIcons.Clear | safeHtml" title="Removed / Excluded Claim"></span>
+          }
+          <span [innerHTML]="rawHtml() | safeHtml" class="flex-1"></span>
+        </p>
       } @else if (type() === 'list-item') {
-        <div [class.bracket-removed]="node().bracketState === 'removed'"
+        <div class="flex items-start gap-2"
+             [class.bracket-removed]="node().bracketState === 'removed'"
              [class.bracket-added]="node().bracketState === 'added'"
-             (dblclick)="onDoubleClick()">
-          <span [innerHTML]="listItemHtml() | safeHtml" class="block"></span>
+             (dblclick)="toggleBracket()">
+          @if (node().bracketState === 'added') {
+            <span class="inline-flex items-center text-green-600 dark:text-green-400 mt-0.5" [innerHTML]="ClinicalIcons.Verified | safeHtml" title="Approved / Bracketed Claim"></span>
+          } @else if (node().bracketState === 'removed') {
+            <span class="inline-flex items-center text-red-500 dark:text-red-400 mt-0.5" [innerHTML]="ClinicalIcons.Clear | safeHtml" title="Removed / Excluded Claim"></span>
+          }
+          <span [innerHTML]="listItemHtml() | safeHtml" class="block flex-1"></span>
         </div>
       }
 

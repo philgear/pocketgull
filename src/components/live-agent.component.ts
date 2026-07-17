@@ -9,7 +9,7 @@ import { Component , ChangeDetectionStrategy} from '@angular/core';
     <div class="flex flex-col h-full bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded-lg shadow-sm transition-all hover:shadow-md">
       <div class="flex items-center justify-between p-4 bg-gray-50/50 dark:bg-zinc-800/50 border-b border-gray-100 dark:border-zinc-800 rounded-t-lg">
         <h2 class="text-sm font-semibold text-gray-800 dark:text-zinc-200 uppercase tracking-widest">Live AI Agent</h2>
-        <span class="px-2 py-0.5 text-[10px] font-semibold text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/50 rounded-full border border-green-200 dark:border-green-800">Online</span>
+        <span class="px-2 py-0.5 text-[12px] font-semibold text-green-700 bg-green-100 dark:text-green-300 dark:bg-green-900/50 rounded-full border border-green-200 dark:border-green-800">Online</span>
       </div>
       <div class="flex-1 p-4 overflow-y-auto w-full">
         <!-- Chat messages will go here -->

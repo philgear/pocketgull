@@ -54,7 +54,7 @@ import { DicomService } from '../services/dicom.service';
       </a>
 
       <!-- Note -->
-      <p class="relative z-10 text-[10px] text-zinc-600 text-center max-w-xs leading-relaxed">
+      <p class="relative z-10 text-[12px] text-zinc-600 text-center max-w-xs leading-relaxed">
         OHIF Viewer opens in a new tab. Public instance hosted at viewer.ohif.org.
       </p>
     </div>

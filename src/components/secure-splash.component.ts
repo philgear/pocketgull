@@ -23,18 +23,10 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
         <!-- Sun/Circadian Glow (Teal to Coral/Amber) -->
         <div class="absolute top-[35%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-r from-[#3ebc9e]/20 via-[#faa63b]/15 to-[#ef6658]/20 blur-[80px] avs-breathing-glow"></div>
         
-        <!-- Interactive Lockscreen Game HUD -->
-        <div class="absolute top-8 left-8 z-30 flex items-center gap-2 bg-white/95 dark:bg-zinc-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl text-[10px] font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 pointer-events-auto">
-          <span>🎮 Tapped: {{ gameScore() }}/5</span>
-          @if (gameWon()) {
-            <span class="text-[#3ebc9e] font-extrabold animate-bounce">🏆 Sanctuary Cleared!</span>
-          } @else {
-            <span class="text-zinc-400">Tap creatures to unlock</span>
-          }
-        </div>
+
 
         <!-- Oregon Coast Buoy Telemetry Info -->
-        <div class="absolute bottom-4 left-4 z-30 bg-black/30 dark:bg-black/50 text-[9px] font-bold text-white px-3 py-1 rounded-md border border-white/10 tracking-widest uppercase pointer-events-auto">
+        <div class="absolute bottom-4 left-4 z-30 bg-black/30 dark:bg-black/50 text-[12px] font-bold text-white px-3 py-1 rounded-md border border-white/10 tracking-widest uppercase pointer-events-auto">
           📡 Buoy 46050 (Oregon Coast): {{ waveHeight() }}m @ {{ wavePeriod() }}s
         </div>
 
@@ -71,7 +63,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                [style.z-index]="item.type === 'surfer' || item.type === 'fish' ? 25 : 15">
             
             @if (item.type === 'ship') {
-              <svg class="animate-bobbing opacity-80 dark:opacity-60 text-zinc-650 dark:text-zinc-500"
+              <svg class="animate-bobbing opacity-80 dark:opacity-60 text-zinc-700 dark:text-zinc-500"
                    [style.animation-delay.s]="item.delay"
                    [style.animation-duration.s]="item.duration"
                    viewBox="0 0 40 40" style="width: 2.5rem; height: 2.5rem;" fill="currentColor">
@@ -121,10 +113,10 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
 
       <!-- HIPAA Lock Status Header (Visible only when locked) -->
       @if (isLocked()) {
-        <div class="absolute shadow-sm top-8 left-1/2 -translate-x-1/2 flex flex-col items-center mb-8 mt-2 animate-in slide-in-from-top-4 duration-500 z-30">
+        <div class="absolute shadow-sm top-8 left-1/2 -translate-x-1/2 flex flex-col items-center mb-8 mt-2 animate-in slide-in-from-top-4-centered duration-500 z-30">
             <div class="flex items-center gap-3 bg-white/95 dark:bg-zinc-900/90 backdrop-blur-md px-5 py-3 rounded-full border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl">
                 <div class="w-2.5 h-2.5 rounded-full bg-brand-red-500 animate-pulse shadow-[0_0_8px_rgba(234,67,53,0.6)]"></div>
-                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">System Locked</span>
+                <span class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">System Locked</span>
             </div>
         </div>
       }
@@ -167,7 +159,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                 style="letter-spacing: 0.1em;">
               {{ isLocked() ? 'Resume Session' : 'Pocket Gull' }}
             </h1>
-            <p class="text-[9px] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
+            <p class="text-[12px] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
               {{ isLocked() ? 'Idle Timeout Protection Active' : 'Clinical Intelligence Engine' }}
             </p>
           </div>
@@ -176,7 +168,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
           <div class="mb-6 p-3 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
             <span class="text-xs">🌴</span>
             <div class="text-left">
-              <p class="text-[8px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Welcome & Coverage Status</p>
+              <p class="text-[12px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Welcome & Coverage Status</p>
               <p class="text-[8.5px] text-amber-700/95 dark:text-amber-300/80 leading-normal">Welcome. Pocket-Gull is operating in automated coverage mode while Phil Gear, Ph.G is away. Full clinical intelligence tools and sandboxes remain active.</p>
             </div>
           </div>
@@ -188,55 +180,13 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                  <div class="absolute inset-0 rounded-full border-2 border-zinc-200 dark:border-zinc-800"></div>
                  <div class="absolute inset-0 rounded-full border-2 border-[#3ebc9e] border-t-transparent animate-spin"></div>
                </div>
-               <p class="text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.3em] font-mono animate-pulse">Establishing Secure Connection</p>
-            </div>
-          }
-          <!-- Restricted Entry Gateway -->
-          @else if (showAuthGateway()) {
-            <div class="space-y-6 py-2 animate-in fade-in duration-500">
-              <div class="text-center space-y-2">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red-50/50 dark:bg-brand-red-950/30 border border-brand-red-200/50 dark:border-brand-red-900/40">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-red-600 dark:text-brand-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <span class="text-[9px] font-bold text-brand-red-600 dark:text-brand-red-400 uppercase tracking-widest">Restricted Access</span>
-                </div>
-                <h2 class="text-xs text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed max-w-xs mx-auto">
-                  Pocket-Gull Clinician Console is restricted. Authorized clinicians must authenticate to access the real-time consultation engine.
-                </h2>
-              </div>
-
-              @if (errorMsg()) {
-                <div class="p-3 bg-brand-red-50/80 dark:bg-brand-red-950/40 border border-brand-red-200 dark:border-brand-red-900/50 rounded-xl">
-                  <p class="text-[9px] text-brand-red-600 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ errorMsg() }}</p>
-                </div>
-              }
-
-              <div class="space-y-3 pt-2">
-                <!-- Google Sign-In -->
-                <button 
-                  type="button" 
-                  (click)="handleGoogleAuth()"
-                  [disabled]="isChecking()"
-                  class="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(37,99,235,0.15)] hover:shadow-[0_6px_24px_rgba(37,99,235,0.25)] active:scale-[0.98]"
-                >
-                  <span>Clinician Sign-in</span>
-                </button>
-
-                <!-- Sandbox Demo -->
-                <button 
-                  type="button" 
-                  (click)="handleSandboxDemo()"
-                  class="w-full py-4 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-200 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                  <span>Explore Sandbox Demo</span>
-                </button>
-              </div>
+               <p class="text-[12px] text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.3em] font-mono animate-pulse">Establishing Secure Connection</p>
             </div>
           }
           <!-- Gesture Unlock Flow -->
           @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
-               <p class="text-[10px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw a beach item or "X" to unlock</p>
+               <p class="text-[12px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw a beach item (Palm Tree, Wave, Seagull, Shell, Starfish, or "X") to unlock</p>
                
                <div class="relative w-[220px] h-[220px] flex items-center justify-center">
                  <!-- Guidelines background SVG (Palm Tree / Wave guide) -->
@@ -266,14 +216,16 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                <!-- Hidden input for Playwright E2E tests compatibility -->
                <input 
                  #pinInput
+                 id="gesture-pin-input"
+                 name="gesture-pin-input"
                  type="password" 
-                 [(ngModel)]="pin"
-                 (ngModelChange)="onPinChange($event)"
+                 [value]="pin"
+                 (input)="pin = pinInput.value; onPinChange(pinInput.value)"
                  (keyup.enter)="verifyPin()"
                  maxlength="4"
                  placeholder="1234" 
-                 class="absolute w-1 h-1 opacity-[0.01] bg-transparent border-none text-transparent z-[-1] pointer-events-none"
-                 style="position: absolute; width: 1px; height: 1px; opacity: 0.01; background: transparent; border: none; color: transparent; z-index: -1;"
+                 class="absolute w-1 h-1 opacity-[0.01] bg-transparent border-none text-transparent"
+                 style="position: absolute; width: 1px; height: 1px; opacity: 0.01; background: transparent; border: none; color: transparent;"
                >
                
                <div class="flex items-center gap-3 mt-2 w-[220px] z-30">
@@ -281,29 +233,44 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                    type="button"
                    (click)="clearDrawing()" 
                    [disabled]="isChecking() || (strokes.length === 0 && currentStroke.length === 0)"
-                   class="flex-1 px-4 py-2.5 text-[9px] uppercase font-bold tracking-widest bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:ring-1 hover:ring-zinc-300 dark:hover:ring-zinc-600 text-zinc-650 dark:text-zinc-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                   class="flex-1 px-4 py-2.5 text-[12px] uppercase font-bold tracking-widest bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:ring-1 hover:ring-zinc-300 dark:hover:ring-zinc-600 text-zinc-700 dark:text-zinc-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
                    Clear Pad
                  </button>
                  <button 
                    type="button"
                    (click)="handleUnlock()" 
                    [disabled]="isChecking()"
-                   class="flex-1 px-4 py-2.5 flex justify-center items-center gap-1.5 text-[9px] uppercase font-bold tracking-widest bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/20 dark:hover:bg-emerald-600/30 border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                   class="flex-1 px-4 py-2.5 flex justify-center items-center gap-1.5 text-[12px] uppercase font-bold tracking-widest bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/20 dark:hover:bg-emerald-600/30 border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
                    <svg *ngIf="!isChecking()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
-                   <svg *ngIf="isChecking()" class="animate-spin w-3.5 h-3.5 text-emerald-655 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                   <svg *ngIf="isChecking()" class="animate-spin w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                    <span>Biometrics</span>
                  </button>
                </div>
+
+               <!-- Reduced Motion Toggle -->
+               <div class="mt-4 flex justify-center z-30">
+                 <label class="flex items-center gap-2 cursor-pointer group">
+                   <input type="checkbox"
+                          id="reduce-motion-lock"
+                          name="reduce-motion-lock"
+                          [checked]="theme.reduceMotion()"
+                          (change)="theme.setReduceMotion(!theme.reduceMotion())"
+                          class="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700/50 bg-zinc-50 dark:bg-black/40 text-[#3ebc9e] focus:ring-[#3ebc9e]/30 focus:ring-offset-0 cursor-pointer transition-colors">
+                   <span class="text-[12px] font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-350 transition-colors uppercase tracking-widest">
+                     Reduce Motion
+                   </span>
+                 </label>
+               </div>
             </div>
             @if (errorMsg()) {
-              <p class="mb-4 text-brand-red-600 dark:text-brand-red-400/90 text-[10px] uppercase font-bold tracking-[0.1em] text-center w-full animate-pulse">{{ errorMsg() }}</p>
+              <p class="mb-4 text-brand-red-600 dark:text-brand-red-400/90 text-[12px] uppercase font-bold tracking-[0.1em] text-center w-full animate-pulse">{{ errorMsg() }}</p>
             }
 
             <!-- Subtle AVS Lock-State Controller -->
-            <div class="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between text-[10px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider animate-in fade-in duration-700 z-30">
+            <div class="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between text-[12px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider animate-in fade-in duration-700 z-30">
                <div class="flex items-center gap-2">
                   <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-brand-green-400' : 'bg-zinc-400 dark:bg-zinc-650'"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-brand-green-400' : 'bg-zinc-400 dark:bg-zinc-700'"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2" [class]="isAvsPlaying() ? 'bg-brand-green-500' : 'bg-zinc-400 dark:bg-zinc-500'"></span>
                   </span>
                   <span>{{ isAvsPlaying() ? 'AVS ENTRAINMENT ACTIVE' : 'AVS ENTRAINMENT MUTED' }}</span>
@@ -311,14 +278,56 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                <button 
                  type="button" 
                  (click)="toggleAvs()"
-                 class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-650 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-white rounded-full transition border border-zinc-200 dark:border-zinc-700/40 text-[9px] uppercase font-bold tracking-widest active:scale-95 flex items-center gap-1.5"
+                 class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-white rounded-full transition border border-zinc-200 dark:border-zinc-700/40 text-[12px] uppercase font-bold tracking-widest active:scale-95 flex items-center gap-1.5"
                >
                   <svg *ngIf="!isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
                   <svg *ngIf="isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-green-600 dark:text-brand-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 12V6.75A2.25 2.25 0 0 0 15 4.5h-1.5a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 13.5 19.5H15a2.25 2.25 0 0 0 2.25-2.25V12z" /></svg>
                   <span>{{ isAvsPlaying() ? 'Mute' : 'Listen' }}</span>
                </button>
             </div>
-          } 
+          }
+          <!-- Restricted Entry Gateway -->
+          @else if (showAuthGateway()) {
+            <div class="space-y-6 py-2 animate-in fade-in duration-500">
+              <div class="text-center space-y-2">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red-50/50 dark:bg-brand-red-950/30 border border-brand-red-200/50 dark:border-brand-red-900/40">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-red-600 dark:text-brand-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <span class="text-[12px] font-bold text-brand-red-600 dark:text-brand-red-400 uppercase tracking-widest">Restricted Access</span>
+                </div>
+                <h2 class="text-xs text-zinc-600 dark:text-zinc-400 font-normal leading-relaxed max-w-xs mx-auto">
+                  Pocket-Gull Clinician Console is restricted. Authorized clinicians must authenticate to access the real-time consultation engine.
+                </h2>
+              </div>
+
+              @if (errorMsg()) {
+                <div class="p-3 bg-brand-red-50/80 dark:bg-brand-red-950/40 border border-brand-red-200 dark:border-brand-red-900/50 rounded-xl">
+                  <p class="text-[12px] text-brand-red-600 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ errorMsg() }}</p>
+                </div>
+              }
+
+              <div class="space-y-3 pt-2">
+                <!-- Google Sign-In -->
+                <button 
+                  type="button" 
+                  (click)="handleGoogleAuth()"
+                  [disabled]="isChecking()"
+                  class="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(37,99,235,0.15)] hover:shadow-[0_6px_24px_rgba(37,99,235,0.25)] active:scale-[0.98]"
+                >
+                  <span>Clinician Sign-in</span>
+                </button>
+
+                <!-- Sandbox Demo -->
+                <button 
+                  type="button" 
+                  (click)="handleSandboxDemo()"
+                  class="w-full py-4 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-200 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                  <span>Explore Sandbox Demo</span>
+                </button>
+              </div>
+            </div>
+          }
           <!-- API Key Setup Flow -->
           @else if (viewState() === 'auth') {
             <form (submit)="handleSubmitKey(); $event.preventDefault();" class="space-y-4">
@@ -331,7 +340,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                   autofocus
                   class="w-full px-4 py-4 pb-3.5 text-xs font-mono bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-800/80 rounded-[1rem] shadow-inner outline-none focus:border-zinc-400 dark:focus:border-zinc-500/80 transition-colors text-zinc-800 dark:text-zinc-200 placeholder:font-sans placeholder:text-zinc-400 dark:placeholder:text-zinc-700 placeholder:tracking-widest placeholder:text-[9.5px]"
                 >
-                <button type="button" (click)="showPassword.set(!showPassword())" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-600 hover:text-zinc-650 dark:hover:text-zinc-300">
+                <button type="button" (click)="showPassword.set(!showPassword())" class="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-600 hover:text-zinc-700 dark:hover:text-zinc-300">
                   <svg *ngIf="!showPassword()" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                   <svg *ngIf="showPassword()" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
                 </button>
@@ -339,7 +348,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
 
               @if (apiKeyError()) {
                 <div class="p-3 bg-brand-red-50 dark:bg-brand-red-950/40 border border-brand-red-200 dark:border-brand-red-900/50 rounded-xl">
-                  <p class="text-[9px] text-brand-red-655 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ apiKeyError() }}</p>
+                  <p class="text-[12px] text-brand-red-655 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ apiKeyError() }}</p>
                 </div>
               }
 
@@ -347,10 +356,12 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <div class="mb-4 flex justify-center">
                 <label class="flex items-center gap-2 cursor-pointer group">
                   <input type="checkbox"
+                         id="reduce-motion-auth"
+                         name="reduce-motion-auth"
                          [checked]="theme.reduceMotion()"
                          (change)="theme.setReduceMotion(!theme.reduceMotion())"
                          class="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700/50 bg-zinc-50 dark:bg-black/40 text-[#3ebc9e] focus:ring-[#3ebc9e]/30 focus:ring-offset-0 cursor-pointer transition-colors">
-                  <span class="text-[9px] font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors uppercase tracking-widest">
+                  <span class="text-[12px] font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors uppercase tracking-widest">
                     Reduce Motion
                   </span>
                 </label>
@@ -359,7 +370,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <button 
                 type="submit"
                 [disabled]="!apiKeyStr().trim() || isChecking()"
-                class="w-full py-4 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] active:scale-[0.98]">
+                class="w-full py-4 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed shadow-[0_4px_12px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] active:scale-[0.98]">
                 Initialize System
               </button>
 
@@ -368,20 +379,20 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                   <div class="w-full border-t border-zinc-200 dark:border-zinc-800/80"></div>
                 </div>
                 <div class="relative flex justify-center text-xs">
-                  <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-450 dark:text-zinc-600 uppercase tracking-widest text-[8px] font-bold rounded-full">Or use alternative</span>
+                  <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-450 dark:text-zinc-600 uppercase tracking-widest text-[12px] font-bold rounded-full">Or use alternative</span>
                 </div>
               </div>
 
               <div class="grid grid-cols-2 gap-3 mb-3">
-                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[9px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleAiStudio()">
+                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleAiStudio()">
                   AI Studio Key
                 </button>
-                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[9px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleDemo()">
+                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleDemo()">
                   Demo Mode
                 </button>
               </div>
 
-              <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800/50 flex items-center justify-center gap-2 text-[9px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider">
+              <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800/50 flex items-center justify-center gap-2 text-[12px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider">
                 <div class="w-1.5 h-1.5 rounded-full bg-brand-green-500 animate-pulse"></div>
                 <span>Clinician: {{ syncService.currentUserEmail() }}</span>
               </div>
@@ -396,7 +407,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
                 <div class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Confidentiality & Privacy</span>
+                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Confidentiality & Privacy</span>
                 </div>
                 <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
                   Demo Environment Active: All clinical data and consults run in an isolated sandbox. Patient details are fully simulated, ensuring zero transmission or disclosure of actual protected health information (PHI).
@@ -407,7 +418,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
                 <div class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-655 dark:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Good Samaritan Bypass</span>
+                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Good Samaritan Bypass</span>
                 </div>
                 <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
                   In acute crises, bypass the lock screen using the emergency trigger at the bottom. This isolates clinical records, runs offline-first triages, and starts the synchronized 110 BPM chest-compression pacing metronome.
@@ -423,7 +434,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                     <line x1="16" y1="13" x2="8" y2="13"/>
                     <line x1="16" y1="17" x2="8" y2="17"/>
                   </svg>
-                  <span class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">ACM Code of Ethics (No False Data)</span>
+                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">ACM Code of Ethics (No False Data)</span>
                 </div>
                 <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
                   In compliance with ACM Principle 1.3: We prohibit fabrication or falsification of data. Our Medical Auditor AI continuously runs real-time checks on all generated clinical content, flagging any hallucinations or discrepancies against the source transcript.
@@ -433,10 +444,12 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <!-- Ethics Pledge Checkbox -->
               <label class="flex items-start gap-2.5 p-1 cursor-pointer group">
                 <input type="checkbox"
+                       id="pledge-accepted"
+                       name="pledge-accepted"
                        [checked]="pledgeAccepted()"
                        (change)="pledgeAccepted.set(!pledgeAccepted())"
                        class="w-3.5 h-3.5 mt-0.5 shrink-0 rounded border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-black text-[#ef6658] focus:ring-[#ef6658]/30 cursor-pointer transition-colors">
-                <span class="text-[9px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors leading-normal uppercase tracking-wide">
+                <span class="text-[12px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors leading-normal uppercase tracking-wide">
                   I pledge to uphold doctor-patient confidentiality, the ACM Code of Ethics (Principle 1.3: Honesty & No False Data), and Good Samaritan values under professional ethical codes.
                 </span>
               </label>
@@ -445,7 +458,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <div class="flex flex-col gap-2 pt-2">
                 <button (click)="enterApp()"
                         [disabled]="!pledgeAccepted()"
-                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
+                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
                   Accept & Enter System
                 </button>
               </div>
@@ -461,18 +474,18 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <div class="p-3 rounded-xl border border-zinc-200 dark:border-zinc-700/40 bg-zinc-50 dark:bg-zinc-800/40">
                 <div class="flex items-center gap-2 mb-1.5">
                   <span class="text-base">{{ kss.circadian().phaseEmoji }}</span>
-                  <p class="text-[9px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">{{ kss.circadian().phaseLabel }}</p>
+                  <p class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">{{ kss.circadian().phaseLabel }}</p>
                 </div>
-                <p class="text-[10px] text-zinc-600 dark:text-zinc-400 leading-relaxed">{{ kss.circadian().recommendation }}</p>
+                <p class="text-[12px] text-zinc-600 dark:text-zinc-400 leading-relaxed">{{ kss.circadian().recommendation }}</p>
                 <div class="flex items-center gap-3 mt-2 pt-2 border-t border-zinc-200 dark:border-zinc-700/30">
-                  <span class="text-[8px] text-zinc-500 uppercase tracking-widest">Expected alertness</span>
+                  <span class="text-[12px] text-zinc-500 uppercase tracking-widest">Expected alertness</span>
                   <div class="flex gap-0.5">
                     @for (i of [1,2,3,4,5,6,7,8,9]; track i) {
                       <div class="w-3 h-1.5 rounded-full transition-colors"
                            [class]="i <= kss.circadian().expectedKss ? 'bg-brand-green-500' : 'bg-zinc-200 dark:bg-zinc-700'"></div>
                     }
                   </div>
-                  <span class="text-[8px] font-bold"
+                  <span class="text-[12px] font-bold"
                         [class]="kss.circadian().cognitiveLoad === 'optimal' ? 'text-brand-green-600 dark:text-brand-green-400' :
                                  kss.circadian().cognitiveLoad === 'good' ? 'text-brand-blue-600 dark:text-brand-blue-400' :
                                  kss.circadian().cognitiveLoad === 'reduced' ? 'text-brand-amber-600 dark:text-brand-amber-400' : 'text-brand-red-600 dark:text-brand-red-400'">
@@ -483,7 +496,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
 
               <!-- KSS question -->
               <div class="text-center">
-                <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-0.5">Karolinska Sleepiness Scale</p>
+                <p class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-0.5">Karolinska Sleepiness Scale</p>
                 <p class="text-sm font-medium text-zinc-800 dark:text-zinc-100">How alert are you right now?</p>
               </div>
 
@@ -497,10 +510,10 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                             : 'border-zinc-200 dark:border-zinc-800/60 bg-white/50 dark:bg-zinc-900/40 hover:border-zinc-350 dark:hover:border-zinc-600/60 hover:bg-zinc-50 dark:hover:bg-zinc-800/40'">
                     <div class="flex items-center gap-1.5 mb-0.5">
                       <span class="text-sm">{{ item.emoji }}</span>
-                      <span class="text-[11px] font-bold tabular-nums"
+                      <span class="text-[12px] font-bold tabular-nums"
                             [class]="clinicianKssSelected() === item.score ? 'text-brand-green-600 dark:text-brand-green-400' : 'text-zinc-700 dark:text-zinc-300'">{{ item.score }}</span>
                     </div>
-                    <p class="text-[8px] leading-tight"
+                    <p class="text-[12px] leading-tight"
                        [class]="clinicianKssSelected() === item.score ? 'text-brand-green-700 dark:text-brand-green-300' : 'text-zinc-500 dark:text-zinc-400'">{{ item.label }}</p>
                   </button>
                 }
@@ -514,13 +527,13 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                         : kss.readiness()!.combinedAlert === 'caution'
                         ? 'border-brand-amber-500/30 bg-brand-amber-500/[0.03] dark:bg-brand-amber-500/[0.05]'
                         : 'border-brand-green-500/20 bg-brand-green-500/[0.02] dark:bg-brand-green-500/[0.04]'">
-                  <p class="text-[10px] leading-relaxed"
+                  <p class="text-[12px] leading-relaxed"
                      [class]="kss.readiness()!.combinedAlert === 'high-risk' ? 'text-brand-red-700 dark:text-brand-red-300' :
                               kss.readiness()!.combinedAlert === 'caution' ? 'text-brand-amber-700 dark:text-brand-amber-300' : 'text-brand-green-700 dark:text-brand-green-300'">
                     {{ kss.readiness()!.recommendation }}
                   </p>
                   @if (kss.readiness()!.avsReset) {
-                    <p class="text-[8px] text-zinc-500 dark:text-zinc-500 mt-1.5 italic">Suggested: {{ kss.readiness()!.avsReset!.wave | uppercase }} reset · {{ kss.readiness()!.avsReset!.durationMin }} min · {{ kss.readiness()!.avsReset!.bpm }} BPM</p>
+                    <p class="text-[12px] text-zinc-500 dark:text-zinc-500 mt-1.5 italic">Suggested: {{ kss.readiness()!.avsReset!.wave | uppercase }} reset · {{ kss.readiness()!.avsReset!.durationMin }} min · {{ kss.readiness()!.avsReset!.bpm }} BPM</p>
                   }
                 </div>
               }
@@ -529,11 +542,11 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <div class="flex flex-col gap-2">
                 <button (click)="gotoEthics()"
                         [disabled]="!clinicianKssSelected()"
-                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[10px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
+                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
                   {{ kss.readiness()?.combinedAlert === 'high-risk' ? 'Acknowledge & Continue' : 'Continue' }}
                 </button>
                 <button (click)="gotoEthics()"
-                        class="text-[9px] text-zinc-500 dark:text-zinc-650 hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors text-center w-full">
+                        class="text-[12px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors text-center w-full">
                   Skip assessment
                 </button>
               </div>
@@ -543,7 +556,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
 
           <!-- Animal Comfort Protocols Lock/Splash Integration -->
           <div class="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 text-left">
-            <p class="text-[9px] font-bold uppercase tracking-wider text-zinc-550 dark:text-zinc-400 mb-2 flex items-center gap-1.5">
+            <p class="text-[12px] font-bold uppercase tracking-wider text-zinc-550 dark:text-zinc-400 mb-2 flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5 text-amber-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
               </svg>
@@ -591,19 +604,19 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
           <span>Good Samaritan Mode (Bypass)</span>
         </button>
 
-        <p class="text-[9px] text-zinc-555 dark:text-zinc-500 mt-8 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
+        <p class="text-[12px] text-zinc-555 dark:text-zinc-500 mt-8 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
 
       </div>
 
       <!-- Secondary Agent Persona Card (Day-based Mascot) -->
       @if (activeSecondaryAgent(); as agent) {
-        <div class="absolute bottom-20 right-8 z-30 flex items-center gap-3 bg-white/95 dark:bg-zinc-950/80 px-4 py-3 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl animate-in slide-in-from-right-8 duration-[800ms] pointer-events-auto">
+        <div class="absolute bottom-20 right-8 z-30 hidden md:flex items-center gap-3 bg-white/95 dark:bg-zinc-950/80 px-4 py-3 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl animate-in slide-in-from-right-8 duration-[800ms] pointer-events-auto">
           <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl select-none" [style.background-color]="agent.accent + '22'" [style.color]="agent.accent">
             {{ agent.emoji }}
           </div>
           <div class="flex flex-col">
-            <span class="text-[10px] font-bold text-zinc-900 dark:text-zinc-100">{{ agent.name }} (Squadron Assistant)</span>
-            <span class="text-[9px] text-zinc-500 dark:text-zinc-400 italic">"{{ agent.msg }}"</span>
+            <span class="text-[12px] font-bold text-zinc-900 dark:text-zinc-100">{{ agent.name }} (Squadron Assistant)</span>
+            <span class="text-[12px] text-zinc-500 dark:text-zinc-400 italic">"{{ agent.msg }}"</span>
           </div>
         </div>
       }
@@ -681,7 +694,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
             to bottom,
             #080e1a 0%,
             #131024 50%,
-            #0b040a 100__
+            #0b040a 100%
         ) !important;
     }
 
@@ -822,7 +835,7 @@ export class SecureSplashComponent implements OnInit {
     return personas[day];
   });
   apiKeyStr = signal('');
-  pin = signal('');
+  pin = '';
   showPassword = signal(false);
   errorMsg = signal('');
   isChecking = signal(false);
@@ -1033,20 +1046,6 @@ export class SecureSplashComponent implements OnInit {
       const yPx = window.innerHeight - ((item.bottom / 100) * window.innerHeight);
       this.triggerParticleBurst(xPx, yPx, '#3ebc9e', 12);
     }
-
-    if (this.gameScore() >= 5) {
-      this.gameWon.set(true);
-      // Play a success message via native SpeechSynthesis
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.speak(new SpeechSynthesisUtterance('Welcome to the Clinical Sanctuary.'));
-      }
-      
-      // Auto unlock as a reward!
-      setTimeout(() => {
-        this.session.isLocked.set(false);
-        this.session.resetIdleTimer();
-      }, 1000);
-    }
   }
 
   generateDecorations() {
@@ -1122,6 +1121,7 @@ export class SecureSplashComponent implements OnInit {
     });
 
     effect(() => {
+      if (!isPlatformBrowser(this.platformId)) return;
       const canvas = this.gestureCanvasRef()?.nativeElement;
       if (canvas && !this.ctx) {
         this.ctx = canvas.getContext('2d');
@@ -1566,15 +1566,12 @@ export class SecureSplashComponent implements OnInit {
           this.session.resetIdleTimer();
           this.clearDrawing();
           this.errorMsg.set('');
-          if (this.hasApiKey()) {
-            this.gotoKss();
-          }
         }, 500);
       } else {
         this.triggerParticleBurst(110, 110, '#ef4444', 25);
         this.playErrorChime();
         this.gestureError.set(true);
-        this.errorMsg.set('Drawing not recognized. Draw a beach item (like a Palm Tree, Coconut, Wave, or "X") to unlock.');
+        this.errorMsg.set('Drawing not recognized. Draw a beach item (like a Palm Tree, Coconut, Wave, Seagull, Shell, Starfish, Sun, Crab, or "X") to unlock.');
         
         setTimeout(() => {
           if (this.gestureError()) {
@@ -1595,6 +1592,7 @@ export class SecureSplashComponent implements OnInit {
   }
 
   onPinChange(val: string) {
+    console.log('[onPinChange] Called. val =', JSON.stringify(val));
     // Enable/resume AudioContext automatically on first keypress
     if (val.length === 1 && !this.isAvsPlaying()) {
       this.startAmbientSoundscape();
@@ -1620,9 +1618,6 @@ export class SecureSplashComponent implements OnInit {
       this.stopAmbientSoundscape();
       this.session.isLocked.set(false);
       this.session.resetIdleTimer();
-      if (this.hasApiKey()) {
-        this.gotoKss();
-      }
     } else {
       this.playErrorChime();
       this.errorMsg.set('Biometric verification failed.');
@@ -1631,20 +1626,18 @@ export class SecureSplashComponent implements OnInit {
   }
 
   verifyPin() {
+    console.log('[verifyPin] Called. this.pin =', JSON.stringify(this.pin));
     this.errorMsg.set('');
-    if (this.pin() === '1234') {
+    if (this.pin === '1234') {
        this.playSuccessChime();
        this.stopAmbientSoundscape();
-       this.session.isLocked.set(false);
-       this.session.resetIdleTimer();
-       this.pin.set('');
-       if (this.hasApiKey()) {
-         this.gotoKss();
-       }
+        this.session.isLocked.set(false);
+        this.session.resetIdleTimer();
+        this.pin = '';
     } else {
        this.playErrorChime();
        this.errorMsg.set('Invalid Access Code.');
-       this.pin.set('');
+       this.pin = '';
        setTimeout(() => this.pinInputRef()?.nativeElement.focus(), 50);
     }
   }
@@ -1687,6 +1680,9 @@ export class SecureSplashComponent implements OnInit {
           // Clear any pending states
           this._pendingDemo = false;
           this._pendingAiStudio = false;
+          if (!this.hasApiKey()) {
+            this._pendingDemo = true;
+          }
           // Cleanly navigate to key setup or Ethics Onboarding
           this.gotoKss();
         }

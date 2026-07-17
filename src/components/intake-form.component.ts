@@ -157,7 +157,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
                   @if(dictation.permissionError(); as error) {
                       <div class="flex items-center gap-2 text-brand-red-600 dark:text-brand-red-400 bg-brand-red-50 dark:bg-brand-red-900/30 px-3 py-2 rounded-md border border-brand-red-100 dark:border-brand-red-800/50">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                        <p class="text-[11px] font-medium">{{ error }}</p>
+                        <p class="text-[12px] font-medium">{{ error }}</p>
                       </div>
                   }
                 </div>

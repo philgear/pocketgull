@@ -39,10 +39,11 @@ gcloud run deploy $SERVICE_NAME \
     --project $PROJECT_ID \
     --no-allow-unauthenticated \
     --set-env-vars NODE_ENV=production \
-    --cpu 2 \
-    --memory 2Gi \
+    --cpu 1 \
+    --memory 1Gi \
     --min-instances 0 \
-    --max-instances 2
+    --max-instances 2 \
+    --update-labels env=production,team=clinical-squad,component=scoring-api
 
 echo ""
 echo "Deployment Complete!"

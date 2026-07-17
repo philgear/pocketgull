@@ -130,7 +130,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
           </div>
 
           <!-- 2D Direction Controls (Local to component as they only apply to 2D) -->
-          <div class="absolute bottom-4 right-4 flex text-[8px] font-bold tracking-widest uppercase gap-1 z-20">
+          <div class="absolute bottom-4 right-4 flex text-[12px] font-bold tracking-widest uppercase gap-1 z-20">
             <button (click)="view.set('front')" 
                     class="w-8 h-8 border transition-all flex items-center justify-center rounded-sm shadow-sm"
                     [class.bg-black]="view() === 'front'"

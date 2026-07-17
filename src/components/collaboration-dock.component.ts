@@ -34,7 +34,7 @@ import { CollaborationService } from '../services/collaboration.service';
             <!-- Active Clinicians Avatars -->
             <div class="flex -space-x-2">
               @for (clinician of activeClinicians(); track clinician) {
-                <div class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-[10px] font-bold border-2 border-white dark:border-zinc-900 shadow-sm" title="{{ clinician }}">
+                <div class="w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-[12px] font-bold border-2 border-white dark:border-zinc-900 shadow-sm" title="{{ clinician }}">
                   {{ getInitials(clinician) }}
                 </div>
               }
@@ -53,7 +53,7 @@ import { CollaborationService } from '../services/collaboration.service';
               <div class="flex flex-col gap-1 max-w-[85%]" 
                    [class.self-end]="isSelf(note.clinicianName)" 
                    [class.self-start]="!isSelf(note.clinicianName)">
-                <span class="text-[10px] text-gray-400 px-1" [class.text-right]="isSelf(note.clinicianName)">
+                <span class="text-[12px] text-gray-400 px-1" [class.text-right]="isSelf(note.clinicianName)">
                   {{ note.clinicianName }} • {{ formatTime(note.timestamp) }}
                 </span>
                 <div class="px-3 py-2 rounded-2xl text-sm shadow-sm"
@@ -104,7 +104,7 @@ import { CollaborationService } from '../services/collaboration.service';
         
         <!-- Notification Badge -->
         @if (!isOpen() && unreadCount() > 0) {
-          <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-white shadow-sm animate-bounce">
+          <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[12px] font-bold text-white border-2 border-white shadow-sm animate-bounce">
             {{ unreadCount() }}
           </span>
         }

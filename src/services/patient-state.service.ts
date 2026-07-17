@@ -51,6 +51,13 @@ export class PatientStateService {
   readonly isDemoMode = signal<boolean>(false);
   readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
 
+  // --- Patient Metadata State (for Demo Mode and Context) ---
+  readonly patientId = signal<string | null>(null);
+  readonly patientName = signal<string>('');
+  readonly patientAge = signal<number>(0);
+  readonly patientGender = signal<string>('');
+  readonly patientHistory = signal<HistoryEntry[]>([]);
+
   // --- AVS Neuro-Therapy Synchronized State ---
   readonly isAvsSessionActive = signal<boolean>(false);
   readonly avsBreathingRate = signal<number>(6.0);
@@ -614,6 +621,11 @@ export class PatientStateService {
     this.viewingPastVisit.set(null);
     this.activePhilosophy.set('western');
     this.ayurvedicStatus.set({});
+    this.patientId.set(null);
+    this.patientName.set('');
+    this.patientAge.set(0);
+    this.patientGender.set('');
+    this.patientHistory.set([]);
   }
 
   /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
@@ -639,6 +651,14 @@ export class PatientStateService {
   /** Loads the state of a specific patient. */
   loadState(state: IPatientState) {
     this.clearState(); // Start from a clean slate
+    
+    const patient = state as any;
+    if (patient.id) this.patientId.set(patient.id);
+    if (patient.name) this.patientName.set(patient.name);
+    if (patient.age) this.patientAge.set(patient.age);
+    if (patient.gender) this.patientGender.set(patient.gender);
+    if (patient.history) this.patientHistory.set(patient.history);
+
     this.issues.set(state.issues);
         if (state.patientGoals) this.patientGoals.set(state.patientGoals);
         if (state.dietaryProtocol) this.dietaryProtocol.set(state.dietaryProtocol);
@@ -653,6 +673,11 @@ export class PatientStateService {
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
     if (state.activePhilosophy) this.activePhilosophy.set(state.activePhilosophy);
     if (state.ayurvedicStatus) this.ayurvedicStatus.set(state.ayurvedicStatus);
+    if ((state as any).biometricHistory) {
+      this.biometricHistory.set((state as any).biometricHistory);
+    } else {
+      this.biometricHistory.set([]);
+    }
   }
 
   /** Returns the current patient state for saving. */
@@ -671,7 +696,8 @@ export class PatientStateService {
             shoppingList: this.shoppingList(),
             activePhilosophy: this.activePhilosophy(),
             ayurvedicStatus: this.ayurvedicStatus(),
-        };
+            biometricHistory: this.biometricHistory(),
+        } as any;
   }
 
 

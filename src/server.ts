@@ -233,8 +233,8 @@ app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
 
   const isProd = process.env['NODE_ENV'] === 'production';
-  const scriptSrc = isProd ? `'self' 'nonce-${nonce}'` : `'self' 'nonce-${nonce}' 'unsafe-inline' 'unsafe-eval'`;
-  let csp = `default-src 'self'; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://fonts.gstatic.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';`;
+  const scriptSrc = isProd ? `'self' 'nonce-${nonce}'` : `'self' 'unsafe-inline' 'unsafe-eval'`;
+  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -588,7 +588,7 @@ app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, r
 // Server-Side Streaming Endpoint
 app.post('/api/ai/stream', express.json(), async (req, res) => {
   try {
-    const { patientData, systemInstruction, model, temperature } = req.body;
+    const { patientData, systemInstruction, model, temperature, lens } = req.body;
     let rawModel: string;
     try {
       rawModel = normalizeAndValidateModel(model);
@@ -625,26 +625,32 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
           Type = ImportedType;
       }
 
+      const configOptions: any = {
+          systemInstruction: systemInstruction,
+          temperature: temperature ?? 0.1
+      };
+
+      // Lean Tools: Only supply tools to lenses that require biochemistry / sequence analysis
+      if (lens === 'Precision Nutrients' || lens === 'Functional Protocols') {
+          configOptions.tools = [{
+              functionDeclarations: [{
+                  name: "protein_sequence_similarity_search",
+                  description: "Searches for homologous protein sequences using MMseqs2 (fast). Use this when analyzing a protein sequence to find homologues and infer protein function.",
+                  parameters: {
+                      type: Type.OBJECT,
+                      properties: {
+                          sequence: { type: Type.STRING, description: "The raw amino acid sequence to search" }
+                      },
+                      required: ["sequence"]
+                  }
+              }]
+          }];
+      }
+
       const streamingResponse = await ai.models.generateContentStream({
           model: rawModel.includes('gemini-2.0-flash') ? rawModel : 'gemini-2.0-flash-exp', // Enforce 2.0 flash
           contents: [{ role: 'user', parts: [{ text: patientData }] }],
-          config: {
-              systemInstruction: systemInstruction,
-              temperature: temperature ?? 0.1,
-              tools: [{
-                  functionDeclarations: [{
-                      name: "protein_sequence_similarity_search",
-                      description: "Searches for homologous protein sequences using MMseqs2 (fast). Use this when analyzing a protein sequence to find homologues and infer protein function.",
-                      parameters: {
-                          type: Type.OBJECT,
-                          properties: {
-                              sequence: { type: Type.STRING, description: "The raw amino acid sequence to search" }
-                          },
-                          required: ["sequence"]
-                      }
-                  }]
-              }]
-          }
+          config: configOptions
       });
 
       for await (const chunk of streamingResponse) {
@@ -824,7 +830,7 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
 });
 
 // JSON File Database Configuration
-const dataDir = join(rootDir, 'data');
+const dataDir = join(process.cwd(), 'data');
 const patientsDbPath = join(dataDir, 'patients.json');
 
 // Ensure data directory and empty DB exists
@@ -950,6 +956,11 @@ app.use((req, res, next) => {
         const nonce = res.locals['nonce'] || '';
         const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${safeKey}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
+        
+        // Inject nonces into all inline script elements to comply with CSP
+        if (nonce) {
+          html = html.replace(/<script(?![^>]*nonce=)/g, `<script nonce="${nonce}"`);
+        }
 
         const modRes = new Response(html, {
           status: response.status,

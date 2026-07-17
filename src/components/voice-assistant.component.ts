@@ -104,7 +104,7 @@ export interface IChatEntry {
             <!-- Minimal Pocket Header -->
             <div class="flex items-center justify-between px-4 py-2 shrink-0 z-20 relative bg-white dark:bg-[#09090b] border-b border-gray-100 dark:border-zinc-800/50">
                 <div class="flex items-center pointer-events-none pl-2">
-                    <span class="font-bold text-gray-400 dark:text-zinc-500 tracking-[0.2em] text-[9px] uppercase">Live Session</span>
+                    <span class="font-bold text-gray-400 dark:text-zinc-500 tracking-[0.2em] text-[12px] uppercase">Live Session</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button
@@ -191,14 +191,14 @@ export interface IChatEntry {
                     <div #transcriptContainer class="relative z-10 flex-1 overflow-y-auto w-full scroll-smooth pt-8 pb-48 px-4 lg:px-8">
                         <div class="max-w-3xl mx-auto space-y-12">
                             <!-- Telemetry Transcript -->
-                            <div class="font-mono text-sm space-y-6 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md p-6 rounded-2xl border border-white/20 dark:border-zinc-800/30 shadow-lg">
+                            <div class="font-mono text-base space-y-6 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md p-6 rounded-2xl border border-white/20 dark:border-zinc-800/30 shadow-lg">
                                 @for (entry of parsedTranscript(); track $index) {
                                     <div class="group relative pl-4 border-l-2 transition-colors duration-300 chat-entry" 
                                          [class.border-blue-500]="entry.role === 'model'" 
                                          [class.border-green-500]="entry.role === 'user'">
                                         
                                         <!-- Header line -->
-                                        <div class="text-[10px] uppercase font-bold tracking-widest mb-1.5 flex justify-between items-center opacity-60">
+                                        <div class="text-[12px] md:text-sm uppercase font-bold tracking-widest mb-1.5 flex justify-between items-center opacity-60">
                                             <span>{{entry.role === 'model' ? 'SYS.INTELLIGENCE' : 'USR.MIC'}}_</span>
                                             
                                             <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
@@ -207,11 +207,11 @@ export interface IChatEntry {
                                                     <button (click)="actionInsert(entry.text)" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
                                                     <button (click)="actionAnchor(entry.text)" class="hover:text-black dark:hover:text-white" title="Anchor to Memory Palace">[ANCHOR]</button>
                                                  }
-                                            </div>
+                                             </div>
                                         </div>
 
                                         <!-- Content -->
-                                        <div class="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-a:text-blue-500 text-gray-800 dark:text-gray-200">
+                                        <div class="prose prose-base md:prose-lg dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-a:text-blue-500 text-gray-800 dark:text-gray-200 text-sm md:text-base leading-relaxed">
                                             <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
                                         </div>
 
@@ -220,19 +220,19 @@ export interface IChatEntry {
                                              <div class="rm-panel mt-3 opacity-90">
                                                  @for (card of entry.richCards; track card.query) {
                                                     <!-- Simplified rendering placeholder for rich media -->
-                                                    <div class="text-xs bg-black/5 dark:bg-white/5 p-2 rounded border border-black/10 dark:border-white/10 my-1">
+                                                    <div class="text-sm bg-black/5 dark:bg-white/5 p-2 rounded border border-black/10 dark:border-white/10 my-1">
                                                         [MEDIA_LINK: {{ card.kind }} | {{ card.query }}]
                                                     </div>
                                                  }
                                              </div>
-                                        }
+                                         }
                                     </div>
                                 }
                                 
                                 <!-- Thinking Indicator -->
                                 @if (agentState() === 'processing') {
                                     <div class="pl-4 border-l-2 border-purple-500 chat-entry">
-                                        <div class="text-[10px] uppercase font-bold tracking-widest mb-1.5 opacity-60 animate-pulse">
+                                        <div class="text-[12px] md:text-sm uppercase font-bold tracking-widest mb-1.5 opacity-60 animate-pulse">
                                             SYS.PROCESSING_
                                         </div>
                                         <div class="text-gray-500 dark:text-zinc-400 animate-pulse">
@@ -904,7 +904,12 @@ Only include a rich-media block when the user explicitly requests visual or rese
         this._appendUser(message, userDisplayHtml);
 
         try {
-            if (this.live.isConnected() && files.length === 0 && !this.isResearchMode()) {
+            if (this.state.isDemoMode()) {
+                const responseText = this.getDemoMockResponse(message);
+                this._accumulateModelText(responseText);
+                this._finalizeModelTurn();
+                this.speak(responseText);
+            } else if (this.live.isConnected() && files.length === 0 && !this.isResearchMode()) {
                 // Send text over WebSockets natively if connected to multimodal live AND no files or grounding are required
                 this.live.sendText(message);
             } else {
@@ -938,6 +943,39 @@ Only include a rich-media block when the user explicitly requests visual or rese
             this.isResearchMode.set(false);
             this.scrollToBottom();
         }
+    }
+
+    getDemoMockResponse(message: string): string {
+        const lower = message.toLowerCase();
+        if (lower.includes('rationale') || lower.includes('explain') || lower.includes('why')) {
+            return `**Clinical Rationale (Simplified):**
+
+The patient's current presentation demonstrates a classic intersection of localized mechanical compression (lumbar radiculopathy) and systemic physiological stress (elevated resting heart rate of 88 bpm and nocturnal hypoxemia at 93% SpO₂). 
+
+Our primary therapeutic strategy focuses on:
+1. **Mechanical Decompression:** Guided physical therapy and targeted lumbar distraction to relieve root compression.
+2. **Autonomic Rebalancing:** Improving sleep quality and nocturnal breathing patterns to stabilize blood oxygen levels. Reducing baseline sympathetic tone will help lower the resting heart rate and support overall functional recovery.`;
+        }
+
+        if (lower.includes('evidence') || lower.includes('critical') || lower.includes('diagnostic')) {
+            return `**Critical Evidence Breakdown:**
+
+1. **Biometric Drift:** Resting heart rate has elevated to **88 bpm** (historical baseline was 72 bpm), signifying increased sympathetic dominance or physiological stress.
+2. **Nocturnal Hypoxemia:** Sleep SpO₂ dips to **93%**, which can exacerbate systemic inflammatory pathways and delay muscle/nerve recovery.
+3. **Mechanical Signs:** Clinical exam notes active **lumbar radiculopathy** (L4-S1 nerve root distribution), limiting mobility and contributing to nocturnal arousal.`;
+        }
+
+        if (lower.includes('intervention') || lower.includes('alternative') || lower.includes('options')) {
+            return `**Alternative Intervention Pathways:**
+
+* **Western Clinical:** Focuses on oral daily dose of prescription Metformin & Statin therapy for direct glycemic and vascular control.
+* **Eastern (TCM) Lens:** Recommends 2x weekly seasonal acupuncture and Xiao Ke Wan (herbs) to address meridian congestions and peripheral nerve sensation.
+* **Ayurvedic Paradigm:** Recommends daily morning Dinacharya (circadian routines), Nisha Amalaki (curcumin/amla) for antioxidant defense, and daily yoga to reduce cortisol-driven glucose spikes.`;
+        }
+
+        return `This is a simulated response in **Demo Mode**. 
+
+To enable full interactive consultations, custom question answering, and live voice streaming with Google Gemini, please click **"Enter API Key"** on the home screen banner to activate cloud engines.`;
     }
 
     toggleListening() {

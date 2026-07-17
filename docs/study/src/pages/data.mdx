@@ -44,6 +44,50 @@ Pocket Gull follows a **Privacy by Design** architecture:
 - **Transient AI Processing** — Clinical context transmitted to <DocNode term="Vertex AI Enterprise" category="Google Cloud" hint="Regional Vertex AI endpoint. Patient context is used for immediate inference only — no data retained for model training." link="https://cloud.google.com/vertex-ai/docs" linkLabel="Vertex AI Docs →" icon="https://www.gstatic.com/devrel-devsite/prod/v0e0f589edd85502a40d78d7d0825db8ea5ef3b99ab4070381571c97ab7df9861/cloud/images/favicons/onecloud/favicon.ico">Vertex AI</DocNode> and <DocNode term="@google/adk" category="Google · Agent Development Kit" hint="Multi-agent orchestration framework. Agents process clinical context in-memory; no remote persistence." link="https://google.github.io/adk-docs/" linkLabel="ADK Docs →" icon="https://ai.google.dev/favicon.ico">ADK</DocNode> agents is used solely for immediate generation. Data is not retained by the application backend.
 - **Real-time Indicators** — Visual "Saving…" / "Saved ✔" feedback confirms local persistence status.
 
+```mermaid
+graph TD
+    Clinician([Clinician Input]) -->|Intake / Voice / 3D Map| App[Pocket Gull Web UI]
+    
+    subgraph Client Browser [Client Browser Sandbox]
+        App <-->|State Signals| State[PatientState Service]
+        State <-->|Local Storage| Session[(SessionStorage)]
+        State -->|Export / Print| PDF[jsPDF Clinical Stationery]
+        State -->|Base64 JSON| FHIR[FHIR R4 Bundle Export]
+    end
+
+    subgraph Server Proxy [Express Proxy Layer]
+        App -->|Proxy Request| Proxy[Express Backend /api]
+    end
+
+    subgraph ExtNIH [External Authoritative Repositories]
+        Proxy -->|1. Anonymize & Strip PHI| PubMed[NCBI PubMed API]
+        App -->|2. Anonymize & Strip PHI| CSE[Google CSE API]
+    end
+
+    subgraph VertexCloud [Vertex AI Enterprise Security Endpoint]
+        Proxy -->|3. Transient Inference Only<br/>No Training Retention| Vertex[Vertex AI API Endpoint]
+    end
+```
+
+---
+
+## 🤖 Machine Learning Triage Pipeline
+
+Pocket Gull leverages a local machine learning sidecar to score and categorize patient clinical risk levels based on physiological metrics:
+
+### 1. Estimator & Features
+A `RandomForestClassifier` is trained on engineered clinical features extracted from standard vitals and demographics:
+*   **Heart Rate (HR)** (BPM)
+*   **Blood Pressure (BP)** (Systolic & Diastolic)
+*   **Oxygen Saturation (SpO2)** (%)
+*   **Age** (years)
+
+### 2. Probability Calibration
+Raw classification scores are calibrated using a `CalibratedClassifierCV` wrapper (Brier score evaluated) to align raw model thresholds directly to standard diagnostic probability scores (Stable vs. Critical Event).
+
+### 3. Clinical Feature Governance
+To comply with medical safety guidelines, features are validated to ensure that Oxygen Saturation (`spo2`) remains the highest weighted predictor in triage classifications, preventing false negatives on acute respiratory events.
+
 ---
 
 ## HIPAA De-identification & Compliance Auditing

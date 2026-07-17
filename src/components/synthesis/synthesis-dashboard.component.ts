@@ -50,10 +50,10 @@ import { InsightGridComponent } from './insight-grid.component';
           <header class="w-full flex items-center justify-between pb-6 border-b border-gray-200 dark:border-zinc-800/50">
              <div>
                <h2 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Interactive Synthesizer</h2>
-               <p class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-0.5">AI-Powered Distillation</p>
+               <p class="text-[12px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mt-0.5">AI-Powered Distillation</p>
              </div>
              
-             <button class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors border border-gray-300 dark:border-zinc-800 rounded hover:bg-gray-100 dark:hover:bg-zinc-900" (click)="reset()">
+             <button class="px-3 py-1.5 text-[12px] font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors border border-gray-300 dark:border-zinc-800 rounded hover:bg-gray-100 dark:hover:bg-zinc-900" (click)="reset()">
                Reset Canvas
              </button>
           </header>

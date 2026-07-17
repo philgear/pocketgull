@@ -131,7 +131,22 @@ export class NanoProvider implements IIntelligenceProvider {
     return { status: 'Verified efficiently by Gemini Nano (On-Device)', issues: [] };
   }
 
-  async translateReadingLevel(text: string, level: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'): Promise<string> {
+  async translateReadingLevel(
+    text: string,
+    level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+    cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+    language?: string
+  ): Promise<string> {
+    let resolvedCognitive = cognitiveLevel || 'standard';
+    let resolvedLang = language || 'english';
+    if (level) {
+      if (['simplified', 'dyslexia', 'child'].includes(level)) {
+        resolvedCognitive = level as 'simplified' | 'dyslexia' | 'child';
+      } else if (['spanish', 'german', 'french', 'mandarin', 'hindi'].includes(level)) {
+        resolvedLang = level;
+      }
+    }
+
     try {
       // 1. Try native Translation API
       const langCodes: Record<string, string> = {
@@ -141,25 +156,25 @@ export class NanoProvider implements IIntelligenceProvider {
         mandarin: 'zh',
         hindi: 'hi'
       };
-      const targetLang = langCodes[level];
+      const targetLang = langCodes[resolvedLang.toLowerCase()] || (resolvedLang.toLowerCase() !== 'english' ? resolvedLang : null);
       if (targetLang && typeof translation !== 'undefined') {
         const canTranslate = await translation.canTranslate({ sourceLanguage: 'en', targetLanguage: targetLang });
         if (canTranslate !== 'no') {
           const translator = await translation.createTranslator({ sourceLanguage: 'en', targetLanguage: targetLang });
-          return await translator.translate(text);
+          text = await translator.translate(text);
         }
       }
 
       // 2. Try native Writing Assistant Rewriter API
-      if (['simplified', 'child', 'dyslexia'].includes(level) && typeof ai !== 'undefined' && ai.rewriter) {
+      if (resolvedCognitive !== 'standard' && typeof ai !== 'undefined' && ai.rewriter) {
         const capabilities = await ai.rewriter.capabilities();
         if (capabilities.available !== 'no') {
           const rewriter = await ai.rewriter.create({
-            tone: level === 'child' ? 'informal' : 'formal',
-            length: level === 'simplified' ? 'short' : 'as-is'
+            tone: resolvedCognitive === 'child' ? 'informal' : 'formal',
+            length: resolvedCognitive === 'simplified' ? 'short' : 'as-is'
           });
           return await rewriter.rewrite(text, {
-            context: `Adapt this medical explanation to a ${level} reading level.`
+            context: `Adapt this medical explanation to a ${resolvedCognitive} cognitive level.`
           });
         }
       }
@@ -167,17 +182,17 @@ export class NanoProvider implements IIntelligenceProvider {
       // 3. Fallback to basic Prompt API
       await this.ensureAiAvailable();
       const session = await ai!.languageModel!.create({
-        systemPrompt: "You are a clinical educator. Translate the medical text into the requested reading level. Output only the translation."
+        systemPrompt: "You are a clinical educator. Translate/rewrite the medical text into the requested cognitive level and target language. Output only the rewritten translation."
       });
-      return await session.prompt(`Translate this to ${level} reading level:\n\n${text}`);
+      return await session.prompt(`Adapt this text to a ${resolvedCognitive} cognitive level and translate to ${resolvedLang}:\n\n${text}`);
     } catch (e) {
       console.warn('[NanoProvider] Native translation/rewriter API failed, falling back to Prompt API:', e);
       try {
         await this.ensureAiAvailable();
         const session = await ai!.languageModel!.create({
-          systemPrompt: "You are a clinical educator. Translate the medical text into the requested reading level. Output only the translation."
+          systemPrompt: "You are a clinical educator. Translate/rewrite the medical text into the requested cognitive level and target language. Output only the rewritten translation."
         });
-        return await session.prompt(`Translate this to ${level} reading level:\n\n${text}`);
+        return await session.prompt(`Adapt this text to a ${resolvedCognitive} cognitive level and translate to ${resolvedLang}:\n\n${text}`);
       } catch {
         return text;
       }

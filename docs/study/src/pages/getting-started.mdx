@@ -55,6 +55,27 @@ npm run preview
 
 The production build outputs to `dist/` with full <DocNode term="Angular SSR" category="Google · Angular Team" hint="Server-Side Rendering — Angular renders the initial page on the Express.js server, then hydrates client-side. Faster first paint and SEO." link="https://angular.dev/guide/ssr" linkLabel="SSR Guide →" icon="https://angular.dev/favicon.ico">SSR</DocNode> support.
 
+```mermaid
+sequenceDiagram
+    actor Developer
+    participant Git as Git Repo
+    participant Local as Local Env (v24.x)
+    participant Husky as Husky Hooks
+    participant CloudRun as Google Cloud Run
+
+    Developer->>Git: 1. git clone & npm install
+    Developer->>Local: 2. npm run dev (http://localhost:4200)
+    Developer->>Local: 3. Make Code Changes
+    Developer->>Husky: 4. git commit (Husky Trigger)
+    activate Husky
+    Husky->>Husky: Run tsc --noEmit (Type check)
+    Husky->>Husky: Run vitest (Unit tests)
+    Husky->>Husky: Run phi_compliance_scanner.py (HIPAA Check)
+    deactivate Husky
+    Developer->>Local: 5. npm run build (Produce dist/)
+    Developer->>CloudRun: 6. gcloud run deploy (gen-lang-client-0540208645)
+```
+
 ---
 
 ## Running Security & Safety Tests

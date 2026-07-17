@@ -177,10 +177,11 @@ app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
     "default-src 'self'; " +
+    "worker-src 'self' blob:; " +
     `script-src 'self' 'nonce-${nonce}'; ` +
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
     "img-src 'self' https: data:; " +
-    "font-src 'self' https://fonts.gstatic.com; " +
+    "font-src 'self'; " +
     "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; " +
     "frame-src 'self' https://www.ncbi.nlm.nih.gov https://insightspark-82c75.web.app; " +
     "frame-ancestors 'self'; " +
@@ -340,7 +341,7 @@ app.get('/health', (req, res) => {
 });
 
 // JSON File Database Configuration
-const dataDir = join(rootDir, 'data');
+const dataDir = join(process.cwd(), 'data');
 const patientsDbPath = join(dataDir, 'patients.json');
 
 // Ensure data directory and empty DB exists
@@ -439,6 +440,10 @@ app.get(/(.*)/, (req, res) => {
         const nonce = res.locals.nonce || '';
         const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${geminiApiKeyCached}";</script>\n</head>`;
         html = html.replace('</head>', scriptTag);
+      }
+      const nonce = res.locals.nonce || '';
+      if (nonce) {
+        html = html.replace(/<script(?![^>]*nonce=)/g, `<script nonce="${nonce}"`);
       }
       res.setHeader('Content-Type', 'text/html');
       return res.status(200).send(html);

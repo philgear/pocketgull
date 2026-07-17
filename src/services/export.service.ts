@@ -691,6 +691,8 @@ export class ExportService {
       </div>`;
     }
 
+    const isDyslexia = !!(translationMatrix && translationMatrix.levelName && translationMatrix.levelName.toLowerCase().includes('dyslexia'));
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1101,12 +1103,23 @@ export class ExportService {
     /* ─── Print Overrides ───────────────────────────── */
     @media print {
       html { font-size: 9.5pt; }
-      body { background: white !important; }
+      body { 
+        background: white !important; 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+      }
       body::before, body::after { position: absolute !important; }
       .page-wrap { padding: 0; max-width: 100%; }
       .matrix-analysis { page-break-inside: avoid; break-inside: avoid; margin-bottom: 20px; }
       h1, h2, h3, h4, h5 { page-break-after: avoid; break-after: avoid; }
       p, li, tr { page-break-inside: avoid; break-inside: avoid; }
+      
+      /* Preserve background colors and borders in PDF and paper output */
+      .vital-chip, .condition-tag, .care-plan-section, .care-plan-header, .matrix-analysis, blockquote {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
       @page {
         size: letter portrait;
         margin: 0.75in 0.75in 1in 0.75in;
@@ -1154,9 +1167,21 @@ export class ExportService {
     @media print { .print-bar { display: none !important; } }
     .main-content { padding-top: 56px; }
     @media print { .main-content { padding-top: 0; } }
+
+    /* ─── Dyslexia-Friendly Print Styles ─── */
+    body.dyslexia-mode {
+      letter-spacing: 0.12em !important;
+      word-spacing: 0.18em !important;
+    }
+    body.dyslexia-mode .care-plan-body p,
+    body.dyslexia-mode .care-plan-body li {
+      font-size: 11.5pt !important;
+      line-height: 1.85 !important;
+      font-weight: 400 !important;
+    }
   </style>
 </head>
-<body>
+<body class="${isDyslexia ? 'dyslexia-mode' : ''}">
   <div class="print-bar">
     <span class="print-bar-title">Pocket Gull Care Plan — ${patientName}</span>
     <div class="print-bar-actions">

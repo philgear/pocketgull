@@ -111,7 +111,7 @@ const ICONS: Record<string, string> = {
                 <div class="p-4 bg-white dark:bg-[#09090b] border border-gray-100 dark:border-zinc-800 border-l-4 border-l-brand-blue-400 rounded">
                   <div>
                     <p class="text-xs font-bold text-brand-blue-500 uppercase tracking-[0.15em]">{{ entry.date }}</p>
-                    <p class="text-sm text-gray-800 dark:text-zinc-300 mt-1 leading-relaxed whitespace-pre-wrap font-mono text-[11px] opacity-80">{{ entry.summary }}</p>
+                    <p class="text-sm text-gray-800 dark:text-zinc-300 mt-1 leading-relaxed whitespace-pre-wrap font-mono text-[12px] opacity-80">{{ entry.summary }}</p>
                   </div>
                 </div>
               }
@@ -164,7 +164,7 @@ const ICONS: Record<string, string> = {
                         [class.dark:border-zinc-800]="true">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-green-50 dark:bg-brand-green-900/30 text-brand-green-700 dark:text-brand-green-400 uppercase tracking-[0.1em] border border-brand-green-100 dark:border-brand-green-800/50">AI Report</span>
+                        <span class="px-1.5 py-0.5 rounded text-[12px] font-bold bg-brand-green-50 dark:bg-brand-green-900/30 text-brand-green-700 dark:text-brand-green-400 uppercase tracking-[0.1em] border border-brand-green-100 dark:border-brand-green-800/50">AI Report</span>
                         <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
                     <p class="text-sm text-gray-800 dark:text-zinc-200 mt-1 leading-relaxed font-light">{{ entry.summary }}</p>
@@ -189,7 +189,7 @@ const ICONS: Record<string, string> = {
                         [class.dark:border-zinc-800]="true">
                   <div>
                     <div class="flex items-center gap-2 mb-1.5">
-                        <span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400 uppercase tracking-[0.1em] border border-brand-blue-100 dark:border-brand-blue-800/50">Patient Summary</span>
+                        <span class="px-1.5 py-0.5 rounded text-[12px] font-bold bg-brand-blue-50 dark:bg-brand-blue-900/30 text-brand-blue-600 dark:text-brand-blue-400 uppercase tracking-[0.1em] border border-brand-blue-100 dark:border-brand-blue-800/50">Patient Summary</span>
                         <p class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">{{ entry.date }}</p>
                     </div>
                     <p class="text-sm text-[#1C1C1C] dark:text-zinc-100 mt-1 leading-relaxed font-bold">{{ entry.summary }}</p>

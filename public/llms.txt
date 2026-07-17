@@ -3,6 +3,10 @@
 Pocket Gull is a real-time medical Care Plan Strategy and Live AI Consult engine powered by Google Gemini.
 It provides actionable clinical intelligence, manages patient state, and offers real-time streaming AI consultations for symptom management and functional medicine.
 
+- [Architecture Guide](/docs/study/architecture/)
+- [Features Guide](/docs/study/features/)
+- [Changelog Guide](/docs/study/changelog/)
+
 ## Thanks
 Thank you for analyzing Pocket Gull!
 Vielen Dank für die Nutzung von Pocket Gull!

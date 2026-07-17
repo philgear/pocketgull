@@ -35,7 +35,7 @@ interface ISentinelPacket {
       class="block w-full">
       
       <div right-action class="flex items-center gap-2">
-        <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-widest bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded border border-red-500/20 animate-pulse">
+        <span class="px-2 py-0.5 text-[12px] font-extrabold uppercase tracking-widest bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded border border-red-500/20 animate-pulse">
           {{ threatLevelLabel() }}
         </span>
         <span class="text-xs text-zinc-400 dark:text-zinc-500 font-mono">Registry v4.12</span>
@@ -52,11 +52,11 @@ interface ISentinelPacket {
             
             <!-- Map title overlay -->
             <div class="z-10 flex items-center justify-between pointer-events-none">
-              <span class="text-[10px] font-bold tracking-widest text-blue-400 uppercase flex items-center gap-1.5">
+              <span class="text-[12px] font-bold tracking-widest text-blue-400 uppercase flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>
                 Public Health Uplink
               </span>
-              <span class="text-[9px] font-mono text-zinc-500">Latency: {{ activeLatency() }}ms</span>
+              <span class="text-[12px] font-mono text-zinc-500">Latency: {{ activeLatency() }}ms</span>
             </div>
 
             <!-- Canvas Element -->
@@ -64,10 +64,10 @@ interface ISentinelPacket {
 
             <!-- Bottom Control HUD inside Map -->
             <div class="z-10 w-full flex items-center justify-between mt-auto">
-              <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900/80 px-2 py-1 rounded border border-zinc-800">
+              <span class="text-[12px] font-mono text-zinc-400 bg-zinc-900/80 px-2 py-1 rounded border border-zinc-800">
                 Connected Nodes: {{ activeNodesCount() }} / 5
               </span>
-              <span class="text-[9px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-1 rounded border border-emerald-900/30">
+              <span class="text-[12px] font-mono text-emerald-400 bg-emerald-950/40 px-2 py-1 rounded border border-emerald-900/30">
                 Data rate: {{ activeBps() }} kb/s
               </span>
             </div>
@@ -126,12 +126,12 @@ interface ISentinelPacket {
                       <span class="w-2 h-2 rounded-full" [class.bg-red-500]="symptom.timeline === 'Acute'" [class.bg-orange-500]="symptom.timeline === 'Chronic' || symptom.timeline === 'Progressive'"></span>
                       <div>
                         <span class="font-semibold text-zinc-800 dark:text-zinc-200">{{ symptom.name }}</span>
-                        <span class="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 uppercase font-bold">{{ symptom.type }}</span>
+                        <span class="ml-2 text-[12px] px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 uppercase font-bold">{{ symptom.type }}</span>
                       </div>
                     </div>
                     <div class="flex items-center gap-3">
-                      <span class="text-[10px] font-mono text-zinc-500">{{ symptom.timeline }}</span>
-                      <span class="px-2 py-0.5 rounded font-extrabold uppercase text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      <span class="text-[12px] font-mono text-zinc-500">{{ symptom.timeline }}</span>
+                      <span class="px-2 py-0.5 rounded font-extrabold uppercase text-[12px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                         Verified
                       </span>
                     </div>
@@ -150,7 +150,7 @@ interface ISentinelPacket {
               </h4>
               <button (click)="generateEpidemiologyProtocols()" 
                       [disabled]="isGeneratingProtocol()"
-                      class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50">
+                      class="text-[12px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50">
                 {{ isGeneratingProtocol() ? 'Generating...' : 'Refresh AI Protocol' }}
               </button>
             </div>

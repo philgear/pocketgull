@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { ThemeService } from './theme.service';
+import { PatientStateService } from './patient-state.service';
 
 export interface ITourStep {
   targetId: string;
@@ -13,6 +14,7 @@ const TOUR_SEEN_KEY = 'pg_tour_seen';
 @Injectable({ providedIn: 'root' })
 export class WalkthroughTourService {
   private theme = inject(ThemeService);
+  private state = inject(PatientStateService);
 
   /** -1 = inactive, 0..N = active step index */
   currentStep = signal<number>(-1);
@@ -30,7 +32,7 @@ export class WalkthroughTourService {
       {
         targetId: 'tour-patient-dropdown',
         title: 'Meet your patient.',
-        body: 'The patient\'s full story lives here — history, vitals, prior visits. Today we\'re following Sarah Jenkins. You can switch patients, or add a new one, any time.',
+        body: 'The patient\'s story lives here (history, vitals, prior visits). Patients flagged for epidemiological/outbreak threats (Sentinels) feature high-priority amber outlines and dedicated tags to activate containment workflows.',
         position: 'bottom',
       },
       {
@@ -54,7 +56,7 @@ export class WalkthroughTourService {
       {
         targetId: 'tour-generate-btn',
         title: 'One tap. Five lenses. A complete care plan.',
-        body: 'When you\'re ready, press this button. Gemini synthesizes Sarah\'s full chart into a structured, multi-lens care plan — protocols, nutrition, monitoring, education, and more. Watch it stream in live.',
+        body: 'When you\'re ready, press this button. Gemini synthesizes the full chart into a structured, multi-lens care plan — protocols, nutrition, monitoring, education, and more. Watch it stream in live.',
         position: 'bottom',
       },
       {
@@ -65,8 +67,14 @@ export class WalkthroughTourService {
       },
       {
         targetId: 'tour-report-node',
-        title: 'Drill deeper into the analysis.',
-        body: 'Every line of the plan is alive. Hover over any recommendation to open Evidence Focus — an inline AI assistant that lets you drill deeper into any single claim, cite medical studies, or explain the rationale.',
+        title: 'Drill deeper and refine tasks.',
+        body: 'Every recommendation is alive. Hover to open Evidence Focus for inline research/verification. Double-click any care plan task to cycle its verification state (Normal -> Approved green checkmark -> Excluded red cross) for custom refinement.',
+        position: 'left',
+      },
+      {
+        targetId: 'tour-voice-assistant',
+        title: 'Voice & Consult Assistant',
+        body: 'Engage in real-time, bi-directional clinical chat. Ask questions, log feedback, or trigger hands-free dictation. In Demo Mode, local mock answers intercept calls to simulate full consult strategy flows.',
         position: 'left',
       },
       {
@@ -95,20 +103,42 @@ export class WalkthroughTourService {
   next() {
     const step = this.currentStep();
     if (step < 0) return;
+    
+    const nextIdx = step + 1;
+    const nextStep = nextIdx < this.steps().length ? this.steps()[nextIdx] : null;
+    
+    if (nextStep && nextStep.targetId === 'tour-voice-assistant') {
+      this.state.toggleLiveAgent(true);
+    } else {
+      this.state.toggleLiveAgent(false);
+    }
+
     if (step >= this.steps().length - 1) {
       this.dismiss();
     } else {
-      this.currentStep.set(step + 1);
+      this.currentStep.set(nextIdx);
     }
   }
 
   prev() {
     const step = this.currentStep();
-    if (step > 0) this.currentStep.set(step - 1);
+    if (step > 0) {
+      const prevIdx = step - 1;
+      const prevStep = this.steps()[prevIdx];
+      
+      if (prevStep.targetId === 'tour-voice-assistant') {
+        this.state.toggleLiveAgent(true);
+      } else {
+        this.state.toggleLiveAgent(false);
+      }
+      
+      this.currentStep.set(prevIdx);
+    }
   }
 
   dismiss() {
     this.currentStep.set(-1);
+    this.state.toggleLiveAgent(false);
     if (typeof localStorage !== 'undefined' && typeof localStorage.setItem === 'function') {
       localStorage.setItem(TOUR_SEEN_KEY, '1');
     }

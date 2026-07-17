@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
       </div>
       
       <div class="flex justify-between items-start mb-2">
-        <h3 class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">{{ title() }}</h3>
+        <h3 class="text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">{{ title() }}</h3>
         
         <!-- Animated visual indicator -->
         <div class="relative flex h-2.5 w-2.5 mt-0.5">
@@ -42,7 +42,7 @@ import { CommonModule } from '@angular/common';
           } @else {
             <svg class="w-3 h-3 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
           }
-          <span class="text-[9px] font-bold uppercase tracking-widest font-mono" [ngClass]="trendColorClass()">{{ trendText() }}</span>
+          <span class="text-[12px] font-bold uppercase tracking-widest font-mono" [ngClass]="trendColorClass()">{{ trendText() }}</span>
         </div>
       }
     </div>

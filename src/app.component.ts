@@ -74,7 +74,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
   template: `
 
     <!-- ACM §1.6: First-run informed consent -->
-    @if (!consentService.hasConsented()) {
+    @if (!showSplash() && !consentService.hasConsented()) {
       <app-consent-modal></app-consent-modal>
     }
 
@@ -109,7 +109,25 @@ import { ResearchTabComponent } from './components/research-tab.component';
           (emergencyBypass)="handleEmergencyBypass()">
         </app-secure-splash>
       } @else {
-        <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
+        @if (state.isEmergencyMode()) {
+          <main class="flex-1 flex flex-col min-w-0 min-h-0 relative bg-[#F9FAFB] dark:bg-[#09090b] p-4 sm:p-6 overflow-y-auto">
+            <div class="mb-4 flex items-center justify-between no-print">
+              <button (click)="state.isEmergencyMode.set(false); session.isLocked.set(true)" class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-gray-900 dark:hover:text-zinc-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                Exit Emergency Mode
+              </button>
+              <div class="flex items-center gap-2 px-3 py-1 bg-red-500/10 dark:bg-red-500/20 border border-red-500/30 rounded-full">
+                <div class="relative flex h-2 w-2">
+                  <span class="absolute inline-flex h-full w-full rounded-full opacity-75 bg-red-500 animate-ping"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </div>
+                <span class="text-[12px] font-bold text-red-655 dark:text-red-400 uppercase tracking-widest">First Aid Mode</span>
+              </div>
+            </div>
+            <app-analysis-container class="block h-full w-full"></app-analysis-container>
+          </main>
+        } @else {
+          <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
         <!-- Offline Banner -->
         @if (!network.isOnline()) {
           <!-- Spectral P1-Critical (640nm red) offline banner -->
@@ -189,7 +207,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
               </div>
               <div>
                 <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-blue-800 dark:text-blue-300">Synchronizing Fitbit Health Data</h3>
-                <p class="text-[11px] text-blue-600 dark:text-blue-400/80">Transferring and transforming patient records, vital logs, and Fitbit metrics between PocketGull and Google Cloud Healthcare FHIR Store...</p>
+                <p class="text-[12px] text-blue-600 dark:text-blue-400/80">Transferring and transforming patient records, vital logs, and Fitbit metrics between PocketGull and Google Cloud Healthcare FHIR Store...</p>
               </div>
             </div>
           </div>
@@ -204,7 +222,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
               </div>
               <div>
                 <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">Fitbit Health Sync Successful</h3>
-                <p class="text-[11px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and Fitbit vital logs successfully synchronized with Google Cloud Healthcare FHIR Store.</p>
+                <p class="text-[12px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and Fitbit vital logs successfully synchronized with Google Cloud Healthcare FHIR Store.</p>
               </div>
             </div>
             <button (click)="showGHealthSuccess.set(false)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors text-green-700 dark:text-green-400">
@@ -222,7 +240,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
               </div>
               <div>
                 <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-red-800 dark:text-red-300">Google Health Sync Failed</h3>
-                <p class="text-[11px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
+                <p class="text-[12px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
               </div>
             </div>
             <button (click)="showGHealthError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
@@ -243,7 +261,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
               </div>
               <div>
                 <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-amber-800 dark:text-amber-300">Synchronizing to AWS HealthLake</h3>
-                <p class="text-[11px] text-amber-600 dark:text-amber-400/80">Transforming medical data to FHIR resources and uploading to AWS HealthLake...</p>
+                <p class="text-[12px] text-amber-600 dark:text-amber-400/80">Transforming medical data to FHIR resources and uploading to AWS HealthLake...</p>
               </div>
             </div>
           </div>
@@ -258,7 +276,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
               </div>
               <div>
                 <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-green-800 dark:text-green-300">AWS HealthLake Sync Successful</h3>
-                <p class="text-[11px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and vital logs successfully archived in AWS HealthLake FHIR Store.</p>
+                <p class="text-[12px] text-green-600 dark:text-green-500/80">Patient demographics, historical conditions, and vital logs successfully archived in AWS HealthLake FHIR Store.</p>
               </div>
             </div>
             <button (click)="showAwsSuccess.set(false)" class="p-1 hover:bg-green-100 dark:hover:bg-green-900/40 rounded transition-colors text-green-700 dark:text-green-400">
@@ -276,7 +294,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
               </div>
               <div>
                 <h3 class="text-xs font-bold uppercase tracking-[0.1em] text-red-800 dark:text-red-300">AWS HealthLake Sync Failed</h3>
-                <p class="text-[11px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
+                <p class="text-[12px] text-red-600 dark:text-red-500/80">{{ errorMsg }}</p>
               </div>
             </div>
             <button (click)="showAwsError.set(null)" class="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors text-red-700 dark:text-red-400">
@@ -368,28 +386,28 @@ import { ResearchTabComponent } from './components/research-tab.component';
                      @if (hardware.primaryGpu(); as gpu) {
                        <div class="pt-2 mt-2 border-t border-gray-800 space-y-2">
                          <div class="flex justify-between items-center">
-                           <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">GPU ACCELERATOR</span>
-                           <span class="text-[8px] px-1 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono uppercase font-bold">{{ gpu.vendor }}</span>
+                           <span class="text-[12px] font-bold text-gray-400 uppercase tracking-wider">GPU ACCELERATOR</span>
+                           <span class="text-[12px] px-1 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono uppercase font-bold">{{ gpu.vendor }}</span>
                          </div>
-                         <p class="text-[11px] text-zinc-100 font-mono truncate font-medium">{{ gpu.name }}</p>
-                         <div class="grid grid-cols-2 gap-2 text-[10px]">
+                         <p class="text-[12px] text-zinc-100 font-mono truncate font-medium">{{ gpu.name }}</p>
+                         <div class="grid grid-cols-2 gap-2 text-[12px]">
                            <div>
-                             <span class="text-zinc-500 block uppercase text-[8px] font-bold tracking-tighter">VRAM Usage</span>
+                             <span class="text-zinc-500 block uppercase text-[12px] font-bold tracking-tighter">VRAM Usage</span>
                              <span class="text-zinc-300 font-mono">{{ gpu.memoryUsedMiB }} / {{ gpu.memoryTotalMiB }} MB</span>
                            </div>
                            <div>
-                             <span class="text-zinc-500 block uppercase text-[8px] font-bold tracking-tighter">Utilization</span>
+                             <span class="text-zinc-500 block uppercase text-[12px] font-bold tracking-tighter">Utilization</span>
                              <span class="text-zinc-300 font-mono">{{ gpu.utilizationPercent }}% @ {{ gpu.temperatureC }}°C</span>
                            </div>
                          </div>
-                         <div class="pt-1 text-[9px] text-zinc-500 border-t border-zinc-800/50 flex justify-between">
+                         <div class="pt-1 text-[12px] text-zinc-500 border-t border-zinc-800/50 flex justify-between">
                            <span>Recommended Path:</span>
                            <span class="text-green-400 font-mono uppercase font-bold">{{ hardware.recommendedExecutionPath() }}</span>
                          </div>
                        </div>
                      }
                      
-                     <div class="pt-2 mt-2 border-t border-gray-800 text-[10px] space-y-1 text-zinc-400">
+                     <div class="pt-2 mt-2 border-t border-gray-800 text-[12px] space-y-1 text-zinc-400">
                        <div class="flex justify-between">
                          <span class="text-zinc-500">Host CPU:</span>
                          <span class="truncate max-w-[120px] text-right font-mono" [title]="hardware.telemetry()?.cpuName || 'Searching...'">{{ hardware.telemetry()?.cpuName || 'Detecting...' }}</span>
@@ -447,15 +465,14 @@ import { ResearchTabComponent } from './components/research-tab.component';
             </button>
             
             <button (click)="state.toggleResearchFrame()"
-                   
-                    aria-label="Toggle Research Frame"
+                    aria-label="Research"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
               <span class="hidden sm:inline">Research</span>
             </button>
 
             <button (click)="state.toggleSynthesisDashboard()"
-                    aria-label="Toggle Synthesis"
+                    aria-label="Synthesize"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                  <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
@@ -464,8 +481,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
             </button>
             
             <a href="/docs/study/" target="_blank" rel="noopener"
-              
-               aria-label="Open Documentation"
+               aria-label="Docs"
                class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
@@ -515,10 +531,10 @@ import { ResearchTabComponent } from './components/research-tab.component';
               <div class="relative group tracking-normal">
                 <div class="flex items-center gap-2.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 rounded-full hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer shadow-sm select-none">
                   <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
-                  <span class="text-[10px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
+                  <span class="text-[12px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
                     {{ game.levelTitle() }} (Lvl {{ game.level() }})
                   </span>
-                  <span class="text-[10px] font-mono font-bold text-[#689F38]">
+                  <span class="text-[12px] font-mono font-bold text-[#689F38]">
                     {{ game.points() }} XP
                   </span>
                   
@@ -537,7 +553,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
 
                   <!-- Next Objective -->
                   <div class="p-2.5 bg-amber-500/5 dark:bg-amber-500/10 rounded-lg border border-amber-500/10">
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Current Objective:</span>
+                    <span class="text-[12px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Current Objective:</span>
                     <p class="text-xs text-zinc-700 dark:text-zinc-300 font-medium leading-normal mt-0.5">
                       {{ game.nextStepText() }}
                     </p>
@@ -557,16 +573,16 @@ import { ResearchTabComponent } from './components/research-tab.component';
                           </span>
                           <div class="min-w-0">
                             <div class="font-bold truncate" [class.text-zinc-400]="q.completed" [class.text-zinc-800]="!q.completed" [class.dark:text-zinc-200]="!q.completed" [class.dark:text-zinc-500]="q.completed">{{ q.name }}</div>
-                            <div class="text-[9px] text-zinc-500 leading-tight">{{ q.description }}</div>
+                            <div class="text-[12px] text-zinc-500 leading-tight">{{ q.description }}</div>
                           </div>
                         </div>
-                        <span class="text-[10px] font-mono shrink-0" [class.text-zinc-400]="q.completed" [class.text-amber-500]="!q.completed">+{{ q.xpReward }} XP</span>
+                        <span class="text-[12px] font-mono shrink-0" [class.text-zinc-400]="q.completed" [class.text-amber-500]="!q.completed">+{{ q.xpReward }} XP</span>
                       </div>
                     }
                   </div>
 
                   <!-- Reset -->
-                  <div class="border-t border-gray-100 dark:border-zinc-800 pt-2 flex justify-between items-center text-[10px]">
+                  <div class="border-t border-gray-100 dark:border-zinc-800 pt-2 flex justify-between items-center text-[12px]">
                     <span class="text-zinc-500 font-mono">Progress stored locally</span>
                     <button (click)="game.reset()" class="text-red-500 hover:underline uppercase font-bold tracking-wider">
                       Reset
@@ -591,7 +607,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
              <!-- EXPORT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="exportMenuOpen.set(true)" (mouseleave)="exportMenuOpen.set(false)">
                <button
-                       class="snap-start shrink-0 flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[10px] font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
+                       class="snap-start shrink-0 flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[12px] font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                  <span class="hidden sm:inline">Export</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -617,7 +633,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
              <!-- CONNECT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="connectMenuOpen.set(true)" (mouseleave)="connectMenuOpen.set(false)">
                <button
-                       class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[10px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
+                       class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[12px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                  <span class="hidden sm:inline">Integrations</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -666,7 +682,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
              <button (click)="finalizeRecord()"
                     
                      id="tour-finalize-btn"
-                     class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#689F38]/20 dark:border-[#689F38]/30 transition-colors text-[10px] font-bold uppercase tracking-widest disabled:opacity-50 text-[#689F38] dark:text-[#689F38] bg-[#689F38]/5 dark:bg-[#689F38]/10 hover:bg-[#689F38]/10 dark:hover:bg-[#689F38]/20 rounded-md">
+                     class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#689F38]/20 dark:border-[#689F38]/30 transition-colors text-[12px] font-bold uppercase tracking-widest disabled:opacity-50 text-[#689F38] dark:text-[#689F38] bg-[#689F38]/5 dark:bg-[#689F38]/10 hover:bg-[#689F38]/10 dark:hover:bg-[#689F38]/20 rounded-md">
                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                <span class="hidden sm:inline">Finalize & Archive</span>
              </button>
@@ -691,7 +707,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                [class.hidden]="isChartCollapsed()"
                [class.max-md:hidden]="!!state.selectedPartId() && !state.isSparkModeActive()">
                <div class="md:h-full w-full md:overflow-hidden flex-1 flex flex-col min-h-0">
-                 @defer (on viewport) {
+                 @defer {
                    <app-medical-chart class="no-print md:h-full block md:overflow-y-auto w-full max-md:overflow-visible"></app-medical-chart>
                  } @placeholder {
                    <div class="h-full w-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold">Loading Chart Engine...</div>
@@ -778,14 +794,14 @@ import { ResearchTabComponent } from './components/research-tab.component';
                     [class.max-md:hidden]="mobileActiveTab() !== 'tasks'"
                     [class.tab-fade-enter]="mobileActiveTab() === 'tasks'">
                   <div id="tour-intake-form" class="flex-1 min-h-0 overflow-hidden rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                    @defer (on viewport) {
+                    @defer {
                       <app-intake-form appReveal></app-intake-form>
                     } @placeholder {
                       <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Intake...</div>
                     }
                   </div>
                   <div class="flex-1 min-h-0 overflow-hidden rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
-                    @defer (on viewport) {
+                    @defer {
                       <app-task-flow appReveal [revealDelay]="100"></app-task-flow>
                     } @placeholder {
                       <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Tasks...</div>
@@ -807,7 +823,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                       [class.shadow-none]="isChartCollapsed()"
                       [class.bg-[#F9FAFB]]="isChartCollapsed()"
                       [class.dark:bg-[#09090b]]="isChartCollapsed()">
-                     @defer (on viewport) {
+                     @defer {
                        <app-analysis-container class="block h-full min-h-0 min-w-0" appReveal [revealDelay]="100"></app-analysis-container>
                      } @placeholder {
                        <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Core AI Synthesis...</div>
@@ -890,7 +906,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                  <div class="flex-1 w-full bg-gradient-to-br from-[#E1EAF4] to-[#C9DEEE] dark:from-[#0F172A] dark:to-[#1E293B] rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(30,58,95,0.4)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6)] border-[3px] border-white dark:border-[#334155] overflow-hidden pointer-events-auto flex flex-col relative ring-1 ring-[#1E3A5F]/10 dark:ring-black/50">
                     <!-- Embedded Voice Assistant logic takes over inner bounds transparently -->
                     @defer (on immediate) {
-                      <app-voice-assistant class="block h-full w-full mix-blend-normal bg-white/70 dark:bg-black/50 backdrop-blur-md"></app-voice-assistant>
+                      <app-voice-assistant id="tour-voice-assistant" class="block h-full w-full mix-blend-normal bg-white/70 dark:bg-black/50 backdrop-blur-md"></app-voice-assistant>
                     }
                  </div>
               </div>
@@ -926,9 +942,9 @@ import { ResearchTabComponent } from './components/research-tab.component';
             <div>
               <div class="flex items-center gap-3 mb-1">
                  <div class="w-2 h-2 rounded-full bg-[#ff4500] animate-pulse shadow-[0_0_8px_rgba(255,69,0,0.6)]"></div>
-                 <h2 class="text-[11px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.2em] font-mono">Care Plan Archiver</h2>
+                 <h2 class="text-[12px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.2em] font-mono">Care Plan Archiver</h2>
               </div>
-              <p class="text-[9px] uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-[0.2em] ml-5">Review • Adjust • Finalize</p>
+              <p class="text-[12px] uppercase font-bold text-gray-500 dark:text-zinc-400 tracking-[0.2em] ml-5">Review • Adjust • Finalize</p>
             </div>
             <button 
               (click)="closePreview()" 
@@ -940,91 +956,126 @@ import { ResearchTabComponent } from './components/research-tab.component';
 
           <!-- Content Body -->
           <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-transparent relative">
-              <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 border-b border-gray-300 dark:border-zinc-700 pb-4">
-                <div class="flex flex-col gap-1.5">
-                  <h3 class="text-[10px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.3em]">Cognitive Output Level</h3>
-                  <p class="text-[9px] text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">Select target patient comprehension</p>
+              <div class="mb-8 flex flex-col gap-6 border-b border-gray-300 dark:border-zinc-700 pb-6">
+                <!-- Cognitive level -->
+                <div class="flex flex-col gap-3">
+                  <div class="flex flex-col gap-1.5">
+                    <h3 class="text-[12px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.3em]">Cognitive Output Level</h3>
+                    <p class="text-[12px] text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">Select target patient comprehension</p>
+                  </div>
+                  
+                  <div class="flex flex-wrap gap-1">
+                    <!-- Dieter Rams Tabs -->
+                    <button (click)="selectCognitiveLevel('standard')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedCognitiveLevel() === 'standard' ? 'bg-[#1C1C1C] text-white dark:bg-white dark:text-[#111111] border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Standard
+                    </button>
+                    <button (click)="selectCognitiveLevel('dyslexia')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedCognitiveLevel() === 'dyslexia' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Cognition (Dyslexia-Friendly)
+                    </button>
+                    <button (click)="selectCognitiveLevel('child')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedCognitiveLevel() === 'child' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Pediatric (Child)
+                    </button>
+                  </div>
                 </div>
-                
-                <div class="flex flex-wrap gap-1">
-                  <!-- Dieter Rams Tabs -->
-                  <button (click)="changeReadingLevel('standard')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'standard' ? 'bg-[#1C1C1C] text-white dark:bg-white dark:text-[#111111] border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    Standard
-                  </button>
-                  <button (click)="changeReadingLevel('simplified')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'simplified' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    Simplified
-                  </button>
-                  <button (click)="changeReadingLevel('dyslexia')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'dyslexia' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    Cognition
-                  </button>
-                  <button (click)="changeReadingLevel('child')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'child' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    Pediatric
-                  </button>
-                  <button (click)="changeReadingLevel('spanish')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'spanish' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    Spanish
-                  </button>
-                  <button (click)="changeReadingLevel('german')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'german' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    German
-                  </button>
-                  <button (click)="changeReadingLevel('french')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'french' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    French
-                  </button>
-                  <button (click)="changeReadingLevel('mandarin')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'mandarin' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    Mandarin
-                  </button>
-                  <button (click)="changeReadingLevel('hindi')" [disabled]="isTranslating()"
-                    class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all"
-                    [ngClass]="selectedReadingLevel() === 'hindi' ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-900'">
-                    Hindi
-                  </button>
+
+                <!-- Language Translation -->
+                <div class="flex flex-col gap-3">
+                  <div class="flex flex-col gap-1.5">
+                    <h3 class="text-[12px] font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-[0.3em]">Language Translation</h3>
+                    <p class="text-[12px] text-gray-500 dark:text-zinc-400 uppercase tracking-widest font-mono">Select target translation language</p>
+                  </div>
+
+                  <div class="flex flex-wrap gap-1 items-center">
+                    <button (click)="selectLanguage('english')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedLanguage() === 'english' && !showCustomLanguageInput() ? 'bg-[#1C1C1C] text-white dark:bg-white dark:text-[#111111] border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      English
+                    </button>
+                    <button (click)="selectLanguage('spanish')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedLanguage() === 'spanish' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Spanish
+                    </button>
+                    <button (click)="selectLanguage('german')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedLanguage() === 'german' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      German
+                    </button>
+                    <button (click)="selectLanguage('french')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedLanguage() === 'french' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      French
+                    </button>
+                    <button (click)="selectLanguage('mandarin')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedLanguage() === 'mandarin' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Mandarin
+                    </button>
+                    <button (click)="selectLanguage('hindi')" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="selectedLanguage() === 'hindi' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Hindi
+                    </button>
+                    <button (click)="toggleCustomLanguageInput()" [disabled]="isTranslating()"
+                      class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
+                      [ngClass]="showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Other...
+                    </button>
+                  </div>
+
+                  <!-- Custom Language Input Field -->
+                  @if (showCustomLanguageInput()) {
+                    <div class="mt-2 flex gap-2 max-w-xs animate-in fade-in slide-in-from-top-1 duration-200">
+                      <input type="text" 
+                             [value]="customLanguage()" 
+                             (input)="onCustomLanguageChange($event)"
+                             placeholder="Enter language (e.g. Italian)"
+                             class="flex-1 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-[12px] text-gray-800 dark:text-gray-100 uppercase tracking-wider font-semibold rounded-none focus:outline-none focus:border-[#ff4500]" />
+                      <button (click)="applyCustomLanguage()" 
+                              [disabled]="isTranslating() || !customLanguage().trim()"
+                              class="px-4 py-1.5 bg-[#1C1C1C] dark:bg-white text-white dark:text-[#111111] text-[12px] uppercase tracking-wider font-bold hover:bg-[#ff4500] dark:hover:bg-[#ff4500] dark:hover:text-white transition-all">
+                        Apply
+                      </button>
+                    </div>
+                  }
                 </div>
 
                 <!-- Pet Auditory Modes -->
                 <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
-                  <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Animal Comfort Protocols</p>
+                  <p class="text-[12px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Animal Comfort Protocols</p>
                   <div class="flex flex-wrap gap-2">
                     <button (click)="petAuditory.playCanineHeartbeat()" 
                       [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M3 12c0-3 2-6 5-6s5 3 5 3 2-3 5-3 5 3 5 6"/></svg>
                       Canine Comfort
                     </button>
                     <button (click)="petAuditory.playFelinePurr()"
                       [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.33.09 2 .26 1.78-1.55 3-.94 3-.94.83 2.22.3 3.86.15 4.27C18.66 10.14 19 11.96 19 14c0 4.97-3.13 7-7 7s-7-2.03-7-7c0-2.04.34-3.86 1.85-5.41-.15-.41-.68-2.05.15-4.27 0 0 1.22-.61 3 .94.65-.17 1.33-.26 2-.26Z" /><path d="M9 13v.01M15 13v.01" /><path d="M12 16l-1-1h2Z" /></svg>
                       Feline Comfort
                     </button>
                     <button (click)="petAuditory.playCetaceanTherapy()"
                       [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-1.5-2.5-3-3.5-6-3.5A4.5 4.5 0 0 1 1.5 12c0-2.5 1.5-3.5 4.5-3.5 3 0 4.5 1 6 3.5 1.5-2.5 3-3.5 6-3.5a4.5 4.5 0 0 1 4.5 4.5c0 2.5-1.5 3.5-4.5 3.5-3 0-4.5 1-6 3.5Z" /><path d="M12 12v4" /></svg>
                       Cetacean Comfort
                     </button>
                     <button (click)="petAuditory.playAvianTherapy()"
                       [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
+                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h.01" /><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20" /><path d="m20 7 2 .5-2 .5" /><path d="M10 18v3" /><path d="M14 17.75V21" /><path d="M7 18a6 6 0 0 0 3.84-10.61" /></svg>
                       Avian Comfort
                     </button>
                     @if(petAuditory.isCurrentlyPlaying) {
-                      <button (click)="petAuditory.stop()" class="px-4 py-2 text-[10px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all">
+                      <button (click)="petAuditory.stop()" class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all">
                         Stop
                       </button>
                     }
@@ -1042,7 +1093,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                         <input type="checkbox" [checked]="includeAnalysisInPrint()" (change)="toggleAnalysisInPrint()" class="sr-only peer">
                         <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-none peer dark:bg-zinc-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-400 after:border after:rounded-none after:h-3 after:w-3.5 after:transition-all dark:border-zinc-600 peer-checked:bg-[#1C1C1C] dark:peer-checked:bg-white"></div>
                       </label>
-                      <span class="text-[9px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include AI Analysis</span>
+                      <span class="text-[12px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include AI Analysis</span>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -1050,7 +1101,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                         <input type="checkbox" [checked]="includeOriginalInPrint()" (change)="toggleOriginalInPrint()" class="sr-only peer">
                         <div class="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-none peer dark:bg-zinc-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-400 after:border after:rounded-none after:h-3 after:w-3.5 after:transition-all dark:border-zinc-600 peer-checked:bg-[#1C1C1C] dark:peer-checked:bg-white"></div>
                       </label>
-                      <span class="text-[9px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include Original</span>
+                      <span class="text-[12px] font-bold text-[#1C1C1C] dark:text-zinc-300 uppercase tracking-widest font-mono">Include Original</span>
                     </div>
                   </div>
                 </div>
@@ -1061,7 +1112,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                <!-- Original English -->
                @if (selectedReadingLevel() !== 'standard') {
                  <div class="flex flex-col gap-2 animate-in fade-in slide-in-from-left-4 duration-300">
-                    <label class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Plan</label>
+                    <label class="text-[12px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Plan</label>
                     <pocket-gull-input
                       type="textarea"
                       [rows]="20"
@@ -1074,7 +1125,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                  </div>
                } @else {
                  <div class="flex flex-col gap-2 relative">
-                    <label class="text-[9px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Care Plan</label>
+                    <label class="text-[12px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-[0.2em] font-mono border-b border-gray-300 dark:border-zinc-700 pb-1">Original Active Care Plan</label>
                     <pocket-gull-input
                       type="textarea"
                       [rows]="20"
@@ -1089,7 +1140,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                <!-- Translated Plan -->
                <div class="flex flex-col gap-2 relative">
                   @if (selectedReadingLevel() !== 'standard') {
-                     <label class="text-[9px] font-bold text-[#ff4500] uppercase tracking-[0.2em] font-mono border-b border-[#ff4500] pb-1 animate-in fade-in duration-300 flex justify-between items-center">
+                     <label class="text-[12px] font-bold text-[#ff4500] uppercase tracking-[0.2em] font-mono border-b border-[#ff4500] pb-1 animate-in fade-in duration-300 flex justify-between items-center">
                        <span>Translated / Adjusted Plan</span>
                        <span class="w-1.5 h-1.5 bg-[#ff4500] rounded-full inline-block animate-pulse"></span>
                      </label>
@@ -1101,18 +1152,19 @@ import { ResearchTabComponent } from './components/research-tab.component';
                     (valueChange)="previewText.set($event)"
                     [disabled]="isTranslating()"
                     placeholder="No Active Care Plan recorded for this visit."
-                    class="w-full bg-white dark:bg-[#09090b] shadow-lg">
+                    class="w-full bg-white dark:bg-[#09090b] shadow-lg"
+                    [class.dyslexia-textarea]="selectedReadingLevel() === 'dyslexia'">
                   </pocket-gull-input>
                </div>
                
                @if (isTranslating()) {
                  <div class="absolute inset-x-0 inset-y-8 bg-white/80 dark:bg-[#111111]/80 backdrop-blur-[2px] flex flex-col items-center justify-center z-10 rounded-sm">
                     <div class="w-8 h-8 border-[3px] border-gray-200 border-t-[#ff4500] rounded-full animate-spin shadow-lg"></div>
-                    <p class="mt-4 text-[10px] font-bold text-[#ff4500] uppercase tracking-[0.3em] font-mono animate-pulse">Processing Translation</p>
+                    <p class="mt-4 text-[12px] font-bold text-[#ff4500] uppercase tracking-[0.3em] font-mono animate-pulse">Processing Translation</p>
                  </div>
                }
                @if (translationError()) {
-                  <div class="absolute bottom-4 left-4 right-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-[0.1em] font-mono shadow-md flex items-center gap-2 z-20">
+                  <div class="absolute bottom-4 left-4 right-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-[12px] font-bold text-red-600 dark:text-red-400 uppercase tracking-[0.1em] font-mono shadow-md flex items-center gap-2 z-20">
                     <div class="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
                     System Error: {{ translationError() }}
                   </div>
@@ -1124,11 +1176,11 @@ import { ResearchTabComponent } from './components/research-tab.component';
                <div class="mt-8 pt-6 border-t border-gray-300 dark:border-zinc-700 animate-in fade-in duration-500">
                   <div class="flex flex-col gap-3 mb-2">
                     <div class="flex justify-between items-end border-b border-gray-200 dark:border-zinc-800 pb-2">
-                      <h4 class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.3em] font-mono">Structural Analysis</h4>
+                      <h4 class="text-[12px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.3em] font-mono">Structural Analysis</h4>
                       <button 
                         (click)="analyzeCurrentTranslation()" 
                         [disabled]="isAnalyzingTranslation() || isTranslating()"
-                        class="px-4 py-1.5 border border-gray-300 dark:border-zinc-700 text-[9px] uppercase tracking-[0.2em] font-bold transition-all text-[#1C1C1C] dark:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+                        class="px-4 py-1.5 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all text-[#1C1C1C] dark:text-zinc-100 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
                         @if (isAnalyzingTranslation()) {
                           <div class="w-2.5 h-2.5 border-2 border-gray-400 border-t-[#1C1C1C] rounded-full animate-spin"></div>
                           Analyzing...
@@ -1138,7 +1190,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                       </button>
                     </div>
                     @if (translationAnalysis()) {
-                      <div class="p-4 sm:p-6 bg-white dark:bg-[#09090b] shadow-inner border border-gray-200 dark:border-zinc-800 text-[11px] leading-relaxed text-gray-800 dark:text-zinc-300 font-mono animate-in slide-in-from-top-4 duration-500 whitespace-pre-wrap">
+                      <div class="p-4 sm:p-6 bg-white dark:bg-[#09090b] shadow-inner border border-gray-200 dark:border-zinc-800 text-[12px] leading-relaxed text-gray-800 dark:text-zinc-300 font-mono animate-in slide-in-from-top-4 duration-500 whitespace-pre-wrap">
                          {{ translationAnalysis() }}
                       </div>
                     }
@@ -1147,7 +1199,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
              }
              
              <div class="mt-8 flex justify-center opacity-40">
-                <p class="text-[8px] font-mono uppercase tracking-[0.4em]">Final Output Target: Medical Chart Archive</p>
+                <p class="text-[12px] font-mono uppercase tracking-[0.4em]">Final Output Target: Medical Chart Archive</p>
              </div>
           </div>
           
@@ -1155,19 +1207,19 @@ import { ResearchTabComponent } from './components/research-tab.component';
           <div class="px-8 py-5 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 flex justify-between items-center mt-auto">
             <button 
               (click)="printReport()" 
-              class="px-5 py-2.5 border border-[#1C1C1C] dark:border-zinc-600 text-[#1C1C1C] dark:text-zinc-100 bg-transparent text-[9px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-2 rounded-[2px]">
+              class="px-5 py-2.5 border border-[#1C1C1C] dark:border-zinc-600 text-[#1C1C1C] dark:text-zinc-100 bg-transparent text-[12px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-2 rounded-[2px]">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
               Print Document
             </button>
             <div class="flex items-center gap-4">
               <button 
                 (click)="closePreview()" 
-                class="px-4 py-2 text-gray-500 hover:text-[#1C1C1C] dark:hover:text-white text-[9px] font-bold uppercase tracking-[0.2em] transition-colors">
+                class="px-4 py-2 text-gray-500 hover:text-[#1C1C1C] dark:hover:text-white text-[12px] font-bold uppercase tracking-[0.2em] transition-colors">
                 Cancel
               </button>
               <button 
                 (click)="confirmFinalize()" 
-                class="px-8 py-3 bg-[#1C1C1C] dark:bg-white text-white dark:text-[#111111] text-[10px] font-bold uppercase tracking-[0.3em] font-mono hover:bg-black dark:hover:bg-gray-200 transition-all flex items-center gap-2 rounded-[2px] shadow-md active:translate-y-[1px]">
+                class="px-8 py-3 bg-[#1C1C1C] dark:bg-white text-white dark:text-[#111111] text-[12px] font-bold uppercase tracking-[0.3em] font-mono hover:bg-black dark:hover:bg-gray-200 transition-all flex items-center gap-2 rounded-[2px] shadow-md active:translate-y-[1px]">
                 Commit to Chart
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
               </button>
@@ -1178,6 +1230,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
     }
     
         </main>
+        }
       }
     </div>
   }
@@ -1271,7 +1324,11 @@ export class AppComponent implements OnDestroy {
   showPreviewModal = signal(false);
   previewText = signal('');
   originalPreviewText = signal('');
-  selectedReadingLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi'>('standard');
+  selectedReadingLevel = signal<string>('standard');
+  selectedCognitiveLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
+  selectedLanguage = signal<string>('english');
+  customLanguage = signal<string>('');
+  showCustomLanguageInput = signal<boolean>(false);
   isTranslating = signal<boolean>(false);
   translationAnalysis = signal<string>('');
   isAnalyzingTranslation = signal(false);
@@ -1599,6 +1656,10 @@ export class AppComponent implements OnDestroy {
     this.previewText.set(finalText);
     this.originalPreviewText.set(finalText);
     this.selectedReadingLevel.set('standard');
+    this.selectedCognitiveLevel.set('standard');
+    this.selectedLanguage.set('english');
+    this.customLanguage.set('');
+    this.showCustomLanguageInput.set(false);
     this.showPreviewModal.set(true);
   }
 
@@ -1606,37 +1667,93 @@ export class AppComponent implements OnDestroy {
     this.showPreviewModal.set(false);
   }
 
-  async changeReadingLevel(levelOrEvent: string | Event) {
-    let level: 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi';
-    if (typeof levelOrEvent === 'string') {
-      level = levelOrEvent as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi';
-    } else {
-      level = (levelOrEvent.target as HTMLSelectElement).value as 'standard' | 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi';
+  selectCognitiveLevel(level: 'standard' | 'simplified' | 'dyslexia' | 'child') {
+    this.selectedCognitiveLevel.set(level);
+    this.updateReadingLevelAndTranslate();
+  }
+
+  selectLanguage(lang: string) {
+    this.selectedLanguage.set(lang);
+    this.showCustomLanguageInput.set(false);
+    this.updateReadingLevelAndTranslate();
+  }
+
+  toggleCustomLanguageInput() {
+    this.showCustomLanguageInput.update(v => !v);
+    if (!this.showCustomLanguageInput()) {
+      // Revert to English if closed
+      this.selectedLanguage.set('english');
+      this.updateReadingLevelAndTranslate();
     }
+  }
+
+  onCustomLanguageChange(event: Event) {
+    const val = (event.target as HTMLInputElement).value;
+    this.customLanguage.set(val);
+  }
+
+  applyCustomLanguage() {
+    if (this.customLanguage().trim()) {
+      this.updateReadingLevelAndTranslate();
+    }
+  }
+
+  async updateReadingLevelAndTranslate() {
+    const cog = this.selectedCognitiveLevel();
+    const lang = this.showCustomLanguageInput() ? this.customLanguage() : this.selectedLanguage();
     
-    this.selectedReadingLevel.set(level);
+    let displayLevel = '';
+    if (cog === 'standard' && lang.toLowerCase() === 'english') {
+      displayLevel = 'standard';
+    } else {
+      displayLevel = `${cog} in ${lang}`;
+    }
+    this.selectedReadingLevel.set(displayLevel);
+
     this.translationAnalysis.set('');
     this.translationError.set(null);
 
-    if (level === 'standard') {
+    if (cog === 'standard' && lang.toLowerCase() === 'english') {
       this.previewText.set(this.originalPreviewText());
       return;
     }
 
     this.isTranslating.set(true);
     try {
-      const translated = await this.clinicalIntelligence.translateReadingLevel(this.originalPreviewText(), level);
+      const translated = await this.clinicalIntelligence.translateReadingLevel(
+        this.originalPreviewText(),
+        undefined,
+        cog,
+        lang
+      );
       this.previewText.set(translated);
-      // Automatically analyze the new translation
       await this.analyzeCurrentTranslation();
     } catch (error) {
       console.error("Translation failed", error);
       this.translationError.set("Failed to translate plan. Please retry.");
-      // NOTE: We no longer revert selectedReadingLevel to 'standard' here
-      // This allows the user to see the error state on the selected level.
     } finally {
       this.isTranslating.set(false);
     }
+  }
+
+  async changeReadingLevel(levelOrEvent: string | Event) {
+    // Keep for backward compatibility with old selectors or external events
+    let level = 'standard';
+    if (typeof levelOrEvent === 'string') {
+      level = levelOrEvent;
+    } else {
+      level = (levelOrEvent.target as HTMLSelectElement).value;
+    }
+
+    if (['simplified', 'dyslexia', 'child'].includes(level)) {
+      this.selectedCognitiveLevel.set(level as any);
+    } else if (level !== 'standard') {
+      this.selectedLanguage.set(level);
+    } else {
+      this.selectedCognitiveLevel.set('standard');
+      this.selectedLanguage.set('english');
+    }
+    await this.updateReadingLevelAndTranslate();
   }
 
   toggleAnalysisInPrint() {
@@ -2249,23 +2366,24 @@ export class AppComponent implements OnDestroy {
     } catch (e) { /* ignore */ }
     this.apiKeyError.set(null);
     this.isDemoMode.set(false);
+    this.state.isDemoMode.set(false);
     // Force GeminiProvider to reinitialise with the new key on next call
     this.hasApiKey.set(true);
   }
 
   loadDemoMode() {
     this.isDemoMode.set(true);
+    this.state.isDemoMode.set(true);
     this.hasApiKey.set(true);
-    // Load demo patient (Sarah Jenkins – p002_bottom)
-    this.patientMgmt.selectPatient('p002_bottom');
-    // Inject pre-baked analysis outputs (no API call)
-    setTimeout(() => {
-      this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT_WESTERN);
-      this.clinicalIntelligence.lastActivePhilosophy.set('western');
-      this.clinicalIntelligence.lastPatientData.set(this.state.getAllDataForPrompt());
-      // Start tour after data is loaded so targets exist in DOM
-      setTimeout(() => this.tour.start(), 400);
-    }, 350);
+    // Load demo patient (Sarah Jenkins – p002)
+    this.patientMgmt.selectPatient('p002');
+    // Inject pre-baked analysis outputs (no API call) synchronously
+    this.state.activePhilosophy.set('western');
+    this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT_WESTERN);
+    this.clinicalIntelligence.lastActivePhilosophy.set('western');
+    this.clinicalIntelligence.lastPatientData.set(this.state.getAllDataForPrompt());
+    // Start tour after data is loaded so targets exist in DOM
+    setTimeout(() => this.tour.start(), 400);
   }
 
   handleEmergencyBypass() {

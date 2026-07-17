@@ -94,7 +94,12 @@ export class WebLLMProvider implements IIntelligenceProvider {
       throw new Error("WebGPU verification payload too large for current configuration. Deferring downward."); 
   }
   
-  async translateReadingLevel(text: string, level: any): Promise<string> { 
+  async translateReadingLevel(
+      text: string,
+      level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+      cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
+      language?: string
+  ): Promise<string> { 
       throw new Error("WebGPU explicit tuning deferred downward."); 
   }
   

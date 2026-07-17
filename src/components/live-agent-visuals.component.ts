@@ -51,8 +51,8 @@ import { CommonModule } from '@angular/common';
                 </svg>
             </div>
             <div class="text-center -mt-8 md:-mt-16 transition-all duration-300" [class.opacity-0]="hasChatHistory">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-widest text-[11px]">Pocket Gull AI</h2>
-                <p class="text-[10px] text-gray-500 dark:text-zinc-400 font-medium tracking-wide">Live Clinical Co-Pilot</p>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-widest text-[12px]">Pocket Gull AI</h2>
+                <p class="text-[12px] text-gray-500 dark:text-zinc-400 font-medium tracking-wide">Live Clinical Co-Pilot</p>
             </div>
         </div>
     `,

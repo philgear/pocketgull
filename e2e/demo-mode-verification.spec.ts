@@ -83,14 +83,14 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // Verify Western Nutrition tab works (which we recently added)
     const nutritionTab = page.getByTestId('tab-nutrition');
-    await nutritionTab.click({ force: true });
+    await nutritionTab.click();
     await page.waitForTimeout(500);
     // Nutrition-specific Western keyword
     await expect(page.locator('app-analysis-report').locator('text=Mediterranean Diet Pattern')).toBeVisible({ timeout: 5000 });
 
     // Take Western Screenshot (from Summary Overview tab)
     const overviewTab = page.getByTestId('tab-overview');
-    await overviewTab.click({ force: true });
+    await overviewTab.click();
     await page.waitForTimeout(500);
     // await page.screenshot({ path: path.join(artifactDir, 'western_dashboard.png') });
     // console.log('[Verification] Western screenshot saved.');
@@ -106,7 +106,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // Verify Functional Protocols in Eastern Mode
     const functionalTab = page.getByTestId('tab-functional-protocols');
-    await functionalTab.click({ force: true });
+    await functionalTab.click();
     await page.waitForTimeout(500);
     await expect(page.locator('app-analysis-report').locator('text=Corydalis Yanhusuo')).toBeVisible({ timeout: 5000 });
 
@@ -125,7 +125,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // Verify Precision Nutrients in Ayurvedic Mode
     const orthomolecularTab = page.getByTestId('tab-precision-nutrients');
-    await orthomolecularTab.click({ force: true });
+    await orthomolecularTab.click();
     await page.waitForTimeout(500);
     // Ayurvedic biomarker check
     await expect(page.locator('app-analysis-report').locator('text=structural dryness')).toBeVisible({ timeout: 5000 });
