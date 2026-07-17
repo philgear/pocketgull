@@ -1,9 +1,33 @@
 import express from 'express';
 import cors from 'cors';
 import fetch from 'node-fetch';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
-app.use(cors({ origin: '*' }));
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:4200,http://127.0.0.1:4200')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow non-browser clients (no Origin header), block unknown browser origins.
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  }
+}));
+
+// Apply Hue Bridge recommended rate limit: maximum 10 requests per second to avoid bridge overload
+const hueLimiter = rateLimit({
+  windowMs: 1000, // 1 second
+  max: 10,
+  message: { error: 'Too many requests sent to the Hue Bridge. Rate limited to 10 req/sec to prevent bridge freeze.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/hue/', hueLimiter);
 app.use(express.json());
 
 const PORT = 8080;
