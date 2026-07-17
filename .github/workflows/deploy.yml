@@ -134,6 +134,8 @@ jobs:
           env_vars: |
             NODE_ENV=production
             OTEL_SDK_DISABLED=true
+            GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }}
+            GOOGLE_CLOUD_REGION=us-central1
           flags: '--set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest --concurrency=100 --max-instances=1 --min-instances=0'
 
       - name: Comment Preview URL on PR
@@ -235,5 +237,7 @@ jobs:
           env_vars: |
             NODE_ENV=production
             OTEL_SDK_DISABLED=true
+            GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }}
+            GOOGLE_CLOUD_REGION=us-central1
           # Secure deployment flags + secrets binding
           flags: '--vpc-egress=private-ranges-only --concurrency=100 --max-instances=2 --min-instances=0 --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest'
