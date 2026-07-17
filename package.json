@@ -194,6 +194,7 @@
     "webpack-dev-server": "^5.2.5"
   },
   "overrides": {
+    "websocket-driver": "0.7.5",
     "esbuild": "0.28.1",
     "@esbuild/aix-ppc64": "0.28.1",
     "@esbuild/android-arm": "0.28.1",

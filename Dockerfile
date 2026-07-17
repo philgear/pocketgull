@@ -13,7 +13,7 @@ COPY package*.json ./
 COPY docs/study/package.json ./docs/study/
 COPY companion-apps/avs-therapy/package.json ./companion-apps/avs-therapy/
 COPY pocketgull_api/package.json ./pocketgull_api/
-RUN npm ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps
 
 # Copy source and build the docs/study Astro sub-project + Angular SSR app
 COPY . .
