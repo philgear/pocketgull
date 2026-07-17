@@ -72,6 +72,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
       window.localStorage.setItem('pg_mock_clinician', '1');
       window.localStorage.setItem('pg_data_consent_v1', 'true');
       window.localStorage.setItem('GEMINI_API_KEY', 'AIzaMockKeyForTestingChaos12345');
+      (window as any).GEMINI_API_KEY = 'AIzaMockKeyForTestingChaos12345';
 
       // Disable service worker during E2E tests
       try {

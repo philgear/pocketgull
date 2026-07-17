@@ -1,10 +1,28 @@
 import { Page } from '@playwright/test';
 
 /**
+ * Polls the backend until it is fully responsive to prevent E2E race conditions on CI.
+ */
+async function waitForBackendToBeReady() {
+  const url = 'http://localhost:4200/api/config';
+  for (let i = 0; i < 30; i++) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return;
+    } catch (e) {}
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  console.warn('⚠️ E2E Setup: Backend API did not become ready in time.');
+}
+
+/**
  * Common setup for E2E tests.
  * Mocks out hardware telemetry, config, and prevents Service Worker registration.
  */
 export async function setupE2ePage(page: Page, options: { mockClinician?: boolean } = { mockClinician: true }) {
+  // Wait for the local Express server backend to finish booting and seeding
+  await waitForBackendToBeReady();
+
   page.on('console', msg => {
     console.log(`PAGE LOG [${msg.type()}]:`, msg.text());
   });
@@ -47,6 +65,9 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
     try {
       window.indexedDB.deleteDatabase('PocketGullDB');
     } catch (e) {}
+
+    // Mock API key so the Voice Assistant doesn't abort initialization
+    (window as any).GEMINI_API_KEY = 'mock-api-key';
 
     window.localStorage.setItem('pg_tour_seen', '1');
     window.localStorage.setItem('pg_data_consent_v1', 'true');
