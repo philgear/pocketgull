@@ -29,16 +29,18 @@ app.use('/api', apiLimiter);
 app.set('trust proxy', true);
 
 // Redirect legacy URLs and alternative domains to the primary pocketgull.app domain
+const legacyRedirectHosts = new Set([
+  'pocketgall.com',
+  'pocketgall.app',
+  'pocketgal.app',
+  'pocketgull.com',
+  'pocketgal.ai',
+  'understory'
+]);
+
 app.use((req, res, next) => {
-  const host = req.hostname || '';
-  if (
-    host.endsWith('pocketgall.com') ||
-    host.endsWith('pocketgall.app') ||
-    host.endsWith('pocketgal.app') ||
-    host.endsWith('pocketgull.com') ||
-    host.endsWith('pocketgal.ai') ||
-    host.includes('understory')
-  ) {
+  const host = (req.hostname || '').toLowerCase().replace(/\.$/, '');
+  if (legacyRedirectHosts.has(host)) {
     return res.redirect(301, `https://pocketgull.app${req.originalUrl}`);
   }
   next();
