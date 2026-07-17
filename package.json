@@ -183,7 +183,7 @@
     "lighthouse": "^13.0.3",
     "lint-staged": "^17.0.5",
     "puppeteer": "^24.39.0",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vite": "^7.3.5",
     "vitest": "^4.1.6",
     "@astrojs/mdx": "^5.0.1",
