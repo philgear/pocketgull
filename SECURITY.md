@@ -13,7 +13,10 @@ Only the latest `main` branch and currently deployed production versions receive
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within Pocket Gull, please do not disclose it publicly. Instead, contact the repository owner/lead developer directly via the channels provided in the developer profile or through private GitHub vulnerability reporting.
+If you discover a security vulnerability within Pocket Gull, please do **not** disclose it publicly. Instead, use one of the following private channels:
+
+1.  **GitHub Private Vulnerability Reporting**: [Report a vulnerability](https://github.com/philgear/pocketgull/security/advisories/new) (preferred).
+2.  **Email**: Send details to **security@pocketgull.app**.
 
 We will review the submission within 48 hours and work with you to patch the vulnerability safely before public disclosure.
 

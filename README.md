@@ -171,6 +171,20 @@ Full engineering documentation is available in the [`docs/study/`](./docs/study/
 - **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
 - **[Valuation & Positioning](./docs/valuation_and_positioning.md)** — Business case, target audience, and valuation framework
 - **[Design System & Avian Personas](./DESIGN.md)** — Dieter Rams design language, brand identity, and the Gull Squadron AI agent personas
+- **[REST API Reference](file:///c:/Users/philg/Pocketgull/pocketgull/pocketgull_api/openapi.yaml)** — OpenAPI specification describing the external REST and WebSocket interfaces (inputs, outputs, endpoints, and schemas) of the backend service.
+
+
+
+---
+
+## 🤝 Contributing & Feedback
+
+We welcome contributions and feedback from the community! Please refer to our [Contributing Guidelines](file:///c:/Users/philg/Pocketgull/pocketgull/CONTRIBUTING.md) for detailed information on:
+*   **Obtaining the software**: Step-by-step instructions on cloning the repository and setting up the local environment.
+*   **Providing Feedback**: How to file bug reports or request new features using our issue tracker.
+*   **Contributing Code**: Guidelines on [Contribution Requirements & Coding Standards](file:///c:/Users/philg/Pocketgull/pocketgull/CONTRIBUTING.md#4-requirements-for-acceptable-contributions) and submitting pull requests.
+
+We also expect all contributors to follow our [Code of Conduct](file:///c:/Users/philg/Pocketgull/pocketgull/CODE_OF_CONDUCT.md) to keep our community safe and welcoming. Detailed policies on data security and terms of usage are available in our [Privacy Policy](file:///c:/Users/philg/Pocketgull/pocketgull/PRIVACY.md) and [Terms of Service](file:///c:/Users/philg/Pocketgull/pocketgull/TERMS.md).
 
 ---
 
