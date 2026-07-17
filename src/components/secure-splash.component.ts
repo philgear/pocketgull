@@ -658,7 +658,6 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
           </div>
         </div>
       }
-
       <!-- Secondary Agent Persona Card (Day-based Mascot) -->
       @if (activeSecondaryAgent(); as agent) {
         <div class="absolute bottom-20 right-8 z-30 hidden md:flex items-center gap-3 bg-white/95 dark:bg-zinc-950/80 px-4 py-3 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl animate-in slide-in-from-right-8 duration-[800ms] pointer-events-auto">
