@@ -39,8 +39,22 @@ async function main() {
     // Download each font file
     const urlToLocalMap = new Map();
     for (const url of urls) {
+        // CodeQL Security Hardening: Enforce trusted Google Fonts domains whitelist
+        if (!url.startsWith('https://fonts.gstatic.com/s/')) {
+            throw new Error(`Security Exception: Untrusted font URL target: ${url}`);
+        }
+
         const filename = path.basename(url);
-        const localPath = path.join(fontsDir, filename);
+        // CodeQL Security Hardening: Sanitize filename to alphanumeric and safe delimiters
+        if (!/^[a-zA-Z0-9_\-\.]+$/.test(filename)) {
+            throw new Error(`Security Exception: Invalid filename format: ${filename}`);
+        }
+        
+        const localPath = path.resolve(fontsDir, filename);
+        // CodeQL Security Hardening: Path traversal containment check
+        if (!localPath.startsWith(fontsDir)) {
+            throw new Error(`Security Exception: Path traversal attempt detected: ${localPath}`);
+        }
         
         console.log(`Downloading ${filename}...`);
         const fontRes = await fetch(url);
