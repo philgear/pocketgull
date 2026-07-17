@@ -612,14 +612,17 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
     try {
       // Initialize Google GenAI SDK
       let ai;
+      let Type;
       if (token) {
           const projectId = (process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645').replace(/[^a-zA-Z0-9-_]/g, '');
           const location = (process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1').replace(/[^a-zA-Z0-9-]/g, '');
-          const { GoogleGenAI } = await import('@google/genai');
+          const { GoogleGenAI, Type: ImportedType } = await import('@google/genai');
           ai = new GoogleGenAI({ vertexai: true, project: projectId, location: location });
+          Type = ImportedType;
       } else {
-          const { GoogleGenAI } = await import('@google/genai');
+          const { GoogleGenAI, Type: ImportedType } = await import('@google/genai');
           ai = new GoogleGenAI({ apiKey: key });
+          Type = ImportedType;
       }
 
       const streamingResponse = await ai.models.generateContentStream({
@@ -633,9 +636,9 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
                       name: "protein_sequence_similarity_search",
                       description: "Searches for homologous protein sequences using MMseqs2 (fast). Use this when analyzing a protein sequence to find homologues and infer protein function.",
                       parameters: {
-                          type: "OBJECT",
+                          type: Type.OBJECT,
                           properties: {
-                              sequence: { type: "STRING", description: "The raw amino acid sequence to search" }
+                              sequence: { type: Type.STRING, description: "The raw amino acid sequence to search" }
                           },
                           required: ["sequence"]
                       }

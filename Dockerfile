@@ -1,15 +1,12 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:24-alpine AS builder
+FROM node:24-alpine3.20 AS builder
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities
-RUN apk update && apk upgrade --no-cache
-
-# Update npm to resolve bundled package vulnerabilities (picomatch, tar, etc.)
-RUN npm install -g npm@latest
+RUN apk upgrade --no-cache
 
 # Install ALL dependencies (including devDependencies needed for ng build)
 COPY package*.json ./
@@ -25,15 +22,12 @@ RUN npm run build
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:24-alpine
+FROM node:24-alpine3.20
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities in production image
-RUN apk update && apk upgrade --no-cache
-
-# Update npm to resolve bundled package vulnerabilities
-RUN npm install -g npm@latest
+RUN apk upgrade --no-cache
 
 # Set Node to production mode
 ENV NODE_ENV=production
@@ -50,6 +44,9 @@ COPY --from=builder /app/dist ./dist
 
 # Copy runtime assets the server loads from the project root at startup
 COPY --from=builder /app/docs/openapi.json ./docs/openapi.json
+
+# Create runtime directories and ensure the non-root 'node' user has write permissions
+RUN mkdir -p /app/logs /app/data && chown -R node:node /app
 
 # Run as non-root user for security
 USER node

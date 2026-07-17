@@ -6,6 +6,8 @@ dist/
 .angular/
 venv/
 .gemini/
+tmp/
+logs/
 pocketgull-release.tar.gz
 playwright-report/
 test-results/
