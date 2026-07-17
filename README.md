@@ -89,7 +89,7 @@ A highly interactive, aesthetically minimal user interface (Industrial Grace) de
 ## 📃 Text Description
 
 **What it does:**
-Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-time human-in-the-loop web speech interaction with a diagnostic 3D surface model and Gemini's deep reasoning (`gemini-2.5-flash` via Vertex AI Enterprise and `@google/adk`), it processes a patient's multimodal symptom data to instantly produce synthesized, actionable clinical strategies.
+Pocketgull is a secure digital assistant for doctors, nurses, and caregivers. It allows clinicians to speak naturally to a smart assistant while viewing a 3D model of the human body. As the clinician describes patient symptoms or taps on pain areas, the assistant instantly compiles the information, searches trusted medical literature (like PubMed), and creates a clear, structured care strategy. This reduces the time clinicians spend on documentation and helps them focus on patient care.
 
 ---
 
@@ -171,6 +171,20 @@ Full engineering documentation is available in the [`docs/study/`](./docs/study/
 - **[Case Study](./docs/case_study.md)** — Professional engineering case study with benchmark results
 - **[Valuation & Positioning](./docs/valuation_and_positioning.md)** — Business case, target audience, and valuation framework
 - **[Design System & Avian Personas](./DESIGN.md)** — Dieter Rams design language, brand identity, and the Gull Squadron AI agent personas
+- **[REST API Reference](file:///c:/Users/philg/Pocketgull/pocketgull/pocketgull_api/openapi.yaml)** — OpenAPI specification describing the external REST and WebSocket interfaces (inputs, outputs, endpoints, and schemas) of the backend service.
+
+
+
+---
+
+## 🤝 Contributing & Feedback
+
+We welcome contributions and feedback from the community! Please refer to our [Contributing Guidelines](file:///c:/Users/philg/Pocketgull/pocketgull/CONTRIBUTING.md) for detailed information on:
+*   **Obtaining the software**: Step-by-step instructions on cloning the repository and setting up the local environment.
+*   **Providing Feedback**: How to file bug reports or request new features using our issue tracker.
+*   **Contributing Code**: Guidelines on [Contribution Requirements & Coding Standards](file:///c:/Users/philg/Pocketgull/pocketgull/CONTRIBUTING.md#4-requirements-for-acceptable-contributions) and submitting pull requests.
+
+We also expect all contributors to follow our [Code of Conduct](file:///c:/Users/philg/Pocketgull/pocketgull/CODE_OF_CONDUCT.md) to keep our community safe and welcoming. Detailed policies on data security and terms of usage are available in our [Privacy Policy](file:///c:/Users/philg/Pocketgull/pocketgull/PRIVACY.md) and [Terms of Service](file:///c:/Users/philg/Pocketgull/pocketgull/TERMS.md).
 
 ---
 

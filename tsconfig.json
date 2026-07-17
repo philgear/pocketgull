@@ -29,15 +29,21 @@
     }
   },
   "files": [
-    "./main.ts",
-    "./src/globals.d.ts",
+    "main.ts",
+    "src/globals.d.ts",
     "src/main.server.ts",
     "src/server.ts"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "main.ts"
   ],
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true
   },
   "exclude": [
+    "node_modules",
+    "dist",
     "src/lib/dataconnect/**"
   ]
 }

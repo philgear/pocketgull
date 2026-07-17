@@ -604,10 +604,60 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
           <span>Good Samaritan Mode (Bypass)</span>
         </button>
 
+        <!-- Terms and Privacy Links -->
+        <div class="mt-6 flex items-center justify-center gap-4 text-[10.5px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 z-30">
+          <button type="button" (click)="showTermsModal.set(true)" class="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-0 cursor-pointer">Terms of Service</button>
+          <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-800"></span>
+          <button type="button" (click)="showPrivacyModal.set(true)" class="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-0 cursor-pointer">Privacy Policy</button>
+        </div>
+
         <p class="text-[12px] text-zinc-555 dark:text-zinc-500 mt-8 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
 
       </div>
 
+      <!-- Terms of Service Modal -->
+      @if (showTermsModal()) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/45 dark:bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
+          <div class="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh] pointer-events-auto">
+            <h2 class="text-base font-bold uppercase tracking-[0.15em] text-zinc-800 dark:text-zinc-100 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-brand-blue-600 dark:text-brand-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Terms of Service
+            </h2>
+            <div class="overflow-y-auto pr-2 text-[12px] text-zinc-655 dark:text-zinc-400 space-y-3 font-sans leading-relaxed text-left">
+              <p class="font-bold">Pocket Gull is an AI-powered clinical co-pilot designed to organize summaries and suggest care strategies.</p>
+              <p><span class="font-bold">1. Clinical Disclaimer:</span> This software does not provide medical diagnosis, treatment, or advice. All suggestions must be reviewed, edited, and approved by a licensed healthcare professional.</p>
+              <p><span class="font-bold">2. Licensing:</span> Released under the permissive MIT License terms. Code acquisition and distribution are free and open.</p>
+              <p><span class="font-bold">3. Account Security:</span> Users are responsible for key safety. API keys must never be shared or committed publicly.</p>
+              <p><span class="font-bold">4. Liability:</span> The authors are not liable for clinical decisions or outcomes resulting from use of this tool.</p>
+            </div>
+            <button type="button" (click)="showTermsModal.set(false)" class="mt-6 w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.15em] transition rounded-xl active:scale-[0.98] cursor-pointer">
+              Close Reference
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Privacy Policy Modal -->
+      @if (showPrivacyModal()) {
+        <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/45 dark:bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
+          <div class="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh] pointer-events-auto">
+            <h2 class="text-base font-bold uppercase tracking-[0.15em] text-zinc-800 dark:text-zinc-100 mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Privacy Policy
+            </h2>
+            <div class="overflow-y-auto pr-2 text-[12px] text-zinc-655 dark:text-zinc-400 space-y-3 font-sans leading-relaxed text-left">
+              <p class="font-bold">We take clinical privacy and patient data security extremely seriously.</p>
+              <p><span class="font-bold">1. Local-First Storage:</span> We do not persist patient health information (PHI) or personal details to any remote database. All vitals, histories, and logs reside strictly in your local browser storage.</p>
+              <p><span class="font-bold">2. Ephemeral Transit:</span> Clinical data sent to Google Gemini or Vertex AI is transient. It is processed in transit only and is never used to train foundation models.</p>
+              <p><span class="font-bold">3. Zero Telemetry:</span> We collect no usage telemetry, analytical tracking, or third-party cookies. The console is fully isolated.</p>
+              <p><span class="font-bold">4. Security Contact:</span> Direct compliance feedback or private security disclosures should be sent to dpo@pocketgull.app.</p>
+            </div>
+            <button type="button" (click)="showPrivacyModal.set(false)" class="mt-6 w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.15em] transition rounded-xl active:scale-[0.98] cursor-pointer">
+              Close Reference
+            </button>
+          </div>
+        </div>
+      }
       <!-- Secondary Agent Persona Card (Day-based Mascot) -->
       @if (activeSecondaryAgent(); as agent) {
         <div class="absolute bottom-20 right-8 z-30 hidden md:flex items-center gap-3 bg-white/95 dark:bg-zinc-950/80 px-4 py-3 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl animate-in slide-in-from-right-8 duration-[800ms] pointer-events-auto">
@@ -819,6 +869,8 @@ export class SecureSplashComponent implements OnInit {
   viewState = signal<'auth' | 'beta' | 'ethics' | 'kss'>('auth');
   pledgeAccepted = signal(false);
   clinicianKssSelected = signal<KssScore | null>(null);
+  showTermsModal = signal(false);
+  showPrivacyModal = signal(false);
   isLocked = computed(() => this.session.isLocked());
   activeSecondaryAgent = computed(() => {
     if (!isPlatformBrowser(this.platformId)) return null;
