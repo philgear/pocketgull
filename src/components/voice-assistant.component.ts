@@ -14,6 +14,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
 import { AdkLiveService } from '../services/ai/adk-live.service';
 import { StorageService } from '../services/storage.service';
 import { inject as baseInject } from '@angular/core';
+import { getStoredApiKey } from '../services/secure-key';
 
 export interface IChatEntry {
     role: 'user' | 'model';
@@ -631,7 +632,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
         
         // Initialize ADK Live Service with user's actual token (from API key context)
         // Check window (SSR inject) first, then fallback to local storage
-        const apiKey = (window as any).GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY') || '';
+        const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
         if (!apiKey) {
              console.error("AdkLiveService Error: No GEMINI_API_KEY found in window or localStorage.");
              this.permissionError.set('Missing API Key. Please re-enter it on the home screen.');

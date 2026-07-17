@@ -63,7 +63,7 @@ function resolveParam(queryVal: unknown, envVal: string | undefined, fallback?: 
 dicomRouter.get('/studies', async (req, res) => {
   try {
     const projectId  = resolveParam(req.query['project'],   process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT']);
-    const location   = resolveParam(req.query['location'],  process.env['HC_LOCATION'], 'us-central2');
+    const location   = resolveParam(req.query['location'],  process.env['HC_LOCATION'], 'us-central1');
     const datasetId  = resolveParam(req.query['dataset'],   process.env['HC_DATASET']);
     const dicomStoreId = resolveParam(req.query['dicomStore'], process.env['HC_DICOM_STORE']);
 

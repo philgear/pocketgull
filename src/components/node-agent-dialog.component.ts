@@ -11,6 +11,7 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { AdkLiveService } from '../services/ai/adk-live.service';
+import { getStoredApiKey } from '../services/secure-key';
 
 export interface INodeAgentDialogData {
     nodeKey: string;
@@ -891,7 +892,7 @@ ${patientCtx}`;
         if (!this.live.isConnected()) {
             this.isLoading.set(true);
             try {
-                const apiKey = (window as any).GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY') || '';
+                const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
                 if (!apiKey) {
                     this.appendModelMessage('System Note: Missing API Key. Please configure it to use voice.');
                     this.isLoading.set(false);

@@ -2,7 +2,7 @@ import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
-import { dirname, join, resolve } from 'path';
+import { dirname, join, resolve, relative, isAbsolute } from 'path';
 import { rateLimit } from 'express-rate-limit';
 import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
@@ -58,15 +58,25 @@ console.log(`[SERVER] Expected dist folder: ${distFolder}`);
 
 // Serve Astro Study Docs independently of Swagger
 app.use('/docs/study', (req, res, next) => {
+  const requestUrl = new URL(req.path || '/', 'http://localhost');
+  const requestedPath = requestUrl.pathname;
+  
+  const expectedBase = resolve(distFolder, 'docs', 'study');
+  const candidatePath = resolve(expectedBase, '.' + requestedPath);
+  const relativePath = relative(expectedBase, candidatePath);
+
+  if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
+    return res.status(403).send("Forbidden");
+  }
+
   if (req.path !== '/' && req.path !== '' && !req.path.endsWith('/') && !req.path.includes('.')) {
     return res.redirect(301, `/docs/study${req.path}/`);
   }
 
-  const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
-  if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const targetPath = join(distFolder, 'docs', 'study', cleanPath, 'index.html');
+  const cleanPath = requestedPath.endsWith('/') ? requestedPath : requestedPath + '/';
+  if (requestedPath === '/' || requestedPath === '' || !requestedPath.includes('.')) {
+    const targetPath = join(expectedBase, cleanPath, 'index.html');
     const resolvedPath = resolve(targetPath);
-    const expectedBase = resolve(join(distFolder, 'docs', 'study'));
     if (resolvedPath.startsWith(expectedBase) && fs.existsSync(resolvedPath)) {
       return res.sendFile(resolvedPath);
     }
@@ -385,14 +395,95 @@ app.get('/api/patients', (req, res) => {
   }
 });
 
+function validatePatientData(data) {
+  if (!Array.isArray(data)) {
+    throw new Error('Data must be an array');
+  }
+  return data.map(patient => {
+    if (typeof patient !== 'object' || patient === null) {
+      throw new Error('Patient must be an object');
+    }
+    return {
+      id: String(patient.id || ''),
+      name: String(patient.name || ''),
+      age: Number(patient.age || 0),
+      gender: String(patient.gender || ''),
+      lastVisit: String(patient.lastVisit || ''),
+      preexistingConditions: Array.isArray(patient.preexistingConditions) 
+        ? patient.preexistingConditions.map(String) 
+        : [],
+      patientGoals: String(patient.patientGoals || ''),
+      vitals: {
+        bp: String(patient.vitals?.bp || ''),
+        hr: String(patient.vitals?.hr || ''),
+        temp: String(patient.vitals?.temp || ''),
+        spO2: String(patient.vitals?.spO2 || ''),
+        weight: String(patient.vitals?.weight || ''),
+        height: String(patient.vitals?.height || '')
+      },
+      oxidativeStressMarkers: Array.isArray(patient.oxidativeStressMarkers)
+        ? patient.oxidativeStressMarkers.map(m => ({
+            id: String(m.id || ''),
+            name: String(m.name || ''),
+            value: String(m.value || '')
+          }))
+        : [],
+      clinicalLogs: Array.isArray(patient.clinicalLogs)
+        ? patient.clinicalLogs.map(l => ({
+            timestamp: String(l.timestamp || ''),
+            clinician: String(l.clinician || ''),
+            note: String(l.note || '')
+          }))
+        : [],
+      medications: Array.isArray(patient.medications)
+        ? patient.medications.map(m => ({
+            name: String(m.name || ''),
+            dosage: String(m.dosage || ''),
+            frequency: String(m.frequency || '')
+          }))
+        : [],
+      labResults: Array.isArray(patient.labResults)
+        ? patient.labResults.map(r => ({
+            testName: String(r.testName || ''),
+            value: String(r.value || ''),
+            unit: String(r.unit || ''),
+            status: String(r.status || '')
+          }))
+        : [],
+      lifestyleFactors: {
+        sleepHours: Number(patient.lifestyleFactors?.sleepHours || 0),
+        activityLevel: String(patient.lifestyleFactors?.activityLevel || ''),
+        stressScore: Number(patient.lifestyleFactors?.stressScore || 0)
+      },
+      avsHistory: Array.isArray(patient.avsHistory)
+        ? patient.avsHistory.map(h => ({
+            timestamp: String(h.timestamp || ''),
+            wave: String(h.wave || ''),
+            bpm: Number(h.bpm || 0),
+            durationMin: Number(h.durationMin || 0)
+          }))
+        : [],
+      clinicalPhilosophy: String(patient.clinicalPhilosophy || ''),
+      selectedPhilosophy: String(patient.selectedPhilosophy || ''),
+      isEmergencyMode: Boolean(patient.isEmergencyMode),
+      reasonForVisit: String(patient.reasonForVisit || ''),
+      occupation: String(patient.occupation || ''),
+      dietaryProtocol: String(patient.dietaryProtocol || '')
+    };
+  });
+}
+
 app.post('/api/patients', (req, res) => {
   try {
     if (!req.body || !Array.isArray(req.body)) {
       return res.status(400).json({ error: 'Body must be a JSON array of patients' });
     }
 
-    // Save exactly what the frontend sends
-    fs.writeFileSync(patientsDbPath, JSON.stringify(req.body, null, 2));
+    // Sanitize and validate incoming patient data
+    const sanitized = validatePatientData(req.body);
+
+    // Save validated data to file
+    fs.writeFileSync(patientsDbPath, JSON.stringify(sanitized, null, 2));
 
     console.log(`[API] Saved ${req.body.length} patients to database.`);
     res.status(200).json({ success: true, count: req.body.length });

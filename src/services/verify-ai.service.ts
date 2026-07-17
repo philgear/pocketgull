@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { IVerificationIssue } from '../components/analysis-report.types';
 import { AI_CONFIG } from './ai-provider.types';
 import { AiCacheService } from './ai-cache.service';
+import { getStoredApiKey } from './secure-key';
 
 @Injectable({
     providedIn: 'root'
@@ -14,9 +15,9 @@ export class VerifyAiService {
     private async getAi(): Promise<any> {
         if (!this._ai) {
             let initialKey = (window as any).GEMINI_API_KEY || this.config.apiKey;
-            if (!initialKey && typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
+            if (!initialKey && typeof localStorage !== 'undefined') {
                 try {
-                    initialKey = localStorage.getItem('GEMINI_API_KEY');
+                    initialKey = getStoredApiKey();
                 } catch (e) { console.error("VerifyAiService: localStorage error", e); }
             }
             if (!initialKey && typeof process !== 'undefined' && process.env) {

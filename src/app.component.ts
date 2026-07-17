@@ -12,6 +12,7 @@ import { DictationModalComponent } from './components/dictation-modal.component'
 import { TaskFlowComponent } from './components/task-flow.component';
 import { IntakeFormComponent } from './components/intake-form.component';
 import { VoiceAssistantComponent } from './components/voice-assistant.component';
+import { getStoredApiKey, setStoredApiKey } from './services/secure-key';
 import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { GeminiProvider } from './services/ai/gemini.provider';
@@ -2001,7 +2002,7 @@ export class AppComponent implements OnDestroy {
         if (configRes.ok) {
           const config = await configRes.json();
           if (config?.apiKey) {
-            try { localStorage.setItem('GEMINI_API_KEY', config.apiKey); } catch (_e) { /* ignore */ }
+            try { setStoredApiKey(config.apiKey); } catch (_e) { /* ignore */ }
             (window as any).GEMINI_API_KEY = config.apiKey; // keep compat for ADK WS handshake
             this.hasApiKey.set(true);
           }
@@ -2011,7 +2012,7 @@ export class AppComponent implements OnDestroy {
       // 2. Check for stored API key in localStorage (manual entry / offline fallback)
       if (!this.hasApiKey()) {
         try {
-          const storedKey = localStorage.getItem('GEMINI_API_KEY');
+          const storedKey = getStoredApiKey();
           if (storedKey) {
             this.hasApiKey.set(true);
           }
@@ -2367,7 +2368,7 @@ export class AppComponent implements OnDestroy {
       return;
     }
     try {
-      localStorage.setItem('GEMINI_API_KEY', key);
+      setStoredApiKey(key);
     } catch (e) { /* ignore */ }
     this.apiKeyError.set(null);
     this.isDemoMode.set(false);

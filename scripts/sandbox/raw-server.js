@@ -8,12 +8,19 @@ const __dirname = path.dirname(__filename);
 const distFolder = path.join(__dirname, 'dist');
 
 const server = http.createServer((req, res) => {
-    const targetPath = path.join(distFolder, req.url === '/' ? 'index.html' : req.url);
-    const resolvedPath = path.resolve(targetPath);
-    const expectedBase = path.resolve(distFolder);
+    const requestUrl = new URL(req.url || '/', 'http://localhost');
+    const requestedPath = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
+    const candidatePath = path.resolve(distFolder, '.' + requestedPath);
+    const relativePath = path.relative(distFolder, candidatePath);
 
-    let filePath = resolvedPath;
-    if (!resolvedPath.startsWith(expectedBase) || !fs.existsSync(resolvedPath)) {
+    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        res.writeHead(403);
+        res.end("Forbidden");
+        return;
+    }
+
+    let filePath = candidatePath;
+    if (!fs.existsSync(filePath)) {
         filePath = path.join(distFolder, 'index.html');
     }
 
