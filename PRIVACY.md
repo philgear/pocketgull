@@ -19,4 +19,4 @@ We do not utilize third-party analytics trackers, cookies, or telemetry tools. Y
 ---
 
 ## 4. Contact Information
-For privacy questions, audits, or feedback, contact **security@pocketgull.app**.
+For privacy questions, audits, or feedback, contact **dpo@pocketgull.app**.

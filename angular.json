@@ -73,7 +73,9 @@
               "@grpc/proto-loader",
               "xmlhttprequest-ssl",
               "@google-cloud/vertexai",
-              "@google-cloud/vertexai/build/src/resources/index.js"
+              "@google-cloud/vertexai/build/src/resources/index.js",
+              "crypto-js",
+              "firebase/data-connect"
             ],
             "externalDependencies": [
               "@mikro-orm/sqlite",

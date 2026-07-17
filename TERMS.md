@@ -19,4 +19,4 @@ When using your personal Gemini API key or clinician sign-in credentials, you ar
 ---
 
 ## 4. Contact Information
-For questions or terms feedback, contact **security@pocketgull.app**.
+For questions or terms feedback, contact **dpo@pocketgull.app**.

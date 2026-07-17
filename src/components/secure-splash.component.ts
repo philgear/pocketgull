@@ -650,7 +650,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               <p><span class="font-bold">1. Local-First Storage:</span> We do not persist patient health information (PHI) or personal details to any remote database. All vitals, histories, and logs reside strictly in your local browser storage.</p>
               <p><span class="font-bold">2. Ephemeral Transit:</span> Clinical data sent to Google Gemini or Vertex AI is transient. It is processed in transit only and is never used to train foundation models.</p>
               <p><span class="font-bold">3. Zero Telemetry:</span> We collect no usage telemetry, analytical tracking, or third-party cookies. The console is fully isolated.</p>
-              <p><span class="font-bold">4. Security Contact:</span> Direct compliance feedback or private security disclosures should be sent to security@pocketgull.app.</p>
+              <p><span class="font-bold">4. Security Contact:</span> Direct compliance feedback or private security disclosures should be sent to dpo@pocketgull.app.</p>
             </div>
             <button type="button" (click)="showPrivacyModal.set(false)" class="mt-6 w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.15em] transition rounded-xl active:scale-[0.98] cursor-pointer">
               Close Reference
