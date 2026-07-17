@@ -93,6 +93,9 @@ awsRouter.post('/healthlake/export', express.json({ limit: '50mb' }), async (req
     const region = process.env['AWS_REGION'] || 'us-east-1';
 
     const patientId = payload.id || 'unknown';
+    if (typeof patientId !== 'string' || !/^[a-zA-Z0-9_\-]+$/.test(patientId)) {
+        return res.status(400).json({ error: 'Invalid patient ID format.' });
+    }
     const fhirPatientId = `pocket-gull-${patientId}`;
 
     // 1. Map patient demographics to standard FHIR R4 Patient

@@ -264,7 +264,11 @@ export interface IChatEntry {
                               </div>
                             }
 
-                            <!-- ... [Rest of controls like error messages, file uploads remain the same] ... -->
+                            @if (permissionError()) {
+                              <div class="px-4 py-2 bg-red-100 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 rounded-xl text-xs text-red-600 dark:text-red-400 font-medium text-center animate-in fade-in slide-in-from-top-1 duration-200">
+                                {{ permissionError() }}
+                              </div>
+                            }
 
                             <form (submit)="sendMessage($event)" class="w-full flex items-center gap-2 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-700 shadow-2xl rounded-full p-2 focus-within:border-gray-300 dark:focus-within:border-zinc-600 transition-all">
                                 <button type="button" (click)="toggleListening()" [disabled]="agentState() !== 'idle' || !!permissionError()"

@@ -1,0 +1,13 @@
+apiVersion: "autoscaling.agones.dev/v1"
+kind: FleetAutoscaler
+metadata:
+  name: pocketgull-consult-autoscaler
+  namespace: default
+spec:
+  fleetName: pocketgull-consult-fleet
+  policy:
+    type: Buffer
+    buffer:
+      bufferSize: 3 # keep 3 Ready pods in reserve
+      minReplicas: 2
+      maxReplicas: 20

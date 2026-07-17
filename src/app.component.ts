@@ -357,7 +357,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
             <span class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-widest">{{ network.isOnline() ? 'System Ready' : 'System Offline' }}</span>
               
               <!-- Tooltip -->
-              <div class="absolute top-full left-0 mt-2 w-64 bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-left">
+              <div class="absolute top-full left-0 mt-2 w-64 bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-2xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-left">
                  <div class="space-y-3">
                     <div class="flex justify-between items-center pb-2 border-b border-gray-800">
                        <span class="text-xs font-bold text-gray-300">CORE STATUS</span>

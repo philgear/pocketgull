@@ -210,39 +210,48 @@ export class AiCacheService {
         const keyObj = await this.encryptionKeyPromise;
         if (!db || !keyObj) return [];
 
-        return new Promise((resolve, reject) => {
+        const encryptedEntries = await new Promise<{ key: string; entry: ICacheEntry }[]>((resolve, reject) => {
             const transaction = db.transaction(this.STORE_NAME, 'readonly');
             const store = transaction.objectStore(this.STORE_NAME);
             const request = store.openCursor();
-            const results: { key: string; value: any; lastUsed: number }[] = [];
+            const list: { key: string; entry: ICacheEntry }[] = [];
 
-            request.onsuccess = async (event: any) => {
+            request.onsuccess = (event: any) => {
                 const cursor = event.target.result;
                 if (cursor) {
-                    const entry: ICacheEntry = cursor.value;
-                    try {
-                        const decrypted = await crypto.subtle.decrypt(
-                            { name: 'AES-GCM', iv: entry.iv as any },
-                            keyObj,
-                            entry.encryptedData
-                        );
-                        const value = JSON.parse(new TextDecoder().decode(decrypted));
-                        results.push({
-                            key: cursor.key as string,
-                            value,
-                            lastUsed: entry.lastUsed
-                        });
-                    } catch (e) {
-                        console.warn('Failed to decrypt entry during bulk fetch:', cursor.key);
-                    }
+                    list.push({
+                        key: cursor.key as string,
+                        entry: cursor.value as ICacheEntry
+                    });
                     cursor.continue();
                 } else {
-                    // Sort by lastUsed descending (newest first)
-                    resolve(results.sort((a, b) => b.lastUsed - a.lastUsed));
+                    resolve(list);
                 }
             };
             request.onerror = () => reject(request.error);
         });
+
+        const results: { key: string; value: any; lastUsed: number }[] = [];
+        for (const { key, entry } of encryptedEntries) {
+            try {
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: entry.iv as any },
+                    keyObj,
+                    entry.encryptedData
+                );
+                const value = JSON.parse(new TextDecoder().decode(decrypted));
+                results.push({
+                    key,
+                    value,
+                    lastUsed: entry.lastUsed
+                });
+            } catch (e) {
+                console.warn('Failed to decrypt entry during bulk fetch:', key);
+            }
+        }
+
+        // Sort by lastUsed descending (newest first)
+        return results.sort((a, b) => b.lastUsed - a.lastUsed);
     }
 
     /**

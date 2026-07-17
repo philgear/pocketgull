@@ -28,6 +28,8 @@ import {
 } from "./patient.types";
 import * as CryptoJS from 'crypto-js';
 import { MOCK_PATIENTS } from "../mock-patients";
+import { dataConnect } from '../lib/firebase';
+import { listPatients, getPatientWithCarePlan, createPatient } from '../lib/dataconnect';
 
 const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 
@@ -60,6 +62,31 @@ export class PatientManagementService implements OnDestroy {
     if (typeof window !== 'undefined') {
         let loaded: any[] = [];
         try {
+          const res = await listPatients(dataConnect);
+          if (res.data && res.data.patients && res.data.patients.length > 0) {
+            const dbPatients = res.data.patients.map(p => ({
+              id: p.id,
+              name: `${p.firstName} ${p.lastName}`,
+              age: 0,
+              gender: "Other" as const,
+              lastVisit: new Date(p.updatedAt).toISOString().split('T')[0].replace(/-/g, '.'),
+              preexistingConditions: [],
+              patientGoals: "",
+              vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
+              issues: {},
+              history: [],
+              bookmarks: []
+            }));
+            this.patients.set(dbPatients);
+            const defaultId = dbPatients.find(p => p.name === 'Phil Gear')?.id || dbPatients[0]?.id || null;
+            this.selectedPatientId.set(defaultId);
+            return;
+          }
+        } catch (err) {
+          console.warn('[PatientManagementService] Failed to load roster from SQL Connect, trying backend HTTP:', err);
+        }
+
+        try {
             const backendPatients = await firstValueFrom(this.http.get<any[]>('/api/patients'));
             if (backendPatients && backendPatients.length > 0) {
                 loaded = backendPatients;
@@ -68,13 +95,12 @@ export class PatientManagementService implements OnDestroy {
                 }
             }
         } catch (e) {
-            console.warn('[PatientManagementService] Failed to load from backend, falling back to local storage:', e);
+            console.warn('[PatientManagementService] Failed to load from backend HTTP, trying local storage:', e);
         }
 
         if (loaded.length === 0) {
             loaded = await this.storage.loadPatients();
         }
-
         if (loaded && loaded.length > 0) {
             let updatedList = [...loaded];
             let modified = false;
@@ -93,7 +119,7 @@ export class PatientManagementService implements OnDestroy {
             for (const p of MOCK_PATIENTS) {
                 await this.storage.savePatient(p);
             }
-            this.patients.set([...MOCK_PATIENTS]);
+            this.patients.set(MOCK_PATIENTS);
             const defaultId = MOCK_PATIENTS.find(p => p.id === 'p_phil_gear')?.id || MOCK_PATIENTS[0]?.id || null;
             this.selectedPatientId.set(defaultId);
         }
@@ -228,27 +254,48 @@ export class PatientManagementService implements OnDestroy {
   }
 
   /** Creates a new patient record and selects it. */
-  createNewPatient() {
+  async createNewPatient() {
     this.saveCurrentPatientState();
 
-    const newPatientId = `p_${Date.now()}`;
-    const newPatient: IPatient = {
-      id: newPatientId,
-      name: "New Patient",
-      age: 0,
-      gender: "Other",
-      lastVisit: new Date().toISOString().split("T")[0].replace(/-/g, "."),
-      patientGoals: "",
-      preexistingConditions: [],
-      vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
-      issues: {},
-      history: [],
-      bookmarks: [],
-    };
+    const firstName = "New";
+    const lastName = "Patient";
+    const dob = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
 
-    // Add to the top of the list for immediate visibility
-    this.patients.update((patients) => [newPatient, ...patients]);
-    this.selectedPatientId.set(newPatientId);
+    try {
+      const res = await createPatient(dataConnect, {
+        firstName,
+        lastName,
+        dateOfBirth: dob,
+        gender: "Other",
+        vitalsHeartRate: 0,
+        vitalsSystolicBP: 0,
+        vitalsDiastolicBP: 0,
+        currentSymptoms: []
+      });
+
+      if (res.data && res.data.patient_insert) {
+        const newPatientId = res.data.patient_insert.id;
+        const newPatient: IPatient = {
+          id: newPatientId,
+          name: `${firstName} ${lastName}`,
+          age: 0,
+          gender: "Other" as const,
+          lastVisit: new Date().toISOString().split("T")[0].replace(/-/g, "."),
+          patientGoals: "",
+          preexistingConditions: [],
+          vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
+          issues: {},
+          history: [],
+          bookmarks: [],
+        };
+
+        // Add to the top of the list for immediate visibility
+        this.patients.update((patients) => [newPatient, ...patients]);
+        this.selectedPatientId.set(newPatientId);
+      }
+    } catch (err) {
+      console.error('Error creating patient in SQL Connect:', err);
+    }
   }
 
   /** Removes a patient record. */

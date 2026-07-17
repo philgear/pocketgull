@@ -38,3 +38,4 @@ allow-dependencies-licenses:
   - pkg:npm/tslib
   - pkg:npm/uri-templates
   - pkg:npm/url-template
+  - pkg:npm/@google-cloud/agones-sdk

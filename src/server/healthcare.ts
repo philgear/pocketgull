@@ -105,6 +105,9 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
      const token = await client.getAccessToken();
      
      const patientId = payload.id || 'unknown';
+     if (typeof patientId !== 'string' || !/^[a-zA-Z0-9_\-]+$/.test(patientId)) {
+         return res.status(400).json({ error: 'Invalid patient ID format.' });
+     }
      const fhirPatientId = `pocket-gull-${patientId}`;
 
      // 1. Map patient demographics to standard FHIR R4 Patient
@@ -384,6 +387,9 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
 healthcareRouter.get('/fhir/import/:id', async (req, res) => {
    try {
      const patientId = req.params.id;
+     if (typeof patientId !== 'string' || !/^[a-zA-Z0-9_\-]+$/.test(patientId)) {
+         return res.status(400).json({ error: 'Invalid patient ID format.' });
+     }
      const projectId = await getProjectId();
      if (!projectId) return res.status(400).json({ error: 'GCP Project ID not configured.' });
 

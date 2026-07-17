@@ -651,6 +651,31 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </section>
                 }
 
+                <!-- Active Anatomical Hotspots -->
+                @if (activeIssues().length > 0) {
+                  <section>
+                      <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-4">Active Anatomical Hotspots</h2>
+                      <div class="grid grid-cols-1 gap-3">
+                          @for (issue of activeIssues(); track issue.noteId) {
+                            <div class="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                              <div>
+                                <h3 class="text-xs font-bold uppercase tracking-wider text-gray-800 dark:text-zinc-200">{{ issue.name }}</h3>
+                                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1" *ngIf="issue.description">{{ issue.description }}</p>
+                              </div>
+                              <div class="flex items-center gap-2 flex-wrap">
+                                <pocket-gull-badge [label]="'Pain: ' + issue.painLevel + '/10'" severity="neutral"></pocket-gull-badge>
+                                @if (state.activePhilosophy() === 'eastern' && issue.tcmPattern) {
+                                  <pocket-gull-badge [label]="'TCM: ' + issue.tcmPattern" severity="success"></pocket-gull-badge>
+                                } @else if (state.activePhilosophy() === 'ayurvedic' && issue.ayurvedicImbalance) {
+                                  <pocket-gull-badge [label]="'Ayurvedic: ' + issue.ayurvedicImbalance" severity="warning"></pocket-gull-badge>
+                                }
+                              </div>
+                            </div>
+                          }
+                      </div>
+                  </section>
+                }
+
                 <!-- Pre-existing Conditions -->
                 @if(p.preexistingConditions.length > 0) {
                   <section>
@@ -806,6 +831,11 @@ export class MedicalChartSummaryComponent {
     const id = this.patientManager.selectedPatientId();
     if (!id) return null;
     return this.patientManager.patients().find(p => p.id === id) ?? null;
+  });
+
+  activeIssues = computed(() => {
+    const issues = this.state.issues();
+    return Object.values(issues).flat();
   });
 
   vitals = this.state.vitals;

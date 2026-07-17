@@ -1,4 +1,4 @@
-import { Component, signal, computed, effect, inject, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
+import { Component, signal, computed, effect, inject, OnDestroy, PLATFORM_ID, Inject, ViewChild, ElementRef, untracked } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PatientStateService } from '../services/patient-state.service';
@@ -65,13 +65,16 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
         
         <!-- Live Visual Entrainment Target -->
         <div class="relative w-full h-44 rounded-xl bg-gray-50 dark:bg-zinc-950/40 border border-gray-100 dark:border-zinc-900 flex flex-col items-center justify-center overflow-hidden">
+          <!-- Ambient Canvas Visualizer -->
+          <canvas #avsCanvas class="absolute inset-0 w-full h-full pointer-events-none opacity-85" *ngIf="isActive()"></canvas>
+          
           <!-- Gradient background ripples -->
-          <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.03)_0%,transparent_70%)]"></div>
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.03)_0%,transparent_70%)] pointer-events-none"></div>
           
           <!-- Sync Pulsing Core -->
           <div [class.paused]="!isActive()"
                [style.animationDuration.ms]="pulseIntervalMs()"
-               class="avs-pulsing-glow relative w-24 h-24 rounded-full bg-gradient-to-tr from-orange-500 to-amber-600 flex items-center justify-center shadow-lg transition-transform duration-500">
+               class="avs-pulsing-glow relative w-24 h-24 rounded-full bg-gradient-to-tr from-orange-500 to-amber-600 flex items-center justify-center shadow-lg transition-transform duration-500 z-10">
             
             <div class="absolute inset-0 rounded-full bg-orange-400/20 animate-ping" [style.animationDuration.ms]="pulseIntervalMs() * 2" *ngIf="isActive()"></div>
             
@@ -85,7 +88,7 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
           </div>
 
           <!-- Active Metrics Status Bar -->
-          <div class="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider">
+          <div class="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[10px] font-semibold text-gray-500 dark:text-zinc-500 uppercase tracking-wider z-10 pointer-events-none">
             <span>Dynamic: {{ currentBaseFrequency() }} Hz Carrier</span>
             <span>Delta/Diff: {{ targetBrainwaveFrequencyHz() }} Hz ({{ currentWaveFrequencyName() }})</span>
           </div>
@@ -155,6 +158,76 @@ export type BrainwaveFrequency = 'delta' | 'theta' | 'alpha' | 'beta';
             </p>
           </div>
 
+        </div>
+
+        <!-- Circadian Tuning Dashboard Panel -->
+        <div class="p-4 rounded-xl bg-gradient-to-br from-indigo-950/20 via-zinc-900/10 to-transparent border border-indigo-500/15 space-y-4">
+          <div class="flex items-center justify-between border-b border-gray-200/50 dark:border-zinc-800/50 pb-2">
+            <span class="text-xs font-bold text-gray-700 dark:text-zinc-300 uppercase tracking-widest flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" /></svg>
+              Circadian Tuning Dashboard
+            </span>
+            <span class="text-[9px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider">Visual &amp; Audio Pacing</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Frequency Slider -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-baseline">
+                <label class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase">Light Modulation Speed</label>
+                <span class="text-xs font-bold text-indigo-400">{{ targetBrainwaveFrequencyHz().toFixed(1) }} Hz</span>
+              </div>
+              <input type="range" min="1.0" max="30.0" step="0.5" 
+                     [value]="targetBrainwaveFrequencyHz()"
+                     (input)="onFrequencySliderChange($event)"
+                     class="w-full accent-indigo-500 h-1 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer">
+              <div class="flex justify-between text-[9px] text-gray-400 dark:text-zinc-500 font-medium">
+                <span>Delta: 2-4Hz</span>
+                <span>Theta: 4-8Hz</span>
+                <span>Alpha: 8-12Hz</span>
+                <span>Beta: 12-30Hz</span>
+              </div>
+            </div>
+
+            <!-- Color Temperature Presets -->
+            <div class="space-y-1.5">
+              <label class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase block">Circadian Color Temperature</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button (click)="selectColorTemp('indigo')"
+                        class="p-2 rounded border text-center transition-all duration-200 cursor-pointer text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1"
+                        [ngClass]="colorTemp() === 'indigo' ? 
+                          'bg-indigo-500/15 border-indigo-500 text-indigo-400 shadow-sm' : 
+                          'bg-white dark:bg-zinc-950/20 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:border-indigo-500/30'">
+                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                  Indigo
+                </button>
+                <button (click)="selectColorTemp('emerald')"
+                        class="p-2 rounded border text-center transition-all duration-200 cursor-pointer text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1"
+                        [ngClass]="colorTemp() === 'emerald' ? 
+                          'bg-emerald-500/15 border-emerald-500 text-emerald-400 shadow-sm' : 
+                          'bg-white dark:bg-zinc-950/20 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:border-emerald-500/30'">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                  Emerald
+                </button>
+                <button (click)="selectColorTemp('violet')"
+                        class="p-2 rounded border text-center transition-all duration-200 cursor-pointer text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1"
+                        [ngClass]="colorTemp() === 'violet' ? 
+                          'bg-violet-500/15 border-violet-500 text-violet-400 shadow-sm' : 
+                          'bg-white dark:bg-zinc-950/20 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:border-violet-500/30'">
+                  <span class="w-2.5 h-2.5 rounded-full bg-violet-500"></span>
+                  Violet
+                </button>
+                <button (click)="selectColorTemp('rose-earth')"
+                        class="p-2 rounded border text-center transition-all duration-200 cursor-pointer text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1"
+                        [ngClass]="colorTemp() === 'rose-earth' ? 
+                          'bg-rose-500/15 border-rose-500 text-rose-400 shadow-sm' : 
+                          'bg-white dark:bg-zinc-950/20 border-gray-200 dark:border-zinc-800 text-gray-500 dark:text-zinc-400 hover:border-rose-500/30'">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                  Rose Earth
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- ══ CO-REGULATION PROTOCOL PANEL ══════════════════════════════════ -->
@@ -534,6 +607,11 @@ export class AvsTherapyComponent implements OnDestroy {
   targetHr = signal(70);
   targetBreathingRate = signal(6.0); // Respiration pacing per minute (coherence frequency)
   targetWave = signal<BrainwaveFrequency>('theta');
+  customFrequency = signal<number | null>(null);
+  colorTemp = signal<'indigo' | 'emerald' | 'violet' | 'rose-earth'>('indigo');
+
+  @ViewChild('avsCanvas') avsCanvasRef!: ElementRef<HTMLCanvasElement>;
+  private canvasRafId: number | null = null;
   
   // --- Web Audio API Properties ---
   private audioCtx: AudioContext | null = null;
@@ -580,16 +658,34 @@ export class AvsTherapyComponent implements OnDestroy {
         const active = this.isActive();
         const rate = this.targetBreathingRate();
         const wave = this.targetWave();
+        const freqHz = this.targetBrainwaveFrequencyHz();
         
         this.patientState.isAvsSessionActive.set(active);
         this.patientState.avsBreathingRate.set(rate);
         this.patientState.avsBrainwaveFrequency.set(wave);
+        this.patientState.avsBrainwaveFrequencyHz.set(freqHz);
       }, { allowSignalWrites: true });
+
+      // Canvas loop reaction based on active status
+      effect(() => {
+        const active = this.isActive();
+        this.targetBrainwaveFrequencyHz();
+        this.colorTemp();
+        untracked(() => {
+          if (active) {
+            setTimeout(() => this.startCanvasLoop(), 100);
+          } else {
+            this.stopCanvasLoop();
+          }
+        });
+      });
     }
   }
 
   // --- Computed Helpers ---
   targetBrainwaveFrequencyHz = computed(() => {
+    const custom = this.customFrequency();
+    if (custom !== null) return custom;
     const profile = this.waveProfiles.find(w => w.id === this.targetWave());
     return profile ? profile.freq : 6.0;
   });
@@ -635,6 +731,109 @@ export class AvsTherapyComponent implements OnDestroy {
     
     if (this.isActive() && this.voiceEnabled()) {
       this.speakGuidance("Respiratory pacing adjusted. Breathing cycle is now set to " + parseFloat(value).toFixed(1) + " breaths per minute.");
+    }
+  }
+
+  onFrequencySliderChange(event: Event) {
+    const value = parseFloat((event.target as HTMLInputElement).value);
+    this.customFrequency.set(value);
+    if (this.isActive()) {
+      this.restartOscillators();
+      if (this.voiceEnabled()) {
+        this.speakGuidance(`Light modulation frequency tuned to ${value.toFixed(1)} Hertz.`);
+      }
+    }
+  }
+
+  selectColorTemp(temp: 'indigo' | 'emerald' | 'violet' | 'rose-earth') {
+    this.colorTemp.set(temp);
+    if (this.isActive() && this.voiceEnabled()) {
+      this.speakGuidance(`Circadian color temperature preset shifted to ${temp.replace('-', ' ')}.`);
+    }
+  }
+
+  private startCanvasLoop() {
+    if (!this.isBrowser) return;
+    this.stopCanvasLoop();
+
+    const canvas = this.avsCanvasRef?.nativeElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      if (canvas && canvas.parentElement) {
+        canvas.width = canvas.parentElement.clientWidth || 400;
+        canvas.height = canvas.parentElement.clientHeight || 176;
+      }
+    };
+    resize();
+
+    window.addEventListener('resize', resize);
+
+    let angle = 0;
+    const tick = () => {
+      if (!this.isActive() || !canvas || !ctx) {
+        window.removeEventListener('resize', resize);
+        return;
+      }
+      
+      const width = canvas.width;
+      const height = canvas.height;
+      
+      ctx.clearRect(0, 0, width, height);
+
+      // Get color temperature colors
+      const preset = this.colorTemp();
+      let colorGlow = 'rgba(67, 56, 202, 0.15)'; // Indigo
+      let colorLine = 'rgba(14, 165, 233, 0.4)';
+      
+      if (preset === 'emerald') {
+        colorGlow = 'rgba(5, 150, 105, 0.15)';
+        colorLine = 'rgba(52, 211, 153, 0.4)';
+      } else if (preset === 'violet') {
+        colorGlow = 'rgba(124, 58, 237, 0.15)';
+        colorLine = 'rgba(192, 132, 252, 0.4)';
+      } else if (preset === 'rose-earth') {
+        colorGlow = 'rgba(225, 29, 72, 0.15)';
+        colorLine = 'rgba(251, 146, 60, 0.4)';
+      }
+
+      // Draw background glow using color temp
+      const radGrad = ctx.createRadialGradient(width / 2, height / 2, 10, width / 2, height / 2, Math.max(width, height) / 2);
+      radGrad.addColorStop(0, colorGlow);
+      radGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = radGrad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw sine wave pattern corresponding to light modulation frequency
+      const freqHz = this.targetBrainwaveFrequencyHz();
+      const speed = (freqHz * 2 * Math.PI) / 1000;
+      angle += speed;
+
+      ctx.beginPath();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = colorLine;
+      
+      for (let x = 0; x < width; x += 3) {
+        const y = height / 2 + 
+                  Math.sin(x * 0.015 + angle) * 35 * Math.sin(angle * 0.1) + 
+                  Math.cos(x * 0.008 - angle * 0.3) * 12;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      this.canvasRafId = requestAnimationFrame(tick);
+    };
+
+    this.canvasRafId = requestAnimationFrame(tick);
+  }
+
+  private stopCanvasLoop() {
+    if (this.canvasRafId !== null) {
+      cancelAnimationFrame(this.canvasRafId);
+      this.canvasRafId = null;
     }
   }
 
@@ -722,7 +921,7 @@ export class AvsTherapyComponent implements OnDestroy {
   }
 
   selectWaveProfile(profileId: string) {
-
+    this.customFrequency.set(null);
     this.targetWave.set(profileId as BrainwaveFrequency);
     
     if (this.isActive()) {

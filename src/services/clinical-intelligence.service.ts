@@ -581,15 +581,16 @@ By focusing on nutrition, movement, sleep, and targeted supplementation, we can 
             return report;
         }
 
-        if (!isEmergency && !this.network.useLocalInference() && !this.network.isOnline()) {
-            this.error.set("You are currently offline and no local inference endpoint is available.");
-            return {};
-        }
-
         this.isLoading.set(true);
         this.error.set(null);
         this.analysisResults.set({});
         this.analysisMetrics.set(null);
+
+        if (!isEmergency && !this.network.useLocalInference() && !this.network.isOnline()) {
+            this.isLoading.set(false);
+            this.error.set("You are currently offline and no local inference endpoint is available.");
+            return {};
+        }
 
         const lenses: AnalysisLens[] = ['Summary Overview', 'Functional Protocols', 'Nutrition', 'Precision Nutrients', 'Monitoring & Follow-up', 'Patient Education'];
         const newReport: Partial<Record<AnalysisLens, string>> = {};
@@ -621,7 +622,7 @@ By focusing on nutrition, movement, sleep, and targeted supplementation, we can 
         try {
             const orchestrationPromises = lenses.map(async (lens) => {
                 const philosophy = this.patientState.activePhilosophy();
-                const philosophyInstruction = this.PHILOSOPHY_INSTRUCTIONS[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
+                const philosophyInstruction = (this.PHILOSOPHY_INSTRUCTIONS as any)[philosophy] || this.PHILOSOPHY_INSTRUCTIONS.western;
                 
                 const agentName = this.getAgentNameForLens(lens);
                 const agentRole = this.getAgentRoleForLens(lens);

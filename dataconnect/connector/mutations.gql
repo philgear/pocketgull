@@ -1,0 +1,57 @@
+# mutations.gql for Pocket-Gull
+
+mutation UpsertClinician($displayName: String!) @auth(level: USER) {
+  clinician_upsert(data: {
+    uid_expr: "auth.uid",
+    email_expr: "auth.token.email",
+    displayName: $displayName
+  })
+}
+
+mutation CreatePatient(
+  $firstName: String!
+  $lastName: String!
+  $dateOfBirth: Date!
+  $gender: String
+  $vitalsHeartRate: Int
+  $vitalsSystolicBP: Int
+  $vitalsDiastolicBP: Int
+  $currentSymptoms: [String!]
+) @auth(level: USER) {
+  patient_insert(data: {
+    firstName: $firstName
+    lastName: $lastName
+    dateOfBirth: $dateOfBirth
+    gender: $gender
+    vitalsHeartRate: $vitalsHeartRate
+    vitalsSystolicBP: $vitalsSystolicBP
+    vitalsDiastolicBP: $vitalsDiastolicBP
+    currentSymptoms: $currentSymptoms
+  })
+}
+
+mutation CreateCarePlan(
+  $patientId: UUID!
+  $diagnosis: String!
+  $recommendations: [String!]!
+) @auth(level: USER) {
+  carePlan_insert(data: {
+    patient: { id: $patientId }
+    clinician: { uid_expr: "auth.uid" }
+    diagnosis: $diagnosis
+    recommendations: $recommendations
+  })
+}
+
+mutation CreateConsultationSession(
+  $patientId: UUID!
+  $transcript: String!
+  $aiSummary: String!
+) @auth(level: USER) {
+  consultationSession_insert(data: {
+    patient: { id: $patientId }
+    clinician: { uid_expr: "auth.uid" }
+    transcript: $transcript
+    aiSummary: $aiSummary
+  })
+}

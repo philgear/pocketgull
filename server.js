@@ -171,7 +171,7 @@ app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
   
   // X-Frame-Options
-  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   
   // Content Security Policy - prevents inline scripts and restricts resource loading
   res.setHeader(
@@ -183,7 +183,7 @@ app.use((req, res, next) => {
     "img-src 'self' https: data:; " +
     "font-src 'self'; " +
     "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; " +
-    "frame-src 'self' https://www.ncbi.nlm.nih.gov https://insightspark-82c75.web.app; " +
+    "frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://insightspark-82c75.web.app; " +
     "frame-ancestors 'self'; " +
     "object-src 'none'; " +
     "base-uri 'self'; " +
