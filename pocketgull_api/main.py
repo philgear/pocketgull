@@ -21,6 +21,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, AsyncGenerator, Optional
 
@@ -496,10 +497,14 @@ async def read_hdf5_segment(
     try:
         import h5py
 
-        # Prevent path traversal
+        # Prevent path traversal and restrict to safe filenames in data/
         file_path = Path(file)
-        if file_path.name != file or ".." in file or "/" in file or "\\" in file:
+        if file_path.name != file:
             raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+        if not re.fullmatch(r"[A-Za-z0-9._-]+", file_path.name):
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+        if file_path.suffix.lower() != ".hdf5":
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename extension.")
 
         hdf5_path = (_HDF5_DATA_DIR / file_path.name).resolve()
         if not hdf5_path.is_relative_to(_HDF5_DATA_DIR.resolve()):
