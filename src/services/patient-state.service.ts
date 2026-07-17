@@ -51,7 +51,7 @@ export class PatientStateService {
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
-  readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'grow-thy-self'>('western');
+  readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
 
   // --- AVS Neuro-Therapy Synchronized State ---
   readonly isAvsSessionActive = signal<boolean>(false);

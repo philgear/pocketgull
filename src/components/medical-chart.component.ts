@@ -164,7 +164,7 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
                 ></app-patient-history-timeline>
               }
 
-              @if (selectedPatient()?.history.length === 0) {
+              @if ((selectedPatient()?.history?.length ?? 0) === 0) {
                 <div class="h-32 flex flex-col items-center justify-center text-gray-200">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-2 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
                   <p class="text-xs font-bold uppercase tracking-[0.15em]">No recorded activity</p>
