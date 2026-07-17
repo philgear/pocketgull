@@ -648,8 +648,6 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                                   <pocket-gull-badge [label]="'TCM: ' + issue.tcmPattern" severity="success"></pocket-gull-badge>
                                 } @else if (state.activePhilosophy() === 'ayurvedic' && issue.ayurvedicImbalance) {
                                   <pocket-gull-badge [label]="'Ayurvedic: ' + issue.ayurvedicImbalance" severity="warning"></pocket-gull-badge>
-                                } @else if (state.activePhilosophy() === 'grow-thy-self' && issue.growThySelfFocus) {
-                                  <pocket-gull-badge [label]="'Longevity: ' + issue.growThySelfFocus" severity="info"></pocket-gull-badge>
                                 }
                               </div>
                             </div>
