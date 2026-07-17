@@ -8,10 +8,12 @@ const __dirname = path.dirname(__filename);
 const distFolder = path.join(__dirname, 'dist');
 
 const server = http.createServer((req, res) => {
-    let filePath = path.join(distFolder, req.url === '/' ? 'index.html' : req.url);
-    
-    // Simple fallback logic since it's an SPA
-    if (!fs.existsSync(filePath)) {
+    const targetPath = path.join(distFolder, req.url === '/' ? 'index.html' : req.url);
+    const resolvedPath = path.resolve(targetPath);
+    const expectedBase = path.resolve(distFolder);
+
+    let filePath = resolvedPath;
+    if (!resolvedPath.startsWith(expectedBase) || !fs.existsSync(resolvedPath)) {
         filePath = path.join(distFolder, 'index.html');
     }
 

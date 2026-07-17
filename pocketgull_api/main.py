@@ -496,7 +496,15 @@ async def read_hdf5_segment(
     try:
         import h5py
 
-        hdf5_path = _HDF5_DATA_DIR / file
+        # Prevent path traversal
+        file_path = Path(file)
+        if file_path.name != file or ".." in file or "/" in file or "\\" in file:
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+
+        hdf5_path = (_HDF5_DATA_DIR / file_path.name).resolve()
+        if not hdf5_path.is_relative_to(_HDF5_DATA_DIR.resolve()):
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+
         if not hdf5_path.exists():
             raise HTTPException(status_code=404, detail=f"HDF5 file not found: {file}")
 

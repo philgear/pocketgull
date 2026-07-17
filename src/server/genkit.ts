@@ -5,7 +5,13 @@ import { vertexAI } from '@genkit-ai/vertexai';
 const originalFetch = globalThis.fetch;
 globalThis.fetch = async (url: any, options: any = {}) => {
   const urlString = typeof url === 'string' ? url : (url && url.url ? url.url : url.toString());
-  if (urlString.includes('generativelanguage.googleapis.com')) {
+  let isTarget = false;
+  try {
+    const parsed = new URL(urlString);
+    isTarget = parsed.hostname === 'generativelanguage.googleapis.com';
+  } catch (e) {}
+
+  if (isTarget) {
     const newHeaders: Record<string, string> = { 'Referer': 'https://pocketgull.app' };
     
     if (options.headers) {

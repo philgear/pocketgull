@@ -21,6 +21,15 @@ const auth = new GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/cloud-healthcare']
 });
 
+function sanitizeUrl(urlStr: string): string {
+  const parsed = new URL(urlStr);
+  if (parsed.protocol !== 'https:' || parsed.hostname !== 'healthcare.googleapis.com') {
+    throw new Error('SSRF Blocked: URL target is not authorized.');
+  }
+  return urlStr;
+}
+
+
 /**
  * Sanitise a DICOM proxy parameter to prevent SSRF.
  * Only allows alphanumerics, hyphens, underscores, and dots.
@@ -76,7 +85,7 @@ dicomRouter.get('/studies', async (req, res) => {
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(dicomWebUrl, {
+    const response = await fetch(sanitizeUrl(dicomWebUrl), {
       headers: {
         'Authorization': `Bearer ${token.token}`,
         'Accept': 'application/dicom+json'
@@ -118,7 +127,7 @@ dicomRouter.get('/rendered', async (req, res) => {
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(dicomWebUrl, {
+    const response = await fetch(sanitizeUrl(dicomWebUrl), {
       headers: {
         'Authorization': `Bearer ${token.token}`,
         'Accept': 'image/jpeg'
@@ -163,7 +172,7 @@ dicomRouter.post('/store', express.raw({ type: 'application/dicom', limit: '100m
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(dicomWebUrl, {
+    const response = await fetch(sanitizeUrl(dicomWebUrl), {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token.token}`,
@@ -207,7 +216,7 @@ dicomRouter.get('/raw', async (req, res) => {
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(dicomWebUrl, {
+    const response = await fetch(sanitizeUrl(dicomWebUrl), {
       headers: {
         'Authorization': `Bearer ${token.token}`,
         'Accept': 'application/dicom; transfer-syntax=*'
@@ -260,7 +269,7 @@ dicomRouter.delete('/delete', async (req, res) => {
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(dicomWebUrl, {
+    const response = await fetch(sanitizeUrl(dicomWebUrl), {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token.token}`

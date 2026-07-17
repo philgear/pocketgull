@@ -202,7 +202,13 @@ export class RichMediaService {
                     url: ii.url ?? '',
                     thumbUrl: ii.thumburl ?? ii.url ?? '',
                     descriptionUrl: ii.descriptionurl ?? '',
-                    credit: meta.Credit?.value?.replace(/<[^>]+>/g, '') ?? 'Wikimedia Commons',
+                    credit: (() => {
+                        let val = meta.Credit?.value ?? 'Wikimedia Commons';
+                        while (/<[^>]+>/.test(val)) {
+                            val = val.replace(/<[^>]+>/g, '');
+                        }
+                        return val;
+                    })(),
                     license: meta.LicenseShortName?.value ?? 'See source'
                 } as IWikimediaImage;
             })

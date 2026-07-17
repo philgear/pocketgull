@@ -2,7 +2,8 @@ import express from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
+import { rateLimit } from 'express-rate-limit';
 import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import swaggerUi from 'swagger-ui-express';
@@ -15,13 +16,29 @@ const app = express();
 app.use(compression());
 app.use('/api', cors()); // Enable CORS for API routes so Flutter apps can sync data
 
+const apiLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
+app.use('/api', apiLimiter);
+
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
 app.set('trust proxy', true);
 
 // Redirect legacy URLs and alternative domains to the primary pocketgull.app domain
 app.use((req, res, next) => {
   const host = req.hostname || '';
-  if (host.includes('understory') || host.includes('pocketgall') || host.includes('pocketgull.com') || (host.includes('pocketgull') && !host.includes('pocketgull.app'))) {
+  if (
+    host.endsWith('pocketgall.com') ||
+    host.endsWith('pocketgall.app') ||
+    host.endsWith('pocketgal.app') ||
+    host.endsWith('pocketgull.com') ||
+    host.endsWith('pocketgal.ai') ||
+    host.includes('understory')
+  ) {
     return res.redirect(301, `https://pocketgull.app${req.originalUrl}`);
   }
   next();
@@ -45,9 +62,11 @@ app.use('/docs/study', (req, res, next) => {
 
   const cleanPath = req.path.endsWith('/') ? req.path : req.path + '/';
   if (req.path === '/' || req.path === '' || !req.path.includes('.')) {
-    const indexPath = join(distFolder, 'docs', 'study', cleanPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
+    const targetPath = join(distFolder, 'docs', 'study', cleanPath, 'index.html');
+    const resolvedPath = resolve(targetPath);
+    const expectedBase = resolve(join(distFolder, 'docs', 'study'));
+    if (resolvedPath.startsWith(expectedBase) && fs.existsSync(resolvedPath)) {
+      return res.sendFile(resolvedPath);
     }
   }
   next();

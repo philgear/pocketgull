@@ -42,6 +42,15 @@ const defaultDatasetId = process.env['HC_DATASET'] || 'pocket_gull_clinical';
 const dicomStoreId = process.env['HC_DICOM_STORE'] || 'dicom_primary';
 const fhirStoreId = process.env['HC_FHIR_STORE'] || 'fhir_primary';
 
+function sanitizeUrl(urlStr: string): string {
+  const parsed = new URL(urlStr);
+  if (parsed.protocol !== 'https:' || parsed.hostname !== 'healthcare.googleapis.com') {
+    throw new Error('SSRF Blocked: URL target is not authorized.');
+  }
+  return urlStr;
+}
+
+
 /**
  * Automatically provisions the GCP Healthcare Dataset, DICOM Store, and FHIR Store.
  */
@@ -64,7 +73,7 @@ export async function ensureHealthcareStoresExist() {
 
     // 1. Create Dataset
     const datasetUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets?datasetId=${defaultDatasetId}`;
-    let res = await fetch(datasetUrl, { method: 'POST', headers });
+    let res = await fetch(sanitizeUrl(datasetUrl), { method: 'POST', headers });
     if (res.ok) {
         console.log(`[Healthcare Auto-Provision] Created Dataset: ${defaultDatasetId}`);
     } else if (res.status !== 409) {
@@ -74,12 +83,12 @@ export async function ensureHealthcareStoresExist() {
 
     // 2. Create DICOM Store
     const dicomUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/dicomStores?dicomStoreId=${dicomStoreId}`;
-    res = await fetch(dicomUrl, { method: 'POST', headers });
+    res = await fetch(sanitizeUrl(dicomUrl), { method: 'POST', headers });
     if (res.ok) console.log(`[Healthcare Auto-Provision] Created DICOM Store: ${dicomStoreId}`);
 
     // 3. Create FHIR Store (R4)
     const fhirUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores?fhirStoreId=${fhirStoreId}`;
-    res = await fetch(fhirUrl, { 
+    res = await fetch(sanitizeUrl(fhirUrl), { 
         method: 'POST', 
         headers,
         body: JSON.stringify({ version: 'R4', enableUpdateCreate: true })
@@ -317,7 +326,7 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
 
      // 4. Save Patient to FHIR Store
      const patientUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Patient/${fhirPatient.id}`;
-     const patientRes = await fetch(patientUrl, {
+     const patientRes = await fetch(sanitizeUrl(patientUrl), {
          method: 'PUT',
          headers: {
              'Authorization': `Bearer ${token.token}`,
@@ -334,7 +343,7 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
      // 5. Save Conditions to FHIR Store
      for (const cond of fhirConditions) {
          const condUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Condition/${cond.id}`;
-         const condRes = await fetch(condUrl, {
+         const condRes = await fetch(sanitizeUrl(condUrl), {
              method: 'PUT',
              headers: {
                  'Authorization': `Bearer ${token.token}`,
@@ -352,7 +361,7 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
      // 6. Save Observations to FHIR Store
      for (const obs of fhirObservations) {
          const obsUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Observation/${obs.id}`;
-         const obsRes = await fetch(obsUrl, {
+         const obsRes = await fetch(sanitizeUrl(obsUrl), {
              method: 'PUT',
              headers: {
                  'Authorization': `Bearer ${token.token}`,
@@ -402,7 +411,7 @@ healthcareRouter.get('/fhir/import/:id', async (req, res) => {
 
      // 1. Fetch Patient
      const patientUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Patient/${fhirPatientId}`;
-     const patientRes = await fetch(patientUrl, { headers });
+     const patientRes = await fetch(sanitizeUrl(patientUrl), { headers });
      if (!patientRes.ok) {
          if (patientRes.status === 404) {
              return res.status(404).json({ error: 'Patient not found in Google Health FHIR store.' });
@@ -413,7 +422,7 @@ healthcareRouter.get('/fhir/import/:id', async (req, res) => {
 
      // 2. Search for Conditions of this Patient
      const conditionsUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Condition?subject=Patient/${fhirPatientId}`;
-     const conditionsRes = await fetch(conditionsUrl, { headers });
+     const conditionsRes = await fetch(sanitizeUrl(conditionsUrl), { headers });
      let conditions: string[] = [];
      if (conditionsRes.ok) {
          const bundle = await conditionsRes.json();
@@ -424,7 +433,7 @@ healthcareRouter.get('/fhir/import/:id', async (req, res) => {
 
      // 3. Search for Observations of this Patient
      const observationsUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Observation?subject=Patient/${fhirPatientId}`;
-     const observationsRes = await fetch(observationsUrl, { headers });
+     const observationsRes = await fetch(sanitizeUrl(observationsUrl), { headers });
      const vitals: any = {};
      if (observationsRes.ok) {
          const bundle = await observationsRes.json();

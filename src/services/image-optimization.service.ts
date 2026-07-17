@@ -19,7 +19,12 @@ export class ImageOptimizationService {
    * @returns The standardized URL.
    */
   standardizeWikipediaUrl(url: string, targetWidth?: number): string {
-    if (!url.includes('upload.wikimedia.org')) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname !== 'upload.wikimedia.org') {
+        return url;
+      }
+    } catch (e) {
       return url;
     }
 

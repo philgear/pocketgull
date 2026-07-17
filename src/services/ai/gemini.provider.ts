@@ -184,7 +184,8 @@ export class GeminiProvider implements IIntelligenceProvider {
 
     async startChat(patientData: string, context: string): Promise<void> {
         const systemInstruction = `${context}\n\nPatient Data:\n${patientData}`;
-        this.chatSessionId = `chat_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const randomPart = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID().slice(0, 8) : Math.random().toString(36).slice(2);
+        this.chatSessionId = `chat_${Date.now()}_${randomPart}`;
 
         const response = await fetch('/api/ai/chat/start', {
             method: 'POST',

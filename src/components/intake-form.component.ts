@@ -846,9 +846,19 @@ export class IntakeFormComponent implements OnDestroy {
   adoptInsight(node: any, target: 'desc' | 'rec' = 'desc') {
     let text = '';
     if (node.type === 'paragraph') {
-      text = node.rawHtml.replace(/<[^>]*>/g, '').trim();
+      let raw = node.rawHtml || '';
+      while (/<[^>]*>/.test(raw)) {
+        raw = raw.replace(/<[^>]*>/g, '');
+      }
+      text = raw.trim();
     } else if (node.type === 'list') {
-      text = node.items.map((it: any) => '• ' + it.html.replace(/<[^>]*>/g, '').trim()).join('\n');
+      text = (node.items || []).map((it: any) => {
+        let htmlStr = it.html || '';
+        while (/<[^>]*>/.test(htmlStr)) {
+          htmlStr = htmlStr.replace(/<[^>]*>/g, '');
+        }
+        return '• ' + htmlStr.trim();
+      }).join('\n');
     }
 
     if (target === 'desc') {
