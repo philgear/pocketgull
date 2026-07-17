@@ -89,7 +89,7 @@ A highly interactive, aesthetically minimal user interface (Industrial Grace) de
 ## 📃 Text Description
 
 **What it does:**
-Pocket Gull is a next-generation "Live Agent" orchestrator. By combining real-time human-in-the-loop web speech interaction with a diagnostic 3D surface model and Gemini's deep reasoning (`gemini-2.5-flash` via Vertex AI Enterprise and `@google/adk`), it processes a patient's multimodal symptom data to instantly produce synthesized, actionable clinical strategies.
+Pocketgull is a secure digital assistant for doctors, nurses, and caregivers. It allows clinicians to speak naturally to a smart assistant while viewing a 3D model of the human body. As the clinician describes patient symptoms or taps on pain areas, the assistant instantly compiles the information, searches trusted medical literature (like PubMed), and creates a clear, structured care strategy. This reduces the time clinicians spend on documentation and helps them focus on patient care.
 
 ---
 
