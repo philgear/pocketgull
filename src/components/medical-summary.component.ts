@@ -10,6 +10,7 @@ import { FhirIntegrationService } from '../services/fhir-integration.service';
 import { DictationService } from '../services/dictation.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { OrcidService } from '../services/orcid.service';
+import { PythonBridgeService } from '../services/python-bridge.service';
 import { marked } from 'marked';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
@@ -186,6 +187,72 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     ></app-metric-card>
                   </div>
                 </section>
+
+                <!-- Real-time Clinical Triage Risk Score Card -->
+                @if (pythonBridge.riskScore(); as risk) {
+                  <section class="mb-8 p-5 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-900/50 dark:to-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div>
+                        <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-1">Clinical Triage Risk</h2>
+                        <div class="flex items-center gap-2">
+                          <span class="text-3xl font-light tracking-tight text-gray-900 dark:text-zinc-100">
+                            {{ (risk.risk_score * 100) | number:'1.0-1' }}%
+                          </span>
+                          <span class="text-xs text-gray-400 dark:text-zinc-500 font-medium">score</span>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-col items-end gap-1.5">
+                        <!-- Dynamic Risk Level Badge -->
+                        @if (risk.risk_level === 'low') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                            Low Risk
+                          </span>
+                        } @else if (risk.risk_level === 'moderate') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+                            Moderate Risk
+                          </span>
+                        } @else if (risk.risk_level === 'high') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>
+                            High Risk
+                          </span>
+                        } @else if (risk.risk_level === 'critical') {
+                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-100 dark:border-red-900/30 animate-pulse">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-ping"></span>
+                            Critical Risk
+                          </span>
+                        }
+                        
+                        <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest">
+                          Confidence: {{ (risk.confidence * 100) | number:'1.0-0' }}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Contributing Factors list -->
+                    @if (risk.contributing_factors && risk.contributing_factors.length > 0) {
+                      <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800/80">
+                        <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Contributing Factors</h3>
+                        <ul class="space-y-1">
+                          @for (factor of risk.contributing_factors; track factor) {
+                            <li class="flex items-start gap-2 text-xs font-light text-gray-600 dark:text-zinc-300">
+                              <span class="text-gray-400 dark:text-zinc-600 mt-0.5">•</span>
+                              <span>{{ factor }}</span>
+                            </li>
+                          }
+                        </ul>
+                      </div>
+                    }
+
+                    <!-- Attribution note -->
+                    <div class="mt-3 text-[9px] font-bold uppercase tracking-widest text-gray-400/80 dark:text-zinc-600 flex justify-between items-center">
+                      <span>Source: {{ risk.note || 'Clinical Intelligence Classifier' }}</span>
+                    </div>
+                  </section>
+                }
 
                 <!-- IVitals Grid -->
                 <!-- IVitals & Biometrics -->
@@ -752,6 +819,7 @@ export class MedicalChartSummaryComponent {
   dictation = inject(DictationService);
   clinicalAI = inject(ClinicalIntelligenceService);
   orcidService = inject(OrcidService);
+  pythonBridge = inject(PythonBridgeService);
   http = inject(HttpClient);
   
   today = new Date();

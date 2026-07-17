@@ -1,12 +1,12 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:24-slim AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities
-RUN apt-get update && apt-get upgrade -y && apt-get clean
+RUN apk update && apk upgrade --no-cache
 
 # Install ALL dependencies (including devDependencies needed for ng build)
 COPY package*.json ./
@@ -25,12 +25,12 @@ RUN npm prune --omit=dev
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:24-slim
+FROM node:24-alpine
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities in production image
-RUN apt-get update && apt-get upgrade -y && apt-get clean
+RUN apk update && apk upgrade --no-cache
 
 # Set Node to production mode
 ENV NODE_ENV=production

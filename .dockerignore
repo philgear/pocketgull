@@ -41,5 +41,6 @@ Thumbs.db
 docs/study/node_modules/
 docs/study/dist/
 pocketgull_api/venv/
+pocketgull_api/.venv/
 pocketgull_api/.pytest_cache/
 pocketgull_api/__pycache__/

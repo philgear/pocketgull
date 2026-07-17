@@ -639,16 +639,42 @@ export class AvsTherapyComponent implements OnDestroy {
     if (this.isBrowser) {
       this.hasVibrator = !!navigator.vibrate;
       
-      // Auto-adapt practitioner baseline targets dynamically if current patient has telemetry
+      // Closed-loop Gradient Tuning: Adjust targets dynamically based on physiological state deviations (RPP, heart rate)
       effect(() => {
         const liveVitals = this.patientState.vitals();
         if (liveVitals.hr) {
           const hrVal = parseInt(liveVitals.hr, 10);
-          if (!isNaN(hrVal) && hrVal > 85) {
-            // High heart rate, automatically recommend calming Theta waves and slow breathing (5.5 breaths/min)
-            this.targetWave.set('theta');
-            this.targetBreathingRate.set(5.5);
-            this.targetHr.set(70); // Practitioner target is set to guide them down
+          const bpParts = (liveVitals.bp || '120/80').split('/');
+          const sbpVal = bpParts.length > 0 ? parseInt(bpParts[0], 10) : 120;
+          
+          if (!isNaN(hrVal) && !isNaN(sbpVal)) {
+            const rpp = hrVal * sbpVal;
+            
+            // If the session is active, dynamically adjust on-the-fly to guide biometrics to target
+            if (this.isActive()) {
+              if (rpp > 12000 || hrVal > 85) {
+                // High myocardial workload or tachycardia: step down target frequency and respiration rate
+                this.targetWave.set('theta');
+                this.targetBreathingRate.set(5.5);
+                this.colorTemp.set('violet');
+              } else if (hrVal < 55 || sbpVal < 100) {
+                // Bradycardia or Hypotension: step up target frequency to maintain safe alertness
+                this.targetWave.set('alpha');
+                this.targetBreathingRate.set(6.5);
+                this.colorTemp.set('emerald');
+              } else {
+                // Baseline target
+                this.targetWave.set('alpha');
+                this.targetBreathingRate.set(6.0);
+                this.colorTemp.set('indigo');
+              }
+            } else {
+              // Standby default recommendations
+              if (rpp > 12000 || hrVal > 85) {
+                this.targetWave.set('theta');
+                this.targetBreathingRate.set(5.5);
+              }
+            }
           }
         }
       }, { allowSignalWrites: true });

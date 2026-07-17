@@ -21,7 +21,7 @@ import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
 import { ThemeService } from './theme.service';
 import { dataConnect } from '../lib/firebase';
-import { createCarePlan, createConsultationSession } from '../lib/dataconnect';
+import { createCarePlan, createConsultationSession } from '../lib/dataconnect/index.cjs.js';
 
 
 @Injectable({

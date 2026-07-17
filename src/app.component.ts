@@ -1936,6 +1936,7 @@ export class AppComponent implements OnDestroy {
   readonly session = inject(SessionStateService);
   readonly fitbit = inject(FitbitService);
   readonly intelligence = inject(ClinicalIntelligenceService);
+  // Exposed for template access to clinical intelligence features
 
   @HostListener('document:mousemove')
   @HostListener('document:keydown')

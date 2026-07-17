@@ -1,0 +1,10 @@
+{
+  "venvPath": "pocketgull_api",
+  "venv": ".venv",
+  "include": [
+    "pocketgull_api"
+  ],
+  "extraPaths": [
+    "pocketgull_api"
+  ]
+}

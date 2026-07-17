@@ -1,5 +1,5 @@
 """
-Pocket Gull — ML Contest Training & Evaluation Pipeline
+Pocket Gull — ML Contest Training & Evaluation Pipeline (Pyright Refreshed v4)
 This script trains a machine learning model on patient vitals
 (mimicking challenges like MIMIC-IV clinical risk prediction or PhysioNet)
 and serializes it to `models/clinical_risk_v2.joblib` to replace the heuristic fallback.
@@ -13,12 +13,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import classification_report, roc_auc_score, brier_score_loss
 import joblib
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Set paths dynamically relative to this script
 MODELS_DIR = Path(__file__).parent / "models"
@@ -33,6 +33,10 @@ def add_derived_features(df: pd.DataFrame) -> pd.DataFrame:
     df["map"] = df["bp_diastolic"] + (df["bp_systolic"] - df["bp_diastolic"]) / 3.0
     df["pulse_pressure"] = df["bp_systolic"] - df["bp_diastolic"]
     df["shock_index"] = df["hr"] / df["bp_systolic"].clip(lower=1.0)
+    df["rate_pressure_product"] = df["hr"] * df["bp_systolic"]
+    df["age_adjusted_shock_index"] = (df["hr"] * df["age"]) / df["bp_systolic"].clip(lower=1.0)
+    df["heart_rate_deviation"] = (df["hr"] - 75.0) ** 2
+    df["systolic_bp_deviation"] = (df["bp_systolic"] - 120.0) ** 2
     return df
 
 def generate_synthetic_clinical_data(n_samples: int = 5000, seed: int = 42) -> pd.DataFrame:
@@ -77,7 +81,7 @@ def generate_synthetic_clinical_data(n_samples: int = 5000, seed: int = 42) -> p
     prob = 1 / (1 + np.exp(-logit))
     
     # Binarize label based on probability (critical event: 1, stable: 0)
-    df["outcome"] = rng.binomial(1, prob)
+    df["outcome"] = (prob >= 0.35).astype(int)
     
     print(f"Generated {n_samples} synthetic patient records.")
     print(f"Outcome distribution: Stable = {np.sum(df['outcome'] == 0)}, Critical Event = {np.sum(df['outcome'] == 1)}")
@@ -89,7 +93,12 @@ def train_pipeline() -> None:
     raw_data = generate_synthetic_clinical_data(n_samples=5000)
     data = add_derived_features(raw_data)
     
-    features = ["hr", "bp_systolic", "bp_diastolic", "spo2", "age", "map", "pulse_pressure", "shock_index"]
+    features = [
+        "hr", "bp_systolic", "bp_diastolic", "spo2", "age",
+        "map", "pulse_pressure", "shock_index",
+        "rate_pressure_product", "age_adjusted_shock_index",
+        "heart_rate_deviation", "systolic_bp_deviation"
+    ]
     X = data[features]
     y = data["outcome"]
     
@@ -99,34 +108,41 @@ def train_pipeline() -> None:
     )
     
     # 3. Hyperparameter Optimization via Grid Search
-    print("\n--- Step 2: Running GridSearchCV for RandomForest ---")
-    rf_base = RandomForestClassifier(class_weight="balanced", random_state=42)
+    print("\n--- Step 2: Running GridSearchCV for HistGradientBoostingClassifier ---")
+    hgb_base = HistGradientBoostingClassifier(class_weight="balanced", random_state=42)
     param_grid = {
-        "n_estimators": [50, 100],
-        "max_depth": [4, 6, 8],
-        "min_samples_split": [2, 5]
+        "learning_rate": [0.05, 0.1],
+        "max_iter": [50, 100],
+        "max_leaf_nodes": [15, 31],
+        "min_samples_leaf": [20, 50]
     }
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     grid_search = GridSearchCV(
-        estimator=rf_base,
+        estimator=hgb_base,
         param_grid=param_grid,
         scoring="roc_auc",
         cv=cv,
         n_jobs=-1
     )
     grid_search.fit(X_train, y_train)
-    best_rf = grid_search.best_estimator_
-    print(f"Best parameters: {grid_search.best_params_}")
+    
+    # Get best hyperparameters to construct an unfitted clone for cross-validated calibration
+    best_params = grid_search.best_params_
+    best_hgb_unfitted = HistGradientBoostingClassifier(
+        class_weight="balanced",
+        random_state=42,
+        **best_params
+    )
+    print(f"Best parameters: {best_params}")
     print(f"Best CV ROC-AUC: {grid_search.best_score_:.4f}")
     
-    # 4. Probability Calibration
-    print("\n--- Step 3: Calibrating Classifier Probabilities ---")
+    # 4. Probability Calibration (Fixed calibration leakage by using cv=5)
+    print("\n--- Step 3: Calibrating Classifier Probabilities (Cross-Validated) ---")
     calibrated_clf = CalibratedClassifierCV(
-        estimator=best_rf,
+        estimator=best_hgb_unfitted,
         method="isotonic",
-        cv="prefit"
+        cv=5
     )
-    # Fit calibration on the same training set (prefit RF)
     calibrated_clf.fit(X_train, y_train)
     
     # 5. Evaluation
@@ -152,16 +168,16 @@ def train_pipeline() -> None:
     
     # Save Metadata sidecar
     metadata = {
-        "model_type": "CalibratedClassifierCV(RandomForestClassifier)",
+        "model_type": "CalibratedClassifierCV(HistGradientBoostingClassifier)",
         "version": "2.0.0",
-        "training_date": datetime.utcnow().isoformat() + "Z",
+        "training_date": datetime.now(timezone.utc).isoformat() + "Z",
         "features": features,
         "metrics": {
             "roc_auc": round(float(auc), 4),
             "brier_score": round(float(brier), 4),
-            "best_cv_auc": round(float(grid_search.best_score_), 4)
+            "best_cv_auc": round(grid_search.best_score_, 4)
         },
-        "best_hyperparameters": grid_search.best_params_
+        "best_hyperparameters": best_params
     }
     with open(METADATA_PATH, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
@@ -170,12 +186,15 @@ def train_pipeline() -> None:
     # 7. Verify predictions
     print("\n--- Step 6: Verification of Loaded Model ---")
     loaded_model = joblib.load(MODEL_PATH)
-    # Sample features including derived ones: [hr, bp_systolic, bp_diastolic, spo2, age, map, pulse_pressure, shock_index]
-    # SBP = 135, DBP = 85, HR = 78
+    # SBP = 135, DBP = 85, HR = 78, Age = 68, SpO2 = 96.5
     # map_val = 85 + (135 - 85)/3 = 101.67
     # pulse_press = 135 - 85 = 50
     # shock_index = 78 / 135 = 0.578
-    sample_features = [[78.0, 135.0, 85.0, 96.5, 68.0, 101.67, 50.0, 0.578]]
+    # rpp = 78 * 135 = 10530.0
+    # sia = (78 * 68) / 135 = 39.289
+    # hr_dev = (78 - 75)**2 = 9.0
+    # sbp_dev = (135 - 120)**2 = 225.0
+    sample_features = [[78.0, 135.0, 85.0, 96.5, 68.0, 101.67, 50.0, 0.578, 10530.0, 39.289, 9.0, 225.0]]
     prob_class_1 = loaded_model.predict_proba(sample_features)[0][1]
     print(f"Inference Test: Patient vitals {sample_features[0]}")
     print(f"Calculated Clinical Risk Score: {prob_class_1:.3f}")

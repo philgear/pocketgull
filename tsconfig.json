@@ -35,5 +35,8 @@
   ],
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true
-  }
+  },
+  "exclude": [
+    "src/lib/dataconnect/**"
+  ]
 }

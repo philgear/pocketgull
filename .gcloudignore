@@ -14,6 +14,7 @@ test-results/
 .dart_tool/
 pocketgull_flutter/
 pocketgull_api/venv/
+pocketgull_api/.venv/
 pocketgull_api/venv_dsp/
 pocketgull_api/__pycache__/
 pocketgull_api/.pytest_cache/
