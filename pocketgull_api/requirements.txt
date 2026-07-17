@@ -11,7 +11,7 @@ numpy>=2.5.1
 pandas>=2.2.0
 
 # FHIR Bundle validation gateway (P1)
-fhir.resources>=7.1.0
+fhir.resources>=8.3.0
 
 # HDF5 biosignal archive reader (P2)
 h5py>=3.16.0
