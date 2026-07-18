@@ -175,7 +175,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                   <p><span class="font-semibold">Purpose:</span> Clinical intelligence features in PocketGull — biometric trend analysis, care plan optimization, and AI-assisted consultation support.</p>
                   <p><span class="font-semibold">Data handling:</span> Health data is held in server memory only during your session and is never written to permanent storage, sold, shared with third parties, or used for advertising.</p>
                   <p><span class="font-semibold">Security:</span> Data is transmitted over HTTPS. Tokens are stored in memory only (ephemeral — cleared on server restart).</p>
-                  <p><span class="font-semibold">Your rights:</span> You may withdraw at any time via Integrations → Google Health Disconnect. Selecting "Disconnect &amp; Erase Data" will permanently remove all synced health data from this session.</p>
+                  <p><span class="font-semibold">Your rights:</span> You may withdraw at any time via Imports → Google Health Disconnect. Selecting "Disconnect &amp; Erase Data" will permanently remove all synced health data from this session.</p>
                   <p><span class="font-semibold">Contact:</span> <a href="mailto:privacy@pocketgull.app" class="text-blue-600 dark:text-blue-400 underline">privacy@pocketgull.app</a></p>
                 </div>
                 <div class="rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 p-3 text-xs text-amber-800 dark:text-amber-300">
@@ -604,7 +604,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
            <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
            <div id="tour-patient-dropdown"><app-patient-dropdown></app-patient-dropdown></div>
 
-           <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1 ml-auto">
+                       <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1 ml-auto">
              <!-- EXPORT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="exportMenuOpen.set(true)" (mouseleave)="exportMenuOpen.set(false)">
                <button
@@ -638,7 +638,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                <button
                        class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[12px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                 <span class="hidden sm:inline">Integrations</span>
+                 <span class="hidden sm:inline">Imports</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </button>
 

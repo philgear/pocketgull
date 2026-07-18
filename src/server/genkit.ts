@@ -366,3 +366,118 @@ Return ONLY a JSON array of objects with this exact structure:
       return JSON.parse(response.text);
     }
 );
+
+// 7. Scan Document Flow (OCR & Clinical Extraction)
+export const scanDocumentFlow = ai.defineFlow(
+  {
+    name: 'scanDocumentFlow',
+    inputSchema: z.object({
+      base64Image: z.string(),
+      context: z.string().optional()
+    }),
+    outputSchema: z.object({
+      name: z.string().optional(),
+      age: z.number().optional(),
+      gender: z.string().optional(),
+      vitals: z.object({
+        bp: z.string().optional(),
+        hr: z.string().optional(),
+        temp: z.string().optional(),
+        spO2: z.string().optional(),
+        weight: z.string().optional(),
+        height: z.string().optional()
+      }).optional(),
+      issues: z.array(z.object({
+        partId: z.string(),
+        name: z.string(),
+        severity: z.enum(['mild', 'moderate', 'critical']),
+        notes: z.string()
+      })).optional(),
+      medications: z.array(z.object({
+        name: z.string(),
+        dosage: z.string(),
+        frequency: z.string()
+      })).optional(),
+      notes: z.array(z.string()).optional(),
+      patientGoals: z.string().optional()
+    })
+  },
+  async ({ base64Image, context }) => {
+    // Remove data URL prefix if present but extract format
+    let mimeType = 'image/jpeg';
+    const match = base64Image.match(/^data:([^;]+);base64,/);
+    if (match) {
+      mimeType = match[1];
+    }
+    const base64Data = base64Image.replace(/^data:[^;]+;base64,/, "");
+
+    const prompt = `You are a clinical expert assistant. Analyze the provided clinical document or image (e.g. lab report, clinical chart, patient intake questionnaire, or medical notes).
+Perform OCR and extract all patient attributes. 
+${context ? 'Additional Context: ' + context : ''}
+
+Strictly map any extracted clinical issues or symptoms to one of the following exact partId strings if applicable:
+- head
+- chest
+- abdomen
+- pelvis
+- r_shoulder
+- l_shoulder
+- r_arm
+- l_arm
+- r_hand
+- l_hand
+- r_thigh
+- l_thigh
+- r_shin
+- l_shin
+- r_foot
+- l_foot
+
+Return all results structured into the response schema.`;
+
+    const response = await ai.generate({
+      model: 'vertexai/gemini-2.5-flash',
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { text: prompt },
+            { media: { contentType: mimeType, url: `data:${mimeType};base64,${base64Data}` } }
+          ]
+        }
+      ],
+      config: {
+        temperature: 0.15,
+        responseMimeType: 'application/json',
+        responseSchema: z.object({
+          name: z.string().optional(),
+          age: z.number().optional(),
+          gender: z.string().optional(),
+          vitals: z.object({
+            bp: z.string().optional(),
+            hr: z.string().optional(),
+            temp: z.string().optional(),
+            spO2: z.string().optional(),
+            weight: z.string().optional(),
+            height: z.string().optional()
+          }).optional(),
+          issues: z.array(z.object({
+            partId: z.string(),
+            name: z.string(),
+            severity: z.enum(['mild', 'moderate', 'critical']),
+            notes: z.string()
+          })).optional(),
+          medications: z.array(z.object({
+            name: z.string(),
+            dosage: z.string(),
+            frequency: z.string()
+          })).optional(),
+          notes: z.array(z.string()).optional(),
+          patientGoals: z.string().optional()
+        })
+      }
+    });
+
+    return JSON.parse(response.text);
+  }
+);

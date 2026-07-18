@@ -140,7 +140,7 @@ import { GamificationService } from '../services/gamification.service';
       }
 
       <!-- Hidden file input for import -->
-      <input #fileInput type="file" accept=".json" class="hidden" (change)="onFileSelected($event)" />
+      <input #fileInput type="file" accept=".json,.xml,.png,.jpg,.jpeg,.pdf" class="hidden" (change)="onFileSelected($event)" />
 
       <!-- Import status toast -->
       @if (importStatus()) {

@@ -1779,5 +1779,135 @@ export const MOCK_PATIENTS: IPatient[] = [
     ],
     "bookmarks": [],
     "scans": []
+  },
+  {
+    "id": "p005",
+    "name": "Philip Verheyen",
+    "age": 45,
+    "gender": "Male",
+    "lastVisit": "1710.04.12",
+    "preexistingConditions": [
+      "Left leg amputation (1693)",
+      "Chronic Phantom Limb Pain",
+      "Wound infection"
+    ],
+    "patientGoals": "Address severe, persistent left lower extremity phantom limb pain and stiffness.",
+    "vitals": {
+      "bp": "120/80",
+      "hr": "72",
+      "temp": "98.6°F",
+      "spO2": "98%",
+      "weight": "165 lbs",
+      "height": "5'9\""
+    },
+    "issues": {
+      "l_thigh": [
+        {
+          "id": "l_thigh",
+          "noteId": "note_verheyen_thigh_1",
+          "name": "Amputated Left Limb",
+          "painLevel": 7,
+          "description": "Amputation site (mid-thigh) shows healthy scar tissue, but patient reports excruciating phantom pain. Dissected his own amputated leg in 1693 to understand Achilles anatomy.",
+          "symptoms": [
+            {
+              "name": "Phantom burning",
+              "type": "Neurological/Sensory",
+              "verified": true,
+              "timeline": "Chronic"
+            },
+            {
+              "name": "Achilles area phantom throbbing",
+              "type": "Neurological/Sensory",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ]
+    },
+    "history": [
+      {
+        "type": "NoteCreated",
+        "date": "1693.10.15",
+        "summary": "Completed self-dissection of amputated left leg. Discovered and documented the Achilles tendon structure."
+      },
+      {
+        "type": "AnalysisRun",
+        "date": "1710.04.12",
+        "summary": "Historical Clinical Analysis",
+        "report": {
+          "Summary Overview": "### Clinical Assessment\nPhilip Verheyen, 45, presents with chronic phantom limb pain following a left mid-thigh amputation in 1693. His pain has a strong neuropathic component ('phantom burning' and localized 'Achilles' throbbing), accompanied by phantom muscle contractions.\n\n### Plan of Care\n- Introduce Mirror Box Therapy to resolve the sensory-motor incongruence.\n- Optimize sleep hygiene and address the psychological toll of chronic phantom pain using guided respiration.\n- Utilize AVS alpha and theta brainwave entrainment to reduce central sensitization.",
+          "Functional Protocols": "### Immediate Actions\n- Begin Mirror Box training twice daily (15 minutes per session).\n- Implement progressive somatic relaxation before bedtime to quiet central hyper-excitability.",
+          "Nutrition": "### Biochemical Assessment\nOxidative stress markers suggest high neurological load from chronic pain. Repletion of magnesium and omega-3 fatty acids is suggested to support axonal health and reduce neuro-inflammation.",
+          "Monitoring & Follow-up": "### Follow-up Schedule\n- Track phantom pain severity daily using the visual analogue scale.\n- Monitor sleep efficiency and report any breakthrough throbbing."
+        }
+      }
+    ],
+    "bookmarks": [],
+    "scans": []
+  },
+  {
+    "id": "p006",
+    "name": "Edwin Smith Case 3",
+    "age": 30,
+    "gender": "Male",
+    "lastVisit": "-1600.01.01",
+    "preexistingConditions": [
+      "Traumatic Skull Fracture",
+      "Meningeal exposure",
+      "Cervical rigidity"
+    ],
+    "patientGoals": "Stabilize acute head injury, wound care, and address neck stiffness.",
+    "vitals": {
+      "bp": "110/70",
+      "hr": "64",
+      "temp": "99.2°F",
+      "spO2": "95%",
+      "weight": "150 lbs",
+      "height": "5'7\""
+    },
+    "issues": {
+      "head": [
+        {
+          "id": "head",
+          "noteId": "note_smith_head_1",
+          "name": "Skull & Cervical Spine Trauma",
+          "painLevel": 9,
+          "description": "Gaping wound in the head penetrating to the bone, smashing the skull. Patient is unable to look at his shoulders, suggesting severe cervical spine stiffness / meningeal irritation.",
+          "symptoms": [
+            {
+              "name": "Gaping head wound",
+              "type": "Trauma",
+              "verified": true,
+              "timeline": "Acute"
+            },
+            {
+              "name": "Cervical rigidity (stiff neck)",
+              "type": "Neurological",
+              "verified": true,
+              "timeline": "Acute"
+            }
+          ]
+        }
+      ]
+    },
+    "history": [
+      {
+        "type": "NoteCreated",
+        "date": "-1600.01.01",
+        "summary": "Edwin Smith Papyrus Case 3 record: An ailment not to be treated. Bind with fresh meat on the first day, followed by grease, honey, and lint daily."
+      },
+      {
+        "type": "AnalysisRun",
+        "date": "-1600.01.01",
+        "summary": "Historical Clinical Analysis",
+        "report": {
+          "Summary Overview": "### Clinical Assessment\nPatient presents with a severe, acute open traumatic brain injury (TBI) with exposed skull fractures and significant cervical rigidity. Historically classified as 'an ailment not to be treated' due to high mortality.\n\n### Plan of Care\n- Immediate wound stabilization and sterile debridement (modern equivalent of grease/honey dressing).\n- Immobilization of the cervical spine to prevent secondary spinal cord injury.\n- Close intracranial pressure (ICP) monitoring.",
+          "Functional Protocols": "### Immediate Actions\n- Rigid cervical collar placement.\n- High-potency topical antimicrobial honey dressing (Medihoney) to promote tissue recovery and prevent wound contamination."
+        }
+      }
+    ],
+    "bookmarks": [],
+    "scans": []
   }
 ] as any[];

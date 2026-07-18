@@ -1664,6 +1664,13 @@ export class ExportService {
    * Detects the format of a JSON file and imports accordingly.
    */
   async importFromFile(file: File): Promise<IPatient> {
+    const isImage = file.type.startsWith('image/') || /\.(png|jpe?g)$/i.test(file.name);
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+
+    if (isImage || isPdf) {
+      return this.importViaOcr(file);
+    }
+
     const text = await file.text();
     const data = JSON.parse(text);
 
@@ -1679,6 +1686,103 @@ export class ExportService {
     } else {
       throw new Error('Unrecognized file format. Expected PocketGull native JSON or FHIR R4 Bundle.');
     }
+  }
+
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  private async importViaOcr(file: File): Promise<IPatient> {
+    console.log('[ExportService] Starting OCR scan for file:', file.name);
+    const base64Data = await this.fileToBase64(file);
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (typeof window !== 'undefined') {
+      const userKey = window.localStorage?.getItem('GEMINI_API_KEY') || (window as any).GEMINI_API_KEY;
+      if (userKey) {
+        headers['X-Gemini-API-Key'] = userKey.trim();
+      }
+    }
+
+    const response = await fetch('/api/ai/scan-document', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        base64Image: base64Data,
+        context: `Scanned from file: ${file.name}`
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`OCR extraction failed: ${errText || response.statusText}`);
+    }
+
+    const ocrData = await response.json();
+
+    const patient: IPatient = {
+      id: `ocr_${Date.now()}`,
+      name: ocrData.name || `Scanned Patient (${file.name.split('.')[0]})`,
+      age: ocrData.age || 35,
+      gender: ocrData.gender || 'Other',
+      lastVisit: new Date().toISOString(),
+      preexistingConditions: [],
+      history: [
+        {
+          date: new Date().toLocaleDateString(),
+          type: 'NoteCreated',
+          summary: `Clinical record extracted via Gemini OCR from scanned file: ${file.name}`,
+          partId: 'full_body',
+          noteId: `ocr_note_${Date.now()}`
+        }
+      ],
+      bookmarks: [],
+      patientGoals: ocrData.patientGoals || '',
+      vitals: {
+        bp: ocrData.vitals?.bp || '',
+        hr: ocrData.vitals?.hr || '',
+        temp: ocrData.vitals?.temp || '',
+        spO2: ocrData.vitals?.spO2 || '',
+        weight: ocrData.vitals?.weight || '',
+        height: ocrData.vitals?.height || '',
+        vitC: '', vitD3: '', magnesium: '', zinc: '', b12: ''
+      },
+      issues: {}
+    };
+
+    if (ocrData.issues && Array.isArray(ocrData.issues)) {
+      ocrData.issues.forEach((issue: any) => {
+        const partId = issue.partId;
+        if (!patient.issues[partId]) {
+          patient.issues[partId] = [];
+        }
+        patient.issues[partId].push({
+          id: partId,
+          noteId: `ocr_note_${partId}_${Date.now()}`,
+          name: issue.name,
+          painLevel: issue.severity === 'critical' ? 8 : (issue.severity === 'moderate' ? 5 : 2),
+          description: issue.notes || '',
+          symptoms: []
+        });
+      });
+    }
+
+    if (ocrData.medications && Array.isArray(ocrData.medications)) {
+      patient.medications = ocrData.medications.map((m: any) => ({
+        id: `ocr_med_${Math.random().toString(36).substr(2, 5)}`,
+        name: m.name,
+        value: `${m.dosage || ''} - ${m.frequency || ''}`.trim()
+      }));
+    }
+
+    return patient;
   }
 
   // ─── BigQuery Export ──────────────────────────────────────

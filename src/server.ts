@@ -586,6 +586,25 @@ app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, r
   }
 });
 
+app.post('/api/ai/scan-document', express.json({ limit: '15mb' }), async (req, res) => {
+  try {
+    const { base64Image, context } = req.body;
+    await getApiKey(req);
+
+    if (!base64Image) {
+      return res.status(400).json({ error: 'base64Image is required' });
+    }
+
+    const { scanDocumentFlow } = await import('./server/genkit.js');
+    const result = await scanDocumentFlow({ base64Image, context });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error scanning document:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
 
 // Server-Side Streaming Endpoint
 app.post('/api/ai/stream', express.json(), async (req, res) => {

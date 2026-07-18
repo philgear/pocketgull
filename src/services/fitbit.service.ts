@@ -175,7 +175,7 @@ export class FitbitService {
         this.connectionStatus.set({ connected: false });
         this.syncError.set(
           data.needsAuth
-            ? 'Google Health not connected. Please authorize via Integrations → Google Health Connect.'
+            ? 'Google Health not connected. Please authorize via Imports → Google Health Connect.'
             : (data.error || 'Authorization failed.')
         );
         return null;
