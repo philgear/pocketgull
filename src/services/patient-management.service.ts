@@ -104,15 +104,41 @@ export class PatientManagementService implements OnDestroy {
         if (loaded && loaded.length > 0) {
             let updatedList = [...loaded];
             let modified = false;
+
+            // Surgically clean up removed mock patients
+            updatedList = updatedList.filter(item => {
+              if (item.id === 'p_phil_gear') {
+                this.storage.deletePatient('p_phil_gear');
+                modified = true;
+                return false;
+              }
+              if (item.id === 'p005' && item.name === 'Philip Verheyen') {
+                this.storage.deletePatient('p005');
+                modified = true;
+                return false;
+              }
+              return true;
+            });
+
+            // Upsert / merge latest MOCK_PATIENTS definitions
             for (const p of MOCK_PATIENTS) {
-                if (!updatedList.some(item => item.id === p.id)) {
+                const existingIndex = updatedList.findIndex(item => item.id === p.id);
+                if (existingIndex === -1) {
                     updatedList.push(p);
                     await this.storage.savePatient(p);
                     modified = true;
+                } else {
+                    // Update/override stored mock patients with latest definitions
+                    const isOriginalMock = MOCK_PATIENTS.some(mp => mp.id === p.id);
+                    if (isOriginalMock) {
+                      updatedList[existingIndex] = p;
+                      await this.storage.savePatient(p);
+                      modified = true;
+                    }
                 }
             }
             this.patients.set(updatedList);
-            const defaultId = updatedList.find(p => p.id === 'p_phil_gear')?.id || updatedList[0]?.id || null;
+            const defaultId = updatedList.find(p => p.id === 'p_mara_santos')?.id || updatedList[0]?.id || null;
             this.selectedPatientId.set(defaultId);
         } else {
             // Seed DB on first run
@@ -120,7 +146,7 @@ export class PatientManagementService implements OnDestroy {
                 await this.storage.savePatient(p);
             }
             this.patients.set(MOCK_PATIENTS);
-            const defaultId = MOCK_PATIENTS.find(p => p.id === 'p_phil_gear')?.id || MOCK_PATIENTS[0]?.id || null;
+            const defaultId = MOCK_PATIENTS.find(p => p.id === 'p_mara_santos')?.id || MOCK_PATIENTS[0]?.id || null;
             this.selectedPatientId.set(defaultId);
         }
         this.rosterLoaded.set(true);

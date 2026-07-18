@@ -1235,256 +1235,6 @@ export const MOCK_PATIENTS: IPatient[] = [
     "scans": []
   },
   {
-    "id": "p_phil_gear",
-    "name": "Phil Gear",
-    "age": 42,
-    "gender": "Male",
-    "lastVisit": "2026.06.08",
-    "preexistingConditions": [
-      "Mild Hypertension",
-      "Mild Sleep Apnea (CPAP-managed)",
-      "Chronic Tension Headache",
-      "Developer & Founder (High Cognitive Load)"
-    ],
-    "patientGoals": "Optimize metabolic health, resolve evening tension headaches, reduce sleep latency to under 20 minutes, and synchronize biometrics from Google Health Connect.",
-    "vitals": {
-      "bp": "122/82",
-      "hr": "64",
-      "temp": "98.4°F",
-      "spO2": "98%",
-      "weight": "178 lbs",
-      "height": "5'10\"",
-      "vitD3": "28 ng/mL (Sub-optimal)",
-      "magnesium": "1.7 mg/dL (Low-normal)",
-      "b12": "412 pg/mL (Adequate)",
-      "zinc": "82 mcg/dL (Optimal)"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Homocysteine",
-        "value": "10.2 μmol/L (Borderline)"
-      },
-      {
-        "id": "2",
-        "name": "hsCRP",
-        "value": "1.4 mg/L (Low-grade)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "1.8 μmol/g Hb (Adequate)"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10",
-        "value": "0.62 μg/mL (Adequate)"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Lisinopril",
-        "value": "10mg Daily"
-      },
-      {
-        "id": "2",
-        "name": "Melatonin",
-        "value": "0.5mg PRN sleep onset"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2025-12-01T08:00:00Z",
-        "type": "hr",
-        "value": "72"
-      },
-      {
-        "timestamp": "2026-01-15T08:00:00Z",
-        "type": "hr",
-        "value": "70"
-      },
-      {
-        "timestamp": "2026-02-20T08:00:00Z",
-        "type": "hr",
-        "value": "68"
-      },
-      {
-        "timestamp": "2026-03-15T08:00:00Z",
-        "type": "hr",
-        "value": "66"
-      },
-      {
-        "timestamp": "2026-04-10T08:00:00Z",
-        "type": "hr",
-        "value": "65"
-      },
-      {
-        "timestamp": "2026-06-08T08:00:00Z",
-        "type": "hr",
-        "value": "64"
-      },
-      {
-        "timestamp": "2025-12-01T08:00:00Z",
-        "type": "spO2",
-        "value": "96"
-      },
-      {
-        "timestamp": "2026-01-15T08:00:00Z",
-        "type": "spO2",
-        "value": "97"
-      },
-      {
-        "timestamp": "2026-02-20T08:00:00Z",
-        "type": "spO2",
-        "value": "97"
-      },
-      {
-        "timestamp": "2026-03-15T08:00:00Z",
-        "type": "spO2",
-        "value": "98"
-      },
-      {
-        "timestamp": "2026-04-10T08:00:00Z",
-        "type": "spO2",
-        "value": "98"
-      },
-      {
-        "timestamp": "2026-06-08T08:00:00Z",
-        "type": "spO2",
-        "value": "98"
-      },
-      {
-        "timestamp": "2025-12-01T08:00:00Z",
-        "type": "bp",
-        "value": "130/88"
-      },
-      {
-        "timestamp": "2026-01-15T08:00:00Z",
-        "type": "bp",
-        "value": "128/85"
-      },
-      {
-        "timestamp": "2026-02-20T08:00:00Z",
-        "type": "bp",
-        "value": "126/84"
-      },
-      {
-        "timestamp": "2026-03-15T08:00:00Z",
-        "type": "bp",
-        "value": "124/83"
-      },
-      {
-        "timestamp": "2026-04-10T08:00:00Z",
-        "type": "bp",
-        "value": "123/82"
-      },
-      {
-        "timestamp": "2026-06-08T08:00:00Z",
-        "type": "bp",
-        "value": "122/82"
-      }
-    ],
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_phil_head_1",
-          "name": "Head & Neck",
-          "painLevel": 3,
-          "description": "Mild-to-moderate tension headaches occurring 3-4x per week in the evening after extended screen time. Associated with suboccipital tightness and eye strain. Worsens with caffeine excess and poor sleep.",
-          "symptoms": [
-            {
-              "name": "Tension headache",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Recurrent"
-            },
-            {
-              "name": "Sleep onset insomnia",
-              "type": "Neurological/Sleep",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "upper_back": [
-        {
-          "id": "upper_back",
-          "noteId": "note_phil_back_1",
-          "name": "Upper Back & Shoulders",
-          "painLevel": 2,
-          "description": "Mild trapezius tightness bilaterally. Attributable to prolonged seated developer posture and laptop use. Improves with movement.",
-          "symptoms": []
-        }
-      ]
-    },
-    "history": [
-      {
-        "type": "AnalysisRun",
-        "date": "2026.06.08",
-        "summary": "Comprehensive Clinical Analysis",
-        "report": {
-          "Summary Overview": "### Clinical Assessment\nPhil Gear presents as a high-cognitive-load developer and founder managing mild hypertension, CPAP-treated sleep apnea, and recurrent tension headaches. The primary drivers are screen-time-induced circadian disruption, suboptimal intracellular magnesium, borderline Vitamin D3, and low-grade sympathetic nervous system dominance from sustained work demands.\n\n### Priority List\n*   **Circadian Realignment**: Blue-light hygiene and structured morning anchor protocol.\n*   **Magnesium Repletion**: Targeting NMDA receptor stabilization and tension headache reduction.\n*   **HPA Axis Support**: Adaptogenic protocol to reduce cortisol load from founder stress.\n*   **Biometric Tracking**: Google Health Connect integration for daily HRV, HR, and SpO2 trend analysis.\n\n### Plan of Care\n*   Initiate magnesium glycinate and Vitamin D3/K2 protocol.\n*   Implement strict circadian anchor routine (sleep onset 10:30 PM target).\n*   Introduce zone 2 cardio 3x/week to support HRV recovery.\n*   Follow-up biometric review in 4 weeks.\n\n### Goals\n*   **Short-term (4 weeks)**: Reduce headache frequency by 50%. Sleep latency < 20 minutes.\n*   **Long-term (3 months)**: BP < 120/80, HRV improvement > 15%, and stable circadian rhythm.",
-          "Functional Protocols": "### Immediate Actions (72 hours)\n*   Install blue-light blocking glasses or activate Night Shift/f.lux after 7:00 PM.\n*   Move all high-cognitive-load work to before 4:00 PM; reserve evenings for low-stimulation activities.\n\n### Circadian Anchor Protocol\n| Anchor Point | Activity | Rationale |\n| :--- | :--- | :--- |\n| 6:30 AM | 10-min outdoor sunlight + cold splash | Cortisol pulse suppression + circadian set |\n| 12:00 PM | Walk (20 min) | Zone 2 + insulin sensitivity reset |\n| 7:00 PM | Blue-light off; dim lighting | Melatonin onset preservation |\n| 10:30 PM | Target sleep onset | 8h sleep window for apnea management |\n\n### Foundational Protocol\n*   Zone 2 cardio (HR 120-140): 3x per week, 30-45 minutes (cycle or treadmill)\n*   Daily 4-7-8 breathing (evening): 4 rounds before sleep to activate parasympathetic tone\n*   Posture reset: Chin tucks + thoracic extension x 10 reps every 90 minutes at desk",
-          "Nutrition": "### Biochemical Assessment\nPhil's dietary profile shows adequate macronutrient intake but micronutrient gaps in magnesium (chronic dietary shortfall in Western male developers) and Vitamin D3 (insufficient outdoor exposure). Borderline homocysteine suggests mild methylation strain from high cognitive demand.\n\n### Nutrition Targets\n*   **Magnesium Repletion**: Top dietary priority — target 420mg elemental/day.\n*   **Vitamin D3 Optimization**: Combined dietary + supplement target 50 ng/mL serum level.\n*   **Anti-inflammatory Pattern**: Reduce arachidonic acid load from processed snacks.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Magnesium Glycinate | 400mg | Before bed | NMDA / Muscle tension / Sleep |\n| Vitamin D3 + K2 | 5000 IU / 100mcg | With breakfast | Immune / Bone / Mood |\n| Omega-3 EPA/DHA | 2000mg | With meals | hsCRP reduction / Cardiovascular |\n| L-Theanine | 200mg | Pre-work + evening | Focus / Cortisol smoothing |\n\n### Dietary Adjustments\n- **Add**: Dark leafy greens (400g/day), pumpkin seeds (30g/day), avocado (daily)\n- **Reduce**: Caffeine after 1:00 PM; switch to L-theanine + green tea after noon\n- **Hydration**: 2.5L water/day minimum; add electrolytes (sodium, potassium) to morning water",
-          "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Begin magnesium glycinate + Vitamin D3/K2 protocol immediately.\n2.  Set up Google Health Connect dashboard for daily HR, HRV, and SpO2 monitoring.\n3.  Activate blue-light blocking protocol.\n4.  4-week check-in: assess headache frequency, sleep latency, and resting HR trend.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Resting HR | < 62 bpm | Daily (wearable) | > 75 bpm for 3+ days |\n| Sleep Latency | < 20 min | Daily | > 45 min on 3+ consecutive nights |\n| Headache Frequency | < 1x/week | Weekly log | > 4x/week or severity > 6/10 |\n| BP | < 120/80 | Bi-weekly | > 135/85 on 2 consecutive readings |\n| Serum Vitamin D3 | 50-70 ng/mL | 12-week lab | < 30 ng/mL |\n\n### Long-term Trajectory (6+ months)\nWith consistent execution, Phil should see normalization of BP without Lisinopril dose increase, significant HRV improvement via wearable tracking, and elimination of recurrent tension headaches. Quarterly biometric reviews via Google Health Connect will guide protocol adjustments.",
-          "Patient Education": "### Understanding Your Health Picture\nYour body is dealing with the classic high-performance developer pattern: sustained mental output without adequate physical recovery, low dietary magnesium, disrupted circadian rhythm from screens, and compounding sympathetic nervous system activation from founder responsibilities.\n\n### What Was Found\n*   **Magnesium Gap**: This single deficiency explains your tension headaches, mild sleep issues, and suboptimal BP control.\n*   **Circadian Disruption**: Screen-induced blue light is delaying your melatonin onset by 1-2 hours, fragmenting your sleep architecture.\n*   **Low-Grade Inflammation**: Your hsCRP of 1.4 mg/L is manageable but warrants dietary attention.\n\n### Your Action Plan\n*   **Tonight**: Take magnesium glycinate before bed. Install f.lux or Night Shift. This will produce measurable results within 72 hours.\n*   **This Week**: Walk for 20 minutes at lunch daily. No caffeine after 1:00 PM.\n*   **Month 1**: Track sleep + HRV daily. Report any headaches in the Pocket Gull app.\n\n### Important Notes\n> 💡 Your Lisinopril is doing its job — do not stop it. These protocols are designed to work alongside it, and over time may reduce the dose required. Always consult your prescribing physician before any medication changes.",
-          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nPhil's orthomolecular profile is consistent with a high-cognitive-load male in his early 40s: suboptimal intracellular magnesium (the most common deficiency in Western male knowledge workers), insufficient Vitamin D3, and borderline homocysteine signaling mild methylation cycle strain. CoQ10 and glutathione are adequate.\n\n```json\n[\n  { \"name\": \"Magnesium\", \"level\": \"Sub-optimal\", \"pathway\": \"NMDA / ATP Synthesis / Sleep\" },\n  { \"name\": \"Vitamin D3\", \"level\": \"Sub-optimal\", \"pathway\": \"Immune / Mood / Bone\" },\n  { \"name\": \"Vitamin B12\", \"level\": \"Optimal\", \"pathway\": \"Methylation\" },\n  { \"name\": \"Zinc\", \"level\": \"Optimal\", \"pathway\": \"Immune / Hormones\" },\n  { \"name\": \"Homocysteine\", \"level\": \"Borderline\", \"pathway\": \"Cardiovascular / Methylation\" },\n  { \"name\": \"CoQ10\", \"level\": \"Adequate\", \"pathway\": \"Mitochondrial / Cardiac\" }\n]\n```\n\n### Detected Deficiencies\n- **Magnesium (Sub-optimal)**: NMDA receptor hyperexcitability from low Mg directly causes tension-type headaches and sleep-onset difficulty. Priority one intervention.\n- **Vitamin D3 (Sub-optimal at 28 ng/mL)**: Target is 50-70 ng/mL. Low D3 contributes to mood instability, impaired immune surveillance, and suboptimal serotonin synthesis.\n- **Homocysteine (Borderline at 10.2 μmol/L)**: Suggests mild one-carbon metabolism strain. May worsen if cognitive demand continues without B-vitamin support.\n\n### Orthomolecular Protocol\n| Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway |\n|---|---|---|---|\n| Magnesium Glycinate | 400mg elemental | Oral, nightly with food | NMDA antagonism / Tension headache / Sleep |\n| Vitamin D3 + K2 | 5000 IU D3 / 100mcg MK-7 | Oral with fat-containing meal | Serum D3 optimization / Bone / Mood |\n| L-Methylfolate (5-MTHF) | 400mcg | Oral with B12 | Homocysteine reduction / Methylation |\n| L-Theanine | 200mg | Oral (AM + PM) | Alpha-wave induction / Cortisol smoothing |\n| Omega-3 EPA/DHA | 2000mg | Oral with meals | hsCRP reduction / Cardiovascular |\n\n### Cautions & Interactions\n- **Magnesium + Lisinopril**: Generally well-tolerated; high-dose Mg may slightly lower BP — monitor for dizziness. Adjust Lisinopril if BP drops below 110/70.\n- **L-Methylfolate + SSRI (if initiated)**: Monitor for serotonin syndrome if antidepressant therapy is ever added; methylfolate enhances serotonergic activity.\n- **Vitamin D3 Toxicity**: Recheck 25(OH)D at 12 weeks; target 50-70 ng/mL. Above 100 ng/mL carries hypercalcemia risk."
-        }
-      },
-      {
-        "type": "Visit",
-        "date": "2026.03.15",
-        "summary": "Initial biometric review: HRV trending low, sleep latency complaints, and headache pattern established.",
-        "state": {
-          "patientGoals": "Reduce headache frequency and improve sleep quality.",
-          "vitals": {
-            "bp": "126/84",
-            "hr": "68",
-            "temp": "98.5°F",
-            "spO2": "97%",
-            "weight": "180 lbs",
-            "height": "5'10\""
-          },
-          "oxidativeStressMarkers": [],
-          "antioxidantSources": [],
-          "medications": [
-            {
-              "id": "1",
-              "name": "Lisinopril",
-              "value": "10mg Daily"
-            }
-          ],
-          "issues": {
-            "head": [
-              {
-                "id": "head",
-                "noteId": "note_phil_head_hist1",
-                "name": "Head & Neck",
-                "painLevel": 4,
-                "description": "Frequent evening headaches, 4-5x per week. Attributable to screen time.",
-                "symptoms": []
-              }
-            ]
-          }
-        }
-      }
-    ],
-    "bookmarks": [],
-    "scans": [],
-    "dietaryProtocol": "",
-    "dynamicNutrients": [],
-    "clinicalNotes": [],
-    "checklist": [],
-    "shoppingList": [],
-    "activePhilosophy": "western",
-    "ayurvedicStatus": {}
-  },
-  {
     "id": "p_mara_santos",
     "name": "Mara Santos",
     "age": 34,
@@ -1781,43 +1531,62 @@ export const MOCK_PATIENTS: IPatient[] = [
     "scans": []
   },
   {
-    "id": "p005",
-    "name": "Philip Verheyen",
-    "age": 45,
-    "gender": "Male",
-    "lastVisit": "1710.04.12",
+    "id": "p_frida_kahlo",
+    "name": "Frida Kahlo",
+    "age": 47,
+    "gender": "Female",
+    "lastVisit": "1954.07.13",
     "preexistingConditions": [
-      "Left leg amputation (1693)",
-      "Chronic Phantom Limb Pain",
-      "Wound infection"
+      "Poliomyelitis (childhood, right leg atrophy)",
+      "Severe streetcar accident trauma (1925)",
+      "Multiple spinal fractures & pelvic fractures",
+      "Right foot amputation (1953)",
+      "Chronic neuropathic pain"
     ],
-    "patientGoals": "Address severe, persistent left lower extremity phantom limb pain and stiffness.",
+    "patientGoals": "Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.",
     "vitals": {
-      "bp": "120/80",
-      "hr": "72",
-      "temp": "98.6°F",
-      "spO2": "98%",
-      "weight": "165 lbs",
-      "height": "5'9\""
+      "bp": "115/75",
+      "hr": "82",
+      "temp": "98.4°F",
+      "spO2": "97%",
+      "weight": "110 lbs",
+      "height": "5'3\""
     },
     "issues": {
-      "l_thigh": [
+      "spine": [
         {
-          "id": "l_thigh",
-          "noteId": "note_verheyen_thigh_1",
-          "name": "Amputated Left Limb",
-          "painLevel": 7,
-          "description": "Amputation site (mid-thigh) shows healthy scar tissue, but patient reports excruciating phantom pain. Dissected his own amputated leg in 1693 to understand Achilles anatomy.",
+          "id": "spine",
+          "noteId": "note_frida_spine_1",
+          "name": "Spinal & Pelvic Trauma",
+          "painLevel": 8,
+          "description": "Chronic pain, spinal instability requiring steel corsets. Post-operative status of 30+ surgeries.",
           "symptoms": [
             {
-              "name": "Phantom burning",
-              "type": "Neurological/Sensory",
+              "name": "Severe back pain",
+              "type": "Neuropathic",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ],
+      "r_leg": [
+        {
+          "id": "r_leg",
+          "noteId": "note_frida_leg_1",
+          "name": "Right Leg Atrophy & Amputation",
+          "painLevel": 9,
+          "description": "Right leg exhibits marked atrophy (post-polio). Right foot/lower leg amputated in 1953 due to gangrene, resulting in severe phantom limb sensations and burning.",
+          "symptoms": [
+            {
+              "name": "Phantom foot pain",
+              "type": "Neuropathic",
               "verified": true,
               "timeline": "Chronic"
             },
             {
-              "name": "Achilles area phantom throbbing",
-              "type": "Neurological/Sensory",
+              "name": "Right lower leg atrophy",
+              "type": "Musculoskeletal",
               "verified": true,
               "timeline": "Chronic"
             }
@@ -1828,18 +1597,16 @@ export const MOCK_PATIENTS: IPatient[] = [
     "history": [
       {
         "type": "NoteCreated",
-        "date": "1693.10.15",
-        "summary": "Completed self-dissection of amputated left leg. Discovered and documented the Achilles tendon structure."
+        "date": "1925.09.17",
+        "summary": "Survived catastrophic streetcar collision resulting in an iron handrail piercing her pelvis and multiple spinal/foot fractures."
       },
       {
         "type": "AnalysisRun",
-        "date": "1710.04.12",
+        "date": "1954.07.13",
         "summary": "Historical Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nPhilip Verheyen, 45, presents with chronic phantom limb pain following a left mid-thigh amputation in 1693. His pain has a strong neuropathic component ('phantom burning' and localized 'Achilles' throbbing), accompanied by phantom muscle contractions.\n\n### Plan of Care\n- Introduce Mirror Box Therapy to resolve the sensory-motor incongruence.\n- Optimize sleep hygiene and address the psychological toll of chronic phantom pain using guided respiration.\n- Utilize AVS alpha and theta brainwave entrainment to reduce central sensitization.",
-          "Functional Protocols": "### Immediate Actions\n- Begin Mirror Box training twice daily (15 minutes per session).\n- Implement progressive somatic relaxation before bedtime to quiet central hyper-excitability.",
-          "Nutrition": "### Biochemical Assessment\nOxidative stress markers suggest high neurological load from chronic pain. Repletion of magnesium and omega-3 fatty acids is suggested to support axonal health and reduce neuro-inflammation.",
-          "Monitoring & Follow-up": "### Follow-up Schedule\n- Track phantom pain severity daily using the visual analogue scale.\n- Monitor sleep efficiency and report any breakthrough throbbing."
+          "Summary Overview": "### Clinical Assessment\nFrida Kahlo presents with complex, refractory chronic neuropathic pain secondary to childhood polio and subsequent high-impact orthopedic trauma. She is post-amputation of the right lower extremity, experiencing severe phantom limb pain, spinal subluxation/pain, and dependency on strong analgesics (Demerol, alcohol).\n\n### Plan of Care\n- **Mirror Box Therapy**: Initiate visual feedback sessions targeting the right lower extremity phantom sensations.\n- **Somatic Myofascial Release**: Gentle upper spine/cervical therapy to reduce strain from wearing structural corsets.\n- **Neuropathic Pain Support**: Utilize high-dose liposomal palmitoylethanolamide (PEA) and alpha-lipoic acid.",
+          "Functional Protocols": "### Immediate Actions\n- Start Mirror Box training 15 mins BID.\n- Implement daily heart rate variability (HRV) breathing exercises to modulate sympathetic tone."
         }
       }
     ],
@@ -1847,7 +1614,7 @@ export const MOCK_PATIENTS: IPatient[] = [
     "scans": []
   },
   {
-    "id": "p006",
+    "id": "p_edwin_smith_3",
     "name": "Edwin Smith Case 3",
     "age": 30,
     "gender": "Male",
@@ -1904,6 +1671,111 @@ export const MOCK_PATIENTS: IPatient[] = [
         "report": {
           "Summary Overview": "### Clinical Assessment\nPatient presents with a severe, acute open traumatic brain injury (TBI) with exposed skull fractures and significant cervical rigidity. Historically classified as 'an ailment not to be treated' due to high mortality.\n\n### Plan of Care\n- Immediate wound stabilization and sterile debridement (modern equivalent of grease/honey dressing).\n- Immobilization of the cervical spine to prevent secondary spinal cord injury.\n- Close intracranial pressure (ICP) monitoring.",
           "Functional Protocols": "### Immediate Actions\n- Rigid cervical collar placement.\n- High-potency topical antimicrobial honey dressing (Medihoney) to promote tissue recovery and prevent wound contamination."
+        }
+      }
+    ],
+    "bookmarks": [],
+    "scans": []
+  },
+  {
+    "id": "p_charles_darwin",
+    "name": "Charles Darwin",
+    "age": 73,
+    "gender": "Male",
+    "lastVisit": "1882.04.19",
+    "preexistingConditions": [
+      "Chronic Gastrointestinal Disease",
+      "Cyclic Vomiting Syndrome (suspected)",
+      "Systemic eczema & skin rashes",
+      "Mitochondrial dysfunction / Chagas disease (suspected)"
+    ],
+    "patientGoals": "Resolve debilitating chronic fatigue, severe episodic vomiting, flatulence, and chest palpitations.",
+    "vitals": {
+      "bp": "110/70",
+      "hr": "68",
+      "temp": "98.2°F",
+      "spO2": "96%",
+      "weight": "148 lbs",
+      "height": "5'11\""
+    },
+    "issues": {
+      "abdomen": [
+        {
+          "id": "abdomen",
+          "noteId": "note_darwin_gut_1",
+          "name": "Chronic Gastrointestinal Syndrome",
+          "painLevel": 6,
+          "description": "Debilitating abdominal pain, severe flatulence, acid reflux, and cyclical episodes of vomiting triggered by stress or intellectual exertion.",
+          "symptoms": [
+            {
+              "name": "Cyclic vomiting",
+              "type": "Gastrointestinal",
+              "verified": true,
+              "timeline": "Chronic/Episodic"
+            },
+            {
+              "name": "Severe flatulence & dyspepsia",
+              "type": "Gastrointestinal",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ],
+      "chest": [
+        {
+          "id": "chest",
+          "noteId": "note_darwin_chest_1",
+          "name": "Cardiac Palpitations",
+          "painLevel": 4,
+          "description": "Recurrent palpitations and chest discomfort, typically co-occurring with episodes of anxiety or intense focus.",
+          "symptoms": [
+            {
+              "name": "Palpitations",
+              "type": "Cardiovascular",
+              "verified": true,
+              "timeline": "Intermittent"
+            }
+          ]
+        }
+      ],
+      "full_body": [
+        {
+          "id": "full_body",
+          "noteId": "note_darwin_systemic_1",
+          "name": "Systemic Fatigue & Dermatological Flare-ups",
+          "painLevel": 5,
+          "description": "Profound, post-exertional fatigue rendering him bedridden for days, accompanied by weeping eczema and skin rashes.",
+          "symptoms": [
+            {
+              "name": "Chronic fatigue",
+              "type": "Systemic/Mitochondrial",
+              "verified": true,
+              "timeline": "Chronic"
+            },
+            {
+              "name": "Eczematous skin rashes",
+              "type": "Dermatological",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ]
+    },
+    "history": [
+      {
+        "type": "NoteCreated",
+        "date": "1839.12.31",
+        "summary": "Onboard HMS Beagle, exposed to various tropical diseases (including suspected Triatoma infestans bites, vector of Chagas disease)."
+      },
+      {
+        "type": "AnalysisRun",
+        "date": "1882.04.19",
+        "summary": "Historical Clinical Analysis",
+        "report": {
+          "Summary Overview": "### Clinical Assessment\nCharles Darwin presents with a multi-systemic syndrome characterized by chronic gut-brain axis dysfunction, cyclical hyperemesis, cardiac palpitations, and eczematous skin issues. Pointing towards either chronic Chagas disease, food intolerance, or mitochondrial dysfunction.\n\n### Plan of Care\n- **Strict Gluten-Free & Lactose-Free Diet**: Eliminate inflammatory dietary proteins.\n- **Mitochondrial Support**: Supplement with CoQ10, Riboflavin (B2), and Carnitine.\n- **Vagus Nerve Stimulation**: Cold exposure and diaphragmatic breathing.",
+          "Functional Protocols": "### Immediate Actions\n- Complete elimination of dairy and wheat product intake.\n- Initiate CoQ10 200mg daily with fat-containing meals."
         }
       }
     ],
