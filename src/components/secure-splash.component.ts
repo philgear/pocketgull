@@ -8,6 +8,7 @@ import { GamificationService } from '../services/gamification.service';
 import { ThemeService } from '../services/theme.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PetAuditoryService } from '../services/pet-auditory.service';
+import { environment } from '../environments/environment';
 
 
 @Component({
@@ -184,7 +185,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
             </div>
           }
           <!-- Gesture Unlock Flow -->
-          @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
+          @else if (isLocked() && isAuthorized() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
                <p class="text-[12px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw a beach item (Palm Tree, Wave, Seagull, Shell, Starfish, or "X") to unlock</p>
                
@@ -287,7 +288,7 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
             </div>
           }
           <!-- Restricted Entry Gateway -->
-          @else if (showAuthGateway()) {
+          @else if (showAuthGateway() && viewState() !== 'signup') {
             <div class="space-y-6 py-2 animate-in fade-in duration-500">
               <div class="text-center space-y-2">
                 <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-red-50/50 dark:bg-brand-red-950/30 border border-brand-red-200/50 dark:border-brand-red-900/40">
@@ -306,12 +307,21 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
               }
 
               <div class="space-y-3 pt-2">
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Clinician Email</label>
+                  <input type="email" 
+                         [ngModel]="signinEmailInput()" 
+                         (ngModelChange)="signinEmailInput.set($event)"
+                         placeholder="dpo@pocketgull.app" 
+                         class="w-full px-4 py-3 text-xs bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-800/80 rounded-xl outline-none focus:border-zinc-400 text-zinc-800 dark:text-zinc-200">
+                </div>
+
                 <!-- Google Sign-In -->
                 <button 
                   type="button" 
                   (click)="handleGoogleAuth()"
-                  [disabled]="isChecking()"
-                  class="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(37,99,235,0.15)] hover:shadow-[0_6px_24px_rgba(37,99,235,0.25)] active:scale-[0.98]"
+                  [disabled]="isChecking() || !signinEmailInput()"
+                  class="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(37,99,235,0.15)] hover:shadow-[0_6px_24px_rgba(37,99,235,0.25)] active:scale-[0.98] disabled:opacity-50"
                 >
                   <span>Clinician Sign-in</span>
                 </button>
@@ -325,8 +335,96 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                   <span>Explore Sandbox Demo</span>
                 </button>
+
+                <div class="relative py-4 mt-2">
+                  <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-zinc-200 dark:border-zinc-800/80"></div>
+                  </div>
+                  <div class="relative flex justify-center text-xs">
+                    <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-400 uppercase tracking-widest text-[10px] font-bold rounded-full">New Clinician?</span>
+                  </div>
+                </div>
+
+                <!-- Sign Up Link -->
+                <button 
+                  type="button" 
+                  (click)="viewState.set('signup'); errorMsg.set('');"
+                  class="w-full py-3 bg-zinc-50 dark:bg-zinc-900/40 hover:bg-zinc-100 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-750 dark:text-zinc-350 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300"
+                >
+                  Create Clinician Account (Sign Up)
+                </button>
               </div>
             </div>
+          }
+
+          <!-- Sign-Up Flow -->
+          @else if (viewState() === 'signup') {
+            <form (submit)="handleSignup(); $event.preventDefault();" class="space-y-4 text-left animate-in fade-in duration-500">
+              <div class="text-center space-y-2 mb-4">
+                <h2 class="text-sm font-bold text-zinc-800 dark:text-zinc-100 uppercase tracking-wider">Create Clinician Account</h2>
+                <p class="text-[10px] uppercase tracking-widest text-zinc-500">Access Restricted Engine</p>
+              </div>
+
+              <div class="space-y-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Full Name</label>
+                  <input type="text" required
+                         [(ngModel)]="signupForm().name"
+                         name="signupName"
+                         placeholder="Dr. Jane Doe" 
+                         class="w-full px-4 py-3 text-xs bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-800/80 rounded-xl outline-none focus:border-[#3ebc9e] text-zinc-800 dark:text-zinc-200">
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Email Address</label>
+                  <input type="email" required
+                         [(ngModel)]="signupForm().email"
+                         name="signupEmail"
+                         placeholder="jane.doe@clinic.org" 
+                         class="w-full px-4 py-3 text-xs bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-800/80 rounded-xl outline-none focus:border-[#3ebc9e] text-zinc-800 dark:text-zinc-200">
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Clinic / Organization</label>
+                  <input type="text" required
+                         [(ngModel)]="signupForm().clinic"
+                         name="signupClinic"
+                         placeholder="Bayview Wellness Center" 
+                         class="w-full px-4 py-3 text-xs bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-800/80 rounded-xl outline-none focus:border-[#3ebc9e] text-zinc-800 dark:text-zinc-200">
+                </div>
+
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Passcode/PIN (4-digits)</label>
+                  <input type="password" required maxlength="4" pattern="[0-9]{4}"
+                         [(ngModel)]="signupForm().pin"
+                         name="signupPin"
+                         placeholder="1234" 
+                         class="w-full px-4 py-3 text-xs font-mono bg-zinc-50 dark:bg-black/40 border border-zinc-200 dark:border-zinc-800/80 rounded-xl outline-none focus:border-[#3ebc9e] text-zinc-800 dark:text-zinc-200">
+                </div>
+              </div>
+
+              @if (errorMsg()) {
+                <div class="p-3 bg-brand-red-50/80 dark:bg-brand-red-950/40 border border-brand-red-200 dark:border-brand-red-900/50 rounded-xl">
+                  <p class="text-[12px] text-brand-red-655 dark:text-brand-red-400 font-medium text-center uppercase tracking-wider">{{ errorMsg() }}</p>
+                </div>
+              }
+
+              <button 
+                type="submit"
+                [disabled]="isChecking() || !signupForm().name || !signupForm().email || !signupForm().clinic || signupForm().pin.length !== 4"
+                class="w-full py-4 mt-2 bg-[#3ebc9e] hover:bg-[#2fa085] text-white text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+              >
+                <span>Register & Proceed</span>
+              </button>
+
+              <button 
+                type="button" 
+                (click)="viewState.set('auth'); errorMsg.set('');"
+                class="w-full py-3 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300"
+              >
+                Back to Sign In
+              </button>
+            </form>
           }
           <!-- API Key Setup Flow -->
           @else if (viewState() === 'auth') {
@@ -611,7 +709,12 @@ import { PetAuditoryService } from '../services/pet-auditory.service';
           <button type="button" (click)="showPrivacyModal.set(true)" class="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-0 cursor-pointer">Privacy Policy</button>
         </div>
 
-        <p class="text-[12px] text-zinc-555 dark:text-zinc-500 mt-8 font-mono uppercase tracking-[0.3em]">Clinical Protocol v2.2</p>
+        <div class="mt-8 flex items-center justify-center gap-3">
+          <p class="text-[12px] text-zinc-555 dark:text-zinc-500 font-mono uppercase tracking-[0.3em]">v{{ appVersion }}</p>
+          <a href="https://github.com/philgear/pocketgull" target="_blank" rel="noopener noreferrer" class="text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" aria-label="View on GitHub">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+        </div>
 
       </div>
 
@@ -854,6 +957,7 @@ export class SecureSplashComponent implements OnInit {
   state = inject(PatientStateService);
   public readonly petAuditory = inject(PetAuditoryService);
   private platformId = inject(PLATFORM_ID);
+  readonly appVersion = environment.appVersion;
   
   // Inputs
   apiKeyError = input<string | null>(null);
@@ -866,7 +970,9 @@ export class SecureSplashComponent implements OnInit {
   emergencyBypass = output<void>();
 
   // State
-  viewState = signal<'auth' | 'beta' | 'ethics' | 'kss'>('auth');
+  viewState = signal<'auth' | 'beta' | 'ethics' | 'kss' | 'signup'>('auth');
+  signupForm = signal({ name: '', email: '', clinic: '', pin: '' });
+  signinEmailInput = signal('');
   pledgeAccepted = signal(false);
   clinicianKssSelected = signal<KssScore | null>(null);
   showTermsModal = signal(false);
@@ -1162,7 +1268,8 @@ export class SecureSplashComponent implements OnInit {
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       const isMock = localStorage.getItem('pg_mock_clinician') === '1';
-      this.isAuthorized.set(isMock || this.syncService.currentUserEmail() === 'philgear@gmail.com');
+      const email = this.syncService.currentUserEmail() || '';
+      this.isAuthorized.set(isMock || this.syncService.isEmailRegistered(email));
     }
 
     effect(() => {
@@ -1190,9 +1297,9 @@ export class SecureSplashComponent implements OnInit {
     });
 
     effect(() => {
-      const email = this.syncService.currentUserEmail();
+      const email = this.syncService.currentUserEmail() || '';
       const isMock = isPlatformBrowser(this.platformId) ? localStorage.getItem('pg_mock_clinician') === '1' : false;
-      this.isAuthorized.set(isMock || email === 'philgear@gmail.com');
+      this.isAuthorized.set(isMock || this.syncService.isEmailRegistered(email));
     });
   }
 
@@ -1680,17 +1787,46 @@ export class SecureSplashComponent implements OnInit {
   verifyPin() {
     console.log('[verifyPin] Called. this.pin =', JSON.stringify(this.pin));
     this.errorMsg.set('');
-    if (this.pin === '1234') {
+    
+    const registered = this.syncService.getRegisteredClinicians();
+    const matchingClinician = registered.find(c => c.pin === this.pin);
+
+    if (matchingClinician) {
        this.playSuccessChime();
        this.stopAmbientSoundscape();
-        this.session.isLocked.set(false);
-        this.session.resetIdleTimer();
-        this.pin = '';
+       this.session.isLocked.set(false);
+       this.session.resetIdleTimer();
+       this.pin = '';
     } else {
        this.playErrorChime();
        this.errorMsg.set('Invalid Access Code.');
        this.pin = '';
        setTimeout(() => this.pinInputRef()?.nativeElement.focus(), 50);
+    }
+  }
+
+  async handleSignup() {
+    this.isChecking.set(true);
+    this.errorMsg.set('');
+    const form = this.signupForm();
+    try {
+      await this.syncService.registerClinician(form.name, form.email, form.clinic, form.pin);
+      this.isChecking.set(false);
+      this.playSuccessChime();
+      
+      // Auto sign-in after registration
+      this.syncService.currentUser.set('mock-google-clinician');
+      this.syncService.currentUserEmail.set(form.email);
+      this.session.isLocked.set(false);
+      this._pendingDemo = true;
+      this.gotoKss();
+      
+      // Reset form
+      this.signupForm.set({ name: '', email: '', clinic: '', pin: '' });
+    } catch (err: any) {
+      this.isChecking.set(false);
+      this.playErrorChime();
+      this.errorMsg.set(err.message || 'Registration failed');
     }
   }
 
@@ -1724,9 +1860,11 @@ export class SecureSplashComponent implements OnInit {
     this.isChecking.set(true);
     this.errorMsg.set('');
     try {
-        await this.syncService.signInWithGoogle();
+        const targetEmail = this.signinEmailInput().trim() || 'dpo@pocketgull.app';
+        await this.syncService.signInWithGoogle(targetEmail);
         this.isChecking.set(false);
-        if (this.syncService.currentUserEmail() === 'philgear@gmail.com') {
+        const email = this.syncService.currentUserEmail() || '';
+        if (this.syncService.isEmailRegistered(email)) {
           this.playSuccessChime();
           this.session.isLocked.set(false);
           // Clear any pending states
@@ -1773,6 +1911,11 @@ export class SecureSplashComponent implements OnInit {
     this.session.isLocked.set(false);
     this.session.isOnboardingComplete.set(true);
     this.session.resetIdleTimer();
+    if (typeof sessionStorage !== 'undefined') {
+      try {
+        sessionStorage.setItem('pg_session_onboarded', '1');
+      } catch (e) {}
+    }
     
     if (this._pendingDemo || this._pendingAiStudio) {
       if (this._pendingDemo) {

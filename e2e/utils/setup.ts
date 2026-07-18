@@ -64,6 +64,7 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
   await page.addInitScript((mockClinician) => {
     try {
       window.indexedDB.deleteDatabase('PocketGullDB');
+      window.indexedDB.deleteDatabase('pocket-gull-cache');
     } catch (e) {}
 
     // Mock API key so the Voice Assistant doesn't abort initialization

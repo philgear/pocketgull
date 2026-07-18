@@ -21,6 +21,7 @@ const apiLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many requests. Please try again later.' }
 });
 app.use('/api', apiLimiter);
@@ -468,7 +469,11 @@ function validatePatientData(data) {
       isEmergencyMode: Boolean(patient.isEmergencyMode),
       reasonForVisit: String(patient.reasonForVisit || ''),
       occupation: String(patient.occupation || ''),
-      dietaryProtocol: String(patient.dietaryProtocol || '')
+      dietaryProtocol: String(patient.dietaryProtocol || ''),
+      issues: patient.issues || {},
+      history: Array.isArray(patient.history) ? patient.history : [],
+      bookmarks: Array.isArray(patient.bookmarks) ? patient.bookmarks : [],
+      scans: Array.isArray(patient.scans) ? patient.scans : []
     };
   });
 }

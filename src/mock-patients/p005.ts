@@ -14,12 +14,12 @@ export const p005: IPatient = {
   ],
   "patientGoals": "Manage blood pressure, optimize glycemic status, protect renal clearance, and support cognitive function and fall prevention.",
   "vitals": {
-    "bp": "142/78",
-    "hr": "68",
+    "bp": "148/92",
+    "hr": "82",
     "temp": "98.4°F",
-    "spO2": "95%",
-    "weight": "162 lbs",
-    "height": "5'4\""
+    "spO2": "94%",
+    "weight": "195 lbs",
+    "height": "5'9\""
   },
   "issues": {
     "chest": [

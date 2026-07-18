@@ -24,6 +24,7 @@ import { HardwareTelemetryService } from './services/hardware-telemetry.service'
 import { ExportService } from './services/export.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT_WESTERN } from './demo-data';
+import { p_charles_darwin } from './mock-patients/p_charles_darwin';
 import { PatientDirectoryComponent } from './components/patient-directory.component';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
@@ -43,7 +44,6 @@ import { SwUpdate } from '@angular/service-worker';
 import { FitbitService } from './services/fitbit.service';
 import { ConsentService } from './services/consent.service';
 import { ConsentModalComponent } from './components/consent-modal.component';
-import { SynthesisDashboardComponent } from './components/synthesis/synthesis-dashboard.component';
 import { ResearchTabComponent } from './components/research-tab.component';
 @Component({
   selector: 'app-root',
@@ -67,8 +67,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
     CollaborationDockComponent,
     FhirCallbackComponent,
     PocketGullInputComponent,
-    ConsentModalComponent,
-    SynthesisDashboardComponent
+    ConsentModalComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -472,14 +471,6 @@ import { ResearchTabComponent } from './components/research-tab.component';
               <span class="hidden sm:inline">Research</span>
             </button>
 
-            <button (click)="state.toggleSynthesisDashboard()"
-                    aria-label="Synthesize"
-                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                 <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
-              </svg>
-              <span class="hidden sm:inline">Synthesize</span>
-            </button>
             
             <a href="/docs/study/" target="_blank" rel="noopener"
                aria-label="Docs"
@@ -922,12 +913,6 @@ import { ResearchTabComponent } from './components/research-tab.component';
         @if(state.isResearchFrameVisible()) {
             @defer (on immediate) {
               <app-research-frame></app-research-frame>
-            }
-        }
-
-        @if(state.isSynthesisDashboardVisible()) {
-            @defer (on immediate) {
-              <app-synthesis-dashboard></app-synthesis-dashboard>
             }
         }
 
@@ -2381,11 +2366,12 @@ export class AppComponent implements OnDestroy {
     this.isDemoMode.set(true);
     this.state.isDemoMode.set(true);
     this.hasApiKey.set(true);
-    // Load demo patient (Sarah Jenkins – p002)
-    this.patientMgmt.selectPatient('p002');
+    // Load demo patient (Charles Darwin – p_charles_darwin)
+    this.patientMgmt.selectPatient('p_charles_darwin');
     // Inject pre-baked analysis outputs (no API call) synchronously
     this.state.activePhilosophy.set('western');
-    this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT_WESTERN);
+    const darwinReport = (p_charles_darwin.history.find((h: any) => h.type === 'AnalysisRun') as any)?.report || {};
+    this.clinicalIntelligence.loadArchivedAnalysis(darwinReport);
     this.clinicalIntelligence.lastActivePhilosophy.set('western');
     this.clinicalIntelligence.lastPatientData.set(this.state.getAllDataForPrompt());
     // Start tour after data is loaded so targets exist in DOM

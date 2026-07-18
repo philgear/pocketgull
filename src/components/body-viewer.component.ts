@@ -72,28 +72,6 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
             </button>
           </div>
 
-          <!-- Custom Model URL Input -->
-          <div class="flex flex-col gap-1 bg-white dark:bg-zinc-800 p-2 rounded-sm shadow-sm border border-[#EEEEEE] dark:border-zinc-700 w-44">
-            <span class="text-[9px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mb-1">Custom 3D Mesh</span>
-            <div class="flex gap-1">
-              <input type="text" 
-                     [value]="state.customModelUrl() || ''" 
-                     #modelInput
-                     placeholder="Paste .glb/.usdz URL" 
-                     class="text-[10px] px-1.5 py-1 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-sm w-full outline-none text-gray-800 dark:text-zinc-200" />
-              <button (click)="state.customModelUrl.set(modelInput.value || null)"
-                      title="Load Model"
-                      class="px-2 py-1 bg-black dark:bg-white text-white dark:text-black rounded-sm text-[10px] hover:opacity-85 font-medium">
-                Load
-              </button>
-            </div>
-            @if (state.customModelUrl()) {
-              <button (click)="state.customModelUrl.set(null); modelInput.value = ''"
-                      class="text-[9px] text-red-500 hover:text-red-700 font-medium text-left mt-1">
-                Clear Custom Model
-              </button>
-            }
-          </div>
         </div>
 
         @if (state.bodyViewerMode() === '3d') {
@@ -101,7 +79,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
             <app-body-3d-viewer 
               class="w-full h-full"
               [anatomyViewMode]="state.anatomyViewMode()"
-              [customModelUrl]="state.customModelUrl()"
+              [customModelUrl]="null"
               (partSelected)="onPartSelected($event)">
             </app-body-3d-viewer>
           } @placeholder {

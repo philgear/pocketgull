@@ -725,13 +725,13 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         let startY = 0;
 
         canvas.addEventListener('pointerdown', (event: PointerEvent) => {
-            if (event.button !== 0) return;
+            if (event.button !== 0 && event.pointerType === 'mouse') return;
             startX = event.clientX;
             startY = event.clientY;
         });
 
         canvas.addEventListener('pointerup', (event: PointerEvent) => {
-            if (event.button !== 0) return;
+            if (event.button !== 0 && event.pointerType === 'mouse') return;
 
             const deltaX = Math.abs(event.clientX - startX);
             const deltaY = Math.abs(event.clientY - startY);

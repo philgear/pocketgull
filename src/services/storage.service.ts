@@ -9,6 +9,8 @@ const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 export class StorageService {
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
+  private memDb = new Map<string, any>();
+  private readonly isE2e = typeof navigator !== 'undefined' && navigator.webdriver;
 
   private readonly DB_NAME = 'PocketGullDB';
   private readonly STORE_NAME = 'patients';
@@ -48,6 +50,12 @@ export class StorageService {
 
   async saveState(id: string, state: IPatientState): Promise<void> {
     if (!this.isBrowser) return;
+    if (this.isE2e) {
+      const current = this.memDb.get(id) || { state: null, chatHistory: [] };
+      current.state = state;
+      this.memDb.set(id, current);
+      return;
+    }
     try {
       const db = await this.initDB();
       return new Promise<void>((resolve, reject) => {
@@ -82,6 +90,12 @@ export class StorageService {
 
   async saveChatHistory(id: string, chatHistory: any[]): Promise<void> {
     if (!this.isBrowser) return;
+    if (this.isE2e) {
+      const current = this.memDb.get(id) || { state: null, chatHistory: [] };
+      current.chatHistory = chatHistory;
+      this.memDb.set(id, current);
+      return;
+    }
     try {
       const db = await this.initDB();
       return new Promise<void>((resolve, reject) => {
@@ -116,6 +130,11 @@ export class StorageService {
 
   async loadState(id: string): Promise<{ state: IPatientState, chatHistory: any[] } | null> {
     if (!this.isBrowser) return null;
+    if (this.isE2e) {
+      const data = this.memDb.get(id);
+      if (data) return data;
+      return null;
+    }
     try {
       const db = await this.initDB();
       return new Promise((resolve, reject) => {
@@ -156,6 +175,10 @@ export class StorageService {
   // --- Patient Roster Operations ---
   async loadPatients(): Promise<any[]> {
     if (!this.isBrowser) return [];
+    if (this.isE2e) {
+      const roster = this.memDb.get('roster') || [];
+      return roster;
+    }
     try {
       const db = await this.initDB();
       return new Promise((resolve, reject) => {
@@ -187,6 +210,17 @@ export class StorageService {
 
   async savePatient(patient: any): Promise<void> {
     if (!this.isBrowser) return;
+    if (this.isE2e) {
+      const roster = this.memDb.get('roster') || [];
+      const index = roster.findIndex((p: any) => p.id === patient.id);
+      if (index !== -1) {
+        roster[index] = patient;
+      } else {
+        roster.push(patient);
+      }
+      this.memDb.set('roster', roster);
+      return;
+    }
     try {
       const db = await this.initDB();
       const encryptedPayload = this.encrypt(patient);
@@ -204,6 +238,12 @@ export class StorageService {
 
   async deletePatient(id: string): Promise<void> {
     if (!this.isBrowser) return;
+    if (this.isE2e) {
+      const roster = this.memDb.get('roster') || [];
+      const next = roster.filter((p: any) => p.id !== id);
+      this.memDb.set('roster', next);
+      return;
+    }
     try {
       const db = await this.initDB();
       return new Promise((resolve, reject) => {

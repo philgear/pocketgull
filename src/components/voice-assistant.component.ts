@@ -501,6 +501,15 @@ export class VoiceAssistantComponent implements OnDestroy {
             });
         });
 
+        effect(() => {
+            const liveErr = this.live.connectionError();
+            if (liveErr) {
+                untracked(() => {
+                    this.permissionError.set('Failed to connect to Live Interface.');
+                });
+            }
+        });
+
         // Only init if in browser
         if (typeof window !== 'undefined') {
             // 1. Hydrate Chat History
@@ -627,24 +636,26 @@ VISUAL GROUNDING: When the user asks for images, a 3D model, or research (e.g. "
 \`\`\`
 Only include a rich-media block when the user explicitly requests visual or research content.`;
 
-        // Start standard STT backend init (keeps context sync'd)
-        await this.intel.ai.startChat(rawPatientData, context);
-        
-        // Initialize ADK Live Service with user's actual token (from API key context)
-        // Check window (SSR inject) first, then fallback to local storage
-        const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
-        if (!apiKey) {
-             console.error("AdkLiveService Error: No GEMINI_API_KEY found in window or localStorage.");
-             this.permissionError.set('Missing API Key. Please re-enter it on the home screen.');
-             return;
-        }
-
         try {
+            // Start standard STT backend init in the background (keeps context sync'd)
+            this.intel.ai.startChat(rawPatientData, context).catch(e => {
+                console.warn("Background chat session initialization failed:", e);
+            });
+            
+            // Initialize ADK Live Service with user's actual token (from API key context)
+            // Check window (SSR inject) first, then fallback to local storage
+            const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
+            if (!apiKey) {
+                 console.error("AdkLiveService Error: No GEMINI_API_KEY found in window or localStorage.");
+                 this.permissionError.set('Missing API Key. Please re-enter it on the home screen.');
+                 return;
+            }
+
             console.log("Connecting to Live API WebSocket...");
             await this.live.connect(apiKey, `${context}\n\nPatient Data:\n${rawPatientData}`);
             // Barge-in enabled natively by SDK setup!
         } catch (e) {
-            console.error("AdkLiveService Connection Error:", e);
+            console.error("Voice Assistant Activation Error:", e);
             this.permissionError.set('Failed to connect to Live Interface.');
         }
 
@@ -960,6 +971,10 @@ The patient's current presentation demonstrates a classic intersection of locali
 Our primary therapeutic strategy focuses on:
 1. **Mechanical Decompression:** Guided physical therapy and targeted lumbar distraction to relieve root compression.
 2. **Autonomic Rebalancing:** Improving sleep quality and nocturnal breathing patterns to stabilize blood oxygen levels. Reducing baseline sympathetic tone will help lower the resting heart rate and support overall functional recovery.`;
+        }
+
+        if (lower.includes('most critical evidence') || lower.includes('critical evidence here')) {
+            return 'This is a mock clinical intelligence response for radiculopathy.';
         }
 
         if (lower.includes('evidence') || lower.includes('critical') || lower.includes('diagnostic')) {

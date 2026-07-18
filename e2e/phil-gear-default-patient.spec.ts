@@ -196,7 +196,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await page.waitForTimeout(1500);
     await orthoTab.click();
     await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
+    await expect(reportEl.locator('text=Herb & Nutrient Matrix').first()).toBeVisible({ timeout: 5000 });
     // await page.screenshot({
     //   path: path.join(SCREENSHOT_DIR, 'phil_gear_ortho_eastern.png'),
     // });

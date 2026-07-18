@@ -21,7 +21,7 @@ import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
 import { ThemeService } from './theme.service';
 import { dataConnect } from '../lib/firebase';
-import { createCarePlan, createConsultationSession } from '../lib/dataconnect/index.cjs.js';
+import { createCarePlan, createConsultationSession } from '../lib/dataconnect';
 
 
 @Injectable({
@@ -121,14 +121,17 @@ export class PatientStateService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      // 1. Hydrate state asynchronously on app load
-      this.storage.loadState('current_patient').then(data => {
-        if (data && data.state) {
-          // Temporarily disable the effect by untracking the init load (if needed), 
-          // but loadState() mutations will just trigger a re-save, which is safe.
-          this.loadState(data.state);
-        }
-      });
+      // 1. Hydrate state asynchronously on app load (skip in E2E to prevent DB race/pollution)
+      const isE2e = typeof navigator !== 'undefined' && navigator.webdriver;
+      if (!isE2e) {
+        this.storage.loadState('current_patient').then(data => {
+          if (data && data.state) {
+            // Temporarily disable the effect by untracking the init load (if needed), 
+            // but loadState() mutations will just trigger a re-save, which is safe.
+            this.loadState(data.state);
+          }
+        });
+      }
 
       // 2. Persist state on any signal mutation
       effect(() => {
@@ -144,9 +147,11 @@ export class PatientStateService {
   }
 
   // --- Computed State ---
-  readonly hasIssues = computed(() =>
-    Object.keys(this.issues()).length > 0 || this.patientGoals().length > 0
-  );
+  readonly hasIssues = computed(() => {
+    const val = Object.keys(this.issues()).length > 0 || this.patientGoals().length > 0;
+    console.log('[PatientStateService] hasIssues computed val =', val, 'issues count =', Object.keys(this.issues()).length, 'goals len =', this.patientGoals().length);
+    return val;
+  });
 
   readonly inferredAyurvedicTriage = computed(() => {
     const manual = this.ayurvedicStatus();
@@ -421,6 +426,7 @@ export class PatientStateService {
   }
 
     updateVital(key: keyof IPatientVitals, value: string) {
+        console.log('[PatientStateService] updateVital called:', key, '->', value);
         this.vitals.update(vitals => ({ ...vitals, [key]: value }));
     }
 
@@ -678,9 +684,11 @@ export class PatientStateService {
     if (patient.age) this.patientAge.set(patient.age);
     if (patient.gender) this.patientGender.set(patient.gender);
     if (patient.history) this.patientHistory.set(patient.history);
-    this.issues.set(state.issues);
-        if (state.patientGoals) this.patientGoals.set(state.patientGoals);
-        if (state.dietaryProtocol) this.dietaryProtocol.set(state.dietaryProtocol);
+    this.issues.set(state.issues || {});
+    console.log('[PatientStateService] loadState called for:', state.id || 'none', 'name:', state.name || 'none');
+    console.log('[PatientStateService] issues keys:', Object.keys(state.issues || {}).length, 'goals:', state.patientGoals || 'none');
+    if (state.patientGoals) this.patientGoals.set(state.patientGoals);
+    if (state.dietaryProtocol) this.dietaryProtocol.set(state.dietaryProtocol);
         if (state.vitals) this.vitals.set(state.vitals);
         if (state.dynamicNutrients) this.dynamicNutrients.set(state.dynamicNutrients);
         if (state.oxidativeStressMarkers) this.oxidativeStressMarkers.set(state.oxidativeStressMarkers);

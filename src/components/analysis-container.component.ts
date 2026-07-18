@@ -157,7 +157,7 @@ export class AnalysisContainerComponent {
   ClinicalIcons = ClinicalIcons;
 
   justGenerated = signal(false);
-
+ 
   triggerAnalysisGenerate() {
     this.justGenerated.set(true);
     this.game.completeQuest('generate_care_plan');

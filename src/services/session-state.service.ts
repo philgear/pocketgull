@@ -23,11 +23,10 @@ export class SessionStateService {
 
   constructor() {
     this.resetIdleTimer();
-    if (typeof localStorage !== 'undefined') {
+    if (typeof sessionStorage !== 'undefined') {
       try {
-        const tourSeen = localStorage.getItem('pg_tour_seen') === '1';
-        const isMock = localStorage.getItem('pg_mock_clinician') === '1';
-        if (tourSeen || isMock) {
+        const sessionOnboarded = sessionStorage.getItem('pg_session_onboarded') === '1';
+        if (sessionOnboarded) {
           this.isOnboardingComplete.set(true);
         }
       } catch (e) { /* ignore */ }

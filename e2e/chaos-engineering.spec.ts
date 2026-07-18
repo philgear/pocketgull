@@ -3,6 +3,7 @@ import * as path from 'path';
 
 test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
   test.beforeEach(async ({ page }) => {
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     // Intercept config endpoint to return a mock API key
     await page.route('**/api/config', async route => {
       await route.fulfill({
@@ -72,6 +73,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
       window.localStorage.setItem('pg_mock_clinician', '1');
       window.localStorage.setItem('pg_data_consent_v1', 'true');
       window.localStorage.setItem('GEMINI_API_KEY', 'AIzaMockKeyForTestingChaos12345');
+      window.sessionStorage.setItem('pg_session_onboarded', '1');
       (window as any).GEMINI_API_KEY = 'AIzaMockKeyForTestingChaos12345';
 
       // Disable service worker during E2E tests
@@ -96,6 +98,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
   });
 
   test('PIN code entry bypasses secure splash screen and loads dashboard', async ({ page }) => {
+    const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await page.goto('/');
 
     // 1. Enter PIN Code
@@ -108,15 +111,23 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
     const analysisReportEl = page.locator('app-analysis-report');
     await expect(analysisReportEl).toBeVisible({ timeout: 10000 });
+    await rosterResponsePromise;
+    await page.waitForTimeout(500);
   });
 
   test('Resilience - App offline override simulates offline banner & warns user', async ({ page }) => {
+    const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await page.goto('/');
 
     // 1. Enter PIN Code
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 10000 });
     await pinInput.fill('1234');
+    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
+
+    // Ensure roster loading and client-side loadState has completed
+    await rosterResponsePromise;
     await page.waitForTimeout(500);
 
     // 2. Click the System Status indicator in the navbar to simulate offline mode
@@ -138,8 +149,10 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     await expect(clearCacheBtn).toBeVisible({ timeout: 5000 });
     await clearCacheBtn.click();
 
-    const generateBtn = page.locator('#tour-generate-btn');
+    const generateBtn = page.locator('#tour-generate-btn button');
+    await expect(page.locator('h1:has-text("Phil Gear")')).toBeVisible({ timeout: 15000 });
     await expect(generateBtn).toBeVisible({ timeout: 5000 });
+    await expect(generateBtn).toBeEnabled({ timeout: 15000 });
     await generateBtn.click();
 
     // 6. Verify that an offline system error alert is shown in the analysis report container
@@ -162,12 +175,18 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
       });
     });
 
+    const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await page.goto('/');
 
     // Enter PIN Code
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 10000 });
     await pinInput.fill('1234');
+    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
+
+    // Ensure roster loading and client-side loadState has completed
+    await rosterResponsePromise;
     await page.waitForTimeout(500);
 
     // Clear Cache to trigger fresh generation
@@ -176,8 +195,10 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     await clearCacheBtn.click();
 
     // Trigger Generation
-    const generateBtn = page.locator('#tour-generate-btn');
+    const generateBtn = page.locator('#tour-generate-btn button');
+    await expect(page.locator('h1:has-text("Phil Gear")')).toBeVisible({ timeout: 15000 });
     await expect(generateBtn).toBeVisible();
+    await expect(generateBtn).toBeEnabled({ timeout: 15000 });
     await generateBtn.click();
 
     // The individual lens should load the failure gracefully
@@ -200,12 +221,18 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
       });
     });
 
+    const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await page.goto('/');
 
     // Enter PIN Code
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 10000 });
     await pinInput.fill('1234');
+    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
+
+    // Ensure roster loading and client-side loadState has completed
+    await rosterResponsePromise;
     await page.waitForTimeout(500);
 
     // Clear Cache
@@ -214,8 +241,10 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     await clearCacheBtn.click();
 
     // Trigger Generation
-    const generateBtn = page.locator('#tour-generate-btn');
+    const generateBtn = page.locator('#tour-generate-btn button');
+    await expect(page.locator('h1:has-text("Phil Gear")')).toBeVisible({ timeout: 15000 });
     await expect(generateBtn).toBeVisible();
+    await expect(generateBtn).toBeEnabled({ timeout: 15000 });
     await generateBtn.click();
 
     // Verify loading indicator is shown immediately
@@ -231,10 +260,21 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
   test('Resilience - Voice Assistant WebSocket connection failure handled gracefully', async ({ page }) => {
     await page.goto('/');
 
+    // Listen for roster patients response to avoid SSR hydration race condition
+    const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
+
     // Enter PIN Code
     const pinInput = page.locator('input[placeholder="1234"]');
     await expect(pinInput).toBeVisible({ timeout: 10000 });
     await pinInput.fill('1234');
+    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
+
+    // Ensure roster loading and client-side loadState has completed
+    await rosterResponsePromise;
+    // Wait for the patient profile heading to be visible and stable
+    await expect(page.locator('h1:has-text("Phil Gear")')).toBeVisible({ timeout: 15000 });
+    // Additional short timeout to let the selection effect settle
     await page.waitForTimeout(500);
 
     // Toggle Voice Assistant Panel

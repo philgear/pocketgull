@@ -27,8 +27,8 @@ import { FormsModule } from '@angular/forms';
             [placeholder]="placeholder()"
             [attr.aria-label]="ariaLabel() || label() || placeholder()"
             [disabled]="disabled()"
-            [ngModel]="value()"
-            (ngModelChange)="onModelChange($event)"
+            [value]="value()"
+            (input)="onModelChange(inputEl.value)"
             [class]="inputClasses()"
             [rows]="rows()"
           ></textarea>
@@ -40,8 +40,8 @@ import { FormsModule } from '@angular/forms';
             [placeholder]="placeholder()"
             [attr.aria-label]="ariaLabel() || label() || placeholder()"
             [disabled]="disabled()"
-            [ngModel]="value()"
-            (ngModelChange)="onModelChange($event)"
+            [value]="value()"
+            (input)="onModelChange(inputEl.value)"
             [class]="inputClasses()"
             class="input-base"
           />
@@ -243,6 +243,7 @@ export class PocketGullInputComponent implements AfterViewInit {
   });
 
   onModelChange(val: string) {
+    console.log('[PocketGullInput] onModelChange called with value:', val);
     this.valueChange.emit(val);
   }
 

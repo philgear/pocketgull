@@ -77,9 +77,19 @@ export class PatientManagementService implements OnDestroy {
               history: [],
               bookmarks: []
             }));
-            this.patients.set(dbPatients);
-            const defaultId = dbPatients.find(p => p.name === 'Phil Gear')?.id || dbPatients[0]?.id || null;
-            this.selectedPatientId.set(defaultId);
+            const merged: IPatient[] = [...dbPatients];
+            for (const p of MOCK_PATIENTS) {
+              if (!merged.some(item => item.id === p.id)) {
+                merged.push(p);
+              }
+            }
+            this.patients.set(merged);
+            const defaultId = merged.find(p => p.id === 'p_mara_santos')?.id || merged.find(p => p.name === 'Phil Gear')?.id || merged[0]?.id || null;
+            const currentId = this.selectedPatientId();
+            if (!currentId || !merged.some(p => p.id === currentId)) {
+              this.selectedPatientId.set(defaultId);
+            }
+            this.rosterLoaded.set(true);
             return;
           }
         } catch (err) {
@@ -139,7 +149,10 @@ export class PatientManagementService implements OnDestroy {
             }
             this.patients.set(updatedList);
             const defaultId = updatedList.find(p => p.id === 'p_mara_santos')?.id || updatedList[0]?.id || null;
-            this.selectedPatientId.set(defaultId);
+            const currentId = this.selectedPatientId();
+            if (!currentId || !updatedList.some(p => p.id === currentId)) {
+              this.selectedPatientId.set(defaultId);
+            }
         } else {
             // Seed DB on first run
             for (const p of MOCK_PATIENTS) {
@@ -147,7 +160,10 @@ export class PatientManagementService implements OnDestroy {
             }
             this.patients.set(MOCK_PATIENTS);
             const defaultId = MOCK_PATIENTS.find(p => p.id === 'p_mara_santos')?.id || MOCK_PATIENTS[0]?.id || null;
-            this.selectedPatientId.set(defaultId);
+            const currentId = this.selectedPatientId();
+            if (!currentId || !MOCK_PATIENTS.some(p => p.id === currentId)) {
+              this.selectedPatientId.set(defaultId);
+            }
         }
         this.rosterLoaded.set(true);
     }
@@ -194,44 +210,43 @@ export class PatientManagementService implements OnDestroy {
     // It's the central point for orchestrating app state updates.
     effect(() => {
       const patientId = this.selectedPatientId();
-      this.rosterLoaded(); // track roster loading completion to ensure selection effect runs when roster loads
+      const loaded = this.rosterLoaded(); // track roster loading completion to ensure selection effect runs when roster loads
 
-      if (patientId) {
-        // Important: Use untracked here so we only run this effect when the *selected patient ID* changes,
-        // NOT every time the patients array updates (which happens on every keystroke due to auto-save).
-        const patient = untracked(() =>
-          this.patients().find((p) => p.id === patientId),
-        );
-        if (patient) {
-          // Load the selected patient's data into the main state service
-          this.patientState.loadState(patient);
-          this.findAndLoadActivePatientSummary(patient.history);
+      untracked(() => {
+        if (patientId && loaded) {
+          const patient = this.patients().find((p) => p.id === patientId);
+          console.log('[PatientManagementService] patientId:', patientId, 'found:', !!patient, 'roster size:', this.patients().length);
+          if (patient) {
+            // Load the selected patient's data into the main state service
+            this.patientState.loadState(patient);
+            this.findAndLoadActivePatientSummary(patient.history);
 
-          // Reset the AI analysis first, then load the existing one if we have it
-          if (!(this.patientState.isDemoMode() && patientId === 'p002')) {
-            this.geminiService.resetAIState();
-          }
+            // Reset the AI analysis first, then load the existing one if we have it
+            if (!(this.patientState.isDemoMode() && patientId === 'p002')) {
+              this.geminiService.resetAIState();
+            }
 
-          console.log('[PatientManagementService] selected patient:', patientId, 'history length:', patient.history.length);
-          const latestAnalysis = patient.history.find(
-            (entry) =>
-              entry.type === "AnalysisRun" ||
-              entry.type === "FinalizedPatientSummary",
-          );
-          console.log('[PatientManagementService] latestAnalysis:', latestAnalysis ? latestAnalysis.type : 'none');
-          if (latestAnalysis && !(this.patientState.isDemoMode() && patientId === 'p002')) {
-            if (latestAnalysis.type === "AnalysisRun") {
-              this.geminiService.loadArchivedAnalysis(latestAnalysis.report);
-            } else if (latestAnalysis.type === "FinalizedPatientSummary") {
-              this.geminiService.loadArchivedAnalysis(latestAnalysis.report);
+            console.log('[PatientManagementService] selected patient:', patientId, 'history length:', patient.history.length);
+            const latestAnalysis = patient.history.find(
+              (entry) =>
+                entry.type === "AnalysisRun" ||
+                entry.type === "FinalizedPatientSummary",
+            );
+            console.log('[PatientManagementService] latestAnalysis:', latestAnalysis ? latestAnalysis.type : 'none');
+            if (latestAnalysis && !(this.patientState.isDemoMode() && patientId === 'p002')) {
+              if (latestAnalysis.type === "AnalysisRun") {
+                this.geminiService.loadArchivedAnalysis(latestAnalysis.report);
+              } else if (latestAnalysis.type === "FinalizedPatientSummary") {
+                this.geminiService.loadArchivedAnalysis(latestAnalysis.report);
+              }
             }
           }
+        } else if (!patientId) {
+          // No patient is selected, so clear the state for a new entry
+          this.patientState.clearState();
+          this.geminiService.resetAIState();
         }
-      } else {
-        // No patient is selected, so clear the state for a new entry
-        this.patientState.clearState();
-        this.geminiService.resetAIState();
-      }
+      });
     }); // Warning: direct signal writes in effects are discouraged but sometimes necessary for orchestration
   }
 

@@ -11,6 +11,7 @@ import { p_mara_santos } from './mock-patients/p_mara_santos';
 import { p_frida_kahlo } from './mock-patients/p_frida_kahlo';
 import { p_edwin_smith_3 } from './mock-patients/p_edwin_smith_3';
 import { p_charles_darwin } from './mock-patients/p_charles_darwin';
+import { p_phil_gear } from './mock-patients/p_phil_gear';
 
 export const MOCK_PATIENTS: IPatient[] = [
   p001,
@@ -24,5 +25,6 @@ export const MOCK_PATIENTS: IPatient[] = [
   p_mara_santos,
   p_frida_kahlo,
   p_edwin_smith_3,
-  p_charles_darwin
+  p_charles_darwin,
+  p_phil_gear
 ];

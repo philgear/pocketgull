@@ -282,7 +282,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
           </div>
         }
         
-        @if (intel.error() && !hasAnyReport()) {
+        @if (intel.error()) {
           <div class="p-4 border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 text-xs rounded-lg mb-4">
             <strong class="block uppercase tracking-wider mb-1">System Error</strong>
             {{ intel.error() }}
@@ -1617,14 +1617,13 @@ export class AnalysisReportComponent implements OnDestroy {
     this.dictation.startRecognition();
   }
 
-  // --- Report Actions ---
   async generate() {
     this.audit.logAction('GENERATE_REPORT', this.patientManager.selectedPatientId());
     const patientId = this.patientManager.selectedPatientId();
     const patient = patientId ? this.patientManager.patients().find(p => p.id === patientId) : null;
     const history = patient?.history || [];
     const bookmarks = patient?.bookmarks || [];
-
+ 
     const reportData = await this.intel.generateComprehensiveReport(this.state.getAllDataForPrompt(history, bookmarks));
 
     if (patientId && Object.keys(reportData).length > 0) {
@@ -1635,7 +1634,9 @@ export class AnalysisReportComponent implements OnDestroy {
         report: reportData
       };
       this.patientManager.addHistoryEntry(patientId, historyEntry);
-      this.activeLens.set('Summary Overview');
+      if (this.activeLens() === 'EMT Handoff') {
+        this.activeLens.set('Summary Overview');
+      }
     }
   }
 

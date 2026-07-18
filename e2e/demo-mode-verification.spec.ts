@@ -2,6 +2,15 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import { setupE2ePage } from './utils/setup';
 
+async function selectPatientByName(page: import('@playwright/test').Page, name: string) {
+  const dropdownBtn = page.locator('app-patient-dropdown button').first();
+  await dropdownBtn.click();
+  const option = page.locator('.origin-top-left button', { hasText: name }).first();
+  await expect(option).toBeVisible({ timeout: 10000 });
+  await option.click();
+  await page.waitForTimeout(1000);
+}
+
 test.describe('Demo Mode Medicine Paradigms Verification', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(90000);
@@ -50,6 +59,9 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     // Wait for initial analysis container content to render
     const analysisReportEl = page.locator('app-analysis-report');
     await expect(analysisReportEl).toBeVisible({ timeout: 10000 });
+
+    // Explicitly select Sarah Jenkins to test Western/Eastern/Ayurvedic paradigms on her data
+    await selectPatientByName(page, 'Sarah Jenkins');
 
     const artifactDir = path.join(process.cwd(), 'test-results');
 

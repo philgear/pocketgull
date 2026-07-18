@@ -867,6 +867,7 @@ const patientsRateLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many requests. Please try again later.' }
 });
 
@@ -875,6 +876,7 @@ const docsRateLimiter = rateLimit({
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many requests. Please try again later.' }
 });
 
@@ -1039,7 +1041,7 @@ async function initializeAgones() {
 }
 
 if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT']) {
-  const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4200;
+  const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4000;
   const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Node Express server listening on http://0.0.0.0:${port}`);
     

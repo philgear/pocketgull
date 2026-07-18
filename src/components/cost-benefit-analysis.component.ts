@@ -545,9 +545,34 @@ export class CostBenefitAnalysisComponent {
     }
   ];
 
+  // Dynamic parsing of custom report content if available
+  parsedOptions = computed(() => {
+    const text = this.reportText();
+    if (!text) return null;
+    try {
+      const jsonStart = text.indexOf('```json');
+      if (jsonStart !== -1) {
+        const jsonEnd = text.indexOf('```', jsonStart + 7);
+        if (jsonEnd !== -1) {
+          const jsonStr = text.substring(jsonStart + 7, jsonEnd).trim();
+          const parsed = JSON.parse(jsonStr);
+          if (parsed && (parsed.treatment || parsed.prevention)) {
+            return parsed;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[CostBenefitAnalysisComponent] Failed to parse custom treatment matrix JSON:', e);
+    }
+    return null;
+  });
+
   // Dynamic ranking based on mode selection and user preferences
   rankedOptions = computed(() => {
-    const activeList = this.activeMode() === 'treatment' ? this.treatmentOptions : this.preventionOptions;
+    const custom = this.parsedOptions();
+    const activeList = this.activeMode() === 'treatment'
+      ? (custom?.treatment || this.treatmentOptions)
+      : (custom?.prevention || this.preventionOptions);
     return [...activeList].sort((a, b) => this.calculateMatch(b) - this.calculateMatch(a));
   });
 

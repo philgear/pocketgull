@@ -18,7 +18,8 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "allowJs": true,
-    "noEmit": true,
+    "noEmit": false,
+    "outDir": "./dist/out-tsc",
     "paths": {
       "@/*": [
         "./*"
