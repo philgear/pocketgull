@@ -15,8 +15,8 @@
 
 | Metric | Score | Clinical Meaning |
 | :--- | :--- | :--- |
-| **ROC-AUC** | **0.9978** | Measure of model's ability to distinguish between stable and critical patients (higher is better). |
-| **Brier Score** | **0.0070** | Calibration metric mapping how close predicted probabilities match actual frequencies (lower/nearer 0 is better). |
+| **ROC-AUC** | **0.9979** | Measure of model's ability to distinguish between stable and critical patients (higher is better). |
+| **Brier Score** | **0.0065** | Calibration metric mapping how close predicted probabilities match actual frequencies (lower/nearer 0 is better). |
 
 ---
 
@@ -29,7 +29,7 @@ In clinical environments, the cost of a False Negative (missed critical patient)
 ```text
               precision    recall  f1-score   support
 
-           0       0.99      0.99      0.99      1197
+           0       1.00      1.00      1.00      1197
            1       0.98      0.98      0.98       303
 
     accuracy                           0.99      1500
@@ -38,18 +38,18 @@ weighted avg       0.99      0.99      0.99      1500
 
 ```
 - **Confusion Matrix:**
-  - **True Negatives (TN)**: 1191 (Correctly classified as Stable)
-  - **False Positives (FP)**: 6 (False alarms / unnecessary escalation warnings)
-  - **False Negatives (FN)**: 6 (Missed critical escalations - **🚨 Safety Concern**)
-  - **True Positives (TP)**: 297 (Correctly classified as Critical)
+  - **True Negatives (TN)**: 1192 (Correctly classified as Stable)
+  - **False Positives (FP)**: 5 (False alarms / unnecessary escalation warnings)
+  - **False Negatives (FN)**: 5 (Missed critical escalations - **🚨 Safety Concern**)
+  - **True Positives (TP)**: 298 (Correctly classified as Critical)
 
-### B. Optimized Safety Threshold (0.500)
+### B. Optimized Safety Threshold (0.590)
 - **Classification Performance (Safety Mode):**
 ```text
               precision    recall  f1-score   support
 
-           0       0.99      0.99      0.99      1197
-           1       0.98      0.98      0.98       303
+           0       1.00      1.00      1.00      1197
+           1       0.99      0.98      0.99       303
 
     accuracy                           0.99      1500
    macro avg       0.99      0.99      0.99      1500
@@ -57,10 +57,10 @@ weighted avg       0.99      0.99      0.99      1500
 
 ```
 - **Confusion Matrix:**
-  - **True Negatives (TN)**: 1191 (Correctly classified as Stable)
-  - **False Positives (FP)**: 6 (False alarms / unnecessary escalation warnings)
-  - **False Negatives (FN)**: 6 (Missed critical escalations - **🚨 Reduced by 0.0%**)
-  - **True Positives (TP)**: 297 (Correctly classified as Critical)
+  - **True Negatives (TN)**: 1193 (Correctly classified as Stable)
+  - **False Positives (FP)**: 4 (False alarms / unnecessary escalation warnings)
+  - **False Negatives (FN)**: 5 (Missed critical escalations - **🚨 Reduced by 0.0%**)
+  - **True Positives (TP)**: 298 (Correctly classified as Critical)
 
 ---
 
@@ -70,21 +70,21 @@ The underlying model relies on the following vital sign signals, ranked by their
 
 | Feature Rank | Vital Sign / Parameter | Relative Contribution | Description |
 | :---: | :--- | :--- | :--- |
-| #1 | **spo2** | `0.2997` | Oxygen Saturation levels (hypoxia indicator) |
-| #2 | **age** | `0.0976` | Patient age (demographic risk multiplier) |
-| #3 | **heart_rate_deviation** | `0.0044` | Heart Rate Deviation (quadratic cardiac stress indicator) |
-| #4 | **pulse_pressure** | `0.0013` | Pulse Pressure (cardiac workload indicator) |
-| #5 | **bp_diastolic** | `0.0013` | Diastolic Blood Pressure (diastolic vascular resistance metric) |
-| #6 | **age_adjusted_shock_index** | `0.0012` | Age-Adjusted Shock Index (geriatric shock risk marker) |
-| #7 | **bp_systolic** | `0.0008` | Systolic Blood Pressure (hypertensive/hypotensive crisis indicator) |
-| #8 | **shock_index** | `0.0005` | Shock Index (early shock/distress indicator) |
-| #9 | **systolic_bp_deviation** | `0.0005` | Systolic BP Deviation (quadratic BP stress indicator) |
-| #10 | **rate_pressure_product** | `0.0003` | Rate Pressure Product (myocardial oxygen demand index) |
-| #11 | **map** | `0.0001` | Mean Arterial Pressure (organ perfusion index) |
-| #12 | **hr** | `-0.0005` | Heart Rate in BPM (cardiac stress metric) |
+| #1 | **spo2** | `0.3031` | Oxygen Saturation levels (hypoxia indicator) |
+| #2 | **age** | `0.0973` | Patient age (demographic risk multiplier) |
+| #3 | **heart_rate_deviation** | `0.0055` | Heart Rate Deviation (quadratic cardiac stress indicator) |
+| #4 | **age_adjusted_shock_index** | `0.0029` | Age-Adjusted Shock Index (geriatric shock risk marker) |
+| #5 | **hr** | `0.0008` | Heart Rate in BPM (cardiac stress metric) |
+| #6 | **pulse_pressure** | `0.0007` | Pulse Pressure (cardiac workload indicator) |
+| #7 | **rate_pressure_product** | `0.0007` | Rate Pressure Product (myocardial oxygen demand index) |
+| #8 | **bp_diastolic** | `0.0004` | Diastolic Blood Pressure (diastolic vascular resistance metric) |
+| #9 | **systolic_bp_deviation** | `0.0003` | Systolic BP Deviation (quadratic BP stress indicator) |
+| #10 | **bp_systolic** | `-0.0001` | Systolic Blood Pressure (hypertensive/hypotensive crisis indicator) |
+| #11 | **map** | `-0.0007` | Mean Arterial Pressure (organ perfusion index) |
+| #12 | **shock_index** | `-0.0016` | Shock Index (early shock/distress indicator) |
 
 ---
 
 ## 5. Clinical Governance Recommendation
-- **Safety Strategy:** Apply the tuned safety decision threshold (**0.500**) for all triage scoring. This ensures a false negative rate below 2%, keeping critically unstable patients protected.
+- **Safety Strategy:** Apply the tuned safety decision threshold (**0.590**) for all triage scoring. This ensures a false negative rate below 2%, keeping critically unstable patients protected.
 - **Continuous Calibration:** Model parameters must be monitored against clinical drifts (e.g. seasonal variations, regional demographic shifts).
