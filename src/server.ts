@@ -247,6 +247,18 @@ app.use((req, res, next) => {
   next();
 });
 
+const apiLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
+app.use('/api', apiLimiter);
+app.use('/docs', apiLimiter);
+app.use('/api-docs', apiLimiter);
+app.use('/health', apiLimiter);
+
 // CSP Telemetry Violation Reporting (Disabled in production for patient privacy)
 app.post('/api/csp-report', express.json({ type: ['application/json', 'application/csp-report'] }), (req, res: any) => {
   if (process.env['NODE_ENV'] === 'production') {

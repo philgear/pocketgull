@@ -417,6 +417,11 @@ export type HistoryEntry = {
     summary: string;
     report: Partial<Record<AnalysisLens, string>>;
     annotations: Record<string, Record<string, { note: string, bracketState: 'normal' | 'added' | 'removed' }>>;
+} | {
+    type: 'Y-BOCsAssessment';
+    date: string;
+    summary: string;
+    assessment: any;
 };
 
 export interface IPatient extends IPatientState {

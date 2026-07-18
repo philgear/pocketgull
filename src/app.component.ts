@@ -45,6 +45,7 @@ import { FitbitService } from './services/fitbit.service';
 import { ConsentService } from './services/consent.service';
 import { ConsentModalComponent } from './components/consent-modal.component';
 import { ResearchTabComponent } from './components/research-tab.component';
+import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -67,7 +68,8 @@ import { ResearchTabComponent } from './components/research-tab.component';
     CollaborationDockComponent,
     FhirCallbackComponent,
     PocketGullInputComponent,
-    ConsentModalComponent
+    ConsentModalComponent,
+    ZamecznikCanvasComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -513,6 +515,11 @@ import { ResearchTabComponent } from './components/research-tab.component';
                  @case ('spark') {
                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#FF6F3D] animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/>
+                   </svg>
+                 }
+                 @case ('calm') {
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#8D6E63]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                    </svg>
                  }
               }
@@ -1223,6 +1230,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
         }
       }
     </div>
+    <app-zamecznik-canvas></app-zamecznik-canvas>
   }
   `,
   styles: [`
@@ -1860,7 +1868,8 @@ export class AppComponent implements OnDestroy {
     const current = this.theme.currentTheme();
     if (current === 'system') this.theme.setTheme('light');
     else if (current === 'light') this.theme.setTheme('dark');
-    else if (current === 'dark') this.theme.setTheme('spark');
+    else if (current === 'dark') this.theme.setTheme('calm');
+    else if (current === 'calm') this.theme.setTheme('spark');
     else this.theme.setTheme('system');
   }
 

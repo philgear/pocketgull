@@ -79,7 +79,7 @@ ThirdsCrop -srcPath $squarePath -poiX $poiX -poiY $poiY -targetW 1280 -targetH 7
 ThirdsCrop -srcPath $squarePath -poiX $poiX -poiY $poiY -targetW 1500 -targetH 500 -outPath "$outDir\banner-1500x500.png" -fracX 0.50 -fracY 0.50
 ThirdsCrop -srcPath $squarePath -poiX $poiX -poiY $poiY -targetW 1080 -targetH 1920 -outPath "$outDir\story-1080x1920.png" -fracX 0.50 -fracY 0.50
 
-# Update root and docs previews
-Copy-Item -Path "$outDir\github-og-1280x640.png" -Destination $rootPreview -Force
-Copy-Item -Path "$outDir\github-og-1280x640.png" -Destination $docsPreview -Force
-Write-Host "Updated root and docs social preview copies."
+# Update root and docs previews with the uncropped square version
+Copy-Item -Path $squarePath -Destination $rootPreview -Force
+Copy-Item -Path $squarePath -Destination $docsPreview -Force
+Write-Host "Updated root and docs social preview copies with the uncropped square version."

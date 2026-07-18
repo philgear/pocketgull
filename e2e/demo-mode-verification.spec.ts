@@ -63,6 +63,12 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     // Explicitly select Sarah Jenkins to test Western/Eastern/Ayurvedic paradigms on her data
     await selectPatientByName(page, 'Sarah Jenkins');
 
+    // Trigger report loading/generation for Sarah Jenkins
+    const generateBtn = page.locator('#tour-generate-btn');
+    await expect(generateBtn).toBeVisible({ timeout: 10000 });
+    await generateBtn.click();
+    await page.waitForTimeout(2000);
+
     const artifactDir = path.join(process.cwd(), 'test-results');
 
     // Set a large viewport size for premium screenshot resolution

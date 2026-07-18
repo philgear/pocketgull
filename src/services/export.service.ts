@@ -1518,6 +1518,94 @@ export class ExportService {
           }
         });
 
+      // 5. Y-BOCs Assessments (QuestionnaireResponse and Observation)
+      patient.history
+        .filter(h => h.type === 'Y-BOCsAssessment')
+        .forEach((entry: any, i) => {
+          const assessment = entry.assessment;
+          if (!assessment) return;
+
+          // Add QuestionnaireResponse
+          const items: any[] = [];
+          
+          // Add checklist answers
+          if (assessment.checklistAnswers) {
+            const checklistItems: any[] = [];
+            Object.entries(assessment.checklistAnswers).forEach(([idStr, val]: [string, any]) => {
+              checklistItems.push({
+                linkId: `symptom-${idStr}`,
+                answer: [{
+                  valueString: `Past: ${val.past ? 'Yes' : 'No'}, Current: ${val.current ? 'Yes' : 'No'}`
+                }]
+              });
+            });
+            if (checklistItems.length > 0) {
+              items.push({
+                linkId: 'symptom-checklist',
+                text: 'Obsessions and Compulsions Checklist',
+                item: checklistItems
+              });
+            }
+          }
+
+          // Add severity answers
+          if (assessment.severityAnswers) {
+            const severityItems: any[] = [];
+            Object.entries(assessment.severityAnswers).forEach(([idStr, val]: [string, any]) => {
+              severityItems.push({
+                linkId: `question-${idStr}`,
+                answer: [{
+                  valueInteger: val
+                }]
+              });
+            });
+            if (severityItems.length > 0) {
+              items.push({
+                linkId: 'severity-questions',
+                text: 'Severity Rating Scale Questions',
+                item: severityItems
+              });
+            }
+          }
+
+          entries.push({
+            resource: {
+              resourceType: 'QuestionnaireResponse',
+              id: `ybocs-questionnaire-response-${i}`,
+              status: 'completed',
+              subject: { reference: patientRef },
+              authored: assessment.dateCreated || new Date().toISOString(),
+              item: items
+            }
+          });
+
+          // Add Observation (total score)
+          entries.push({
+            resource: {
+              resourceType: 'Observation',
+              id: `ybocs-observation-${i}`,
+              status: 'final',
+              code: {
+                coding: [{
+                  system: 'http://loinc.org',
+                  code: '82290-8',
+                  display: 'Yale-Brown Obsessive Compulsive Scale total score'
+                }]
+              },
+              subject: { reference: patientRef },
+              effectiveDateTime: assessment.dateCreated || new Date().toISOString(),
+              valueQuantity: {
+                value: assessment.totalScore || 0,
+                unit: '{score}',
+                system: 'http://unitsofmeasure.org'
+              },
+              interpretation: [{
+                text: assessment.severityCategory || 'Unknown'
+              }]
+            }
+          });
+        });
+
       const bundle: IFhirBundle = {
         resourceType: 'Bundle',
         id: `pocket-gull-bundle-${Date.now()}`,

@@ -1,6 +1,13 @@
 import { Component, ChangeDetectionStrategy, input, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientManagementService } from '../services/patient-management.service';
+import { PatientStateService } from '../services/patient-state.service';
+
+interface IAnnotatedItem {
+  text: string;
+  isCustomAdded?: boolean;
+  isRemoved?: boolean;
+}
 
 interface ITreatmentOption {
   paradigm: 'Western' | 'Eastern' | 'Ayurvedic';
@@ -196,10 +203,26 @@ interface ISentinelContainmentOption {
                       <div>
                         <span class="font-extrabold uppercase tracking-widest text-[12px] text-emerald-600 dark:text-emerald-400 block mb-1">Expected Benefits</span>
                         <ul class="list-none space-y-1">
-                          @for (ben of opt.benefits; track ben) {
-                            <li class="flex items-start gap-1.5 text-gray-700 dark:text-zinc-300">
-                              <span class="text-emerald-500">✓</span>
-                              <span>{{ ben }}</span>
+                          @for (ben of opt.benefits; track ben.text) {
+                            <li class="flex items-start gap-1.5 text-gray-700 dark:text-zinc-300"
+                                [class.line-through]="ben.isRemoved"
+                                [class.opacity-50]="ben.isRemoved">
+                              @if (ben.isRemoved) {
+                                <span class="text-red-500 font-extrabold">✕</span>
+                              } @else if (ben.isCustomAdded) {
+                                <span class="text-emerald-500 font-extrabold">+</span>
+                              } @else {
+                                <span class="text-emerald-500">✓</span>
+                              }
+                              <span>
+                                {{ ben.text }}
+                                @if (ben.isCustomAdded) {
+                                  <span class="ml-1 text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Added</span>
+                                }
+                                @if (ben.isRemoved) {
+                                  <span class="ml-1 text-[9px] bg-red-500/10 text-red-600 dark:text-red-400/60 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Removed</span>
+                                }
+                              </span>
                             </li>
                           }
                         </ul>
@@ -208,10 +231,21 @@ interface ISentinelContainmentOption {
                       <div>
                         <span class="font-extrabold uppercase tracking-widest text-[12px] text-amber-600 dark:text-amber-400 block mb-1">Side Effects & Risks</span>
                         <ul class="list-none space-y-1">
-                          @for (risk of opt.risks; track risk) {
-                            <li class="flex items-start gap-1.5 text-gray-600 dark:text-zinc-450">
-                              <span class="text-amber-500">⚠</span>
-                              <span>{{ risk }}</span>
+                          @for (risk of opt.risks; track risk.text) {
+                            <li class="flex items-start gap-1.5 text-gray-600 dark:text-zinc-450"
+                                [class.line-through]="risk.isRemoved"
+                                [class.opacity-50]="risk.isRemoved">
+                              @if (risk.isRemoved) {
+                                <span class="text-red-500 font-extrabold">✕</span>
+                              } @else {
+                                <span class="text-amber-500">⚠</span>
+                              }
+                              <span>
+                                {{ risk.text }}
+                                @if (risk.isRemoved) {
+                                  <span class="ml-1 text-[9px] bg-red-500/10 text-red-600 dark:text-red-400/60 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Removed</span>
+                                }
+                              </span>
                             </li>
                           }
                         </ul>
@@ -238,7 +272,7 @@ interface ISentinelContainmentOption {
               </div>
               
               <div class="grid grid-cols-1 gap-5">
-                @for (opt of sentinelOptions; track opt.name) {
+                @for (opt of rankedSentinelOptions(); track opt.name) {
                   <div class="bg-amber-500/5 dark:bg-amber-500/5 backdrop-blur-md rounded-2xl p-5 border border-amber-500/20 dark:border-amber-500/10 hover:shadow-lg relative flex flex-col justify-between">
                     <div>
                       <div class="flex items-center gap-2 mb-3">
@@ -283,10 +317,26 @@ interface ISentinelContainmentOption {
                         <div>
                           <span class="font-extrabold uppercase tracking-widest text-[12px] text-emerald-600 dark:text-emerald-400 block mb-1">Containment Benefits</span>
                           <ul class="list-none space-y-1">
-                            @for (ben of opt.benefits; track ben) {
-                              <li class="flex items-start gap-1.5 text-gray-700 dark:text-zinc-300">
-                                <span class="text-emerald-500">✓</span>
-                                <span>{{ ben }}</span>
+                            @for (ben of opt.benefits; track ben.text) {
+                              <li class="flex items-start gap-1.5 text-gray-700 dark:text-zinc-300"
+                                  [class.line-through]="ben.isRemoved"
+                                  [class.opacity-50]="ben.isRemoved">
+                                @if (ben.isRemoved) {
+                                  <span class="text-red-500 font-extrabold">✕</span>
+                                } @else if (ben.isCustomAdded) {
+                                  <span class="text-emerald-500 font-extrabold">+</span>
+                                } @else {
+                                  <span class="text-emerald-500">✓</span>
+                                }
+                                <span>
+                                  {{ ben.text }}
+                                  @if (ben.isCustomAdded) {
+                                    <span class="ml-1 text-[9px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Added</span>
+                                  }
+                                  @if (ben.isRemoved) {
+                                    <span class="ml-1 text-[9px] bg-red-500/10 text-red-600 dark:text-red-400/60 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Removed</span>
+                                  }
+                                </span>
                               </li>
                             }
                           </ul>
@@ -295,10 +345,21 @@ interface ISentinelContainmentOption {
                         <div>
                           <span class="font-extrabold uppercase tracking-widest text-[12px] text-red-600 dark:text-red-400 block mb-1">Community Side Effects & Risks</span>
                           <ul class="list-none space-y-1">
-                            @for (risk of opt.risks; track risk) {
-                              <li class="flex items-start gap-1.5 text-gray-600 dark:text-zinc-450">
-                                <span class="text-red-500">⚠</span>
-                                <span>{{ risk }}</span>
+                            @for (risk of opt.risks; track risk.text) {
+                              <li class="flex items-start gap-1.5 text-gray-600 dark:text-zinc-450"
+                                  [class.line-through]="risk.isRemoved"
+                                  [class.opacity-50]="risk.isRemoved">
+                                @if (risk.isRemoved) {
+                                  <span class="text-red-500 font-extrabold">✕</span>
+                                } @else {
+                                  <span class="text-red-500">⚠</span>
+                                }
+                                <span>
+                                  {{ risk.text }}
+                                  @if (risk.isRemoved) {
+                                    <span class="ml-1 text-[9px] bg-red-500/10 text-red-600 dark:text-red-400/60 px-1 py-0.5 rounded font-bold uppercase tracking-wider">Removed</span>
+                                  }
+                                </span>
                               </li>
                             }
                           </ul>
@@ -325,6 +386,7 @@ interface ISentinelContainmentOption {
 export class CostBenefitAnalysisComponent {
   reportText = input<string>('');
   patientManagement = inject(PatientManagementService);
+  patientState = inject(PatientStateService);
 
   isSentinel = computed(() => {
     const id = this.patientManagement.selectedPatientId();
@@ -567,14 +629,101 @@ export class CostBenefitAnalysisComponent {
     return null;
   });
 
-  // Dynamic ranking based on mode selection and user preferences
+  // Dynamic ranking based on mode selection and user preferences, incorporating Human in the Loop (HITL) annotations
   rankedOptions = computed(() => {
     const custom = this.parsedOptions();
     const activeList = this.activeMode() === 'treatment'
       ? (custom?.treatment || this.treatmentOptions)
       : (custom?.prevention || this.preventionOptions);
-    return [...activeList].sort((a, b) => this.calculateMatch(b) - this.calculateMatch(a));
+
+    const annotations = this.patientState.lensAnnotations();
+    const clinicalNotes = this.patientState.clinicalNotes();
+
+    return activeList.map((opt: any) => {
+      const cloned = { ...opt, benefits: [...opt.benefits], risks: [...opt.risks] };
+      const optParadigm = opt.paradigm.toLowerCase();
+
+      // Map base benefits and risks checking for clinician removals
+      const mappedBenefits = cloned.benefits.map((b: string) => this.annotateItem(b, annotations, optParadigm));
+      const mappedRisks = cloned.risks.map((r: string) => this.annotateItem(r, annotations, optParadigm));
+
+      // Append custom clinician additions (from clinicalNotes)
+      clinicalNotes.forEach(note => {
+        const sourceLower = (note.sourceLens || '').toLowerCase();
+        // Match Western, Eastern, Ayurvedic, or general clinical/nutrition lenses
+        const isMatch = sourceLower.includes(optParadigm) ||
+          (optParadigm === 'western' && (sourceLower === 'summary overview' || sourceLower === 'functional protocols' || sourceLower === 'nutrition' || sourceLower === 'precision nutrients'));
+
+        if (isMatch) {
+          if (!mappedBenefits.some((b: IAnnotatedItem) => b.text.includes(note.text))) {
+            mappedBenefits.push({ text: note.text, isCustomAdded: true });
+          }
+        }
+      });
+
+      return {
+        ...cloned,
+        benefits: mappedBenefits,
+        risks: mappedRisks
+      };
+    }).sort((a: any, b: any) => this.calculateMatch(b as any) - this.calculateMatch(a as any));
   });
+
+  // Dynamic public health options incorporating Human in the Loop (HITL) annotations
+  rankedSentinelOptions = computed(() => {
+    const annotations = this.patientState.lensAnnotations();
+    const clinicalNotes = this.patientState.clinicalNotes();
+
+    return this.sentinelOptions.map((opt: ISentinelContainmentOption) => {
+      const cloned = { ...opt, benefits: [...opt.benefits], risks: [...opt.risks] };
+      const optParadigm = opt.paradigm.toLowerCase();
+
+      const mappedBenefits = cloned.benefits.map((b: string) => this.annotateItem(b, annotations, optParadigm));
+      const mappedRisks = cloned.risks.map((r: string) => this.annotateItem(r, annotations, optParadigm));
+
+      // Append custom clinician additions matching sentinel context
+      clinicalNotes.forEach(note => {
+        const sourceLower = (note.sourceLens || '').toLowerCase();
+        if (sourceLower.includes('sentinel') || sourceLower.includes('containment') || sourceLower.includes('quarantine')) {
+          if (!mappedBenefits.some((b: IAnnotatedItem) => b.text.includes(note.text))) {
+            mappedBenefits.push({ text: note.text, isCustomAdded: true });
+          }
+        }
+      });
+
+      return {
+        ...cloned,
+        benefits: mappedBenefits,
+        risks: mappedRisks
+      };
+    });
+  });
+
+  private annotateItem(
+    text: string,
+    annotations: Record<string, Record<string, any>>,
+    paradigm: string
+  ): IAnnotatedItem {
+    let isRemoved = false;
+
+    // Check all lenses in annotations for removed state
+    Object.keys(annotations).forEach(lensName => {
+      const lensData = annotations[lensName] || {};
+      Object.keys(lensData).forEach(nodeKey => {
+        const ann = lensData[nodeKey];
+        if (ann.bracketState === 'removed') {
+          const cleanKey = nodeKey.toLowerCase().trim();
+          const cleanText = text.toLowerCase().trim();
+          // Fuzzy match text to removed claims
+          if (cleanText.includes(cleanKey) || cleanKey.includes(cleanText)) {
+            isRemoved = true;
+          }
+        }
+      });
+    });
+
+    return { text, isRemoved };
+  }
 
   calculateMatch(opt: ITreatmentOption): number {
     const activePrefs = this.prefs();
