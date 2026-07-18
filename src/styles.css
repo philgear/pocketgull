@@ -954,12 +954,10 @@
     transition-duration: 100ms !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   GLOBAL AVS CSS CONTRACT  v1.1
+/* GLOBAL AVS CSS CONTRACT v1.1
    Single source of truth for all AVS visual states.
    Written by GlobalAvsService via rAF loop to :root.
-   All downstream components inherit automatically.
-   ═══════════════════════════════════════════════════════════════ */
+   All downstream components inherit automatically. */
 
 /* ── @property: circadian hue — enables CSS-native animation of the hue
       value when JS updates it. Supported in Chrome 85+, Edge 85+, Safari 16.4+.
