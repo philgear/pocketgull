@@ -43,6 +43,7 @@ export class PatientStateService {
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
   readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
+  readonly customModelUrl = signal<string | null>(null);
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<IDraftSummaryItem[]>([]);
   /** AI-derived anatomical findings mapped to severity tier for 3D overlay. */
