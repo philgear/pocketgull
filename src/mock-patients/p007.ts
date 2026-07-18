@@ -6,8 +6,12 @@ export const p007: IPatient = {
   "age": 28,
   "gender": "Female",
   "lastVisit": "2026.03.12",
-  "preexistingConditions": [],
-  "patientGoals": "Evaluate global maternal mortality risks.",
+  "preexistingConditions": [
+    "Gestational Hypertension",
+    "Primigravida (32 Weeks Gestation)",
+    "Iron-Deficiency Anemia of Pregnancy"
+  ],
+  "patientGoals": "Optimize blood pressure, correct anemia, track fetal movements, and establish a postpartum hemorrhage prevention plan.",
   "vitals": {
     "bp": "135/85",
     "hr": "90",
@@ -17,43 +21,48 @@ export const p007: IPatient = {
     "height": "5'6\""
   },
   "issues": {
+    "pelvis": [
+      {
+        "id": "pelvis",
+        "noteId": "note_p007_pelvis_1",
+        "name": "Uterine & Gestational Status (32 Weeks)",
+        "painLevel": 5,
+        "description": "Third-trimester pregnancy with borderline gestational hypertension (BP 135/85). Undergoing regular fetal kick count tracking and growth scans. Experiencing intermittent Braxton Hicks contractions.",
+        "symptoms": [
+          {
+            "name": "Borderline gestational hypertension",
+            "type": "Obstetric/Cardiovascular",
+            "verified": true,
+            "timeline": "Chronic"
+          },
+          {
+            "name": "Intermittent Braxton Hicks contractions",
+            "type": "Obstetric",
+            "verified": true,
+            "timeline": "Intermittent"
+          }
+        ]
+      }
+    ],
     "full_body": [
       {
         "id": "full_body",
         "noteId": "note_p007_full_1",
-        "name": "Systemic Health",
-        "painLevel": 7,
-        "description": "Patient exhibits clinical signs or risks associated with the top causes of maternal mortality.",
+        "name": "Iron-Deficiency Anemia & Fatigue",
+        "painLevel": 4,
+        "description": "Presents with moderate microcytic anemia (Hemoglobin 9.8 g/dL). Reports systemic fatigue, cold sensitivity, and mild orthostatic lightheadedness when standing up quickly.",
         "symptoms": [
           {
-            "name": "Severe bleeding (Hemorrhage)",
-            "type": "Obstetric/Cardiovascular",
+            "name": "Maternal fatigue",
+            "type": "Hematologic",
             "verified": true,
-            "timeline": "Acute"
+            "timeline": "Chronic"
           },
           {
-            "name": "Infections (Sepsis)",
-            "type": "Infectious",
+            "name": "Orthostatic lightheadedness",
+            "type": "Cardiovascular",
             "verified": true,
-            "timeline": "Acute"
-          },
-          {
-            "name": "Gestational Hypertension (Pre-eclampsia/Eclampsia)",
-            "type": "Cardiovascular/Obstetric",
-            "verified": true,
-            "timeline": "Acute/Chronic"
-          },
-          {
-            "name": "Complications from delivery",
-            "type": "Obstetric",
-            "verified": true,
-            "timeline": "Acute"
-          },
-          {
-            "name": "Unsafe abortion complications",
-            "type": "Obstetric/Trauma",
-            "verified": true,
-            "timeline": "Acute"
+            "timeline": "Chronic"
           }
         ]
       }
@@ -63,22 +72,20 @@ export const p007: IPatient = {
     {
       "type": "AnalysisRun",
       "date": "2026.06.25",
-      "summary": "Comprehensive Clinical Analysis",
+      "summary": "Maternal Sentinel Third-Trimester Risk Assessment",
       "report": {
-        "Summary Overview": "### Clinical Assessment\nMaternal Sentinel presents with a complex clinical picture primarily characterized by Systemic Health. Functional status remains stable, though specific risk factors require targeted intervention to prevent disease progression.\n\n### Priority List\n*   **Metabolic Optimization**: Immediate support needed for ongoing systemic stress.\n*   **Inflammatory Control**: Address underlying drivers of chronic inflammation.\n*   **Symptom Management**: Provide relief for primary presenting complaints.\n\n### Plan of Care\n*   Initiate targeted anti-inflammatory protocol.\n*   Begin functional medicine assessment for underlying root causes.\n*   Schedule follow-up to re-evaluate response to initial interventions.\n\n### Goals\n*   **Short-term (2 weeks)**: 15% reduction in primary symptom severity.\n*   **Long-term (3 months)**: Stabilization of key biomarkers and improved quality of life.\n\n### References\n*   **Smith, J. et al.** (2025). *Integrative Approaches to Chronic Disease*. Journal of Functional Medicine. [DOI:10.1234/jfm.2025.001](https://doi.org/10.1234/jfm.2025.001). Peer-Reviewed.",
-        "Functional Protocols": "### Immediate Actions (To start within 72 hours)\n*   Begin comprehensive elimination diet to identify potential food triggers.\n*   Implement strict sleep hygiene protocol (7-8 hours uninterrupted).\n\n### Foundation (Diet & Lifestyle)\n*   Transition to a Mediterranean-style, whole-foods diet.\n*   Engage in 150 minutes of moderate-intensity zone 2 cardio weekly.\n*   Incorporate daily 10-minute mindfulness or breathwork practice.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Omega-3 EPA/DHA | 2000mg | With meals | Anti-inflammatory support |\n| Vitamin D3 + K2 | 5000 IU | AM | Immune modulation |\n| Magnesium Glycinate | 400mg | Before bed | Nervous system relaxation |\n\n### Functional Protocols\nA comprehensive **HPA Axis Support** protocol is recommended to address systemic fatigue and optimize stress resilience. This includes targeted adaptogens and circadian rhythm realignment.",
-        "Nutrition": "### Biochemical Assessment\nAnalysis of Maternal's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
-        "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Maternal should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-        "Patient Education": "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
-        "Precision Nutrients": "### Biochemical & Biomarker Matrix\nMaternal's clinical markers suggest mild-to-moderate nutrient depletions corresponding to high-demand physiological stress and chronic condition burdens.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| Vitamin D3 | Sub-optimal | Immunomodulation / Serotonin |\n| Magnesium | Low-normal | Muscle / Sleep / Nervous System |\n| B-Complex | Sub-optimal | Methylation / Energy Co-factors |\n\n### Detected Deficiencies\n- **Intracellular Magnesium (Sub-optimal)**: Contributes to muscular tension, elevated vascular tone, and sleep disruptions.\n- **Vitamin D3 (Deficient/Sub-optimal)**: Common driver of compromised immune tolerance and lower neuroplastic resilience.\n\n### Orthomolecular Protocol\n- **Magnesium Glycinate**: 400mg before bed.\n- **Vitamin D3 + K2**: 5000 IU daily with breakfast.\n- **Methylated B12/Folate**: 1 capsule AM."
+        "Summary Overview": "### Clinical Assessment\nMaternal Sentinel is a 28-year-old female at 32 weeks gestation presenting with gestational hypertension and iron deficiency anemia. The main clinical priorities are to control blood pressure to prevent progression to pre-eclampsia/eclampsia, correct maternal iron levels to prevent postpartum hemorrhage complications, and optimize fetal developmental nutrients.\n\n### Priority List\n*   **Pre-eclampsia Surveillance**: Monitor blood pressure and scan for signs like severe headaches, visual disturbances, or right upper quadrant pain.\n*   **Hematologic Recovery**: Replete iron reserves safely to optimize oxygen delivery and build a buffer against delivery blood loss.\n*   **Vascular & Endothelial Health**: Maintain maternal blood vessel elasticity and support uterine blood flow.\n\n### Plan of Care\n*   Implement low-stress lifestyle with daily rest periods; monitor blood pressure twice daily.\n*   Recommend gentle prenatal yoga and pelvic floor preparation exercises.\n*   Optimize iron intake through dietary and supplemental routes; take iron with Vitamin C to enhance absorption.\n\n### Goals\n*   **Short-term (2 weeks)**: Maintain BP below 140/90 mmHg; increase hemoglobin above 10.5 g/dL.\n*   **Long-term (Birth)**: Safe delivery at term (39-40 weeks) with minimal postpartum blood loss and healthy birth weight.",
+        "Functional Protocols": "### Immediate Actions (To start within 24 hours)\n*   Establish a home BP logging routine (morning and afternoon).\n*   Verify fetal movement count daily (10 movements within 2 hours).\n*   Begin prenatal-safe iron supplementation with Vitamin C.\n\n### Foundation (Diet & Lifestyle)\n*   **Diet**: Mediterranean-style diet high in organic iron sources (spinach, lentils, clean grass-fed beef in moderation) paired with citrus fruits. Ensure adequate protein (1.2g/kg) and hydration (80-100 oz of water daily).\n*   **Activity**: Daily 15-20 minute gentle walk; avoid overheating or intense exercises.\n*   **Rest**: Sleep on the left side to maximize uterine blood flow and kidney filtration.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Iron Bisglycinate | 25mg | PM, empty stomach | Highly absorbable iron, gentle on stomach |\n| Methylated Prenatal Vitamin | 1 daily | With breakfast | Comprehensive fetal co-factors |\n| Magnesium Glycinate | 300mg | Bedtime | Support vascular relaxation and reduce leg cramps |\n| Vitamin C | 500mg | PM, with Iron | Optimize non-heme iron absorption |",
+        "Nutrition": "### Biochemical Assessment\nGestational physiology requires a significant increase in red blood cell volume. Lack of adequate iron reserves leads to tissue hypoxia and maternal exhaustion, while endothelial stress raises pre-eclampsia risk.\n\n### Nutrition Targets\n*   **Erythropoiesis Support**: Iron, Folate, and B12 are critical co-factors for RBC production.\n*   **Vascular Smooth Muscle Support**: Magnesium, Calcium, and Potassium support proper vascular tone.\n*   **Hydration Density**: Electrolyte balance prevents rapid blood volume contractions.\n\n### Dietary Adjustments\nEmphasize iron-rich plant foods combined with ascorbic acid. Limit simple sugars and processed foods that trigger systemic vascular inflammation.",
+        "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Log daily fetal kick counts.\n2.  Log daily blood pressures.\n3.  Follow up in 2 weeks for complete blood count (CBC) and urine protein check.\n\n### Ongoing (Month 8 to Delivery)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Blood Pressure | < 140/90 | Twice daily | BP >= 140/90 or headache/vision change |\n| Fetal Kicks | >= 10 in 2 hrs | Daily | < 10 kicks in 2 hours (go to triage) |\n| Urine Protein | Negative | Every 2 weeks | Traces or +1 protein |"
       }
     },
     {
       "type": "Visit",
       "date": "2026.03.12",
-      "summary": "Comprehensive review of leading maternal mortality indicators.",
+      "summary": "Third-trimester evaluation of maternal health. Identified borderline gestational hypertension and moderate iron deficiency anemia. Fetal movements normal.",
       "state": {
-        "patientGoals": "Evaluate maternal mortality risks.",
+        "patientGoals": "Evaluate global maternal mortality risks.",
         "vitals": {
           "bp": "135/85",
           "hr": "90",
@@ -91,5 +98,6 @@ export const p007: IPatient = {
       }
     }
   ],
-  "bookmarks": []
+  "bookmarks": [],
+  "scans": []
 };
