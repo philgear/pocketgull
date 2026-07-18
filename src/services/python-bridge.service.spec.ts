@@ -123,4 +123,32 @@ describe('PythonBridgeService', () => {
     expect(result?.contributing_factors).toContain('High Myocardial Workload (RPP: 19500)');
     expect(result?.note).toContain('Client-side Medical Indices Fallback');
   });
+
+  it('should trigger hypoxia factors and adjust risk levels dynamically at different SpO2 thresholds', async () => {
+    service.isAvailable.set(false);
+
+    // 1. Normal SpO2 (e.g., 98%)
+    mockPatientState.vitals.set({ hr: '75', bp: '120/80', spO2: '98' });
+    let result = await service.fetchRiskScore();
+    expect(result?.risk_score).toBe(0.0);
+    expect(result?.contributing_factors).not.toContain(expect.stringContaining('Hypoxia'));
+    expect(result?.risk_level).toBe('low');
+
+    // 2. Hypoxia boundary (e.g., 93%)
+    mockPatientState.vitals.set({ hr: '75', bp: '120/80', spO2: '93' });
+    result = await service.fetchRiskScore();
+    expect(result?.risk_score).toBe(0.40);
+    expect(result?.contributing_factors).toContain('Hypoxia detected (SpO2: 93%)');
+    expect(result?.risk_level).toBe('moderate');
+
+    // 3. Hypoxia + Heart Rate deviation (e.g., SpO2: 90%, HR: 100 bpm)
+    // SBP=120, HR=100 -> SIA = 100 * 45 / 120 = 37.5 (<50)
+    // HR dev = (100-75)^2 = 625 (>400) -> adds 0.15. Total = 0.40 + 0.15 = 0.55
+    mockPatientState.vitals.set({ hr: '100', bp: '120/80', spO2: '90' });
+    result = await service.fetchRiskScore();
+    expect(result?.risk_score).toBe(0.55);
+    expect(result?.contributing_factors).toContain('Hypoxia detected (SpO2: 90%)');
+    expect(result?.contributing_factors).toContain('Heart Rate out of baseline: 100 bpm');
+    expect(result?.risk_level).toBe('high');
+  });
 });
