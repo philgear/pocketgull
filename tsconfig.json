@@ -29,14 +29,20 @@
     }
   },
   "files": [
-    "main.ts",
-    "src/globals.d.ts",
-    "src/main.server.ts",
-    "src/server.ts"
+    "./main.ts",
+    "./src/globals.d.ts",
+    "./src/main.server.ts",
+    "./src/server.ts",
+    "./src/server/dicom.ts",
+    "./src/server/healthcare.ts",
+    "./src/server/fitbit.ts",
+    "./src/server/world-health.ts",
+    "./src/server/telemetry.ts",
+    "./src/server/genkit.ts"
   ],
   "include": [
-    "src/**/*.ts",
-    "main.ts"
+    "./src/**/*.ts",
+    "./main.ts"
   ],
   "angularCompilerOptions": {
     "disableTypeScriptVersionCheck": true
