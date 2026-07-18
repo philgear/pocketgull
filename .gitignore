@@ -137,3 +137,40 @@ firebase-debug.*.log
 # --- Billing & Stripe Configs ---
 *billing*
 *stripe*
+
+# --- Pocket Gull Custom Ignores ---
+
+# Runtime & Process IDs
+server.pid
+*.log
+*log.txt
+
+# Bundle & Build Analysis
+dist_stats.json
+sizes.json
+sizes.txt
+bundle-analysis.json
+bundle-stats*.json
+
+# Lighthouse Audits & Benchmarks
+lh-*.json
+lighthouse-*.json
+lighthouse-report*.json
+lighthouse-report*.html
+
+# Scratch Test Rigs & Automation Scripts
+adk-test*.ts
+puppeteer-*.js
+test-browser.js
+test-page.js
+test-watch*.mjs
+test-watch*.js
+test-*.js
+test-*.mjs
+test-*.cjs
+read_lh*.cjs
+
+# Local HTML DOM Snapshots & Screenshots
+dom-*.html
+test-*.png
+
