@@ -214,8 +214,8 @@ export class PatientDropdownComponent {
     this.searchQuery.set('');
   }
 
-  createNewPatient() {
-    this.patientManagement.createNewPatient();
+  async createNewPatient() {
+    await this.patientManagement.createNewPatient();
     this.isOpen.set(false);
     this.searchQuery.set('');
   }

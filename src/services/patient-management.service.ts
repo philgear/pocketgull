@@ -279,13 +279,14 @@ export class PatientManagementService implements OnDestroy {
     }
   }
 
-  /** Creates a new patient record and selects it. */
-  async createNewPatient() {
+  /** Creates a new patient record and selects it. Returns the new patient's ID. */
+  async createNewPatient(): Promise<string> {
     this.saveCurrentPatientState();
 
     const firstName = "New";
     const lastName = "Patient";
     const dob = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    let newPatientId = `p_local_${Date.now()}`;
 
     try {
       const res = await createPatient(dataConnect, {
@@ -300,28 +301,34 @@ export class PatientManagementService implements OnDestroy {
       });
 
       if (res.data && res.data.patient_insert) {
-        const newPatientId = res.data.patient_insert.id;
-        const newPatient: IPatient = {
-          id: newPatientId,
-          name: `${firstName} ${lastName}`,
-          age: 0,
-          gender: "Other" as const,
-          lastVisit: new Date().toISOString().split("T")[0].replace(/-/g, "."),
-          patientGoals: "",
-          preexistingConditions: [],
-          vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
-          issues: {},
-          history: [],
-          bookmarks: [],
-        };
-
-        // Add to the top of the list for immediate visibility
-        this.patients.update((patients) => [newPatient, ...patients]);
-        this.selectedPatientId.set(newPatientId);
+        newPatientId = res.data.patient_insert.id;
       }
     } catch (err) {
-      console.error('Error creating patient in SQL Connect:', err);
+      console.warn('[PatientManagementService] Error creating patient in SQL Connect, falling back to local ID:', err);
     }
+
+    const newPatient: IPatient = {
+      id: newPatientId,
+      name: `${firstName} ${lastName}`,
+      age: 0,
+      gender: "Other" as const,
+      lastVisit: new Date().toISOString().split("T")[0].replace(/-/g, "."),
+      patientGoals: "",
+      preexistingConditions: [],
+      vitals: { bp: "", hr: "", temp: "", spO2: "", weight: "", height: "" },
+      issues: {},
+      history: [],
+      bookmarks: [],
+    };
+
+    // Add to the top of the list for immediate visibility
+    this.patients.update((patients) => [newPatient, ...patients]);
+    this.selectedPatientId.set(newPatientId);
+
+    // Save locally to IndexedDB/storage
+    await this.storage.savePatient(newPatient);
+
+    return newPatientId;
   }
 
   /** Removes a patient record. */
