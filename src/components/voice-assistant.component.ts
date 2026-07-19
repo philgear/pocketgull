@@ -15,6 +15,8 @@ import { AdkLiveService } from '../services/ai/adk-live.service';
 import { StorageService } from '../services/storage.service';
 import { inject as baseInject } from '@angular/core';
 import { getStoredApiKey } from '../services/secure-key';
+import { YbocsService } from '../services/ybocs/ybocs.service';
+import { severityQuestions } from '../services/ybocs/data';
 
 export interface IChatEntry {
     role: 'user' | 'model';
@@ -374,6 +376,10 @@ export class VoiceAssistantComponent implements OnDestroy {
     richMedia = inject(RichMediaService);
     storage = inject(StorageService);
 
+    ybocsService = inject(YbocsService);
+    voiceAssistantMode = signal<'standard' | 'ybocs'>('standard');
+    ybocsQuestionIndex = signal<number>(-1);
+
     panelMode = signal<'selection' | 'chat' | 'dictation'>('selection');
 
     transcriptContainer = viewChild<ElementRef<HTMLDivElement>>('transcriptContainer');
@@ -501,8 +507,24 @@ export class VoiceAssistantComponent implements OnDestroy {
             });
         });
 
+        effect(() => {
+            const liveErr = this.live.connectionError();
+            if (liveErr) {
+                untracked(() => {
+                    this.permissionError.set('Failed to connect to Live Interface.');
+                });
+            }
+        });
+
         // Only init if in browser
         if (typeof window !== 'undefined') {
+            // Listen to Y-BOCs voice mode change
+            window.addEventListener('voice-mode-change', (e: any) => {
+                if (e.detail === 'ybocs') {
+                    this.activateYbocsInterview();
+                }
+            });
+
             // 1. Hydrate Chat History
             this.storage.loadState('current_patient').then(data => {
                 if (data && data.chatHistory && data.chatHistory.length > 0) {
@@ -566,6 +588,11 @@ export class VoiceAssistantComponent implements OnDestroy {
                     if (finalBlock) {
                         this._liveUserText += finalBlock + " ";
                         this._updateUserBubble(this._liveUserText.trim() + " " + interim);
+                        if (this.voiceAssistantMode() === 'ybocs') {
+                            const trimmedText = finalBlock.trim();
+                            this._liveUserText = '';
+                            this.handleYbocsInput(trimmedText);
+                        }
                     } else if (interim) {
                         this._updateUserBubble(this._liveUserText.trim() + " " + interim);
                     }
@@ -627,24 +654,26 @@ VISUAL GROUNDING: When the user asks for images, a 3D model, or research (e.g. "
 \`\`\`
 Only include a rich-media block when the user explicitly requests visual or research content.`;
 
-        // Start standard STT backend init (keeps context sync'd)
-        await this.intel.ai.startChat(rawPatientData, context);
-        
-        // Initialize ADK Live Service with user's actual token (from API key context)
-        // Check window (SSR inject) first, then fallback to local storage
-        const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
-        if (!apiKey) {
-             console.error("AdkLiveService Error: No GEMINI_API_KEY found in window or localStorage.");
-             this.permissionError.set('Missing API Key. Please re-enter it on the home screen.');
-             return;
-        }
-
         try {
+            // Start standard STT backend init in the background (keeps context sync'd)
+            this.intel.ai.startChat(rawPatientData, context).catch(e => {
+                console.warn("Background chat session initialization failed:", e);
+            });
+            
+            // Initialize ADK Live Service with user's actual token (from API key context)
+            // Check window (SSR inject) first, then fallback to local storage
+            const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
+            if (!apiKey) {
+                 console.error("AdkLiveService Error: No GEMINI_API_KEY found in window or localStorage.");
+                 this.permissionError.set('Missing API Key. Please re-enter it on the home screen.');
+                 return;
+            }
+
             console.log("Connecting to Live API WebSocket...");
             await this.live.connect(apiKey, `${context}\n\nPatient Data:\n${rawPatientData}`);
             // Barge-in enabled natively by SDK setup!
         } catch (e) {
-            console.error("AdkLiveService Connection Error:", e);
+            console.error("Voice Assistant Activation Error:", e);
             this.permissionError.set('Failed to connect to Live Interface.');
         }
 
@@ -890,6 +919,13 @@ Only include a rich-media block when the user explicitly requests visual or rese
         const files = this.selectedFiles();
         if ((!message && files.length === 0) || this.agentState() !== 'idle') return;
 
+        if (this.voiceAssistantMode() === 'ybocs') {
+            this.messageText.set('');
+            this._appendUser(message);
+            this.handleYbocsInput(message);
+            return;
+        }
+
         if (this.live.isSpeaking()) {
             this.live.interrupt();
         }
@@ -962,6 +998,10 @@ Our primary therapeutic strategy focuses on:
 2. **Autonomic Rebalancing:** Improving sleep quality and nocturnal breathing patterns to stabilize blood oxygen levels. Reducing baseline sympathetic tone will help lower the resting heart rate and support overall functional recovery.`;
         }
 
+        if (lower.includes('most critical evidence') || lower.includes('critical evidence here')) {
+            return 'This is a mock clinical intelligence response for radiculopathy.';
+        }
+
         if (lower.includes('evidence') || lower.includes('critical') || lower.includes('diagnostic')) {
             return `**Critical Evidence Breakdown:**
 
@@ -999,5 +1039,105 @@ To enable full interactive consultations, custom question answering, and live vo
     speak(text: string) {
         // Handled directly via ADK Multimodal audio stream / playNextAudio().
         // Legacy TTS is disabled to prevent colliding with real model voice.
+    }
+
+    activateYbocsInterview() {
+        this.voiceAssistantMode.set('ybocs');
+        this.panelMode.set('chat');
+        this.ybocsQuestionIndex.set(1);
+        this.chatHistory.set([]);
+        
+        const welcomeText = "Hello, I am Mindful Macaw, your Y-BOCs Neuropsychiatric Diagnostic guide. I will help you assess your obsessive-compulsive symptom severity. Let's start with Question 1: Time Occupied by Obsessive Thoughts. How much of your day is occupied by obsessive thoughts? (Options: None, Mild (less than 1 hour), Moderate (1 to 3 hours), Severe (3 to 8 hours), or Extreme (more than 8 hours)).";
+        this.chatHistory.set([{ role: 'model', text: welcomeText, htmlContent: `<p>${welcomeText}</p>` }]);
+        this.scrollToBottom();
+        this.speakClientSide(welcomeText);
+    }
+
+    speakClientSide(text: string) {
+        if (this.isMuted()) return;
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.onend = () => {
+                this.agentState.set('listening');
+                if (this.recognition) {
+                    try { this.recognition.start(); } catch {}
+                }
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    parseYbocsScore(text: string): number {
+        const lower = text.toLowerCase().trim();
+        
+        if (lower.includes('four') || lower.includes('4') || lower.includes('extreme') || lower.includes('constant') || lower.includes('more than 8') || lower.includes('greater than 8')) {
+            return 4;
+        }
+        if (lower.includes('three') || lower.includes('3') || lower.includes('severe') || lower.includes('very frequent') || lower.includes('3 to 8') || lower.includes('3-8')) {
+            return 3;
+        }
+        if (lower.includes('two') || lower.includes('2') || lower.includes('moderate') || lower.includes('1 to 3') || lower.includes('1-3')) {
+            return 2;
+        }
+        if (lower.includes('one') || lower.includes('1') || lower.includes('mild') || lower.includes('occasional') || lower.includes('less than 1') || lower.includes('under 1')) {
+            return 1;
+        }
+        if (lower.includes('zero') || lower.includes('0') || lower.includes('none') || lower.includes('no') || lower.includes('never') || lower.includes('not at all')) {
+            return 0;
+        }
+        
+        const match = lower.match(/[0-4]/);
+        if (match) {
+            return parseInt(match[0], 10);
+        }
+
+        return -1;
+    }
+
+    handleYbocsInput(text: string) {
+        const qId = this.ybocsQuestionIndex();
+        const score = this.parseYbocsScore(text);
+        
+        if (score === -1) {
+            const errorText = "I couldn't quite score that answer. Please say or type a rating from 0 (None) to 4 (Extreme) or describe the severity (e.g. Mild, Moderate, Severe).";
+            this.chatHistory.update(h => [...h, { role: 'model', text: errorText, htmlContent: `<p>${errorText}</p>` }]);
+            this.scrollToBottom();
+            this.speakClientSide(errorText);
+            return;
+        }
+
+        // Set the score
+        this.ybocsService.setSeverityScore(qId, score);
+
+        // Print confirmation bubble
+        const confirmationText = `Got it. Question ${qId} score is set to ${score}.`;
+        this.chatHistory.update(h => [...h, { role: 'model', text: confirmationText, htmlContent: `<p>${confirmationText}</p>` }]);
+
+        // Advance question
+        const nextQId = qId + 1;
+        this.ybocsQuestionIndex.set(nextQId);
+
+        if (nextQId <= 11) {
+            const nextQ = severityQuestions.find(q => q.id === nextQId);
+            if (nextQ) {
+                const questionText = `Question ${nextQId}: ${nextQ.title}. ${nextQ.subtitle} (${nextQ.options.map(o => `${o.label} (score ${o.score})`).join(', ')})`;
+                this.chatHistory.update(h => [...h, { role: 'model', text: questionText, htmlContent: `<p>${questionText}</p>` }]);
+                this.scrollToBottom();
+                this.speakClientSide(questionText);
+            }
+        } else {
+            // Finished!
+            const total = this.ybocsService.totalScore();
+            const severity = this.ybocsService.severityDetails();
+            const finishedText = `Thank you. We have completed the Y-BOCs severity assessment. Your total score is ${total}/40, which indicates a severity of ${severity.name}. I have successfully updated the patient record.`;
+            
+            this.chatHistory.update(h => [...h, { role: 'model', text: finishedText, htmlContent: `<p>${finishedText}</p>` }]);
+            this.scrollToBottom();
+            this.speakClientSide(finishedText);
+            
+            this.voiceAssistantMode.set('standard');
+            localStorage.removeItem('voice_assistant_mode');
+        }
     }
 }

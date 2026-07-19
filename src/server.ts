@@ -247,6 +247,18 @@ app.use((req, res, next) => {
   next();
 });
 
+const apiLimiter = rateLimit({
+  windowMs: 60_000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' }
+});
+app.use('/api', apiLimiter);
+app.use('/docs', apiLimiter);
+app.use('/api-docs', apiLimiter);
+app.use('/health', apiLimiter);
+
 // CSP Telemetry Violation Reporting (Disabled in production for patient privacy)
 app.post('/api/csp-report', express.json({ type: ['application/json', 'application/csp-report'] }), (req, res: any) => {
   if (process.env['NODE_ENV'] === 'production') {
@@ -586,6 +598,25 @@ app.post('/api/ai/analyze-image', express.json({ limit: '10mb' }), async (req, r
   }
 });
 
+app.post('/api/ai/scan-document', express.json({ limit: '15mb' }), async (req, res) => {
+  try {
+    const { base64Image, context } = req.body;
+    await getApiKey(req);
+
+    if (!base64Image) {
+      return res.status(400).json({ error: 'base64Image is required' });
+    }
+
+    const { scanDocumentFlow } = await import('./server/genkit.js');
+    const result = await scanDocumentFlow({ base64Image, context });
+
+    res.json(result);
+  } catch (error) {
+    console.error('Error scanning document:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Unknown error' });
+  }
+});
+
 
 // Server-Side Streaming Endpoint
 app.post('/api/ai/stream', express.json(), async (req, res) => {
@@ -848,6 +879,7 @@ const patientsRateLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many requests. Please try again later.' }
 });
 
@@ -856,6 +888,7 @@ const docsRateLimiter = rateLimit({
   max: 300,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many requests. Please try again later.' }
 });
 
@@ -1020,7 +1053,7 @@ async function initializeAgones() {
 }
 
 if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT']) {
-  const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4200;
+  const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4000;
   const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Node Express server listening on http://0.0.0.0:${port}`);
     

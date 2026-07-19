@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="./docs/images/transparent-banner.svg" alt="PocketGull Banner" width="100%">
-</p>
-
 # 🕊️ POCKET GULL
 **Aerial Perspective for the Clinical Ocean**
 
@@ -108,6 +104,8 @@ Pocketgull is a secure digital assistant for doctors, nurses, and caregivers. It
 
 - **Live AI Consult & Multi-Agent Orchestration:** Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts synthesize clinical data into actionable insights through an interruptible, natural conversational UI with **context-aware memory** of recently discussed report nodes.
 - **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
+- **Y-BOCs Diagnostic Screener & Voice Interview:** Core clinical logic mapping obsessive-compulsive target symptom checklists and a 10-item severity rating scale. Features a hands-free voice diagnostic interview agent ("Mindful Macaw") using the Web Speech API's `speechSynthesis` and text-to-score semantic mapping.
+- **Human-in-the-Loop (HITL) Cost-Benefit Matrix:** The *Treatment Matrix* dynamically tracks and visualizes the clinician's vetting decisions. Appends custom additions with green `[Added]` badges, and highlights rejected default recommendations with `line-through` styles and red `[Removed]` badges.
 - **Orthomolecular Profiling & Biomarker Matrix:** Automatically extracts and visualizes biochemical markers (e.g., Magnesium, B12) from AI-generated functional protocols into a glassmorphic diagnostic dashboard.
 - **Multi-Paradigm Philosophy Dashboards:** Full system support for Western, Eastern, and Ayurvedic medicine paradigms, with automated report regeneration and a secular translation engine mapping 13 world philosophies into psychological and physiological domains.
 - **Offline PWA Intelligence:** Built-in `window.ai` (Gemini Nano) routing for on-device fallback and token-free local processing in the Progressive Web App.
@@ -116,6 +114,7 @@ Pocketgull is a secure digital assistant for doctors, nurses, and caregivers. It
 ### 🏥 Clinical UX
 
 - **Good Samaritan Emergency Care:** Offline emergency override mode featuring a 110 BPM chest-compression metronome, BLS safety-gated Gemini Nano local routing, local FHIR-compliant EMT QR code serialization (`lean-qr`), and global telemetry suppression.
+- **Calm Mode & Somatic Grounding:** Specialized paper-white sensory layout with reduced motion transitions. Overlaid with an interactive Three.js somatic particle visualizer, Zamecznik HTML5 Grounding Canvas, and a 16-second box-breathing coach.
 - **Cognition & Multilingual Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly, pediatric formats, or professionally translate them into **Spanish, German, French, or Mandarin**. Outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
 - **Colleague Collaboration Room (TaskFlow):** A real-time multiplayer workspace integrated directly into the patient's view for clinicians to share states, dictate notes, and chat collaboratively.
 - **Hands-Free Voice Dictation & Controls:** Voice command interception during dictation allows hands-free UI control, task addition, and message composition.
@@ -301,6 +300,12 @@ We align our engineering practices and ethical standards with these guidelines a
 ## 👨‍💻 THE CRAFT
 **Phil Gear** / [g.dev/philgear](https://g.dev/philgear)  
 Engineering with **Kaizen**—the belief that clinical excellence is a journey of continuous refinement.
+
+---
+
+<p align="center">
+  <img src="./docs/images/transparent-banner.svg" alt="PocketGull Banner" width="100%">
+</p>
 
 ---
 

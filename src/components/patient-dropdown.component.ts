@@ -140,7 +140,7 @@ import { GamificationService } from '../services/gamification.service';
       }
 
       <!-- Hidden file input for import -->
-      <input #fileInput type="file" accept=".json" class="hidden" (change)="onFileSelected($event)" />
+      <input #fileInput type="file" accept=".json,.xml,.png,.jpg,.jpeg,.pdf" class="hidden" (change)="onFileSelected($event)" />
 
       <!-- Import status toast -->
       @if (importStatus()) {
@@ -214,8 +214,8 @@ export class PatientDropdownComponent {
     this.searchQuery.set('');
   }
 
-  createNewPatient() {
-    this.patientManagement.createNewPatient();
+  async createNewPatient() {
+    await this.patientManagement.createNewPatient();
     this.isOpen.set(false);
     this.searchQuery.set('');
   }

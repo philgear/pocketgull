@@ -20,6 +20,38 @@
 - **Widget Composability**: Keep widget classes small and focused. Extract deeply nested UI trees into standalone, reusable, stateless widgets.
 - **Null Safety**: Strict null safety must be maintained at all times.
 
+## Commit Message Convention
+- **Format**: Follow the **Conventional Commits** specification strictly: `<type>(<scope>): <description>`
+- **Types**: `feat`, `fix`, `docs`, `test`, `security`, `chore`, `refactor`, `perf`, `style`, `ci`, `build`
+- **Scope**: Use a bracketed category tag that identifies the sub-system. Common scopes include:
+  - `ui`, `ux`, `layout`, `theme`, `print` — Frontend visual changes
+  - `ai`, `gemini`, `adk`, `voice` — AI and voice integration
+  - `clinical`, `fhir`, `intake`, `triage` — Clinical intelligence and data
+  - `server`, `ssr`, `api` — Backend / Express / SSR
+  - `flutter`, `dart`, `mobile` — Flutter companion apps
+  - `python`, `ml`, `sidecar` — Python FastAPI sidecar
+  - `security`, `csp`, `codeql`, `hipaa` — Security hardening
+  - `ci`, `cd`, `docker`, `deploy`, `cloudrun` — CI/CD and infrastructure
+  - `demo`, `mock` — Demo mode and mock data
+  - `e2e`, `playwright`, `test` — Testing
+  - `three`, `anatomy`, `3d` — Three.js anatomy viewer
+  - `sentinel`, `companion` — Sentinel triage and companion apps
+  - `types`, `build`, `deps` — TypeScript types, build config, dependencies
+- **Subject line rules**:
+  - Use imperative mood ("add", "fix", "remove", not "added", "fixes", "removed")
+  - Do NOT capitalize the first letter of the description
+  - No period at the end
+  - Max 72 characters for the full subject line
+- **Body** (optional): If the diff is non-trivial, add a blank line after the subject, then a concise body explaining *why* the change was made, not *what* (the diff shows what). Wrap at 80 characters.
+- **Breaking changes**: Prefix the body with `BREAKING CHANGE:` if the commit introduces breaking changes.
+- **Examples of good commit messages**:
+  - `feat(ai): add Gemini 2.5 Flash streaming to voice assistant`
+  - `fix(clinical): sync intake form keys with care plan report structure`
+  - `security(server): sanitize Vertex AI URL params against SSRF`
+  - `chore(deps): bump Angular to v22.1 and resolve esbuild overrides`
+  - `feat(demo): add dynamic mock clinical assessments per patient demographics`
+  - `fix(types): add explicit token loop types in analysis-report parser`
+
 ## FHIR R4 Compliance
 - **Data Serialization**: Anytime patient data (symptoms, history, conditions) is serialized, exported, or passed across API boundaries, the payload MUST strictly conform to the **FHIR R4 Bundle** standard.
 - **Sanitization**: All incoming/outgoing string data must be sanitized using DOMPurify before being stored or rendered to ensure HIPAA-compatible privacy and security.

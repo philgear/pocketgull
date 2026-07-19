@@ -5,6 +5,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { USDZLoader } from 'three/examples/jsm/loaders/USDZLoader.js';
 import { PatientStateService } from '../services/patient-state.service';
 
 const PART_NAMES: Record<string, string> = {
@@ -63,6 +65,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     rotation = input<number>(0);
     zoom = input<number>(1);
     anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
+    customModelUrl = input<string | null>(null);
 
     readonly webglSupported = signal<boolean>(true);
     readonly webglError = signal<string>('');
@@ -72,6 +75,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private camera!: THREE.PerspectiveCamera;
     private controls!: OrbitControls;
     private mannequinGroup!: THREE.Group;
+    private customModelGroup: THREE.Group | null = null;
     private parts: Map<string, THREE.Group | THREE.Mesh> = new Map();
     private raycaster = new THREE.Raycaster();
     private mouse = new THREE.Vector2();
@@ -134,6 +138,14 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 this.camera.updateProjectionMatrix();
             }
         });
+
+        // React to custom model URL changes
+        effect(() => {
+            const url = this.customModelUrl();
+            if (this.scene) {
+                this.loadCustomModel(url);
+            }
+        });
     }
 
     ngAfterViewInit() {
@@ -170,11 +182,160 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         if (this.controls) {
             this.controls.dispose();
         }
+        if (this.mannequinGroup) {
+            this.disposeHierarchy(this.mannequinGroup);
+        }
+        if (this.customModelGroup) {
+            this.disposeHierarchy(this.customModelGroup);
+        }
         if (this.renderer) {
             this.renderer.dispose();
             this.renderer.forceContextLoss();
             this.renderer.domElement?.remove();
         }
+    }
+
+    private disposeHierarchy(obj: THREE.Object3D) {
+        obj.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(m => m.dispose());
+                    } else {
+                        child.material.dispose();
+                    }
+                }
+            }
+        });
+    }
+
+    private loadCustomModel(url: string | null) {
+        if (this.customModelGroup) {
+            this.scene.remove(this.customModelGroup);
+            this.disposeHierarchy(this.customModelGroup);
+            this.customModelGroup = null;
+        }
+
+        if (!url) {
+            if (this.mannequinGroup) {
+                this.mannequinGroup.visible = true;
+                this.restoreMannequinParts();
+                this.updatePartColors();
+                this.updateTransparency(this.anatomyViewMode());
+            }
+            return;
+        }
+
+        if (this.mannequinGroup) {
+            this.mannequinGroup.visible = false;
+        }
+
+        const isUSDZ = url.toLowerCase().endsWith('.usdz');
+        
+        if (isUSDZ) {
+            const loader = new USDZLoader();
+            loader.load(
+                url,
+                (usdz) => {
+                    this.processLoadedModel(usdz);
+                },
+                undefined,
+                (error) => {
+                    console.error('Failed to load USDZ model:', error);
+                }
+            );
+        } else {
+            const loader = new GLTFLoader();
+            loader.load(
+                url,
+                (gltf) => {
+                    this.processLoadedModel(gltf.scene);
+                },
+                undefined,
+                (error) => {
+                    console.error('Failed to load GLTF model:', error);
+                }
+            );
+        }
+    }
+
+    private processLoadedModel(loadedObject: THREE.Object3D) {
+        this.customModelGroup = new THREE.Group();
+        this.customModelGroup.add(loadedObject);
+        this.scene.add(this.customModelGroup);
+
+        this.parts.clear();
+        const meshesToMap: Array<{ mesh: THREE.Mesh; mappedId: string; layer: string }> = [];
+
+        loadedObject.traverse((child: THREE.Object3D) => {
+            if (child instanceof THREE.Mesh) {
+                const nameLower = child.name.toLowerCase();
+                let mappedId = '';
+                
+                if (nameLower.includes('head') || nameLower.includes('skull') || nameLower.includes('brain') || nameLower.includes('neck')) mappedId = 'head';
+                else if (nameLower.includes('chest') || nameLower.includes('torso') || nameLower.includes('lung') || nameLower.includes('heart') || nameLower.includes('ribs')) mappedId = 'chest';
+                else if (nameLower.includes('abdomen') || nameLower.includes('stomach') || nameLower.includes('liver') || nameLower.includes('kidney') || nameLower.includes('intestine')) mappedId = 'abdomen';
+                else if (nameLower.includes('pelvis') || nameLower.includes('hip') || nameLower.includes('spine') || nameLower.includes('back')) mappedId = 'pelvis';
+                else if (nameLower.includes('r_shoulder') || (nameLower.includes('shoulder') && nameLower.includes('right'))) mappedId = 'r_shoulder';
+                else if (nameLower.includes('l_shoulder') || (nameLower.includes('shoulder') && nameLower.includes('left'))) mappedId = 'l_shoulder';
+                else if (nameLower.includes('r_arm') || (nameLower.includes('arm') && nameLower.includes('right'))) mappedId = 'r_arm';
+                else if (nameLower.includes('l_arm') || (nameLower.includes('arm') && nameLower.includes('left'))) mappedId = 'l_arm';
+                else if (nameLower.includes('r_hand') || (nameLower.includes('hand') && nameLower.includes('right'))) mappedId = 'r_hand';
+                else if (nameLower.includes('l_hand') || (nameLower.includes('hand') && nameLower.includes('left'))) mappedId = 'l_hand';
+                else if (nameLower.includes('r_thigh') || (nameLower.includes('thigh') && nameLower.includes('right')) || (nameLower.includes('femur') && nameLower.includes('right'))) mappedId = 'r_thigh';
+                else if (nameLower.includes('l_thigh') || (nameLower.includes('thigh') && nameLower.includes('left')) || (nameLower.includes('femur') && nameLower.includes('left'))) mappedId = 'l_thigh';
+                else if (nameLower.includes('r_shin') || (nameLower.includes('shin') && nameLower.includes('right')) || (nameLower.includes('tibia') && nameLower.includes('right'))) mappedId = 'r_shin';
+                else if (nameLower.includes('l_shin') || (nameLower.includes('shin') && nameLower.includes('left')) || (nameLower.includes('tibia') && nameLower.includes('left'))) mappedId = 'l_shin';
+                else if (nameLower.includes('r_foot') || (nameLower.includes('foot') && nameLower.includes('right'))) mappedId = 'r_foot';
+                else if (nameLower.includes('l_foot') || (nameLower.includes('foot') && nameLower.includes('left'))) mappedId = 'l_foot';
+
+                if (mappedId) {
+                    let layer = 'skin';
+                    if (nameLower.includes('bone') || nameLower.includes('skeleton')) layer = 'bone';
+                    else if (nameLower.includes('muscle')) layer = 'muscle';
+                    meshesToMap.push({ mesh: child, mappedId, layer });
+                }
+            }
+        });
+
+        meshesToMap.forEach(({ mesh, mappedId, layer }) => {
+            if (!(mesh.material instanceof THREE.MeshStandardMaterial)) {
+                const oldMat = mesh.material as any;
+                mesh.material = new THREE.MeshStandardMaterial({
+                    color: oldMat.color || 0xfdfdfd,
+                    roughness: oldMat.roughness || 0.4,
+                    metalness: oldMat.metalness || 0.1,
+                    transparent: true,
+                    opacity: 0.9,
+                    depthWrite: true
+                });
+            }
+
+            mesh.userData['id'] = mappedId;
+            mesh.userData['layer'] = layer;
+
+            let partGroup = this.parts.get(mappedId) as THREE.Group;
+            if (!partGroup) {
+                partGroup = new THREE.Group();
+                partGroup.userData['id'] = mappedId;
+                this.parts.set(mappedId, partGroup);
+                this.customModelGroup!.add(partGroup);
+            }
+            partGroup.add(mesh);
+        });
+
+        this.updatePartColors();
+        this.updateTransparency(this.anatomyViewMode());
+    }
+
+    private restoreMannequinParts() {
+        this.parts.clear();
+        this.mannequinGroup.traverse((child) => {
+            if (child instanceof THREE.Group && child.userData['id']) {
+                this.parts.set(child.userData['id'], child);
+            }
+        });
     }
 
     private isWebGLAvailable(): boolean {
@@ -564,13 +725,13 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         let startY = 0;
 
         canvas.addEventListener('pointerdown', (event: PointerEvent) => {
-            if (event.button !== 0) return;
+            if (event.button !== 0 && event.pointerType === 'mouse') return;
             startX = event.clientX;
             startY = event.clientY;
         });
 
         canvas.addEventListener('pointerup', (event: PointerEvent) => {
-            if (event.button !== 0) return;
+            if (event.button !== 0 && event.pointerType === 'mouse') return;
 
             const deltaX = Math.abs(event.clientX - startX);
             const deltaY = Math.abs(event.clientY - startY);
@@ -582,7 +743,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
                 this.raycaster.setFromCamera(this.mouse, this.camera);
-                const intersects = this.raycaster.intersectObjects(this.mannequinGroup.children, true);
+                const activeGroup = this.customModelGroup ? this.customModelGroup : this.mannequinGroup;
+                const intersects = this.raycaster.intersectObjects(activeGroup.children, true);
                 if (intersects.length > 0) {
                     // Find the mesh object that has the userData.id
                     let object: THREE.Object3D | null = intersects[0].object;
@@ -643,6 +805,9 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 
                 // 2. Gentle floating
                 this.mannequinGroup.position.y = Math.sin(time * 1.5) * 0.02;
+                if (this.customModelGroup) {
+                    this.customModelGroup.position.y = Math.sin(time * 1.5) * 0.02;
+                }
                 
                 // 3. Update Shader Uniforms for Heatmaps
                 this.parts.forEach((group) => {
@@ -699,6 +864,9 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             // Sync external rotation
             if (this.mannequinGroup) {
                 this.mannequinGroup.rotation.y = this.rotation();
+            }
+            if (this.customModelGroup) {
+                this.customModelGroup.rotation.y = this.rotation();
             }
 
             if (this.composer) {

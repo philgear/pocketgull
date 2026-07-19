@@ -21,9 +21,13 @@ const apiLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many requests. Please try again later.' }
 });
 app.use('/api', apiLimiter);
+app.use('/docs', apiLimiter);
+app.use('/api-docs', apiLimiter);
+app.use('/health', apiLimiter);
 
 // Trust the Google Cloud Run proxy so req.hostname resolves correctly
 app.set('trust proxy', true);
@@ -58,32 +62,14 @@ console.log(`[SERVER] Expected dist folder: ${distFolder}`);
 
 // Serve Astro Study Docs independently of Swagger
 app.use('/docs/study', (req, res, next) => {
-  const requestUrl = new URL(req.path || '/', 'http://localhost');
-  const requestedPath = requestUrl.pathname;
-  
-  const expectedBase = resolve(distFolder, 'docs', 'study');
-  const candidatePath = resolve(expectedBase, '.' + requestedPath);
-  const relativePath = relative(expectedBase, candidatePath);
-
-  if (relativePath.startsWith('..') || isAbsolute(relativePath)) {
-    return res.status(403).send("Forbidden");
-  }
-
+  // Only redirect directory-style paths that lack a trailing slash and have no file extension.
   if (req.path !== '/' && req.path !== '' && !req.path.endsWith('/') && !req.path.includes('.')) {
-    return res.redirect(301, `/docs/study${req.path}/`);
-  }
-
-  const cleanPath = requestedPath.endsWith('/') ? requestedPath : requestedPath + '/';
-  if (requestedPath === '/' || requestedPath === '' || !requestedPath.includes('.')) {
-    const targetPath = join(expectedBase, cleanPath, 'index.html');
-    const resolvedPath = resolve(targetPath);
-    if (resolvedPath.startsWith(expectedBase) && fs.existsSync(resolvedPath)) {
-      return res.sendFile(resolvedPath);
-    }
+    const safePath = req.path.replace(/[^a-zA-Z0-9\-_\/]/g, '');
+    return res.redirect(301, `/docs/study${safePath}/`);
   }
   next();
 });
-app.use('/docs/study', express.static(join(distFolder, 'docs', 'study')));
+app.use('/docs/study', express.static(join(distFolder, 'docs', 'study'), { index: 'index.html', extensions: ['html'] }));
 
 // Load OpenAPI documentation dynamically
 let swaggerDocument;
@@ -468,7 +454,11 @@ function validatePatientData(data) {
       isEmergencyMode: Boolean(patient.isEmergencyMode),
       reasonForVisit: String(patient.reasonForVisit || ''),
       occupation: String(patient.occupation || ''),
-      dietaryProtocol: String(patient.dietaryProtocol || '')
+      dietaryProtocol: String(patient.dietaryProtocol || ''),
+      issues: patient.issues || {},
+      history: Array.isArray(patient.history) ? patient.history : [],
+      bookmarks: Array.isArray(patient.bookmarks) ? patient.bookmarks : [],
+      scans: Array.isArray(patient.scans) ? patient.scans : []
     };
   });
 }

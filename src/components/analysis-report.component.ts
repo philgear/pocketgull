@@ -25,11 +25,12 @@ import { AiCacheService } from '../services/ai-cache.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
+import { YbocsScreenerComponent } from './ybocs-screener.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, CostBenefitAnalysisComponent, NodeAgentDialogComponent],
+  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, CostBenefitAnalysisComponent, NodeAgentDialogComponent, YbocsScreenerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
@@ -101,6 +102,15 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
               [ngClass]="activeLens() === 'Patient Education' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
               class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
               Patient Education
+            </button>
+
+            <button (click)="changeLens('Y-BOCs Screener')"
+              data-testid="tab-ybocs-screener"
+              [class.border-b-2]="activeLens() === 'Y-BOCs Screener'"
+              [class.border-transparent]="activeLens() !== 'Y-BOCs Screener'"
+              [ngClass]="activeLens() === 'Y-BOCs Screener' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
+              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              🧠 Y-BOCs Screener
             </button>
 
             @if (state.isEmergencyMode()) {
@@ -199,9 +209,12 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
           </div>
         }
 
-        <!-- ACM §1.3: AI-Generated Content Disclosure -->
-        @if (hasAnyReport()) {
-          <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/50 dark:border-violet-800/30">
+        @if (activeLens() === 'Y-BOCs Screener') {
+          <app-ybocs-screener></app-ybocs-screener>
+        } @else {
+          <!-- ACM §1.3: AI-Generated Content Disclosure -->
+          @if (hasAnyReport()) {
+            <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/50 dark:border-violet-800/30">
             <div class="relative group/ai-badge cursor-help">
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-bold uppercase tracking-widest bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-700/40 select-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -282,7 +295,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
           </div>
         }
         
-        @if (intel.error() && !hasAnyReport()) {
+        @if (intel.error()) {
           <div class="p-4 border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 text-xs rounded-lg mb-4">
             <strong class="block uppercase tracking-wider mb-1">System Error</strong>
             {{ intel.error() }}
@@ -785,6 +798,7 @@ import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dia
             <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-widest">Waiting for input data...</p>
           </div>
         }
+      }
       </div>
     </div>
 
@@ -924,18 +938,18 @@ export class AnalysisReportComponent implements OnDestroy {
     this.historyEntries.set(entries.filter(e => e.value?._isSnapshot));
   }
 
-  activeLens = signal<AnalysisLens | 'EMT Handoff'>('Summary Overview');
+  activeLens = signal<AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener'>('Summary Overview');
   showRawFhir = signal(false);
 
   activeAgentName = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'EMT Handoff') return '';
+    if (lens === 'EMT Handoff' || lens === 'Y-BOCs Screener') return '';
     return this.intel.getAgentNameForLens(lens as AnalysisLens);
   });
 
   activeAgentRole = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'EMT Handoff') return '';
+    if (lens === 'EMT Handoff' || lens === 'Y-BOCs Screener') return '';
     return this.intel.getAgentRoleForLens(lens as AnalysisLens);
   });
 
@@ -1617,14 +1631,13 @@ export class AnalysisReportComponent implements OnDestroy {
     this.dictation.startRecognition();
   }
 
-  // --- Report Actions ---
   async generate() {
     this.audit.logAction('GENERATE_REPORT', this.patientManager.selectedPatientId());
     const patientId = this.patientManager.selectedPatientId();
     const patient = patientId ? this.patientManager.patients().find(p => p.id === patientId) : null;
     const history = patient?.history || [];
     const bookmarks = patient?.bookmarks || [];
-
+ 
     const reportData = await this.intel.generateComprehensiveReport(this.state.getAllDataForPrompt(history, bookmarks));
 
     if (patientId && Object.keys(reportData).length > 0) {
@@ -1635,11 +1648,13 @@ export class AnalysisReportComponent implements OnDestroy {
         report: reportData
       };
       this.patientManager.addHistoryEntry(patientId, historyEntry);
-      this.activeLens.set('Summary Overview');
+      if (this.activeLens() === 'EMT Handoff') {
+        this.activeLens.set('Summary Overview');
+      }
     }
   }
 
-  changeLens(lens: AnalysisLens | 'EMT Handoff') {
+  changeLens(lens: AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener') {
     this.audit.logAction('VIEW_LENS', this.patientManager.selectedPatientId(), { lens });
     this.flushAutoSave();
     this.activeLens.set(lens);

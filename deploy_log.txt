@@ -1,5 +1,0 @@
-==========================================================
-🚀 Deploying Pocket Gull to Google Cloud Run
-==========================================================
-📦 1/3: Building the image for Cloud Run using Buildpacks...
-./scripts/deploy.sh: line 24: gcloud: command not found

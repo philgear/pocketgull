@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  appVersion: '0.3.0',
   firebase: {
     projectId: 'growthyself',
     appId: '1:placeholder:web:abcd1234',

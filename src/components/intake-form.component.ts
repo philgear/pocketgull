@@ -524,15 +524,21 @@ export class IntakeFormComponent implements OnDestroy {
     }
   });
 
+  private lastSyncedNoteId: string | null = null;
+
   constructor() {
     // Sync local state when the selected issue changes from the global state
     effect(() => {
       const note = this.viewedNote();
+      const currentId = this.state.selectedNoteId();
       // Use untracked for local signal writes to prevent infinite loops from local state changes.
       untracked(() => {
-        this.localPainLevel.set(note?.painLevel ?? 0);
-        this.localDescription.set(note?.description ?? '');
-        this.localRecommendation.set(note?.recommendation ?? '');
+        if (this.lastSyncedNoteId !== currentId || !this.isDirty()) {
+          this.localPainLevel.set(note?.painLevel ?? 0);
+          this.localDescription.set(note?.description ?? '');
+          this.localRecommendation.set(note?.recommendation ?? '');
+          this.lastSyncedNoteId = currentId;
+        }
       });
     });
 

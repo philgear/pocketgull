@@ -915,12 +915,49 @@
     border-color: rgba(249, 115, 22, 0.25) !important;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   GLOBAL AVS CSS CONTRACT  v1.1
+/* ─── Y-BOCs Calm Mode Sensory-Safe Styling ─── */
+.theme-calm body {
+    background-color: #F5F5F4 !important; /* Soft warm stone-100 */
+    color: #44403C !important; /* Stone-700 dark text */
+}
+
+.theme-calm .bg-white,
+.theme-calm .dark\:bg-zinc-950,
+.theme-calm .dark\:bg-\[\#09090b\],
+.theme-calm .dark\:bg-zinc-900 {
+    background-color: #FAF9F6 !important; /* Soft paper white */
+}
+
+.theme-calm .border-gray-200,
+.theme-calm .dark\:border-zinc-800,
+.theme-calm .border-zinc-200,
+.theme-calm .dark\:border-zinc-850 {
+    border-color: #E7E5E4 !important; /* Stone-200 */
+}
+
+.theme-calm .text-zinc-900,
+.theme-calm .dark\:text-zinc-50,
+.theme-calm .dark\:text-zinc-100,
+.theme-calm .text-zinc-800,
+.theme-calm .dark\:text-zinc-200 {
+    color: #292524 !important; /* Stone-800 */
+}
+
+.theme-calm .text-zinc-500,
+.theme-calm .dark\:text-zinc-400,
+.theme-calm .text-zinc-400,
+.theme-calm .dark\:text-zinc-550 {
+    color: #78716C !important; /* Stone-500 */
+}
+
+.theme-calm * {
+    transition-duration: 100ms !important;
+}
+
+/* GLOBAL AVS CSS CONTRACT v1.1
    Single source of truth for all AVS visual states.
    Written by GlobalAvsService via rAF loop to :root.
-   All downstream components inherit automatically.
-   ═══════════════════════════════════════════════════════════════ */
+   All downstream components inherit automatically. */
 
 /* ── @property: circadian hue — enables CSS-native animation of the hue
       value when JS updates it. Supported in Chrome 85+, Edge 85+, Safari 16.4+.

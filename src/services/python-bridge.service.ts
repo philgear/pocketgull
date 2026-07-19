@@ -297,34 +297,35 @@ export class PythonBridgeService {
       conditions
     };
 
-    // If Python bridge is marked offline/unavailable, run the local medical indices fallback
+    // Calculate local fallback immediately so the UI is responsive and never hangs
+    const localResult = this.computeLocalMedicalIndicesRisk(hr, bp_systolic, bp_diastolic, spo2, age, conditions);
+    
+    // If we definitely know Python is offline, just use local result immediately
     if (this.isAvailable() === false) {
-      const localResult = this.computeLocalMedicalIndicesRisk(hr, bp_systolic, bp_diastolic, spo2, age, conditions);
       this.riskScore.set(localResult);
       return localResult;
     }
+
+    // Set local fallback first as default, then try to fetch in the background with a strict timeout
+    this.riskScore.set(localResult);
 
     try {
       const res = await fetch(`${this.BASE}/ml/risk-score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(1500)
       });
-      if (!res.ok) {
-        // Fall back to local calculation if server returns an error
-        const localResult = this.computeLocalMedicalIndicesRisk(hr, bp_systolic, bp_diastolic, spo2, age, conditions);
-        this.riskScore.set(localResult);
-        return localResult;
+      if (res.ok) {
+        const result: IRiskScoreResult = await res.json();
+        this.riskScore.set(result);
+        return result;
       }
-      const result: IRiskScoreResult = await res.json();
-      this.riskScore.set(result);
-      return result;
     } catch (err: any) {
-      console.warn('[PythonBridge] fetchRiskScore server error, falling back to local indices:', err.message);
-      const localResult = this.computeLocalMedicalIndicesRisk(hr, bp_systolic, bp_diastolic, spo2, age, conditions);
-      this.riskScore.set(localResult);
-      return localResult;
+      console.warn('[PythonBridge] fetchRiskScore server error or timeout, using local indices:', err.message);
     }
+    
+    return localResult;
   }
 
   /**

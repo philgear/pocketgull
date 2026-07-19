@@ -1,0 +1,19 @@
+# Exclude test suites, configurations, and internal tooling from git archives/releases
+e2e/ export-ignore
+tests/ export-ignore
+playwright.config.ts export-ignore
+vitest.config.ts export-ignore
+run-playwright.cjs export-ignore
+.husky/ export-ignore
+.github/ export-ignore
+.agents/ export-ignore
+.gemini/ export-ignore
+scratch/ export-ignore
+
+# Tell GitHub Linguist to ignore test files and documentation in repository language statistics
+e2e/** linguist-vendored
+tests/** linguist-vendored
+*.spec.ts linguist-vendored
+*.test.ts linguist-vendored
+docs/** linguist-documentation
+companion-apps/avs-therapy/docs/** linguist-documentation

@@ -19,6 +19,7 @@
             "browser": "main.ts",
             "index": "index.html",
             "tsConfig": "tsconfig.json",
+            "preserveSymlinks": true,
             "assets": [
               {
                 "glob": "robots.txt",

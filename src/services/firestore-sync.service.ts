@@ -4,6 +4,13 @@ import { Auth, authState, signInWithPopup, signInWithRedirect, getRedirectResult
 import { IPatient } from './patient.types';
 import { environment } from '../environments/environment';
 
+export interface IRegisteredClinician {
+  name: string;
+  email: string;
+  clinic: string;
+  pin: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,12 +25,46 @@ export class FirestoreSyncService {
   /** Signal emitting whether the initial auth state is still loading. */
   public readonly isAuthLoading = signal<boolean>(true);
 
+  getRegisteredClinicians(): IRegisteredClinician[] {
+    if (typeof localStorage === 'undefined') {
+      return [{ name: 'Phil Gear', email: 'dpo@pocketgull.app', clinic: 'PocketGull Clinic', pin: '1234' }];
+    }
+    try {
+      const stored = localStorage.getItem('pg_registered_clinicians');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {}
+    const defaultList = [{ name: 'Phil Gear', email: 'dpo@pocketgull.app', clinic: 'PocketGull Clinic', pin: '1234' }];
+    try {
+      localStorage.setItem('pg_registered_clinicians', JSON.stringify(defaultList));
+    } catch (e) {}
+    return defaultList;
+  }
+
+  isEmailRegistered(email: string): boolean {
+    const list = this.getRegisteredClinicians();
+    return list.some(c => c.email.toLowerCase() === email.toLowerCase());
+  }
+
+  async registerClinician(name: string, email: string, clinic: string, pin: string): Promise<boolean> {
+    const list = this.getRegisteredClinicians();
+    if (list.some(c => c.email.toLowerCase() === email.toLowerCase())) {
+      throw new Error('This email is already registered.');
+    }
+    list.push({ name, email, clinic, pin });
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('pg_registered_clinicians', JSON.stringify(list));
+    }
+    return true;
+  }
+
   constructor() {
     if (this.auth) {
       authState(this.auth).subscribe(user => {
         this.isAuthLoading.set(false);
         if (user) {
-          if (user.email === 'philgear@gmail.com') {
+          if (this.isEmailRegistered(user.email || '')) {
             this.currentUser.set(user.uid);
             this.currentUserEmail.set(user.email);
           } else {
@@ -44,7 +85,7 @@ export class FirestoreSyncService {
           .then(result => {
             this.isAuthLoading.set(false);
             if (result?.user) {
-              if (result.user.email === 'philgear@gmail.com') {
+              if (this.isEmailRegistered(result.user.email || '')) {
                 console.log('[Firebase Auth] Logged in via redirect result:', result.user.uid);
                 this.currentUser.set(result.user.uid);
                 this.currentUserEmail.set(result.user.email);
@@ -67,13 +108,17 @@ export class FirestoreSyncService {
   }
 
   /** Triggers a Google OAuth popup, falling back to redirect, or using a mock if keys are placeholders. */
-  async signInWithGoogle() {
+  async signInWithGoogle(mockEmail?: string) {
     const isPlaceholder = !environment.firebase.apiKey || environment.firebase.apiKey.includes('placeholder');
     if (isPlaceholder || !this.auth) {
       console.warn('[Firebase Auth] Using placeholder configuration. Authenticating with mock clinician credentials...');
       await new Promise(resolve => setTimeout(resolve, 800));
+      const email = mockEmail || 'dpo@pocketgull.app';
+      if (!this.isEmailRegistered(email)) {
+        throw new Error('Access Denied: Clinician email is not registered.');
+      }
       this.currentUser.set('mock-google-clinician');
-      this.currentUserEmail.set('philgear@gmail.com');
+      this.currentUserEmail.set(email);
       return;
     }
 
@@ -84,7 +129,7 @@ export class FirestoreSyncService {
     try {
       console.log('[Firebase Auth] Initiating Google Popup Sign-in...');
       const result = await signInWithPopup(this.auth, provider);
-      if (result.user && result.user.email !== 'philgear@gmail.com') {
+      if (result.user && !this.isEmailRegistered(result.user.email || '')) {
         console.error('[Firebase Auth] Post-sign-in unauthorized email:', result.user.email);
         await signOut(this.auth);
         this.currentUser.set(null);

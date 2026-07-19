@@ -14,6 +14,7 @@ import {
     DEMO_ANALYSIS_REPORT_EASTERN,
     DEMO_ANALYSIS_REPORT_AYURVEDIC
 } from '../demo-data';
+import { FORMATTING_RULES, PHILOSOPHY_INSTRUCTIONS, SYSTEM_INSTRUCTIONS } from './clinical-prompts';
 
 export interface ITranscriptEntry {
     role: 'user' | 'model';
@@ -120,196 +121,9 @@ export class ClinicalIntelligenceService {
         });
     }
 
-    private readonly FORMATTING_RULES = `
-
-FORMATTING RULES (you MUST follow these exactly):
-- Use ONLY ### level headings. Never use # or ##.
-- Keep paragraphs to 2–3 sentences maximum. Be concise and clinical.
-- Use **bold** for key clinical terms. Never use ALL CAPS.
-- Prefer bullet lists over numbered lists unless ordering matters clinically.
-- Use markdown tables for structured data (labs, dosing, schedules, vitals).
-- Never output raw URLs.
-- Do NOT repeat the patient data back — synthesize and advise.
-- Write in third person clinical voice ("The patient presents with..." not "You have...").
-- CITATION INTEGRITY (UKRIO): When referencing medical literature, you MUST use a parenthetical citation [Author et al., Year].
-- ACCURACY: Only cite a source if it directly supports the specific clinical claim being made. DO NOT use research sources to support patient-reported symptoms unless the source provides specific diagnostic criteria or evidence matched to those symptoms.
-- TRANSPARENCY: Include the full reference in the 'References' section. Use DOIs whenever available. If a source is peer-reviewed, state this clearly in the reference.
-- NO HALLUCINATION: Only cite sources provided in the "Research Context" or "Bookmarks" sections. If no provided source supports a claim, do NOT cite anything.
-- WHO GUIDELINE ALIGNMENT: Recommendations, diagnostic thresholds (e.g. blood pressure, fasting blood glucose), and pharmacological strategies should align with official World Health Organization (WHO) clinical guidelines, protocols, and standard global health baselines.
-- HIPAA PRIVACY COMPLIANCE: Never output hypothetical or real personally identifiable information (PII) such as full names, social security numbers, phone numbers, or physical addresses. Keep all outputs strictly restricted to de-identified clinical telemetry and anonymous diagnostics.
-
-ANNOTATION SYNTAX (place on a NEW LINE after the relevant paragraph or list item, never inline):
-[[suggestion: Short actionable suggestion]]
-[[proposed: Full replacement text for the paragraph above]]
-`;
-
-    private readonly PHILOSOPHY_INSTRUCTIONS: Record<'western' | 'eastern' | 'ayurvedic', string> = {
-        western: `CLINICAL PARADIGM: Western (Allopathic) Medicine.
-- Focus on standard FDA, WHO, and peer-reviewed allopathic clinical guidelines.
-- Target conventional pharmacology, evidence-based diagnostics, standard metabolic pathways, and structured healthcare interventions.
-- Ensure recommendations are backed by randomized controlled trials (RCTs) and clinical reference models.`,
-
-        eastern: `CLINICAL PARADIGM: Eastern (Traditional Chinese Medicine - TCM).
-- FRAME WORK & 8 PRINCIPLES: Frame the clinical assessment and care plan using TCM diagnostic paradigms: identify Zang-Fu organ system imbalances and categorize them according to the Eight Principles (Yin/Yang, Interior/Exterior, Cold/Heat, Deficiency/Excess).
-- ZANG-FU PATTERN ANALYSIS: Detail specific Zang-Fu organ disharmonies relevant to the patient's symptoms (e.g., Liver Qi Stagnation for stress/pain, Spleen Qi Deficiency for fatigue/digestive issues, Kidney Yin or Yang Deficiency for chronic vitality depletion, Lung Qi Deficiency for respiratory weakness).
-- WU XING (FIVE ELEMENTS) DYNAMICS: Utilize Five Elements theory to analyze generating (Sheng) and controlling (Ke) relationships (e.g., Wood overacting on Earth causing Liver-Spleen disharmony, or Earth failing to generate Metal).
-- MERIDIANS & CLINICAL ACUPOINTS: Suggest targeted stimulation of specific acupoints and meridians to restore homeostasis:
-  * ST36 (Zusanli) for Spleen/Stomach tonification, digestive health, and building Wei Qi.
-  * LI4 (Hegu) and LV3 (Taichong) in combination (the "Four Gates") to circulate Qi and blood, relieve pain, and alleviate stagnation.
-  * SP6 (Sanyinjiao) to nourish Yin and Blood, regulate the Kidney/Liver/Spleen channels.
-  * Du 20 (Baihui) for raising Yang Qi and calming the Shen.
-- TONGUE & PULSE DIAGNOSTIC INDICATORS: Provide expected diagnostic markers (e.g., pale tongue with thin white coat indicating Qi/Blood deficiency; red body with yellow greasy coat indicating Damp-Heat; Pulse qualities like Wiry [Xian] indicating Liver disharmony or pain, Slippery [Hua] indicating Dampness/Phlegm, or Weak/Thready [Xi/Ruo] indicating deficiency).
-- THERAPEUTIC MODALITIES: Integrate personalized lifestyle, nutrition, and therapies: acupressure, meridian therapy, moxibustion guidelines, and traditional herbal formulations (categorized by energetic temperatures: cooling vs. warming foods, Yin-nourishing vs. Yang-tonifying herbs).
-- LINK BIOCHEMISTRY TO TRADITIONAL ORGAN CHANNELS: Connect Western biomarker trends and minerals directly to Meridian/Zang-Fu systems:
-  * Map Zinc and Vitamin D3 to Kidney Essence (Jing) and Yang Vitality.
-  * Map Magnesium to Liver/Heart Qi regulation and smoothing Qi flow.
-  * Map Vitamin B12, Iron, and Folate to Spleen Qi and Blood generation (Spleen's function of transformation and transportation).
-  * Map Vitamin C and antioxidants to Lung Qi and the strength of Wei Qi (protective exterior).
-- MODERN PHYSIOLOGICAL TRANSLATION: Always translate these traditional concepts into clean clinical contexts that blend with modern physiological understanding (e.g., referencing autonomic nervous system regulation, hypothalamic-pituitary-adrenal (HPA) axis balance, and microcirculation alongside Qi and blood stasis).`,
-
-        ayurvedic: `CLINICAL PARADIGM: Ayurvedic Medicine.
-- FRAMEWORK & 3 DOSHAS: Frame the clinical assessment and care plan using Ayurvedic diagnostic paradigms: evaluate the patient's likely Tridosha constitution (Prakriti) and current imbalances (Vikriti - Vata, Pitta, Kapha).
-- METABOLISM, TOXICITY & DIGESTIVE FIRE: Analyze cellular health through the concepts of Agni (digestive and metabolic fire: Sama, Vishama, Tikshna, Manda) and Ama (accumulated toxic residue: Sama vs. Nirama status).
-- DHATUS (7 TISSUE LAYERS) PENETRATION: Map pathology and symptoms to affected Dhatus:
-  * Rasa (Plasma/Lymph): Dry skin, fatigue, lymphatic congestion.
-  * Rakta (Blood/Oxygenation): Rashes, inflammation, blood pressure.
-  * Mamsa (Muscle): Muscle pain, spasms, wasting.
-  * Medas (Fat/Adipose): Metabolic and weight issues.
-  * Asthi (Bone/Cartilage): Skeletal/joint issues, bone density.
-  * Majja (Nervous/Marrow): Neuropathic pain, sleep/anxiety, nervous system.
-  * Shukra (Reproductive/Vitality): Hormonal and vigor depletion.
-- SROTAS (PHYSIOLOGICAL CHANNELS): Identify compromised channels and blockages (Srotas dusti), e.g., Pranavaha (Respiratory), Annavaha (Digestive), Rasavaha (Plasma), Raktavaha (Circulatory), Asthivaha (Skeletal), Majjavaha (Nervous).
-- TONGUE & PULSE DIAGNOSIS (JIHVA & NADI PARIKSHA):
-  * Vata indicators: Rapid, irregular pulse (Nadi: Snake-like/Tarpana); thin, dry tongue with cracking.
-  * Pitta indicators: Strong, bounding pulse (Nadi: Frog-like/Manduka); red tongue body, yellowish coat.
-  * Kapha indicators: Slow, steady, deep pulse (Nadi: Swan-like/Hamsa); pale, swollen tongue with thick white coating (indicating high Ama).
-- BOTANICAL-TO-BIOCHEMICAL TRANSLATION: Map traditional Ayurvedic Rasayanas to both their energetic qualities (Rasa/Taste, Virya/Potency, Vipaka/Post-digestive effect) and modern biochemical pathways:
-  * Ashwagandha (Withania somnifera) -> Ushna Virya, Madhura Vipaka; mediates HPA-axis regulation, cortisol reduction, and GABAergic modulation.
-  * Curcumin/Shallaki (Boswellia serrata) -> Tikta/Katu Rasa, Ushna Virya; inhibits 5-LOX, downregulates NF-kB, and reduces pro-inflammatory cytokines.
-  * Triphala (Amalaki, Bibhitaki, Haritaki) -> Pancharasa (5 tastes), warm/neutral; stimulates short-chain fatty acid (SCFA) production, maintains gut barrier integrity, and optimizes microbiome diversity.
-- LINK BIOCHEMISTRY TO DHATUS & OJAS: Map Western biomarker trends (minerals, vitamins) to Dhatus and Ojas:
-  * Map Vitamin D3 and Calcium to Asthi Dhatu (bone tissue).
-  * Map Iron, B12, and Folate to Rakta Dhatu (blood tissue).
-  * Map Zinc and Magnesium to Majja Dhatu (nervous tissue).
-  * Map general antioxidants and immune markers to Ojas replenishment.
-- THERAPEUTIC REGIMEN (DINACHARYA): Detail circadian lifestyle alignment, including oil pulling (Gandusha), nasal therapy (Nasya), dry powder massage (Udvartana), and warm self-massage (Abhyanga), along with dietary guidelines based on the dominant Gunas (qualities).`
-    };
-
-    private systemInstructions: Record<AnalysisLens, string> = {
-        'Summary Overview': `You are a world-class care plan recommendation engine for a clinical decision-support tool.
-
-Analyze the patient overview and generate a **Visit Summary Overview** structured as follows:
-
-### Clinical Assessment
-A concise 2–3 sentence synthesis of the patient's current clinical picture — key diagnoses, functional status, and risk factors.
-
-### Priority List
-A bullet list of the top 3–5 clinical priorities, ordered by urgency. Each item should be **bold label**: brief rationale.
-
-### Plan of Care
-Actionable treatment steps organized by priority. Use sub-bullets for specifics (medication, dose, frequency). Include a markdown table if there are ≥3 medications or interventions to compare.
-
-### Goals
-Short-term (2 weeks) and long-term (3 months) measurable clinical goals as bullet points.
-
-### References
-A structured list of all sources cited in this report. Format: **Author(s)** (Year). *Title*. Publisher/Journal. DOI (as a clickable link if available). Indicate if Peer-Reviewed.
-` + this.FORMATTING_RULES,
-
-        'Functional Protocols': `You are an expert functional medicine strategist for a clinical decision-support tool, deeply inspired by the work of Linus Pauling (providing the right molecules in the right amounts).
-
-Analyze the patient overview and recommend specific, evidence-based biochemical pathways and interventions structured as follows. CRITICAL: For pediatric patients, avoid generic "exercise" or exhaustive "supplement" routines. Instead, focus on parent-guided therapeutic environments, targeted food-as-medicine, and gentle metabolic support pathways.
-
-### Immediate Actions (To start within 72 hours)
-(List critical interventions to initiate immediately, focusing on environmental or dietary modifications first.)
-
-### Functional Foundation (Diet, Environment & Lifestyle)
-(Provide recommendations focusing on optimizing the cellular environment, nutrient-dense whole foods, sleep architecture, and toxin reduction.)
-
-### Targeted Biochemical Support
-(Generate a Markdown table with columns: Intervention/Molecule | Form/Dose | Delivery/Timing | Targeted Pathway. Use clinical precision rather than generic supplements.)
-
-### Functional & Environmental Protocols
-(Describe specific therapeutic protocols like "HPA Axis Support", "Histamine Reduction", or "Circadian Alignment" tailored appropriately, especially for children.)` + this.FORMATTING_RULES,
-
-        'Nutrition': `You are an expert in clinical nutrition for a clinical decision-support tool.
-
-Analyze the patient overview and telemetry with a strict focus on biochemical pathways, micronutrient deficiencies, and cellular health. Structure as follows:
-
-### Biochemical Assessment
-(2-3 sentences analyzing the patient's oxidative stress, antioxidant status, and micronutrient panel findings.)
-
-### Nutrition Targets
-(Bullet list of specific metabolic pathways or nutrient deficiencies to target, e.g., "**Vitamin C Deficit**: high oxidative load requires replenishment.")
-
-### Nutritional Interventions
-(Generate a Markdown table with columns: Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway. Focus on high-dose or targeted nutrient therapies.)
-
-### Dietary Adjustments
-(Crucial whole-food or specific dietary modifications to support the functional strategy.)` + this.FORMATTING_RULES,
-
-        'Monitoring & Follow-up': `You are a care coordination AI for a clinical decision-support tool.
-
-Generate a structured monitoring and follow-up plan organized by time horizon:
-
-### Immediate Next Steps (0-30 days)
-(Provide an ordered list of high-priority actions.)
-
-### Ongoing (Month 1-3)
-(Generate a markdown table of tracking parameters with columns: Parameter | Target | Frequency | Escalation Trigger. Only output the table in this section, do not include preamble.)
-
-### Long-term Trajectory (6+ months)
-(Provide a brief narrative on expected outcomes.)` + this.FORMATTING_RULES,
-
-        'Patient Education': `You are a patient education specialist for a clinical decision-support tool. Translate the documented clinical findings into patient-friendly language.
-
-CRITICAL: You must ONLY include information that is explicitly documented in the patient data provided. Do NOT invent, assume, or add any clinical details, recommendations, or advice not present in the source material. Every statement must be directly traceable to the provided data.
-
-Generate clear, empathetic educational content in **plain language** (8th grade reading level). Structure as follows:
-
-### Understanding Your Condition
-2–3 sentence explanation of the patient's documented condition(s) using everyday language. ONLY reference diagnoses, symptoms, and findings that appear in the source data. Use everyday analogies where helpful.
-
-### What Was Found
-Bullet list summarizing ONLY the documented clinical findings, test results, and observations from the patient record. Each item: **Finding**: plain-language explanation of what it means. Do NOT add findings not in the source.
-
-### Current Plan
-Bullet list of ONLY the treatments, medications, or interventions that are explicitly documented or recommended in the other care plan sections. Each item: **Intervention**: plain-language explanation of why it was chosen. If no specific plan is documented, state "Your care team will discuss treatment options with you."
-
-### Important Notes
-> 💡 Summarize ONLY the specific precautions, follow-up instructions, or red flags that are documented in the source data. If none are documented, state "Discuss follow-up and precautions with your care team at your next visit."
-
-If a section has no relevant source data, output the heading followed by: "*No specific information documented — please discuss with your care team.*"
-` + this.FORMATTING_RULES,
-
-        'Precision Nutrients': `You are an expert in Orthomolecular Medicine and functional psychiatry for a clinical decision-support tool.
-
-Analyze the patient overview, specifically hunting for lab metrics, micronutrient imbalances, or symptom profiles that suggest underlying biochemical deficiencies (e.g., methylation cycle blocks, pyroluria, oxidative stress, heavy metal toxicity). Structure as follows:
-
-### Biochemical & Biomarker Matrix
-(2-3 sentences summarizing the patient's critical orthomolecular status based on the provided data.)
-
-At the very end of the "Biochemical & Biomarker Matrix" section, you MUST output a structured JSON block containing the status of key biomarkers. Use EXACTLY the following JSON format inside a json code block:
-\`\`\`json
-[
-  { "name": "Magnesium", "level": "Deficient", "pathway": "ATP Synthesis / NMDA" },
-  { "name": "Vitamin D3", "level": "Sub-optimal", "pathway": "Immune / Bone" }
-]
-\`\`\`
-Allowed names are: "Magnesium", "Vitamin D3", "Vitamin B12", "Folate (B9)", "Zinc", "Homocysteine", "Ferritin", "Vitamin C".
-Allowed levels are: "Deficient", "Sub-optimal", "Optimal", "High", "Excess".
-Provide a status for at least 3-4 biomarkers that are most relevant to the patient's data, labs, or symptoms.
-
-### Detected Deficiencies
-(Bullet list of specific nutrient depletions or metabolic blocks detected. If none are explicitly found, list "potential" deficiencies based strictly on the symptom profile.)
-
-### Orthomolecular Protocol
-(Generate a Markdown table with columns: Intervention/Molecule | Therapeutic Dose | Delivery Method | Targeted Pathway. Suggest specific, bioavailable forms (e.g., Methylcobalamin, P-5-P) rather than generic vitamins. Suggest IV therapies if appropriate.)
-
-### Cautions & Interactions
-(List any critical nutrient-drug interactions or contraindications for the suggested mega-doses based on the patient's pharmaceutical profile.)` + this.FORMATTING_RULES,
-        'Treatment Matrix': ''
-    };
+    private readonly FORMATTING_RULES = FORMATTING_RULES;
+    private readonly PHILOSOPHY_INSTRUCTIONS = PHILOSOPHY_INSTRUCTIONS;
+    private readonly systemInstructions = SYSTEM_INSTRUCTIONS;
 
     public resetAIState() {
         this.isLoading.set(false);
@@ -322,7 +136,10 @@ Provide a status for at least 3-4 biomarkers that are most relevant to the patie
 
     public loadArchivedAnalysis(report: Partial<Record<AnalysisLens, string>>) {
         this.resetAIState();
-        this.analysisResults.set(report);
+        const activeName = this.patientState.patientName() || 'Patient';
+        const currentPhilosophy = this.patientState.activePhilosophy() || 'western';
+        const dynamicMock = this.generateDynamicMockReport(activeName, currentPhilosophy);
+        this.analysisResults.set({ ...dynamicMock, ...report });
         this.lastRefreshTime.set(new Date());
     }
 
@@ -425,7 +242,12 @@ ${name} is a ${age}-year-old ${gender.toLowerCase()} presenting with ${tcmPatter
                 'Nutrition': `### Dietary Recommendations (TCM)
 - **Thermal Nature**: Emphasize warm and cooked foods; strictly avoid raw/cold foods which deplete Spleen Yang.
 - **Flavors**: Moderate sweet (tonifying) and pungent (dispersing) foods.
-- **Specific Foods**: Add ginger, garlic, scallions, and warm broths.`,
+- **Specific Foods**: Add ginger, garlic, scallions, and warm bone broths.
+
+### Local & Wild Sourcing
+- **Standard Supermarkets**: Fresh ginger root, organic garlic bulbs, and scallions are cheap and abundant in the produce aisle.
+- **Specialty Asian Markets**: Purchase high-quality dried red jujube dates (to nourish Blood) and lotus seeds (to calm the Shen).
+- **Wild Foraging**: Hawthorn berries (Shan Zha) can be gathered in clean suburban hedgerows to aid in digestion, and wild dandelion greens (Pu Gong Ying) can be harvested in spring to clear damp-heat.`,
 
                 'Precision Nutrients': `### Herb & Nutrient Matrix
 - **Astragalus (Huang Qi)**: Tonify spleen and lung Qi.
@@ -470,10 +292,15 @@ ${name} is a ${age}-year-old ${gender.toLowerCase()} presenting with ${doshaImba
                 'Nutrition': `### Ayurvedic Diet
 - **Dosha-specific**: Favor warm, moist, cooked foods. Use warming spices (cumin, coriander, turmeric).
 - **Avoid**: Dry, cold, processed foods, and ice-cold water.
-- **Hydration**: Warm water or herbal ginger tea throughout the day.`,
+- **Hydration**: Warm water or herbal ginger tea throughout the day.
+
+### Local & Wild Sourcing
+- **Standard Supermarkets**: Buy organic grass-fed butter to clarify into Ghee (vital for pacifying Vata), and yellow split mung dal beans for Kitchari.
+- **Specialty Indian Grocers**: Source high-quality spices like green cardamom pods, whole cumin seeds, and dry ginger powder.
+- **Wild Foraging**: Fresh wild nettle leaves (cooling to Pitta, flushing to Kapha) can be gathered near clean stream banks in late spring.`,
 
                 'Precision Nutrients': `### Ayurvedic Rasayanas
-- **Ashwagandha**: Pacify Vata, nourish Majja Dhatu, and support stress resilience.
+- **Ashwagandha**: Pacify Vata, nourish Majja Dhatu, and support stress resilience (resolves structural dryness).
 - **Triphala**: Kindles Agni and supports daily detoxification.
 - **Turmeric & Boswellia**: Anti-inflammatory support.`,
 
@@ -505,21 +332,25 @@ ${issuesStr}
 - **Short-term**: Optimize daily movement and address acute stressors/pain.
 - **Long-term**: Functional rehabilitation and systemic health optimization.`,
 
-                'Functional Protocols': `### Lifestyle & Activity
+                'Functional Protocols': `### Diagnostic Workup & Lifestyle
 - **Exercise**: Structured moderate-intensity cardiovascular exercise 3x/week.
 - **Posture & Ergonomics**: Regular movement breaks and ergonomic assessment.
 - **Sleep**: Maintain consistent sleep/wake cycle.`,
 
-                'Nutrition': `### Nutritional Recommendations
+                'Nutrition': `### Nutritional Interventions
 - **Anti-inflammatory Diet**: Emphasize whole foods, lean proteins, omega-3 fats, and high-fiber vegetables.
-- **Hydration**: Target 2-3 liters of filtered water daily.`,
+- **Hydration**: Target 2-3 liters of filtered water daily.
 
-                'Precision Nutrients': `### Suggested Supplements
+### Local & Wild Sourcing
+- **Standard Supermarkets**: Source wild-caught salmon and mackerel in the seafood aisle. Frozen wild blueberries are highly abundant and cost-effective.
+- **Wild Foraging**: Forage for wild dandelions or stinging nettles in organic, pesticide-free meadows (blanch nettles thoroughly to deactivate stingers; they are rich in iron and vitamin C).`,
+
+                'Precision Nutrients': `### Biomarker Matrix & Suggested Supplements
 - **Magnesium Glycinate**: 300-400mg before bed.
 - **Vitamin D3**: Optimize levels to support immune and bone health.
 - **Omega-3 Fatty Acids**: Anti-inflammatory support.`,
 
-                'Monitoring & Follow-up': `### Clinical Tracking
+                'Monitoring & Follow-up': `### Immediate (24-72 hours) & Clinical Tracking
 - Monitor vitals and symptom logs.
 - Re-assess functional capacity in 4 weeks.`,
 
@@ -557,7 +388,8 @@ By focusing on nutrition, movement, sleep, and targeted supplementation, we can 
                 );
                 
                 if (prebakedEntry && (prebakedEntry.type === 'AnalysisRun' || prebakedEntry.type === 'FinalizedPatientSummary') && currentPhilosophy === 'western') {
-                    report = prebakedEntry.report;
+                    const dynamicMock = this.generateDynamicMockReport(activeName, currentPhilosophy);
+                    report = { ...dynamicMock, ...prebakedEntry.report };
                 } else {
                     report = this.generateDynamicMockReport(activeName, currentPhilosophy);
                 }

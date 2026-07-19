@@ -171,6 +171,16 @@ export class GeminiProvider implements IIntelligenceProvider {
         return data.analysis;
     }
 
+    async scanDocument(base64Image: string, context?: string): Promise<any> {
+        const response = await fetch('/api/ai/scan-document', {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify({ base64Image, context })
+        });
+        if (!response.ok) throw new Error(await response.text());
+        return await response.json();
+    }
+
     async synthesizeKnowledge(inputText: string): Promise<any> {
         const response = await fetch('/api/ai/synthesize', {
             method: 'POST',

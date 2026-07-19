@@ -24,6 +24,7 @@ import { HardwareTelemetryService } from './services/hardware-telemetry.service'
 import { ExportService } from './services/export.service';
 import { RevealDirective } from './directives/reveal.directive';
 import { DEMO_ANALYSIS_REPORT_WESTERN } from './demo-data';
+import { p_charles_darwin } from './mock-patients/p_charles_darwin';
 import { PatientDirectoryComponent } from './components/patient-directory.component';
 import { FhirCallbackComponent } from './components/fhir-callback.component';
 import { WalkthroughTourComponent } from './components/walkthrough-tour.component';
@@ -43,8 +44,8 @@ import { SwUpdate } from '@angular/service-worker';
 import { FitbitService } from './services/fitbit.service';
 import { ConsentService } from './services/consent.service';
 import { ConsentModalComponent } from './components/consent-modal.component';
-import { SynthesisDashboardComponent } from './components/synthesis/synthesis-dashboard.component';
 import { ResearchTabComponent } from './components/research-tab.component';
+import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -68,7 +69,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
     FhirCallbackComponent,
     PocketGullInputComponent,
     ConsentModalComponent,
-    SynthesisDashboardComponent
+    ZamecznikCanvasComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -175,7 +176,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                   <p><span class="font-semibold">Purpose:</span> Clinical intelligence features in PocketGull — biometric trend analysis, care plan optimization, and AI-assisted consultation support.</p>
                   <p><span class="font-semibold">Data handling:</span> Health data is held in server memory only during your session and is never written to permanent storage, sold, shared with third parties, or used for advertising.</p>
                   <p><span class="font-semibold">Security:</span> Data is transmitted over HTTPS. Tokens are stored in memory only (ephemeral — cleared on server restart).</p>
-                  <p><span class="font-semibold">Your rights:</span> You may withdraw at any time via Integrations → Google Health Disconnect. Selecting "Disconnect &amp; Erase Data" will permanently remove all synced health data from this session.</p>
+                  <p><span class="font-semibold">Your rights:</span> You may withdraw at any time via Imports → Google Health Disconnect. Selecting "Disconnect &amp; Erase Data" will permanently remove all synced health data from this session.</p>
                   <p><span class="font-semibold">Contact:</span> <a href="mailto:privacy@pocketgull.app" class="text-blue-600 dark:text-blue-400 underline">privacy@pocketgull.app</a></p>
                 </div>
                 <div class="rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/30 p-3 text-xs text-amber-800 dark:text-amber-300">
@@ -472,14 +473,6 @@ import { ResearchTabComponent } from './components/research-tab.component';
               <span class="hidden sm:inline">Research</span>
             </button>
 
-            <button (click)="state.toggleSynthesisDashboard()"
-                    aria-label="Synthesize"
-                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                 <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
-              </svg>
-              <span class="hidden sm:inline">Synthesize</span>
-            </button>
             
             <a href="/docs/study/" target="_blank" rel="noopener"
                aria-label="Docs"
@@ -522,6 +515,11 @@ import { ResearchTabComponent } from './components/research-tab.component';
                  @case ('spark') {
                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#FF6F3D] animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                      <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/>
+                   </svg>
+                 }
+                 @case ('calm') {
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#8D6E63]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                    </svg>
                  }
               }
@@ -604,7 +602,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
            <div class="h-4 w-px bg-gray-300 dark:bg-zinc-700 hidden sm:block"></div>
            <div id="tour-patient-dropdown"><app-patient-dropdown></app-patient-dropdown></div>
 
-           <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1 ml-auto">
+                       <div class="flex items-center gap-2 pr-2 pb-1 pt-1 -mb-1 -mt-1 ml-auto">
              <!-- EXPORT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="exportMenuOpen.set(true)" (mouseleave)="exportMenuOpen.set(false)">
                <button
@@ -638,7 +636,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
                <button
                        class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[12px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                 <span class="hidden sm:inline">Integrations</span>
+                 <span class="hidden sm:inline">Imports</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </button>
 
@@ -922,12 +920,6 @@ import { ResearchTabComponent } from './components/research-tab.component';
         @if(state.isResearchFrameVisible()) {
             @defer (on immediate) {
               <app-research-frame></app-research-frame>
-            }
-        }
-
-        @if(state.isSynthesisDashboardVisible()) {
-            @defer (on immediate) {
-              <app-synthesis-dashboard></app-synthesis-dashboard>
             }
         }
 
@@ -1238,6 +1230,7 @@ import { ResearchTabComponent } from './components/research-tab.component';
         }
       }
     </div>
+    <app-zamecznik-canvas></app-zamecznik-canvas>
   }
   `,
   styles: [`
@@ -1875,7 +1868,8 @@ export class AppComponent implements OnDestroy {
     const current = this.theme.currentTheme();
     if (current === 'system') this.theme.setTheme('light');
     else if (current === 'light') this.theme.setTheme('dark');
-    else if (current === 'dark') this.theme.setTheme('spark');
+    else if (current === 'dark') this.theme.setTheme('calm');
+    else if (current === 'calm') this.theme.setTheme('spark');
     else this.theme.setTheme('system');
   }
 
@@ -2381,11 +2375,12 @@ export class AppComponent implements OnDestroy {
     this.isDemoMode.set(true);
     this.state.isDemoMode.set(true);
     this.hasApiKey.set(true);
-    // Load demo patient (Sarah Jenkins – p002)
-    this.patientMgmt.selectPatient('p002');
+    // Load demo patient (Charles Darwin – p_charles_darwin)
+    this.patientMgmt.selectPatient('p_charles_darwin');
     // Inject pre-baked analysis outputs (no API call) synchronously
     this.state.activePhilosophy.set('western');
-    this.clinicalIntelligence.loadArchivedAnalysis(DEMO_ANALYSIS_REPORT_WESTERN);
+    const darwinReport = (p_charles_darwin.history.find((h: any) => h.type === 'AnalysisRun') as any)?.report || {};
+    this.clinicalIntelligence.loadArchivedAnalysis(darwinReport);
     this.clinicalIntelligence.lastActivePhilosophy.set('western');
     this.clinicalIntelligence.lastPatientData.set(this.state.getAllDataForPrompt());
     // Start tour after data is loaded so targets exist in DOM

@@ -64,6 +64,7 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
   await page.addInitScript((mockClinician) => {
     try {
       window.indexedDB.deleteDatabase('PocketGullDB');
+      window.indexedDB.deleteDatabase('pocket-gull-cache');
     } catch (e) {}
 
     // Mock API key so the Voice Assistant doesn't abort initialization
@@ -84,7 +85,7 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
         getRegistration: () => Promise.resolve(undefined),
         getRegistrations: () => Promise.resolve([]),
         controller: null,
-        ready: new Promise(() => {})
+        ready: Promise.resolve({ active: null } as any)
       };
       Object.defineProperty(navigator, 'serviceWorker', {
         get() { return mockSW; },

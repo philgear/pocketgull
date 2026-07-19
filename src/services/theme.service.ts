@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm';
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +47,7 @@ export class ThemeService {
     // Check URL query parameters first for testing, audits, or direct links
     const urlParams = new URLSearchParams(window.location.search);
     const urlTheme = urlParams.get('theme') as AppTheme;
-    if (urlTheme && ['light', 'dark', 'system', 'spark'].includes(urlTheme)) {
+    if (urlTheme && ['light', 'dark', 'system', 'spark', 'calm'].includes(urlTheme)) {
       this.currentTheme.set(urlTheme);
       this.resolveTheme(urlTheme);
     } else {
@@ -84,6 +84,8 @@ export class ThemeService {
       this.activeTheme.set(isSystemDark ? 'dark' : 'light');
     } else if (theme === 'spark') {
       this.activeTheme.set('dark');
+    } else if (theme === 'calm') {
+      this.activeTheme.set('light');
     } else {
       this.activeTheme.set(theme);
     }
@@ -93,7 +95,7 @@ export class ThemeService {
     if (typeof document === 'undefined') return;
     
     // Always remove existing classes first to clean up state
-    document.documentElement.classList.remove('dark', 'theme-spark');
+    document.documentElement.classList.remove('dark', 'theme-spark', 'theme-calm');
     
     const theme = this.currentTheme();
     if (theme === 'spark') {
@@ -102,6 +104,12 @@ export class ThemeService {
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
         metaThemeColor.setAttribute('content', '#0a0503'); // Custom dark copper/ember background
+      }
+    } else if (theme === 'calm') {
+      document.documentElement.classList.add('theme-calm');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#FAF9F6'); // soft paper-white background
       }
     } else if (resolvedTheme === 'dark') {
       document.documentElement.classList.add('dark');

@@ -48,9 +48,23 @@ app.put('/api/hue/:bridgeIp/api/:username/lights/:lightId/state', async (req, re
   const { bridgeIp, username, lightId } = req.params;
 
   // Validate parameters to prevent Server-Side Request Forgery (SSRF)
-  const isValidIp = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(bridgeIp) || bridgeIp === 'localhost';
   const isValidUsername = /^[a-zA-Z0-9_\-]+$/.test(username);
   const isValidLightId = /^[0-9]+$/.test(lightId);
+
+  // Enforce that bridgeIp is strictly localhost or a private local subnet IP to prevent SSRF
+  const isPrivateIp = (ip) => {
+    if (ip === 'localhost' || ip === '127.0.0.1') return true;
+    const parts = ip.split('.').map(Number);
+    if (parts.length !== 4 || parts.some(isNaN)) return false;
+    return (
+      parts[0] === 10 ||
+      (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+      (parts[0] === 192 && parts[1] === 168) ||
+      parts[0] === 127
+    );
+  };
+
+  const isValidIp = (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(bridgeIp) && isPrivateIp(bridgeIp)) || bridgeIp === 'localhost';
 
   if (!isValidIp || !isValidUsername || !isValidLightId) {
     return res.status(400).json({ error: 'Invalid parameters provided. SSRF check failed.' });

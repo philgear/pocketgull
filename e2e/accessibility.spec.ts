@@ -21,11 +21,6 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     const headingsCount = await page.locator('h1, h2, h3').count();
     expect(headingsCount).toBeGreaterThan(0);
 
-    // First unlock the Gesture Unlock / PIN pad to reveal the sign-in options
-    const initialPinInput = page.locator('input[placeholder="1234"]');
-    await expect(initialPinInput).toBeVisible({ timeout: 5000 });
-    await initialPinInput.fill('1234');
-
     // 4. Button descriptive names (WCAG 2.4.6 / 4.1.2)
     // Ensure the Google SSO button contains visible text or an aria-label
     const ssoBtn = page.locator('button', { hasText: 'Clinician Sign-in' });

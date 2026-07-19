@@ -1518,6 +1518,94 @@ export class ExportService {
           }
         });
 
+      // 5. Y-BOCs Assessments (QuestionnaireResponse and Observation)
+      patient.history
+        .filter(h => h.type === 'Y-BOCsAssessment')
+        .forEach((entry: any, i) => {
+          const assessment = entry.assessment;
+          if (!assessment) return;
+
+          // Add QuestionnaireResponse
+          const items: any[] = [];
+          
+          // Add checklist answers
+          if (assessment.checklistAnswers) {
+            const checklistItems: any[] = [];
+            Object.entries(assessment.checklistAnswers).forEach(([idStr, val]: [string, any]) => {
+              checklistItems.push({
+                linkId: `symptom-${idStr}`,
+                answer: [{
+                  valueString: `Past: ${val.past ? 'Yes' : 'No'}, Current: ${val.current ? 'Yes' : 'No'}`
+                }]
+              });
+            });
+            if (checklistItems.length > 0) {
+              items.push({
+                linkId: 'symptom-checklist',
+                text: 'Obsessions and Compulsions Checklist',
+                item: checklistItems
+              });
+            }
+          }
+
+          // Add severity answers
+          if (assessment.severityAnswers) {
+            const severityItems: any[] = [];
+            Object.entries(assessment.severityAnswers).forEach(([idStr, val]: [string, any]) => {
+              severityItems.push({
+                linkId: `question-${idStr}`,
+                answer: [{
+                  valueInteger: val
+                }]
+              });
+            });
+            if (severityItems.length > 0) {
+              items.push({
+                linkId: 'severity-questions',
+                text: 'Severity Rating Scale Questions',
+                item: severityItems
+              });
+            }
+          }
+
+          entries.push({
+            resource: {
+              resourceType: 'QuestionnaireResponse',
+              id: `ybocs-questionnaire-response-${i}`,
+              status: 'completed',
+              subject: { reference: patientRef },
+              authored: assessment.dateCreated || new Date().toISOString(),
+              item: items
+            }
+          });
+
+          // Add Observation (total score)
+          entries.push({
+            resource: {
+              resourceType: 'Observation',
+              id: `ybocs-observation-${i}`,
+              status: 'final',
+              code: {
+                coding: [{
+                  system: 'http://loinc.org',
+                  code: '82290-8',
+                  display: 'Yale-Brown Obsessive Compulsive Scale total score'
+                }]
+              },
+              subject: { reference: patientRef },
+              effectiveDateTime: assessment.dateCreated || new Date().toISOString(),
+              valueQuantity: {
+                value: assessment.totalScore || 0,
+                unit: '{score}',
+                system: 'http://unitsofmeasure.org'
+              },
+              interpretation: [{
+                text: assessment.severityCategory || 'Unknown'
+              }]
+            }
+          });
+        });
+
       const bundle: IFhirBundle = {
         resourceType: 'Bundle',
         id: `pocket-gull-bundle-${Date.now()}`,
@@ -1664,6 +1752,13 @@ export class ExportService {
    * Detects the format of a JSON file and imports accordingly.
    */
   async importFromFile(file: File): Promise<IPatient> {
+    const isImage = file.type.startsWith('image/') || /\.(png|jpe?g)$/i.test(file.name);
+    const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+
+    if (isImage || isPdf) {
+      return this.importViaOcr(file);
+    }
+
     const text = await file.text();
     const data = JSON.parse(text);
 
@@ -1679,6 +1774,103 @@ export class ExportService {
     } else {
       throw new Error('Unrecognized file format. Expected PocketGull native JSON or FHIR R4 Bundle.');
     }
+  }
+
+  private fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (err) => reject(err);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  private async importViaOcr(file: File): Promise<IPatient> {
+    console.log('[ExportService] Starting OCR scan for file:', file.name);
+    const base64Data = await this.fileToBase64(file);
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (typeof window !== 'undefined') {
+      const userKey = window.localStorage?.getItem('GEMINI_API_KEY') || (window as any).GEMINI_API_KEY;
+      if (userKey) {
+        headers['X-Gemini-API-Key'] = userKey.trim();
+      }
+    }
+
+    const response = await fetch('/api/ai/scan-document', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        base64Image: base64Data,
+        context: `Scanned from file: ${file.name}`
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`OCR extraction failed: ${errText || response.statusText}`);
+    }
+
+    const ocrData = await response.json();
+
+    const patient: IPatient = {
+      id: `ocr_${Date.now()}`,
+      name: ocrData.name || `Scanned Patient (${file.name.split('.')[0]})`,
+      age: ocrData.age || 35,
+      gender: ocrData.gender || 'Other',
+      lastVisit: new Date().toISOString(),
+      preexistingConditions: [],
+      history: [
+        {
+          date: new Date().toLocaleDateString(),
+          type: 'NoteCreated',
+          summary: `Clinical record extracted via Gemini OCR from scanned file: ${file.name}`,
+          partId: 'full_body',
+          noteId: `ocr_note_${Date.now()}`
+        }
+      ],
+      bookmarks: [],
+      patientGoals: ocrData.patientGoals || '',
+      vitals: {
+        bp: ocrData.vitals?.bp || '',
+        hr: ocrData.vitals?.hr || '',
+        temp: ocrData.vitals?.temp || '',
+        spO2: ocrData.vitals?.spO2 || '',
+        weight: ocrData.vitals?.weight || '',
+        height: ocrData.vitals?.height || '',
+        vitC: '', vitD3: '', magnesium: '', zinc: '', b12: ''
+      },
+      issues: {}
+    };
+
+    if (ocrData.issues && Array.isArray(ocrData.issues)) {
+      ocrData.issues.forEach((issue: any) => {
+        const partId = issue.partId;
+        if (!patient.issues[partId]) {
+          patient.issues[partId] = [];
+        }
+        patient.issues[partId].push({
+          id: partId,
+          noteId: `ocr_note_${partId}_${Date.now()}`,
+          name: issue.name,
+          painLevel: issue.severity === 'critical' ? 8 : (issue.severity === 'moderate' ? 5 : 2),
+          description: issue.notes || '',
+          symptoms: []
+        });
+      });
+    }
+
+    if (ocrData.medications && Array.isArray(ocrData.medications)) {
+      patient.medications = ocrData.medications.map((m: any) => ({
+        id: `ocr_med_${Math.random().toString(36).substr(2, 5)}`,
+        name: m.name,
+        value: `${m.dosage || ''} - ${m.frequency || ''}`.trim()
+      }));
+    }
+
+    return patient;
   }
 
   // ─── BigQuery Export ──────────────────────────────────────

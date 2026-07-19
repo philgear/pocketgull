@@ -198,12 +198,11 @@ export class PatientDirectoryComponent {
     this.showNewPatientModal.set(true);
   }
 
-  saveNewPatient() {
+  async saveNewPatient() {
     if (!this.newPatientForm.name || !this.newPatientForm.age) return;
     
-    // Create via service and capture the auto-generated ID by peeking at the new active selection
-    this.patientService.createNewPatient();
-    const newId = this.patientService.selectedPatientId();
+    // Create via service and capture the auto-generated ID
+    const newId = await this.patientService.createNewPatient();
     
     if (newId) {
       this.patientService.updatePatientDetails(newId, {
