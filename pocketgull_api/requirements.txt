@@ -8,7 +8,7 @@ pydantic>=2.13.4
 numpy>=2.2.0
 
 # DataFrame ingestion (P1)
-pandas>=2.2.0
+pandas>=3.0.3
 
 # FHIR Bundle validation gateway (P1)
 fhir.resources>=8.3.0
