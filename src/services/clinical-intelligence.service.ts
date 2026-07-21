@@ -15,6 +15,7 @@ import {
     DEMO_ANALYSIS_REPORT_AYURVEDIC
 } from '../demo-data';
 import { FORMATTING_RULES, PHILOSOPHY_INSTRUCTIONS, SYSTEM_INSTRUCTIONS } from './clinical-prompts';
+import { ISirOdeResult, IGcnInteractionResult } from './patient.types';
 
 export interface ITranscriptEntry {
     role: 'user' | 'model';
@@ -788,7 +789,7 @@ Feel free to reference their research areas and publications if it supports the 
         return null;
     }
 
-    async runSentinelSirOde(r0: number = 2.5, pop: number = 100000, intervention: string = 'Quarantine', cost: number = 50.0): Promise<import('./patient.types').ISirOdeResult | null> {
+    async runSentinelSirOde(r0: number = 2.5, pop: number = 100000, intervention: string = 'Quarantine', cost: number = 50.0): Promise<ISirOdeResult | null> {
         try {
             const res = await fetch('/api/python/ml/matrix/sentinel-sir-ode', {
                 method: 'POST',
@@ -807,7 +808,7 @@ Feel free to reference their research areas and publications if it supports the 
         return null;
     }
 
-    async checkPharmacogenomics(options: any[]): Promise<import('./patient.types').IGcnInteractionResult[] | null> {
+    async checkPharmacogenomics(options: any[]): Promise<IGcnInteractionResult[] | null> {
         try {
             const genomicVariants = this.patientState.genomicProfile();
             const res = await fetch('/api/python/ml/matrix/pharmacogenomics', {

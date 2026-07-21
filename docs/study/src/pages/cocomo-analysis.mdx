@@ -25,13 +25,13 @@ COCOMO II (developed by Dr. Barry Boehm at USC) is one of the most widely refere
 
 ### 🧮 Core Formula & Mechanics
 
-$$PM = A \times (KLOC)^E \times \prod_{i=1}^{17} EM_i$$
+$$PM = A \times (KLOC)^E \times \prod_{"i=1"}^{17} EM_i$$
 
 Where:
 * **$A = 2.94$**: Calibration constant based on historical software project data.
 * **$KLOC$**: Sizing in Thousands of Source Lines of Code (or converted Function Points).
 * **$E$ (Scaling Exponent)**: Derived from 5 Scale Factors ($SF_i$):
-  $$E = 0.91 + 0.01 \times \sum_{i=1}^{5} SF_i$$
+  $$E = 0.91 + 0.01 \times \sum_{"i=1"}^{5} SF_i$$
   * *Scale Factors:* Precedentedness ($PREC$), Development Flexibility ($FLEX$), Architecture/Risk Resolution ($RESL$), Team Cohesion ($TEAM$), Process Maturity ($PMAT$).
 * **$EM_i$ (17 Effort Multipliers)**: Factors covering Product (e.g., Reliability, Complexity), Personnel (Analyst Capability, Programmer Ability), Platform (Memory/Storage constraints, Volatility), and Project (Tool usage, Schedule pressure).
 
