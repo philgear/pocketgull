@@ -90,6 +90,13 @@ export interface IGenealogicalRoot {
             <span class="text-red-400 font-bold font-mono">{{ overallRipeness() }}%</span>
             <span class="text-zinc-400 text-[10px] uppercase font-mono">Orchard Index</span>
           </div>
+
+          <button (click)="shakeTree()"
+            [class.animate-bounce]="isShaking()"
+            class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-red-600 text-white font-bold uppercase tracking-wider text-[10px] shadow-lg hover:brightness-110 transition cursor-pointer flex items-center gap-1.5 font-mono">
+            <span>🌳</span>
+            <span>{{ isShaking() ? 'Shaking Orchard...' : 'Shake Tree (Harvest)' }}</span>
+          </button>
         </div>
       </div>
 
@@ -530,6 +537,31 @@ export class PatientFruitTreeComponent {
   selectRoot(root: IGenealogicalRoot) {
     this.selectedApple.set(null);
     this.selectedRoot.set(root);
+  }
+
+  isShaking = signal(false);
+
+  shakeTree() {
+    this.isShaking.set(true);
+
+    // Harvest low hanging fruit & advance ripeness
+    const currentApples = this.apples();
+    const lowHanging = currentApples.find(a => a.isLowHanging || a.ripeness > 60);
+
+    if (lowHanging) {
+      this.advanceAppleLifecycle(lowHanging);
+    }
+
+    this.patientState.addClinicalNote({
+      id: `eureka-drop-${Date.now()}`,
+      text: `🍏 Newton's Eureka Discovery: Shook the orchard canopy for ${this.activePatientName()} — Low-hanging clinical goals harvested into active care plan!`,
+      sourceLens: 'Summary Overview',
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+    });
+
+    setTimeout(() => {
+      this.isShaking.set(false);
+    }, 1200);
   }
 
   advanceAppleLifecycle(apple: IAppleNode) {
