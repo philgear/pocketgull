@@ -21,11 +21,12 @@ export interface IClinicalMenuItem {
 import { PantryLazySusanComponent } from './pantry-lazy-susan.component';
 import { ChronoClockDecisionRailComponent } from './chrono-clock-decision-rail.component';
 import { MobileMenuQrModalComponent } from './mobile-menu-qr-modal.component';
+import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.component';
 
 @Component({
   selector: 'app-clinical-menu',
   standalone: true,
-  imports: [CommonModule, PantryLazySusanComponent, ChronoClockDecisionRailComponent, MobileMenuQrModalComponent],
+  imports: [CommonModule, PantryLazySusanComponent, ChronoClockDecisionRailComponent, MobileMenuQrModalComponent, ChronoWeeklyMealPlannerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 
 
@@ -88,6 +89,9 @@ import { MobileMenuQrModalComponent } from './mobile-menu-qr-modal.component';
 
       <!-- Chrono-Nutrition Circadian Clock & Decision Rail -->
       <app-chrono-clock-decision-rail></app-chrono-clock-decision-rail>
+
+      <!-- 7-Day Chrono-Nutrition Meal Planner & Regional Sourcing -->
+      <app-chrono-weekly-meal-planner></app-chrono-weekly-meal-planner>
 
       <!-- Patient Precision Health Data Context Callout -->
       <div class="mb-8 bg-gradient-to-r from-emerald-500/10 via-sky-500/10 to-indigo-500/10 dark:from-emerald-950/40 dark:via-sky-950/40 dark:to-indigo-950/40 p-4 rounded-2xl border border-emerald-500/20 dark:border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs font-mono">
