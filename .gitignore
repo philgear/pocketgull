@@ -174,3 +174,51 @@ read_lh*.cjs
 dom-*.html
 test-*.png
 
+# Redteaming & Chaos Engineering Tests
+e2e/chaos-engineering.spec.ts
+
+# Contests & Hackathon Artifacts
+contests/
+*contest*
+
+# Trained Models, Machine Learning Weights & Checkpoints
+*.onnx
+*.safetensors
+*.pt
+*.pth
+*.pkl
+*.h5
+*.hdf5
+*.pb
+*.tflite
+*.ckpt
+*.joblib
+models/
+trained_models/
+pocketgull_api/models/
+pocketgull_api/*.joblib
+pocketgull_api/*.pkl
+pocketgull_api/*.pt
+
+# Physio / PhysioNet Signal Telemetry & Trained Models
+physio*/
+physionet*/
+*physio*model*
+*physionet*model*
+physio_models/
+physionet_models/
+trained_physio_models/
+*.edf
+*.mat
+*.dat
+*.hea
+*.atr
+*.rec
+
+# Temporary build cache & scratch workspace
+tmp/
+scratch/
+
+
+
+
