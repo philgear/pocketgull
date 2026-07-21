@@ -671,7 +671,7 @@ Feel free to reference their research areas and publications if it supports the 
 
     async translateReadingLevel(
         text: string,
-        targetLevel?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'japanese' | 'hindi',
+        targetLevel?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'japanese' | 'hindi',
         cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
         language?: string
     ): Promise<string> {
