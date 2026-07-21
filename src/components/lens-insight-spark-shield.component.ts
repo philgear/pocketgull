@@ -241,8 +241,7 @@ export class LensInsightSparkShieldComponent {
   }
 
   launchPubMedSearch(spark: IInsightSpark) {
-    const url = `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(spark.pubmedSearchQuery)}`;
-    window.open(url, '_blank', 'noopener');
+    this.patientState.requestResearchSearch(spark.pubmedSearchQuery, 'pubmed');
   }
 
   bookmarkSpark(spark: IInsightSpark) {

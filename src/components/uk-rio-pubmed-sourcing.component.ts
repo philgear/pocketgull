@@ -123,10 +123,10 @@ export interface IPubMedEvidenceCitation {
             <!-- Footer PMID / DOI Links & Actions -->
             <div class="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px]">
               <div class="flex items-center gap-2">
-                <a [href]="'https://pubmed.ncbi.nlm.nih.gov/' + item.pmid + '/'" target="_blank" rel="noopener"
-                  class="text-blue-400 hover:underline font-bold flex items-center gap-1">
+                <button (click)="openPubmedInResearchFrame(item)"
+                  class="text-blue-400 hover:underline font-bold flex items-center gap-1 cursor-pointer">
                   <span>📚 PMID: {{ item.pmid }}</span>
-                </a>
+                </button>
                 @if (item.openAccessPmcId) {
                   <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">
                     PMC: {{ item.openAccessPmcId }}
@@ -270,5 +270,9 @@ export class UkRioPubmedSourcingComponent {
       sourceLens: item.targetLens,
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
     });
+  }
+
+  openPubmedInResearchFrame(item: IPubMedEvidenceCitation) {
+    this.patientState.requestResearchSearch(item.pmid || item.title, 'pubmed');
   }
 }
