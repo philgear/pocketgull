@@ -38,9 +38,18 @@ export class AdkLiveService {
 
   constructor() {}
 
-  async connect(apiKey: string, systemInstruction: string) {
+  async connect(apiKey: string, systemInstruction: string, voiceName: string = 'Aoede') {
     if (this.isConnected()) return;
     this.connectionError.set(null);
+
+    // Enhance system instruction with vocal prosody directives for natural human speech
+    const enhancedInstruction = `${systemInstruction}
+
+Vocal & Speech Delivery Style:
+- Speak in a warm, conversational, empathetic, and reassuring voice.
+- Use natural speech cadence with appropriate pauses for breathing and emphasis.
+- Dynamically adjust pitch and intonation to match clinical context.
+- Avoid robotic or rapid-fire delivery.`;
 
     try {
       // We use the standard WebSocket approach directly to the Gemini API since the 
@@ -145,11 +154,11 @@ export class AdkLiveService {
           this.liveClient.send(JSON.stringify({
             setup: {
               model: 'models/gemini-2.0-flash-exp',
-              systemInstruction: { parts: [{ text: systemInstruction }] },
+              systemInstruction: { parts: [{ text: enhancedInstruction }] },
               generationConfig: {
                 responseModalities: ["TEXT", "AUDIO"],
                 speechConfig: {
-                  voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } }
+                  voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } }
                 }
               }
             }
@@ -159,7 +168,7 @@ export class AdkLiveService {
              this.isListening.set(true);
           });
           updateVolume(); // Start the VU loop
-          console.log('[AdkLiveService] Connected to Gemini Live API');
+          console.log(`[AdkLiveService] Connected to Gemini Live API with HD Voice '${voiceName}'`);
           resolve();
         };
   

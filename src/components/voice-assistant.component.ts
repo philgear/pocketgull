@@ -1084,11 +1084,62 @@ To enable full interactive consultations, custom question answering, and live vo
         this.speakClientSide(welcomeText);
     }
 
+    private getBestNaturalVoice(): SpeechSynthesisVoice | null {
+        if (typeof window === 'undefined' || !window.speechSynthesis) return null;
+        const voices = window.speechSynthesis.getVoices();
+        
+        const preferredVoices = [
+            'Google US English',
+            'Google UK English Female',
+            'Google UK English Male',
+            'Microsoft Jenny Online (Natural)',
+            'Microsoft Guy Online (Natural)',
+            'Microsoft Aria Online (Natural)',
+            'Samantha (Enhanced)',
+            'Karen (Enhanced)',
+            'Daniel (Enhanced)'
+        ];
+
+        for (const name of preferredVoices) {
+            const found = voices.find(v => v.name.includes(name));
+            if (found) return found;
+        }
+
+        return voices.find(v => 
+            v.name.includes('Natural') || 
+            v.name.includes('Enhanced') || 
+            v.name.includes('Google') || 
+            (v.lang.startsWith('en') && !v.name.includes('Desktop'))
+        ) || voices[0] || null;
+    }
+
+    private sanitizeTextForSpeech(rawText: string): string {
+        return rawText
+            .replace(/#{1,6}\s+/g, '')               // Strip headings
+            .replace(/\*\*([^*]+)\*\*/g, '$1')       // Strip bold
+            .replace(/\*([^*]+)\*/g, '$1')           // Strip italics
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Strip markdown links
+            .replace(/^[\s*•-]+/gm, '')               // Strip bullet characters
+            .replace(/`([^`]+)`/g, '$1')             // Strip inline code backticks
+            .replace(/\n+/g, '. ')                   // Convert linebreaks to sentence pauses
+            .trim();
+    }
+
     speakClientSide(text: string) {
         if (this.isMuted()) return;
         if (typeof window !== 'undefined' && window.speechSynthesis) {
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
+            const cleanText = this.sanitizeTextForSpeech(text);
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            
+            const voice = this.getBestNaturalVoice();
+            if (voice) {
+                utterance.voice = voice;
+            }
+            
+            utterance.rate = 0.94;  // Natural conversational pace
+            utterance.pitch = 1.02; // Warm intonation
+
             utterance.onend = () => {
                 this.agentState.set('listening');
                 if (this.recognition) {
