@@ -55,6 +55,19 @@ export class PatientStateService {
   readonly isDemoMode = signal<boolean>(false);
   readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
 
+  // --- ML Treatment Cost-Benefit Matrix State & Pharmacogenomics ---
+  readonly genomicProfile = signal<import('./patient.types').IFhirGenomicObservation[]>([
+    { resourceType: 'Observation', geneSymbol: 'CYP2D6', variantCode: '*4/*4', phenotype: 'Poor' },
+    { resourceType: 'Observation', geneSymbol: 'CYP2C19', variantCode: '*2/*2', phenotype: 'Poor' }
+  ]);
+  readonly clinicianRole = signal<'Cardiology' | 'Integrative' | 'Public Health' | 'General'>('General');
+  readonly paretoWeights = signal<import('./patient.types').IMlParetoWeights>({ costWeight: 0.33, speedWeight: 0.33, adherenceWeight: 0.34 });
+  readonly banditState = signal<import('./patient.types').IMlBanditState>({
+    clinicianSpecialty: 'General',
+    weights: { Western: 1.0, Eastern: 1.0, Ayurvedic: 1.0 }
+  });
+
+
   // --- Patient Metadata State (for Demo Mode and Context) ---
   readonly patientId = signal<string | null>(null);
   readonly patientName = signal<string>('');
@@ -430,6 +443,11 @@ export class PatientStateService {
         this.vitals.update(vitals => ({ ...vitals, [key]: value }));
     }
 
+    updateCmpLabs(cmpLabs: any) {
+        console.log('[PatientStateService] updateCmpLabs called:', cmpLabs);
+        this.vitals.update(vitals => ({ ...vitals, cmpLabs: { ...(vitals.cmpLabs || {}), ...cmpLabs } }));
+    }
+
     addDynamicNutrient() {
         this.dynamicNutrients.update(nutrients => [
             ...nutrients, 
@@ -685,8 +703,8 @@ export class PatientStateService {
     if (patient.gender) this.patientGender.set(patient.gender);
     if (patient.history) this.patientHistory.set(patient.history);
     this.issues.set(state.issues || {});
-    console.log('[PatientStateService] loadState called for:', state.id || 'none', 'name:', state.name || 'none');
-    console.log('[PatientStateService] issues keys:', Object.keys(state.issues || {}).length, 'goals:', state.patientGoals || 'none');
+    console.log('[PatientStateService] loadState completed successfully');
+    console.log('[PatientStateService] loadState updates configured');
     if (state.patientGoals) this.patientGoals.set(state.patientGoals);
     if (state.dietaryProtocol) this.dietaryProtocol.set(state.dietaryProtocol);
         if (state.vitals) this.vitals.set(state.vitals);

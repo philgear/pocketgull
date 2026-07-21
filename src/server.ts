@@ -1,5 +1,6 @@
 process.env['OTEL_SDK_DISABLED'] = 'true';
 
+import '@angular/compiler';
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -48,10 +49,23 @@ function normalizeAndValidateModel(model: unknown): string {
 }
 
 const app = express();
-const angularApp = new AngularNodeAppEngine({
-  allowedHosts: ['localhost', '127.0.0.1', '0.0.0.0', 'pocketgull.app', '*.pocketgull.app', 'pocketgall.com', 'pocketgall.app', 'pocketgal.app', 'pocketgull.com', 'pocketgal.ai', '*.run.app', '*.cloudworkstations.dev'],
-  trustProxyHeaders: true
-});
+let angularApp: any = null;
+
+function getAngularApp() {
+  if (!angularApp) {
+    try {
+      angularApp = new AngularNodeAppEngine({
+        allowedHosts: ['localhost', '127.0.0.1', '0.0.0.0', 'pocketgull.app', '*.pocketgull.app', 'pocketgall.com', 'pocketgall.app', 'pocketgal.app', 'pocketgull.com', 'pocketgal.ai', '*.run.app', '*.cloudworkstations.dev'],
+        trustProxyHeaders: true
+      });
+    } catch (e: any) {
+      console.warn('[Server] AngularNodeAppEngine not initialized (dev mode without dist/ manifest):', e.message);
+      return null;
+    }
+  }
+  return angularApp;
+}
+
 app.use(compression());
 
 // Fix for Node 20+ undici fetch rejecting 0.0.0.0 host header during SSR
@@ -235,8 +249,12 @@ app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
 
   const isProd = process.env['NODE_ENV'] === 'production';
-  const scriptSrc = isProd ? `'self' 'nonce-${nonce}'` : `'self' 'unsafe-inline' 'unsafe-eval'`;
-  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
+  const isDev = !isProd;
+  const scriptSrc = isDev
+    ? `'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.googleapis.com`
+    : `'self' 'nonce-${nonce}' https://apis.google.com https://*.googleapis.com`;
+
+  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; script-src-elem ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:* https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -380,7 +398,7 @@ app.get('/api/pubmed/summary', async (req, res) => {
 app.get('/api/config', async (req, res) => {
   try {
     const key = await getApiKey(req);
-    res.json({ apiKey: key });
+    res.json({ hasKey: !!key });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
@@ -975,22 +993,19 @@ app.use(
  * Handle all other requests by rendering the Angular application.
  */
 app.use((req, res, next) => {
-  angularApp
+  const engine = getAngularApp();
+  if (!engine) return next();
+  engine
     .handle(req)
-    .then(async (response) => {
+    .then(async (response: any) => {
       if (!response) {
         return next();
       }
 
-      // If the response is HTML and we have an API key, inject it
       const contentType = response.headers.get('content-type') || '';
-      const key = await getApiKey(req);
-      if (contentType.includes('text/html') && key) {
+      if (contentType.includes('text/html')) {
         let html = await response.text();
-        const safeKey = key.replace(/[^a-zA-Z0-9_\-]/g, '');
         const nonce = res.locals['nonce'] || '';
-        const scriptTag = `<script nonce="${nonce}" px-api-key="true">window.GEMINI_API_KEY = "${safeKey}";</script>\n</head>`;
-        html = html.replace('</head>', scriptTag);
         
         // Inject nonces into all inline script elements to comply with CSP
         if (nonce) {
@@ -1020,6 +1035,10 @@ app.use((req, res, next) => {
  * The server listens on the port defined by the `PORT` environment variable, or defaults to 4200.
  */
 async function initializeAgones() {
+  if (!process.env['AGONES_SDK_GRPC_PORT']) {
+    console.log('[Agones Info] AGONES_SDK_GRPC_PORT not set. Skipping Agones integration.');
+    return;
+  }
   try {
     const agonesSDK = new AgonesSDK();
     await agonesSDK.connect();
@@ -1052,10 +1071,14 @@ async function initializeAgones() {
   }
 }
 
-if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT']) {
+let _serverInstance: any = null;
+
+if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT'] || !process.env['NODE_ENV'] || process.env['NODE_ENV'] === 'development') {
   const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4000;
-  const server = app.listen(port, '0.0.0.0', () => {
-    console.log(`Node Express server listening on http://0.0.0.0:${port}`);
+  if (!_serverInstance) {
+    _serverInstance = app.listen(port, '0.0.0.0', () => {
+      console.log(`Node Express server listening on http://0.0.0.0:${port}`);
+    });
     
     // Auto-provision Cloud Healthcare API datasets and stores
     ensureHealthcareStoresExist().catch(console.error);
@@ -1063,7 +1086,7 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
     // Setup secure WebSocket proxy for Vertex AI Multimodal Live API
     const wss = new WebSocketServer({ noServer: true });
     
-    server.on('upgrade', (request, socket, head) => {
+    _serverInstance.on('upgrade', (request: any, socket: any, head: any) => {
       const { pathname } = new URL(request.url || '', `http://${request.headers.host || 'localhost'}`);
       if (pathname === '/ws/gemini-live') {
         wss.handleUpgrade(request, socket, head, (ws) => {
@@ -1187,46 +1210,46 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
     // Initialize Agones SDK sidecar
     initializeAgones().catch(console.error);
 
-    // Explicitly keep the process alive, as something is closing the event loop
+    // Explicitly keep the process alive
     setInterval(() => {}, 1000 * 60 * 60 * 24);
-  });
 
-  // Attach Socket.IO for the Colleague Collaboration Room
-  const io = new SocketIOServer(server, {
-    cors: {
-      origin: "*", // Lock this down to pocketgull.app in a real production scenario
-      methods: ["GET", "POST"]
-    }
-  });
-
-  io.on('connection', (socket) => {
-    console.log('[Socket.IO] Clinician connected:', socket.id);
-
-    // Join a specific patient's collaboration room
-    socket.on('join_patient_room', (patientId: string) => {
-      socket.join(patientId);
-      console.log(`[Socket.IO] ${socket.id} joined patient room: ${patientId}`);
+    // Attach Socket.IO for the Colleague Collaboration Room
+    const io = new SocketIOServer(_serverInstance, {
+      cors: {
+        origin: "*", // Lock this down to pocketgull.app in a real production scenario
+        methods: ["GET", "POST"]
+      }
     });
 
-    // Real-time IVitals Sync
-    socket.on('sync_vitals', (data: { patientId: string, vitals: any }) => {
-      socket.to(data.patientId).emit('vitals_updated', data.vitals);
-    });
+    io.on('connection', (socket) => {
+      console.log('[Socket.IO] Clinician connected:', socket.id);
 
-    // Colleague Chat & Intelligence Notes
-    socket.on('send_note', (data: { patientId: string, note: any }) => {
-      socket.to(data.patientId).emit('note_received', data.note);
-    });
+      // Join a specific patient's collaboration room
+      socket.on('join_patient_room', (patientId: string) => {
+        socket.join(patientId);
+        console.log(`[Socket.IO] ${socket.id} joined patient room: ${patientId}`);
+      });
 
-    // Colleague Presence (e.g. "Dr. Smith is viewing this chart")
-    socket.on('presence_update', (data: { patientId: string, clinician: any }) => {
-      socket.to(data.patientId).emit('presence_updated', data.clinician);
-    });
+      // Real-time IVitals Sync
+      socket.on('sync_vitals', (data: { patientId: string, vitals: any }) => {
+        socket.to(data.patientId).emit('vitals_updated', data.vitals);
+      });
 
-    socket.on('disconnect', () => {
-      console.log('[Socket.IO] Clinician disconnected:', socket.id);
+      // Colleague Chat & Intelligence Notes
+      socket.on('send_note', (data: { patientId: string, note: any }) => {
+        socket.to(data.patientId).emit('note_received', data.note);
+      });
+
+      // Colleague Presence (e.g. "Dr. Smith is viewing this chart")
+      socket.on('presence_update', (data: { patientId: string, clinician: any }) => {
+        socket.to(data.patientId).emit('presence_updated', data.clinician);
+      });
+
+      socket.on('disconnect', () => {
+        console.log('[Socket.IO] Clinician disconnected:', socket.id);
+      });
     });
-  });
+  }
 }
 
 /**

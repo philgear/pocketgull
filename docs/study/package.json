@@ -1,7 +1,7 @@
 {
   "name": "docs-study",
   "type": "module",
-  "version": "0.9.0",
+  "version": "1.0.0-rc10",
   "engines": {
     "node": ">=22.12.0"
   },

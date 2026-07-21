@@ -46,6 +46,7 @@ import { ConsentService } from './services/consent.service';
 import { ConsentModalComponent } from './components/consent-modal.component';
 import { ResearchTabComponent } from './components/research-tab.component';
 import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
+import { CompanionSyncModalComponent } from './components/companion-sync-modal.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -65,11 +66,11 @@ import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.c
     WalkthroughTourComponent,
     SecureSplashComponent,
     PatientDirectoryComponent,
-    CollaborationDockComponent,
     FhirCallbackComponent,
     PocketGullInputComponent,
     ConsentModalComponent,
-    ZamecznikCanvasComponent
+    ZamecznikCanvasComponent,
+    CompanionSyncModalComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -91,15 +92,17 @@ import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.c
          }
       }
 
+      <!-- Companion Sync Modal -->
+      @if (showCompanionSyncModal()) {
+        <app-companion-sync-modal (closeModal)="showCompanionSyncModal.set(false)"></app-companion-sync-modal>
+      }
+
       @defer (on idle) {
         <app-dictation-modal></app-dictation-modal>
       }
       @defer (on idle) {
         <app-walkthrough-tour></app-walkthrough-tour>
       }
-      
-      <!-- Collaboration Dock -->
-      <app-collaboration-dock></app-collaboration-dock>
       
       @if (showSplash()) {
         <app-secure-splash
@@ -339,12 +342,7 @@ import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.c
                       <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
                   </svg>
                   <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
-              </div>
-            <div class="h-4 w-px bg-[#EEEEEE] hidden sm:block"></div>
-
-
-
-            <!-- System Status Indicator (Hidden on smallest watches) -->
+                  <!-- System Status Indicator (Hidden on smallest watches) -->
             <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-full border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-pointer group relative no-print" 
                  (click)="network.toggleForceOffline()"
                  [title]="network.isOnline() ? 'Click to simulate offline' : 'Click to disable offline override'">
@@ -357,6 +355,16 @@ import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.c
                     [style.background-color]="network.isOnline() ? 'var(--spectral-stable)' : 'var(--spectral-critical)'"></span>
             </div>
             <span class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-widest">{{ network.isOnline() ? 'System Ready' : 'System Offline' }}</span>
+            </div>
+
+            <!-- Companion App Sync Button -->
+            <button 
+              type="button" 
+              (click)="showCompanionSyncModal.set(true)"
+              class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-full text-xs font-bold uppercase tracking-wider transition shadow-sm"
+              title="Generate FHIR R4 Smart Launch QR for Patient/Doctor Mobile Companion">
+              <span>📱 Sync Companion</span>
+            </button>
               
               <!-- Tooltip -->
               <div class="absolute top-full left-0 mt-2 w-64 bg-gray-900 border border-gray-800 p-4 rounded-xl shadow-2xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none text-left">
@@ -1009,10 +1017,10 @@ import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.c
                       [ngClass]="selectedLanguage() === 'french' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
                       French
                     </button>
-                    <button (click)="selectLanguage('mandarin')" [disabled]="isTranslating()"
+                    <button (click)="selectLanguage('japanese')" [disabled]="isTranslating()"
                       class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
-                      [ngClass]="selectedLanguage() === 'mandarin' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
-                      Mandarin
+                      [ngClass]="selectedLanguage() === 'japanese' && !showCustomLanguageInput() ? 'bg-[#ff4500] text-white border-transparent shadow-sm' : 'bg-transparent text-gray-500'">
+                      Japanese
                     </button>
                     <button (click)="selectLanguage('hindi')" [disabled]="isTranslating()"
                       class="px-4 py-2 border border-gray-300 dark:border-zinc-700 text-[12px] uppercase tracking-[0.2em] font-bold transition-all hover:bg-gray-100 dark:hover:bg-zinc-900"
@@ -1293,6 +1301,7 @@ export class AppComponent implements OnDestroy {
     return show;
   });
   isDemoMode = this.state.isDemoMode;
+  readonly showCompanionSyncModal = signal<boolean>(false);
   apiKeyInput = signal<string>('');
   showPassword = signal<boolean>(false);
   apiKeyError = signal<string | null>(null);
@@ -1989,19 +1998,16 @@ export class AppComponent implements OnDestroy {
 
       this.isMobile.set(window.innerWidth < 768);
 
-      // 1. Fetch API key from server (replaces window.GEMINI_API_KEY HTML injection)
-      //    The server only serves /api/config to same-origin requests.
+      // 1. Check API key status from the server
       try {
         const configRes = await fetch('/api/config');
         if (configRes.ok) {
           const config = await configRes.json();
-          if (config?.apiKey) {
-            try { setStoredApiKey(config.apiKey); } catch (_e) { /* ignore */ }
-            (window as any).GEMINI_API_KEY = config.apiKey; // keep compat for ADK WS handshake
+          if (config?.hasKey) {
             this.hasApiKey.set(true);
           }
         }
-      } catch (_e) { /* network offline or dev mode without server */ }
+      } catch (_e) { /* network offline */ }
 
       // 2. Check for stored API key in localStorage (manual entry / offline fallback)
       if (!this.hasApiKey()) {
@@ -2021,11 +2027,13 @@ export class AppComponent implements OnDestroy {
       window.addEventListener('resize', this.boundOnWindowResize);
 
       // Initialize WebMCP Polyfill
-      if (!navigator.modelContext) {
+      const mContextInit = (document as any).modelContext || (navigator as any).modelContext;
+      if (!mContextInit) {
         initializeWebMCPPolyfill();
       }
 
-      if (navigator.modelContext) {
+      const modelContext = (document as any).modelContext || (navigator as any).modelContext;
+      if (modelContext) {
         // Register generate_medical_summary
         const sumCtrl = new AbortController();
         const sumTool = {
@@ -2050,7 +2058,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(sumTool, { signal: sumCtrl.signal });
+        modelContext.registerTool(sumTool, { signal: sumCtrl.signal });
         this.mcpControllers.push({ name: sumTool.name, controller: sumCtrl });
 
         // Register translate_clinical_text
@@ -2084,7 +2092,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(transTool, { signal: transCtrl.signal });
+        modelContext.registerTool(transTool, { signal: transCtrl.signal });
         this.mcpControllers.push({ name: transTool.name, controller: transCtrl });
 
         // Register get_current_patient_data
@@ -2103,7 +2111,7 @@ export class AppComponent implements OnDestroy {
             };
           }
         };
-        (navigator.modelContext as any).registerTool(pdataTool, { signal: pdataCtrl.signal });
+        modelContext.registerTool(pdataTool, { signal: pdataCtrl.signal });
         this.mcpControllers.push({ name: pdataTool.name, controller: pdataCtrl });
 
         // Register navigate_to_body_part
@@ -2134,7 +2142,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(navTool, { signal: navCtrl.signal });
+        modelContext.registerTool(navTool, { signal: navCtrl.signal });
         this.mcpControllers.push({ name: navTool.name, controller: navCtrl });
 
         // Register inject_clinical_note
@@ -2177,7 +2185,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(injectTool, { signal: injectCtrl.signal });
+        modelContext.registerTool(injectTool, { signal: injectCtrl.signal });
         this.mcpControllers.push({ name: injectTool.name, controller: injectCtrl });
 
         // Register trigger_sync
@@ -2197,7 +2205,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(syncTool, { signal: syncCtrl.signal });
+        modelContext.registerTool(syncTool, { signal: syncCtrl.signal });
         this.mcpControllers.push({ name: syncTool.name, controller: syncCtrl });
 
         // Register research_clinical_term
@@ -2223,7 +2231,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(researchTool, { signal: researchCtrl.signal });
+        modelContext.registerTool(researchTool, { signal: researchCtrl.signal });
         this.mcpControllers.push({ name: researchTool.name, controller: researchCtrl });
 
         // Register load_research_url
@@ -2250,7 +2258,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(loadUrlTool, { signal: loadUrlCtrl.signal });
+        modelContext.registerTool(loadUrlTool, { signal: loadUrlCtrl.signal });
         this.mcpControllers.push({ name: loadUrlTool.name, controller: loadUrlCtrl });
 
         // Register add_research_bookmark
@@ -2288,7 +2296,7 @@ export class AppComponent implements OnDestroy {
             }
           }
         };
-        (navigator.modelContext as any).registerTool(bmkTool, { signal: bmkCtrl.signal });
+        modelContext.registerTool(bmkTool, { signal: bmkCtrl.signal });
         this.mcpControllers.push({ name: bmkTool.name, controller: bmkCtrl });
       }
     });

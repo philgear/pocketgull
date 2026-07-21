@@ -377,8 +377,9 @@ export class VoiceAssistantComponent implements OnDestroy {
     storage = inject(StorageService);
 
     ybocsService = inject(YbocsService);
-    voiceAssistantMode = signal<'standard' | 'ybocs'>('standard');
+    voiceAssistantMode = signal<'standard' | 'ybocs' | 'chrono' | 'avs'>('standard');
     ybocsQuestionIndex = signal<number>(-1);
+
 
     panelMode = signal<'selection' | 'chat' | 'dictation'>('selection');
 
@@ -518,12 +519,17 @@ export class VoiceAssistantComponent implements OnDestroy {
 
         // Only init if in browser
         if (typeof window !== 'undefined') {
-            // Listen to Y-BOCs voice mode change
+            // Listen to voice mode changes
             window.addEventListener('voice-mode-change', (e: any) => {
                 if (e.detail === 'ybocs') {
                     this.activateYbocsInterview();
+                } else if (e.detail === 'chrono') {
+                    this.activateChronoVoiceConsultation();
+                } else if (e.detail === 'avs') {
+                    this.activateAvsVoiceCoRegulation();
                 }
             });
+
 
             // 1. Hydrate Chat History
             this.storage.loadState('current_patient').then(data => {
@@ -669,12 +675,34 @@ Only include a rich-media block when the user explicitly requests visual or rese
                  return;
             }
 
+            // Hook up AdkLiveService callbacks
+            this.live.onMessage = (msg) => {
+                if (msg.text) {
+                    this._accumulateModelText(msg.text);
+                }
+            };
+            this.live.onModelTurnComplete = () => {
+                this._finalizeModelTurn();
+            };
+            this.live.onInterrupted = () => {
+                this._finalizeModelTurn();
+            };
+
             console.log("Connecting to Live API WebSocket...");
             await this.live.connect(apiKey, `${context}\n\nPatient Data:\n${rawPatientData}`);
             // Barge-in enabled natively by SDK setup!
-        } catch (e) {
+        } catch (e: any) {
             console.error("Voice Assistant Activation Error:", e);
-            this.permissionError.set('Failed to connect to Live Interface.');
+            const errName = e?.name || '';
+            const errMsg = e?.message || String(e);
+            
+            if (errName === 'NotAllowedError' || errName === 'PermissionDeniedError' || errMsg.toLowerCase().includes('permission')) {
+                this.permissionError.set('Microphone access denied. Please grant microphone permission in your browser URL bar.');
+            } else if (errName === 'NotFoundError' || errMsg.toLowerCase().includes('found')) {
+                this.permissionError.set('No microphone hardware detected. Please connect a microphone and try again.');
+            } else {
+                this.permissionError.set(`Connection Error: ${errMsg}`);
+            }
         }
 
         console.log("Chat session started.");
@@ -717,7 +745,10 @@ Only include a rich-media block when the user explicitly requests visual or rese
         setTimeout(() => {
             const container = this.transcriptContainer()?.nativeElement;
             if (container) {
-                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+                if (isNearBottom || container.scrollTop === 0) {
+                    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+                }
             }
         }, 100);
     }
@@ -1140,4 +1171,29 @@ To enable full interactive consultations, custom question answering, and live vo
             localStorage.removeItem('voice_assistant_mode');
         }
     }
+
+    activateChronoVoiceConsultation() {
+        this.voiceAssistantMode.set('chrono');
+        this.panelMode.set('chat');
+        const introText = "Hello! I am Pocket Gull's Chrono-Nutrition & Circadian Rhythm Voice Specialist. I am analyzing your current metabolic window and meal timing relative to BMAL1 and CLOCK gene expression. How can I assist with your meal timing today?";
+        this.chatHistory.set([{
+            role: 'model',
+            text: introText,
+            htmlContent: `<p class="text-sky-600 dark:text-sky-400 font-bold">🕒 Chrono-Nutrition Voice Specialist Active</p><p>${introText}</p>`
+        }]);
+        this.speakClientSide(introText);
+    }
+
+    activateAvsVoiceCoRegulation() {
+        this.voiceAssistantMode.set('avs');
+        this.panelMode.set('chat');
+        const introText = "Welcome to your Autonomic Co-Regulation session. I am here to guide your vagal resonant breathing at 0.1 Hz—inhaling for 5 seconds, holding for 2 seconds, and exhaling for 5 seconds—to entrain your brainwaves to Theta and Alpha states. Take a deep breath with me.";
+        this.chatHistory.set([{
+            role: 'model',
+            text: introText,
+            htmlContent: `<p class="text-purple-600 dark:text-purple-400 font-bold">🧠 Autonomic Co-Regulation & AVS Voice Guide Active</p><p>${introText}</p>`
+        }]);
+        this.speakClientSide(introText);
+    }
 }
+

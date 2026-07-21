@@ -16,9 +16,15 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   late Animation<double> _paperOpacity;
 
   bool _showLockScreen = false;
+  bool _usePinMode = false;
   String _pinCode = '';
   final TextEditingController _apiKeyController = TextEditingController();
   bool _usePubGemma = false;
+
+  // Draw Pad Gesture State
+  final List<List<Offset>> _strokes = [];
+  List<Offset> _currentStroke = [];
+  bool _isDrawingError = false;
 
   @override
   void initState() {
@@ -44,8 +50,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     ]).animate(_foldController);
 
     _foldController.forward().then((_) {
-      // Reveal the lock screen after animation completes
-      Future.delayed(const Duration(milliseconds: 800), () {
+      Future.delayed(const Duration(milliseconds: 600), () {
         if (mounted) {
           setState(() {
             _showLockScreen = true;
@@ -60,6 +65,28 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     _foldController.dispose();
     _apiKeyController.dispose();
     super.dispose();
+  }
+
+  void _clearDrawing() {
+    setState(() {
+      _strokes.clear();
+      _currentStroke.clear();
+      _isDrawingError = false;
+    });
+  }
+
+  void _verifyDrawingAndUnlock() {
+    if (_strokes.isEmpty && _currentStroke.isEmpty) return;
+
+    int totalPoints = _strokes.fold(0, (sum, s) => sum + s.length) + _currentStroke.length;
+    if (totalPoints > 10 || _strokes.isNotEmpty) {
+      _unlockAndNavigate();
+    } else {
+      setState(() => _isDrawingError = true);
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        if (mounted) _clearDrawing();
+      });
+    }
   }
 
   void _handlePinPress(String digit) {
@@ -78,7 +105,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   }
 
   void _unlockAndNavigate() {
-    // In a production app, we would validate the PIN and securely store the API Key / PubGemma config here.
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (_, _, _) => const DashboardScreen(),
@@ -91,42 +117,51 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    // Base layout calculates vertical centering based on screen size minus a fixed offset
     final double centerOffset = (size.height * 0.5) - 200;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF9FAFB),
       body: SafeArea(
         child: Stack(
           children: [
-            // Logo Container
+            // Background Dieter Rams Linear Grid Details
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.04,
+                child: CustomPaint(
+                  painter: _GridPatternPainter(),
+                ),
+              ),
+            ),
+
+            // Logo & Pocket Canvas Container
             AnimatedPositioned(
               duration: const Duration(milliseconds: 800),
               curve: Curves.easeInOut,
-              top: _showLockScreen ? (size.height * 0.02) : centerOffset,
+              top: _showLockScreen ? (size.height < 900 ? 10 : 20) : centerOffset,
               left: 0,
               right: 0,
               child: AnimatedScale(
-                scale: _showLockScreen ? 0.6 : 1.0,
+                scale: _showLockScreen ? (size.height < 900 ? 0.6 : 0.75) : 1.0,
                 duration: const Duration(milliseconds: 800),
                 curve: Curves.easeInOut,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      width: 300,
-                      height: 300,
+                      width: 280,
+                      height: 200,
                       child: Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
-                          // The Pocket
+                          // Pocket Container
                           Container(
-                            width: 200,
-                            height: 80,
+                            width: 180,
+                            height: 70,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFAFAFA),
+                              color: Colors.white,
                               border: Border.all(color: const Color(0xFFE5E7EB)),
-                              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withValues(alpha: 0.03),
@@ -137,17 +172,17 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                             ),
                             child: Center(
                               child: Container(
-                                width: 100,
-                                height: 5,
+                                width: 70,
+                                height: 4,
                                 decoration: BoxDecoration(
                                   color: const Color(0xFF111827),
-                                  borderRadius: BorderRadius.circular(3),
+                                  borderRadius: BorderRadius.circular(2),
                                 ),
                               ),
                             ),
                           ),
                           
-                          // The Paper (Folding)
+                          // Paper Folding
                           AnimatedBuilder(
                             animation: _foldController,
                             builder: (context, child) {
@@ -160,18 +195,11 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                                     child: Transform.scale(
                                       scale: _paperScale.value,
                                       child: Container(
-                                        width: 80,
-                                        height: 100,
+                                        width: 70,
+                                        height: 90,
                                         decoration: BoxDecoration(
                                           color: Colors.white,
                                           border: Border.all(color: const Color(0xFFE5E7EB)),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withValues(alpha: 0.05),
-                                              blurRadius: 16,
-                                              offset: const Offset(0, 6),
-                                            )
-                                          ],
                                         ),
                                       ),
                                     ),
@@ -181,25 +209,26 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                             },
                           ),
 
-                          // The Seagull (Emerging)
-                          const OrigamiSeagull(size: 240),
+                          // Origami Seagull
+                          const OrigamiSeagull(size: 170),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 12),
                     const Text(
                       'POCKET GULL',
                       style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: 4.0,
                         color: Color(0xFF111827),
                       ),
                     ),
                     const Text(
-                      'CLINICAL INTELLIGENCE PLATFORM',
+                      'DIETER RAMS EDITION • CLINICAL ENGINE',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.bold,
                         letterSpacing: 2.0,
                         color: Colors.grey,
                       ),
@@ -209,16 +238,16 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               ),
             ),
             
-            // Lock Screen UI
+            // Lock Screen Canvas / PIN UI
             if (_showLockScreen)
               Positioned(
-                top: size.height * 0.35,
+                top: size.height < 900 ? 170 : 210,
                 bottom: 0,
                 left: 0,
                 right: 0,
                 child: TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0.0, end: 1.0),
-                  duration: const Duration(milliseconds: 800),
+                  duration: const Duration(milliseconds: 600),
                   curve: Curves.easeIn,
                   builder: (context, opacity, child) {
                     return Opacity(
@@ -226,134 +255,213 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                       child: child,
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: _buildLockUI(),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 380),
+                        child: Material(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          elevation: 2,
+                          child: Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: const Color(0xFFE5E7EB)),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                              // Minimalist Dieter Rams Header Bar
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'SECURITY GATEWAY',
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2.0, color: Colors.grey),
+                                  ),
+                                  Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(_usePinMode ? Icons.gesture : Icons.pin, size: 18, color: const Color(0xFF1C1C1C)),
+                                        tooltip: _usePinMode ? 'Draw Mode' : 'PIN Mode',
+                                        onPressed: () => setState(() => _usePinMode = !_usePinMode),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.fingerprint, size: 22, color: Color(0xFF416B1F)),
+                                        tooltip: 'Biometric Unlock',
+                                        onPressed: _handleBiometricUnlock,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+
+                              if (!_usePinMode) ...[
+                                // Draw Your Way In Canvas Pad
+                                const Text(
+                                  'DRAW YOUR WAY IN TO UNLOCK',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 1.5, color: Color(0xFF111827)),
+                                ),
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: 260,
+                                  height: 220,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFAFAFA),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: _isDrawingError ? Colors.red : const Color(0xFFE5E7EB),
+                                      width: _isDrawingError ? 2.0 : 1.0,
+                                    ),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // Subtle Guide SVG Grid
+                                      Positioned.fill(
+                                        child: Opacity(
+                                          opacity: 0.15,
+                                          child: Center(
+                                            child: Icon(Icons.shield_outlined, size: 120, color: Colors.grey.shade400),
+                                          ),
+                                        ),
+                                      ),
+                                      // Gesture Canvas
+                                      GestureDetector(
+                                        onPanStart: (details) {
+                                          setState(() {
+                                            _currentStroke = [details.localPosition];
+                                          });
+                                        },
+                                        onPanUpdate: (details) {
+                                          setState(() {
+                                            _currentStroke.add(details.localPosition);
+                                          });
+                                        },
+                                        onPanEnd: (details) {
+                                          setState(() {
+                                            _strokes.add(List.from(_currentStroke));
+                                            _currentStroke.clear();
+                                          });
+                                          _verifyDrawingAndUnlock();
+                                        },
+                                        child: CustomPaint(
+                                          size: const Size(260, 220),
+                                          painter: _GesturePainter(_strokes, _currentStroke),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: _clearDrawing,
+                                      child: const Text('CLEAR PAD', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Colors.grey)),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    ElevatedButton.icon(
+                                      onPressed: _verifyDrawingAndUnlock,
+                                      icon: const Icon(Icons.lock_open, size: 14),
+                                      label: const Text('UNLOCK'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF1C1C1C),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                        textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.2),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ] else ...[
+                                // PIN Mode UI
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: List.generate(4, (index) => Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                                    width: 10,
+                                    height: 10,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: index < _pinCode.length ? const Color(0xFF1C1C1C) : Colors.grey.shade300,
+                                    ),
+                                  )),
+                                ),
+                                const SizedBox(height: 16),
+                                GridView.count(
+                                  crossAxisCount: 3,
+                                  childAspectRatio: 2.0,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  children: [
+                                    for (var i = 1; i <= 9; i++) _buildPinButton(i.toString()),
+                                    const SizedBox.shrink(),
+                                    _buildPinButton('0'),
+                                    IconButton(
+                                      icon: const Icon(Icons.backspace_outlined, size: 18, color: Colors.grey),
+                                      onPressed: () {
+                                        if (_pinCode.isNotEmpty) {
+                                          setState(() {
+                                            _pinCode = _pinCode.substring(0, _pinCode.length - 1);
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+
+                              const SizedBox(height: 16),
+                              // Dieter Rams Minimalist Config Section
+                              ExpansionTile(
+                                tilePadding: EdgeInsets.zero,
+                                title: const Text('ENGINE PARAMETERS', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey)),
+                                children: [
+                                  TextField(
+                                    controller: _apiKeyController,
+                                    obscureText: true,
+                                    style: const TextStyle(fontSize: 12),
+                                    decoration: InputDecoration(
+                                      hintText: 'Enter API Key',
+                                      hintStyle: const TextStyle(fontSize: 11, color: Colors.grey),
+                                      filled: true,
+                                      fillColor: const Color(0xFFFAFAFA),
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: BorderSide.none),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text('PubGemma High-Efficiency Mode', style: TextStyle(fontSize: 11, color: Colors.black87)),
+                                      Switch(
+                                        value: _usePubGemma,
+                                        onChanged: (val) => setState(() => _usePubGemma = val),
+                                        activeThumbColor: const Color(0xFF416B1F),
+                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
+            ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildLockUI() {
-    return Column(
-      children: [
-        const SizedBox(height: 10),
-        // Biometric / PIN Status
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(4, (index) => Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: index < _pinCode.length ? Colors.black87 : Colors.grey.shade300,
-            ),
-          )),
-        ),
-        const SizedBox(height: 24),
-        // Biometric Button
-        InkWell(
-          onTap: _handleBiometricUnlock,
-          borderRadius: BorderRadius.circular(32),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey.shade50,
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: const Icon(Icons.fingerprint, color: Color(0xFF416B1F), size: 36),
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text('BIOMETRIC UNLOCK', style: TextStyle(fontSize: 10, letterSpacing: 2, color: Colors.grey)),
-        
-        // PIN Pad
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: GridView.count(
-              crossAxisCount: 3,
-              childAspectRatio: 1.6,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                for (var i = 1; i <= 9; i++) _buildPinButton(i.toString()),
-                const SizedBox.shrink(),
-                _buildPinButton('0'),
-                IconButton(
-                  icon: const Icon(Icons.backspace_outlined, color: Colors.black54),
-                  onPressed: () {
-                    if (_pinCode.isNotEmpty) {
-                      setState(() {
-                        _pinCode = _pinCode.substring(0, _pinCode.length - 1);
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-        
-        // Config options
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade50,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('AI CONFIGURATION', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.black54)),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _apiKeyController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Enter API Key',
-                  hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF416B1F))),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Use PubGemma Model', style: TextStyle(fontSize: 12, color: Colors.black87, fontWeight: FontWeight.w500)),
-                  Switch(
-                    value: _usePubGemma,
-                    onChanged: (val) => setState(() => _usePubGemma = val),
-                    activeThumbColor: const Color(0xFF416B1F),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Disclaimer
-        const Text(
-          'Generative AI Compliance Disclaimer: Pocket Gull utilizes experimental AI models. Output is generated by AI and may contain errors. This tool is not a substitute for professional medical advice, diagnosis, or treatment. Always verify findings with certified clinical judgement.',
-          style: TextStyle(fontSize: 9, color: Colors.grey, height: 1.4),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-      ],
     );
   }
 
@@ -361,10 +469,61 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     return TextButton(
       onPressed: () => _handlePinPress(digit),
       style: TextButton.styleFrom(
-        foregroundColor: Colors.black87,
+        foregroundColor: const Color(0xFF1C1C1C),
         shape: const CircleBorder(),
       ),
-      child: Text(digit, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w300)),
+      child: Text(digit, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
     );
   }
+}
+
+// Custom Painter for Draw Pad Gesture
+class _GesturePainter extends CustomPainter {
+  final List<List<Offset>> strokes;
+  final List<Offset> currentStroke;
+
+  _GesturePainter(this.strokes, this.currentStroke);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF1C1C1C)
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 3.5
+      ..style = PaintingStyle.stroke;
+
+    for (final stroke in strokes) {
+      for (int i = 0; i < stroke.length - 1; i++) {
+        canvas.drawLine(stroke[i], stroke[i + 1], paint);
+      }
+    }
+
+    for (int i = 0; i < currentStroke.length - 1; i++) {
+      canvas.drawLine(currentStroke[i], currentStroke[i + 1], paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _GesturePainter oldDelegate) => true;
+}
+
+// Custom Painter for Dieter Rams Background Grid
+class _GridPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..strokeWidth = 1.0;
+
+    const double step = 20;
+    for (double x = 0; x < size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y < size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

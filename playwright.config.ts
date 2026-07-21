@@ -28,7 +28,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx cross-env GEMINI_API_KEY="" SKIP_HEALTHCARE_PROVISION=true node dist/server/server.mjs',
+    command: 'npx cross-env PORT=4200 GEMINI_API_KEY="" SKIP_HEALTHCARE_PROVISION=true node dist/server/server.mjs',
     url: 'http://localhost:4200',
     reuseExistingServer: !process.env['CI'],
     timeout: 120000,

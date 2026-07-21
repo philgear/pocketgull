@@ -136,6 +136,7 @@ class _TriageBoardScreenState extends ConsumerState<TriageBoardScreen> with Sing
               setState(() {
                 _currentViewMode = newSelection.first;
               });
+              ref.read(patientProvider.notifier).changeAnatomicalViewMode(newSelection.first);
             },
             style: ButtonStyle(
               textStyle: WidgetStateProperty.all(const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),

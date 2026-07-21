@@ -1,69 +1,33 @@
-# Pocket Gull
+# Pocket Gull - Real-Time AI Clinical Copilot & Care Plan Engine
 
-> Insight beneath the surface. A voice-first clinical co-pilot for AI-augmented patient intake and care plan synthesis.
+> Pocket Gull is a high-performance, real-time medical Care Plan Strategy and Live AI Consult engine powered by Google Gemini 2.5. It provides actionable clinical intelligence, manages patient states via FHIR R4/R5 standards, and offers real-time streaming bi-directional voice consultations.
 
-Pocket Gull is an Angular v21.2.3 progressive web application deployed on Google Cloud Run. It combines a Three.js interactive 3D anatomical body map with Google Gemini AI (`gemini-2.5-flash` via `@google/adk` multi-agent orchestration) and the Web Speech API to help clinicians rapidly synthesize patient intake data into structured care plan recommendations.
+## Core System Architecture
+- **Frontend**: Angular 22 Standalone Components with Signals (`signal`, `computed`, `effect`).
+- **Backend / SSR**: Node.js, Express, and integrated Angular Server-Side Rendering.
+- **Interactive 3D Anatomy**: Three.js WebGL procedural skeletal, organ, and dermatome mapping.
+- **Python ML Sidecar**: FastAPI sidecar (`pocketgull_api`) providing XGBoost risk scoring and digital signal processing (EDF / PhysioNet 2026).
+- **Mobile Companion**: Flutter / Dart cross-platform mobile suite (`pocketgull_flutter`) supporting Doctor Mode & Patient Mode.
+- **Interoperability**: Strict FHIR R4 Bundle export & FHIR R5 `SubscriptionTopic` real-time biometric telemetry streaming (`http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream`).
 
-This application was built for the Gemini Live Agent Challenge hackathon (Category: Live Agents — Real-time Voice & Visual UI).
+## WebMCP Model Context Protocol (MCP) Tools
+Pocket Gull exposes native WebMCP tools for autonomous AI browser agents:
+- `get_patient_state`: Retrieves current patient demographics, vitals, CMP lab panel, and active symptoms.
+- `update_patient_vitals`: Pushes updated vital signs (HR, BP, SpO2, Temp) or CMP laboratory values.
+- `trigger_fhir_r5_stream`: Toggles live FHIR R5 biometric telemetry streaming.
+- `connect_ble_wearable`: Connects to Apple Watch / Garmin Web Bluetooth GATT Heart Rate Service (`0x180D`).
+- `toggle_dermatome_layer`: Activates interactive WebGL 3D spine & dermatome nerve root mapping (C1-C8, T1-T12, L1-L5, S1-S5).
+- `generate_companion_sync_link`: Produces dynamic FHIR R4 Smart Launch QR code and deep links (`pocketgull://sync?...`).
+- `generate_care_plan`: Triggers multi-paradigm clinical strategy generation across 6 specialized lenses (Western, TCM, Ayurvedic, Longevity).
 
-- Live URL: https://pocketgull.app
-- Repository: https://github.com/philgear/pocketgull
-- Developer: https://g.dev/philgear
+## Key Documentation & References
+- [Architecture & Medical Paradigms](/docs/study/architecture/)
+- [Clinical Features & FHIR Specifications](/docs/study/features/)
+- [Positioning & Open-Source Strategy](/docs/study/positioning/)
+- [Changelog](/docs/study/changelog/)
 
-## Key Capabilities
-
-- **Live AI Consult:** Interruptible voice-first conversational co-pilot powered by the Web Speech API and `@google/adk` LlmAgent orchestration.
-- **Care Plan Recommendation Engine:** Generates structured clinical strategies across four diagnostic lenses: Overview, Interventions, Monitoring, and Education.
-- **Interactive 3D Body Mapping:** Three.js skeletal/surface model with extensible mesh ingestion loaders (USDZ, GLTF, OBJ) for precise anatomical symptom annotation.
-- **Interactive Task Bracketing:** Double-click state machine (Normal → Added → Removed) for physician vetting of AI recommendations.
-- **Patient Management System:** Full CRUD for patient records with FHIR Bundle import/export and local auto-save.
-- **Cognitive Localization Matrix:** Renders structured translation columns comparing standard recommendations, audience translations (dyslexia, pediatric, multi-lingual), and AI translation accuracy audits.
-- **Printable Clinical Stationery:** CSS Grid `@media print` layouts with Halftone body maps and optional patient history toggles.
-- **Research Integrations:** Google Programmable Search Engine (CSE) and NIH PubMed E-utilities for auxiliary real-time clinical context.
-- **Sentinel Gamification:** Real-time cognitive load leveler and fatigue tracker to coregulate physician diagnostic stress.
-- **WebMCP Integration:** Model Context Protocol standards mapping for custom external medical database queries.
-- **Box Breathing UX:** 16-second box breathing animations in intake fields to promote practitioner mindfulness.
-- **Smartwatch Support:** Responsive layouts down to 286px (Pixel Watch 2).
-
-## Technology Stack
-
-- **Framework:** Angular v21.2.3 — Signals-based, Zoneless, with SSR and Client-Side Hydration
-- **Visualization:** Three.js v0.183
-- **AI/ML:** Google GenAI SDK (`gemini-2.5-flash`), Google Agent Development Kit (`@google/adk`), Web Speech API, and on-device Gemini Nano fallback
-- **Backend:** Express.js (Node.js) — proxies PubMed E-utilities, serves static search integration
-- **Styling:** Tailwind CSS, Dieter Rams-inspired design system
-- **Export:** jsPDF, FHIR R4 Bundle standard (Unicode-safe Base64)
-- **Security & Compliance:** Google Tink AEAD envelopes, Quantum-Safe Cryptography (Kyber/Dilithium transport fallback), and hardened Firebase MFA Identity Gateways
-- **Infrastructure:** Google Cloud Run, Docker, Cloud Build, and hybrid enterprise connectors (AWS KMS, Windows Active Directory AD FS)
-
-## Architecture
-
-Angular frontend (SSR, Zoneless Signals) → Express.js backend on Cloud Run.
-PatientState service manages reactive application state via Angular Signals.
-ADK InMemoryRunner orchestrates specialized LlmAgents, each targeting a clinical lens, streaming partial JSON back to the Analysis component.
-Backend proxies `/api/pubmed` to NCBI E-utilities (XML→JSON) and statically serves `search.html` for Google CSE iframe postMessage integration.
-All patient data persists in browser localStorage only. No remote patient database exists.
-
-## API Endpoints (Backend)
-
-- `GET /api/pubmed?query=<term>` — Proxies NCBI PubMed E-utilities and returns structured article results as JSON.
-- `GET /search.html` — Serves the Google Programmable Search Engine integration page.
-- `GET /*` — Serves the Angular SSR-rendered application.
-
-## Responsible AI
-
-Pocket Gull is a clinical productivity tool, not a medical device. All AI-generated content requires explicit physician review and approval via Task Bracketing before clinical use. Patient data is processed transiently; no PII is persisted remotely or used for model training. The platform is designed to augment, not replace, licensed clinical judgment.
-
-## Data Handling
-
-- All patient session data (intake, brackets, history) stored in browser `localStorage` only.
-- AI inference calls transmit only the current patient context snapshot to `gemini-2.5-flash` via transient HTTPS requests.
-- No remote database. No analytics tracking of patient data. FHIR R4 compliant export.
-- Gemini API key is managed as a Cloud Run environment variable; never exposed to the client.
-
-## Dependency & License Management
-
-- Pocket Gull is licensed under the MIT License.
-- External dependencies are strictly audited for security (vulnerability checking via Dependabot) and compatibility.
-- Integrates Apache 2.0-licensed packages (including Google Genkit, @google/adk, @google/genai, and OpenTelemetry) while maintaining full attribution compliance in DEPENDENCIES.md.
-
+## AI Agent Guidance
+When navigating or controlling Pocket Gull:
+1. Always verify patient consent and ethics pledge before accessing clinical metrics.
+2. Utilize standalone Angular signals for state inspection.
+3. Ensure all clinical data payloads adhere strictly to FHIR R4 bundle specifications.

@@ -11,8 +11,15 @@ import { PatientStateService } from '../services/patient-state.service';
 
 const PART_NAMES: Record<string, string> = {
     'head': 'Head & Neck',
-    'chest': 'Chest & Upper Torso',
-    'abdomen': 'Abdomen & Stomach',
+    'brain': 'Brain & Nervous System',
+    'thyroid': 'Thyroid & Endocrine',
+    'chest': 'Chest & Thorax',
+    'heart': 'Heart & Cardiovascular System',
+    'lungs': 'Lungs & Respiratory System',
+    'abdomen': 'Abdomen & Digestive Tract',
+    'liver': 'Liver & Hepatic System',
+    'stomach': 'Stomach & Gastric Pouch',
+    'kidneys': 'Kidneys & Renal System',
     'pelvis': 'Pelvis & Hips',
     'r_shoulder': 'Right Shoulder',
     'r_arm': 'Right Arm',
@@ -25,7 +32,13 @@ const PART_NAMES: Record<string, string> = {
     'r_foot': 'Right Foot',
     'l_thigh': 'Left Thigh',
     'l_shin': 'Left Lower Leg',
-    'l_foot': 'Left Foot'
+    'l_foot': 'Left Foot',
+    'spine_cervical': 'Cervical Spine (C1-C8)',
+    'spine_thoracic': 'Thoracic Spine (T1-T12)',
+    'spine_lumbar': 'Lumbar Spine (L1-L5)',
+    'spine_sacral': 'Sacral Spine (S1-S5)',
+    'dermatome_c6_c8': 'C6-C8 Radial & Ulnar Dermatome',
+    'dermatome_l4_l5': 'L4-L5 Sciatic Nerve Dermatome'
 };
 
 @Component({
@@ -42,6 +55,17 @@ const PART_NAMES: Record<string, string> = {
         </svg>
         <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">3D view unavailable on this device</span>
         <span *ngIf="webglError()" class="text-[12px] text-red-500 mt-2 max-w-xs break-words">{{ webglError() }}</span>
+      </div>
+      <!-- Spine & Dermatome Layer Controls Overlay -->
+      <div *ngIf="webglSupported()" class="absolute top-2 right-2 flex items-center gap-1.5 z-20">
+        <button 
+          type="button" 
+          (click)="toggleDermatomeLayer()" 
+          class="px-2.5 py-1.5 rounded-lg border text-[10.5px] font-bold uppercase tracking-wider transition shadow-sm backdrop-blur-md flex items-center gap-1"
+          [class]="showDermatomeLayer() ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/40' : 'bg-white/70 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
+        >
+          <span>🦴 Spine & Dermatomes</span>
+        </button>
       </div>
       <div *ngIf="webglSupported()" class="absolute bottom-2 left-2 flex flex-col gap-1 pointer-events-none">
         <span class="text-[12px] font-bold text-gray-500 uppercase tracking-tighter">Left Click: Select Part</span>
@@ -69,6 +93,11 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
     readonly webglSupported = signal<boolean>(true);
     readonly webglError = signal<string>('');
+    readonly showDermatomeLayer = signal<boolean>(false);
+
+    toggleDermatomeLayer(): void {
+      this.showDermatomeLayer.set(!this.showDermatomeLayer());
+    }
 
     private renderer!: THREE.WebGLRenderer;
     private scene!: THREE.Scene;
@@ -106,6 +135,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         effect(() => {
             const selectedId = this.state.selectedPartId();
             this.updatePartColors();
+            this.focusOnPart(selectedId);
         });
 
         // React to issue changes (pain levels)
@@ -414,21 +444,44 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.mannequinGroup = new THREE.Group();
         this.scene.add(this.mannequinGroup);
 
-        // Define our three fundamental material layers
+        // Base Layer Materials
         const skinMaterial = new THREE.MeshStandardMaterial({
-            color: 0xfdfdfd, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.9, depthWrite: true
+            color: 0xf3e5dc, roughness: 0.35, metalness: 0.05, transparent: true, opacity: 0.95, depthWrite: true
         });
         const muscleMaterial = new THREE.MeshStandardMaterial({
-            color: 0xc95353, roughness: 0.7, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xbe123c, roughness: 0.65, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
         const boneMaterial = new THREE.MeshStandardMaterial({
-            color: 0xe0e0e0, roughness: 0.5, metalness: 0.05, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xf5f5f4, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
-        const mindMaterial = new THREE.MeshStandardMaterial({
-            color: 0x8b5cf6, roughness: 0.2, metalness: 0.4, transparent: true, emissive: 0x8b5cf6, emissiveIntensity: 0.1, opacity: 0.0, depthWrite: false
+
+        // Organ Layer Materials with Distinct Anatomical Colors & Emissive Highlights
+        const brainMaterial = new THREE.MeshStandardMaterial({
+            color: 0x9333ea, roughness: 0.3, metalness: 0.2, emissive: 0x6b21a8, emissiveIntensity: 0.2, transparent: true, opacity: 0.0, depthWrite: false
         });
-        
-        // Procedural Shader Material for Heatmaps
+        const thyroidMaterial = new THREE.MeshStandardMaterial({
+            color: 0xc084fc, roughness: 0.4, metalness: 0.1, emissive: 0x9333ea, emissiveIntensity: 0.15, transparent: true, opacity: 0.0, depthWrite: false
+        });
+        const heartMaterial = new THREE.MeshStandardMaterial({
+            color: 0xef4444, roughness: 0.3, metalness: 0.2, emissive: 0x991b1b, emissiveIntensity: 0.3, transparent: true, opacity: 0.0, depthWrite: false
+        });
+        const lungMaterial = new THREE.MeshStandardMaterial({
+            color: 0x38bdf8, roughness: 0.5, metalness: 0.1, emissive: 0x0284c7, emissiveIntensity: 0.15, transparent: true, opacity: 0.0, depthWrite: false
+        });
+        const liverMaterial = new THREE.MeshStandardMaterial({
+            color: 0xd97706, roughness: 0.4, metalness: 0.1, emissive: 0x92400e, emissiveIntensity: 0.15, transparent: true, opacity: 0.0, depthWrite: false
+        });
+        const stomachMaterial = new THREE.MeshStandardMaterial({
+            color: 0xf59e0b, roughness: 0.4, metalness: 0.1, emissive: 0xb45309, emissiveIntensity: 0.15, transparent: true, opacity: 0.0, depthWrite: false
+        });
+        const kidneyMaterial = new THREE.MeshStandardMaterial({
+            color: 0xe11d48, roughness: 0.4, metalness: 0.1, emissive: 0x9f1239, emissiveIntensity: 0.15, transparent: true, opacity: 0.0, depthWrite: false
+        });
+        const vascularMaterial = new THREE.MeshStandardMaterial({
+            color: 0xd97706, roughness: 0.2, metalness: 0.4, emissive: 0xd97706, emissiveIntensity: 0.4, transparent: true, opacity: 0.0, depthWrite: false
+        });
+
+        // Procedural Shader Material for Molecular Pain Heatmaps
         const molecularMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 uPainLevel: { value: 0.0 },
@@ -447,7 +500,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     vNormal = normalize(normalMatrix * normal);
                     
                     vec3 pos = position;
-                    // Pulsing displacement based on pain
                     if (uPainLevel > 0.0) {
                         float pulse = sin(uTime * 6.0) * 0.5 + 0.5;
                         pos += normal * pulse * uPainLevel * 0.05;
@@ -467,8 +519,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 varying vec3 vPosition;
                 void main() {
                     float pulse = (sin(uTime * 6.0) * 0.5 + 0.5) * uPainLevel;
-                    
-                    // Fresnel/Rim effect
                     vec3 viewDir = normalize(-vPosition);
                     float rim = 1.0 - max(dot(viewDir, vNormal), 0.0);
                     rim = smoothstep(0.4, 1.0, rim);
@@ -484,55 +534,177 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             wireframe: true
         });
 
-        // Procedural construction functions for contoured/biological shapes
+        // Procedural Primitive Helpers
         const rSkin = (w: number, h: number, d: number) => new THREE.CapsuleGeometry(Math.min(w, d), h, 4, 16);
         const rBone = (l: number, thickness: number = 0.03) => new THREE.CylinderGeometry(thickness, thickness, l, 8);
         const rJoint = (r: number = 0.05) => new THREE.SphereGeometry(r, 16, 16);
         const rBox = (w: number, h: number, d: number) => new THREE.BoxGeometry(w, h, d);
         const rSphere = (r: number) => new THREE.SphereGeometry(r, 32, 32);
 
-        // Head
+        // 1. Head & Neck Complex (Head, Skull, Brain, Thyroid)
         this.addPartComplex('head',
             rSphere(0.25), skinMaterial, { y: 1.75 },
             rSphere(0.24), muscleMaterial, { y: 1.75 },
             rSphere(0.22), boneMaterial, { y: 1.75 },
-            rSphere(0.20), mindMaterial, { y: 1.75 },
+            rSphere(0.18), brainMaterial, { y: 1.77, z: 0.01 }, // Brain Cerebrum
             rSphere(0.26), molecularMaterial, { y: 1.75 }
         );
+        this.addPartComplex('brain',
+            rSphere(0.01), skinMaterial, { y: 1.77 },
+            rSphere(0.01), muscleMaterial, { y: 1.77 },
+            rSphere(0.01), boneMaterial, { y: 1.77 },
+            rSphere(0.18), brainMaterial, { y: 1.77, z: 0.01 },
+            rSphere(0.19), molecularMaterial, { y: 1.77 }
+        );
+        this.addPartComplex('neck',
+            rSkin(0.12, 0.15, 0.12), skinMaterial, { y: 1.55 },
+            rSkin(0.11, 0.14, 0.11), muscleMaterial, { y: 1.55 },
+            rBone(0.15, 0.04), boneMaterial, { y: 1.55 },
+            undefined, undefined, undefined,
+            rSkin(0.13, 0.16, 0.13), molecularMaterial, { y: 1.55 }
+        );
+        this.addPartComplex('thyroid',
+            rSphere(0.01), skinMaterial, { y: 1.54, z: 0.05 },
+            rSphere(0.01), muscleMaterial, { y: 1.54, z: 0.05 },
+            rSphere(0.01), boneMaterial, { y: 1.54, z: 0.05 },
+            rBox(0.08, 0.04, 0.03), thyroidMaterial, { y: 1.54, z: 0.05 },
+            rBox(0.09, 0.05, 0.04), molecularMaterial, { y: 1.54, z: 0.05 }
+        );
 
-        // Neck
-        this.addPartComplex('neck', rSkin(0.12, 0.15, 0.12), skinMaterial, { y: 1.55 }, rSkin(0.11, 0.14, 0.11), muscleMaterial, { y: 1.55 }, rBone(0.15, 0.04), boneMaterial, { y: 1.55 }, undefined, undefined, undefined, rSkin(0.13, 0.16, 0.13), molecularMaterial, { y: 1.55 });
+        // 2. Chest / Thorax Complex (Chest, Ribcage, Heart, Lungs, Aorta)
+        this.addPartComplex('chest',
+            rBox(0.5, 0.45, 0.3), skinMaterial, { y: 1.3 },
+            rBox(0.48, 0.43, 0.28), muscleMaterial, { y: 1.3 },
+            rBox(0.45, 0.4, 0.25), boneMaterial, { y: 1.3 },
+            undefined, undefined, undefined,
+            rBox(0.52, 0.47, 0.32), molecularMaterial, { y: 1.3 }
+        );
 
-        // Torso (Upper/Chest)
-        this.addPartComplex('chest', rBox(0.5, 0.45, 0.3), skinMaterial, { y: 1.3 }, rBox(0.48, 0.43, 0.28), muscleMaterial, { y: 1.3 }, rBox(0.45, 0.4, 0.25), boneMaterial, { y: 1.3 }, undefined, undefined, undefined, rBox(0.52, 0.47, 0.32), molecularMaterial, { y: 1.3 });
+        // Heart Organ Group
+        const heartGroup = new THREE.Group();
+        const cardiacMesh = new THREE.Mesh(rSphere(0.09), heartMaterial.clone());
+        cardiacMesh.scale.set(1, 1.2, 1);
+        cardiacMesh.position.set(-0.06, 1.34, 0.04);
+        cardiacMesh.userData['layer'] = 'organ';
+        cardiacMesh.userData['organ'] = 'heart';
+        cardiacMesh.userData['id'] = 'heart';
+        heartGroup.add(cardiacMesh);
 
-        // Abdomen
-        this.addPartComplex('abdomen', rBox(0.45, 0.3, 0.28), skinMaterial, { y: 0.95 }, rBox(0.43, 0.28, 0.26), muscleMaterial, { y: 0.95 }, rBone(0.3, 0.05), boneMaterial, { y: 0.95 }, undefined, undefined, undefined, rBox(0.47, 0.32, 0.30), molecularMaterial, { y: 0.95 });
+        // Ascending Aorta Trunk
+        const aortaMesh = new THREE.Mesh(rBone(0.2, 0.025), vascularMaterial.clone());
+        aortaMesh.position.set(-0.04, 1.42, 0.02);
+        aortaMesh.rotation.z = -0.2;
+        aortaMesh.userData['layer'] = 'organ';
+        aortaMesh.userData['organ'] = 'heart';
+        aortaMesh.userData['id'] = 'heart';
+        heartGroup.add(aortaMesh);
+        
+        heartGroup.userData['id'] = 'heart';
+        this.mannequinGroup.add(heartGroup);
+        this.parts.set('heart', heartGroup);
 
-        // Pelvis
-        this.addPartComplex('pelvis', rBox(0.48, 0.25, 0.3), skinMaterial, { y: 0.7 }, rBox(0.46, 0.23, 0.28), muscleMaterial, { y: 0.7 }, rBox(0.4, 0.2, 0.2), boneMaterial, { y: 0.7 }, undefined, undefined, undefined, rBox(0.50, 0.27, 0.32), molecularMaterial, { y: 0.7 });
+        // Lungs Organ Group (Left & Right)
+        const lungsGroup = new THREE.Group();
+        const leftLung = new THREE.Mesh(rSkin(0.1, 0.25, 0.12), lungMaterial.clone());
+        leftLung.position.set(0.14, 1.32, 0.02);
+        leftLung.userData['layer'] = 'organ';
+        leftLung.userData['organ'] = 'lungs';
+        leftLung.userData['id'] = 'lungs';
+        lungsGroup.add(leftLung);
 
-        // Arms (Right)
+        const rightLung = new THREE.Mesh(rSkin(0.1, 0.25, 0.12), lungMaterial.clone());
+        rightLung.position.set(-0.14, 1.32, 0.02);
+        rightLung.userData['layer'] = 'organ';
+        rightLung.userData['organ'] = 'lungs';
+        rightLung.userData['id'] = 'lungs';
+        lungsGroup.add(rightLung);
+
+        lungsGroup.userData['id'] = 'lungs';
+        this.mannequinGroup.add(lungsGroup);
+        this.parts.set('lungs', lungsGroup);
+
+        // 3. Abdomen Complex (Abdomen, Liver, Stomach, Kidneys)
+        this.addPartComplex('abdomen',
+            rBox(0.45, 0.3, 0.28), skinMaterial, { y: 0.95 },
+            rBox(0.43, 0.28, 0.26), muscleMaterial, { y: 0.95 },
+            rBone(0.3, 0.05), boneMaterial, { y: 0.95 },
+            undefined, undefined, undefined,
+            rBox(0.47, 0.32, 0.30), molecularMaterial, { y: 0.95 }
+        );
+
+        // Liver Organ
+        const liverGroup = new THREE.Group();
+        const liverMesh = new THREE.Mesh(rBox(0.18, 0.12, 0.14), liverMaterial.clone());
+        liverMesh.position.set(-0.12, 1.04, 0.03);
+        liverMesh.userData['layer'] = 'organ';
+        liverMesh.userData['organ'] = 'liver';
+        liverMesh.userData['id'] = 'liver';
+        liverGroup.add(liverMesh);
+        liverGroup.userData['id'] = 'liver';
+        this.mannequinGroup.add(liverGroup);
+        this.parts.set('liver', liverGroup);
+
+        // Stomach Organ
+        const stomachGroup = new THREE.Group();
+        const stomachMesh = new THREE.Mesh(rSphere(0.09), stomachMaterial.clone());
+        stomachMesh.scale.set(1.2, 0.8, 1);
+        stomachMesh.position.set(0.10, 1.02, 0.03);
+        stomachMesh.userData['layer'] = 'organ';
+        stomachMesh.userData['organ'] = 'stomach';
+        stomachMesh.userData['id'] = 'stomach';
+        stomachGroup.add(stomachMesh);
+        stomachGroup.userData['id'] = 'stomach';
+        this.mannequinGroup.add(stomachGroup);
+        this.parts.set('stomach', stomachGroup);
+
+        // Kidneys Organ (Bilateral Renal)
+        const kidneysGroup = new THREE.Group();
+        const leftKidney = new THREE.Mesh(rSphere(0.05), kidneyMaterial.clone());
+        leftKidney.scale.set(0.8, 1.3, 0.8);
+        leftKidney.position.set(0.12, 0.92, -0.07);
+        leftKidney.userData['layer'] = 'organ';
+        leftKidney.userData['organ'] = 'kidneys';
+        leftKidney.userData['id'] = 'kidneys';
+        kidneysGroup.add(leftKidney);
+
+        const rightKidney = new THREE.Mesh(rSphere(0.05), kidneyMaterial.clone());
+        rightKidney.scale.set(0.8, 1.3, 0.8);
+        rightKidney.position.set(-0.12, 0.90, -0.07);
+        rightKidney.userData['layer'] = 'organ';
+        rightKidney.userData['organ'] = 'kidneys';
+        rightKidney.userData['id'] = 'kidneys';
+        kidneysGroup.add(rightKidney);
+        kidneysGroup.userData['id'] = 'kidneys';
+        this.mannequinGroup.add(kidneysGroup);
+        this.parts.set('kidneys', kidneysGroup);
+
+        // 4. Pelvis & Spine Complex
+        this.addPartComplex('pelvis',
+            rBox(0.48, 0.25, 0.3), skinMaterial, { y: 0.7 },
+            rBox(0.46, 0.23, 0.28), muscleMaterial, { y: 0.7 },
+            rBox(0.4, 0.2, 0.2), boneMaterial, { y: 0.7 },
+            undefined, undefined, undefined,
+            rBox(0.50, 0.27, 0.32), molecularMaterial, { y: 0.7 }
+        );
+
+        // 5. Appendages (Arms & Legs)
         this.addPartComplex('r_shoulder', rJoint(0.12), skinMaterial, { x: -0.32, y: 1.45 }, rJoint(0.11), muscleMaterial, { x: -0.32, y: 1.45 }, rJoint(0.06), boneMaterial, { x: -0.32, y: 1.45 }, undefined, undefined, undefined, rJoint(0.13), molecularMaterial, { x: -0.32, y: 1.45 });
         this.addPartComplex('r_arm', rSkin(0.08, 0.4, 0.08), skinMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.07, 0.38, 0.07), muscleMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rBone(0.4), boneMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, undefined, undefined, undefined, rSkin(0.09, 0.42, 0.09), molecularMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 });
         this.addPartComplex('r_hand', rBox(0.08, 0.15, 0.05), skinMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, rBox(0.07, 0.14, 0.04), muscleMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, rBox(0.06, 0.12, 0.03), boneMaterial, { x: -0.5, y: 0.82, rx: 0.2 }, undefined, undefined, undefined, rBox(0.09, 0.16, 0.06), molecularMaterial, { x: -0.5, y: 0.82, rx: 0.2 });
 
-        // Arms (Left)
         this.addPartComplex('l_shoulder', rJoint(0.12), skinMaterial, { x: 0.32, y: 1.45 }, rJoint(0.11), muscleMaterial, { x: 0.32, y: 1.45 }, rJoint(0.06), boneMaterial, { x: 0.32, y: 1.45 }, undefined, undefined, undefined, rJoint(0.13), molecularMaterial, { x: 0.32, y: 1.45 });
         this.addPartComplex('l_arm', rSkin(0.08, 0.4, 0.08), skinMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.07, 0.38, 0.07), muscleMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, rBone(0.4), boneMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 }, undefined, undefined, undefined, rSkin(0.09, 0.42, 0.09), molecularMaterial, { x: 0.42, y: 1.15, z: 0.05, rx: 0.1 });
         this.addPartComplex('l_hand', rBox(0.08, 0.15, 0.05), skinMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, rBox(0.07, 0.14, 0.04), muscleMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, rBox(0.06, 0.12, 0.03), boneMaterial, { x: 0.5, y: 0.82, rx: 0.2 }, undefined, undefined, undefined, rBox(0.09, 0.16, 0.06), molecularMaterial, { x: 0.5, y: 0.82, rx: 0.2 });
 
-        // Legs (Right)
         this.addPartComplex('r_thigh', rSkin(0.12, 0.5, 0.12), skinMaterial, { x: -0.18, y: 0.35 }, rSkin(0.11, 0.48, 0.11), muscleMaterial, { x: -0.18, y: 0.35 }, rBone(0.5, 0.04), boneMaterial, { x: -0.18, y: 0.35 }, undefined, undefined, undefined, rSkin(0.13, 0.52, 0.13), molecularMaterial, { x: -0.18, y: 0.35 });
         this.addPartComplex('r_shin', rSkin(0.1, 0.5, 0.1), skinMaterial, { x: -0.18, y: -0.25 }, rSkin(0.09, 0.48, 0.09), muscleMaterial, { x: -0.18, y: -0.25 }, rBone(0.5, 0.03), boneMaterial, { x: -0.18, y: -0.25 }, undefined, undefined, undefined, rSkin(0.11, 0.52, 0.11), molecularMaterial, { x: -0.18, y: -0.25 });
         this.addPartComplex('r_foot', rBox(0.15, 0.08, 0.25), skinMaterial, { x: -0.18, y: -0.58, z: 0.05 }, rBox(0.14, 0.07, 0.24), muscleMaterial, { x: -0.18, y: -0.58, z: 0.05 }, rBox(0.12, 0.06, 0.22), boneMaterial, { x: -0.18, y: -0.58, z: 0.05 }, undefined, undefined, undefined, rBox(0.16, 0.09, 0.26), molecularMaterial, { x: -0.18, y: -0.58, z: 0.05 });
 
-        // Legs (Left)
         this.addPartComplex('l_thigh', rSkin(0.12, 0.5, 0.12), skinMaterial, { x: 0.18, y: 0.35 }, rSkin(0.11, 0.48, 0.11), muscleMaterial, { x: 0.18, y: 0.35 }, rBone(0.5, 0.04), boneMaterial, { x: 0.18, y: 0.35 }, undefined, undefined, undefined, rSkin(0.13, 0.52, 0.13), molecularMaterial, { x: 0.18, y: 0.35 });
         this.addPartComplex('l_shin', rSkin(0.1, 0.5, 0.1), skinMaterial, { x: 0.18, y: -0.25 }, rSkin(0.09, 0.48, 0.09), muscleMaterial, { x: 0.18, y: -0.25 }, rBone(0.5, 0.03), boneMaterial, { x: 0.18, y: -0.25 }, undefined, undefined, undefined, rSkin(0.11, 0.52, 0.11), molecularMaterial, { x: 0.18, y: -0.25 });
         this.addPartComplex('l_foot', rBox(0.15, 0.08, 0.25), skinMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.14, 0.07, 0.24), muscleMaterial, { x: 0.18, y: -0.58, z: 0.05 }, rBox(0.12, 0.06, 0.22), boneMaterial, { x: 0.18, y: -0.58, z: 0.05 }, undefined, undefined, undefined, rBox(0.16, 0.09, 0.26), molecularMaterial, { x: 0.18, y: -0.58, z: 0.05 });
 
-        // Add subtle procedural "breathing" and idle materials
+        // Add subtle procedural "breathing" and idle mind core
         const mindGeo = new THREE.IcosahedronGeometry(0.5, 2);
         const mindMesh = new THREE.Mesh(mindGeo, new THREE.MeshStandardMaterial({
             color: 0x8b5cf6, emissive: 0x8b5cf6, emissiveIntensity: 0.5, wireframe: true, transparent: true, opacity: 0.0, visible: false
@@ -553,13 +725,13 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         molecularGeo?: THREE.BufferGeometry, molecularMat?: THREE.Material, molecularPos?: any) {
 
         const group = new THREE.Group();
-        group.userData['id'] = id; // Store ID on the parent group for raycasting
+        group.userData['id'] = id;
 
         // 1. Skin Layer
         const meshSkin = new THREE.Mesh(skinGeo, skinMat.clone());
         this.applyPos(meshSkin, skinPos);
         meshSkin.userData['layer'] = 'skin';
-        meshSkin.userData['id'] = id; // So children raycast back to parent logical ID
+        meshSkin.userData['id'] = id;
         group.add(meshSkin);
 
         // 2. Muscle Layer
@@ -576,11 +748,11 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         meshBone.userData['id'] = id;
         group.add(meshBone);
 
-        // 4. Mind Layer (Optional)
+        // 4. Organ Layer (Optional)
         if (mindGeo && mindMat && mindPos) {
             const meshMind = new THREE.Mesh(mindGeo, mindMat.clone());
             this.applyPos(meshMind, mindPos);
-            meshMind.userData['layer'] = 'mind';
+            meshMind.userData['layer'] = 'organ';
             meshMind.userData['id'] = id;
             group.add(meshMind);
         }
@@ -595,7 +767,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         }
 
         this.mannequinGroup.add(group);
-        this.parts.set(id, group); // Store the group
+        this.parts.set(id, group);
     }
 
     private applyPos(mesh: THREE.Mesh, pos: any) {
@@ -619,22 +791,27 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 const material = child.material as THREE.MeshStandardMaterial;
                 const layer = child.userData['layer'];
 
-                // Color Logic overrides
                 if (maxPain > 0) {
                     const intensity = maxPain / 10;
                     if (layer === 'skin') (material as THREE.MeshStandardMaterial).color.setRGB(1, 1 - intensity * 0.6, 1 - intensity * 0.6);
                     if (layer === 'muscle') (material as THREE.MeshStandardMaterial).color.setRGB(0.9, 0.2 - intensity * 0.2, 0.2 - intensity * 0.2);
-                    if (layer === 'bone') (material as THREE.MeshStandardMaterial).color.setRGB(0.9, 0.7 - intensity * 0.5, 0.7 - intensity * 0.5);
-                    if (layer === 'mind') (material as THREE.MeshStandardMaterial).color.setRGB(0.9, 0.2 - intensity * 0.2, 0.9);
+                    if (layer === 'bone') {
+                        (material as THREE.MeshStandardMaterial).color.setRGB(0.9, 0.7 - intensity * 0.5, 0.7 - intensity * 0.5);
+                        child.scale.setScalar(1.0 + intensity * 0.15);
+                        child.userData['painIntensity'] = intensity;
+                    }
+                    if (layer === 'organ') (material as THREE.MeshStandardMaterial).color.setRGB(0.95, 0.2, 0.4);
                     if (layer === 'molecular' && (material as any).uniforms) {
                         (material as any).uniforms['uPainLevel'].value = intensity;
                     }
                 } else {
-                    // Reset to Base Colors
-                    if (layer === 'skin') (material as THREE.MeshStandardMaterial).color.setHex(0xfdfdfd);
-                    if (layer === 'muscle') (material as THREE.MeshStandardMaterial).color.setHex(0xc95353);
-                    if (layer === 'bone') (material as THREE.MeshStandardMaterial).color.setHex(0xe0e0e0);
-                    if (layer === 'mind') (material as THREE.MeshStandardMaterial).color.setHex(0x8b5cf6);
+                    if (layer === 'skin') (material as THREE.MeshStandardMaterial).color.setHex(0xf3e5dc);
+                    if (layer === 'muscle') (material as THREE.MeshStandardMaterial).color.setHex(0xbe123c);
+                    if (layer === 'bone') {
+                        (material as THREE.MeshStandardMaterial).color.setHex(0xf5f5f4);
+                        child.scale.setScalar(1.0);
+                        child.userData['painIntensity'] = 0;
+                    }
                     if (layer === 'molecular' && (material as any).uniforms) {
                         (material as any).uniforms['uPainLevel'].value = 0.0;
                     }
@@ -645,25 +822,36 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                         (material as THREE.MeshStandardMaterial).color.setHex(0x1C1C1C);
                         (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
                         (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.2;
-                    } else if (layer === 'molecular' && (material as any).uniforms) {
-                        // Highlight logic for shaders can be left simple, handled by uniforms
                     } else if (layer !== 'molecular') {
                         (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
                         (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.3;
                     }
                 } else {
-                    if (layer === 'mind') {
-                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x8b5cf6);
-                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.1;
-                    } else if (layer === 'molecular') {
-                        // Shader uniform uPainLevel dictates emission/glow
-                    } else {
+                    if (layer === 'organ') {
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.2;
+                    } else if (layer === 'bone' && maxPain > 0) {
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(0xff3333);
+                    } else if (layer !== 'molecular') {
                         (material as THREE.MeshStandardMaterial).emissive.setHex(0x000000);
                         (material as THREE.MeshStandardMaterial).emissiveIntensity = 0;
                     }
                 }
             });
         });
+    }
+
+    private focusOnPart(id: string | null) {
+        if (!id || !this.controls || !this.camera) return;
+        const group = this.parts.get(id);
+        if (!group) return;
+
+        const box = new THREE.Box3().setFromObject(group);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+
+        // Smoothly adjust OrbitControls target to anatomical center
+        this.controls.target.copy(center);
+        this.controls.update();
     }
 
     private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular') {
@@ -675,23 +863,24 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 const layer = child.userData['layer'];
 
                 if (mode === 'skin') {
-                    if (layer === 'skin') { material.opacity = isSelected ? 0.95 : 0.9; material.depthWrite = true; }
+                    if (layer === 'skin') { material.opacity = isSelected ? 0.98 : 0.92; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
                 else if (mode === 'muscle') {
-                    if (layer === 'skin') { material.opacity = 0.15; material.depthWrite = false; }
-                    else if (layer === 'muscle') { material.opacity = 0.9; material.depthWrite = true; }
+                    if (layer === 'skin') { material.opacity = 0.12; material.depthWrite = false; }
+                    else if (layer === 'muscle') { material.opacity = 0.92; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
                 else if (mode === 'skeleton') {
-                    if (layer === 'skin') { material.opacity = 0.10; material.depthWrite = false; }
+                    if (layer === 'skin') { material.opacity = 0.08; material.depthWrite = false; }
                     else if (layer === 'muscle') { material.opacity = 0.0; material.depthWrite = false; }
                     else if (layer === 'bone') { material.opacity = 1.0; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
                 else if (mode === 'organs') {
-                    if (layer === 'skin') { material.opacity = 0.10; material.depthWrite = false; }
-                    else if (layer === 'mind') { material.opacity = 0.9; material.depthWrite = true; }
+                    if (layer === 'skin') { material.opacity = 0.08; material.depthWrite = false; }
+                    else if (layer === 'organ') { material.opacity = 0.95; material.depthWrite = true; }
+                    else if (layer === 'bone') { material.opacity = 0.05; material.depthWrite = false; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
                 else if (mode === 'molecular') {
@@ -784,7 +973,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             if (this.mannequinGroup) {
                 const avsActive = this.state.isAvsSessionActive();
                 
-                // 1. Respiratory Coherence Entrainment (Chest Heave Sync)
+                // 1. Respiratory & Organ Coherence Entrainment
                 const chestPart = this.parts.get('chest');
                 if (chestPart) {
                     if (avsActive) {
@@ -801,6 +990,31 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                             1 + Math.sin(time * 2) * 0.03
                         );
                     }
+                }
+
+                // Heart Beat Animation (Systolic/Diastolic rhythm)
+                const heartPart = this.parts.get('heart');
+                if (heartPart) {
+                    const cardiacPulse = 1 + Math.sin(time * 7) * 0.05 + Math.sin(time * 14) * 0.02;
+                    heartPart.scale.set(cardiacPulse, cardiacPulse, cardiacPulse);
+                }
+
+                // Lungs Respiration Animation
+                const lungsPart = this.parts.get('lungs');
+                if (lungsPart) {
+                    const lungExpansion = 1 + Math.sin(time * 2) * 0.04;
+                    lungsPart.scale.set(lungExpansion, 1 + Math.sin(time * 2) * 0.02, lungExpansion);
+                }
+
+                // Brain Neural Firing Animation
+                const brainPart = this.parts.get('brain');
+                if (brainPart) {
+                    const neuralGlow = 0.2 + Math.sin(time * 5) * 0.1;
+                    brainPart.children.forEach(c => {
+                        if (c instanceof THREE.Mesh && c.material instanceof THREE.MeshStandardMaterial) {
+                            c.material.emissiveIntensity = neuralGlow;
+                        }
+                    });
                 }
                 
                 // 2. Gentle floating
@@ -820,7 +1034,23 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     });
                 });
                 
-                // 3. Mind Core & Neural Pathway Entrainment
+                // 4. Update pulsing for inflamed bones
+                this.parts.forEach((group) => {
+                    group.children.forEach(child => {
+                        if (child instanceof THREE.Mesh && child.userData['layer'] === 'bone') {
+                            const pain = child.userData['painIntensity'] || 0;
+                            if (pain > 0) {
+                                // Subtle throbbing for acute inflammation
+                                const pulse = Math.sin(time * 4) * 0.5 + 0.5;
+                                if (child.material instanceof THREE.MeshStandardMaterial) {
+                                    child.material.emissiveIntensity = pain * 0.5 * pulse;
+                                }
+                            }
+                        }
+                    });
+                });
+                
+                // 5. Mind Core & Neural Pathway Entrainment
                 this.mannequinGroup.children.forEach(child => {
                     if (child.userData['isMindCore']) {
                         child.rotation.y += 0.01;
@@ -871,7 +1101,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
             if (this.composer) {
                 this.composer.render();
-            } else {
+            } else if (this.renderer && this.scene && this.camera) {
                 this.renderer.render(this.scene, this.camera);
             }
         };

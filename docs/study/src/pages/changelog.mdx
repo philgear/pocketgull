@@ -8,7 +8,28 @@ title: Changelog
 All notable changes to Pocket Gull are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## Unreleased
+## v1.0.0-rc10 — 2026-07-21
+
+**PhysioNet Electrophysiology Lens, 7-Sec Origami Unfolding Animation, Brand Icon Standardization & Pacific Coast Viewport**
+
+### Added
+- **[Clinical / Telemetry] PhysioNet 2026 Digital Signal & Electrophysiology Lens (`📡 PhysioNet Waveforms`)**: Added a 7th clinical lens in `clinical-intelligence.service.ts`, `analysis-report.component.ts`, `clinical-prompts.ts`, and `demo-data.ts`. Ingests high-frequency EDF/PhysioNet waveform metrics: QRS interval duration (92 ms), neutral ST-segment deviation (+0.04 mV), Fridericia QTc prolongation risk (418 ms), and HRV spectral power density (LF/HF ratio 1.08).
+- **[UI / Animation] 7-Second Origami Unfolding & Glowing Papercraft Heart**: Added a 7-second traditional origami unfolding animation sequence to `secure-splash.component.ts` featuring staggered paper crease rotations and a glowing papercraft heart emergence with radiant warm aura at the 4.5s mark.
+- **[Design / Branding] Signature Origami Seagull Icon Standardization**: Standardized the signature origami seagull logo in full brand color palette (Teal `#3ebc9e`, Coral `#ef6658`, White paper `#ffffff`, Amber beak `#faa63b`) across `index.html` favicons, Docs portal (`DocsLayout.astro`), guided walkthrough tour modal (`walkthrough-tour.component.ts`), and PDF stationery letterheads (`export.service.ts`).
+- **[UI / UX] Pacific Coast 56% Sandy Beach & Breezy Sand Gusts**: Re-proportioned splash dune height to 56%, bound daily SVG beach gesture guides (`todayBeachItem().svgGuide`) using `DomSanitizer.bypassSecurityTrustHtml()`, added horizontal sand particle gust animations (`@keyframes breezy-sand`), and mimicked local time-of-day sky gradients.
+- **[UI / UX] Walkthrough Tour Real-time Window Scroll & Spotlight Tracking**: Added passive `scroll` event listeners to `window` and multi-frame post-scroll re-measurements (`150ms`, `400ms`) in `walkthrough-tour.component.ts` to ensure spotlight masks remain anchored accurately during smooth scroll transitions.
+- **[Audio] Default Muted Audio Entrainment**: Removed automatic AVS soundscape autostart triggers from splash drawing gestures to ensure audio is strictly off by default until explicitly toggled.
+- **[Security / Repo] Trained Model & Physio Dataset Git Exclusions**: Added PhysioNet dataset formats (`*.edf`, `*.mat`, `*.dat`, `*.hea`, `*.atr`, `*.rec`) and trained model weights (`*.onnx`, `*.safetensors`, `*.pt`, `*.pth`, `*.pkl`, `*.joblib`, `*.h5`, `*.ckpt`) to `.gitignore` and `.gcloudignore`.
+
+## v1.0.0-rc9 — 2026-07-21
+
+**3D Anatomical Search, Viewport-Contextual CMP Telemetry, Global Multilingual Research Alignment & FHIR 7 Architecture**
+
+### Added
+- **[3D Anatomy / UI] Anatomical Search & Auto-Camera Tracking**: Top-left search bar with quick system filter pills (`Head/Neuro`, `Organs`, `Limbs/Spine`). Selecting search results triggers smooth `focusOnPart(id)` camera target interpolation onto 3D organ meshes.
+- **[Clinical / Telemetry] Viewport-Contextual CMP Lab Panels**: Isolated organ-specific metabolic panels (`ICmpLabs`: Troponin, ALT/AST, eGFR, Creatinine, Fasting Glucose) and one-tap symptom shortcuts tailored to the currently targeted organ system.
+- **[Docs / Architecture] HL7 FHIR Evolution Strategy (R4 → R5 → R6 → FHIR 7)**: Comprehensive roadmap for event-driven telemetry (FHIR R5 `SubscriptionTopic`), AI inference provenance (FHIR R6 `DeviceMetric`), and multi-agent AI co-pilot traces with zero-copy federated graphs (FHIR 7).
+- **[Internationalization] Global Clinical & Research Language Alignment**: Realigned care plan exports to focus on global medical research exchanges (**Spanish, German, French, Japanese, Hindi**). Replaced Mandarin button and provider types across all AI engines.
 
 ## v1.0.0-rc8 — 2026-07-16
 

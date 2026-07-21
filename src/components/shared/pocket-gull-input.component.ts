@@ -159,30 +159,30 @@ import { FormsModule } from '@angular/forms';
     @keyframes box-breathing-border {
       0% { 
         border-color: #E5E7EB; 
-        box-shadow: 0 0 0 0 rgba(104, 159, 56, 0); 
+        box-shadow: 0 0 0 0 rgba(62, 188, 158, 0); 
       }
       25% { 
-        border-color: #689F38; 
-        box-shadow: 0 0 0 4px rgba(104, 159, 56, 0.2); 
+        border-color: #3ebc9e; 
+        box-shadow: 0 0 0 4px rgba(62, 188, 158, 0.25); 
       }
       50% { 
-        border-color: #689F38; 
-        box-shadow: 0 0 0 4px rgba(104, 159, 56, 0.2); 
+        border-color: #3ebc9e; 
+        box-shadow: 0 0 0 4px rgba(62, 188, 158, 0.25); 
       }
       75% { 
         border-color: #E5E7EB; 
-        box-shadow: 0 0 0 0 rgba(104, 159, 56, 0); 
+        box-shadow: 0 0 0 0 rgba(62, 188, 158, 0); 
       }
       100% { 
         border-color: #E5E7EB; 
-        box-shadow: 0 0 0 0 rgba(104, 159, 56, 0); 
+        box-shadow: 0 0 0 0 rgba(62, 188, 158, 0); 
       }
     }
     
     @keyframes box-breathing-caret {
       0% { caret-color: transparent; }
-      25% { caret-color: #689F38; }
-      50% { caret-color: #689F38; }
+      25% { caret-color: #3ebc9e; }
+      50% { caret-color: #3ebc9e; }
       75% { caret-color: transparent; }
       100% { caret-color: transparent; }
     }

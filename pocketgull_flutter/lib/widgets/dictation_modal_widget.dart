@@ -59,7 +59,7 @@ class _DictationModalWidgetState extends ConsumerState<DictationModalWidget> {
 
       // If no clarification needed, auto-accept
       if (_clarificationQuestion == null) {
-        widget.onAccept(result.symptoms ?? text, result);
+        widget.onAccept(result.symptoms, result);
       }
     }
   }
@@ -74,7 +74,6 @@ class _DictationModalWidgetState extends ConsumerState<DictationModalWidget> {
     final finalResult = ClinicalIntelligenceResult(
       painLevel: _latestResult?.painLevel,
       symptoms: finalSymptoms,
-      recommendations: _latestResult?.recommendations,
     );
     
     widget.onAccept(finalSymptoms, finalResult);

@@ -1,215 +1,385 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/patient_provider.dart';
-import '../widgets/ui/metric_card.dart';
-import '../widgets/ui/primary_button.dart';
-import '../widgets/ui/glass_container.dart';
+import '../providers/services_providers.dart';
+import '../models/patient_types.dart';
+import 'home_screen.dart';
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final patientState = ref.watch(patientProvider);
-    final vitals = patientState.vitals;
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  String _searchQuery = '';
+  List<Patient> _patients = [];
+  bool _isLoading = true;
+  bool _showNewModal = false;
+
+  final _nameController = TextEditingController();
+  final _ageController = TextEditingController();
+  String _selectedGender = 'Male';
+  final _goalsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRoster();
+  }
+
+  Future<void> _loadRoster() async {
+    setState(() => _isLoading = true);
+    final service = ref.read(patientManagementProvider);
+    final roster = await service.loadPatients();
+    setState(() {
+      _patients = roster;
+      _isLoading = false;
+    });
+  }
+
+  void _saveNewPatient() async {
+    if (_nameController.text.isEmpty || _ageController.text.isEmpty) return;
+
+    final newPatient = Patient(
+      id: 'p_${DateTime.now().millisecondsSinceEpoch}',
+      name: _nameController.text,
+      age: int.tryParse(_ageController.text) ?? 30,
+      gender: _selectedGender,
+      lastVisit: DateTime.now().toIso8601String().split('T')[0].replaceAll('-', '.'),
+      preexistingConditions: const [],
+      patientGoals: _goalsController.text,
+      vitals: const PatientVitals(bp: '120/80', hr: '72', temp: '98.6F', weight: '150 lbs', spO2: '98', height: ''),
+      issues: const {},
+    );
+
+    final updated = [..._patients, newPatient];
+    await ref.read(patientManagementProvider).savePatients(updated);
+
+    setState(() {
+      _patients = updated;
+      _showNewModal = false;
+      _nameController.clear();
+      _ageController.clear();
+      _goalsController.clear();
+    });
+  }
+
+  void _selectPatient(Patient patient) {
+    ref.read(patientProvider.notifier).loadPatient(patient);
+
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = _patients.where((p) {
+      final query = _searchQuery.toLowerCase();
+      return p.name.toLowerCase().contains(query) || p.id.toLowerCase().contains(query);
+    }).toList();
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF9FAFB),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Clinical Roster',
+          style: TextStyle(color: Color(0xFF1C1C1C), fontWeight: FontWeight.bold, fontSize: 22),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.grey),
+            onPressed: _loadRoster,
+          ),
+          ElevatedButton.icon(
+            onPressed: () => setState(() => _showNewModal = true),
+            icon: const Icon(Icons.add, size: 16),
+            label: const Text('NEW PATIENT'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1C1C1C),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+            ),
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
       body: Stack(
         children: [
-          // Background content
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 100, left: 16, right: 16, bottom: 80),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Patient Vitals',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
+          Column(
+            children: [
+              // Search Input
+              Container(
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: TextField(
+                  onChanged: (val) => setState(() => _searchQuery = val),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    hintText: 'Search by name or ID...',
+                    filled: true,
+                    fillColor: const Color(0xFFF3F4F6),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
                     ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  const SizedBox(height: 16),
-                  // Vitals Grid
-                  GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.5,
-                    children: [
-                      MetricCard(
-                        title: 'Heart Rate',
-                        value: vitals.hr.isEmpty ? '--' : '${vitals.hr} bpm',
-                        trend: 0,
-                      ),
-                      MetricCard(
-                        title: 'Blood Pressure',
-                        value: vitals.bp.isEmpty ? '--/--' : vitals.bp,
-                        trend: 0,
-                      ),
-                      MetricCard(
-                        title: 'SpO2',
-                        value: vitals.spO2.isEmpty ? '--' : '${vitals.spO2}%',
-                        trend: 0,
-                      ),
-                      MetricCard(
-                        title: 'Temperature',
-                        value: vitals.temp.isEmpty ? '--' : '${vitals.temp}°',
-                        trend: 0,
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  Text(
-                    'Recent Issues',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  if (patientState.issues.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 24),
-                      child: Center(
-                        child: Text(
-                          'No recent issues recorded.',
-                          style: TextStyle(color: Colors.grey),
+                ),
+              ),
+              Expanded(
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : GridView.builder(
+                        padding: const EdgeInsets.all(24),
+                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 350,
+                          childAspectRatio: 1.4,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
                         ),
-                      ),
-                    )
-                  else
-                    ...patientState.issues.entries.map((entry) {
-                      final bodyPart = entry.key;
-                      final issuesList = entry.value;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: issuesList.map((issue) {
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardTheme.color,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                        itemCount: filtered.length,
+                        itemBuilder: (context, idx) {
+                          final patient = filtered[idx];
+                          final isHighRisk = patient.triageScore > 10;
+                          return InkWell(
+                            onTap: () => _selectPatient(patient),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isHighRisk ? Colors.red.shade300 : Colors.grey.shade200,
+                                  width: isHighRisk ? 2.0 : 1.0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.02),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          patient.name,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF1C1C1C),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (isHighRisk)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.red.shade50,
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: const Text(
+                                            'RISK',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '${patient.age} y/o • ${patient.gender}',
+                                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Expanded(
+                                    child: Text(
+                                      patient.patientGoals.isNotEmpty
+                                          ? patient.patientGoals
+                                          : 'No active complain details provided.',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                        height: 1.4,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const Divider(height: 16),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        issue.name,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                        'BP: ${patient.vitals.bp}',
+                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
                                       ),
-                                      const SizedBox(height: 4),
                                       Text(
-                                        '$bodyPart - ${issue.date ?? 'Unknown date'}',
-                                        style: const TextStyle(color: Colors.grey, fontSize: 13),
+                                        'HR: ${patient.vitals.hr} bpm',
+                                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
                                       ),
                                     ],
                                   ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    'Pain: ${issue.painLevel}/10',
-                                    style: const TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           );
-                        }).toList(),
-                      );
-                    }),
-                ],
+                        },
+                      ),
               ),
-            ),
+            ],
           ),
-          
-          // Floating Top Header
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: GlassContainer(
-              opacity: 0.7,
-              borderRadius: BorderRadius.zero,
-              padding: EdgeInsets.only(
-                top: MediaQuery.of(context).padding.top + 16,
-                bottom: 16,
-                left: 20,
-                right: 20,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Good Morning,',
-                        style: TextStyle(color: Colors.grey, fontSize: 13),
+          if (_showNewModal)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.4),
+                child: Center(
+                  child: Container(
+                    width: 450,
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                        )
+                      ],
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Create New Patient',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () => setState(() => _showNewModal = false),
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          const Text('Full Name', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _nameController,
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xFFF3F4F6),
+                              border: OutlineInputBorder(borderSide: BorderSide.none),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Age', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                    const SizedBox(height: 6),
+                                    TextField(
+                                      controller: _ageController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: const InputDecoration(
+                                        filled: true,
+                                        fillColor: Color(0xFFF3F4F6),
+                                        border: OutlineInputBorder(borderSide: BorderSide.none),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('Gender', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                    const SizedBox(height: 6),
+                                    DropdownButtonFormField<String>(
+                                      initialValue: _selectedGender,
+                                      decoration: const InputDecoration(
+                                        filled: true,
+                                        fillColor: Color(0xFFF3F4F6),
+                                        border: OutlineInputBorder(borderSide: BorderSide.none),
+                                      ),
+                                      items: const [
+                                        DropdownMenuItem(value: 'Male', child: Text('Male')),
+                                        DropdownMenuItem(value: 'Female', child: Text('Female')),
+                                        DropdownMenuItem(value: 'Other', child: Text('Other')),
+                                      ],
+                                      onChanged: (val) => setState(() => _selectedGender = val ?? 'Male'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          const Text('Primary Complaint / Goals', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          const SizedBox(height: 6),
+                          TextField(
+                            controller: _goalsController,
+                            maxLines: 3,
+                            decoration: const InputDecoration(
+                              filled: true,
+                              fillColor: Color(0xFFF3F4F6),
+                              border: OutlineInputBorder(borderSide: BorderSide.none),
+                              hintText: 'What is the primary reason for the visit today?',
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => setState(() => _showNewModal = false),
+                                child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                              ),
+                              const SizedBox(width: 16),
+                              ElevatedButton(
+                                onPressed: _saveNewPatient,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1C1C1C),
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text('Create Chart'),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      Text(
-                        'Dr. Jane Doe',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () {},
-                      ),
-                      const CircleAvatar(
-                        radius: 18,
-                        backgroundColor: Colors.blueAccent,
-                        child: Icon(Icons.person, color: Colors.white, size: 20),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ),
-          
-          // Floating Action Area (Bottom)
-          Positioned(
-            bottom: 24,
-            left: 16,
-            right: 16,
-            child: Row(
-              children: [
-                Expanded(
-                  child: PrimaryButton(
-                    onPressed: () {
-                      // Action to start live consult
-                    },
-                    label: 'Start Live Consult',
-                    icon: Icons.mic,
+                    ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
         ],
       ),
     );

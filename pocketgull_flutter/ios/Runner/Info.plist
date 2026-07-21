@@ -70,5 +70,7 @@
 	<string>Pocket Gull requires speech recognition for hands-free clinical documentation.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Pocket Gull requires microphone access for clinical voice-first intake.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Pocket Gull uses Face ID to verify clinician identity before accessing patient records.</string>
 </dict>
 </plist>

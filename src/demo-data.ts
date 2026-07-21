@@ -118,25 +118,45 @@ The patient displays elevated systemic inflammatory markers and increased oxidat
 > - Patient reports opioid cravings or use
 > - PHQ-9 >=20 or active suicidal ideation`,
 
-    'Patient Education': `### Understanding Your Condition
-Your lower back pain is coming from the area between two vertebrae called L4 and L5, where a disc may be pressing on a nerve that runs down into your left leg and buttock. This is common and very manageable with the right combination of movement, mental health support, and non-opioid treatments.
+    'Patient Education': `### Understanding Your Pain & Recovery Plan
+Your lower back pain is real and challenging, but there are effective ways to manage it without returning to opioid medications. Your recovery relies on a multi-pronged approach that combines targeted physical therapy, non-opioid medications, and emotional support.
 
-### What Was Found
-- **Chronic lower back pain (L4-L5 region)**: A persistent ache in your lower back that radiates into your left glute, rated 7 out of 10. It gets worse when you stand for long periods.
-- **Opioid Use Disorder (in remission)**: You are doing great staying off opioids. Your care plan is specifically designed to manage pain without medications that could put your recovery at risk.
-- **Depression**: Depression and chronic pain are closely linked - each makes the other worse. Treating both together gives you the best results.
+### Key Points to Remember
+- **Opioid Safety**: Returning to opioids presents a significant health risk. Your pain management plan is designed to be completely opioid-free.
+- **Stay Active**: Gentle, consistent movement through physical therapy will help strengthen your back muscles and protect your lumbar spine. Rest when needed, but avoid prolonged bed rest.
+- **Mental Health Matters**: Depression and pain affect the same neural pathways in the brain. Treating your depression with your provider's help will directly improve your ability to cope with pain.
 
-### Current Plan
-- **Physical Therapy**: You will work with a physical therapist on specific exercises to strengthen the muscles that support your spine, which takes pressure off the nerve.
-- **Cognitive Behavioral Therapy (CBT)**: A type of talking therapy that helps change thought patterns around pain. Research shows it significantly reduces pain intensity and improves daily function.
-- **Anti-inflammatory support**: Dietary changes and possibly a short course of anti-inflammatory medication to calm down the pain signals.
-- **Duloxetine (to discuss with your care team)**: A medication that can help with both depression and nerve pain at the same time.
+### Your Daily Routine
+- **Morning**: Take prescribed non-opioid pain medication with breakfast. Perform 10-15 minutes of prescribed home physical therapy exercises.
+- **Afternoon**: Take short walking breaks every 1-2 hours if working at a desk. Apply ice or moist heat to your lower back for 15-20 minutes as needed.
+- **Evening**: Practice relaxation or mindfulness techniques before bed to help manage both pain and stress. Take nightly supplements as recommended.
 
-### Important Notes
-> Note: **Please be aware of the following:**
-> - Avoid lifting heavy objects or bending forward repeatedly until your physical therapist clears you.
-> - If you develop weakness in both legs, or have trouble controlling your bladder or bowels, go to the emergency room immediately.
-> - Your opioid-free status is a major health achievement. Let your care team know immediately if you experience cravings - this is not a failure, it is clinical information that helps us help you.`,
+### When to Contact Your Provider
+- Pain suddenly worsens or spreads further down your leg.
+- You experience new weakness, numbness, or tingling in your legs or feet.
+- You experience any change in bowel or bladder function (seek immediate emergency care).
+- You feel overwhelming stress or urges to misuse substances.`,
+
+    'PhysioNet Telemetry': `### PhysioNet 2026 Digital Signal & Electrophysiology Summary
+Integrated EDF/PhysioNet waveform metrics captured from high-frequency BLE telemetry sensors and continuous multi-lead ECG monitoring.
+
+### Electrocardiographic Waveform Morphology
+- **QRS Interval Duration**: 92 ms (Normal baseline: < 120 ms). Zero bundle branch block patterns observed.
+- **ST-Segment Elevation/Depression**: Neutral ST morphology across Lead II, V2, V5 (+0.04 mV deviation). Low acute ischemic risk.
+- **QTc Interval (Fridericia)**: 418 ms (Normal baseline: < 450 ms). Safe threshold maintained for concurrent SNRI / psychotropic management.
+
+### Heart Rate Variability (HRV) Spectral Power Density
+| Parameter | Value | Reference Range | Interpretation |
+|---|---|---|---|
+| **LF Power (0.04-0.15 Hz)** | 520 ms² | 300-800 ms² | Sympathetic / Baroreflex Modulation |
+| **HF Power (0.15-0.40 Hz)** | 480 ms² | 200-600 ms² | Parasympathetic / Vagal Tone |
+| **LF/HF Spectral Ratio** | 1.08 | 0.8 - 1.5 | Balanced Autonomic Nervous System Homeostasis |
+| **SDNN (Time Domain)** | 58 ms | > 50 ms | Optimal Autonomic Recovery Buffer |
+
+### Clinical Actionable Findings
+- **Autonomic Tone**: Balanced LF/HF ratio (1.08) indicates satisfactory stress resilience with zero autonomic crash signals.
+- **Arrhythmia Screening**: Zero premature ventricular contractions (PVCs) or atrial fibrillation episodes detected over 24-hour continuous stream.
+- **Follow-up Protocol**: Continue 24-hour continuous BLE telemetry monitoring during physical therapy stress trials.`,
 
     'Precision Nutrients': `### Biochemical & Biomarker Matrix
 The patient exhibits moderate systemic stress combined with suboptimal cellular energy production cofactors. Methylation pathway efficiency is reduced, contributing to neuroinflammation and pain sensitization. Primary focus is to support methylation pathways, improve mitochondrial respiration, and modulate NMDA receptor excitability.

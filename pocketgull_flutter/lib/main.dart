@@ -4,12 +4,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'theme/app_theme.dart';
 import 'services/local_intelligence_service.dart';
 import 'services/orcid_service.dart';
 import 'services/circadian_sleepiness_service.dart';
 import 'screens/splash_screen.dart';
 import 'providers/services_providers.dart';
+import 'services/theme_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -78,17 +78,17 @@ void main() async {
   });
 }
 
-class PocketGullApp extends StatelessWidget {
+class PocketGullApp extends ConsumerWidget {
   const PocketGullApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeState = ref.watch(themeProvider);
+
     return MaterialApp(
       title: 'Pocket Gull',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      theme: themeState.themeData,
       home: const SplashScreen(),
     );
   }

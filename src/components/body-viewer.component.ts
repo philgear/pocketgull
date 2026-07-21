@@ -26,6 +26,58 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
       <!-- Main Viewer Area -->
       <div class="h-full w-full relative flex items-center justify-center overflow-hidden">
         
+        <!-- Anatomical Search & Quick-Select Overlay (Top Left) -->
+        <div class="absolute top-4 left-4 z-30 no-print flex flex-col gap-2 max-w-[280px] sm:max-w-[340px]">
+          <!-- Search Input Bar -->
+          <div class="relative flex items-center bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-[#EEEEEE] dark:border-zinc-800 rounded-lg shadow-md p-1.5 transition-all focus-within:ring-2 focus-within:ring-lime-500/50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 dark:text-zinc-500 ml-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input 
+              type="text" 
+              [value]="searchQuery()" 
+              (input)="onSearchInput($event)" 
+              placeholder="Search body part or organ (e.g. Heart, Knee)..." 
+              class="w-full bg-transparent text-xs text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 px-2 py-1 outline-none font-medium" />
+            @if (searchQuery()) {
+              <button (click)="clearSearch()" class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            }
+          </div>
+
+          <!-- Live Search Results & Quick System Pills -->
+          @if (isSearchOpen() || filteredParts().length > 0 && searchQuery().trim()) {
+            <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-[#EEEEEE] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden max-h-[220px] overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800">
+              @for (part of filteredParts(); track part.id) {
+                <button (click)="onPartSearchResultClick(part)" 
+                        class="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-lime-500/10 dark:hover:bg-lime-500/20 transition-colors group">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base">{{ part.icon }}</span>
+                    <div>
+                      <div class="font-semibold text-gray-800 dark:text-zinc-200 group-hover:text-lime-600 dark:group-hover:text-lime-400">{{ part.name }}</div>
+                      <div class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider">{{ part.system }}</div>
+                    </div>
+                  </div>
+                  @if (state.hasPainfulIssue(part.id)) {
+                    <span class="text-[10px] font-extrabold bg-red-500/20 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">
+                      Pain Issue
+                    </span>
+                  }
+                </button>
+              } @empty {
+                <div class="p-3 text-xs text-gray-400 dark:text-zinc-500 text-center font-medium">No matching body part found</div>
+              }
+            </div>
+          }
+
+          <!-- Quick System Category Pills -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+            <button (click)="activeSystemFilter.set('all')" [class.bg-black]="activeSystemFilter() === 'all'" [class.text-white]="activeSystemFilter() === 'all'" [class.bg-white/80]="activeSystemFilter() !== 'all'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">All</button>
+            <button (click)="activeSystemFilter.set('neuro')" [class.bg-black]="activeSystemFilter() === 'neuro'" [class.text-white]="activeSystemFilter() === 'neuro'" [class.bg-white/80]="activeSystemFilter() !== 'neuro'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">Head/Neuro</button>
+            <button (click)="activeSystemFilter.set('organ')" [class.bg-black]="activeSystemFilter() === 'organ'" [class.text-white]="activeSystemFilter() === 'organ'" [class.bg-white/80]="activeSystemFilter() !== 'organ'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">Organs</button>
+            <button (click)="activeSystemFilter.set('skeletal')" [class.bg-black]="activeSystemFilter() === 'skeletal'" [class.text-white]="activeSystemFilter() === 'skeletal'" [class.bg-white/80]="activeSystemFilter() !== 'skeletal'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">Limbs/Spine</button>
+          </div>
+        </div>
+        
         <!-- 2D/3D & Anatomy Layer Toggles (Top Right) -->
         <div class="absolute top-4 right-4 flex flex-col gap-2 z-20 no-print">
           <!-- View Modes -->
@@ -206,6 +258,61 @@ export class BodyViewerComponent implements OnDestroy {
   tooltipX = signal<number>(0);
   tooltipY = signal<number>(0);
   manualZoom = signal(1);
+
+  searchQuery = signal<string>('');
+  isSearchOpen = signal<boolean>(false);
+  activeSystemFilter = signal<string>('all');
+
+  readonly allParts = [
+    { id: 'head', name: 'Head & Brain (Cranial)', system: 'neuro', icon: '🧠' },
+    { id: 'neck', name: 'Neck & Cervical Spine', system: 'skeletal', icon: '🦴' },
+    { id: 'chest', name: 'Chest & Thorax', system: 'organ', icon: '🫁' },
+    { id: 'heart', name: 'Cardiac / Heart', system: 'organ', icon: '🫀' },
+    { id: 'lungs', name: 'Pulmonary / Lungs', system: 'organ', icon: '🫁' },
+    { id: 'abdomen', name: 'Abdomen & Digestive', system: 'organ', icon: '🟡' },
+    { id: 'stomach', name: 'Gastric / Stomach', system: 'organ', icon: '🟡' },
+    { id: 'liver', name: 'Hepatic / Liver', system: 'organ', icon: '🟤' },
+    { id: 'kidneys', name: 'Renal / Kidneys', system: 'organ', icon: '🔴' },
+    { id: 'pelvis', name: 'Pelvis & Hip Girdle', system: 'skeletal', icon: '🦴' },
+    { id: 'spine', name: 'Spine & Lumbar Column', system: 'skeletal', icon: '🦴' },
+    { id: 'shoulder_left', name: 'Left Shoulder', system: 'skeletal', icon: '💪' },
+    { id: 'shoulder_right', name: 'Right Shoulder', system: 'skeletal', icon: '💪' },
+    { id: 'arm_left', name: 'Left Arm & Biceps', system: 'skeletal', icon: '💪' },
+    { id: 'arm_right', name: 'Right Arm & Biceps', system: 'skeletal', icon: '💪' },
+    { id: 'hand_left', name: 'Left Hand & Wrist', system: 'skeletal', icon: '✋' },
+    { id: 'hand_right', name: 'Right Hand & Wrist', system: 'skeletal', icon: '✋' },
+    { id: 'leg_left', name: 'Left Leg & Knee', system: 'skeletal', icon: '🦵' },
+    { id: 'leg_right', name: 'Right Leg & Knee', system: 'skeletal', icon: '🦵' },
+    { id: 'foot_left', name: 'Left Foot & Ankle', system: 'skeletal', icon: '🦶' },
+    { id: 'foot_right', name: 'Right Foot & Ankle', system: 'skeletal', icon: '🦶' }
+  ];
+
+  filteredParts = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    const system = this.activeSystemFilter();
+    return this.allParts.filter(p => {
+      const matchesQuery = !q || p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q) || p.system.toLowerCase().includes(q);
+      const matchesSystem = system === 'all' || p.system === system;
+      return matchesQuery && matchesSystem;
+    });
+  });
+
+  onSearchInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery.set(target.value);
+    this.isSearchOpen.set(true);
+  }
+
+  clearSearch() {
+    this.searchQuery.set('');
+    this.isSearchOpen.set(false);
+  }
+
+  onPartSearchResultClick(part: { id: string, name: string }) {
+    this.select(part.id, part.name);
+    this.searchQuery.set('');
+    this.isSearchOpen.set(false);
+  }
 
 
 

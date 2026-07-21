@@ -122,16 +122,51 @@ export class ExportService {
             </section>`;
     }).join('');
 
+    const sideBySideHtml = `
+            <section class="lens-section" style="--accent: #059669">
+                <div class="lens-header">
+                    <h2 class="lens-title">Multimodal Diagnostic Philosophy Side-by-Side Comparison</h2>
+                </div>
+                <div class="lens-body rams-typography">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 9pt;">
+                      <thead>
+                        <tr style="background: #f8fafc;">
+                          <th style="border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; color: #0284c7; width: 33.3%;">🔵 Western Allopathic</th>
+                          <th style="border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; color: #059669; width: 33.3%;">🟢 Eastern (TCM)</th>
+                          <th style="border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; color: #d97706; width: 33.3%;">🟡 Ayurvedic Medicine</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style="border: 1px solid #e2e8f0; padding: 10px; vertical-align: top;">
+                            <strong>Diagnostic Paradigm:</strong> Biomarker assays, ICD-10 coding, GCN receptor pharmacokinetics.<br/><br/>
+                            <strong>Target Interventions:</strong> Statins, Metformin, ACE-inhibitors, targeted receptor agonists.
+                          </td>
+                          <td style="border: 1px solid #e2e8f0; padding: 10px; vertical-align: top;">
+                            <strong>Diagnostic Paradigm:</strong> Meridian channel disharmony, Zang-Fu organ energetics, Tongue/Pulse pattern identification.<br/><br/>
+                            <strong>Target Interventions:</strong> Xiao Ke Wan herbal formulas, Spleen Qi & Blood tonics, Dampness clearing.
+                          </td>
+                          <td style="border: 1px solid #e2e8f0; padding: 10px; vertical-align: top;">
+                            <strong>Diagnostic Paradigm:</strong> Prakriti / Vikriti dosha assessment (Vata/Pitta/Kapha), Agni fire strength.<br/><br/>
+                            <strong>Target Interventions:</strong> Nisha Amalaki rasayana, Gingerol decoctions, Ashwagandha HPA reset.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                </div>
+            </section>`;
+
     const summaryHtml = summary ? `
             <section class="lens-section summary-section" style="--accent: #1C1C1C">
                 <div class="lens-header">
-                    <h2 class="lens-title">Clinical Summary</h2>
+                    <h2 class="lens-title">Clinical Summary & Care Plan Notes</h2>
                 </div>
                 <div class="lens-body rams-typography">
                     ${renderMd(summary)}
                     <br/>
                 </div>
             </section>` : '';
+
 
     const html = `<!DOCTYPE html>
 <html lang="en">
@@ -477,13 +512,13 @@ export class ExportService {
       <header class="letterhead">
         <div class="brand-block" style="display:flex;align-items:center;gap:12px;">
           <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-            <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5" stroke-linejoin="round"/>
             <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5" stroke-linejoin="round"/>
             <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round"/>
           </svg>
           <div>
             <div class="brand-name">Pocket Gull</div>
@@ -521,7 +556,9 @@ export class ExportService {
       </div>
 
       ${summaryHtml}
+      ${sideBySideHtml}
       ${sectionsHtml}
+
 
       <!-- Footer -->
       <footer class="report-footer">
@@ -1197,13 +1234,13 @@ export class ExportService {
       <header class="letterhead">
         <div class="brand-block" style="display:flex;align-items:center;gap:12px;">
           <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
-            <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5" stroke-linejoin="round"/>
             <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5" stroke-linejoin="round"/>
             <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
-            <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round"/>
+            <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round"/>
           </svg>
           <div>
             <div class="brand-name">Pocket Gull</div>

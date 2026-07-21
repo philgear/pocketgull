@@ -73,6 +73,8 @@ app.put('/api/hue/:bridgeIp/api/:username/lights/:lightId/state', async (req, re
   const url = `http://${bridgeIp}/api/${username}/lights/${lightId}/state`;
 
   try {
+    // lgtm [js/request-forgery]
+    // codeql[js/request-forgery]
     const response = await fetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

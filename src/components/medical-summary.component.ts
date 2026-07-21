@@ -41,40 +41,6 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 <p class="text-xs font-bold uppercase tracking-[0.2em] text-gray-500 dark:text-zinc-400 mt-2">{{ today | date:'fullDate' }}</p>
               </div>
               
-              <!-- ORCID Integration Panel -->
-              <div class="flex flex-col items-end gap-2 text-right">
-                @if (orcidService.orcidProfile(); as profile) {
-                  <div class="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg p-2 animate-in fade-in zoom-in duration-200">
-                    <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
-                    </svg>
-                    <div class="text-left">
-                      <div class="text-xs font-bold text-emerald-800 dark:text-emerald-300">Clinician: {{ profile.name }}</div>
-                    </div>
-                    <pocket-gull-button variant="ghost" size="xs" (click)="orcidService.disconnect()" title="Disconnect ORCID" icon="M6 18L18 6M6 6l12 12"></pocket-gull-button>
-                  </div>
-                } @else {
-                  <div class="flex items-center gap-2 bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg p-1.5 shadow-sm">
-                    <input 
-                      #orcidInput
-                      type="text" 
-                      placeholder="ORCID (e.g. 0009-0008-1372-5381)" 
-                      class="text-xs px-2 py-1 bg-transparent border-0 outline-none text-[#1C1C1C] dark:text-zinc-100 placeholder-gray-400 w-56 font-mono"
-                      (keyup.enter)="connectOrcid(orcidInput.value); orcidInput.value = ''"
-                    />
-                    <pocket-gull-button 
-                      [disabled]="orcidService.isLoading()"
-                      (click)="connectOrcid(orcidInput.value); orcidInput.value = ''"
-                      size="xs">
-                      {{ orcidService.isLoading() ? 'Connecting...' : 'Connect' }}
-                    </pocket-gull-button>
-                  </div>
-                  @if (orcidService.error(); as err) {
-                    <p class="text-[12px] text-red-500 mt-1 font-medium font-sans">{{ err }}</p>
-                  }
-                }
-              </div>
-              
               <!-- EHR Interoperability Panel -->
               <div class="flex items-center gap-2 mt-2">
                 <pocket-gull-button 

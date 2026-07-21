@@ -34,7 +34,7 @@ class PocketGullInputWidget extends StatefulWidget {
     this.error,
     this.hint,
     this.icon,
-    this.breathing = false,
+    this.breathing = true, // Enabled by default across active components
     this.autofocus = false,
     this.ariaLabel,
     this.isMinimal = false,
@@ -57,6 +57,8 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
     _controller = TextEditingController(text: widget.value);
     _focusNode = FocusNode();
 
+    _focusNode.addListener(_handleFocusChange);
+
     if (widget.breathing) {
       _initBreathingAnimation();
     }
@@ -67,6 +69,15 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
           _focusNode.requestFocus();
         }
       });
+    }
+  }
+
+  void _handleFocusChange() {
+    if (mounted) {
+      setState(() {});
+      if (_focusNode.hasFocus && _breathingController != null && !_breathingController!.isAnimating) {
+        _breathingController!.repeat();
+      }
     }
   }
 
@@ -92,11 +103,11 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
       duration: const Duration(seconds: 16),
     )..repeat();
 
-    // Box Breathing: Inhale (4s), Hold (4s), Exhale (4s), Hold (4s)
-    // 0% -> 25% (Inhale): Fade to brand green
-    // 25% -> 50% (Hold): Steady brand green
+    // Box Breathing 16s Cycle: Inhale (4s), Hold (4s), Exhale (4s), Hold (4s)
+    // 0% -> 25% (Inhale): Fade to bio-green
+    // 25% -> 50% (Hold): Steady bio-green
     // 50% -> 75% (Exhale): Fade back to base grey
-    // 75% -> 100% (Hold): Steady base grey
+    // 75% -> 100% (Hold): Resting state
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final baseColor = isDark ? const Color(0xFF27272A) : const Color(0xFFE5E7EB);
     final activeColor = isDark ? const Color(0xFF8BC34A) : const Color(0xFF689F38);
@@ -140,7 +151,7 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
     ]).animate(_breathingController!);
 
     _breathingController!.addListener(() {
-      setState(() {});
+      if (mounted) setState(() {});
     });
   }
 
@@ -153,6 +164,7 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
 
   @override
   void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
     _controller.dispose();
     _focusNode.dispose();
     _disposeBreathingAnimation();
@@ -178,7 +190,7 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
         : (isDark ? const Color(0xFF8BC34A) : const Color(0xFF689F38));
 
     Color currentBorderColor = _focusNode.hasFocus ? focusBorderColor : baseBorderColor;
-    if (widget.breathing && _borderColorAnimation != null) {
+    if ((widget.breathing || _focusNode.hasFocus) && _borderColorAnimation != null) {
       currentBorderColor = _borderColorAnimation!.value ?? currentBorderColor;
     }
 
@@ -187,16 +199,16 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
     if (_focusNode.hasFocus && !widget.isMinimal) {
       shadows = [
         BoxShadow(
-          color: focusBorderColor.withValues(alpha: 0.1),
+          color: focusBorderColor.withValues(alpha: 0.15),
           blurRadius: 0,
           spreadRadius: 4,
         ),
       ];
-    } else if (widget.breathing && _glowAnimation != null && !widget.isMinimal) {
+    } else if ((widget.breathing || _focusNode.hasFocus) && _glowAnimation != null && !widget.isMinimal) {
       final green = isDark ? const Color(0xFF8BC34A) : const Color(0xFF689F38);
       shadows = [
         BoxShadow(
-          color: green.withValues(alpha: 0.1 * _glowAnimation!.value),
+          color: green.withValues(alpha: 0.12 * _glowAnimation!.value),
           blurRadius: 0,
           spreadRadius: 4 * _glowAnimation!.value,
         ),
@@ -223,141 +235,115 @@ class _PocketGullInputWidgetState extends State<PocketGullInputWidget> with Sing
       enabled: !widget.disabled,
       onChanged: widget.onChanged,
       style: TextStyle(
+        fontSize: 14,
         color: textColor,
-        fontSize: 13,
-        fontWeight: FontWeight.w500,
-        fontFamily: 'Inter',
       ),
       decoration: InputDecoration(
         hintText: widget.placeholder,
         hintStyle: TextStyle(
           color: isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF),
-          fontSize: 13,
-          fontWeight: FontWeight.normal,
+          fontSize: 14,
         ),
-        filled: true,
-        fillColor: inputColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         prefixIcon: widget.icon != null
-            ? Padding(
-                padding: const EdgeInsets.only(left: 12, right: 8),
-                child: IconTheme(
-                  data: IconThemeData(
-                    color: _focusNode.hasFocus
-                        ? (isDark ? const Color(0xFF8BC34A) : const Color(0xFF689F38))
-                        : (isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF)),
-                    size: 16,
-                  ),
-                  child: widget.icon!,
+            ? IconTheme(
+                data: IconThemeData(
+                  color: isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF),
+                  size: 18,
                 ),
+                child: widget.icon!,
               )
             : null,
-        prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-        suffixIcon: widget.error != null
-            ? const Padding(
-                padding: EdgeInsets.only(right: 12),
-                child: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.redAccent,
-                  size: 16,
-                ),
-              )
-            : null,
-        suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: currentBorderColor, width: 1),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: widget.isMinimal ? 0 : 16,
+          vertical: widget.isMultiline ? 16 : 12,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: currentBorderColor, width: 1),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: currentBorderColor, width: 1),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(
-            color: isDark ? const Color(0xFF18181B) : const Color(0xFFF3F4F6),
-            width: 1,
-          ),
-        ),
+        border: InputBorder.none,
       ),
-      onTapOutside: (_) => _focusNode.unfocus(),
     );
 
-    // If breathing, repaint the border on change
-    if (widget.breathing) {
-      inputField = AnimatedBuilder(
-        animation: _breathingController!,
-        builder: (context, child) => Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: shadows,
-          ),
-          child: child,
-        ),
-        child: inputField,
-      );
-    } else {
-      inputField = Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: shadows,
-        ),
-        child: inputField,
-      );
-    }
-
-    final hintOrErrorText = widget.error ?? widget.hint;
-    final hintOrErrorColor = widget.error != null
-        ? (isDark ? Colors.redAccent : Colors.red)
-        : (isDark ? const Color(0xFF71717A) : const Color(0xFF6B7280));
-
-    Widget fieldWithLabels = Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.label != null) ...[
           Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 6),
-            child: Text(
-              widget.label!.toUpperCase(),
-              style: TextStyle(
-                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF6B7280),
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-              ),
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.label!,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? const Color(0xFFE4E4E7) : const Color(0xFF374151),
+                  ),
+                ),
+                if (widget.breathing)
+                  Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: (isDark ? const Color(0xFF8BC34A) : const Color(0xFF689F38))
+                              .withValues(alpha: 0.4 + 0.6 * (_glowAnimation?.value ?? 0.0)),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        '16s BOX PACE',
+                        style: TextStyle(
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
             ),
           ),
         ],
-        inputField,
-        if (hintOrErrorText != null) ...[
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          decoration: BoxDecoration(
+            color: inputColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: currentBorderColor,
+              width: _focusNode.hasFocus ? 1.5 : 1.0,
+            ),
+            boxShadow: shadows,
+          ),
+          child: inputField,
+        ),
+        if (widget.error != null) ...[
           Padding(
-            padding: const EdgeInsets.only(left: 4, top: 6),
+            padding: const EdgeInsets.only(top: 4),
             child: Text(
-              hintOrErrorText,
+              widget.error!,
               style: TextStyle(
-                color: hintOrErrorColor,
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                letterSpacing: 0.5,
+                fontSize: 12,
+                color: isDark ? const Color(0xFFF87171) : const Color(0xFFEF4444),
+              ),
+            ),
+          ),
+        ] else if (widget.hint != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              widget.hint!,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? const Color(0xFF71717A) : const Color(0xFF9CA3AF),
               ),
             ),
           ),
         ],
       ],
     );
-
-    if (widget.ariaLabel != null) {
-      fieldWithLabels = Semantics(
-        label: widget.ariaLabel,
-        child: fieldWithLabels,
-      );
-    }
-
-    return fieldWithLabels;
   }
 }

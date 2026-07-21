@@ -25,10 +25,55 @@ Pocket Gull is positioned to bridge the gap between patient care, live telemetry
 * **Value Proposition:** Translates complex clinical reports into patient-friendly, accessible instructions, promoting adherence and coregulation.
 * **Key Features:** Cognition-aware localization (pediatric, dyslexia-friendly), multi-language exports, and real-time multiplayer collaboration rooms.
 
-### 3. 💻 Health-Tech Developers & IT Administrators
-* **Positioning:** *"A secure, containerized clinical AI intelligence layer."*
-* **Value Proposition:** A plug-and-play, HIPAA-compliant gateway that connects Google Gemini models and GCP Healthcare APIs to legacy EHR systems.
-* **Key Features:** Cloud Run infrastructure compatibility, automated secret provisioning via GCP Secret Manager, and Apigee-friendly CORS routing.
+### 3. 💻 Health-Tech Developers & Enterprise Health Networks
+* **Positioning:** *"A secure, containerized clinical AI intelligence layer for Global Research Networks."*
+* **Value Proposition:** A plug-and-play, HIPAA-compliant gateway connecting Google Gemini models and GCP Healthcare APIs to enterprise EHR systems, with Care Plan exports aligned with primary medical research fields (Spanish, German, French, Japanese, Hindi).
+* **Key Features:** Cloud Run infrastructure compatibility, 3D Anatomical Search with viewport-contextual Comprehensive Metabolic Panel (CMP) labs, FHIR R4/R5/R6/R7 evolutionary architecture, and automated secret provisioning via GCP Secret Manager.
+
+---
+
+## 🏛️ HL7 FHIR Evolution Roadmap (R4 → R5 → R6 → FHIR 7)
+
+Pocket Gull is designed to evolve alongside the HL7 FHIR standard across four distinct operational horizons:
+
+```mermaid
+graph TD
+    classDef R4 fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#f8fafc;
+    classDef R5 fill:#1e293b,stroke:#10b981,stroke-width:2px,color:#f8fafc;
+    classDef R6 fill:#1e293b,stroke:#f59e0b,stroke-width:2px,color:#f8fafc;
+    classDef F7 fill:#1e293b,stroke:#8b5cf6,stroke-width:2px,color:#f8fafc;
+
+    subgraph FHIR_R4 ["🔹 FHIR R4 / R4B Baseline"]
+        R4_1["Patient & Observation Resources"]
+        R4_2["Condition & CarePlan Payloads"]
+        R4_3["HIPAA DOMPurify Sanitized Bundles"]
+    end
+
+    subgraph FHIR_R5 ["🔹 FHIR R5 Real-Time Telemetry"]
+        R5_1["SubscriptionTopic Pub/Sub Streaming"]
+        R5_2["GenomicStudy & Pharmacogenomics"]
+        R5_3["BiologicallyDerivedProduct Tracking"]
+    end
+
+    subgraph FHIR_R6 ["🔹 FHIR R6 AI Inference & RWE"]
+        R6_1["DeviceMetric AI Confidence Scores"]
+        R6_2["ArtifactAssessment Model Traces"]
+        R6_3["100Hz Waveform Telemetry Payload"]
+    end
+
+    subgraph FHIR_7 ["🔹 FHIR 7 Multi-Agent AI Graph"]
+        F7_1["Multi-Agent GraphTrace Reasoning"]
+        F7_2["Zero-Copy BigLake / Iceberg Catalog"]
+        F7_3["Multimodal Full-Duplex Stream Trace"]
+    end
+
+    FHIR_R4 --> FHIR_R5 --> FHIR_R6 --> FHIR_7
+
+    class R4_1,R4_2,R4_3 R4;
+    class R5_1,R5_2,R5_3 R5;
+    class R6_1,R6_2,R6_3 R6;
+    class F7_1,F7_2,F7_3 F7;
+```
 
 ---
 

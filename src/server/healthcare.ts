@@ -50,7 +50,7 @@ function sanitizeUrl(urlStr: string): string {
   if (!parsed.pathname.startsWith('/v1/projects/')) {
     throw new Error('SSRF Blocked: URL path is not authorized.');
   }
-  return parsed.toString();
+  return `https://healthcare.googleapis.com${parsed.pathname}${parsed.search}`;
 }
 
 

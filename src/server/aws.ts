@@ -14,7 +14,7 @@ function sanitizeAwsUrl(urlStr: string): string {
   if (parsed.protocol !== 'https:' || !parsed.hostname.endsWith('.amazonaws.com')) {
     throw new Error('SSRF Blocked: URL target is not authorized.');
   }
-  return parsed.toString();
+  return `https://${parsed.hostname}${parsed.pathname}${parsed.search}`;
 }
 
 

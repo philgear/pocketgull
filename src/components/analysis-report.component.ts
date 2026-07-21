@@ -26,11 +26,29 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
 import { YbocsScreenerComponent } from './ybocs-screener.component';
+import { ClinicalMenuComponent } from './clinical-menu.component';
+import { KssCognitiveShieldComponent } from './kss-cognitive-shield.component';
+import { CarePlanPrintPreviewComponent } from './care-plan-print-preview.component';
+import { EmergencyNutritionalBypassComponent } from './emergency-nutritional-bypass.component';
+import { MoodConsciousnessMatrixComponent } from './mood-consciousness-matrix.component';
+import { UkRioPubmedSourcingComponent } from './uk-rio-pubmed-sourcing.component';
+import { PatientFruitTreeComponent } from './patient-fruit-tree.component';
+import { DietaryAllergyShieldComponent } from './dietary-allergy-shield.component';
+import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, CostBenefitAnalysisComponent, NodeAgentDialogComponent, YbocsScreenerComponent],
+  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, CostBenefitAnalysisComponent, NodeAgentDialogComponent, YbocsScreenerComponent, ClinicalMenuComponent, KssCognitiveShieldComponent, CarePlanPrintPreviewComponent, EmergencyNutritionalBypassComponent, MoodConsciousnessMatrixComponent, UkRioPubmedSourcingComponent, PatientFruitTreeComponent, DietaryAllergyShieldComponent, LensInsightSparkShieldComponent],
+
+
+
+
+
+
+
+
+
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
@@ -102,6 +120,15 @@ import { YbocsScreenerComponent } from './ybocs-screener.component';
               [ngClass]="activeLens() === 'Patient Education' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
               class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
               Patient Education
+            </button>
+
+            <button (click)="changeLens('PhysioNet Telemetry')"
+              data-testid="tab-physionet-telemetry"
+              [class.border-b-2]="activeLens() === 'PhysioNet Telemetry'"
+              [class.border-transparent]="activeLens() !== 'PhysioNet Telemetry'"
+              [ngClass]="activeLens() === 'PhysioNet Telemetry' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
+              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              📡 PhysioNet Waveforms
             </button>
 
             <button (click)="changeLens('Y-BOCs Screener')"
@@ -519,6 +546,10 @@ import { YbocsScreenerComponent } from './ybocs-screener.component';
               }
             </div>
 
+            <!-- Emergency Bypass Rapid Nutritional Triage Telemetry -->
+            <app-emergency-nutritional-bypass></app-emergency-nutritional-bypass>
+
+
             <!-- First Aid Quick Guides -->
             <pocket-gull-card title="Emergency Offline Treatment Guides" [icon]="ClinicalIcons.Medication">
               <div class="flex flex-wrap gap-2 mb-4 border-b border-gray-150 dark:border-zinc-800/80 pb-3">
@@ -677,31 +708,148 @@ import { YbocsScreenerComponent } from './ybocs-screener.component';
                 </div>
               }
 
-              <!-- Collapsible raw FHIR bundle text area -->
-              <div class="w-full border-t border-gray-200 dark:border-zinc-800/60 pt-4 flex flex-col items-center">
-                <pocket-gull-button (click)="showRawFhir.set(!showRawFhir())" variant="ghost" size="sm" class="text-xs text-gray-500 hover:text-gray-900 dark:text-zinc-400 dark:hover:text-zinc-200 gap-1.5">
-                  {{ showRawFhir() ? 'Hide Raw FHIR Bundle' : 'Show Raw FHIR Bundle' }}
-                </pocket-gull-button>
-                
-                @if (showRawFhir()) {
-                  <div class="w-full mt-4 bg-zinc-950 rounded-lg p-3 border border-zinc-800">
-                    <pre class="text-[12px] font-mono text-zinc-300 overflow-x-auto whitespace-pre-wrap max-h-48 scrollbar-thin">{{ fhirJsonString() }}</pre>
-                  </div>
-                }
-              </div>
             </div>
           </div>
         }
+
+        <!-- Care Plan Print Studio & Document Carousel -->
+        <app-care-plan-print-preview></app-care-plan-print-preview>
+
+
+        <!-- Karolinska Sleepiness Scale (KSS) Adaptive Cognitive Load Shield -->
+        <app-kss-cognitive-shield></app-kss-cognitive-shield>
+
+        <!-- Neuro-Consciousness & Mood Optimization Matrix -->
+        @if ((activeLens() === 'Functional Protocols' || activeLens() === 'Nutrition') && hasAnyReport()) {
+          <app-mood-consciousness-matrix></app-mood-consciousness-matrix>
+        }
+
+        <!-- Living Health Fruit Tree (Summary Overview Lens) -->
+        @if (activeLens() === 'Summary Overview' && hasAnyReport()) {
+          <app-patient-fruit-tree></app-patient-fruit-tree>
+        }
+
+        <!-- Dietary Allergy & Synthetic Red Dye #40 Shield -->
+        @if ((activeLens() === 'Nutrition' || activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
+          <app-dietary-allergy-shield></app-dietary-allergy-shield>
+        }
+
+        <!-- Lens Innovation Shield & Insight Sparks Drill-Down -->
+        @if (hasAnyReport()) {
+          <app-lens-insight-spark-shield [activeLens]="activeLens()"></app-lens-insight-spark-shield>
+        }
+
+        <!-- UK RIO PubMed Sourcing & Evidence Hierarchy Panel -->
+        @if ((activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
+          <app-uk-rio-pubmed-sourcing></app-uk-rio-pubmed-sourcing>
+        }
+
+
+
+        <!-- Dieter Rams Clinical Menu (Nutrition Lens Only) -->
+        @if (activeLens() === 'Nutrition' && hasAnyReport()) {
+          <app-clinical-menu [reportText]="activeReport()"></app-clinical-menu>
+        }
+
+
+
 
         <!-- Biomarker Matrix (Orthomolecular Only) -->
         @if (activeLens() === 'Precision Nutrients' && hasAnyReport()) {
           <app-biomarker-matrix [reportText]="activeReport()"></app-biomarker-matrix>
         }
 
+
         <!-- Cost-Benefit Analysis (Treatment Matrix Lens Only) -->
         @if (activeLens() === 'Treatment Matrix' && hasAnyReport()) {
           <app-cost-benefit-analysis [reportText]="activeReport()"></app-cost-benefit-analysis>
         }
+
+        <!-- AVS Neuro-Therapy & Autonomic Co-Regulation (Functional Protocols Lens Only) -->
+        @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
+          <div class="mb-6 bg-gradient-to-r from-indigo-900/10 via-purple-900/10 to-emerald-900/10 dark:from-indigo-950/40 dark:via-purple-950/40 dark:to-emerald-950/40 rounded-2xl p-6 border border-indigo-500/20 dark:border-indigo-500/30 shadow-lg relative overflow-hidden">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-indigo-200/40 dark:border-indigo-800/40 pb-4 mb-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></span>
+                  <h3 class="text-base font-bold text-gray-900 dark:text-zinc-150 uppercase tracking-widest">
+                    🧠 Autonomic Co-Regulation & AVS Therapy Apps
+                  </h3>
+                  <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                    Functional Protocol Integration
+                  </span>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
+                  Audio-Visual Stimulation (AVS) companion session targeting parasympathetic vagal tone restoration & brainwave entrainment.
+                </p>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" (click)="launchAvsVoiceCoRegulation()"
+                  class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                  <span>🎙️</span>
+                  <span>AVS Voice Guide</span>
+                </button>
+                <button type="button" (click)="toggleAvsSession()"
+                  [class]="state.isAvsSessionActive() ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'"
+                  class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                  <span>{{ state.isAvsSessionActive() ? '⏸ Pause AVS Therapy' : '▶ Start AVS Co-Regulation' }}</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Parameters Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <!-- Breathing Cadence -->
+              <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-bold text-gray-700 dark:text-zinc-300">🫁 Resonant Breathing Rate</span>
+                  <span class="font-mono font-black text-indigo-600 dark:text-indigo-400">{{ state.avsBreathingRate().toFixed(1) }} bpm</span>
+                </div>
+                <input type="range" min="4.0" max="8.0" step="0.5" [value]="state.avsBreathingRate()"
+                  (input)="updateAvsBreathing($event)"
+                  class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+                <span class="text-[10px] text-gray-400 dark:text-zinc-500 block mt-1">0.1 Hz Baroreflex Peak Resonance</span>
+              </div>
+
+              <!-- Brainwave Entrainment -->
+              <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="font-bold text-gray-700 dark:text-zinc-300">🧠 Target Entrainment</span>
+                  <span class="font-mono font-black text-purple-600 dark:text-purple-400">{{ state.avsBrainwaveFrequency() | titlecase }} ({{ state.avsBrainwaveFrequencyHz() }} Hz)</span>
+                </div>
+                <div class="flex gap-1">
+                  <button type="button" (click)="setAvsBrainwave('theta', 6.0)"
+                    [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'theta'"
+                    [class.text-white]="state.avsBrainwaveFrequency() === 'theta'"
+                    class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Theta (6Hz)</button>
+                  <button type="button" (click)="setAvsBrainwave('alpha', 10.0)"
+                    [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'alpha'"
+                    [class.text-white]="state.avsBrainwaveFrequency() === 'alpha'"
+                    class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Alpha (10Hz)</button>
+                  <button type="button" (click)="setAvsBrainwave('gamma', 40.0)"
+                    [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'gamma'"
+                    [class.text-white]="state.avsBrainwaveFrequency() === 'gamma'"
+                    class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Gamma (40Hz)</button>
+                </div>
+              </div>
+
+              <!-- Active Status Indicator -->
+              <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col justify-between">
+                <span class="font-bold text-gray-700 dark:text-zinc-300">⚡ Autonomic Status</span>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="w-2.5 h-2.5 rounded-full" [class.bg-emerald-500]="state.isAvsSessionActive()" [class.animate-ping]="state.isAvsSessionActive()" [class.bg-gray-400]="!state.isAvsSessionActive()"></span>
+                  <span class="font-bold font-mono text-[11px]" [class.text-emerald-600]="state.isAvsSessionActive()" [class.dark:text-emerald-400]="state.isAvsSessionActive()">
+                    {{ state.isAvsSessionActive() ? 'SESSION ACTIVE (AUDIO-VISUAL FLICKER)' : 'STANDBY' }}
+                  </span>
+                </div>
+                <span class="text-[10px] text-gray-400 block mt-1">Integrated in Functional Protocols Lens</span>
+              </div>
+            </div>
+          </div>
+        }
+
 
         <!--AI Report Section-->
         @if (activeLens() !== 'EMT Handoff' && reportSections(); as sections) {
@@ -1448,13 +1596,17 @@ export class AnalysisReportComponent implements OnDestroy {
 
     this.loadHistory();
 
-    // Auto-scroll during streaming: react to reportSections() changes while loading
+    // Auto-scroll during streaming: ONLY scroll if user is already near bottom (within 150px)
     effect(() => {
       this.reportSections();
       if (!this.intel.isLoading()) return;
       untracked(() => {
         const el = this.contentArea()?.nativeElement;
-        el?.scrollTo({ top: el.scrollHeight, behavior: 'auto' });
+        if (!el) return;
+        const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 150;
+        if (isNearBottom) {
+          el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+        }
       });
     });
 
@@ -1486,7 +1638,29 @@ export class AnalysisReportComponent implements OnDestroy {
     this._saveVersion.update(v => v + 1);
   }
 
+  toggleAvsSession() {
+    this.state.isAvsSessionActive.update(v => !v);
+  }
+
+  launchAvsVoiceCoRegulation() {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('voice-mode-change', { detail: 'avs' }));
+    }
+  }
+
+  updateAvsBreathing(event: Event) {
+
+    const rate = parseFloat((event.target as HTMLInputElement).value);
+    this.state.avsBreathingRate.set(rate);
+  }
+
+  setAvsBrainwave(type: string, hz: number) {
+    this.state.avsBrainwaveFrequency.set(type);
+    this.state.avsBrainwaveFrequencyHz.set(hz);
+  }
+
   private flushAutoSave() {
+
     if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
     this.persistToHistory();
   }

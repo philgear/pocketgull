@@ -41,6 +41,21 @@ class PatientNotifier extends Notifier<PatientState> {
     _saveToPrefs(state);
   }
 
+  void addNote(String text) {
+    final noteId = 'note_${DateTime.now().millisecondsSinceEpoch}';
+    final newIssue = BodyPartIssue(
+      id: noteId,
+      noteId: noteId,
+      name: 'General Clinical Note',
+      painLevel: 1,
+      description: text,
+      symptoms: [text],
+    );
+    addIssue('general', newIssue);
+  }
+
+
+
   void selectPart(String? partId) {
     state = state.copyWith(selectedPartId: partId);
   }
@@ -124,11 +139,102 @@ class PatientNotifier extends Notifier<PatientState> {
     _saveToPrefs(state);
   }
 
+  void updateOccupation(String occupation) {
+    state = state.copyWith(occupation: occupation);
+    _saveToPrefs(state);
+  }
+
+  void updateReasonForVisit(String reason) {
+    state = state.copyWith(reasonForVisit: reason);
+    _saveToPrefs(state);
+  }
+
+  void updateDietaryProtocol(String protocol) {
+    state = state.copyWith(dietaryProtocol: protocol);
+    _saveToPrefs(state);
+  }
+
+  void updateActivePhilosophy(MedicalPhilosophy philosophy) {
+    state = state.copyWith(activePhilosophy: philosophy);
+    _saveToPrefs(state);
+  }
+
+  void updateAyurvedicStatus(AyurvedicStatus status) {
+    state = state.copyWith(ayurvedicStatus: status);
+    _saveToPrefs(state);
+  }
+
+  void updateTraumaFlags(TraumaFlags flags) {
+    state = state.copyWith(traumaFlags: flags);
+    _saveToPrefs(state);
+  }
+
+  void updateAvsProtocol(AvsProtocol? protocol) {
+    state = state.copyWith(avsProtocol: protocol);
+    _saveToPrefs(state);
+  }
+
+  void addBiometricEntry(BiometricEntry entry) {
+    final updated = List<BiometricEntry>.from(state.biometricHistory ?? [])..add(entry);
+    state = state.copyWith(biometricHistory: updated);
+    _saveToPrefs(state);
+  }
+
+  void updateMedications(List<DynamicMarker> medications) {
+    state = state.copyWith(medications: medications);
+    _saveToPrefs(state);
+  }
+
+  void addScan(DiagnosticScan scan) {
+    final updated = List<DiagnosticScan>.from(state.scans)..add(scan);
+    state = state.copyWith(scans: updated);
+    _saveToPrefs(state);
+  }
+
+  void addClinicalNote(ClinicalNote note) {
+    final updated = List<ClinicalNote>.from(state.clinicalNotes ?? [])..add(note);
+    state = state.copyWith(clinicalNotes: updated);
+    _saveToPrefs(state);
+  }
+
+  void addShoppingListItem(ShoppingListItem item) {
+    final updated = List<ShoppingListItem>.from(state.shoppingList ?? [])..add(item);
+    state = state.copyWith(shoppingList: updated);
+    _saveToPrefs(state);
+  }
+
+  void toggleShoppingListItem(String itemId) {
+    final updated = state.shoppingList?.map((item) {
+      if (item.id == itemId) {
+        return ShoppingListItem(
+          id: item.id,
+          name: item.name,
+          completed: !item.completed,
+          category: item.category,
+          referenceNotion: item.referenceNotion,
+        );
+      }
+      return item;
+    }).toList();
+    state = state.copyWith(shoppingList: updated);
+    _saveToPrefs(state);
+  }
+
+  void clearState() {
+    state = PatientState(
+      issues: const {},
+      patientGoals: '',
+      vitals: PatientVitals.empty(),
+    );
+    _saveToPrefs(state);
+  }
+
   Future<void> _saveToPrefs(PatientState currentState) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       
       final data = {
+        'name': currentState.name,
         'patientGoals': currentState.patientGoals,
         'vitals': {
           'bp': currentState.vitals.bp,
@@ -167,11 +273,12 @@ class PatientNotifier extends Notifier<PatientState> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final dataStr = prefs.getString(_storageKey);
-      if (dataStr != null) {
+      if (dataStr != null && state.issues.isEmpty && state.patientGoals.isEmpty && state.vitals.hr.isEmpty) {
         final data = jsonDecode(dataStr);
         final vitalsData = data['vitals'];
         
         final loadedState = PatientState(
+          name: data['name'] ?? 'Selected Patient',
           patientGoals: data['patientGoals'] ?? '',
           vitals: PatientVitals(
             bp: vitalsData['bp'] ?? '',

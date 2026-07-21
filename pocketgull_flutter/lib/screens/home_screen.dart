@@ -16,6 +16,7 @@ import '../providers/patient_provider.dart';
 import '../widgets/visit_review_widget.dart';
 import 'documentation_screen.dart';
 import 'triage_board_screen.dart';
+import '../services/collaboration_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +27,15 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedMobileTab = 0; // 0: Map, 1: Chart, 2: Docs
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Connect to the Node.js/Angular server
+      ref.read(collaborationServiceProvider).connect('http://localhost:4000');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +90,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   label: Text(isMobile ? 'AI' : 'AGENT'),
                   onPressed: () {
                     ref.read(patientProvider.notifier).toggleLiveAgent(true);
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF1C1C1C),
+                    side: const BorderSide(color: Color(0xFFE5E7EB)),
+                    textStyle: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.0),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                height: 32,
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.sync, size: 14),
+                  label: const Text('SYNC'),
+                  onPressed: () {
+                    // Send a test note to verify connection
+                    ref.read(collaborationServiceProvider).sendNote('Hello from Flutter Companion App!');
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF1C1C1C),
