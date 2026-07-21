@@ -4,6 +4,7 @@ import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { FloatingWaterConsciousnessComponent } from './floating-water-consciousness.component';
 import { SocialHealthGravitationComponent } from './social-health-gravitation.component';
+import { LyricaConcertComponent } from './lyrica-concert.component';
 
 export interface IConsciousnessState {
   id: 'focus' | 'calm' | 'sleep' | 'creativity' | 'grounding';
@@ -31,7 +32,7 @@ export interface IConsciousnessState {
 @Component({
   selector: 'app-mood-consciousness-matrix',
   standalone: true,
-  imports: [CommonModule, FloatingWaterConsciousnessComponent, SocialHealthGravitationComponent],
+  imports: [CommonModule, FloatingWaterConsciousnessComponent, SocialHealthGravitationComponent, LyricaConcertComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-8 p-6 sm:p-8 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl font-sans relative overflow-hidden">
@@ -310,6 +311,11 @@ export interface IConsciousnessState {
 
         </div>
 
+      </div>
+
+      <!-- Lyrica Generative Healing Concert & Music Video -->
+      <div class="mt-8 relative z-10">
+        <app-lyrica-concert></app-lyrica-concert>
       </div>
 
       <!-- Social Health & Local Event Gravitation Matrix -->
