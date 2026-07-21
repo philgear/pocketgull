@@ -21,7 +21,7 @@ const auth = new GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/cloud-healthcare']
 });
 
-function sanitizeUrl(urlStr: string): string {
+function sanitizeUrl(urlStr: string): URL {
   const parsed = new URL(urlStr);
   if (parsed.protocol !== 'https:' || parsed.hostname !== 'healthcare.googleapis.com') {
     throw new Error('SSRF Blocked: URL target is not authorized.');
@@ -29,7 +29,7 @@ function sanitizeUrl(urlStr: string): string {
   if (!parsed.pathname.startsWith('/v1/projects/')) {
     throw new Error('SSRF Blocked: URL path is not authorized.');
   }
-  return `https://healthcare.googleapis.com${parsed.pathname}${parsed.search}`;
+  return new URL(`https://healthcare.googleapis.com${parsed.pathname}${parsed.search}`);
 }
 
 
@@ -88,7 +88,7 @@ dicomRouter.get('/studies', async (req, res) => {
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(sanitizeUrl(dicomWebUrl), {
+    const response = await fetch(sanitizeUrl(dicomWebUrl).href, {
       headers: {
         'Authorization': `Bearer ${token.token}`,
         'Accept': 'application/dicom+json'
@@ -130,7 +130,7 @@ dicomRouter.get('/rendered', async (req, res) => {
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(sanitizeUrl(dicomWebUrl), {
+    const response = await fetch(sanitizeUrl(dicomWebUrl).href, {
       headers: {
         'Authorization': `Bearer ${token.token}`,
         'Accept': 'image/jpeg'
@@ -175,7 +175,7 @@ dicomRouter.post('/store', express.raw({ type: 'application/dicom', limit: '100m
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(sanitizeUrl(dicomWebUrl), {
+    const response = await fetch(sanitizeUrl(dicomWebUrl).href, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token.token}`,
@@ -219,7 +219,7 @@ dicomRouter.get('/raw', async (req, res) => {
     const client = await auth.getClient();
     const token = await client.getAccessToken();
 
-    const response = await fetch(sanitizeUrl(dicomWebUrl), {
+    const response = await fetch(sanitizeUrl(dicomWebUrl).href, {
       headers: {
         'Authorization': `Bearer ${token.token}`,
         'Accept': 'application/dicom; transfer-syntax=*'

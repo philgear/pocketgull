@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
@@ -35,16 +35,38 @@ import { UkRioPubmedSourcingComponent } from './uk-rio-pubmed-sourcing.component
 import { PatientFruitTreeComponent } from './patient-fruit-tree.component';
 import { DietaryAllergyShieldComponent } from './dietary-allergy-shield.component';
 import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.component';
+import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboard.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
-  imports: [CommonModule, SummaryNodeComponent, PocketGullCardComponent, PocketGullBadgeComponent, ClinicalGaugeComponent, ClinicalTrendComponent, PocketGullButtonComponent, RevealDirective, SafeHtmlPipe, BiomarkerMatrixComponent, CostBenefitAnalysisComponent, NodeAgentDialogComponent, YbocsScreenerComponent, ClinicalMenuComponent, KssCognitiveShieldComponent, CarePlanPrintPreviewComponent, EmergencyNutritionalBypassComponent, MoodConsciousnessMatrixComponent, UkRioPubmedSourcingComponent, PatientFruitTreeComponent, DietaryAllergyShieldComponent, LensInsightSparkShieldComponent],
-
-
-
-
-
+  imports: [
+    CommonModule,
+    DecimalPipe,
+    TitleCasePipe,
+    SummaryNodeComponent,
+    PocketGullCardComponent,
+    BiomarkerMatrixComponent,
+    CostBenefitAnalysisComponent,
+    SafeHtmlPipe,
+    PocketGullBadgeComponent,
+    ClinicalGaugeComponent,
+    ClinicalTrendComponent,
+    PocketGullButtonComponent,
+    RevealDirective,
+    NodeAgentDialogComponent,
+    YbocsScreenerComponent,
+    ClinicalMenuComponent,
+    KssCognitiveShieldComponent,
+    CarePlanPrintPreviewComponent,
+    EmergencyNutritionalBypassComponent,
+    MoodConsciousnessMatrixComponent,
+    UkRioPubmedSourcingComponent,
+    PatientFruitTreeComponent,
+    DietaryAllergyShieldComponent,
+    LensInsightSparkShieldComponent,
+    ParadigmClinicalDashboardComponent
+  ],
 
 
 
@@ -266,6 +288,11 @@ import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.com
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
             <div class="col-span-full mb-2">
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
+            </div>
+
+            <!-- Multi-Paradigm Switchable Clinical Dashboard -->
+            <div class="col-span-full mb-2">
+              <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
             </div>
 
             <app-clinical-gauge

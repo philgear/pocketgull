@@ -2,6 +2,8 @@ import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@a
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
+import { FloatingWaterConsciousnessComponent } from './floating-water-consciousness.component';
+import { SocialHealthGravitationComponent } from './social-health-gravitation.component';
 
 export interface IConsciousnessState {
   id: 'focus' | 'calm' | 'sleep' | 'creativity' | 'grounding';
@@ -29,14 +31,16 @@ export interface IConsciousnessState {
 @Component({
   selector: 'app-mood-consciousness-matrix',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FloatingWaterConsciousnessComponent, SocialHealthGravitationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mb-8 p-6 sm:p-8 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl font-sans relative overflow-hidden">
+
       
       <!-- Background Ambient Glow -->
       <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+
 
       <!-- Section Header -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5 mb-6 relative z-10 font-mono">
@@ -77,9 +81,15 @@ export interface IConsciousnessState {
         }
       </div>
 
+      <!-- Aquatic Consciousness & Floating City Archipelagos Component -->
+      <div class="mb-8 relative z-10">
+        <app-floating-water-consciousness></app-floating-water-consciousness>
+      </div>
+
       <!-- Detailed Mind-State Optimization Dashboard -->
       @let active = selectedState();
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10 font-sans">
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10 font-sans mb-8">
         
         <!-- Left 7 Cols: Prescribed Mind-State Interventions -->
         <div class="lg:col-span-7 space-y-4">
@@ -180,6 +190,131 @@ export interface IConsciousnessState {
           </div>
         </div>
 
+      </div>
+
+      <!-- Lyrica Generative Healing Jukebox Suite -->
+      <div class="p-6 rounded-3xl bg-zinc-900/90 border border-purple-500/30 shadow-[0_0_25px_rgba(168,85,247,0.15)] relative z-10 font-mono overflow-hidden">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-lg text-purple-300">
+              📻
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-bold uppercase tracking-tight text-purple-200">
+                  Lyrica Generative Healing Jukebox
+                </h3>
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">
+                  Solfeggio & Binaural Synth
+                </span>
+              </div>
+              <p class="text-[11px] text-zinc-400 font-sans mt-0.5">
+                Generates therapeutic ambient soundscapes, Solfeggio carrier waves, and spoken Lyrica healing affirmations tuned to {{ active.name }}.
+              </p>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center gap-2">
+            @if (!isPlayingJukebox()) {
+              <button (click)="toggleJukebox()"
+                class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-lg flex items-center gap-2 cursor-pointer active:scale-95">
+                <span>▶ Play Soundscape</span>
+              </button>
+            } @else {
+              <button (click)="toggleJukebox()"
+                class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-lg flex items-center gap-2 cursor-pointer active:scale-95">
+                <span>⏸ Pause Jukebox</span>
+              </button>
+            }
+
+            <button (click)="generateNewLyricaTrack()"
+              class="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider transition cursor-pointer border border-zinc-700 active:scale-95 flex items-center gap-1.5">
+              <span>🎲 New Track</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Jukebox Main Content: Track Info, Audio Visualizer & Lyrica Teleprompter -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+          
+          <!-- Column 1: Active Track Spec & Solfeggio Tuning -->
+          <div class="md:col-span-5 space-y-3">
+            <div class="p-3.5 rounded-2xl bg-zinc-950/80 border border-zinc-800">
+              <span class="text-[9.5px] text-purple-400 uppercase tracking-widest block font-bold">Now Playing</span>
+              <h4 class="text-xs font-bold text-zinc-100 mt-1 font-sans">
+                {{ activeJukeboxTrack().title }}
+              </h4>
+              <div class="flex items-center gap-2 text-[10.5px] text-zinc-400 mt-1">
+                <span class="text-purple-300 font-bold">🎵 {{ activeJukeboxTrack().solfeggioFreq }} Hz {{ activeJukeboxTrack().tuningName }}</span>
+                <span>•</span>
+                <span class="text-indigo-300">🧠 {{ activeJukeboxTrack().binauralBeatHz }} Hz Binaural</span>
+              </div>
+            </div>
+
+            <!-- Volume Slider -->
+            <div class="flex items-center gap-3 px-1">
+              <span class="text-xs text-zinc-400">🔊 Volume</span>
+              <input type="range" min="0" max="1" step="0.05" [value]="jukeboxVolume()" (input)="updateVolume($event)"
+                class="w-full accent-purple-500 bg-zinc-800 rounded-lg h-1.5 cursor-pointer">
+              <span class="text-xs text-purple-300 font-bold min-w-[32px] text-right">{{ Math.round(jukeboxVolume() * 100) }}%</span>
+            </div>
+          </div>
+
+          <!-- Column 2: Ambient Equalizer Visualizer & Scrolling Healing Lyrica Text -->
+          <div class="md:col-span-7 p-4 rounded-2xl bg-zinc-950/90 border border-purple-500/20 relative overflow-hidden space-y-3">
+            
+            <!-- Animated Soundwave Equalizer Bars -->
+            <div class="flex items-end justify-between gap-1 h-10 px-2">
+              @for (bar of visualizerBars(); track $index) {
+                <div class="w-full bg-gradient-to-t from-purple-600 via-indigo-500 to-emerald-400 rounded-t transition-all duration-300"
+                  [style.height.%]="isPlayingJukebox() ? bar : 15"></div>
+              }
+            </div>
+
+            <!-- Lyrica Healing Teleprompter Affirmation -->
+            <div class="border-t border-zinc-800/80 pt-2.5">
+              <div class="flex items-center justify-between text-[9px] text-zinc-500 uppercase tracking-widest mb-1">
+                <span>Spoken Lyrica Affirmation</span>
+                <span class="text-emerald-400 flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  Healing Frequency Active
+                </span>
+              </div>
+              <p class="text-xs italic text-purple-200 font-sans leading-relaxed">
+                "{{ currentLyricaLyric() }}"
+              </p>
+            </div>
+
+            <!-- Gemini Generative Mind Visual Mandala Banner -->
+            <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <span class="text-sm">🎨</span>
+                <div>
+                  <span class="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">Gemini Mind Mandala Art</span>
+                  <span class="text-[11px] text-zinc-300 font-sans">
+                    Visual: {{ activeJukeboxTrack().artTheme }}
+                  </span>
+                </div>
+              </div>
+              <button (click)="synthesizeMindVisual()"
+                class="px-2.5 py-1.5 rounded-lg bg-purple-600/40 hover:bg-purple-600/70 border border-purple-400/40 text-purple-200 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer active:scale-95">
+                ✨ Generate Art
+              </button>
+            </div>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+      <!-- Social Health & Local Event Gravitation Matrix -->
+      <div class="mt-8 relative z-10">
+        <app-social-health-gravitation></app-social-health-gravitation>
       </div>
 
     </div>
@@ -349,4 +484,163 @@ export class MoodConsciousnessMatrixComponent {
       window.dispatchEvent(new CustomEvent('voice-mode-change', { detail: 'avs' }));
     }
   }
+
+  // Lyrica Generative Healing Jukebox State & Web Audio Synthesizer
+  Math = Math;
+  isPlayingJukebox = signal<boolean>(false);
+  jukeboxVolume = signal<number>(0.5);
+  visualizerBars = signal<number[]>([40, 65, 80, 50, 90, 70, 45, 85, 60, 95, 30, 75]);
+
+  tracksSpec = [
+    { title: '528 Hz Solfeggio Vagal Serenade (Transformation)', solfeggioFreq: 528, tuningName: 'Transformation & DNA Repair', binauralBeatHz: 10, artTheme: 'Bioluminescent Indigo Lotus' },
+    { title: '432 Hz Harmonic Gamma Flow (Prefrontal Gamma)', solfeggioFreq: 432, tuningName: 'Natural Harmonic Balance', binauralBeatHz: 40, artTheme: 'Golden Neural Cortex Matrix' },
+    { title: '639 Hz Heart Coherence Sonnet (Shen Anchoring)', solfeggioFreq: 639, tuningName: 'Interpersonal Harmony', binauralBeatHz: 8, artTheme: 'Rose Gold Heart Aura Mandala' },
+    { title: '174 Hz Deep Delta Glymphatic Lullaby', solfeggioFreq: 174, tuningName: 'Pain & Stress Anesthetic', binauralBeatHz: 2, artTheme: 'Starlight Glymphatic Nebula' },
+    { title: '852 Hz Intuitive Reverie Chants (Anandamide Flow)', solfeggioFreq: 852, tuningName: 'Spiritual Order & Intuition', binauralBeatHz: 6, artTheme: 'Emerald Crystalline Prism' }
+  ];
+
+  activeJukeboxTrack = signal(this.tracksSpec[0]);
+
+  lyricaAffirmations = [
+    "Breathe in clarity; your prefrontal cortex resonates with pure 528 Hz transformation and vagal harmony.",
+    "Every breath releases somatic tension. Cortisol recedes as 432 Hz natural harmonics restore equilibrium.",
+    "Your heart rate variability expands. Shen is anchored softly within the heart channel.",
+    "Slow-wave delta entry begins. Glymphatic metabolic clearance washes over brain parenchyma.",
+    "Anandamide and alpha waves flow freely. You are grounded, safe, and profoundly restored."
+  ];
+
+  currentLyricaLyric = signal<string>(this.lyricaAffirmations[0]);
+
+  synthesizeMindVisual() {
+    const track = this.activeJukeboxTrack();
+    const noteText = `🎨 Synthesized Gemini Mood Visual Mandala: ${track.artTheme} (${track.solfeggioFreq} Hz Solfeggio, ${track.binauralBeatHz} Hz Binaural)`;
+    this.patientState.addClinicalNote({
+      id: `mood-visual-${Date.now()}`,
+      text: noteText,
+      sourceLens: 'Functional Protocols',
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+    });
+    alert(`✨ Synthesized Gemini Mind Visual: ${track.artTheme}\nPrompted for ${track.solfeggioFreq} Hz Solfeggio & ${track.binauralBeatHz} Hz EEG Target.`);
+  }
+
+
+  private audioCtx: AudioContext | null = null;
+  private oscLeft: OscillatorNode | null = null;
+  private oscRight: OscillatorNode | null = null;
+  private gainNode: GainNode | null = null;
+  private visualizerInterval: any = null;
+
+  toggleJukebox() {
+    if (this.isPlayingJukebox()) {
+      this.stopAudioSynth();
+    } else {
+      this.startAudioSynth();
+    }
+  }
+
+  generateNewLyricaTrack() {
+    const nextIdx = (this.tracksSpec.indexOf(this.activeJukeboxTrack()) + 1) % this.tracksSpec.length;
+    const newTrack = this.tracksSpec[nextIdx];
+    this.activeJukeboxTrack.set(newTrack);
+    this.currentLyricaLyric.set(this.lyricaAffirmations[nextIdx % this.lyricaAffirmations.length]);
+
+    if (this.isPlayingJukebox()) {
+      this.stopAudioSynth();
+      this.startAudioSynth();
+    }
+  }
+
+  updateVolume(event: Event) {
+    const val = parseFloat((event.target as HTMLInputElement).value);
+    this.jukeboxVolume.set(val);
+    if (this.gainNode) {
+      this.gainNode.gain.setValueAtTime(val * 0.15, this.audioCtx?.currentTime || 0);
+    }
+  }
+
+  private startAudioSynth() {
+    if (typeof window === 'undefined') return;
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      this.audioCtx = new AudioCtx();
+
+      const track = this.activeJukeboxTrack();
+      const carrierFreq = track.solfeggioFreq;
+      const beatFreq = track.binauralBeatHz;
+
+      // Create stereo panners for binaural beat separation (Left: Carrier, Right: Carrier + Beat)
+      const pannerLeft = this.audioCtx.createStereoPanner ? this.audioCtx.createStereoPanner() : null;
+      const pannerRight = this.audioCtx.createStereoPanner ? this.audioCtx.createStereoPanner() : null;
+
+      if (pannerLeft) pannerLeft.pan.value = -0.8;
+      if (pannerRight) pannerRight.pan.value = 0.8;
+
+      this.oscLeft = this.audioCtx.createOscillator();
+      this.oscRight = this.audioCtx.createOscillator();
+
+      this.oscLeft.type = 'sine';
+      this.oscRight.type = 'sine';
+
+      this.oscLeft.frequency.setValueAtTime(carrierFreq, this.audioCtx.currentTime);
+      this.oscRight.frequency.setValueAtTime(carrierFreq + beatFreq, this.audioCtx.currentTime);
+
+      this.gainNode = this.audioCtx.createGain();
+      this.gainNode.gain.setValueAtTime(this.jukeboxVolume() * 0.15, this.audioCtx.currentTime);
+
+      if (pannerLeft && pannerRight) {
+        this.oscLeft.connect(pannerLeft);
+        pannerLeft.connect(this.gainNode);
+        this.oscRight.connect(pannerRight);
+        pannerRight.connect(this.gainNode);
+      } else {
+        this.oscLeft.connect(this.gainNode);
+        this.oscRight.connect(this.gainNode);
+      }
+
+      this.gainNode.connect(this.audioCtx.destination);
+
+      this.oscLeft.start();
+      this.oscRight.start();
+
+      this.isPlayingJukebox.set(true);
+
+      // Start animated visualizer pulse
+      this.visualizerInterval = setInterval(() => {
+        const newBars = Array.from({ length: 12 }, () => Math.floor(Math.random() * 70) + 30);
+        this.visualizerBars.set(newBars);
+      }, 300);
+
+      // Speak spoken Lyrica affirmation using Web Speech API SpeechSynthesis if available
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(this.currentLyricaLyric());
+        utterance.rate = 0.85;
+        utterance.pitch = 0.95;
+        window.speechSynthesis.speak(utterance);
+      }
+    } catch (err) {
+      console.warn('[Lyrica Jukebox Synth Error]', err);
+    }
+  }
+
+  private stopAudioSynth() {
+    try {
+      if (this.oscLeft) { this.oscLeft.stop(); this.oscLeft.disconnect(); }
+      if (this.oscRight) { this.oscRight.stop(); this.oscRight.disconnect(); }
+      if (this.audioCtx) { this.audioCtx.close(); }
+      if (this.visualizerInterval) { clearInterval(this.visualizerInterval); }
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (err) {
+      console.warn('[Lyrica Jukebox Stop Error]', err);
+    } finally {
+      this.isPlayingJukebox.set(false);
+      this.oscLeft = null;
+      this.oscRight = null;
+      this.audioCtx = null;
+    }
+  }
 }
+

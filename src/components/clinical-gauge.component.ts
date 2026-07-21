@@ -1,133 +1,179 @@
 import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+export type GaugeType = 'complexity' | 'stability' | 'certainty';
+export type GaugeDisplayMode = 'full' | 'spark';
+
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-clinical-gauge',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
-    <div class="gauge-container">
-      <div class="gauge-header">
-        <span class="label">{{ label() }}</span>
-        <span class="value">{{ value() }}/10</span>
-      </div>
-      <div class="track">
-        <div class="bar" [style.width.%]="value() * 10" [style.background]="barColor()"></div>
-      </div>
-      @if (description()) {
-        <div class="description">
-          {{ description() }}
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    @if (mode() === 'full') {
+      <div class="p-4 sm:p-5 rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-gray-200/80 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+           tabindex="0"
+           role="progressbar"
+           [attr.aria-valuenow]="value()"
+           aria-valuemin="0"
+           aria-valuemax="10"
+           [attr.aria-label]="accessibilityLabel()">
+        
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400 font-mono">{{ label() }}</span>
+            <span [class]="statusBadgeClasses()" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full border uppercase tracking-wider font-mono">
+              {{ statusText() }}
+            </span>
+          </div>
+          <span class="text-xl font-black text-gray-900 dark:text-zinc-100 font-mono tracking-tight">{{ value() }}<span class="text-xs font-normal text-gray-400 dark:text-zinc-500">/10</span></span>
         </div>
-      }
-    </div>
-  `,
-    styles: [`
-    .gauge-container {
-      margin-bottom: 1rem;
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(10px);
-      padding: 1.25rem;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
 
-    .gauge-container:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      background: rgba(255, 255, 255, 0.9);
-      border-color: var(--brand-green-light, #8bc34a);
-    }
+        <!-- Accessible Track -->
+        <div class="w-full h-3 bg-gray-100 dark:bg-zinc-800/80 rounded-full overflow-hidden relative shadow-inner">
+          <div class="h-full rounded-full transition-all duration-700 ease-out relative"
+               [style.width.%]="value() * 10"
+               [style.background]="barColor()">
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+          </div>
+        </div>
 
-    .gauge-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-    }
+        @if (description()) {
+          <p class="mt-2.5 text-xs text-gray-600 dark:text-zinc-400 leading-relaxed font-sans font-medium">
+            {{ description() }}
+          </p>
+        }
+      </div>
+    } @else {
+      <!-- Spark / Compact Mode -->
+      <div class="inline-flex items-center gap-3 px-3.5 py-2 rounded-xl bg-zinc-900/90 dark:bg-zinc-950/90 border border-zinc-800/90 shadow-sm text-zinc-100 font-mono focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+           tabindex="0"
+           role="progressbar"
+           [attr.aria-valuenow]="value()"
+           aria-valuemin="0"
+           aria-valuemax="10"
+           [attr.aria-label]="accessibilityLabel()">
+        
+        <!-- Spark Micro Ring Gauge -->
+        <div class="relative w-7 h-7 flex items-center justify-center">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
+            <path class="text-zinc-800" stroke-width="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path [style.stroke]="ringColor()" stroke-width="4" stroke-linecap="round" fill="none"
+                  [attr.stroke-dasharray]="dashArray()"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+          </svg>
+          <span class="absolute text-[10px] font-extrabold text-zinc-100">{{ value() }}</span>
+        </div>
 
-    .label {
-      font-weight: 700;
-      font-size: 0.7rem;
-      color: #718096;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+        <!-- Spark Label & Status -->
+        <div class="flex flex-col">
+          <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{{ label() }}</span>
+          <span class="text-[11px] font-black text-zinc-100">{{ statusText() }}</span>
+        </div>
+      </div>
     }
-
-    .value {
-      font-weight: 800;
-      font-size: 1.25rem;
-      color: #1a202c;
-      font-feature-settings: "tnum";
-    }
-
-    .track {
-      height: 10px;
-      background: #edf2f7;
-      border-radius: 5px;
-      overflow: hidden;
-      position: relative;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .bar {
-      height: 100%;
-      border-radius: 5px;
-      transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-    }
-
-    .bar::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: shine 3s infinite;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .description {
-      margin-top: 0.75rem;
-      font-size: 0.75rem;
-      color: #4a5568;
-      line-height: 1.5;
-      font-weight: 500;
-    }
-  `]
+  `
 })
 export class ClinicalGaugeComponent {
-    readonly label = input<string>('');
-    readonly value = input<number>(0);
-    readonly description = input<string>('');
-    readonly type = input<'complexity' | 'stability' | 'certainty'>('certainty');
+  readonly label = input<string>('');
+  readonly value = input<number>(0);
+  readonly description = input<string>('');
+  readonly type = input<GaugeType>('certainty');
+  readonly mode = input<GaugeDisplayMode>('full');
 
-    readonly barColor = computed(() => {
-        const val = this.value();
-        const t = this.type();
-        if (t === 'stability') {
-            if (val > 7) return 'linear-gradient(90deg, #48bb78, #38a169)'; // Stable Green
-            if (val > 4) return 'linear-gradient(90deg, #ecc94b, #d69e2e)'; // Warning Yellow
-            return 'linear-gradient(90deg, #f56565, #e53e3e)'; // Unstable Red
-        }
+  readonly accessibilityLabel = computed(() => {
+    const desc = this.description() ? `. ${this.description()}` : '';
+    return `${this.label()}: ${this.value()} out of 10, Status: ${this.statusText()}${desc}`;
+  });
 
-        if (t === 'complexity') {
-            if (val > 7) return 'linear-gradient(90deg, #805ad5, #6b46c1)'; // High Complexity Purple
-            if (val > 4) return 'linear-gradient(90deg, #4299e1, #3182ce)'; // Moderate Blue
-            return 'linear-gradient(90deg, #4fd1c5, #38b2ac)'; // Low Complexity Teal
-        }
+  readonly statusText = computed(() => {
+    const val = this.value();
+    const t = this.type();
 
-        // Default/Certainty
-        if (val > 8) return 'linear-gradient(90deg, #4fd1c5, #38b2ac)'; // High Certainty Teal
-        if (val > 5) return 'linear-gradient(90deg, #4299e1, #3182ce)'; // Moderate
-        return 'linear-gradient(90deg, #a0aec0, #718096)'; // Low
-    });
+    if (t === 'stability') {
+      if (val >= 8) return 'Optimal Stability';
+      if (val >= 5) return 'Moderate Compensated';
+      return 'Critical Unstable';
+    }
+
+    if (t === 'complexity') {
+      if (val >= 8) return 'High Comorbidity';
+      if (val >= 5) return 'Moderate Complexity';
+      return 'Low Complexity';
+    }
+
+    // Certainty
+    if (val >= 8) return 'High Evidence';
+    if (val >= 5) return 'Moderate Evidence';
+    return 'Low Certainty';
+  });
+
+  readonly statusBadgeClasses = computed(() => {
+    const val = this.value();
+    const t = this.type();
+
+    if (t === 'stability') {
+      if (val >= 8) return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+      if (val >= 5) return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 animate-pulse';
+    }
+
+    if (t === 'complexity') {
+      if (val >= 8) return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
+      if (val >= 5) return 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20';
+      return 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20';
+    }
+
+    // Certainty
+    if (val >= 8) return 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20';
+    if (val >= 5) return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
+    return 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20';
+  });
+
+  readonly barColor = computed(() => {
+    const val = this.value();
+    const t = this.type();
+
+    if (t === 'stability') {
+      if (val >= 8) return 'linear-gradient(90deg, #10b981, #059669)';
+      if (val >= 5) return 'linear-gradient(90deg, #f59e0b, #d97706)';
+      return 'linear-gradient(90deg, #ef4444, #dc2626)';
+    }
+
+    if (t === 'complexity') {
+      if (val >= 8) return 'linear-gradient(90deg, #a855f7, #7e22ce)';
+      if (val >= 5) return 'linear-gradient(90deg, #6366f1, #4338ca)';
+      return 'linear-gradient(90deg, #14b8a6, #0d9488)';
+    }
+
+    if (val >= 8) return 'linear-gradient(90deg, #06b6d4, #0891b2)';
+    if (val >= 5) return 'linear-gradient(90deg, #3b82f6, #1d4ed8)';
+    return 'linear-gradient(90deg, #6b7280, #4b5563)';
+  });
+
+  readonly ringColor = computed(() => {
+    const val = this.value();
+    const t = this.type();
+
+    if (t === 'stability') {
+      if (val >= 8) return '#10b981';
+      if (val >= 5) return '#f59e0b';
+      return '#ef4444';
+    }
+
+    if (t === 'complexity') {
+      if (val >= 8) return '#a855f7';
+      if (val >= 5) return '#6366f1';
+      return '#14b8a6';
+    }
+
+    if (val >= 8) return '#06b6d4';
+    if (val >= 5) return '#3b82f6';
+    return '#6b7280';
+  });
+
+  readonly dashArray = computed(() => {
+    const pct = Math.min(100, Math.max(0, this.value() * 10));
+    return `${pct}, 100`;
+  });
 }

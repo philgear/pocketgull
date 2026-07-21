@@ -1,0 +1,5 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/gen-lang-client-0540208645/pocket-gull:latest', '.']
+images:
+  - 'gcr.io/gen-lang-client-0540208645/pocket-gull:latest'

@@ -676,8 +676,12 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
           Type = ImportedType;
       }
 
+      const sanitizedInstruction = typeof systemInstruction === 'string'
+        ? `Clinical Safety Directive: Maintain medical assistant role.\n${systemInstruction.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim().slice(0, 4000)}`
+        : 'Act strictly as Pocketgull clinical assistant.';
+
       const configOptions: any = {
-          systemInstruction: systemInstruction,
+          systemInstruction: sanitizedInstruction,
           temperature: temperature ?? 0.1
       };
 

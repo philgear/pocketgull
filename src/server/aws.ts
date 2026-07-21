@@ -9,12 +9,12 @@ import { defaultProvider } from "@aws-sdk/credential-provider-node";
 
 export const awsRouter = Router();
 
-function sanitizeAwsUrl(urlStr: string): string {
+function sanitizeAwsUrl(urlStr: string): URL {
   const parsed = new URL(urlStr);
   if (parsed.protocol !== 'https:' || !parsed.hostname.endsWith('.amazonaws.com')) {
     throw new Error('SSRF Blocked: URL target is not authorized.');
   }
-  return `https://${parsed.hostname}${parsed.pathname}${parsed.search}`;
+  return new URL(`https://${parsed.hostname}${parsed.pathname}${parsed.search}`);
 }
 
 
@@ -345,7 +345,7 @@ awsRouter.post('/healthlake/export', express.json({ limit: '50mb' }), async (req
       });
 
       const signedRequest = await signer.sign(request);
-      const response = await fetch(sanitizeAwsUrl(url.toString()), {
+      const response = await fetch(sanitizeAwsUrl(url.toString()).href, {
         method: signedRequest.method,
         headers: signedRequest.headers as Record<string, string>,
         body: signedRequest.body

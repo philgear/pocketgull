@@ -126,9 +126,15 @@ To protect patient records and maintain high-efficiency serverless environments,
 
 Patient data is exportable as standard <DocNode term="FHIR R4" category="HL7 International" hint="Fast Healthcare Interoperability Resources Release 4 — the current HL7 standard for electronic health data exchange. Pocket Gull implements full R4 Patient, Condition, and Observation resources." link="http://hl7.org/fhir/R4/" linkLabel="HL7 FHIR R4 →" icon="https://hl7.org/favicon.ico">**FHIR R4 JSON Bundles**</DocNode>, Unicode-safe and Base64-encoded. This ensures open data portability across any FHIR-compliant healthcare system.
 
-### FHIR Import
+### FHIR Import & Google Cloud Healthcare API Extensions
 
-The Import Service accepts FHIR payloads — including **Epic/MyChart "Lucy" format** — mapping external `DiagnosticReport`, `Observation`, `Condition`, and `Evidence` (PubMed evidence trails) resources into Pocket Gull's native models. Patient records are also directly synchronizable with the **Google Cloud Healthcare FHIR Store** via the `/api/healthcare/fhir/export` and `/api/healthcare/fhir/import/:id` endpoints.
+The Import Service accepts FHIR payloads — including **Epic/MyChart "Lucy" format** — mapping external `DiagnosticReport`, `Observation`, `Condition`, and `Evidence` (PubMed evidence trails) resources into Pocket Gull's native models. Patient records are directly synchronizable with the **Google Cloud Healthcare FHIR Store** via `/api/healthcare/fhir/export` and `/api/healthcare/fhir/import/:id`.
+
+Pocket Gull extends Cloud Healthcare API capabilities with:
+* **Healthcare Natural Language API (`/api/healthcare/nlp/analyze`)**: Entity mentions extraction (SNOMED CT, ICD-10, LOINC, RxNorm) from voice transcripts and doctor notes.
+* **Healthcare Data De-identification (`/api/healthcare/deidentify`)**: HIPAA Safe Harbor PII/PHI redaction engine for external model inference.
+* **BigQuery Streaming Analytics (`/api/healthcare/fhir/export-to-bigquery`)**: Automated FHIR store export into BigQuery analytics datasets.
+* **Pub/Sub Sidecar Webhook (`/api/healthcare/pubsub/webhook`)**: Real-time push notification handler that triggers Python FastAPI sidecar re-evaluation on FHIR Store mutations.
 
 ### Printable Stationery
 
@@ -144,5 +150,6 @@ Generated insights can be physically printed via CSS-optimized layouts featuring
 | **Remote storage**    | None (GCP Healthcare FHIR Store optional)                      |
 | **PHI in transit**    | Stripped before any external request                           |
 | **AI data retention** | Transient inference only (Vertex AI Enterprise)                |
-| **Export formats**    | FHIR R4 Bundle (JSON), PDF                                     |
-| **Import formats**    | FHIR R4, Epic/Lucy, Google Cloud Healthcare FHIR Store         |
+| **Export formats**    | FHIR R4 Bundle (JSON), PDF, BigQuery Analytics                 |
+| **Import formats**    | FHIR R4, Epic/Lucy, Google Cloud Healthcare FHIR Store, Healthcare NLP |
+

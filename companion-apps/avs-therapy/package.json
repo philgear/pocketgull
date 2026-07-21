@@ -78,12 +78,16 @@
     "webpack": ">=5.104.1",
     "ajv": ">=8.20.0",
     "vite": ">=5.4.15",
-    "webpack-dev-server": ">=5.2.5",
+    "webpack-dev-server": "^5.2.6",
     "undici": "7.28.0",
-    "http-proxy-middleware": "3.0.7",
+    "http-proxy-middleware": "^4.2.0",
     "piscina": "^5.2.0",
     "@babel/core": "^7.29.1",
     "launch-editor": ">=2.14.1",
-    "ws": "^8.21.0"
+    "ws": "^8.21.0",
+    "brace-expansion": "^2.0.1",
+    "fast-uri": "^3.0.6",
+    "js-yaml": "^4.1.0",
+    "@hono/node-server": "^1.19.10"
   }
 }
