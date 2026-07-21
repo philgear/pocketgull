@@ -11,6 +11,11 @@ import 'summary_node_widget.dart';
 import 'clinical_gauge_widget.dart';
 import 'clinical_trend_widget.dart';
 
+import '../widgets/ybocs_screener_widget.dart';
+import '../widgets/research_tab_widget.dart';
+import '../widgets/mood_consciousness_matrix_widget.dart';
+
+
 class AnalysisReportWidget extends ConsumerStatefulWidget {
   const AnalysisReportWidget({super.key});
 
@@ -180,6 +185,35 @@ class _AnalysisReportWidgetState extends ConsumerState<AnalysisReportWidget> {
       );
     }
 
+    if (state.activeLens == AnalysisLens.ybocsScreener) {
+      return const SizedBox(
+        height: 600,
+        child: YbocsScreenerWidget(),
+      );
+    }
+
+    if (state.activeLens == AnalysisLens.research) {
+      return const SizedBox(
+        height: 600,
+        child: ResearchTabWidget(
+          hits: [
+            ProteinHit(
+              id: 'P01308',
+              name: 'Insulin (INS)',
+              identity: '98.5%',
+              evalue: '1.2e-45',
+            ),
+            ProteinHit(
+              id: 'P01009',
+              name: 'Alpha-1-antitrypsin (SERPINA1)',
+              identity: '91.2%',
+              evalue: '3.4e-38',
+            ),
+          ],
+        ),
+      );
+    }
+
     final activeReport = state.reports[state.activeLens];
 
     if (activeReport == null || activeReport.isEmpty) {
@@ -244,8 +278,13 @@ class _AnalysisReportWidgetState extends ConsumerState<AnalysisReportWidget> {
           ),
           const SizedBox(height: 16),
         ],
+        if (state.activeLens == AnalysisLens.functionalProtocols) ...[
+          const MoodConsciousnessMatrixWidget(),
+          const SizedBox(height: 16),
+        ],
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+
           child: Row(
             children: [
               const Text(
@@ -286,7 +325,11 @@ class _AnalysisReportWidgetState extends ConsumerState<AnalysisReportWidget> {
 
   void _handleGenerate(BuildContext context) async {
     final patientState = ref.read(patientProvider);
-    final data = "Goals: ${patientState.patientGoals}";
+    final issuesList = patientState.issues.values.expand((list) => list).map((i) => i.description).join(', ');
+    final data = "Patient: ${patientState.name}\n"
+        "Issues: ${issuesList.isNotEmpty ? issuesList : 'None reported'}\n"
+        "Vitals: BP ${patientState.vitals.bp}, HR ${patientState.vitals.hr} bpm, Temp ${patientState.vitals.temp}, SpO2 ${patientState.vitals.spO2}%\n"
+        "Goals: ${patientState.patientGoals}";
     
     final orcidService = ref.read(orcidServiceProvider);
     final orcidProfile = orcidService.profile;

@@ -28,7 +28,7 @@ function extractBaseName(filename) {
   let base = path.basename(filename);
   base = base.replace(/\.(component|service|directive|pipe)\.ts$/, '');
   base = base.replace(/\.(dart|ts)$/, '');
-  base = base.replace(/_(widget|screen|bloc)$/, '');
+  base = base.replace(/_(widget|screen|bloc|provider|model|types|cubit|event|service)$/, '');
   base = base.replace(/(-|_)/g, ' ');
   return base.toLowerCase().trim();
 }
@@ -44,7 +44,9 @@ const flutterFiles = [
   ...getFiles(path.join(flutterRoot, 'widgets')),
   ...getFiles(path.join(flutterRoot, 'screens')),
   ...getFiles(path.join(flutterRoot, 'services')),
-  ...getFiles(path.join(flutterRoot, 'blocs')),
+  ...getFiles(path.join(flutterRoot, 'providers')),
+  ...getFiles(path.join(flutterRoot, 'models')),
+  ...getFiles(path.join(flutterRoot, 'theme')),
 ];
 
 const angularMap = new Map();

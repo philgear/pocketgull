@@ -98,6 +98,35 @@ export interface IBodyPartIssue {
     ayurvedicImbalance?: string;  // Ayurvedic dosha imbalance (e.g., Vata Aggravation)
 }
 
+export interface ICmpLabs {
+    // Cardiac
+    troponinI?: string;
+    ntProBnp?: string;
+    ckMb?: string;
+    // Hepatic / Liver
+    alt?: string;
+    ast?: string;
+    alp?: string;
+    totalBilirubin?: string;
+    albumin?: string;
+    // Renal / Kidneys
+    egfr?: string;
+    creatinine?: string;
+    bun?: string;
+    sodium?: string;
+    potassium?: string;
+    // Gastric / Metabolic
+    glucose?: string;
+    hba1c?: string;
+    lipase?: string;
+    amylase?: string;
+    bicarbonate?: string;
+    // Inflammatory / Skeletal
+    hsCrp?: string;
+    calcium?: string;
+    uricAcid?: string;
+}
+
 export interface IPatientVitals {
     bp: string;      // Blood Pressure
     hr: string;      // Heart Rate
@@ -111,6 +140,8 @@ export interface IPatientVitals {
     magnesium?: string;
     zinc?: string;
     b12?: string;
+    // Comprehensive Metabolic Panel (CMP)
+    cmpLabs?: ICmpLabs;
 }
 
 export interface IDynamicMarker {
@@ -436,3 +467,38 @@ export interface IPatient extends IPatientState {
     occupation?: string;
     reasonForVisit?: string;
 }
+
+export interface IFhirGenomicObservation {
+    resourceType: 'Observation';
+    geneSymbol: 'CYP2D6' | 'CYP2C19' | 'CYP3A4' | 'SLCO1B1';
+    variantCode: string;
+    phenotype: 'Poor' | 'Intermediate' | 'Normal' | 'Rapid' | 'Ultra-Rapid';
+}
+
+export interface IMlParetoWeights {
+    costWeight: number;      // 0.0 - 1.0
+    speedWeight: number;     // 0.0 - 1.0
+    adherenceWeight: number; // 0.0 - 1.0
+}
+
+export interface IMlBanditState {
+    clinicianSpecialty: 'Cardiology' | 'Integrative' | 'Public Health' | 'General';
+    weights: Record<string, number>;
+}
+
+export interface ISirOdeResult {
+    effectiveR0: number;
+    r0Delta: number;
+    infectionsAverted: number;
+    dollarsSaved: number;
+    containmentRoiPerAvertedInfection: number;
+}
+
+export interface IGcnInteractionResult {
+    optionName: string;
+    paradigm: string;
+    riskLevel: 'Low' | 'Moderate' | 'High' | 'Severe';
+    hasGenomicInteraction: boolean;
+    interactionDetails: string[];
+}
+

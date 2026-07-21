@@ -150,7 +150,7 @@ export class PubGemmaProvider implements IIntelligenceProvider {
    */
   async translateReadingLevel(
     text: string,
-    level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+    level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'japanese' | 'hindi',
     cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
     language?: string
   ): Promise<string> {
@@ -159,7 +159,7 @@ export class PubGemmaProvider implements IIntelligenceProvider {
     if (level) {
       if (['simplified', 'dyslexia', 'child'].includes(level)) {
         resolvedCognitive = level as 'simplified' | 'dyslexia' | 'child';
-      } else if (['spanish', 'german', 'french', 'mandarin', 'hindi'].includes(level)) {
+      } else if (['spanish', 'german', 'french', 'japanese', 'hindi'].includes(level)) {
         resolvedLang = level;
       }
     }

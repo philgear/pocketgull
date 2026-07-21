@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'draggable_window.dart';
 
@@ -19,9 +20,11 @@ class _ResearchFrameWidgetState extends State<ResearchFrameWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://www.google.com/search?q=clinical+anatomy'));
+    _controller = WebViewController();
+    if (!kIsWeb) {
+      _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+    }
+    _controller.loadRequest(Uri.parse('https://www.google.com/search?q=clinical+anatomy'));
   }
 
   void _performSearch() {

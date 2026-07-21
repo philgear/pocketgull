@@ -21,6 +21,7 @@ const navItems = [
   { href: `${base}/getting-started/`, label: 'Getting Started' },
   { href: `${base}/case-study/`, label: 'Case Study' },
   { href: `${base}/positioning/`, label: 'Valuation & Positioning' },
+  { href: `${base}/git-roadmap/`, label: 'Git Roadmap & Telemetry' },
   { href: `${base}/changelog/`, label: 'Changelog' },
 ];
 
@@ -35,10 +36,19 @@ const currentIndex = navItems.findIndex(item => isActive(item.href));
 const prevPage = currentIndex > 0 ? navItems[currentIndex - 1] : null;
 const nextPage = currentIndex < navItems.length - 1 ? navItems[currentIndex + 1] : null;
 
-// Version info
+// Version info & Git Release Candidates History
+const currentVersion = 'v1.0.0-rc10';
 const versions = [
-  { label: 'v0.9.0', tag: 'latest', current: true },
-  { label: 'v0.1.0', tag: 'alpha', current: false },
+  { label: 'v1.0.0-rc10', tag: 'latest', summary: 'PhysioNet Telemetry & 7s Origami Unfolding', current: true },
+  { label: 'v1.0.0-rc9', tag: 'release', summary: '3D Search & Global Languages', current: false },
+  { label: 'v1.0.0-rc8', tag: 'release', summary: 'Dynamic Mocks & Task Bracketing', current: false },
+  { label: 'v1.0.0-rc7', tag: 'release', summary: 'Companion Apps & Widget Tests', current: false },
+  { label: 'v1.0.0-rc6', tag: 'release', summary: 'CodeQL Security Hardening', current: false },
+  { label: 'v1.0.0-rc5', tag: 'release', summary: 'Good Samaritan CPR Mode & QR', current: false },
+  { label: 'v1.0.0-rc4', tag: 'release', summary: 'FHIR R4 Bundle Serialization', current: false },
+  { label: 'v1.0.0-rc3', tag: 'release', summary: 'Multi-Agent ADK & Lenses', current: false },
+  { label: 'v1.0.0-rc2', tag: 'release', summary: '3D Skeletal Anatomy & Spine', current: false },
+  { label: 'v1.0.0-rc1', tag: 'initial', summary: 'Angular Signals Core Architecture', current: false },
 ];
 ---
 
@@ -50,8 +60,8 @@ const versions = [
   <meta name="description" content={description} />
   <title>{title} — Pocket Gull Docs</title>
   <link rel="canonical" href={canonicalUrl} />
-  <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><g transform=%22translate(5, 5) scale(0.9)%22><path d=%22M45 30 L25 40 C 35 20, 40 10, 45 0 Z%22 fill=%22%23689F38%22/><path d=%22M45 30 L45 0 L38 30Z%22 fill=%22%23558B2F%22/><path d=%22M55 30 L75 40 C 65 20, 60 10, 55 0 Z%22 fill=%22%23689F38%22/><path d=%22M55 30 L55 0 L62 30Z%22 fill=%22%23558B2F%22/><rect x=%2225%22 y=%2235%22 width=%2250%22 height=%224%22 fill=%22%23689F38%22/></g></svg>" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,40 65,15 58,45' fill='%233ebc9e' stroke='%232fa085' stroke-width='0.5'/><polygon points='20,50 50,40 10,35' fill='%23e5e5e5' stroke='%23d5d5d5' stroke-width='0.5'/><polygon points='20,50 50,40 58,45 75,55 50,65' fill='%23f4f4f4' stroke='%23e0e0e0' stroke-width='0.5'/><polygon points='50,40 58,45 35,85' fill='%23ef6658' stroke='%23df5648' stroke-width='0.5'/><polygon points='50,40 35,85 20,50' fill='%23d85547' stroke='%23c84537' stroke-width='0.5'/><polygon points='75,55 58,45 85,38' fill='%23ffffff' stroke='%23f0f0f0' stroke-width='0.5'/><polygon points='85,38 82,45 95,34' fill='%23faa63b' stroke='%23e0902c' stroke-width='0.5'/></svg>" />
   <link rel="stylesheet" href="/fonts/fonts.css">
   <script is:inline>
     const savedTheme = localStorage.getItem('pg-docs-theme') || 'western';
@@ -87,15 +97,20 @@ const versions = [
         <!-- Version Dropdown -->
         <div class="version-dropdown" id="versionDropdown">
           <button class="version-trigger" id="versionTrigger">
-            <span>v0.9.0</span>
+            <span>{currentVersion}</span>
             <svg viewBox="0 -960 960 960" fill="currentColor" width="10" height="10"><path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/></svg>
           </button>
           <div class="version-menu" id="versionMenu">
             {versions.map(v => (
               <div class:list={['version-item', { active: v.current }]}>
-                <span class="version-label">{v.label}</span>
-                {v.current && <span class="version-tag">current</span>}
-                {!v.current && <span class="version-tag muted">{v.tag}</span>}
+                <div class="version-info flex-1 min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="version-label font-mono font-bold text-xs">{v.label}</span>
+                    {v.current && <span class="version-tag">current</span>}
+                    {!v.current && <span class="version-tag muted">{v.tag}</span>}
+                  </div>
+                  <div class="version-summary text-[10px] text-zinc-400 dark:text-zinc-500 truncate">{v.summary}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -129,7 +144,7 @@ const versions = [
         ))}
       </nav>
       <div class="sidebar-footer">
-        <span>v0.9.0</span>
+        <span>{currentVersion}</span>
         <span>·</span>
         <span>MIT</span>
       </div>

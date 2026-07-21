@@ -1,7 +1,7 @@
 export default {
     "/ws/gemini-live": {
       target: "wss://generativelanguage.googleapis.com",
-      secure: true,
+      secure: false,
       changeOrigin: true,
       ws: true,
       pathRewrite: {

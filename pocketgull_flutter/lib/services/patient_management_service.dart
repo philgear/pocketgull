@@ -15,7 +15,13 @@ class PatientManagementService {
     if (box.containsKey('patients')) {
       try {
         final List<dynamic> decodedList = jsonDecode(box.get('patients') as String);
-        return decodedList.map((json) => _patientFromJson(json)).toList();
+        final list = decodedList.map((json) => _patientFromJson(json)).toList();
+        if (list.any((p) => p.id == 'p_charles_darwin')) {
+          return list;
+        }
+        // Force reset if Darwin is not in cache
+        debugPrint('[Roster] Roster cache outdated. Force resetting roster...');
+        await box.delete('patients');
       } catch (e) {
         debugPrint('Failed to parse patients from Hive: $e');
         return _getDefaultPatients();
@@ -44,14 +50,50 @@ class PatientManagementService {
   List<Patient> _getDefaultPatients() {
     return [
       Patient(
-        id: 'p001',
-        name: 'Robert Davis',
-        age: 58,
+        id: 'p_charles_darwin',
+        name: 'Charles Darwin',
+        age: 73,
         gender: 'Male',
         lastVisit: '2024.11.20',
-        preexistingConditions: ['Essential Hypertension'],
-        patientGoals: 'Discuss CPAP compliance issues.',
-        vitals: const PatientVitals(bp: '152/95', hr: '88', temp: '98.4F', weight: '295 lbs', spO2: '', height: ''),
+        preexistingConditions: const ['Chagas Disease (Suspected)', 'Episodic Palpitations'],
+        patientGoals: 'Resolve debilitating chronic fatigue, severe episodic vomiting, flatulence, and chest palpitations.',
+        vitals: const PatientVitals(bp: '120/80', hr: '72', temp: '98.6F', weight: '154 lbs', spO2: '98', height: '5\'11"'),
+        issues: const {},
+        history: const [],
+        bookmarks: const [],
+        scans: const [],
+        triageScore: 2,
+        kaizenColor: 'green',
+        activeTimerSeconds: null,
+        recommendedGuidelines: const [],
+      ),
+      Patient(
+        id: 'p_frida_kahlo',
+        name: 'Frida Kahlo',
+        age: 47,
+        gender: 'Female',
+        lastVisit: '2024.11.20',
+        preexistingConditions: ['Spinal Trauma (Post-Bus Incident)', 'Polio Sequelae', 'Right Leg Amputation'],
+        patientGoals: 'Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.',
+        vitals: const PatientVitals(bp: '118/76', hr: '78', temp: '98.2F', weight: '110 lbs', spO2: '97', height: '5\'3"'),
+        issues: const {},
+        history: const [],
+        bookmarks: const [],
+        scans: const [],
+        triageScore: 4,
+        kaizenColor: 'blue',
+        activeTimerSeconds: null,
+        recommendedGuidelines: const [],
+      ),
+      Patient(
+        id: 'p_phil_gear',
+        name: 'Phil Gear',
+        age: 38,
+        gender: 'Male',
+        lastVisit: '2024.11.20',
+        preexistingConditions: ['None'],
+        patientGoals: 'Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.',
+        vitals: const PatientVitals(bp: '120/80', hr: '72', temp: '98.6F', weight: '175 lbs', spO2: '98', height: '6\'0"'),
         issues: const {},
         history: const [],
         bookmarks: const [],
@@ -67,7 +109,7 @@ class PatientManagementService {
         age: 42,
         gender: 'Female',
         lastVisit: '2024.11.20',
-        preexistingConditions: ['Asthma', 'Heart Failure'],
+        preexistingConditions: const ['Asthma', 'Heart Failure'],
         patientGoals: 'Manage recent shortness of breath.',
         vitals: const PatientVitals(bp: '95/60', hr: '145', temp: '101.2F', weight: '165 lbs', spO2: '89', height: '5\'4"'),
         issues: const {
@@ -88,35 +130,17 @@ class PatientManagementService {
       ),
       Patient(
         id: 'p003',
-        name: 'John Doe',
+        name: 'John Doe (Sentinel Threat)',
         age: 34,
         gender: 'Male',
         lastVisit: '2024.11.20',
-        preexistingConditions: ['None'],
+        preexistingConditions: const ['None'],
         patientGoals: 'Survive severe respiratory distress and shock.',
         vitals: const PatientVitals(bp: '85/50', hr: '130', temp: '103.1F', weight: '180 lbs', spO2: '82', height: '6\'0"'),
         issues: const {
           'chest': [
             BodyPartIssue(id: 'chest', noteId: 'n1', name: 'Pulmonary Edema', description: 'Severe fluid buildup', painLevel: 9, symptoms: []),
           ],
-          'abdomen': [
-            BodyPartIssue(id: 'abdomen', noteId: 'n2', name: 'Renal Failure', description: 'Hemorrhagic fever signs', painLevel: 7, symptoms: []),
-          ],
-          'pelvis': [
-            BodyPartIssue(id: 'pelvis', noteId: 'n3', name: 'Renal Failure', description: 'Kidney involvement', painLevel: 7, symptoms: []),
-          ],
-          'l_arm': [
-            BodyPartIssue(id: 'l_arm', noteId: 'n4', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
-          ],
-          'r_arm': [
-            BodyPartIssue(id: 'r_arm', noteId: 'n5', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
-          ],
-          'l_thigh': [
-            BodyPartIssue(id: 'l_thigh', noteId: 'n6', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
-          ],
-          'r_thigh': [
-            BodyPartIssue(id: 'r_thigh', noteId: 'n7', name: 'Myalgia / Shock', description: 'Capillary leak', painLevel: 5, symptoms: []),
-          ]
         },
         history: const [],
         bookmarks: const [],
@@ -128,7 +152,7 @@ class PatientManagementService {
           {'id': '98765432', 'title': 'Hantavirus Pulmonary Syndrome: Clinical Management'},
           {'id': '11223344', 'title': 'Extracorporeal Membrane Oxygenation in Severe HPS'}
         ],
-      )
+      ),
     ];
   }
 

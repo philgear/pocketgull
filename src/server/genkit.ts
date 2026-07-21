@@ -141,7 +141,7 @@ export const translateReadingLevelFlow = ai.defineFlow(
       if (level) {
         if (['simplified', 'dyslexia', 'child'].includes(level)) {
           resolvedCognitiveLevel = level as 'simplified' | 'dyslexia' | 'child';
-        } else if (['spanish', 'german', 'french', 'mandarin', 'hindi'].includes(level)) {
+        } else if (['spanish', 'german', 'french', 'japanese', 'hindi'].includes(level)) {
           resolvedLanguage = level;
         }
       }

@@ -203,24 +203,44 @@ export class ZamecznikCanvasComponent implements OnDestroy {
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
 
-      // Draw Zamecznik Oscillating Kinetic Loops
-      ctx.lineWidth = 1.5;
+      // Calculate Box Breathing Progress Scale (4s Inhale, 4s Hold In, 4s Exhale, 4s Hold Out)
       const phase = this.currentPhase();
-      let themeColor = 'rgba(16, 185, 129, 0.25)'; // Default Emerald
-      if (phase === 'Hold (In)') themeColor = 'rgba(245, 158, 11, 0.25)';
-      if (phase === 'Exhale') themeColor = 'rgba(20, 184, 166, 0.25)';
-      if (phase === 'Hold (Out)') themeColor = 'rgba(59, 130, 246, 0.25)';
+      const secondsLeft = this.secondsLeft();
+      let boxScale = 1.0;
+      let boxGlow = 0.5;
+      let themeColor = 'rgba(62, 188, 158, 0.4)'; // Brand Teal for Inhale
 
+      if (phase === 'Inhale') {
+        const progress = Math.max(0, Math.min(1, (4 - secondsLeft) / 4));
+        boxScale = 1.0 + progress * 0.22; // 1.0 -> 1.22
+        boxGlow = 0.4 + progress * 0.6;
+        themeColor = 'rgba(62, 188, 158, 0.45)'; // Teal
+      } else if (phase === 'Hold (In)') {
+        boxScale = 1.22;
+        boxGlow = 1.0;
+        themeColor = 'rgba(250, 166, 59, 0.45)'; // Amber
+      } else if (phase === 'Exhale') {
+        const progress = Math.max(0, Math.min(1, (4 - secondsLeft) / 4));
+        boxScale = 1.22 - progress * 0.22; // 1.22 -> 1.0
+        boxGlow = 1.0 - progress * 0.6;
+        themeColor = 'rgba(239, 102, 88, 0.45)'; // Coral
+      } else { // Hold (Out)
+        boxScale = 1.0;
+        boxGlow = 0.4;
+        themeColor = 'rgba(99, 102, 241, 0.45)'; // Indigo/Blue
+      }
+
+      // Draw Zamecznik Oscillating Kinetic Loops modulated by Box Breathing
+      ctx.lineWidth = 1.5 * boxScale;
       ctx.strokeStyle = themeColor;
 
-      // Render 5 nested spiraling loops
+      // Render 5 nested spiraling loops scaled by Box Breathing
       for (let j = 0; j < 5; j++) {
         ctx.beginPath();
-        const baseRadius = 60 + j * 45;
-        const amplitude = 15 + j * 5;
+        const baseRadius = (60 + j * 45) * boxScale;
+        const amplitude = (15 + j * 5) * boxScale;
 
         for (let angle = 0; angle < Math.PI * 2; angle += 0.02) {
-          // Dynamic offset modulation based on breathing phase and frequency
           const oscillation = Math.sin(angle * (5 + j) + time * (2 + j)) * amplitude;
           const radius = baseRadius + oscillation;
           const x = centerX + Math.cos(angle) * radius;
@@ -233,18 +253,22 @@ export class ZamecznikCanvasComponent implements OnDestroy {
         ctx.stroke();
       }
 
-      // Draw client trace path
+      // Draw client trace path breathing in Box Breathing style
       if (this.mousePoints.length > 1) {
+        ctx.save();
         ctx.beginPath();
         ctx.moveTo(this.mousePoints[0].x, this.mousePoints[0].y);
         for (let i = 1; i < this.mousePoints.length; i++) {
           ctx.lineTo(this.mousePoints[i].x, this.mousePoints[i].y);
         }
-        ctx.strokeStyle = 'rgba(139, 92, 246, 0.6)'; // violet trace path
-        ctx.lineWidth = 4;
+        ctx.strokeStyle = themeColor.replace('0.45', '0.85').replace('0.4', '0.75'); // High visibility box breathing stroke
+        ctx.lineWidth = 4.5 * boxScale;
+        ctx.shadowBlur = 14 * boxGlow;
+        ctx.shadowColor = themeColor;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.stroke();
+        ctx.restore();
       }
 
       // Update ages and filter out old points

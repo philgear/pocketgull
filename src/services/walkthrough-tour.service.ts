@@ -25,21 +25,21 @@ export class WalkthroughTourService {
     const list: ITourStep[] = [
       {
         targetId: 'tour-body-chart',
-        title: 'Every journey starts with the body.',
-        body: 'I\'ve soared over many clinics. The first thing I always check: where does it hurt? Tap any region on this anatomical chart to focus our intelligence on a specific system.',
+        title: 'Interactive 3D Anatomical & Dermatome Raycaster',
+        body: 'Tap any region on this 3D mannequin model (Skin, Muscle, Bone, Organs, Spine & Dermatomes) or use the Search Bar to focus the camera. Selecting an organ isolates relevant telemetry and metabolic CMP lab panels without covering the mannequin.',
         position: 'right',
       },
       {
         targetId: 'tour-patient-dropdown',
-        title: 'Meet your patient.',
-        body: 'The patient\'s story lives here (history, vitals, prior visits). Patients flagged for epidemiological/outbreak threats (Sentinels) feature high-priority amber outlines and dedicated tags to activate containment workflows.',
+        title: 'Patient Story & Sentinel Epidemiological Triage',
+        body: 'The patient\'s story lives here (history, vitals, prior visits). Patients flagged for epidemiological or outbreak threats (Sentinels) feature high-priority amber outlines and dedicated tags to activate containment workflows.',
         position: 'bottom',
       },
       {
         targetId: 'tour-intake-form',
-        title: 'The intake is where the story begins.',
-        body: 'Review or edit the patient\'s chief complaint, vitals, and conditions here. Our intelligence engine analyzes every detail in this form to generate personalized, context-aware clinical recommendations.',
-        position: 'left',
+        title: 'Viewport-Contextual Organ Telemetry & CMP Labs',
+        body: 'Review organ-specific metabolic lab panels (Troponin, ALT/AST, eGFR/Creatinine, Fasting Glucose) and tap one-click clinical symptom shortcuts. Our intelligence engine analyzes every detail to generate context-aware care plans.',
+        position: 'right',
       }
     ];
 
@@ -47,40 +47,70 @@ export class WalkthroughTourService {
       list.push({
         targetId: 'tour-avs-therapy',
         title: 'AVS Biometric Neuro-Therapy',
-        body: 'In Spark mode, you have access to real-time audio-visual entrainment. Generate a clinical co-regulation protocol or adjust brainwave frequencies and respiratory pacing to guide your patient\'s autonomic state.',
-        position: 'left',
+        body: 'In Spark mode, access real-time audio-visual entrainment. Generate a clinical co-regulation protocol or adjust brainwave frequencies and respiratory pacing to guide your patient\'s autonomic state.',
+        position: 'right',
       });
     }
 
     list.push(
       {
         targetId: 'tour-generate-btn',
-        title: 'One tap. Five lenses. A complete care plan.',
-        body: 'When you\'re ready, press this button. Gemini synthesizes the full chart into a structured, multi-lens care plan — protocols, nutrition, monitoring, education, and more. Watch it stream in live.',
+        title: 'One Tap. Multi-Lens Synthesis.',
+        body: 'When ready, press this button. Gemini synthesizes the full patient chart into structured clinical lenses — protocols, nutrition, monitoring, education, and digital telemetry. Watch it stream in live.',
         position: 'bottom',
       },
       {
         targetId: 'tour-lens-tabs',
-        title: 'See the plan from every angle.',
-        body: 'Each tab is a different clinical lens: Overview, Interventions, Nutrition, Monitoring, Patient Education. The AI crafts each one independently. Explore freely.',
+        title: 'Lens 1: Summary Overview',
+        body: 'Synthesizes documented conditions, diagnostic priorities, and immediate therapeutic targets into a clear executive summary for the attending clinician.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-lens-tabs',
+        title: 'Lens 2: Functional Protocols',
+        body: 'Integrates biochemical pathway targets, bio-energetic balances (TCM Zang-Fu / Ayurvedic Doshas), and high-evidence medical interventions.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-lens-tabs',
+        title: 'Lens 3: Therapeutic Nutrition',
+        body: 'Custom anti-inflammatory, DASH, or elimination diets tailored to metabolic CMP lab markers, liver enzymes, and renal clearance limits.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-lens-tabs',
+        title: 'Lens 4: Precision Nutrients & Botanicals',
+        body: 'Targeted bioavailable micronutrients (Methylcobalamin, L-5-MTHF), adaptogens, and active botanical compounds translated into clinical dosages.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-lens-tabs',
+        title: 'Lens 5: Biometric Monitoring & Follow-Up',
+        body: 'Defines continuous BLE wearable parameters, lab re-check windows, and red-flag clinical escalation rules.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-lens-tabs',
+        title: 'Lens 6: Patient Education Guide',
+        body: 'Translates complex clinical strategies into plain-language 6th-grade patient guides with everyday analogies.',
         position: 'bottom',
       },
       {
         targetId: 'tour-report-node',
-        title: 'Drill deeper and refine tasks.',
-        body: 'Every recommendation is alive. Hover to open Evidence Focus for inline research/verification. Double-click any care plan task to cycle its verification state (Normal -> Approved green checkmark -> Excluded red cross) for custom refinement.',
+        title: 'Interactive Evidence Focus & Verification',
+        body: 'Every recommendation is interactive. Hover to open Evidence Focus for inline PubMed research/verification. Double-click any task to cycle its verification state (Approved checkmark vs Excluded cross).',
         position: 'left',
       },
       {
         targetId: 'tour-voice-assistant',
-        title: 'Voice & Consult Assistant',
-        body: 'Engage in real-time, bi-directional clinical chat. Ask questions, log feedback, or trigger hands-free dictation. In Demo Mode, local mock answers intercept calls to simulate full consult strategy flows.',
+        title: 'Voice & Multimodal WebRTC Consult Assistant',
+        body: 'Engage in real-time, bi-directional clinical audio streaming (`AdkLiveService`). Ask questions, log feedback, or trigger hands-free voice dictation with client-side speech barge-in.',
         position: 'left',
       },
       {
         targetId: 'tour-finalize-btn',
-        title: 'When you\'re satisfied — commit it.',
-        body: 'Archive the finalized plan to the patient chart. You can also adjust the reading level for the patient copy: simplified, dyslexia-friendly, or pediatric. That\'s the full flight path. Welcome aboard.',
+        title: 'Global Research Export & Companion App Sync',
+        body: 'Archive the finalized plan to the patient chart and FHIR R4 Bundle. Export care plans into global research languages or sync directly to the mobile app (`pocketgull_flutter`).',
         position: 'bottom',
       }
     );
@@ -93,11 +123,17 @@ export class WalkthroughTourService {
   start() {
     if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function' && localStorage.getItem(TOUR_SEEN_KEY)) return;
     this.currentStep.set(0);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   /** Force-start regardless of seen status (e.g. from a help button) */
   forceStart() {
     this.currentStep.set(0);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   next() {

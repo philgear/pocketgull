@@ -14,6 +14,10 @@ const __dirname = dirname(__filename);
 
 const app = express();
 app.use(compression());
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', "default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' http: https: ws: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:; connect-src 'self' http: https: ws: wss:;");
+  next();
+});
 app.use('/api', cors()); // Enable CORS for API routes so Flutter apps can sync data
 
 const apiLimiter = rateLimit({

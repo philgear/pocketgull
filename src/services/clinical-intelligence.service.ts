@@ -28,7 +28,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
@@ -671,7 +671,7 @@ Feel free to reference their research areas and publications if it supports the 
 
     async translateReadingLevel(
         text: string,
-        targetLevel?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+        targetLevel?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'japanese' | 'hindi',
         cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
         language?: string
     ): Promise<string> {
@@ -721,4 +721,111 @@ Feel free to reference their research areas and publications if it supports the 
             this.isLoading.set(false);
         }
     }
+
+    // ── ML Cost-Benefit Matrix Python Sidecar Integration ──────────────────────
+
+    async paretoOptimizeMatrix(options: any[], weights: { costWeight: number; speedWeight: number; adherenceWeight: number }): Promise<any> {
+        try {
+            const res = await fetch('/api/python/ml/matrix/pareto-optimize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ options, ...weights })
+            });
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.warn('[ClinicalIntelligenceService] Sidecar pareto optimization offline, using client fallback');
+        }
+        return null;
+    }
+
+    async predictAdherenceMatrix(options: any[], age: number, workBusy: number = 3, fillRate: number = 0.85): Promise<Record<string, number> | null> {
+        try {
+            const res = await fetch('/api/python/ml/matrix/adherence-score', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    patientAge: age || 45,
+                    workScheduleBusyScore: workBusy,
+                    historicalFillRate: fillRate,
+                    options
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                return data.predictions;
+            }
+        } catch (e) {
+            console.warn('[ClinicalIntelligenceService] Sidecar adherence prediction offline');
+        }
+        return null;
+    }
+
+    async sendBanditFeedback(paradigm: string, action: string): Promise<any> {
+        try {
+            const spec = this.patientState.clinicianRole();
+            const currentWeights = this.patientState.banditState().weights;
+            const res = await fetch('/api/python/ml/matrix/bandit-feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clinicianSpecialty: spec,
+                    paradigm,
+                    action,
+                    currentWeights
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                this.patientState.banditState.update(curr => ({
+                    ...curr,
+                    weights: data.updatedWeights
+                }));
+                return data;
+            }
+        } catch (e) {
+            console.warn('[ClinicalIntelligenceService] Sidecar bandit feedback offline');
+        }
+        return null;
+    }
+
+    async runSentinelSirOde(r0: number = 2.5, pop: number = 100000, intervention: string = 'Quarantine', cost: number = 50.0): Promise<import('./patient.types').ISirOdeResult | null> {
+        try {
+            const res = await fetch('/api/python/ml/matrix/sentinel-sir-ode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    baselineR0: r0,
+                    populationSize: pop,
+                    interventionType: intervention,
+                    treatmentCostDollars: cost
+                })
+            });
+            if (res.ok) return await res.json();
+        } catch (e) {
+            console.warn('[ClinicalIntelligenceService] Sidecar SIR ODE solver offline');
+        }
+        return null;
+    }
+
+    async checkPharmacogenomics(options: any[]): Promise<import('./patient.types').IGcnInteractionResult[] | null> {
+        try {
+            const genomicVariants = this.patientState.genomicProfile();
+            const res = await fetch('/api/python/ml/matrix/pharmacogenomics', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    genomicVariants,
+                    options
+                })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                return data.interactionResults;
+            }
+        } catch (e) {
+            console.warn('[ClinicalIntelligenceService] Sidecar pharmacogenomics offline');
+        }
+        return null;
+    }
 }
+

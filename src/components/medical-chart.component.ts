@@ -61,6 +61,7 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
 
       <!-- 3D Body Viewer Card -->
       <pocket-gull-card 
+        id="tour-body-chart"
         title="3D Body Viewer" 
         [icon]="viewerIcon"
         [noPadding]="true">
@@ -71,7 +72,7 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
 
         @if(isViewerExpanded()) {
           <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-black/20 shrink-0">
-            @defer (on viewport) {
+            @defer (on immediate) {
               <app-body-viewer></app-body-viewer>
             } @placeholder {
               <div class="h-full w-full flex items-center justify-center text-gray-500 dark:text-zinc-400 bg-gray-50/50 dark:bg-zinc-800/50">

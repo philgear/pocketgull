@@ -169,18 +169,30 @@ export class AdkLiveService {
   
         this.liveClient.onclose = (ev: CloseEvent) => {
           console.warn(`[AdkLiveService] WebSocket closed: Code ${ev.code}, Reason: ${ev.reason || 'None provided'}`);
-          if (ev.code !== 1000 && ev.code !== 1005 && !this.connectionError()) {
-              this.ngZone.run(() => this.connectionError.set(`Connection Lost: Code ${ev.code} ${ev.reason}`));
+          if (ev.code !== 1000 && ev.code !== 1005) {
+              this.ngZone.run(() => this.connectionError.set(`Connection Lost: Code ${ev.code} ${ev.reason}. Reconnecting...`));
+              
+              // Defensive network interruption handling
+              setTimeout(() => {
+                  console.log("[AdkLiveService] Attempting to reconnect after unexpected disconnect...");
+                  this.connect(apiKey, systemInstruction).catch(err => {
+                      console.error("[AdkLiveService] Reconnection failed:", err);
+                      this.ngZone.run(() => this.connectionError.set(`Reconnection Failed: ${err.message}`));
+                  });
+              }, 2500);
           }
           this.handleDisconnect();
-          reject(new Error(`WebSocket connection closed: Code ${ev.code}`));
+          if (ev.code !== 1000 && ev.code !== 1005) {
+              reject(new Error(`WebSocket connection closed unexpectedly: Code ${ev.code}`));
+          } else {
+              resolve();
+          }
         };
         
         this.liveClient.onerror = (err: Event) => {
           console.error('[AdkLiveService] Live API Error:', err);
           this.ngZone.run(() => this.connectionError.set('WebSocket Error'));
-          this.handleDisconnect();
-          reject(new Error('WebSocket connection error'));
+          // Do not disconnect aggressively on error, let onclose handle reconnects
         };
       });
 

@@ -43,6 +43,18 @@ Clinical inputs are structured and physician-directed, reducing the risk of bias
 
 ---
 
+## UK Research Integrity Office (UK RIO) Compliance Framework
+
+Pocket Gull strictly aligns with the **UK Research Integrity Office (UK RIO) Code of Practice for Research** (§3.4 Governance, §3.7 Data Management, §3.8 Publication & Provenance):
+
+| UK RIO Principle | Technical Implementation | Compliance Verification |
+| :--- | :--- | :--- |
+| **1. Rigour & Reproducibility (§3.4)** | Version-controlled prompt instructions (`clinical-prompts.ts`) and explicit seed reproducibility across Gemini 2.5 Flash inference runners. | Automated Vitest test suites (`npx vitest run`) verify multi-agent runner reproducibility on every release candidate. |
+| **2. Data Governance & Privacy (§3.7)** | UK GDPR / DPA 2018 information governance compliance. Patient session state is processed 100% locally in browser memory with zero remote server data logging. | DOMPurify sanitization and Base64-encoded FHIR R4 Bundle serialization ensure privacy-by-design. |
+| **3. Informed Consent & Duty of Care (§3.5)** | First-run interactive informed consent modal (`ConsentModalComponent` & `ConsentService`) gating application access until explicit clinician acknowledgement. | Mandatory consent state stored in local encrypted session storage. |
+| **4. AI Provenance & Attribution (§3.8)** | Multi-agent ADK `InMemoryRunner` tags every recommendation node with explicit agent provenance (`Overview`, `Intervention`, `Monitor`, `Education`). | Inline agent query dialogs surface exact reasoning trails and underlying lab source metrics. |
+
+
 ## Societal Impact
 
 ### Overview

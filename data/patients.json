@@ -33,37 +33,35 @@
         "value": "45 pg/mg creatinine"
       }
     ],
-    "clinicalLogs": [],
-    "medications": [
+    "antioxidantSources": [
       {
-        "name": "Lisinopril",
-        "dosage": "",
-        "frequency": ""
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "1.2 μmol/g Hb"
       },
       {
-        "name": "Metformin",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Atorvastatin",
-        "dosage": "",
-        "frequency": ""
+        "id": "2",
+        "name": "CoQ10",
+        "value": "0.45 μg/mL"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "medications": [
+      {
+        "id": "1",
+        "name": "Lisinopril",
+        "value": "20mg Daily"
+      },
+      {
+        "id": "2",
+        "name": "Metformin",
+        "value": "1000mg BID"
+      },
+      {
+        "id": "3",
+        "name": "Atorvastatin",
+        "value": "40mg Daily"
+      }
+    ],
     "issues": {
       "chest": [
         {
@@ -161,7 +159,10 @@
         "status": "Reviewed",
         "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Chest_xray_mac.jpg/640px-Chest_xray_mac.jpg"
       }
-    ]
+    ],
+    "dynamicNutrients": [],
+    "clinicalNotes": [],
+    "checklist": []
   },
   {
     "id": "p002",
@@ -185,43 +186,83 @@
       "weight": "145 lbs",
       "height": "5'5\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [
+    "biometricHistory": [
       {
-        "name": "Albuterol Inhaler",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-10-15T08:00:00Z",
+        "type": "hr",
+        "value": "78"
       },
       {
-        "name": "Sertraline",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-11-01T08:00:00Z",
+        "type": "hr",
+        "value": "77"
       },
       {
-        "name": "Gabapentin",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-12-01T08:00:00Z",
+        "type": "hr",
+        "value": "76"
       },
       {
-        "name": "Ibuprofen",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-10-15T08:00:00Z",
+        "type": "spO2",
+        "value": "98"
+      },
+      {
+        "timestamp": "2024-11-01T08:00:00Z",
+        "type": "spO2",
+        "value": "98"
+      },
+      {
+        "timestamp": "2024-12-01T08:00:00Z",
+        "type": "spO2",
+        "value": "99"
+      },
+      {
+        "timestamp": "2024-10-15T08:00:00Z",
+        "type": "bp",
+        "value": "120/75"
+      },
+      {
+        "timestamp": "2024-11-01T08:00:00Z",
+        "type": "bp",
+        "value": "119/73"
+      },
+      {
+        "timestamp": "2024-12-01T08:00:00Z",
+        "type": "bp",
+        "value": "118/72"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "oxidativeStressMarkers": [],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Vitamin C",
+        "value": "1.2 mg/dL"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Albuterol Inhaler",
+        "value": "2 puffs PRN"
+      },
+      {
+        "id": "2",
+        "name": "Sertraline",
+        "value": "50mg Daily"
+      },
+      {
+        "id": "3",
+        "name": "Gabapentin",
+        "value": "300mg TID"
+      },
+      {
+        "id": "4",
+        "name": "Ibuprofen",
+        "value": "600mg PRN MSK Pain"
+      }
+    ],
     "issues": {
       "mid_back": [
         {
@@ -354,42 +395,35 @@
         "value": "12 nmol/mL"
       }
     ],
-    "clinicalLogs": [],
-    "medications": [
+    "antioxidantSources": [
       {
-        "name": "Donepezil",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Aspirin",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Furosemide",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Acetaminophen",
-        "dosage": "",
-        "frequency": ""
+        "id": "1",
+        "name": "Alpha-Tocopherol",
+        "value": "11.5 mg/L"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "medications": [
+      {
+        "id": "1",
+        "name": "Donepezil",
+        "value": "5mg Daily"
+      },
+      {
+        "id": "2",
+        "name": "Aspirin",
+        "value": "81mg Daily"
+      },
+      {
+        "id": "3",
+        "name": "Furosemide",
+        "value": "20mg Daily"
+      },
+      {
+        "id": "4",
+        "name": "Acetaminophen",
+        "value": "500mg PRN OA Pain"
+      }
+    ],
     "issues": {
       "head": [
         {
@@ -531,22 +565,6 @@
       "weight": "172 lbs",
       "height": "5'9\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -667,29 +685,13 @@
     ],
     "patientGoals": "Manage blood pressure, optimize glycemic status, protect renal clearance, and support cognitive function and fall prevention.",
     "vitals": {
-      "bp": "148/92",
-      "hr": "82",
+      "bp": "142/78",
+      "hr": "68",
       "temp": "98.4°F",
-      "spO2": "94%",
-      "weight": "195 lbs",
-      "height": "5'9\""
+      "spO2": "95%",
+      "weight": "162 lbs",
+      "height": "5'4\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -815,22 +817,6 @@
       "weight": "34 lbs",
       "height": "3'4\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -949,22 +935,6 @@
       "weight": "165 lbs",
       "height": "5'6\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "pelvis": [
         {
@@ -1064,7 +1034,12 @@
       "temp": "98.2°F",
       "spO2": "98%",
       "weight": "165 lbs",
-      "height": "5'10\""
+      "height": "5'10\"",
+      "vitC": "10000",
+      "vitD3": "85",
+      "magnesium": "6.5",
+      "zinc": "120",
+      "b12": "1200"
     },
     "oxidativeStressMarkers": [
       {
@@ -1073,21 +1048,14 @@
         "value": "2.5"
       }
     ],
-    "clinicalLogs": [],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Antioxidant Status",
+        "value": "9.2"
+      }
+    ],
     "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -1315,7 +1283,11 @@
       "temp": "98.1°F",
       "spO2": "97%",
       "weight": "138 lbs",
-      "height": "5'6\""
+      "height": "5'6\"",
+      "vitD3": "18 ng/mL (Deficient)",
+      "magnesium": "1.6 mg/dL (Low)",
+      "b12": "310 pg/mL (Low-normal)",
+      "zinc": "68 mcg/dL (Low-normal)"
     },
     "oxidativeStressMarkers": [
       {
@@ -1334,42 +1306,122 @@
         "value": "18.2 pg/mL (Elevated)"
       }
     ],
-    "clinicalLogs": [],
-    "medications": [
+    "antioxidantSources": [
       {
-        "name": "Ocrevus (Ocrelizumab)",
-        "dosage": "",
-        "frequency": ""
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "1.1 μmol/g Hb (Low)"
       },
       {
-        "name": "Baclofen",
-        "dosage": "",
-        "frequency": ""
+        "id": "2",
+        "name": "CoQ10",
+        "value": "0.38 μg/mL (Low)"
       },
       {
-        "name": "Modafinil",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Escitalopram",
-        "dosage": "",
-        "frequency": ""
+        "id": "3",
+        "name": "Alpha-Lipoic Acid",
+        "value": "Not tested"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "medications": [
+      {
+        "id": "1",
+        "name": "Ocrevus (Ocrelizumab)",
+        "value": "600mg IV q6mo"
+      },
+      {
+        "id": "2",
+        "name": "Baclofen",
+        "value": "10mg TID (spasticity)"
+      },
+      {
+        "id": "3",
+        "name": "Modafinil",
+        "value": "100mg AM (fatigue)"
+      },
+      {
+        "id": "4",
+        "name": "Escitalopram",
+        "value": "10mg Daily"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2025-12-01T08:00:00Z",
+        "type": "hr",
+        "value": "82"
+      },
+      {
+        "timestamp": "2026-01-15T08:00:00Z",
+        "type": "hr",
+        "value": "80"
+      },
+      {
+        "timestamp": "2026-03-10T08:00:00Z",
+        "type": "hr",
+        "value": "78"
+      },
+      {
+        "timestamp": "2026-04-20T08:00:00Z",
+        "type": "hr",
+        "value": "77"
+      },
+      {
+        "timestamp": "2026-06-20T08:00:00Z",
+        "type": "hr",
+        "value": "76"
+      },
+      {
+        "timestamp": "2025-12-01T08:00:00Z",
+        "type": "spO2",
+        "value": "96"
+      },
+      {
+        "timestamp": "2026-01-15T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2026-03-10T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2026-04-20T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2026-06-20T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2025-12-01T08:00:00Z",
+        "type": "bp",
+        "value": "112/72"
+      },
+      {
+        "timestamp": "2026-01-15T08:00:00Z",
+        "type": "bp",
+        "value": "110/70"
+      },
+      {
+        "timestamp": "2026-03-10T08:00:00Z",
+        "type": "bp",
+        "value": "108/68"
+      },
+      {
+        "timestamp": "2026-04-20T08:00:00Z",
+        "type": "bp",
+        "value": "110/70"
+      },
+      {
+        "timestamp": "2026-06-20T08:00:00Z",
+        "type": "bp",
+        "value": "108/68"
+      }
+    ],
     "issues": {
       "head": [
         {
@@ -1505,7 +1557,14 @@
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [],
+    "dietaryProtocol": "",
+    "dynamicNutrients": [],
+    "clinicalNotes": [],
+    "checklist": [],
+    "shoppingList": [],
+    "activePhilosophy": "western",
+    "ayurvedicStatus": {}
   },
   {
     "id": "p_frida_kahlo",
@@ -1529,22 +1588,6 @@
       "weight": "110 lbs",
       "height": "5'3\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "spine": [
         {
@@ -1628,22 +1671,6 @@
       "weight": "150 lbs",
       "height": "5'7\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "head": [
         {
@@ -1711,22 +1738,6 @@
       "weight": "148 lbs",
       "height": "5'11\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "abdomen": [
         {
@@ -1805,12 +1816,8 @@
         "date": "1882.04.19",
         "summary": "Historical Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nCharles Darwin presents with a multi-systemic syndrome characterized by chronic gut-brain axis dysfunction, cyclical hyperemesis (cyclic vomiting syndrome), cardiac palpitations, and system-wide eczematous skin flare-ups. His presentation suggests chronic dysbiosis, systemic food intolerances (celiac/lactose sensitivity), and mitochondrial dysfunction, potentially exacerbated by historical exposure to Chagas disease (HMS Beagle bites).\n\n### Priority List\n- **Gluten & Casein Elimination**: Highest priority to resolve chronic mucosal irritation, flatulence, and cyclical emesis.\n- **Mitochondrial & Cardiac Optimization**: Support heart rhythm and energy production with key cofactors.\n- **Vagal Tone Enhancement**: Coregulate the hyperactive gut-brain axis through diaphragmatic breathing and cold hydrotherapy.\n\n### Plan of Care\n- Transition immediately to a grain-free, dairy-free diet utilizing local, nutrient-dense whole foods.\n- Supplement daily mitochondrial cofactors to address cellular fatigue.\n- Implement vagal nerve stimulation exercises twice daily to lower emotional and physiological stress triggers.",
-          "Functional Protocols": "### Immediate Actions\n- **Dietary Purge**: Remove all wheat, barley, rye, and dairy products. Cook all vegetables thoroughly to reduce lectins and fiber-induced gas.\n- **Mitochondrial Therapy**: Supplement CoQ10 (200mg/day) and Riboflavin (B2, 400mg/day) to restore cellular energy output.\n- **Hydrotherapy**: Daily 3-minute cold water chest compresses to stimulate vagal response.\n\n### Vagal & Circadian Rhythm Support\n- Diaphragmatic breathing exercises (5 seconds in, 5 seconds out) for 10 minutes prior to eating to optimize digestive enzyme secretion.",
-          "Nutrition": "### Victorian Dietary Context & Abundance\nLiving at Down House in Kent, Mr. Darwin has access to an abundance of high-quality, whole foods that can replace inflammatory Victorian staples (like heavy wheat-flour puddings, unpasteurized milk, and refined sugar):\n\n- **Kentish Coast Wild Seafood**: Wild mackerel, herring, and native oysters are abundant and rich in anti-inflammatory Omega-3 fatty acids to resolve his eczema and cardiac palpitations.\n- **Down House Kitchen Gardens**: Thoroughly cooked leafy greens (spinach, cabbage), root vegetables, and herbs provide critical trace minerals and antioxidants without triggering his flatulence.\n- **Orchard & Poultry Coops**: Freshly collected chicken/duck eggs provide highly bioavailable proteins and choline for brain health, while stewed apples/pears (cooked to break down complex sugars) support intestinal barrier repair.\n\n### Inflammatory Victorian Foods to Avoid\n- **Heavy Yeasted Breads & Suet Puddings**: Highly inflammatory wheat gluten triggers his gut barrier breakdown.\n- **Raw Cow's Milk**: Lactose and A1 casein promote gut inflammation and cyclic emesis.\n- **Mercury-laden Patent Medicines**: Discontinue all 'blue pill' formulations as they degrade the gut lining and neurological function.",
-          "Precision Nutrients": "### Orthomolecular Co-Factor Protocol\n\n| Nutrient | Victorian Food Source | Supplement Dose | Clinical Target |\n| :--- | :--- | :--- | :--- |\n| **Coenzyme Q10** | Mackerel, Heart Meats | 200 mg / day | Mitochondrial ETC / Palpitations |\n| **Riboflavin (B2)** | Egg Yolks, Wild Game | 400 mg / day | Krebs Cycle Energy Production |\n| **Omega-3 (EPA/DHA)** | Oysters, Mackerel | 3000 mg / day | Eczema Resolution & Cellular Membranes |\n| **L-Carnitine** | Mutton, Beef | 1000 mg / day | Fatty Acid Transportation |\n| **Magnesium** | Spinach, Sea Salt | 400 mg / day | Smooth Muscle Relaxation & Vagal Tone |\n\n### Clinical Notes\nEnsure all supplements are administered with fat-containing meals (such as egg yolks or pheasant fat) to optimize absorption of fat-soluble cofactors.",
-          "Monitoring & Follow-up": "### Key Clinical Milestones\n\n1. **Weeks 1-2**: Assess frequency of cyclic vomiting episodes. Target is zero hyperemesis events.\n2. **Week 4**: Evaluate skin integrity. Eczema should show a 30% reduction in surface area and weeping.\n3. **Month 3**: Re-evaluate cardiac palpitations and flatulence. Monitor energy levels during cognitive exertion (writing/researching).\n\n| Parameter | Target | Frequency | Action Trigger |\n| :--- | :--- | :--- | :--- |\n| **Vomiting Episodes** | 0 episodes | Weekly | Any episode requires immediate dietary audit |\n| **Flatulence Severity** | Mild/None | Daily | Severe gas indicates high-lectin vegetable load |\n| **Cardiac Palpitations** | < 2 per week | Daily | Daily episodes trigger magnesium dose adjustment |\n\n### Long-Term Prognosis\nBy adhering to a clean, non-inflammatory dietary regime that bypasses Victorian gut-toxins, Mr. Darwin's systemic fatigue should subside, allowing for prolonged periods of intellectual focus and scientific research without triggering cyclic physical collapses.",
-          "Patient Education": "### Understanding Your Gut-Brain Connection\nYour severe stomach issues, headaches, and chest palpitations are not isolated symptoms; they are closely connected. When your gut lining becomes irritated by wheat (gluten) and dairy (casein), it sends stress signals directly to your heart and brain via the vagus nerve.\n\n### Critical Actions\n1. **Eat Simply**: Stick to game meats, wild fish, eggs, and well-cooked garden vegetables.\n2. **Avoid Victorian Comforts**: Say no to milk, beer, and sweet puddings.\n3. **Breathe & Rest**: Do not engage in intense scientific writing immediately after meals. Give your body 30 minutes of rest to digest simply and cleanly."
+          "Summary Overview": "### Clinical Assessment\nCharles Darwin presents with a multi-systemic syndrome characterized by chronic gut-brain axis dysfunction, cyclical hyperemesis, cardiac palpitations, and eczematous skin issues. Pointing towards either chronic Chagas disease, food intolerance, or mitochondrial dysfunction.\n\n### Plan of Care\n- **Strict Gluten-Free & Lactose-Free Diet**: Eliminate inflammatory dietary proteins.\n- **Mitochondrial Support**: Supplement with CoQ10, Riboflavin (B2), and Carnitine.\n- **Vagus Nerve Stimulation**: Cold exposure and diaphragmatic breathing.",
+          "Functional Protocols": "### Immediate Actions\n- Complete elimination of dairy and wheat product intake.\n- Initiate CoQ10 200mg daily with fat-containing meals."
         }
       }
     ],
@@ -1818,75 +1825,47 @@
     "scans": []
   },
   {
-    "id": "p_phil_gear",
-    "name": "Phil Gear",
-    "age": 42,
-    "gender": "Male",
-    "lastVisit": "2026.05.20",
-    "preexistingConditions": [
-      "Hypertension",
-      "Mild Sleep Apnea",
-      "Google Health Integration"
-    ],
-    "patientGoals": "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
-    "vitals": {
-      "bp": "122/82",
-      "hr": "68",
-      "temp": "98.6°F",
-      "spO2": "98%",
-      "weight": "178 lbs",
-      "height": "5'10\""
-    },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [
-      {
-        "name": "Lisinopril",
-        "dosage": "",
-        "frequency": ""
-      }
-    ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_phil_head_1",
-          "name": "Head & Neck",
-          "painLevel": 2,
-          "description": "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
-          "symptoms": []
-        }
-      ]
-    },
+    "id": "emergency_casualty",
+    "name": "Emergency Casualty",
+    "age": 30,
+    "gender": "Other",
+    "lastVisit": "2026-07-21T20:54:51.476Z",
+    "preexistingConditions": [],
     "history": [
       {
-        "type": "AnalysisRun",
-        "date": "2026.05.20",
-        "summary": "Comprehensive Clinical Analysis",
-        "report": {
-          "Summary Overview": "### Clinical Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Focus is on optimization of metabolic pathways, screen time hygiene, and real-time biometric telemetry tracking.\n\n### Goals\n*   **Short-term**: Reduce sleep latency to < 20 minutes.\n*   **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
-          "Functional Protocols": "### Diagnostic Workup & Lifestyle\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.",
-          "Nutrition": "### Nutritional Interventions\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.",
-          "Monitoring & Follow-up": "### Immediate (24-72 hours) & Clinical Tracking\n- Monitor daily resting heart rate and sleep cycles using Fitbit/Google Health Connect.\n- Follow up in 4 weeks.",
-          "Patient Education": "### Understanding Your Health Path\nWe are focusing on tuning your body's daily rhythms, syncing Fitbit metrics, and optimizing cellular nutrients to resolve evening tension.",
-          "Precision Nutrients": "### Biomarker Matrix\n\n- **Magnesium**: Sub-optimal (ATP Synthesis / NMDA)\n- **Vitamin D3**: Sub-optimal (Immune / Bone)\n- **Vitamin B12**: Optimal (Methylation)\n- **Zinc**: Optimal (Immune / Hormones)"
-        }
+        "type": "FinalizedPatientSummary",
+        "date": "2026.07.21",
+        "summary": "Patient Summary updated (auto-saved).",
+        "report": {},
+        "annotations": {}
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "issues": {},
+    "patientGoals": "Immediate trauma and emergency life support bypass mode.",
+    "dietaryProtocol": "",
+    "vitals": {
+      "bp": "",
+      "hr": "",
+      "temp": "",
+      "spO2": "",
+      "weight": "",
+      "height": "",
+      "vitC": "",
+      "vitD3": "",
+      "magnesium": "",
+      "zinc": "",
+      "b12": ""
+    },
+    "dynamicNutrients": [],
+    "oxidativeStressMarkers": [],
+    "antioxidantSources": [],
+    "medications": [],
+    "clinicalNotes": [],
+    "checklist": [],
+    "shoppingList": [],
+    "activePhilosophy": "western",
+    "ayurvedicStatus": {},
+    "biometricHistory": []
   }
 ]

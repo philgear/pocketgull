@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef, viewChild, input, output, computed, PLATFORM_ID, OnInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SessionStateService } from '../services/session-state.service';
 import { FirestoreSyncService } from '../services/firestore-sync.service';
@@ -32,26 +33,35 @@ import { environment } from '../environments/environment';
         </div>
 
         <!-- Paper Waves (Layered vector curves representing paper hills) -->
-        <!-- Layer 1: Back Waves -->
-        <svg class="absolute bottom-0 left-0 w-[200%] h-[38%] paper-hill-back opacity-90 wave-layer"
+        <!-- Layer 1: Back Ocean Waves (46% height) -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[46%] paper-hill-back opacity-90 wave-layer"
              [style.animation-duration.s]="wavePeriod() * 1.5"
              viewBox="0 0 2880 200" preserveAspectRatio="none">
           <path fill="currentColor" [attr.d]="getWavePath(1)"></path>
         </svg>
         
-        <!-- Layer 2: Mid Waves -->
-        <svg class="absolute bottom-0 left-0 w-[200%] h-[26%] paper-hill-mid wave-layer"
+        <!-- Layer 2: Mid Ocean Waves (36% height) -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[36%] paper-hill-mid wave-layer"
              [style.animation-duration.s]="wavePeriod() * 1.2"
              viewBox="0 0 2880 200" preserveAspectRatio="none">
           <path fill="currentColor" [attr.d]="getWavePath(2)"></path>
         </svg>
 
-        <!-- Layer 3: Front Waves -->
-        <svg class="absolute bottom-0 left-0 w-[200%] h-[14%] paper-hill-front wave-layer"
+        <!-- Layer 3: Sandy Beach Front Dune (56% height) -->
+        <svg class="absolute bottom-0 left-0 w-[200%] h-[56%] paper-hill-front wave-layer"
              [style.animation-duration.s]="wavePeriod() * 0.9"
              viewBox="0 0 2880 200" preserveAspectRatio="none">
           <path fill="currentColor" [attr.d]="getWavePath(3)"></path>
         </svg>
+
+        <!-- Breezy Sandy Animation Layer (Wind gusts & sand particles across the beach) -->
+        <div class="absolute bottom-0 left-0 w-full h-[56%] pointer-events-none overflow-hidden z-10">
+          <div class="sand-breeze-particle p1"></div>
+          <div class="sand-breeze-particle p2"></div>
+          <div class="sand-breeze-particle p3"></div>
+          <div class="sand-breeze-particle p4"></div>
+          <div class="sand-breeze-particle p5"></div>
+        </div>
 
         <!-- Random Dynamic Beach Elements -->
         @for (item of decorations(); track $index) {
@@ -122,28 +132,38 @@ import { environment } from '../environments/environment';
         </div>
       }
 
-      <!-- Unified Seagull Mascot in full brand colors -->
-      <div class="origami-seagull-container group drop-shadow-2xl relative z-20 pointer-events-none mb-6 avs-breathing-mascot">
+      <!-- Unified Origami Unfolding Seagull Mascot & Papercraft Heart -->
+      <div class="origami-seagull-container group drop-shadow-2xl relative z-20 pointer-events-none mb-6 avs-breathing-mascot origami-unfold-container">
         <svg
-          class="w-24 h-24 xs:w-32 xs:h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 hover:scale-105 active:scale-95 transition-transform" 
+          class="w-24 h-24 xs:w-32 xs:h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 hover:scale-105 active:scale-95 transition-transform origami-unfold-svg" 
           viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <g>
             <!-- Far Wing (Teal) -->
-            <polygon class="origami-fold fold-4 origin-[60%_40%]" points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5" stroke-linejoin="round"></polygon>
+            <polygon class="origami-fold-far-wing" points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5" stroke-linejoin="round"></polygon>
             <!-- Tail (Light gray paper) -->
-            <polygon class="origami-fold fold-4 origin-[20%_40%]" points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5" stroke-linejoin="round"></polygon>
+            <polygon class="origami-fold-tail" points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5" stroke-linejoin="round"></polygon>
             <!-- Body Base (White paper) -->
-            <polygon class="origami-fold fold-3 origin-[50%_50%]" points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"></polygon>
+            <polygon class="origami-fold-body" points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"></polygon>
             <!-- Near Wing Upper (Coral) -->
-            <polygon class="origami-fold fold-2 origin-[40%_60%]" points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round"></polygon>
+            <polygon class="origami-fold-near-wing" points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round"></polygon>
             <!-- Near Wing Fold (Darker Coral) -->
-            <polygon class="origami-fold fold-2 origin-[40%_60%]" points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5" stroke-linejoin="round"></polygon>
+            <polygon class="origami-fold-near-wing" points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5" stroke-linejoin="round"></polygon>
             <!-- Neck/Head (White paper) -->
-            <polygon class="origami-fold fold-1 origin-[70%_45%]" points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"></polygon>
+            <polygon class="origami-fold-head" points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"></polygon>
             <!-- Beak (Golden-Amber Orange) -->
-            <polygon class="origami-fold fold-1 origin-[85%_35%]" points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round"></polygon>
+            <polygon class="origami-fold-head" points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round"></polygon>
           </g>
         </svg>
+
+        <!-- Glowing Papercraft Origami Heart (Emerges at 4.5s mark) -->
+        <div class="origami-heart-container">
+          <svg class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,85 15,45 25,20 50,35" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round" />
+            <polygon points="50,85 50,35 75,20 85,45" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
+            <polygon points="50,35 25,20 50,15" fill="#f48479" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round" />
+            <polygon points="50,35 50,15 75,20" fill="#fbc378" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
+          </svg>
+        </div>
       </div>
 
       <div class="w-full max-w-sm relative z-10 flex flex-col items-center">
@@ -165,14 +185,6 @@ import { environment } from '../environments/environment';
             </p>
           </div>
 
-          <!-- Vacation Standby Banner -->
-          <div class="mb-6 p-3 bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-900/30 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
-            <span class="text-xs">🌴</span>
-            <div class="text-left">
-              <p class="text-[12px] font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wider">Welcome & Coverage Status</p>
-              <p class="text-[8.5px] text-amber-700/95 dark:text-amber-300/80 leading-normal">Welcome. Pocket-Gull is operating in automated coverage mode while Phil Gear, Ph.G is away. Full clinical intelligence tools and sandboxes remain active.</p>
-            </div>
-          </div>
 
           <!-- Auth Loading State -->
           @if (isAuthLoading()) {
@@ -185,20 +197,14 @@ import { environment } from '../environments/environment';
             </div>
           }
           <!-- Gesture Unlock Flow -->
-          @else if (isLocked() && isAuthorized() && viewState() !== 'kss' && viewState() !== 'ethics') {
+          @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
-               <p class="text-[12px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">Draw a beach item (Palm Tree, Wave, Seagull, Shell, Starfish, or "X") to unlock</p>
+               <p class="text-[12px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">{{ todayBeachItem().prompt }}</p>
                
                <div class="relative w-[220px] h-[220px] flex items-center justify-center">
-                 <!-- Guidelines background SVG (Palm Tree / Wave guide) -->
-                 <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/30 dark:text-[#2fa085]/15" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="1.5">
-                   <circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/>
-                   <path d="M 20 60 C 35 45, 45 45, 60 60 C 70 70, 80 55, 85 50" stroke-dasharray="3 3"/>
-                   <path d="M 48 75 Q 48 50 55 40" stroke-dasharray="2 2"/>
-                   <path d="M 55 40 Q 42 32 38 42" stroke-dasharray="2 2"/>
-                   <path d="M 55 40 Q 68 30 72 40" stroke-dasharray="2 2"/>
-                   <path d="M 55 40 Q 55 25 58 28" stroke-dasharray="2 2"/>
-                 </svg>
+                  <!-- Guidelines background SVG (Dynamic Daily Beach Item guide) -->
+                  <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5" [innerHTML]="todayBeachItem().svgGuide">
+                  </svg>
                  
                  <canvas
                    #gestureCanvas
@@ -213,12 +219,19 @@ import { environment } from '../environments/environment';
                    (pointerleave)="stopDrawing()"
                  ></canvas>
                </div>
+
+                <!-- Daily Medical Quote & Light Humor Banner -->
+                <div class="mt-1 px-4 py-2 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 text-center max-w-xs transition-all hover:bg-white/80 dark:hover:bg-zinc-900/80">
+                  <p class="text-[11.5px] italic text-zinc-700 dark:text-zinc-300 font-serif leading-snug">{{ todayQuote().text }}</p>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mt-1">{{ todayQuote().author }}</p>
+                </div>
                
                <!-- Hidden input for Playwright E2E tests compatibility -->
                <input 
                  #pinInput
                  id="gesture-pin-input"
                  name="gesture-pin-input"
+                 aria-label="Clinician Security PIN Entry"
                  type="password" 
                  [value]="pin"
                  (input)="pin = pinInput.value; onPinChange(pinInput.value)"
@@ -341,7 +354,7 @@ import { environment } from '../environments/environment';
                     <div class="w-full border-t border-zinc-200 dark:border-zinc-800/80"></div>
                   </div>
                   <div class="relative flex justify-center text-xs">
-                    <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-400 uppercase tracking-widest text-[10px] font-bold rounded-full">New Clinician?</span>
+                    <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-700 dark:text-zinc-300 uppercase tracking-widest text-[10px] font-bold rounded-full">New Clinician?</span>
                   </div>
                 </div>
 
@@ -761,18 +774,6 @@ import { environment } from '../environments/environment';
           </div>
         </div>
       }
-      <!-- Secondary Agent Persona Card (Day-based Mascot) -->
-      @if (activeSecondaryAgent(); as agent) {
-        <div class="absolute bottom-20 right-8 z-30 hidden md:flex items-center gap-3 bg-white/95 dark:bg-zinc-950/80 px-4 py-3 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl animate-in slide-in-from-right-8 duration-[800ms] pointer-events-auto">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl select-none" [style.background-color]="agent.accent + '22'" [style.color]="agent.accent">
-            {{ agent.emoji }}
-          </div>
-          <div class="flex flex-col">
-            <span class="text-[12px] font-bold text-zinc-900 dark:text-zinc-100">{{ agent.name }} (Squadron Assistant)</span>
-            <span class="text-[12px] text-zinc-500 dark:text-zinc-400 italic">"{{ agent.msg }}"</span>
-          </div>
-        </div>
-      }
     </main>
   `,
   styles: [`
@@ -790,20 +791,27 @@ import { environment } from '../environments/environment';
     .fold-3 { animation-delay: 450ms; }
     .fold-4 { animation-delay: 600ms; }
 
+    /* Clinical Standard Box Breathing (4s Inhale, 4s Hold, 4s Exhale, 4s Hold = 16s total) */
     @keyframes avs-respiratory-breath {
-        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(62, 188, 158, 0.1)); }
-        50% { transform: scale(1.06); filter: drop-shadow(0 0 25px rgba(239, 102, 88, 0.25)); }
+        0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(62, 188, 158, 0.15)); }
+        25% { transform: scale(1.12); filter: drop-shadow(0 0 28px rgba(62, 188, 158, 0.45)); }
+        50% { transform: scale(1.12); filter: drop-shadow(0 0 28px rgba(239, 102, 88, 0.45)); }
+        75% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(239, 102, 88, 0.15)); }
+        100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(62, 188, 158, 0.15)); }
     }
     .avs-breathing-mascot {
-        animation: avs-respiratory-breath 10.909s ease-in-out infinite;
+        animation: avs-respiratory-breath 16s ease-in-out infinite;
     }
 
     @keyframes avs-glow-breath {
-        0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
-        50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.85; }
+        0% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+        25% { transform: translate(-50%, -50%) scale(1.25); opacity: 0.85; }
+        50% { transform: translate(-50%, -50%) scale(1.25); opacity: 0.85; }
+        75% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+        100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
     }
     .avs-breathing-glow {
-        animation: avs-glow-breath 10.909s ease-in-out infinite;
+        animation: avs-glow-breath 16s ease-in-out infinite;
     }
 
     .wave-layer {
@@ -893,6 +901,103 @@ import { environment } from '../environments/environment';
       animation: bird-glide 24s linear infinite;
     }
 
+    /* Breezy Sand Gust Particles */
+    .sand-breeze-particle {
+      position: absolute;
+      background: rgba(255, 235, 205, 0.4);
+      border-radius: 9999px;
+      height: 2px;
+      animation: breezy-sand linear infinite;
+      box-shadow: 0 0 6px rgba(255, 248, 220, 0.5);
+    }
+    .sand-breeze-particle.p1 { top: 20%; width: 60px; animation-duration: 4.5s; animation-delay: 0s; }
+    .sand-breeze-particle.p2 { top: 45%; width: 90px; animation-duration: 6s; animation-delay: 1.5s; }
+    .sand-breeze-particle.p3 { top: 65%; width: 40px; animation-duration: 3.8s; animation-delay: 0.8s; }
+    .sand-breeze-particle.p4 { top: 80%; width: 110px; animation-duration: 7s; animation-delay: 2.2s; }
+    .sand-breeze-particle.p5 { top: 35%; width: 75px; animation-duration: 5.2s; animation-delay: 3s; }
+
+    @keyframes breezy-sand {
+      0% { left: -20%; opacity: 0; transform: translateY(0) scaleX(0.5); }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.6; }
+      100% { left: 120%; opacity: 0; transform: translateY(-15px) scaleX(1.5); }
+    }
+
+    /* ─── 7-Second Origami Unfolding & Glowing Heart Sequence ─── */
+    .origami-unfold-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .origami-unfold-svg {
+      transform-style: preserve-3d;
+      animation: origami-master-unfold 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    }
+
+    @keyframes origami-master-unfold {
+      0% { transform: scale(0.6) rotate(-35deg) rotateX(60deg); filter: blur(2px); opacity: 0; }
+      12% { transform: scale(0.85) rotate(-15deg) rotateX(25deg); filter: blur(0px); opacity: 1; }
+      40% { transform: scale(1.06) rotate(4deg) rotateX(0deg); }
+      55%, 100% { transform: scale(1) rotate(0deg) rotateX(0deg); }
+    }
+
+    .origami-fold-tail {
+      transform-origin: 20% 40%;
+      animation: fold-tail-unfold 7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+    @keyframes fold-tail-unfold {
+      0%, 10% { transform: rotate(-100deg) scale(0.1); opacity: 0; }
+      28%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
+    }
+
+    .origami-fold-far-wing {
+      transform-origin: 60% 40%;
+      animation: fold-far-wing-unfold 7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+    @keyframes fold-far-wing-unfold {
+      0%, 18% { transform: rotateY(130deg) rotateZ(-45deg); opacity: 0; }
+      42%, 100% { transform: rotateY(0deg) rotateZ(0deg); opacity: 1; }
+    }
+
+    .origami-fold-near-wing {
+      transform-origin: 40% 60%;
+      animation: fold-near-wing-unfold 7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+    @keyframes fold-near-wing-unfold {
+      0%, 26% { transform: rotateY(-150deg) rotateZ(60deg); opacity: 0; }
+      52%, 100% { transform: rotateY(0deg) rotateZ(0deg); opacity: 1; }
+    }
+
+    .origami-fold-head {
+      transform-origin: 70% 45%;
+      animation: fold-head-unfold 7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+    @keyframes fold-head-unfold {
+      0%, 38% { transform: rotate(-90deg) scale(0.2); opacity: 0; }
+      60%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
+    }
+
+    .origami-heart-container {
+      position: absolute;
+      top: 50%;
+      left: 52%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: heart-emerge-pulse 7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    }
+
+    @keyframes heart-emerge-pulse {
+      0%, 62% { transform: translate(-50%, -50%) scale(0); opacity: 0; filter: drop-shadow(0 0 0px transparent); }
+      70% { transform: translate(-50%, -50%) scale(1.25); opacity: 1; filter: drop-shadow(0 0 18px rgba(239, 102, 88, 0.85)); }
+      76% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.9; }
+      82% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; filter: drop-shadow(0 0 22px rgba(239, 102, 88, 0.95)); }
+      88% { transform: translate(-50%, -50%) scale(1); opacity: 0.95; }
+      94% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; filter: drop-shadow(0 0 18px rgba(239, 102, 88, 0.85)); }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: drop-shadow(0 0 14px rgba(239, 102, 88, 0.75)); }
+    }
+
     /* Responsive styling for small mobile screens (Pixel 9 or smaller) */
     @media (max-width: 380px), (max-height: 660px) {
       .origami-seagull-container {
@@ -949,6 +1054,7 @@ import { environment } from '../environments/environment';
   `]
 })
 export class SecureSplashComponent implements OnInit {
+  private sanitizer = inject(DomSanitizer);
   session    = inject(SessionStateService);
   readonly kss = inject(CircadianSleepinessService);
   syncService = inject(FirestoreSyncService);
@@ -993,6 +1099,70 @@ export class SecureSplashComponent implements OnInit {
     return personas[day];
   });
   apiKeyStr = signal('');
+  
+  readonly dailyBeachItems = [
+    {
+      name: 'Palm Tree',
+      emoji: '🌴',
+      prompt: 'Today\'s Beach Item: Draw a Palm Tree (Trunk & Fronds) to unlock',
+      svgGuide: `<circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/><path d="M 48 75 Q 48 50 55 40"/><path d="M 55 40 Q 42 32 38 42"/><path d="M 55 40 Q 68 30 72 40"/><path d="M 55 40 Q 55 25 58 28"/>`
+    },
+    {
+      name: 'Ocean Wave',
+      emoji: '🌊',
+      prompt: 'Today\'s Beach Item: Draw an Ocean Wave (Curved Crest) to unlock',
+      svgGuide: `<circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/><path d="M 15 65 Q 35 25 55 55 T 85 45" stroke-width="2"/>`
+    },
+    {
+      name: 'Seagull',
+      emoji: '🕊️',
+      prompt: 'Today\'s Beach Item: Draw a Flying Seagull (\'V\' Wings) to unlock',
+      svgGuide: `<circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/><path d="M 20 45 Q 35 30 50 45 Q 65 30 80 45" stroke-width="2"/>`
+    },
+    {
+      name: 'Starfish',
+      emoji: '⭐',
+      prompt: 'Today\'s Beach Item: Draw a Starfish (5 Points) to unlock',
+      svgGuide: `<circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/><polygon points="50,20 58,40 80,40 62,54 68,75 50,62 32,75 38,54 20,40 42,40" stroke-dasharray="2 2"/>`
+    },
+    {
+      name: 'Sailboat',
+      emoji: '⛵',
+      prompt: 'Today\'s Beach Item: Draw a Sailboat (Hull & Sail) to unlock',
+      svgGuide: `<circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/><path d="M 25 65 L 75 65 L 65 80 L 35 80 Z"/><path d="M 50 25 L 50 60 L 75 60 Z"/>`
+    },
+    {
+      name: 'Sea Shell',
+      emoji: '🐚',
+      prompt: 'Today\'s Beach Item: Draw a Sea Shell (Fan / Spiral) to unlock',
+      svgGuide: `<circle cx="50" cy="50" r="45" stroke-dasharray="3 3"/><path d="M 50 75 L 25 35 Q 50 15 75 35 Z"/><path d="M 50 75 L 50 20"/><path d="M 50 75 L 35 25"/><path d="M 50 75 L 65 25"/>`
+    }
+  ];
+
+  todayBeachItem = computed(() => {
+    const dayEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    const item = this.dailyBeachItems[dayEpoch % this.dailyBeachItems.length];
+    return {
+      ...item,
+      svgGuide: this.sanitizer.bypassSecurityTrustHtml(item.svgGuide)
+    };
+  });
+
+  readonly dailyQuotesAndHumor = [
+    { text: '"Wherever the art of Medicine is loved, there is also a love of Humanity."', author: '— Hippocrates' },
+    { text: 'Why did the skeleton cancel his medical appointment? He had no body to go with!', author: '— Medical Humor 💀' },
+    { text: '"The good physician treats the disease; the great physician treats the patient who has the disease."', author: '— Sir William Osler' },
+    { text: 'Statistically, 9 out of 10 clinical errors start with "Hey watch this..."', author: '— ER Wisdom 🩺' },
+    { text: '"Medicine is a science of uncertainty and an art of probability."', author: '— Sir William Osler' },
+    { text: 'Remember: Coffee is technically an intravenous electrolyte solution for clinicians.', author: '— Night Shift Motto ☕' },
+    { text: '"Observation, Reason, Human Understanding, Courage; these make the physician."', author: '— Martin H. Fischer' }
+  ];
+
+  todayQuote = computed(() => {
+    const dayEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    return this.dailyQuotesAndHumor[dayEpoch % this.dailyQuotesAndHumor.length];
+  });
+
   pin = '';
   showPassword = signal(false);
   errorMsg = signal('');
@@ -1646,9 +1816,7 @@ export class SecureSplashComponent implements OnInit {
     const canvas = this.gestureCanvasRef()?.nativeElement;
     if (!canvas) return;
     
-    if (this.strokes.length === 0 && this.currentStroke.length === 0 && !this.isAvsPlaying()) {
-      this.startAmbientSoundscape();
-    }
+    // AVS is disabled by default until user explicitly clicks Listen
     
     canvas.setPointerCapture(e.pointerId);
     
@@ -1752,10 +1920,7 @@ export class SecureSplashComponent implements OnInit {
 
   onPinChange(val: string) {
     console.log('[onPinChange] Called. val =', JSON.stringify(val));
-    // Enable/resume AudioContext automatically on first keypress
-    if (val.length === 1 && !this.isAvsPlaying()) {
-      this.startAmbientSoundscape();
-    }
+    // AVS is disabled by default until user explicitly clicks Listen
     
     if (val.length > this.lastPinLength) {
       this.playKeyPressChime();

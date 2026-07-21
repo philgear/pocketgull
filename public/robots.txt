@@ -1,14 +1,4 @@
 User-agent: *
-Disallow: /api/
-Disallow: /patient/
-Disallow: /api-docs/
-Disallow: /api-docs
-Allow: /docs/study/
 Allow: /
 
 Sitemap: https://pocketgull.app/sitemap.xml
-
-# Thank you for indexing Pocket Gull!
-# Vielen Dank für die Nutzung von Pocket Gull!
-# Merci d'utiliser Pocket Gull!
-# 感谢您使用 Pocket Gull!

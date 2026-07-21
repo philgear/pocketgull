@@ -5,7 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0-rc11] - 2026-07-21
+
+**Neuro-Consciousness & Mood Optimization Matrix, Care Plan Print Studio, Mobile QR Code Engine & Emergency Bypass Triage**
+
+### Added
+- **[Mind-State / AVS] Neuro-Consciousness & Mood Optimization Matrix (`mood-consciousness-matrix.component.ts`)**: Multimodal mind-state calibration engine organizing interventions into 5 states of consciousness (`⚡ Hyper-Focus & Flow`, `🧘 Meditative Calm`, `🌙 Deep Rest & Sleep`, `🎨 Creative Reverie`, `🛡️ Anxiolytic Grounding`). Single-click state prescriptions synchronize AVS brainwave frequencies (Gamma, Alpha, Theta, Delta), vagal breathing cadences (4–6 BPM), botanical micro-doses, and Gemini bi-directional voice consultation modes.
+- **[Print / Export] Care Plan Print Studio & Document Carousel (`care-plan-print-preview.component.ts` & `export.service.ts`)**: Replaced raw code/FHIR dumps with a compact inline note editor and an interactive 4-page print thumbnail carousel with live page previews. Supports section toggle switches (`Vitals`, `Side-by-Side Comparison`, `AVS Protocols`, `Chrono-Nutrition`, `GCN Genomics`) and renders a 3-column side-by-side comparative table (`🔵 Western Allopathic` vs `🟢 Eastern TCM` vs `🟡 Ayurvedic Medicine`) in printed PDFs.
+- **[Mobile / QR] Mobile Menu QR Code Engine & Smartphone View (`mobile-menu-qr-modal.component.ts`)**: Encodes patient clinical parameters into a high-contrast QR Code matrix for mobile camera scanning. Features an interactive smartphone mockup with 1-tap meal prescriptions for on-the-fly patient exploration.
+- **[Emergency / Telemetry] Emergency Bypass Rapid Nutritional Triage (`emergency-nutritional-bypass.component.ts`)**: Real-time osmotic hydration and botanical triage recommendations calculated from vitals readouts ($\text{BP} \ge 130/80$, $\text{HR} \ge 85$, $\text{SpO}_2 < 95\%$), active conditions, and live GPS location telemetry (e.g. Oregon Pacific Coast Buoy 46050) with 1-click triage logging.
+- **[UI / Visualization] Living Patient Health Fruit Tree (`patient-fruit-tree.component.ts`)**: Interactive visual clinical metaphor rendering patient health as a living procedural fruit tree on the **Summary Overview** screen. Renders soil roots for preexisting conditions (*Type 2 Diabetes*, *Hypertension*), major clinical domain boughs, procedural fruit nodes (`🍎 Blood Pressure`, `🫐 Glycemic HbA1c`, `🍋 Vagal HRV`, `🍊 CYP2D6 Clearance`), and live ripeness growth ($0\% \to 100\%$) tied to patient note additions.
+- **[Clinical / Research] Lens Innovation Shield & Insight Sparks Engine (`lens-insight-spark-shield.component.ts`)**: Lens-tailored protection engine and translational research hypothesis generator. Dynamically renders active lens shields and provides an interactive drill-down modal proposing cutting-edge clinical research sparks (*0.1 Hz Vagal Breathing & Telomere Epigenetics*, *Chrono-Nutrition & GLUT4 Clearance*, *Anthocyanin Glymphatic Clearance*) with 1-click PubMed launches.
+- **[Docs] Feature & Architecture Documentation Update**: Updated `docs/study/src/pages/features.mdx` and `docs/study/src/pages/clinical-paradigms.mdx` to reflect all 4 new clinical systems and the Multimodal Side-by-Side Philosophy Comparison framework.
+
+
+
+## [1.0.0-rc10] - 2026-07-21
+
+
+**PhysioNet Electrophysiology Lens, 7-Sec Origami Unfolding Animation, Brand Icon Standardization & Pacific Coast Viewport**
+
+### Added
+- **[Clinical / Telemetry] PhysioNet 2026 Digital Signal & Electrophysiology Lens (`📡 PhysioNet Waveforms`)**: Added a 7th clinical lens in `clinical-intelligence.service.ts`, `analysis-report.component.ts`, `clinical-prompts.ts`, and `demo-data.ts`. Ingests high-frequency EDF/PhysioNet waveform metrics: QRS interval duration (92 ms), neutral ST-segment deviation (+0.04 mV), Fridericia QTc prolongation risk (418 ms), and HRV spectral power density (LF/HF ratio 1.08).
+- **[UI / Animation] 7-Second Origami Unfolding & Glowing Papercraft Heart**: Added a 7-second traditional origami unfolding animation sequence to `secure-splash.component.ts` featuring staggered paper crease rotations and a glowing papercraft heart emergence with radiant warm aura at the 4.5s mark.
+- **[Design / Branding] Signature Origami Seagull Icon Standardization**: Standardized the signature origami seagull logo in full brand color palette (Teal `#3ebc9e`, Coral `#ef6658`, White paper `#ffffff`, Amber beak `#faa63b`) across `index.html` favicons, Docs portal (`DocsLayout.astro`), guided walkthrough tour modal (`walkthrough-tour.component.ts`), and PDF stationery letterheads (`export.service.ts`).
+- **[UI / UX] Pacific Coast 56% Sandy Beach & Breezy Sand Gusts**: Re-proportioned splash dune height to 56%, bound daily SVG beach gesture guides (`todayBeachItem().svgGuide`) using `DomSanitizer.bypassSecurityTrustHtml()`, added horizontal sand particle gust animations (`@keyframes breezy-sand`), and mimicked local time-of-day sky gradients.
+- **[UI / UX] Walkthrough Tour Real-time Window Scroll & Spotlight Tracking**: Added passive `scroll` event listeners to `window` and multi-frame post-scroll re-measurements (`150ms`, `400ms`) in `walkthrough-tour.component.ts` to ensure spotlight masks remain anchored accurately during smooth scroll transitions.
+- **[Audio] Default Muted Audio Entrainment**: Removed automatic AVS soundscape autostart triggers from splash drawing gestures to ensure audio is strictly off by default until explicitly toggled.
+- **[Security / Repo] Trained Model & Physio Dataset Git Exclusions**: Added PhysioNet dataset formats (`*.edf`, `*.mat`, `*.dat`, `*.hea`, `*.atr`, `*.rec`) and trained model weights (`*.onnx`, `*.safetensors`, `*.pt`, `*.pth`, `*.pkl`, `*.joblib`, `*.h5`, `*.ckpt`) to `.gitignore` and `.gcloudignore`.
+
+## [1.0.0-rc9] - 2026-07-21
+
+**3D Anatomical Search, Viewport-Contextual CMP Telemetry, Global Multilingual Research Alignment & FHIR 7 Architecture**
+
+### Added
+- **[3D Anatomy / UI] Anatomical Search & Auto-Camera Tracking**: Top-left search bar with quick system filter pills (`Head/Neuro`, `Organs`, `Limbs/Spine`). Selecting search results triggers smooth `focusOnPart(id)` camera target interpolation onto 3D organ meshes.
+- **[Clinical / Telemetry] Viewport-Contextual CMP Lab Panels**: Isolated organ-specific metabolic panels (`ICmpLabs`: Troponin, ALT/AST, eGFR, Creatinine, Fasting Glucose) and one-tap symptom shortcuts tailored to the currently targeted organ system.
+- **[Docs / Architecture] HL7 FHIR Evolution Strategy (R4 → R5 → R6 → FHIR 7)**: Comprehensive roadmap for event-driven telemetry (FHIR R5 `SubscriptionTopic`), AI inference provenance (FHIR R6 `DeviceMetric`), and multi-agent AI co-pilot traces with zero-copy federated graphs (FHIR 7).
+- **[Internationalization] Global Clinical & Research Language Alignment**: Realigned care plan exports to focus on global medical research exchanges (**Spanish, German, French, Japanese, Hindi**). Replaced Mandarin button and provider types across all AI engines.
 
 ## [1.0.0-rc8] - 2026-07-16
 

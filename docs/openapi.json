@@ -393,6 +393,136 @@
         }
       }
     },
+    "/api/healthcare/nlp/analyze": {
+      "post": {
+        "summary": "Analyze Clinical Text using Healthcare NLP API",
+        "description": "Extracts medical entity mentions (SNOMED CT, ICD-10, LOINC, RxNorm) and clinical relationships from unstructured clinical text notes.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": { "type": "string", "example": "Patient has acute hypertension and dyspnea, taking Lisinopril 10mg." }
+                },
+                "required": ["text"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Healthcare NLP extraction result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "source": { "type": "string", "example": "gcp_healthcare_nlp" },
+                    "entities": { "type": "array" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/healthcare/deidentify": {
+      "post": {
+        "summary": "De-identify PII/PHI using GCP Healthcare De-id Engine",
+        "description": "Sanitizes clinical narratives and JSON patient payloads under HIPAA Safe Harbor rules.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": { "type": "string" },
+                  "payload": { "type": "object" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "De-identification result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "source": { "type": "string" },
+                    "deidentifiedText": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/healthcare/fhir/export-to-bigquery": {
+      "post": {
+        "summary": "Export FHIR Store to BigQuery Analytics",
+        "description": "Triggers automated export of FHIR R4 store datasets to BigQuery analytics tables for population health modeling.",
+        "responses": {
+          "200": {
+            "description": "Export job initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "targetUri": { "type": "string", "example": "bq://gen-lang-client-0540208645.pocketgull_fhir_analytics" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/healthcare/pubsub/webhook": {
+      "post": {
+        "summary": "Cloud Healthcare Pub/Sub Webhook Listener",
+        "description": "Receives real-time FHIR mutation events pushed by Cloud Pub/Sub and triggers Python FastAPI sidecar ML scoring re-evaluations.",
+        "responses": {
+          "200": {
+            "description": "Webhook notification processed successfully"
+          }
+        }
+      }
+    },
+    "/api/healthcare/search": {
+      "post": {
+        "summary": "Grounded Clinical Search",
+        "description": "Executes grounded search queries across Cloud Healthcare API FHIR resources.",
+        "responses": {
+          "200": {
+            "description": "Search results returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "count": { "type": "integer" },
+                    "results": { "type": "array" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/hardware/telemetry": {
       "get": {
         "summary": "Retrieve Node Hardware Telemetry",

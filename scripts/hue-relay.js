@@ -70,10 +70,10 @@ app.put('/api/hue/:bridgeIp/api/:username/lights/:lightId/state', async (req, re
     return res.status(400).json({ error: 'Invalid parameters provided. SSRF check failed.' });
   }
 
-  const url = `http://${bridgeIp}/api/${username}/lights/${lightId}/state`;
+  const targetUrl = new URL(`http://${bridgeIp}/api/${username}/lights/${lightId}/state`);
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(targetUrl.href, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)

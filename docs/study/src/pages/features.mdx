@@ -27,6 +27,10 @@ A professional clinical analysis engine that synthesizes structured strategies f
 
 Automatically extracts and visualizes biochemical markers (e.g., Magnesium, B12, Homocysteine) from the AI-generated functional protocols. The glassmorphic dashboard uses pulsed indicators and semantic color-coding to provide an instant orthomolecular status read.
 
+### PhysioNet 2026 Digital Signal & Electrophysiology Lens (`📡 PhysioNet Waveforms`)
+
+High-frequency digital signal & electrophysiology lens ingesting EDF/PhysioNet waveform metrics: QRS interval duration (ms), neutral ST-segment elevation/depression (+0.04 mV), Fridericia QTc prolongation risk (418 ms), and Heart Rate Variability (HRV) spectral power density (LF/HF ratio 1.08, SDNN 58 ms).
+
 ### Colleague Collaboration Room (TaskFlow)
 
 A real-time multiplayer workspace integrated directly into the patient's view. Clinicians can share patient states, dictate clinical notes, and chat collaboratively without leaving the active diagnostic session.
@@ -35,9 +39,14 @@ A real-time multiplayer workspace integrated directly into the patient's view. C
 
 Speak the wake word **"Gull"** followed by actions (e.g., *"Gull, highlight head"*, *"Gull, sync data"*) during active dictation. The application intelligently intercepts these commands without modifying the transcript, mapping them directly to UI actions. Clinicians can also use the integrated dictation modal to add tasks or chat messages completely hands-free.
 
-### Good Samaritan Emergency Care
+### Good Samaritan Emergency Care & Relevancy Architecture
 
-An offline emergency override mode that requires zero network connectivity. Activating it enables a **110 BPM chest-compression metronome**, Basic Life Support (BLS) guidance safety-gated through on-device Gemini Nano (`window.ai`), local <DocNode term="FHIR R4" category="HL7 International" hint="Fast Healthcare Interoperability Resources — the current standard for electronic health data exchange." link="https://hl7.org/fhir/R4/" linkLabel="HL7 FHIR R4 →" icon="https://hl7.org/favicon.ico">FHIR-compliant</DocNode> EMT QR code serialization via `lean-qr`, and full global telemetry (OTel) suppression to eliminate network latency. Designed for Good Samaritan scenarios where a clinician may be first on scene without system access.
+An offline emergency override mode engineered to maximize **Information Relevancy** when seconds count:
+* **Cognitive Noise Suppression (95% UI Reduction):** Completely strips away non-essential UI (historical labs, herbal formulas, multi-tab billing) to present a single, high-contrast emergency card.
+* **Imperative Resuscitation Directives:** Replaces complex medical jargon with 5-word physical action imperatives (*"PUSH HARD & FAST AT CENTER OF CHEST"*, *"TILT HEAD BACK, LIFT CHIN"*).
+* **Visual & Haptic 110 BPM CPR Metronome:** Flashes high-visibility rhythmic cues matching AHA Basic Life Support (BLS) compression rate guidelines.
+* **On-Device Zero-Latency AI (`window.ai` / Gemini Nano):** Operates 100% offline with full OpenTelemetry (OTel) network suppression, guaranteeing zero token latency during cellular blackouts.
+* **EMT Hand-off QR Code Serialization (`lean-qr`):** Encodes emergency vitals, resuscitation timestamps, critical allergies, and anticoagulant warnings into an instant-scannable <DocNode term="FHIR R4" category="HL7 International" hint="Fast Healthcare Interoperability Resources — the current standard for electronic health data exchange." link="https://hl7.org/fhir/R4/" linkLabel="HL7 FHIR R4 →" icon="https://hl7.org/favicon.ico">FHIR R4</DocNode> Emergency Bundle.
 
 ### Client-Side Speech Barge-In
 
@@ -45,7 +54,7 @@ Local `onspeechstart` interruption tuning across all clinical dialog and voice a
 
 ### Cognition & Multilingual Care Plans
 
-Seamlessly translate Care Plans into dyslexia-friendly or pediatric formats, or professionally translate them into **Spanish, German, French, or Mandarin**. Outputted to PDF using <DocNode term="jsPDF" category="James Hall · Parallax" hint="Client-side PDF generation library for JavaScript. Created by James Hall. Generates printable clinical stationery and accessible export formats." link="https://github.com/parallax/jsPDF" linkLabel="GitHub →" icon="https://github.com/favicon.ico">jsPDF</DocNode> with refined Dieter Rams "carousel informatics" typography. Designed for patient-facing communication where reading accessibility and cultural localization is critical.
+Seamlessly translate Care Plans into dyslexia-friendly or pediatric formats, or professionally translate them into **Spanish, German, French, Japanese, or Hindi** (aligned with global medical research exchange). Outputted to PDF using <DocNode term="jsPDF" category="James Hall · Parallax" hint="Client-side PDF generation library for JavaScript. Created by James Hall. Generates printable clinical stationery and accessible export formats." link="https://github.com/parallax/jsPDF" linkLabel="GitHub →" icon="https://github.com/favicon.ico">jsPDF</DocNode> with refined Dieter Rams "carousel informatics" typography. Designed for patient-facing communication where reading accessibility and cultural localization is critical.
 
 ---
 
@@ -71,8 +80,57 @@ Embedded directly within the AI Assessment panel, historical patient vitals (Wei
 
 An interactive, 3D-assisted clinical learning tool anchored to the spatial Method of Loci mnemonic framework. Integrated directly within the Patient Analysis Report, this interface allows clinicians to map complex treatment paths, diagnostic criteria, and patient symptoms to interactive visual "loci" nodes in a 3D space, facilitating rapid memory recall and reducing cognitive fatigue during patient consults.
 
+---
+
+## Functional & Mind-State Protocols
+
+### Neuro-Consciousness & Mood Optimization Matrix
+
+Targeted mind-state calibration engine organizing interventions into 5 states of consciousness:
+* **⚡ Hyper-Focus & Flow (40 Hz Gamma):** Cholinergic & Dopaminergic nootropics, Prefrontal Gamma coherence, L-Theanine & Dark Cacao.
+* **🧘 Meditative Calm (10 Hz Alpha):** GABAergic adaptogens, HPA axis cortisol blunting, 0.1 Hz vagal resonant breathing, Ashwagandha KSM-66.
+* **🌙 Deep Rest & Sleep (2 Hz Delta):** Glymphatic metabolic waste clearance, Melatonin & Apigenin tart cherry compote, 4 BPM delta entrainment.
+* **🎨 Creative Reverie (6 Hz Theta):** Hippocampal-cortical associative crosstalk, Gotu Kola & Lion's Mane Hericenones brew, 6 Hz Theta entrainment.
+* **🛡️ Anxiolytic Grounding (8 Hz Low Alpha):** Amygdala hyper-reactivity buffering, TCM Heart Shen anchoring, Wild Salmon & Reishi Lingzhi soup.
+
+Single-click state prescriptions synchronize AVS brainwave frequencies, vagal breathing cadences, botanical micro-doses, and Gemini bi-directional voice consultation modes.
+
+### Care Plan Print Studio & Document Carousel
+
+Replaces raw code dumps with an inline note editor and an interactive 4-page document page thumbnail carousel. Supports section toggle switches (`Vitals`, `Side-by-Side Comparison`, `AVS Protocols`, `Chrono-Nutrition`, `GCN Genomics`) and renders a 3-column side-by-side comparative table (`🔵 Western Allopathic` vs `🟢 Eastern TCM` vs `🟡 Ayurvedic Medicine`) in printed PDFs.
+
+### Mobile Menu QR Code Engine & Smartphone View
+
+Encodes patient clinical parameters into a high-contrast QR Code matrix for mobile camera scanning. Features an interactive smartphone mockup with 1-tap meal prescriptions for on-the-fly patient exploration.
+
+### Emergency Bypass Rapid Nutritional Triage Telemetry
+
+Real-time osmotic hydration and botanical triage recommendations calculated from vitals readouts (BP ≥ 130/80, HR ≥ 85, SpO2 < 95%), active conditions, and live GPS location telemetry (e.g. Oregon Pacific Coast Buoy 46050) with 1-click triage logging.
+
+
+### Living Apple Lifecycle & Genealogical Root Tree Engine
+
+An interactive visual clinical metaphor rendering patient health as a living procedural apple tree on the **Summary Overview** screen:
+* **Genealogical Root Tapestry**: Deep underground taproots branching into maternal and paternal inherited DNA lineages (`🧬 MTHFR C677T`, `🧬 ApoE4 Variant`, `🧬 Ancestral SOD2 Antioxidant Protection`).
+* **5-Stage Apple Lifecycle**:
+  1. `🌸 Blossom Bud`: Early clinical target identification.
+  2. `🍏 Low-Hanging Green Apple`: High-feasibility, quick-win intervention (sized larger with `⚡ Quick Win` badge on lower branches).
+  3. `🍎 Crisp Red Apple`: Ripe clinical goal ($61\% - 99\%$).
+  4. `🧺 Fallen Apple`: Goal achieved ($100\%$), drops smoothly to the orchard earth floor.
+  5. `🌿 Sprouted Generational Sapling`: Decomposes into rich soil humus and sprouts a mini sapling representing inherited generational health habits!
+
+
+### Lens Innovation Shield & Translational Insight Sparks
+
+A dynamic clinical protection and hypothesis generator dynamically tailored to the currently active clinical lens:
+* **Lens-Tailored Protection Banners**: Dynamically renders active clinical shields (`Karolinska Cognitive Shield`, `Autonomic Trauma Safety Shield`, `Dietary Allergy Shield`, `UK RIO PubMed Integrity Shield`).
+* **Translational Insight Sparks**: Interactive drill-down directory proposing cutting-edge research hypotheses (e.g., *0.1 Hz Resonant Breathing & Leukocyte Telomere Horvath Clock Epigenetics*, *Chrono-Nutrition & GLUT4 Clearance*, *Anthocyanin Glymphatic Amyloid Clearance*).
+* **1-Click PubMed Launch**: Direct query generation opening PubMed literature searches for selected insight sparks.
 
 ---
+
+
+
 
 ## Data & Export
 
@@ -99,6 +157,14 @@ Ingest external healthcare payloads — including **Epic/MyChart "Lucy" format**
 ### Minimalist Dieter Rams Design
 
 A premium, minimalist UI prioritizing **clarity, neutrality, and functional excellence**. Seamless mobile responsive layouts using `100dvh`. Dark-mode agent conversations provide comfortable extended-use scenarios.
+
+### 7-Second Origami Unfolding & Glowing Papercraft Heart
+
+A buttery 7-second traditional origami unfolding animation sequence for the splash mascot featuring step-by-step crease rotations (tail, wings, head) culminating in a glowing 3D papercraft heart emergence at 4.5s.
+
+### Pacific Coast 56% Sandy Beach Viewport & Breezy Sand Gusts
+
+First-person Pacific Coast atmospheric landscape set to 56% dune height with dynamic daily SVG gesture drawing guides, horizontal sand particle gusts (`@keyframes breezy-sand`), and time-of-day sky color matching.
 
 ### Smartwatch & Mobile Optimization
 

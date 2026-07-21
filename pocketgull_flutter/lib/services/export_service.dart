@@ -184,6 +184,8 @@ class ExportService {
         return 'The Road Ahead';
       case AnalysisLens.patientEducation:
         return 'Staying Strong';
+      default:
+        return 'Health Adventure';
     }
   }
 

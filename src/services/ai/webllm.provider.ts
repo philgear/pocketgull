@@ -96,7 +96,7 @@ export class WebLLMProvider implements IIntelligenceProvider {
   
   async translateReadingLevel(
       text: string,
-      level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'mandarin' | 'hindi',
+      level?: 'simplified' | 'dyslexia' | 'child' | 'spanish' | 'german' | 'french' | 'japanese' | 'hindi',
       cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
       language?: string
   ): Promise<string> { 

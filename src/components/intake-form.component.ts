@@ -5,6 +5,7 @@ import { DictationService } from '../services/dictation.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
+import { FhirR5TelemetryService } from '../services/fhir-r5-telemetry.service';
 import { IBodyPartIssue, BODY_PART_NAMES, BODY_PART_MAPPING, HistoryEntry } from '../services/patient.types';
 
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
@@ -77,6 +78,82 @@ interface INoteTimelineItem extends IBodyPartIssue {
 
               <!-- Bracket Body -->
               <div class="p-6 space-y-8">
+
+                <!-- 0. Organ-Contextual Biometric Telemetry & Metabolic Panel (CMP) -->
+                <div class="p-4 bg-gray-50/80 dark:bg-zinc-900/80 rounded-xl border border-gray-200/80 dark:border-zinc-800 shadow-2xs">
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="w-2 h-2 rounded-full" [ngClass]="r5Telemetry.isStreaming() ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'"></span>
+                      <h3 class="text-xs font-bold text-gray-600 dark:text-zinc-300 uppercase tracking-widest flex items-center gap-1.5">
+                        Contextual {{ organContext().systemName }} Telemetry & Labs
+                        @if (r5Telemetry.isStreaming()) {
+                          <span class="text-[9px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-300 dark:border-emerald-800">FHIR R5 LIVE</span>
+                        }
+                      </h3>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button type="button" (click)="r5Telemetry.toggleStreaming()" class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded border transition-all active:scale-95 shadow-2xs" [ngClass]="r5Telemetry.isStreaming() ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-300' : 'bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-zinc-400 border-gray-300'">
+                        {{ r5Telemetry.isStreaming() ? '⏸ Pause R5 Stream' : '▶ Live R5 Stream' }}
+                      </button>
+                      <button type="button" (click)="openLabModal()" class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-lime-600 text-white hover:bg-lime-700 rounded border border-lime-700 transition-all active:scale-95 shadow-2xs">
+                        ✏️ Edit Labs (CMP)
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Out-of-Range Biomarker Alerts Bar -->
+                  @if (abnormalBiomarkers().length > 0) {
+                    <div class="mb-3 p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg flex flex-wrap items-center gap-1.5">
+                      <span class="text-[10px] font-extrabold uppercase text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/></svg>
+                        Abnormal Lab Flags:
+                      </span>
+                      @for (alert of abnormalBiomarkers(); track alert) {
+                        <span class="px-2 py-0.5 text-[10px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/40 rounded-full">
+                          {{ alert }}
+                        </span>
+                      }
+                    </div>
+                  }
+
+                  <!-- Contextual Biomarker Metrics Grid -->
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                    @for (item of organContext().metrics; track item.label) {
+                      <div class="p-2 bg-white dark:bg-zinc-800/90 rounded-lg border border-gray-100 dark:border-zinc-700/60 shadow-2xs">
+                        <div class="text-[10px] font-semibold text-gray-400 dark:text-zinc-400 uppercase tracking-wider truncate">{{ item.label }}</div>
+                        <div class="text-sm font-bold text-gray-900 dark:text-zinc-100 mt-0.5 flex items-baseline gap-1">
+                          {{ item.value }}
+                          <span class="text-[10px] font-normal text-gray-400 dark:text-zinc-500">{{ item.unit }}</span>
+                        </div>
+                        <div class="mt-1 flex items-center gap-1">
+                          <span [class]="item.status === 'normal' ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200' : 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200'" class="text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded border">
+                            {{ item.status }}
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Quick Symptom Descriptor Chips (One-Tap Doctor Assistant) -->
+                  @if (note.isCurrent) {
+                    <div class="pt-2 border-t border-gray-200/60 dark:border-zinc-800">
+                      <div class="text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-500 mb-1.5 flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-lime-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                        One-Tap Symptom Shortcuts
+                      </div>
+                      <div class="flex flex-wrap gap-1.5">
+                        @for (chip of organContext().symptomChips; track chip) {
+                          <button 
+                            type="button"
+                            (click)="appendSymptomChip(chip)"
+                            class="px-2 py-1 text-[11px] font-medium bg-white dark:bg-zinc-800 hover:bg-lime-500/10 dark:hover:bg-lime-500/20 text-gray-700 dark:text-zinc-200 hover:text-lime-700 dark:hover:text-lime-300 border border-gray-200 dark:border-zinc-700 hover:border-lime-500/40 rounded-md transition-all active:scale-95 flex items-center gap-1 shadow-2xs">
+                            <span>+</span> {{ chip }}
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
                 
                 <!-- 1. Pain Level Section -->
                 <div class="mb-8">
@@ -367,16 +444,129 @@ interface INoteTimelineItem extends IBodyPartIssue {
            <p class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Select a body part to begin assessment</p>
         </div>
       }
+
+      <!-- Edit Comprehensive Metabolic Panel (CMP) Modal Overlay -->
+      @if (showLabModal()) {
+        <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between bg-gray-50/50 dark:bg-zinc-900/50">
+              <h3 class="text-sm font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-lime-500"></span>
+                Edit Comprehensive Metabolic Panel (CMP)
+              </h3>
+              <button (click)="closeLabModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200 text-lg font-bold">✕</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-4 text-xs">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">Troponin I (ng/mL)</label>
+                  <input type="text" [value]="tempCmp().troponinI || '0.02'" (input)="updateLabField('troponinI', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">NT-proBNP (pg/mL)</label>
+                  <input type="text" [value]="tempCmp().ntProBnp || '85'" (input)="updateLabField('ntProBnp', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">Serum ALT (U/L)</label>
+                  <input type="text" [value]="tempCmp().alt || '28'" (input)="updateLabField('alt', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">Serum AST (U/L)</label>
+                  <input type="text" [value]="tempCmp().ast || '32'" (input)="updateLabField('ast', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">eGFR (mL/min)</label>
+                  <input type="text" [value]="tempCmp().egfr || '94'" (input)="updateLabField('egfr', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">Serum Creatinine (mg/dL)</label>
+                  <input type="text" [value]="tempCmp().creatinine || '0.9'" (input)="updateLabField('creatinine', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">Fasting Glucose (mg/dL)</label>
+                  <input type="text" [value]="tempCmp().glucose || '92'" (input)="updateLabField('glucose', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider text-[10px] mb-1">hs-CRP Marker (mg/L)</label>
+                  <input type="text" [value]="tempCmp().hsCrp || '0.8'" (input)="updateLabField('hsCrp', $event)" class="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-300 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 font-bold focus:ring-2 focus:ring-lime-500 focus:outline-none" />
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 border-t border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 flex justify-end gap-2">
+              <button (click)="closeLabModal()" class="px-4 py-2 text-xs font-bold text-gray-600 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-all">Cancel</button>
+              <button (click)="saveLabModal()" class="px-4 py-2 text-xs font-bold bg-lime-600 text-white hover:bg-lime-700 rounded-lg transition-all shadow-md">Save Biomarker Panel</button>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `
 })
 export class IntakeFormComponent implements OnDestroy {
   state = inject(PatientStateService);
+  r5Telemetry = inject(FhirR5TelemetryService);
   private patientManager = inject(PatientManagementService);
   dictation = inject(DictationService);
 
   justCopied = signal(false);
   justCopiedRec = signal(false);
+
+  // CMP Lab Modal State
+  showLabModal = signal(false);
+  tempCmp = signal<any>({});
+
+  // Out-of-Range Biomarker Alerts
+  abnormalBiomarkers = computed(() => {
+    const cmp = this.state.vitals().cmpLabs || {};
+    const alerts: string[] = [];
+
+    if (parseFloat(cmp.troponinI || '0.02') > 0.04) {
+      alerts.push(`Elevated Troponin I: ${cmp.troponinI || '0.02'} ng/mL (Cardiac Risk)`);
+    }
+    if (parseFloat(cmp.ntProBnp || '85') > 125) {
+      alerts.push(`Elevated NT-proBNP: ${cmp.ntProBnp} pg/mL (Heart Failure Risk)`);
+    }
+    if (parseFloat(cmp.alt || '28') > 55) {
+      alerts.push(`Elevated Serum ALT: ${cmp.alt} U/L (Hepatic Stress)`);
+    }
+    if (parseFloat(cmp.ast || '32') > 48) {
+      alerts.push(`Elevated Serum AST: ${cmp.ast} U/L`);
+    }
+    if (parseFloat(cmp.egfr || '94') < 60) {
+      alerts.push(`Impaired eGFR: ${cmp.egfr} mL/min (Renal Risk)`);
+    }
+    if (parseFloat(cmp.glucose || '92') > 125) {
+      alerts.push(`Elevated Fasting Glucose: ${cmp.glucose} mg/dL`);
+    }
+    if (parseFloat(cmp.hsCrp || '0.8') > 3.0) {
+      alerts.push(`High hs-CRP Inflammatory Marker: ${cmp.hsCrp} mg/L`);
+    }
+
+    return alerts;
+  });
+
+  openLabModal() {
+    const currentCmp = this.state.vitals().cmpLabs || {};
+    this.tempCmp.set({ ...currentCmp });
+    this.showLabModal.set(true);
+  }
+
+  closeLabModal() {
+    this.showLabModal.set(false);
+  }
+
+  updateLabField(field: string, event: Event) {
+    const val = (event.target as HTMLInputElement).value;
+    this.tempCmp.update(old => ({ ...old, [field]: val }));
+  }
+
+  saveLabModal() {
+    const updatedCmp = this.tempCmp();
+    this.state.updateCmpLabs(updatedCmp);
+    this.showLabModal.set(false);
+  }
 
   // --- Local State for the Form ---
   private localPainLevel = signal(0);
@@ -450,6 +640,98 @@ export class IntakeFormComponent implements OnDestroy {
     description: this.localDescription(),
     recommendation: this.localRecommendation()
   }));
+
+  // Organ-Contextual Biometric Telemetry & Metabolic Panel (CMP) Mapping
+  organContext = computed(() => {
+    const partId = (this.state.selectedPartId() || '').toLowerCase();
+    const vitals = this.state.vitals();
+    const cmp = vitals.cmpLabs || {};
+
+    if (partId.includes('heart') || partId.includes('cardiac') || partId === 'chest') {
+      return {
+        systemName: 'Cardiovascular',
+        metrics: [
+          { label: 'Blood Pressure', value: vitals.bp || '120/80', unit: 'mmHg', status: vitals.bp === '120/80' ? 'normal' : 'warning' },
+          { label: 'Heart Rate', value: vitals.hr || '72', unit: 'bpm', status: parseInt(vitals.hr || '72') > 100 ? 'warning' : 'normal' },
+          { label: 'Troponin I', value: cmp.troponinI || '0.02', unit: 'ng/mL', status: parseFloat(cmp.troponinI || '0.02') > 0.04 ? 'critical' : 'normal' },
+          { label: 'NT-proBNP', value: cmp.ntProBnp || '85', unit: 'pg/mL', status: parseFloat(cmp.ntProBnp || '85') > 125 ? 'warning' : 'normal' }
+        ],
+        symptomChips: ['Substernal Tightness', 'Palpitations', 'Dyspnea on Exertion', 'Radiating Left Arm Pain', 'Irregular Rhythm']
+      };
+    } else if (partId.includes('lung') || partId.includes('pulmonary') || partId.includes('resp')) {
+      return {
+        systemName: 'Pulmonary / Respiratory',
+        metrics: [
+          { label: 'SpO2 Saturation', value: vitals.spO2 || '98', unit: '%', status: parseInt(vitals.spO2 || '98') < 95 ? 'critical' : 'normal' },
+          { label: 'Respiration Rate', value: '16', unit: 'br/min', status: 'normal' },
+          { label: 'Arterial PaO2', value: '92', unit: 'mmHg', status: 'normal' },
+          { label: 'PaCO2 / pH', value: '40 / 7.41', unit: 'mmHg', status: 'normal' }
+        ],
+        symptomChips: ['Pleuritic Chest Pain', 'Wheezing', 'Productive Cough', 'Cyanosis', 'Shortness of Breath']
+      };
+    } else if (partId.includes('liver') || partId.includes('hepatic')) {
+      return {
+        systemName: 'Hepatic / Liver',
+        metrics: [
+          { label: 'Serum ALT', value: cmp.alt || '28', unit: 'U/L', status: parseFloat(cmp.alt || '28') > 55 ? 'warning' : 'normal' },
+          { label: 'Serum AST', value: cmp.ast || '32', unit: 'U/L', status: parseFloat(cmp.ast || '32') > 48 ? 'warning' : 'normal' },
+          { label: 'Alk Phos (ALP)', value: cmp.alp || '68', unit: 'U/L', status: 'normal' },
+          { label: 'Total Bilirubin', value: cmp.totalBilirubin || '0.8', unit: 'mg/dL', status: 'normal' }
+        ],
+        symptomChips: ['Right Upper Quadrant Pain', 'Postprandial Nausea', 'Fatigue / Jaundice', 'Hepatomegaly']
+      };
+    } else if (partId.includes('kidney') || partId.includes('renal')) {
+      return {
+        systemName: 'Renal / Nephrology',
+        metrics: [
+          { label: 'eGFR', value: cmp.egfr || '94', unit: 'mL/min', status: parseFloat(cmp.egfr || '94') < 60 ? 'warning' : 'normal' },
+          { label: 'Serum Creatinine', value: cmp.creatinine || '0.9', unit: 'mg/dL', status: 'normal' },
+          { label: 'BUN', value: cmp.bun || '14', unit: 'mg/dL', status: 'normal' },
+          { label: 'Sodium / Potassium', value: `${cmp.sodium || '139'} / ${cmp.potassium || '4.1'}`, unit: 'mEq/L', status: 'normal' }
+        ],
+        symptomChips: ['Flank / CVA Tenderness', 'Dysuria', 'Peripheral Edema', 'Foamy Urine']
+      };
+    } else if (partId.includes('stomach') || partId.includes('gastric') || partId.includes('abdomen')) {
+      return {
+        systemName: 'Gastrointestinal & Metabolic',
+        metrics: [
+          { label: 'Fasting Glucose', value: cmp.glucose || '92', unit: 'mg/dL', status: 'normal' },
+          { label: 'Serum Lipase', value: cmp.lipase || '34', unit: 'U/L', status: 'normal' },
+          { label: 'Amylase', value: cmp.amylase || '58', unit: 'U/L', status: 'normal' },
+          { label: 'HbA1c', value: cmp.hba1c || '5.4', unit: '%', status: 'normal' }
+        ],
+        symptomChips: ['Epigastric Burning', 'Early Satiety', 'Abdominal Bloating', 'Acid Regurgitation', 'Nausea']
+      };
+    } else if (partId.includes('head') || partId.includes('brain') || partId.includes('skull')) {
+      return {
+        systemName: 'Neurological & Cranial',
+        metrics: [
+          { label: 'Blood Pressure', value: vitals.bp || '120/80', unit: 'mmHg', status: 'normal' },
+          { label: 'EEG Coherence', value: '92', unit: '%', status: 'normal' },
+          { label: 'Serum Sodium (Na+)', value: cmp.sodium || '139', unit: 'mEq/L', status: 'normal' },
+          { label: 'SpO2', value: vitals.spO2 || '98', unit: '%', status: 'normal' }
+        ],
+        symptomChips: ['Pulsatile Headache', 'Photophobia', 'Cognitive Brain Fog', 'Vertigo / Dizziness', 'Neck Stiffness']
+      };
+    } else {
+      return {
+        systemName: 'Musculoskeletal & Inflammatory',
+        metrics: [
+          { label: 'hs-CRP Marker', value: cmp.hsCrp || '0.8', unit: 'mg/L', status: parseFloat(cmp.hsCrp || '0.8') > 3.0 ? 'warning' : 'normal' },
+          { label: 'Serum Calcium', value: cmp.calcium || '9.4', unit: 'mg/dL', status: 'normal' },
+          { label: 'Serum Uric Acid', value: cmp.uricAcid || '5.2', unit: 'mg/dL', status: 'normal' },
+          { label: 'Vitamin D3', value: vitals.vitD3 || '45', unit: 'ng/mL', status: 'normal' }
+        ],
+        symptomChips: ['Joint Stiffness', 'Localized Tenderness', 'Radiating Neuropathic Pain', 'Swelling / Erythema']
+      };
+    }
+  });
+
+  appendSymptomChip(chipText: string) {
+    const current = this.localDescription();
+    const updated = current ? `${current}, ${chipText}` : chipText;
+    this.localDescription.set(updated);
+  }
 
   // Dirty checking to enable/disable the update button
   isDirty = computed(() => {

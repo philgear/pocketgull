@@ -155,6 +155,22 @@ interface IRect { top: number; left: number; width: number; height: number; }
     .tour-btn-next--finish { background: #416B1F; }
     .tour-btn-next--finish:hover { background: #4e7d25; }
 
+    /* ─── Glowing Target Spotlight Ring ─────────────── */
+    .tour-ring {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9002;
+      border: 2px solid #3ebc9e;
+      border-radius: 18px;
+      box-shadow: 0 0 24px rgba(62, 188, 158, 0.7), inset 0 0 12px rgba(62, 188, 158, 0.4);
+      animation: tour-ring-pulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes tour-ring-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.015); opacity: 0.8; }
+    }
+
     /* ─── Spotlight ring ──────────────────────────── */
     .tour-ring {
       position: fixed; border-radius: 14px;
@@ -260,15 +276,22 @@ interface IRect { top: number; left: number; width: number; height: number; }
           <!-- Seagull header -->
           <div class="tour-gull-header">
             <div class="tour-gull-row">
-              <!-- Origami Seagull SVG (matches splash screen) -->
+              <!-- Origami Seagull SVG (matches splash screen & main nav) -->
               <svg class="tour-gull-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="50,40 65,15 58,45" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="0.5" stroke-linejoin="round"/>
-                <polygon points="20,50 50,40 10,35" fill="#e0e0e0" stroke="#d0d0d0" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- Far Wing (Teal) -->
+                <polygon points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- Tail (Light gray paper) -->
+                <polygon points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- Body Base (White paper) -->
                 <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
-                <polygon points="50,40 58,45 35,85" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
-                <polygon points="50,40 35,85 20,50" fill="#f9f9f9" stroke="#e0e0e0" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- Near Wing Upper (Coral) -->
+                <polygon points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- Near Wing Fold (Darker Coral) -->
+                <polygon points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- Neck/Head (White paper) -->
                 <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5" stroke-linejoin="round"/>
-                <polygon points="85,38 82,45 95,34" fill="#ff4500" stroke="#df3d00" stroke-width="0.5" stroke-linejoin="round"/>
+                <!-- Beak (Golden-Amber Orange) -->
+                <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round"/>
               </svg>
               <div>
                 <div class="tour-gull-name">Pocket Gull · Your Guide</div>
@@ -334,10 +357,11 @@ export class WalkthroughTourComponent implements OnDestroy {
       }
     });
 
-    // Keyboard escape support & window resize support
+    // Keyboard escape support, window resize & scroll support
     if (typeof window !== 'undefined') {
       document.addEventListener('keydown', this._onKey);
       window.addEventListener('resize', this._onResize);
+      window.addEventListener('scroll', this._onScroll, { passive: true });
     }
   }
 
@@ -352,6 +376,21 @@ export class WalkthroughTourComponent implements OnDestroy {
     }
   };
 
+  private _onScroll = () => {
+    if (!this.tour.isActive()) return;
+    const def = this.stepDef();
+    if (def) {
+      this._updateRectPosition(def.targetId);
+    }
+  };
+
+  private _updateRectPosition(targetId: string) {
+    const el = document.getElementById(targetId);
+    if (!el) { this.rect.set(null); return; }
+    const r = el.getBoundingClientRect();
+    this.rect.set({ top: r.top, left: r.left, width: r.width, height: r.height });
+  }
+
   private _updateRect(targetId: string) {
     // Defer one frame so newly-rendered elements are in DOM
     if (typeof window !== 'undefined') {
@@ -359,8 +398,24 @@ export class WalkthroughTourComponent implements OnDestroy {
       this._rafId = requestAnimationFrame(() => {
         const el = document.getElementById(targetId);
         if (!el) { this.rect.set(null); return; }
-        const r = el.getBoundingClientRect();
-        this.rect.set({ top: r.top, left: r.left, width: r.width, height: r.height });
+
+        if (targetId === 'tour-body-chart') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const r0 = el.getBoundingClientRect();
+          const vh = window.innerHeight;
+          const vw = window.innerWidth;
+          const isInViewport = r0.top >= 0 && r0.left >= 0 && r0.bottom <= vh && r0.right <= vw;
+
+          if (!isInViewport) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+          }
+        }
+
+        // Measure immediately and re-measure after smooth scroll completes
+        this._updateRectPosition(targetId);
+        setTimeout(() => this._updateRectPosition(targetId), 150);
+        setTimeout(() => this._updateRectPosition(targetId), 400);
 
         // Measure actual card height after Angular has finished rendering the content
         setTimeout(() => {
@@ -472,6 +527,7 @@ export class WalkthroughTourComponent implements OnDestroy {
     if (typeof window !== 'undefined') {
       document.removeEventListener('keydown', this._onKey);
       window.removeEventListener('resize', this._onResize);
+      window.removeEventListener('scroll', this._onScroll);
     }
     if (typeof window !== 'undefined') {
       cancelAnimationFrame(this._rafId);

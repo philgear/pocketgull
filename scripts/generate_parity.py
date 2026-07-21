@@ -13,7 +13,7 @@ def extract_basename(filename):
     base = os.path.basename(filename)
     base = re.sub(r'\.(component|service|directive|pipe)\.ts$', '', base)
     base = re.sub(r'\.(dart|ts)$', '', base)
-    base = re.sub(r'_(widget|screen|bloc)$', '', base)
+    base = re.sub(r'_(widget|screen|bloc|provider|model|types|cubit|event|service)$', '', base)
     base = re.sub(r'(-|_)', ' ', base)
     return base.lower().strip()
 
@@ -24,7 +24,7 @@ angular_root = os.path.join(project_root, 'src')
 flutter_root = os.path.join(project_root, 'pocketgull_flutter', 'lib')
 
 angular_dirs = ['components', 'services', 'directives', 'pipes']
-flutter_dirs = ['widgets', 'screens', 'services', 'blocs']
+flutter_dirs = ['widgets', 'screens', 'services', 'providers', 'models', 'theme']
 
 angular_files = []
 for d in angular_dirs:
