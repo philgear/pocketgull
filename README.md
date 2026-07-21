@@ -67,6 +67,55 @@ Moving beyond simple translation, the **COLO Engine** adjusts the "Clinical Stra
 
 ## 🧩 TECHNICAL ARCHITECTURE
 
+Pocket Gull utilizes a hybrid client-server-edge architecture designed for low-latency live consults, privacy-first offline operation, and continuous multi-lens clinical reasoning.
+
+```mermaid
+graph TD
+    classDef client fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef server fill:#0f172a,stroke:#34d399,stroke-width:2px,color:#f8fafc;
+    classDef ai fill:#0f172a,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
+    classDef db fill:#0f172a,stroke:#fbbf24,stroke-width:2px,color:#f8fafc;
+
+    subgraph ClientLayer ["📱 Frontend Client (Angular 22 + Three.js)"]
+        UI["Clinical Workspace UI"]
+        Viewer["3D Body Viewer & Anatomical Search"]
+        Intake["Viewport-Contextual CMP Intake"]
+        PWA["On-Device Nano AI (window.ai)"]
+    end
+
+    subgraph BackendLayer ["⚡ Node.js SSR + FastAPI Sidecar"]
+        Express["Express Server / Proxy (/ws/gemini-live)"]
+        FastAPI["Python FastAPI Sidecar (ML Risk Scoring)"]
+    end
+
+    subgraph AILayer ["🧠 Multimodal AI & Medical Intelligence"]
+        Gemini["Google Gemini 1.5 / Live API (Bidi Voice)"]
+        PubMed["NCBI PubMed / Google Search Grounding"]
+        Genkit["Genkit Microservice Workflows"]
+    end
+
+    subgraph StorageLayer ["💾 Data & Standards Compliance"]
+        FHIR["FHIR R4 / R5 / R6 / FHIR 7 Bundles"]
+        IndexedDB["Local Encrypted Browser Cache"]
+    end
+
+    UI --> Viewer
+    UI --> Intake
+    Intake --> PWA
+    UI <-->|"WebSocket / REST"| Express
+    Express <-->|"gRPC / Multimodal"| Gemini
+    Express <-->|"Pydantic API"| FastAPI
+    Gemini --> PubMed
+    Express --> Genkit
+    Intake --> FHIR
+    UI --> IndexedDB
+
+    class UI,Viewer,Intake,PWA client;
+    class Express,FastAPI server;
+    class Gemini,PubMed,Genkit ai;
+    class FHIR,IndexedDB db;
+```
+
 A highly interactive, aesthetically minimal user interface (Industrial Grace) designed for immediate clinical insight.
 *For a full demonstration, press the `Demo` button in the top-right of the application to load the patient simulation.*
 
@@ -103,6 +152,23 @@ Pocketgull is a secure digital assistant for doctors, nurses, and caregivers. It
 ### 🤖 AI & Intelligence
 
 - **Live AI Consult & Multi-Agent Orchestration:** Powered by `@google/adk` and the Web Speech API. Specialized `LlmAgent` experts synthesize clinical data into actionable insights through an interruptible, natural conversational UI with **context-aware memory** of recently discussed report nodes.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Clinician as 🩺 Clinician
+    participant UI as 💻 Angular UI (Web Speech)
+    participant Proxy as ⚡ Express WS Proxy
+    participant Gemini as 🧠 Gemini Live API
+
+    Clinician->>UI: Speaks Clinical Query / Dictation
+    UI->>Proxy: Stream PCM Audio / AudioBuffer
+    Proxy->>Gemini: Full-Duplex Multimodal Stream
+    Gemini-->>Proxy: Streaming Response & Audio Tokens
+    Proxy-->>UI: Chunked Audio & Text Response
+    UI-->>Clinician: Play Audio & Render Care Plan Lenses
+    Note over Clinician,UI: Clinician Barge-In: Auto-Mutes Audio on Speech Start
+```
 - **Care Plan Recommendation Engine:** A professional clinical analysis engine that synthesizes structured strategies for patient care, organized by diagnostic lenses (Overview, Interventions, Monitoring, Education). Includes **inline agent queries** directly from generated report nodes.
 - **Y-BOCs Diagnostic Screener & Voice Interview:** Core clinical logic mapping obsessive-compulsive target symptom checklists and a 10-item severity rating scale. Features a hands-free voice diagnostic interview agent ("Mindful Macaw") using the Web Speech API's `speechSynthesis` and text-to-score semantic mapping.
 - **Human-in-the-Loop (HITL) Cost-Benefit Matrix:** The *Treatment Matrix* dynamically tracks and visualizes the clinician's vetting decisions. Appends custom additions with green `[Added]` badges, and highlights rejected default recommendations with `line-through` styles and red `[Removed]` badges.
@@ -115,7 +181,8 @@ Pocketgull is a secure digital assistant for doctors, nurses, and caregivers. It
 
 - **Good Samaritan Emergency Care:** Offline emergency override mode featuring a 110 BPM chest-compression metronome, BLS safety-gated Gemini Nano local routing, local FHIR-compliant EMT QR code serialization (`lean-qr`), and global telemetry suppression.
 - **Calm Mode & Somatic Grounding:** Specialized paper-white sensory layout with reduced motion transitions. Overlaid with an interactive Three.js somatic particle visualizer, Zamecznik HTML5 Grounding Canvas, and a 16-second box-breathing coach.
-- **Cognition & Multilingual Export Modes:** Seamlessly translate Care Plans into dyslexia-friendly, pediatric formats, or professionally translate them into **Spanish, German, French, or Mandarin**. Outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
+- **3D Anatomical Search & Viewport-Contextual CMP Telemetry:** Real-time fuzzy anatomical search bar with auto-camera tracking onto 3D organ meshes (`focusOnPart`), dynamically filtering Comprehensive Metabolic Panels (CMP) and organ-specific lab values (Troponin, ALT/AST, eGFR, Fasting Glucose) alongside one-tap symptom shortcuts.
+- **Cognition & Multilingual Care Plan Exports:** Seamlessly translate Care Plans into dyslexia-friendly, pediatric formats, or professionally translate them into **Spanish, German, French, Japanese, or Hindi** (aligned with global medical research exchange). Outputted to PDF using refined Dieter Rams 'carousel informatics' typography.
 - **Colleague Collaboration Room (TaskFlow):** A real-time multiplayer workspace integrated directly into the patient's view for clinicians to share states, dictate notes, and chat collaboratively.
 - **Hands-Free Voice Dictation & Controls:** Voice command interception during dictation allows hands-free UI control, task addition, and message composition.
 - **Client-Side Barge-In Interruption:** Local `onspeechstart` barge-in tuning across clinical dialog and voice assistant panels, with instant audio muting when the clinician begins speaking.

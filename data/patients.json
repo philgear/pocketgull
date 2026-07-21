@@ -33,37 +33,35 @@
         "value": "45 pg/mg creatinine"
       }
     ],
-    "clinicalLogs": [],
-    "medications": [
+    "antioxidantSources": [
       {
-        "name": "Lisinopril",
-        "dosage": "",
-        "frequency": ""
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "1.2 μmol/g Hb"
       },
       {
-        "name": "Metformin",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Atorvastatin",
-        "dosage": "",
-        "frequency": ""
+        "id": "2",
+        "name": "CoQ10",
+        "value": "0.45 μg/mL"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "medications": [
+      {
+        "id": "1",
+        "name": "Lisinopril",
+        "value": "20mg Daily"
+      },
+      {
+        "id": "2",
+        "name": "Metformin",
+        "value": "1000mg BID"
+      },
+      {
+        "id": "3",
+        "name": "Atorvastatin",
+        "value": "40mg Daily"
+      }
+    ],
     "issues": {
       "chest": [
         {
@@ -161,7 +159,10 @@
         "status": "Reviewed",
         "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Chest_xray_mac.jpg/640px-Chest_xray_mac.jpg"
       }
-    ]
+    ],
+    "dynamicNutrients": [],
+    "clinicalNotes": [],
+    "checklist": []
   },
   {
     "id": "p002",
@@ -185,43 +186,83 @@
       "weight": "145 lbs",
       "height": "5'5\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [
+    "biometricHistory": [
       {
-        "name": "Albuterol Inhaler",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-10-15T08:00:00Z",
+        "type": "hr",
+        "value": "78"
       },
       {
-        "name": "Sertraline",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-11-01T08:00:00Z",
+        "type": "hr",
+        "value": "77"
       },
       {
-        "name": "Gabapentin",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-12-01T08:00:00Z",
+        "type": "hr",
+        "value": "76"
       },
       {
-        "name": "Ibuprofen",
-        "dosage": "",
-        "frequency": ""
+        "timestamp": "2024-10-15T08:00:00Z",
+        "type": "spO2",
+        "value": "98"
+      },
+      {
+        "timestamp": "2024-11-01T08:00:00Z",
+        "type": "spO2",
+        "value": "98"
+      },
+      {
+        "timestamp": "2024-12-01T08:00:00Z",
+        "type": "spO2",
+        "value": "99"
+      },
+      {
+        "timestamp": "2024-10-15T08:00:00Z",
+        "type": "bp",
+        "value": "120/75"
+      },
+      {
+        "timestamp": "2024-11-01T08:00:00Z",
+        "type": "bp",
+        "value": "119/73"
+      },
+      {
+        "timestamp": "2024-12-01T08:00:00Z",
+        "type": "bp",
+        "value": "118/72"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "oxidativeStressMarkers": [],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Vitamin C",
+        "value": "1.2 mg/dL"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Albuterol Inhaler",
+        "value": "2 puffs PRN"
+      },
+      {
+        "id": "2",
+        "name": "Sertraline",
+        "value": "50mg Daily"
+      },
+      {
+        "id": "3",
+        "name": "Gabapentin",
+        "value": "300mg TID"
+      },
+      {
+        "id": "4",
+        "name": "Ibuprofen",
+        "value": "600mg PRN MSK Pain"
+      }
+    ],
     "issues": {
       "mid_back": [
         {
@@ -354,42 +395,35 @@
         "value": "12 nmol/mL"
       }
     ],
-    "clinicalLogs": [],
-    "medications": [
+    "antioxidantSources": [
       {
-        "name": "Donepezil",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Aspirin",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Furosemide",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Acetaminophen",
-        "dosage": "",
-        "frequency": ""
+        "id": "1",
+        "name": "Alpha-Tocopherol",
+        "value": "11.5 mg/L"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "medications": [
+      {
+        "id": "1",
+        "name": "Donepezil",
+        "value": "5mg Daily"
+      },
+      {
+        "id": "2",
+        "name": "Aspirin",
+        "value": "81mg Daily"
+      },
+      {
+        "id": "3",
+        "name": "Furosemide",
+        "value": "20mg Daily"
+      },
+      {
+        "id": "4",
+        "name": "Acetaminophen",
+        "value": "500mg PRN OA Pain"
+      }
+    ],
     "issues": {
       "head": [
         {
@@ -531,22 +565,6 @@
       "weight": "172 lbs",
       "height": "5'9\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -674,22 +692,6 @@
       "weight": "195 lbs",
       "height": "5'9\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -815,22 +817,6 @@
       "weight": "34 lbs",
       "height": "3'4\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -949,22 +935,6 @@
       "weight": "165 lbs",
       "height": "5'6\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "pelvis": [
         {
@@ -1064,7 +1034,12 @@
       "temp": "98.2°F",
       "spO2": "98%",
       "weight": "165 lbs",
-      "height": "5'10\""
+      "height": "5'10\"",
+      "vitC": "10000",
+      "vitD3": "85",
+      "magnesium": "6.5",
+      "zinc": "120",
+      "b12": "1200"
     },
     "oxidativeStressMarkers": [
       {
@@ -1073,21 +1048,14 @@
         "value": "2.5"
       }
     ],
-    "clinicalLogs": [],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Antioxidant Status",
+        "value": "9.2"
+      }
+    ],
     "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "chest": [
         {
@@ -1315,7 +1283,11 @@
       "temp": "98.1°F",
       "spO2": "97%",
       "weight": "138 lbs",
-      "height": "5'6\""
+      "height": "5'6\"",
+      "vitD3": "18 ng/mL (Deficient)",
+      "magnesium": "1.6 mg/dL (Low)",
+      "b12": "310 pg/mL (Low-normal)",
+      "zinc": "68 mcg/dL (Low-normal)"
     },
     "oxidativeStressMarkers": [
       {
@@ -1334,42 +1306,122 @@
         "value": "18.2 pg/mL (Elevated)"
       }
     ],
-    "clinicalLogs": [],
-    "medications": [
+    "antioxidantSources": [
       {
-        "name": "Ocrevus (Ocrelizumab)",
-        "dosage": "",
-        "frequency": ""
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "1.1 μmol/g Hb (Low)"
       },
       {
-        "name": "Baclofen",
-        "dosage": "",
-        "frequency": ""
+        "id": "2",
+        "name": "CoQ10",
+        "value": "0.38 μg/mL (Low)"
       },
       {
-        "name": "Modafinil",
-        "dosage": "",
-        "frequency": ""
-      },
-      {
-        "name": "Escitalopram",
-        "dosage": "",
-        "frequency": ""
+        "id": "3",
+        "name": "Alpha-Lipoic Acid",
+        "value": "Not tested"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "medications": [
+      {
+        "id": "1",
+        "name": "Ocrevus (Ocrelizumab)",
+        "value": "600mg IV q6mo"
+      },
+      {
+        "id": "2",
+        "name": "Baclofen",
+        "value": "10mg TID (spasticity)"
+      },
+      {
+        "id": "3",
+        "name": "Modafinil",
+        "value": "100mg AM (fatigue)"
+      },
+      {
+        "id": "4",
+        "name": "Escitalopram",
+        "value": "10mg Daily"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2025-12-01T08:00:00Z",
+        "type": "hr",
+        "value": "82"
+      },
+      {
+        "timestamp": "2026-01-15T08:00:00Z",
+        "type": "hr",
+        "value": "80"
+      },
+      {
+        "timestamp": "2026-03-10T08:00:00Z",
+        "type": "hr",
+        "value": "78"
+      },
+      {
+        "timestamp": "2026-04-20T08:00:00Z",
+        "type": "hr",
+        "value": "77"
+      },
+      {
+        "timestamp": "2026-06-20T08:00:00Z",
+        "type": "hr",
+        "value": "76"
+      },
+      {
+        "timestamp": "2025-12-01T08:00:00Z",
+        "type": "spO2",
+        "value": "96"
+      },
+      {
+        "timestamp": "2026-01-15T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2026-03-10T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2026-04-20T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2026-06-20T08:00:00Z",
+        "type": "spO2",
+        "value": "97"
+      },
+      {
+        "timestamp": "2025-12-01T08:00:00Z",
+        "type": "bp",
+        "value": "112/72"
+      },
+      {
+        "timestamp": "2026-01-15T08:00:00Z",
+        "type": "bp",
+        "value": "110/70"
+      },
+      {
+        "timestamp": "2026-03-10T08:00:00Z",
+        "type": "bp",
+        "value": "108/68"
+      },
+      {
+        "timestamp": "2026-04-20T08:00:00Z",
+        "type": "bp",
+        "value": "110/70"
+      },
+      {
+        "timestamp": "2026-06-20T08:00:00Z",
+        "type": "bp",
+        "value": "108/68"
+      }
+    ],
     "issues": {
       "head": [
         {
@@ -1529,22 +1581,6 @@
       "weight": "110 lbs",
       "height": "5'3\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "spine": [
         {
@@ -1628,22 +1664,6 @@
       "weight": "150 lbs",
       "height": "5'7\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "head": [
         {
@@ -1711,22 +1731,6 @@
       "weight": "148 lbs",
       "height": "5'11\""
     },
-    "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
-    "medications": [],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
     "issues": {
       "abdomen": [
         {
@@ -1838,27 +1842,26 @@
       "height": "5'10\""
     },
     "oxidativeStressMarkers": [],
-    "clinicalLogs": [],
+    "antioxidantSources": [],
     "medications": [
       {
+        "id": "1",
         "name": "Lisinopril",
-        "dosage": "",
-        "frequency": ""
+        "value": "10mg Daily"
       }
     ],
-    "labResults": [],
-    "lifestyleFactors": {
-      "sleepHours": 0,
-      "activityLevel": "",
-      "stressScore": 0
-    },
-    "avsHistory": [],
-    "clinicalPhilosophy": "",
-    "selectedPhilosophy": "",
-    "isEmergencyMode": false,
-    "reasonForVisit": "",
-    "occupation": "",
-    "dietaryProtocol": "",
+    "biometricHistory": [
+      {
+        "timestamp": "2026-05-20T08:00:00Z",
+        "type": "hr",
+        "value": "68"
+      },
+      {
+        "timestamp": "2026-05-20T08:00:00Z",
+        "type": "bp",
+        "value": "122/82"
+      }
+    ],
     "issues": {
       "head": [
         {
@@ -1887,6 +1890,13 @@
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [],
+    "dietaryProtocol": "",
+    "dynamicNutrients": [],
+    "clinicalNotes": [],
+    "checklist": [],
+    "shoppingList": [],
+    "activePhilosophy": "western",
+    "ayurvedicStatus": {}
   }
 ]

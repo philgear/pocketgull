@@ -1,6 +1,6 @@
 {
   "name": "pocket-gull",
-  "version": "1.0.0-rc7",
+  "version": "1.0.0-rc10",
   "workspaces": [
     "docs/study",
     "companion-apps/avs-therapy",
@@ -77,11 +77,10 @@
     "postinstall": "patch-package",
     "dev": "ng serve",
     "build": "npm install --prefix docs/study && npm run build --prefix docs/study && ng build",
+    "deploy": "gcloud run deploy pocket-gull --source . --project gen-lang-client-0540208645 --region=us-west1 --update-env-vars=OTEL_SDK_DISABLED=true --quiet",
     "lint": "node node_modules/typescript/lib/tsc.js --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
-    "deploy": "echo '⚠️  Production deploys should go through GitHub Actions (deploy.yml). Use npm run deploy:manual if you really need a direct deploy.' && exit 1",
-    "deploy:manual": "npm run build && gcloud run deploy pocket-gull --source . --project gen-lang-client-0540208645 --region=us-west1 --set-secrets=\"GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest\" --update-env-vars=OTEL_SDK_DISABLED=true --quiet",
     "serve:ssr:app": "node dist/server/server.mjs",
     "start": "node dist/server/server.mjs",
     "gcp-build": "npm run build && npm prune --production",

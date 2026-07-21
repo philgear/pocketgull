@@ -1,7 +1,7 @@
 {
   "model_type": "CalibratedClassifierCV(HistGradientBoostingClassifier)",
   "version": "2.0.0",
-  "training_date": "2026-07-18T23:54:08.519764+00:00Z",
+  "training_date": "2026-07-21T15:25:29.208787+00:00Z",
   "features": [
     "hr",
     "bp_systolic",
@@ -17,19 +17,19 @@
     "systolic_bp_deviation"
   ],
   "metrics": {
-    "roc_auc": 0.9994,
-    "brier_score": 0.0062,
-    "best_cv_auc": 0.9992
+    "roc_auc": 0.9993,
+    "brier_score": 0.0063,
+    "best_cv_auc": 0.9993
   },
   "best_hyperparameters": {
     "learning_rate": 0.1,
     "max_iter": 100,
     "max_leaf_nodes": 15,
-    "min_samples_leaf": 50
+    "min_samples_leaf": 20
   },
-  "optimal_safety_threshold": 0.59,
+  "optimal_safety_threshold": 0.5,
   "optimal_metrics": {
-    "recall": 0.9835,
-    "precision": 0.9868
+    "recall": 0.9802,
+    "precision": 0.9802
   }
 }
