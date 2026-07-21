@@ -154,4 +154,60 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
 
   });
+
+  test('should verify historical mock patients (Frida Kahlo and Charles Darwin)', async ({ page }) => {
+    // Set a large viewport size early
+    await page.setViewportSize({ width: 1440, height: 900 });
+
+    // Go to home page
+    await page.goto('/');
+
+    // PIN Code Entry
+    const pinInput = page.locator('input[placeholder="1234"]');
+    await expect(pinInput).toBeVisible({ timeout: 10000 });
+    await pinInput.fill('1234');
+
+    // Select Demo Mode
+    const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
+    await expect(demoBtn).toBeVisible({ timeout: 10000 });
+    await demoBtn.click();
+
+    // Skip KSS assessment
+    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
+    await expect(skipBtn).toBeVisible({ timeout: 10000 });
+    await skipBtn.click();
+
+    // Accept Ethics Pledge
+    const pledgeCheckbox = page.locator('input[type="checkbox"]');
+    await expect(pledgeCheckbox).toBeVisible({ timeout: 10000 });
+    await pledgeCheckbox.check();
+
+    // Click Accept & Enter System
+    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
+    await expect(acceptBtn).toBeVisible({ timeout: 10000 });
+    await acceptBtn.click();
+
+    // Verify Main Viewport loads
+    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
+
+    // Verify Frida Kahlo
+    console.log('[Verification] Testing Frida Kahlo profile...');
+    await selectPatientByName(page, 'Frida Kahlo');
+    const generateBtn = page.locator('#tour-generate-btn');
+    await expect(generateBtn).toBeVisible({ timeout: 10000 });
+    await generateBtn.click();
+    await page.waitForTimeout(2000);
+
+    const fridaText = page.locator('app-analysis-report').locator('text=Frida Kahlo');
+    await expect(fridaText).toBeVisible({ timeout: 5000 });
+
+    // Verify Charles Darwin
+    console.log('[Verification] Testing Charles Darwin profile...');
+    await selectPatientByName(page, 'Charles Darwin');
+    await generateBtn.click();
+    await page.waitForTimeout(2000);
+
+    const darwinText = page.locator('app-analysis-report').locator('text=Charles Darwin');
+    await expect(darwinText).toBeVisible({ timeout: 5000 });
+  });
 });
