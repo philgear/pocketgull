@@ -746,18 +746,18 @@ import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboar
         <!-- Karolinska Sleepiness Scale (KSS) Adaptive Cognitive Load Shield -->
         <app-kss-cognitive-shield></app-kss-cognitive-shield>
 
-        <!-- Neuro-Consciousness & Mood Optimization Matrix -->
-        @if ((activeLens() === 'Functional Protocols' || activeLens() === 'Nutrition') && hasAnyReport()) {
+        <!-- Functional Protocols Lens Only: Neuro-Consciousness & Mood Optimization Matrix -->
+        @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
           <app-mood-consciousness-matrix></app-mood-consciousness-matrix>
         }
 
-        <!-- Living Health Fruit Tree (Summary Overview Lens) -->
+        <!-- Summary Overview Lens Only: Living Health Fruit Tree -->
         @if (activeLens() === 'Summary Overview' && hasAnyReport()) {
           <app-patient-fruit-tree></app-patient-fruit-tree>
         }
 
-        <!-- Dietary Allergy & Synthetic Red Dye #40 Shield -->
-        @if ((activeLens() === 'Nutrition' || activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
+        <!-- Nutrition Lens Only: Dietary Allergy & Synthetic Red Dye #40 Shield -->
+        @if (activeLens() === 'Nutrition' && hasAnyReport()) {
           <app-dietary-allergy-shield></app-dietary-allergy-shield>
         }
 
@@ -766,8 +766,8 @@ import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboar
           <app-lens-insight-spark-shield [activeLens]="activeLens()"></app-lens-insight-spark-shield>
         }
 
-        <!-- UK RIO PubMed Sourcing & Evidence Hierarchy Panel -->
-        @if ((activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
+        <!-- Patient Education Lens Only: UK RIO PubMed Sourcing & Evidence Hierarchy Panel -->
+        @if (activeLens() === 'Patient Education' && hasAnyReport()) {
           <app-uk-rio-pubmed-sourcing></app-uk-rio-pubmed-sourcing>
         }
 
