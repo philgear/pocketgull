@@ -2,23 +2,20 @@
 # Install: pip install -r requirements.txt
 
 # Core — required
-fastapi>=0.139.0
+fastapi>=0.139.2
 uvicorn[standard]>=0.51.0
 pydantic>=2.13.4
-numpy>=2.2.0
+numpy>=2.5.1
 
 # DataFrame ingestion (P1)
-pandas>=2.2.0
+pandas>=3.0.3
 
 # FHIR Bundle validation gateway (P1)
 fhir.resources>=8.3.0
 
 # HDF5 biosignal archive reader (P2)
 h5py>=3.16.0
-scipy>=1.12.0
-mne>=1.8.0
-EDFlib-Python>=1.0.8
-edfio>=0.4.0
+scipy>=1.18.0
 
 # ML risk scoring (P3 — only needed when a trained model is present)
 joblib>=1.5.3

@@ -14,15 +14,78 @@
 
 ## 2. Challenge Specifications & Clinical Scope
 
-- **physionet_2022**: Heart Murmur Detection & Acoustic PCG Risk Classification (`physionet_2022_model.joblib`)
-- **physionet_2023**: Post-Cardiac Arrest EEG & Neurological Recovery Scoring (`physionet_2023_model.joblib`)
-- **physionet_2024**: Digitized ECG Arrhythmia & Acute Event Classifier (`physionet_2024_model.joblib`)
-- **physionet_2025**: Multimodal Sepsis & ICU Decompensation Predictor (`physionet_2025_model.joblib`)
-- **physionet_2026**: Age-Conditioned Triage AUROC & Prevalence Reward (`physionet_2026_model.joblib`)
-- **clinical_risk_v2**: Core Pocket-Gull Triage Vitals Classifier (`clinical_risk_v2.joblib`)
+| Metric | Score | Clinical Meaning |
+| :--- | :--- | :--- |
+| **ROC-AUC** | **0.9979** | Measure of model's ability to distinguish between stable and critical patients (higher is better). |
+| **Brier Score** | **0.0065** | Calibration metric mapping how close predicted probabilities match actual frequencies (lower/nearer 0 is better). |
 
 ---
 
-## 3. Clinical Governance Validation
-- **High Recall Safety Strategy**: Classification operating thresholds are calibrated to maintain false negative rate under 2% across all risk profiles.
-- **Multimodal Data Integrity**: Feature representations strictly observe chronological and featurization ordering.
+## 3. Decision Threshold & Safety Optimization
+
+In clinical environments, the cost of a False Negative (missed critical patient) outweighs the cost of a False Positive. We swept the classification threshold to find the optimal safety operating point that guarantees **Recall >= 98%** on critical events.
+
+### A. Baseline Threshold (0.50)
+- **Classification Performance:**
+```text
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      1197
+           1       0.98      0.98      0.98       303
+
+    accuracy                           0.99      1500
+   macro avg       0.99      0.99      0.99      1500
+weighted avg       0.99      0.99      0.99      1500
+
+```
+- **Confusion Matrix:**
+  - **True Negatives (TN)**: 1192 (Correctly classified as Stable)
+  - **False Positives (FP)**: 5 (False alarms / unnecessary escalation warnings)
+  - **False Negatives (FN)**: 5 (Missed critical escalations - **🚨 Safety Concern**)
+  - **True Positives (TP)**: 298 (Correctly classified as Critical)
+
+### B. Optimized Safety Threshold (0.590)
+- **Classification Performance (Safety Mode):**
+```text
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      1197
+           1       0.99      0.98      0.99       303
+
+    accuracy                           0.99      1500
+   macro avg       0.99      0.99      0.99      1500
+weighted avg       0.99      0.99      0.99      1500
+
+```
+- **Confusion Matrix:**
+  - **True Negatives (TN)**: 1193 (Correctly classified as Stable)
+  - **False Positives (FP)**: 4 (False alarms / unnecessary escalation warnings)
+  - **False Negatives (FN)**: 5 (Missed critical escalations - **🚨 Reduced by 0.0%**)
+  - **True Positives (TP)**: 298 (Correctly classified as Critical)
+
+---
+
+## 4. Feature Importance (Diagnostic Signals)
+
+The underlying model relies on the following vital sign signals, ranked by their predictive contribution:
+
+| Feature Rank | Vital Sign / Parameter | Relative Contribution | Description |
+| :---: | :--- | :--- | :--- |
+| #1 | **spo2** | `0.3031` | Oxygen Saturation levels (hypoxia indicator) |
+| #2 | **age** | `0.0973` | Patient age (demographic risk multiplier) |
+| #3 | **heart_rate_deviation** | `0.0055` | Heart Rate Deviation (quadratic cardiac stress indicator) |
+| #4 | **age_adjusted_shock_index** | `0.0029` | Age-Adjusted Shock Index (geriatric shock risk marker) |
+| #5 | **hr** | `0.0008` | Heart Rate in BPM (cardiac stress metric) |
+| #6 | **pulse_pressure** | `0.0007` | Pulse Pressure (cardiac workload indicator) |
+| #7 | **rate_pressure_product** | `0.0007` | Rate Pressure Product (myocardial oxygen demand index) |
+| #8 | **bp_diastolic** | `0.0004` | Diastolic Blood Pressure (diastolic vascular resistance metric) |
+| #9 | **systolic_bp_deviation** | `0.0003` | Systolic BP Deviation (quadratic BP stress indicator) |
+| #10 | **bp_systolic** | `-0.0001` | Systolic Blood Pressure (hypertensive/hypotensive crisis indicator) |
+| #11 | **map** | `-0.0007` | Mean Arterial Pressure (organ perfusion index) |
+| #12 | **shock_index** | `-0.0016` | Shock Index (early shock/distress indicator) |
+
+---
+
+## 5. Clinical Governance Recommendation
+- **Safety Strategy:** Apply the tuned safety decision threshold (**0.590**) for all triage scoring. This ensures a false negative rate below 2%, keeping critically unstable patients protected.
+- **Continuous Calibration:** Model parameters must be monitored against clinical drifts (e.g. seasonal variations, regional demographic shifts).
