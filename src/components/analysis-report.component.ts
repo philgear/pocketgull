@@ -37,6 +37,7 @@ import { DietaryAllergyShieldComponent } from './dietary-allergy-shield.componen
 import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.component';
 import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboard.component';
 import { GeolocationalHealthRelocationComponent } from './geolocational-health-relocation.component';
+import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapper.service';
 
 @Component({
   selector: 'app-analysis-report',
@@ -355,6 +356,34 @@ import { GeolocationalHealthRelocationComponent } from './geolocational-health-r
           <div class="p-4 border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 text-xs rounded-lg mb-4">
             <strong class="block uppercase tracking-wider mb-1">System Error</strong>
             {{ intel.error() }}
+          </div>
+        }
+
+        <!-- Theatrical Clinical Proposal Act Banner -->
+        @if (activeActProposal(); as act) {
+          <div class="mb-6 p-4 rounded-md border-l-4 border-indigo-600 dark:border-indigo-400 bg-slate-50 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">{{ act.icon }}</span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300/40">
+                    {{ act.actsSequenceStage }}
+                  </span>
+                </div>
+                <h3 class="text-sm font-extrabold text-slate-900 dark:text-zinc-100 uppercase tracking-wider mt-1">
+                  {{ activeActTitle() }}
+                </h3>
+                <p class="text-xs text-slate-600 dark:text-zinc-400 mt-0.5 font-medium">
+                  {{ act.proposalFocus }}
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                Paradigm: {{ state.activePhilosophy() | uppercase }}
+              </span>
+            </div>
           </div>
         }
 
@@ -1022,6 +1051,15 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly dictation = inject(DictationService);
   private audit = inject(AuditService);
   protected readonly export = inject(ExportService);
+  protected readonly actMapper = inject(ClinicalActLensMapperService);
+
+  activeActTitle = computed(() => {
+    return this.actMapper.getActTitleForLens(this.activeLens(), this.state.activePhilosophy());
+  });
+
+  activeActProposal = computed(() => {
+    return this.actMapper.getActProposal(this.activeLens());
+  });
   isCprMetronomeActive = signal<boolean>(false);
   private cprIntervalId: any = null;
   private audioCtx: AudioContext | null = null;
