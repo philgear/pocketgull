@@ -250,6 +250,12 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               <span>🌱</span> Grow-Thyself Education
             </button>
 
+            <button (click)="changeLens('Epigenetic Longevity')"
+              [class]="activeLens() === 'Epigenetic Longevity' ? '!bg-purple-600 !text-white dark:!bg-purple-600 dark:!text-white border-purple-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-purple-50 dark:hover:bg-zinc-800 hover:text-purple-700 dark:hover:text-purple-300 font-semibold'"
+              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>⌛</span> Epigenetic Longevity
+            </button>
+
             @if (state.isEmergencyMode()) {
               <button (click)="changeLens('EMT Handoff')"
                 [class]="activeLens() === 'EMT Handoff' ? '!bg-red-600 !text-white border-red-600 shadow-md font-extrabold scale-[1.02]' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/40 hover:bg-red-600 hover:text-white font-semibold'"
@@ -1274,7 +1280,7 @@ export class AnalysisReportComponent implements OnDestroy {
   showHandoffModal = signal<boolean>(false);
   lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
 
-  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum' | 'Grow-Thyself Education')[] = [
+  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity')[] = [
     'Summary Overview',
     'Treatment Matrix',
     'Functional Protocols',
@@ -1285,7 +1291,8 @@ export class AnalysisReportComponent implements OnDestroy {
     'PhysioNet Telemetry',
     'Y-BOCs Screener',
     'Maternal & Postpartum',
-    'Grow-Thyself Education'
+    'Grow-Thyself Education',
+    'Epigenetic Longevity'
   ];
 
   activeLensIndex = computed(() => {

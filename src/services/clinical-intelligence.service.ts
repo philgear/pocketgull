@@ -29,7 +29,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
