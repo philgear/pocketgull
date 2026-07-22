@@ -973,6 +973,42 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
         <!--AI Report Section-->
         @if (activeLens() !== 'EMT Handoff' && reportSections(); as sections) {
           <div class="flex flex-col gap-4 sm:gap-6 pb-4 w-full min-w-0">
+
+          <!-- Storybook Narrative Arc Banner & Lens Stage Indicator -->
+          <div class="mb-2 p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-500/30 shadow-xl font-sans relative overflow-hidden">
+            <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none"></div>
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold uppercase tracking-widest bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                    📖 Storybook Chapter: {{ activeLens() }}
+                  </span>
+                  <span class="text-[10px] font-mono text-zinc-400">
+                    Paradigm Framework: <strong class="text-cyan-400 font-bold uppercase">{{ state.activePhilosophy() }}</strong>
+                  </span>
+                </div>
+                <h2 class="text-base font-extrabold uppercase tracking-wide text-zinc-100 mt-1">
+                  {{ activeActTitle() }}
+                </h2>
+              </div>
+
+              <!-- 3-Act Narrative Arc Progress Dots -->
+              <div class="flex items-center gap-2 bg-zinc-900/80 px-3.5 py-2 rounded-xl border border-zinc-800 shrink-0 font-mono text-[11px]">
+                <div class="flex items-center gap-1.5 text-indigo-400 font-bold">
+                  <span>Act I: Triage</span>
+                  <span class="text-xs">→</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-cyan-400 font-bold">
+                  <span>Act II: Probing</span>
+                  <span class="text-xs">→</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-emerald-400 font-bold">
+                  <span>Act III: Quest</span>
+                </div>
+              </div>
+            </div>
+          </div>
             @for (section of sections; track section.title; let i = $index) {
               <div [id]="i === 0 ? 'tour-report-node' : null" appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
                 <pocket-gull-card [title]="section.title" [icon]="section.icon" class="flex-1 min-w-0 overflow-hidden">
