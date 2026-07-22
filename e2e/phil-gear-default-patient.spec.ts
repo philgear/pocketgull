@@ -12,6 +12,7 @@ const SCREENSHOT_DIR = path.join(__dirname, '..', 'test-results', 'screenshots')
 
 /** Shared login + demo mode entry flow */
 async function enterDemoMode(page: import('@playwright/test').Page) {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
 
   // PIN entry
@@ -46,15 +47,6 @@ async function enterDemoMode(page: import('@playwright/test').Page) {
 /** Helper to enter demo mode and select Phil Gear */
 async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) {
   await enterDemoMode(page);
-
-  // Click patient dropdown to select Phil Gear
-  const dropdownBtn = page.locator('app-patient-dropdown button').first();
-  await dropdownBtn.click();
-
-  const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
-  await philGearOption.click();
-
-  // Wait for selection to load
   await page.waitForTimeout(1000);
 }
 
@@ -94,13 +86,25 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     const philGearName = page.locator('text=Phil Gear').first();
     await expect(philGearName).toBeVisible({ timeout: 10000 });
 
+    const reportTab = page.locator('button', { hasText: 'Analysis' }).first();
+    if (await reportTab.isVisible()) {
+      await reportTab.click();
+      await page.waitForTimeout(500);
+    }
+
     const reportEl = page.locator('app-analysis-report');
     await expect(reportEl).toBeVisible({ timeout: 10000 });
 
     // Western is the default paradigm — generate/load the report
-    const westernBtn = page.locator('button', { hasText: 'Western' });
+    const westernBtn = page.locator('button', { hasText: 'Western' }).first();
     await westernBtn.click();
     await page.waitForTimeout(1500);
+
+    const generateBtn = page.locator('button', { hasText: 'Generate Strategy' }).first();
+    if (await generateBtn.isVisible()) {
+      await generateBtn.click();
+      await page.waitForTimeout(2000);
+    }
 
     // Verify all 6 tabs are present
     const expectedTabs = [
@@ -175,14 +179,26 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     const philGearName = page.locator('text=Phil Gear').first();
     await expect(philGearName).toBeVisible({ timeout: 10000 });
 
+    const reportTab = page.locator('button', { hasText: 'Analysis' }).first();
+    if (await reportTab.isVisible()) {
+      await reportTab.click();
+      await page.waitForTimeout(500);
+    }
+
     const reportEl = page.locator('app-analysis-report');
     await expect(reportEl).toBeVisible({ timeout: 10000 });
 
     const orthoTab = page.getByTestId('tab-precision-nutrients');
 
     // Western paradigm
-    await page.locator('button', { hasText: 'Western' }).click();
+    await page.locator('button', { hasText: 'Western' }).first().click();
     await page.waitForTimeout(1500);
+
+    const generateBtn = page.locator('button', { hasText: 'Generate Strategy' }).first();
+    if (await generateBtn.isVisible()) {
+      await generateBtn.click();
+      await page.waitForTimeout(2000);
+    }
     await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
@@ -192,7 +208,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     console.log('[PASS] Western Orthomolecular Profiling verified.');
 
     // Eastern paradigm
-    await page.locator('button', { hasText: 'Eastern (TCM)' }).click();
+    await page.locator('button', { hasText: 'Eastern (TCM)' }).first().click();
     await page.waitForTimeout(1500);
     await orthoTab.click();
     await page.waitForTimeout(500);
@@ -203,7 +219,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     console.log('[PASS] Eastern Orthomolecular Profiling verified.');
 
     // Ayurvedic paradigm
-    await page.locator('button', { hasText: 'Ayurvedic' }).click();
+    await page.locator('button', { hasText: 'Ayurvedic' }).first().click();
     await page.waitForTimeout(1500);
     await orthoTab.click();
     await page.waitForTimeout(500);

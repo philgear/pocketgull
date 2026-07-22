@@ -1,0 +1,37 @@
+{
+  "title": "Pocket-Gull: Real-time Medical Care Plan Strategy and Live AI Consult Engine",
+  "description": "Pocket-Gull is a real-time medical Care Plan Strategy and Live AI Consult engine powered by Google Gemini. It provides actionable clinical intelligence, manages patient state across Western, Traditional Chinese Medicine (TCM), and Ayurvedic paradigms, and offers real-time streaming AI consultations for symptom management.",
+  "creators": [
+    {
+      "name": "Gear, Phil",
+      "orcid": "0009-0008-1372-5381",
+      "affiliation": "Pocket-Gull Open Research"
+    }
+  ],
+  "access_right": "open",
+  "license": "CC0-1.0",
+  "upload_type": "software",
+  "keywords": [
+    "clinical intelligence",
+    "care plan strategy",
+    "google gemini",
+    "functional medicine",
+    "orthomolecular profiling",
+    "fhir r4",
+    "tcm",
+    "ayurveda",
+    "digital health"
+  ],
+  "communities": [
+    {
+      "identifier": "zenodo"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/philgear/pocketgull",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
