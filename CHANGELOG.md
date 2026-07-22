@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-rc12] - 2026-07-21
+
+**7-Day Chrono Weekly Meal Planner, Geolocational Micro-Climate Relocation Engine, KSS Acronym Expansion & PhysioNet 2026 Dataset Integration**
+
+### Added
+- **[Nutrition / Chrono] 7-Day Chrono Weekly Meal Planner (`chrono-weekly-meal-planner.component.ts`)**: 7-day circadian calendar (Monday–Sunday) with regional ingredient sourcing filters (Pacific Northwest, Mediterranean, Asian, Nordic), prep time complexity filters (Snacks <5m, Quick <15m, Full Course 30m+), and 1-click Care Plan prescribing capabilities.
+- **[Geolocational / SDOH] Geolocational Micro-Climate & Relocation Engine (`geolocational-health-relocation.component.ts`)**: Analyzes US Census ACS data, EPA Air Quality Index (AQI), Walkability Scores, and Blue Zone Longevity indices to prescribe therapeutic relocation micro-climates (Desert Hot Springs CA, San Luis Obispo CA, Sequim WA, Loma Linda CA, Nicoya Costa Rica) and geolocational hobbies (*Shinrin-yoku*, *Geothermal Mineral Hydrotherapy*, *Citrus Permaculture*).
+- **[Health Literacy / KSS] KSS-Driven Medical Acronym Expansion Engine (`acronym-expander.service.ts` & `acronym-expander.pipe.ts`)**: Automatically expands 40+ clinical medical acronyms (e.g., `COPD` &rarr; `Chronic Obstructive Pulmonary Disease (COPD)`) and provides interactive `<abbr>` tooltips when Karolinska Sleepiness Scale (KSS) score &ge; 5 or in simplified cognitive modes.
+- **[Patient Dataset / PhysioNet] Complete Roster Data Completeness & PhysioNet 2026 Scenarios (`src/mock-patients/`)**: Updated all 13 patient records with full vitals (`bp`, `hr`, `temp`, `spO2`, `weight`, `height`, `vitD3`, `magnesium`, `b12`, `zinc`), oxidative stress markers, antioxidant metrics, diagnostic scans, and dedicated PhysioNet 2026 Challenge scenarios across all 7 lenses.
+- **[Export / Literacy] Cognitive Level OpenDyslexic PDF Exporting (`export.service.ts` & `care-plan-print-preview.component.ts`)**: Added Health Literacy Export Badges and OpenDyslexic typography CSS overrides (`line-height: 1.95`, `letter-spacing: 0.05em`) to printed PDF reports.
+
 ## [1.0.0-rc11] - 2026-07-21
 
 **Neuro-Consciousness & Mood Optimization Matrix, Care Plan Print Studio, Mobile QR Code Engine & Emergency Bypass Triage**

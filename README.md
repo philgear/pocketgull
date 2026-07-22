@@ -11,7 +11,7 @@
 ![Three.js](https://img.shields.io/badge/Three.js-v0.185-000000?logo=three.js)
 ![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Version](https://img.shields.io/badge/version-1.0.0--rc8-blue)
+![Version](https://img.shields.io/badge/version-1.0.0--rc12-blue)
 [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
 [![DOI](https://zenodo.org/badge/1161259215.svg)](https://doi.org/10.5281/zenodo.20647513)
 [![ACM Code of Ethics](https://img.shields.io/badge/ACM-Ethics%20%26%20Conduct-006699?logo=associationforcomputingmachinery&logoColor=white)](https://www.acm.org/code-of-ethics)
