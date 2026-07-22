@@ -47,6 +47,7 @@ import { HandoffModalComponent } from './handoff-modal.component';
 import { SdohNavigatorComponent } from './sdoh-navigator.component';
 import { LifePerilsParadigmMatrixComponent } from './life-perils-paradigm-matrix.component';
 import { CyclingErgonomicsDualRevealComponent } from './cycling-ergonomics-dual-reveal.component';
+import { StormAnalysisComponent } from './storm-analysis.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -84,7 +85,8 @@ import { CyclingErgonomicsDualRevealComponent } from './cycling-ergonomics-dual-
     HandoffModalComponent,
     SdohNavigatorComponent,
     LifePerilsParadigmMatrixComponent,
-    CyclingErgonomicsDualRevealComponent
+    CyclingErgonomicsDualRevealComponent,
+    StormAnalysisComponent
   ],
 
 
@@ -472,9 +474,10 @@ import { CyclingErgonomicsDualRevealComponent } from './cycling-ergonomics-dual-
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
             </div>
 
-            <!-- Multi-Paradigm Switchable Clinical Dashboard & Life-Stage Perils Matrix -->
+            <!-- Multi-Paradigm Switchable Clinical Dashboard, Storm Analysis & Life-Stage Perils Matrix -->
             <div class="col-span-full mb-4 space-y-4">
               <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
+              <app-storm-analysis></app-storm-analysis>
               <app-life-perils-paradigm-matrix></app-life-perils-paradigm-matrix>
             </div>
 
