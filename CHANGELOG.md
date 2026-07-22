@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-07-21
+
+**Pocket-Gull v1.1.0 — AIGA 2025/2026 Models, Multi-Paradigm Storm Shield, Ambient Co-Regulation & Multilingual Health Passport**
+
+### Added
+- **[AI / Omics] AIGA 2025/2026 Model Augmentation & Telemetry (`aiga-model-augmentation.service.ts` & `aiga-telemetry-lens.component.ts`)**: Integrated PhysioNet 2025 deep neural ECG predictions, Genomic Polygenic Risk Scores (PRS), and serum NMR metabolomic spectrum telemetry.
+- **[Clinical / Emergency] Physiological Storm Analysis Engine & De-escalation Shield (`storm-analysis.component.ts`)**: Acute Cytokine, Adrenergic Sympathetic, Thyroid, and Barometric Storm triage across Western, Eastern, and Ayurvedic paradigms.
+- **[Actuarial / Innovation] Procedural Health Investments & QALY Matrix (`procedural-health-investment.service.ts` & `procedural-investment-matrix.component.ts`)**: Capital return matrix linking procedural technical innovations to 5-year cost avoidance ($28,500 max) and QALY yields (+4.6 max).
+- **[OSHA / Rest] OSHA Worker Safety & Green Room Lounge (`osha-workplace-safety.service.ts` & `green-room-lounge.component.ts`)**: Shift fatigue cap monitoring (KSS $\le$ 6) paired with a restorative written reflections lounge modal.
+- **[Geographic / Microclimate] Lewiston-Auburn Androscoggin River Valley Foraging & Phytoncide Tracker (`androscoggin-foraging-phytoncide.component.ts`)**: Seasonal foraging wheel and pine phytoncide tracker tailored for the Androscoggin River valley microclimate.
+- **[International / Wallet] Multilingual WHO ICD-11 Cross-Border Emergency Health Passport (`cross-border-health-wallet.service.ts`)**: De-identified WHO ICD-11 emergency medical passport generation with native directives in English, Spanish, French, and Mandarin.
+- **[International Policy / Verification] Portland International & New York UN/WHO Health Policy Alignment (`tests/enterprise-suite.spec.ts`)**: Automated test verifying Casco Bay Atlantic maritime corridor & NYC UN/WHO ICD-11 health passport standards.
+
 ## [1.0.0-rc12] - 2026-07-21
 
 **7-Day Chrono Weekly Meal Planner, Geolocational Micro-Climate Relocation Engine, KSS Acronym Expansion & PhysioNet 2026 Dataset Integration**
