@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
+import { AcronymExpanderService, MEDICAL_ACRONYM_DICTIONARY } from '../services/acronym-expander.service';
 
 export interface IKssLevel {
   score: number;
@@ -39,7 +40,7 @@ export interface IKssLevel {
             </span>
           </div>
           <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 font-mono">
-            Dynamically reduces UI cognitive load, enlarges touch targets, and enforces double-confirmation safety gates during night-shift clinician fatigue.
+            Dynamically reduces UI cognitive load, enlarges touch targets, auto-expands medical acronyms, and enforces safety gates during clinician fatigue.
           </p>
         </div>
 
@@ -90,14 +91,14 @@ export interface IKssLevel {
       </div>
 
       <!-- Active Cognitive Adaptations Matrix -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-xs">
         
         <!-- 1. UI Density & Layout Simplification -->
         <div class="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80">
           <div class="flex items-center gap-2 font-bold text-zinc-800 dark:text-zinc-200 mb-2">
             <span>📐 UI Density Adaptation</span>
           </div>
-          <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans">
             @if (kssScore() <= 4) {
               Full analytical telemetry mode. Displays multi-layered charts, 3D anatomical models, and secondary data tabs.
             } @else if (kssScore() >= 5 && kssScore() <= 6) {
@@ -111,42 +112,69 @@ export interface IKssLevel {
         <!-- 2. Night-Shift Color Spectrum & Typography -->
         <div class="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80">
           <div class="flex items-center gap-2 font-bold text-zinc-800 dark:text-zinc-200 mb-2">
-            <span>🌙 Ergonomic Contrast & Touch Target</span>
+            <span>🌙 Ergonomic Contrast</span>
           </div>
-          <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans">
             @if (kssScore() <= 4) {
               Standard high-definition typography and compact 32px UI touch controls.
             } @else if (kssScore() >= 5 && kssScore() <= 6) {
               Enlarges buttons to 40px touch targets with increased text contrast.
             } @else {
-              <strong>Night-Shift Warm Amber Spectrum:</strong> Touch targets expanded to 48px+, blue-light emission suppressed, high contrast text for night fatigue.
+              <strong>Night-Shift Amber Spectrum:</strong> Touch targets expanded to 48px+, blue-light emission suppressed for night fatigue.
             }
           </p>
         </div>
 
-        <!-- 3. Safety Guardrails & Voice Auto-Readout -->
+        <!-- 3. Medical Acronym Expansion Engine -->
         <div class="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80">
           <div class="flex items-center gap-2 font-bold text-zinc-800 dark:text-zinc-200 mb-2">
-            <span>🚨 Clinical Safety Guardrails</span>
+            <span>📚 Acronym Expansion</span>
           </div>
-          <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans">
+            @if (kssScore() <= 4) {
+              Standard clinical shorthand (e.g. COPD, OSA, HRV, eGFR) with hover tooltips.
+            } @else {
+              <strong class="text-amber-600 dark:text-amber-400">Plain-Language Acronym Expansion Active:</strong> Automatically converts all medical acronyms (e.g., <em>COPD</em> &rarr; <em>Chronic Obstructive Pulmonary Disease</em>) to eliminate cognitive interpretation errors.
+            }
+          </p>
+        </div>
+
+        <!-- 4. Safety Guardrails & Voice Auto-Readout -->
+        <div class="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80">
+          <div class="flex items-center gap-2 font-bold text-zinc-800 dark:text-zinc-200 mb-2">
+            <span>🚨 Clinical Safety Lock</span>
+          </div>
+          <p class="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed font-sans">
             @if (kssScore() <= 4) {
               Standard single-click clinical actions and standard verification checks.
             } @else if (kssScore() >= 5 && kssScore() <= 6) {
               Soft confirmation prompts on high-risk medication changes.
             } @else {
-              <strong>Strict Safety Lock:</strong> Mandates explicit 2-step verification on all medication orders and auto-reads key flags aloud via Gemini Voice.
+              <strong>Strict Safety Lock:</strong> Mandates explicit 2-step verification on all medication orders and auto-reads key flags aloud.
             }
           </p>
         </div>
 
       </div>
 
+      <!-- Quick Acronym Expansion Sample Preview -->
+      @if (kssScore() >= 5) {
+        <div class="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs text-amber-800 dark:text-amber-300 font-sans flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span class="font-bold">✨ Active KSS Acronym Expansion:</span> 
+            <span>"COPD + OSA + T2DM" automatically renders as </span>
+            <span class="font-semibold underline decoration-dotted">"Chronic Obstructive Pulmonary Disease (COPD) + Obstructive Sleep Apnea (OSA) + Type 2 Diabetes Mellitus (T2DM)"</span>
+          </div>
+          <span class="text-[10px] font-mono uppercase bg-amber-500/20 px-2 py-0.5 rounded font-bold shrink-0">40+ Medical Acronyms Unfolded</span>
+        </div>
+      }
+
     </div>
   `
 })
 export class KssCognitiveShieldComponent {
   patientState = inject(PatientStateService);
+  acronymService = inject(AcronymExpanderService);
 
   kssScore = signal<number>(3); // Default Alert (3)
 
@@ -155,9 +183,9 @@ export class KssCognitiveShieldComponent {
     { score: 2, label: 'Very alert', category: 'Alert', uiAdaptation: 'Full telemetry density' },
     { score: 3, label: 'Alert, normal level', category: 'Alert', uiAdaptation: 'Standard interface' },
     { score: 4, label: 'Fairly alert', category: 'Alert', uiAdaptation: 'Standard interface' },
-    { score: 5, label: 'Neither alert nor sleepy', category: 'Moderate Fatigue', uiAdaptation: 'Highlighted primary cards' },
-    { score: 6, label: 'Some signs of sleepiness', category: 'Moderate Fatigue', uiAdaptation: 'Enlarged touch targets' },
-    { score: 7, label: 'Sleepy, no effort to stay awake', category: 'High Fatigue', uiAdaptation: 'Single-column simplified view' },
+    { score: 5, label: 'Neither alert nor sleepy', category: 'Moderate Fatigue', uiAdaptation: 'Acronym expansion active' },
+    { score: 6, label: 'Some signs of sleepiness', category: 'Moderate Fatigue', uiAdaptation: 'Enlarged touch targets + Acronyms' },
+    { score: 7, label: 'Sleepy, no effort to stay awake', category: 'High Fatigue', uiAdaptation: 'Single-column view + Plain language' },
     { score: 8, label: 'Sleepy, effort to stay awake', category: 'High Fatigue', uiAdaptation: 'Warm amber night spectrum + 48px targets' },
     { score: 9, label: 'Extremely sleepy, fighting sleep', category: 'High Fatigue', uiAdaptation: 'Maximum Safety Shield + 2-step order lock' }
   ];
@@ -171,6 +199,7 @@ export class KssCognitiveShieldComponent {
 
   setKssScore(score: number) {
     this.kssScore.set(score);
+    this.acronymService.currentKssScore.set(score);
     // Dispatches custom event to notify parent components
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('kss-score-change', { detail: score }));
