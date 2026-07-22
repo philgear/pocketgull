@@ -680,24 +680,48 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 <!-- Patient Trends Chart -->
                 @defer (on viewport) {
                   <section>
-                      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                        <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-0">Retrospective Data Visualization</h2>
-                        <div class="flex items-center gap-4 text-xs font-medium text-gray-600 dark:text-zinc-400 bg-white dark:bg-zinc-900 px-3 py-1.5 rounded border border-gray-200 dark:border-zinc-800">
-                          <label class="flex items-center gap-2 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">
-                            <input type="checkbox" [checked]="showCDCBaseline()" (change)="showCDCBaseline.set(!showCDCBaseline())" class="w-3.5 h-3.5 accent-[#4285F4] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
-                            <span class="flex items-center gap-1.5"><div class="w-2 h-0.5 bg-[#4285F4]"></div> CDC Baselines</span>
+                      <div class="flex flex-col gap-3 mb-4 md:mb-6">
+                        <h2 class="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-0">Retrospective Data Visualization</h2>
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-[10px] md:text-xs font-medium text-gray-600 dark:text-zinc-400 bg-white dark:bg-zinc-900 px-2.5 py-2 md:px-3 md:py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800">
+                          <label class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
+                                 [class.bg-blue-50]="showCDCBaseline()"
+                                 [class.dark:bg-blue-950/40]="showCDCBaseline()"
+                                 [class.ring-1]="showCDCBaseline()"
+                                 [class.ring-blue-300]="showCDCBaseline()"
+                                 [class.dark:ring-blue-700]="showCDCBaseline()"
+                                 [class.text-blue-700]="showCDCBaseline()"
+                                 [class.dark:text-blue-300]="showCDCBaseline()"
+                                 [class.font-bold]="showCDCBaseline()">
+                            <input type="checkbox" [checked]="showCDCBaseline()" (change)="showCDCBaseline.set(!showCDCBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#4285F4] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap"><div class="w-1.5 md:w-2 h-0.5 bg-[#4285F4] rounded-full"></div> CDC Baselines</span>
                           </label>
-                          <label class="flex items-center gap-2 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">
-                            <input type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3.5 h-3.5 accent-[#689F38] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
-                            <span class="flex items-center gap-1.5"><div class="w-2 h-0.5 bg-[#689F38]"></div> WHO Baselines</span>
+                          <label class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
+                                 [class.bg-green-50]="showWHOBaseline()"
+                                 [class.dark:bg-green-950/40]="showWHOBaseline()"
+                                 [class.ring-1]="showWHOBaseline()"
+                                 [class.ring-green-300]="showWHOBaseline()"
+                                 [class.dark:ring-green-700]="showWHOBaseline()"
+                                 [class.text-green-700]="showWHOBaseline()"
+                                 [class.dark:text-green-300]="showWHOBaseline()"
+                                 [class.font-bold]="showWHOBaseline()">
+                            <input type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#689F38] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap"><div class="w-1.5 md:w-2 h-0.5 bg-[#689F38] rounded-full"></div> WHO Baselines</span>
                           </label>
-                          <label class="flex items-center gap-2 cursor-pointer hover:text-gray-900 dark:hover:text-zinc-100 transition-colors">
-                            <input type="checkbox" [checked]="showBQBaseline()" (change)="showBQBaseline.set(!showBQBaseline())" class="w-3.5 h-3.5 accent-[#EA4335] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
-                            <span class="flex items-center gap-1.5">
-                              <div class="w-2 h-0.5 bg-[#EA4335]"></div> 
+                          <label class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
+                                 [class.bg-red-50]="showBQBaseline()"
+                                 [class.dark:bg-red-950/40]="showBQBaseline()"
+                                 [class.ring-1]="showBQBaseline()"
+                                 [class.ring-red-300]="showBQBaseline()"
+                                 [class.dark:ring-red-700]="showBQBaseline()"
+                                 [class.text-red-700]="showBQBaseline()"
+                                 [class.dark:text-red-300]="showBQBaseline()"
+                                 [class.font-bold]="showBQBaseline()">
+                            <input type="checkbox" [checked]="showBQBaseline()" (change)="showBQBaseline.set(!showBQBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#EA4335] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap">
+                              <div class="w-1.5 md:w-2 h-0.5 bg-[#EA4335] rounded-full"></div> 
                               BigQuery OMOP 
-                              <span class="text-[12px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
-                              <span class="text-[12px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
+                              <span class="text-[9px] md:text-[10px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
+                              <span class="text-[9px] md:text-[10px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
                             </span>
                           </label>
                         </div>

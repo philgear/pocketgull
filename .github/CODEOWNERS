@@ -1,0 +1,9 @@
+# Default: Phil reviews everything
+* @philgear
+
+# Security-sensitive files require explicit review
+/.github/ @philgear
+/Dockerfile @philgear
+/SECURITY.md @philgear
+/pocketgull_api/Dockerfile* @philgear
+/cloudrun-redirects/Dockerfile @philgear

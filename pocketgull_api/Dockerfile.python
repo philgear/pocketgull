@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Builder
 # ==========================================
-FROM python:3.13-slim-bookworm AS builder
+FROM python:3.13-slim-bookworm@sha256:9d7f287598e1a5a978c015ee176d8216435aaf335ed69ac3c38dd1bbb10e8d64 AS builder
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # ==========================================
 # Stage 2: Runtime
 # ==========================================
-FROM python:3.13-slim-bookworm
+FROM python:3.13-slim-bookworm@sha256:9d7f287598e1a5a978c015ee176d8216435aaf335ed69ac3c38dd1bbb10e8d64
 
 # Create a non-root user and group for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser
