@@ -285,7 +285,7 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
                   </span>
 
                   <!-- Dynamic Agent Pill -->
-                  <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[12px] font-bold uppercase tracking-wider bg-gray-50/50 dark:bg-zinc-900/50 border-gray-200/40 dark:border-zinc-800/40"
+                  <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[12px] font-bold uppercase tracking-wider bg-gray-50/50 dark:bg-zinc-900/50 border-gray-200/40 dark:border-zinc-800/40"
                        [class.text-sky-700]="state.activePhilosophy() === 'western'"
                        [class.dark:text-sky-400]="state.activePhilosophy() === 'western'"
                        [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
@@ -906,11 +906,11 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-indigo-200/40 dark:border-indigo-800/40 pb-4 mb-4">
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full bg-indigo-500 animate-pulse"></span>
+                  <span class="w-3 h-3 rounded-md bg-indigo-500 animate-pulse"></span>
                   <h3 class="text-base font-bold text-gray-900 dark:text-zinc-150 uppercase tracking-widest">
                     🧠 Autonomic Co-Regulation & AVS Therapy Apps
                   </h3>
-                  <span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                  <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30">
                     Functional Protocol Integration
                   </span>
                 </div>
@@ -921,13 +921,13 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
 
               <div class="flex flex-wrap items-center gap-2">
                 <button type="button" (click)="launchAvsVoiceCoRegulation()"
-                  class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                  class="px-3.5 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
                   <span>🎙️</span>
                   <span>AVS Voice Guide</span>
                 </button>
                 <button type="button" (click)="toggleAvsSession()"
                   [class]="state.isAvsSessionActive() ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'"
-                  class="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                  class="px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
                   <span>{{ state.isAvsSessionActive() ? '⏸ Pause AVS Therapy' : '▶ Start AVS Co-Regulation' }}</span>
                 </button>
               </div>
