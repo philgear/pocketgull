@@ -49,7 +49,7 @@ export class PatientManagementService implements OnDestroy {
   private autoSaveSub?: Subscription;
 
   private ensurePatientCompleteness(p: IPatient): IPatient {
-    const pVitals = p.vitals || {};
+    const pVitals = (p.vitals || {}) as Record<string, any>;
     const vitals = {
       bp: pVitals.bp || "120/80",
       hr: pVitals.hr || "72",
