@@ -361,7 +361,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
             <button 
               type="button" 
               (click)="showCompanionSyncModal.set(true)"
-              class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-full text-xs font-bold uppercase tracking-wider transition shadow-sm"
+              class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-md text-xs font-bold uppercase tracking-wider transition shadow-xs focus:ring-2 focus:ring-indigo-500/50 outline-none"
               title="Generate FHIR R4 Smart Launch QR for Patient/Doctor Mobile Companion">
               <span>📱 Sync Companion</span>
             </button>

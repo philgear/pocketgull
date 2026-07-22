@@ -33,7 +33,7 @@ export interface IInsightSpark {
             <div>
               <h2 class="text-lg font-bold uppercase tracking-tight text-zinc-100 flex items-center gap-2">
                 <span>Lens Innovation Shield & Insight Sparks</span>
-                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase">
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase">
                   {{ activeLens() }} Shield Active
                 </span>
               </h2>
@@ -46,7 +46,7 @@ export interface IInsightSpark {
 
         <div class="flex items-center gap-2 font-mono text-xs">
           <button (click)="isDrillDownOpen.set(true)"
-            class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold uppercase transition shadow-md cursor-pointer active:scale-95 flex items-center gap-1.5">
+            class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold uppercase transition shadow-md cursor-pointer active:scale-95 flex items-center gap-1.5 focus:ring-2 focus:ring-indigo-400 outline-none">
             <span>🔬</span>
             <span>Drill-Down Insight Sparks ({{ activeSparks().length }})</span>
           </button>
@@ -54,13 +54,13 @@ export interface IInsightSpark {
       </div>
 
       <!-- Lens-Specific Active Innovation Shield Banner -->
-      <div class="p-5 rounded-2xl bg-zinc-900/90 border border-indigo-900/50 mb-6 font-mono">
+      <div class="p-5 rounded-xl bg-zinc-900/90 border border-indigo-900/50 mb-6 font-mono">
         <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-3">
           <div class="flex items-center gap-2 text-xs">
             <span class="text-lg">{{ getLensIcon(activeLens()) }}</span>
             <span class="font-bold uppercase text-indigo-300">{{ activeLens() }} Innovation Shield Protocol</span>
           </div>
-          <span class="text-[9.5px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
             PROTECTION ENGAGED
           </span>
         </div>
@@ -73,11 +73,11 @@ export interface IInsightSpark {
       <!-- Insight Sparks Cards Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @for (spark of activeSparks(); track spark.id) {
-          <div class="p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-indigo-500 transition flex flex-col justify-between group">
+          <div class="p-5 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-indigo-500 transition flex flex-col justify-between group">
             
             <div>
               <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2.5 font-mono text-[10px]">
-                <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold uppercase border border-indigo-500/30">
+                <span class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold uppercase border border-indigo-500/30">
                   ⚡ {{ spark.innovationBadge }}
                 </span>
                 <span class="text-zinc-400">Translational Research Spark</span>
@@ -95,7 +95,7 @@ export interface IInsightSpark {
                 <span class="text-[10px] font-mono text-zinc-400 font-bold uppercase block mb-1">Key Biomarkers / Metrics:</span>
                 <div class="flex flex-wrap gap-1 font-mono text-[9.5px]">
                   @for (bio of spark.keyBiomarkers; track bio) {
-                    <span class="px-2 py-0.5 rounded bg-zinc-950 text-indigo-300 border border-zinc-800">
+                    <span class="px-2 py-0.5 rounded-md bg-zinc-950 text-indigo-300 border border-zinc-800">
                       🧪 {{ bio }}
                     </span>
                   }
@@ -103,15 +103,15 @@ export interface IInsightSpark {
               </div>
             </div>
 
-            <!-- Footer Action Buttons -->
+            <!-- Footer Action Buttons (Rams 8px Grid Spacing & Focus Accessibility) -->
             <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between font-mono text-[10px]">
               <button (click)="launchPubMedSearch(spark)"
-                class="text-indigo-400 hover:underline font-bold flex items-center gap-1">
+                class="text-indigo-400 hover:text-indigo-300 hover:underline font-bold flex items-center gap-1 focus:ring-1 focus:ring-indigo-400 outline-none rounded-xs px-1">
                 <span>📚 Launch PubMed Search</span>
               </button>
 
               <button (click)="bookmarkSpark(spark)"
-                class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[9.5px] font-bold uppercase transition cursor-pointer active:scale-95">
+                class="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[9.5px] font-bold uppercase transition cursor-pointer active:scale-95 border border-zinc-700/60 focus:ring-2 focus:ring-indigo-500/50 outline-none">
                 📌 Log Research Hypothesis
               </button>
             </div>
