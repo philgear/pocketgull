@@ -100,40 +100,12 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
       <div class="px-2 sm:px-8 py-2 sm:py-3 no-print w-full bg-slate-100/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-800">
         <div class="max-w-4xl mx-auto min-w-0 relative flex flex-col gap-2">
           
-          <!-- Paradigm Mobile Quick Selector Pill Bar -->
+          <!-- Lens Navigation & Action Bar -->
           <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1 hide-scrollbar">
             <div class="flex items-center gap-1.5 shrink-0">
-              <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-400">
-                Paradigm:
-              </span>
-              <button (click)="state.selectPhilosophy('western')"
-                [class.bg-sky-600]="state.activePhilosophy() === 'western'"
-                [class.text-white]="state.activePhilosophy() === 'western'"
-                [class.bg-white]="state.activePhilosophy() !== 'western'"
-                [class.dark:bg-zinc-900]="state.activePhilosophy() !== 'western'"
-                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-sky-500 transition-all cursor-pointer flex items-center gap-1">
-                <span>🔵</span> Western
-              </button>
-              <button (click)="state.selectPhilosophy('eastern')"
-                [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'"
-                [class.text-white]="state.activePhilosophy() === 'eastern'"
-                [class.bg-white]="state.activePhilosophy() !== 'eastern'"
-                [class.dark:bg-zinc-900]="state.activePhilosophy() !== 'eastern'"
-                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-emerald-500 transition-all cursor-pointer flex items-center gap-1">
-                <span>🟢</span> Eastern (TCM)
-              </button>
-              <button (click)="state.selectPhilosophy('ayurvedic')"
-                [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'"
-                [class.text-white]="state.activePhilosophy() === 'ayurvedic'"
-                [class.bg-white]="state.activePhilosophy() !== 'ayurvedic'"
-                [class.dark:bg-zinc-900]="state.activePhilosophy() !== 'ayurvedic'"
-                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-amber-500 transition-all cursor-pointer flex items-center gap-1">
-                <span>🟡</span> Ayurvedic
-              </button>
-
               <button type="button" (click)="showHandoffModal.set(true)"
-                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition cursor-pointer flex items-center gap-1">
-                <span>🤝</span> Handoff
+                class="px-3 py-1 text-[11px] font-extrabold uppercase rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition cursor-pointer flex items-center gap-1">
+                <span>🤝</span> Specialist Handoff
               </button>
             </div>
 
