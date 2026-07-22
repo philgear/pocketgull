@@ -39,15 +39,10 @@ export class ExportService {
     return (str: string, opts?: any) => {
       try {
         if (raw && typeof raw.sanitize === 'function') {
-          const res = raw.sanitize(str, opts);
-          if (typeof res === 'string' && res.length > 0 && !res.includes('onerror=')) return res;
+          return raw.sanitize(str, opts);
         }
       } catch (e) {}
-      return str
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<img\b[^>]*\/?>/gi, '')
-        .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
-        .replace(/\son\w+\s*=\s*[^>\s]+/gi, '');
+      return str;
     };
   }
 
@@ -73,7 +68,7 @@ export class ExportService {
 
   sanitizeForExport(inputStr: string): string {
     const sanitize = this.getSanitizer();
-    return sanitize(inputStr);
+    return sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe'], FORBID_ATTR: ['onerror', 'onload', 'onclick'] });
   }
 
   buildFhirR4Bundle(patientData: any): any {
