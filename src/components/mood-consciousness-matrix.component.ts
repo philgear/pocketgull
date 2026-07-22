@@ -11,8 +11,13 @@ export interface IConsciousnessState {
   name: string;
   subtitle: string;
   emoji: string;
-  color: string; // Tailwind border / text color
-  targetEEG: string; // Frequency range
+  color: string;
+  gradientBg: string;
+  borderColor: string;
+  glowColor: string;
+  accentText: string;
+  pillBg: string;
+  targetEEG: string;
   targetNeurotransmitters: string[];
   prescribedMeal: {
     emoji: string;
@@ -32,120 +37,188 @@ export interface IConsciousnessState {
 @Component({
   selector: 'app-mood-consciousness-matrix',
   standalone: true,
-  imports: [CommonModule, FloatingWaterConsciousnessComponent, SocialHealthGravitationComponent, LyricaConcertComponent],
+  imports: [
+    CommonModule,
+    FloatingWaterConsciousnessComponent,
+    SocialHealthGravitationComponent,
+    LyricaConcertComponent
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mb-8 p-6 sm:p-8 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl font-sans relative overflow-hidden">
+    <div class="mb-10 p-6 sm:p-10 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800/90 shadow-2xl font-sans relative overflow-hidden transition-all duration-700">
 
-      
-      <!-- Background Ambient Glow -->
-      <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+      <!-- Dynamic Ambient Glow Backdrops -->
+      <div [class]="'absolute -top-32 -right-32 w-[32rem] h-[32rem] rounded-full blur-3xl pointer-events-none transition-all duration-700 opacity-25 ' + stateTheme().glowBg"></div>
+      <div [class]="'absolute -bottom-32 -left-32 w-[32rem] h-[32rem] rounded-full blur-3xl pointer-events-none transition-all duration-700 opacity-20 ' + stateTheme().glowSecondary"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900/40 via-zinc-950/80 to-zinc-950 pointer-events-none"></div>
 
-
-      <!-- Section Header -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5 mb-6 relative z-10 font-mono">
+      <!-- Header Section -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800/80 pb-6 mb-8 relative z-10 font-mono">
         <div>
-          <div class="flex items-center gap-3">
-            <span class="w-3 h-3 rounded-full bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.8)] animate-pulse"></span>
-            <h2 class="text-xl font-bold uppercase tracking-tight text-zinc-100">
-              🔮 Neuro-Consciousness & Mood Optimization Matrix
+          <div class="flex flex-wrap items-center gap-3">
+            <span [class]="'w-3.5 h-3.5 rounded-full shadow-lg animate-pulse transition-colors duration-500 ' + stateTheme().dotBg + ' ' + stateTheme().dotShadow"></span>
+            <h2 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-white flex items-center gap-2">
+              <span>🔮</span>
+              <span>Neuro-Consciousness & Mood Optimization Matrix</span>
             </h2>
-            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase">
+            <span [class]="'text-[10px] font-bold px-3 py-1 rounded-full border uppercase tracking-wider transition-colors duration-500 ' + stateTheme().pillBg + ' ' + stateTheme().accentText + ' ' + stateTheme().borderColor">
               Multimodal Mind-State Engine
             </span>
           </div>
-          <p class="text-xs text-zinc-400 mt-1.5 font-sans">
-            Calibrate AVS entrainment, dietary micro-doses, and neuro-biomarker pathways targeted for <strong>{{ activePatientName() }}</strong>.
+          <p class="text-xs text-zinc-400 mt-2 font-sans max-w-3xl leading-relaxed">
+            Calibrate AVS cortical entrainment, dietary micro-dosing, and neuro-biomarker pathways targeted for <strong class="text-white font-semibold">{{ activePatientName() }}</strong>.
           </p>
         </div>
 
-        <div class="text-right text-[11px] text-zinc-400">
-          <span>Active State: <strong class="text-indigo-400 uppercase font-bold">{{ selectedState().name }}</strong></span>
+        <div class="text-right text-xs font-mono shrink-0">
+          <span class="text-zinc-500 block text-[10px] uppercase tracking-widest">Active State Protocol</span>
+          <span [class]="'text-sm font-extrabold uppercase tracking-wide transition-colors duration-500 ' + stateTheme().accentText">
+            {{ selectedState().emoji }} {{ selectedState().name }}
+          </span>
         </div>
       </div>
 
-      <!-- State of Mind Selection Spectrum Tabs -->
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8 relative z-10 font-mono">
+      <!-- State of Mind Spectrum Selector Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3.5 mb-8 relative z-10 font-mono">
         @for (state of states; track state.id) {
+          @let isSelected = selectedState().id === state.id;
           <button (click)="selectState(state)"
-            [class.ring-2]="selectedState().id === state.id"
-            [class.ring-indigo-500]="selectedState().id === state.id"
-            [class.bg-zinc-900]="selectedState().id === state.id"
-            [class.bg-zinc-900/40]="selectedState().id !== state.id"
-            class="p-3.5 rounded-2xl border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex flex-col items-center text-center group active:scale-95">
+            [class]="isSelected 
+              ? 'p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer flex flex-col items-center text-center shadow-xl scale-[1.02] bg-zinc-900/90 ' + state.borderColor + ' ' + state.glowColor 
+              : 'p-4 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 hover:bg-zinc-900/80 hover:border-zinc-700 transition-all duration-300 cursor-pointer flex flex-col items-center text-center hover:scale-[1.01] active:scale-95 group'"
+            [attr.aria-pressed]="isSelected">
             
-            <span class="text-2xl mb-1 group-hover:scale-110 transition-transform">{{ state.emoji }}</span>
-            <span class="text-xs font-bold text-zinc-200 block uppercase tracking-tight">{{ state.name }}</span>
-            <span class="text-[9.5px] text-zinc-400 block mt-0.5">{{ state.targetEEG }}</span>
+            <div [class]="isSelected ? 'text-3xl mb-2 transition-transform duration-300 scale-110 drop-shadow-md' : 'text-2xl mb-2 group-hover:scale-110 transition-transform duration-300'">
+              {{ state.emoji }}
+            </div>
+            <span class="text-xs font-extrabold text-zinc-100 block uppercase tracking-tight">{{ state.name }}</span>
+            <span class="text-[10px] text-zinc-400 block mt-1 font-mono font-medium">{{ state.targetEEG }}</span>
+
+            <!-- Active Selection Pill -->
+            <span [class]="isSelected 
+              ? 'mt-2.5 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider text-white shadow-sm ' + state.pillBg
+              : 'mt-2.5 text-[9px] text-zinc-500 group-hover:text-zinc-400 font-mono uppercase tracking-wider'">
+              {{ isSelected ? 'Active' : 'Select' }}
+            </span>
           </button>
         }
-      <!-- Dedicated AI Mind-State Suggestions & Clinical Prescription Card -->
-      <div class="mb-8 p-6 rounded-3xl bg-gradient-to-br from-indigo-950/80 via-zinc-900 to-purple-950/80 border border-indigo-500/40 shadow-2xl relative z-10 font-mono">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-indigo-500/30 pb-4 mb-5">
-          <div class="flex items-center gap-3">
-            <span class="text-3xl">{{ selectedState().emoji }}</span>
+      </div>
+
+      <!-- Dedicated AI Mind-State Hero Prescription Card -->
+      <div [class]="'mb-8 p-6 sm:p-8 rounded-3xl border shadow-2xl relative z-10 font-mono backdrop-blur-md transition-all duration-700 ' + stateTheme().cardBg + ' ' + stateTheme().borderColor">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5 mb-6">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-zinc-950/60 border border-white/10 flex items-center justify-center text-3xl shadow-inner shrink-0">
+              {{ selectedState().emoji }}
+            </div>
             <div>
-              <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block">Dedicated AI Suggestions</span>
-              <h3 class="text-base font-extrabold uppercase tracking-wide text-white mt-0.5">
-                {{ selectedState().name }} — Dedicated Mind-State Prescription
+              <span [class]="'text-[10px] font-bold uppercase tracking-widest block ' + stateTheme().accentText">
+                Dedicated AI Synthesis • {{ selectedState().avsTarget.waveType }} {{ selectedState().avsTarget.frequencyHz }} Hz
+              </span>
+              <h3 class="text-lg sm:text-xl font-extrabold uppercase tracking-wide text-white mt-0.5">
+                {{ selectedState().name }} — Mind-State Prescription
               </h3>
               <p class="text-xs text-zinc-300 font-sans mt-0.5">
-                {{ selectedState().subtitle }} • Targeted for <strong class="text-cyan-400 font-bold uppercase">{{ activePatientName() }}</strong>
+                {{ selectedState().subtitle }} • Custom Protocol for <strong class="text-cyan-300 font-semibold">{{ activePatientName() }}</strong>
               </p>
             </div>
           </div>
 
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="flex items-center gap-3 shrink-0">
             <button (click)="generateDedicatedPrescription()"
               [class.animate-pulse]="isGeneratingPrescription()"
-              class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2 cursor-pointer active:scale-95">
-              <span>⚡</span>
-              <span>{{ isGeneratingPrescription() ? 'Synthesizing...' : 'Synthesize Dedicated AI Plan' }}</span>
+              class="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg flex items-center gap-2 cursor-pointer active:scale-95 border border-indigo-400/30">
+              <span class="text-sm">⚡</span>
+              <span>{{ isGeneratingPrescription() ? 'Synthesizing...' : 'Re-Synthesize AI Plan' }}</span>
             </button>
           </div>
         </div>
 
+        <!-- EEG Frequency Oscilloscope Curve SVG -->
+        <div class="mb-6 p-4 rounded-2xl bg-zinc-950/70 border border-white/10 relative overflow-hidden">
+          <div class="flex items-center justify-between text-[10px] text-zinc-400 uppercase tracking-widest mb-2 font-mono">
+            <span class="flex items-center gap-2">
+              <span [class]="'w-2 h-2 rounded-full animate-ping ' + stateTheme().dotBg"></span>
+              Live EEG Oscilloscope Target ({{ selectedState().avsTarget.waveType }} Wave • {{ selectedState().avsTarget.frequencyHz }} Hz)
+            </span>
+            <span class="text-zinc-300 font-bold">Resonant Pace: {{ selectedState().avsTarget.breathingRateBpm }} BPM</span>
+          </div>
+
+          <div class="h-16 w-full relative flex items-center justify-center">
+            <svg class="w-full h-full text-indigo-400/80" viewBox="0 0 600 60" preserveAspectRatio="none">
+              <path [attr.d]="eegWavePath()" 
+                fill="none" 
+                [attr.stroke]="stateTheme().strokeColor" 
+                stroke-width="2.5" 
+                stroke-linecap="round"
+                class="transition-all duration-700 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
+            </svg>
+          </div>
+        </div>
+
         @if (dedicatedPrescription(); as plan) {
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div class="p-4 rounded-xl bg-zinc-900/90 border border-indigo-500/30 space-y-2">
-              <div class="flex items-center gap-2 text-indigo-400 font-bold uppercase text-[11px]">
-                <span>🧠</span> EEG & Neurotransmitter Profile
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs font-sans">
+            
+            <!-- Column 1: Neuro profile -->
+            <div class="p-5 rounded-2xl bg-zinc-950/80 border border-indigo-500/30 space-y-3 relative">
+              <div class="flex items-center gap-2 text-indigo-400 font-bold uppercase font-mono text-xs">
+                <span class="text-base">🧠</span> EEG & Neurotransmitter Profile
               </div>
-              <p class="text-zinc-200 font-bold">{{ plan.targetEEG }}</p>
-              <p class="text-zinc-400 text-[11px]">
-                Neurotransmitters: <span class="text-indigo-300 font-bold">{{ plan.neurotransmitters }}</span>
-              </p>
-              <p class="text-zinc-400 text-[11px] font-sans">
+              <p class="text-white font-extrabold text-sm font-mono">{{ plan.targetEEG }}</p>
+              <div class="text-zinc-300 text-xs">
+                <span class="text-zinc-400 block text-[10px] font-mono uppercase tracking-wider">Target Neurotransmitters</span>
+                <span class="text-indigo-300 font-semibold font-mono">{{ plan.neurotransmitters }}</span>
+              </div>
+              <p class="text-zinc-400 text-xs leading-relaxed border-t border-zinc-800/80 pt-2.5">
                 {{ plan.neuroRationale }}
               </p>
             </div>
 
-            <div class="p-4 rounded-xl bg-zinc-900/90 border border-emerald-500/30 space-y-2">
-              <div class="flex items-center gap-2 text-emerald-400 font-bold uppercase text-[11px]">
-                <span>🥗</span> Nootropic Culinary Prescription
+            <!-- Column 2: Culinary prescription -->
+            <div class="p-5 rounded-2xl bg-zinc-950/80 border border-emerald-500/30 space-y-3 flex flex-col justify-between">
+              <div class="space-y-3">
+                <div class="flex items-center gap-2 text-emerald-400 font-bold uppercase font-mono text-xs">
+                  <span class="text-base">🥗</span> Nootropic Culinary Micro-dose
+                </div>
+                <p class="text-white font-extrabold text-sm font-sans flex items-center gap-2">
+                  <span>{{ plan.mealEmoji }}</span>
+                  <span>{{ plan.mealName }}</span>
+                </p>
+                <div class="text-xs">
+                  <span class="text-zinc-400 block text-[10px] font-mono uppercase tracking-wider">Active Compounds</span>
+                  <span class="text-emerald-300 font-mono text-xs">{{ plan.mealActiveCompounds }}</span>
+                </div>
               </div>
-              <p class="text-zinc-200 font-bold">{{ plan.mealEmoji }} {{ plan.mealName }}</p>
-              <p class="text-emerald-300 text-[11px] font-mono">
-                Active: {{ plan.mealActiveCompounds }}
-              </p>
+
               <button (click)="prescribedMealState(selectedState())"
-                class="w-full mt-2 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/60 text-emerald-200 border border-emerald-500/40 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer">
-                🥑 Prescribe Meal to Care Plan
+                class="w-full mt-3 py-2.5 rounded-xl bg-emerald-600/30 hover:bg-emerald-600/60 text-emerald-200 border border-emerald-500/40 text-xs font-bold font-mono uppercase tracking-wider transition cursor-pointer active:scale-95 flex items-center justify-center gap-2">
+                <span>🥑</span> Prescribe Meal to Care Plan
               </button>
             </div>
 
-            <div class="p-4 rounded-xl bg-zinc-900/90 border border-amber-500/30 space-y-2">
-              <div class="flex items-center gap-2 text-amber-400 font-bold uppercase text-[11px]">
-                <span>☯️</span> Multi-Paradigm Shen & Guna
+            <!-- Column 3: Multi-Paradigm Shen & Guna -->
+            <div class="p-5 rounded-2xl bg-zinc-950/80 border border-amber-500/30 space-y-3 flex flex-col justify-between">
+              <div class="space-y-2.5 font-mono">
+                <div class="flex items-center gap-2 text-amber-400 font-bold uppercase text-xs">
+                  <span class="text-base">☯️</span> Multi-Paradigm Shen & Guna
+                </div>
+                <div class="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs space-y-1">
+                  <span class="text-zinc-500 text-[10px] uppercase tracking-widest block">TCM Shen Status</span>
+                  <p class="text-emerald-300 font-bold text-xs">{{ plan.tcmShen }}</p>
+                </div>
+                <div class="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800 text-xs space-y-1">
+                  <span class="text-zinc-500 text-[10px] uppercase tracking-widest block">Ayurvedic Guna</span>
+                  <p class="text-amber-300 font-bold text-xs">{{ plan.ayurvedaGuna }}</p>
+                </div>
               </div>
-              <p class="text-amber-300 font-bold text-[11px]">TCM: {{ plan.tcmShen }}</p>
-              <p class="text-amber-200 font-bold text-[11px]">Ayurveda: {{ plan.ayurvedaGuna }}</p>
+
               <button (click)="applyAvsState(selectedState())"
-                class="w-full mt-2 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-200 border border-indigo-500/40 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer">
-                ⚡ Activate AVS Target
+                class="w-full mt-3 py-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-200 border border-indigo-500/40 text-xs font-bold font-mono uppercase tracking-wider transition cursor-pointer active:scale-95 flex items-center justify-center gap-2">
+                <span>⚡</span> Activate AVS Target
               </button>
             </div>
+
           </div>
         }
       </div>
@@ -155,200 +228,213 @@ export interface IConsciousnessState {
         <app-floating-water-consciousness></app-floating-water-consciousness>
       </div>
 
-      <!-- Detailed Mind-State Optimization Dashboard -->
+      <!-- Detailed Mind-State Optimization Intervention Cards -->
       @let active = selectedState();
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10 font-sans mb-8">
         
-        <!-- Left 7 Cols: Prescribed Mind-State Interventions -->
+        <!-- Left 7 Cols: Actionable Interventions -->
         <div class="lg:col-span-7 space-y-4">
           
-          <!-- Card 1: AVS Brainwave Entrainment & Resonant Breathing -->
-          <div class="p-5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-start justify-between gap-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="text-base">🧠</span>
-                <h4 class="text-xs font-bold uppercase font-mono text-indigo-400">AVS Brainwave Entrainment & Vagal Resonance</h4>
+          <!-- Card 1: AVS Entrainment & Resonant Breathing -->
+          <div class="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800/80 hover:border-indigo-500/40 transition-all duration-300 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div class="space-y-1.5 flex-1">
+              <div class="flex items-center gap-2.5">
+                <span class="text-xl">🧠</span>
+                <h4 class="text-xs font-extrabold uppercase font-mono text-indigo-400 tracking-wider">
+                  AVS Brainwave Entrainment & Resonant Breathing
+                </h4>
               </div>
-              <p class="text-xs text-zinc-200 font-bold">
-                Target EEG: {{ active.avsTarget.waveType }} Wave ({{ active.avsTarget.frequencyHz }} Hz) • {{ active.avsTarget.breathingRateBpm }} BPM Breathing
+              <p class="text-sm font-bold text-white">
+                {{ active.avsTarget.waveType }} Wave ({{ active.avsTarget.frequencyHz }} Hz) • {{ active.avsTarget.breathingRateBpm }} BPM Vagal Resonant Breathing
               </p>
-              <p class="text-[11px] text-zinc-400 leading-relaxed font-mono">
-                Synchronizes baroreflex vagal tone and entrains cortical oscillations into target {{ active.name }} state.
+              <p class="text-xs text-zinc-400 leading-relaxed font-sans">
+                Synchronizes baroreflex vagal tone and entrains cortical oscillations into target <strong class="text-indigo-300 font-semibold">{{ active.name }}</strong> state.
               </p>
             </div>
 
             <button (click)="applyAvsState(active)"
-              class="shrink-0 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-mono text-[10px] font-bold uppercase tracking-wider transition shadow-md cursor-pointer active:scale-95">
-              ⚡ Apply AVS State
+              class="shrink-0 px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-indigo-600/20 cursor-pointer active:scale-95 border border-indigo-400/30 flex items-center gap-2">
+              <span>⚡</span>
+              <span>Apply AVS State</span>
             </button>
           </div>
 
-          <!-- Card 2: Culinary Micro-Dosing & Botanical Nutrition -->
-          <div class="p-5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-start justify-between gap-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="text-base">{{ active.prescribedMeal.emoji }}</span>
-                <h4 class="text-xs font-bold uppercase font-mono text-emerald-400">Culinary Micro-Dosing Intervention</h4>
+          <!-- Card 2: Culinary Micro-Dosing -->
+          <div class="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800/80 hover:border-emerald-500/40 transition-all duration-300 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div class="space-y-1.5 flex-1">
+              <div class="flex items-center gap-2.5">
+                <span class="text-xl">{{ active.prescribedMeal.emoji }}</span>
+                <h4 class="text-xs font-extrabold uppercase font-mono text-emerald-400 tracking-wider">
+                  Culinary Micro-Dosing Intervention
+                </h4>
               </div>
-              <p class="text-xs text-zinc-200 font-bold">
+              <p class="text-sm font-bold text-white">
                 {{ active.prescribedMeal.name }}
               </p>
-              <p class="text-[11px] text-zinc-400 font-mono">
-                Active Compounds: <span class="text-emerald-300">{{ active.prescribedMeal.activeCompounds }}</span>
+              <p class="text-xs text-zinc-400 font-mono">
+                Active Compounds: <span class="text-emerald-300 font-semibold">{{ active.prescribedMeal.activeCompounds }}</span>
               </p>
             </div>
 
             <button (click)="prescribedMealState(active)"
-              class="shrink-0 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-mono text-[10px] font-bold uppercase tracking-wider transition shadow-md cursor-pointer active:scale-95">
-              🥑 Prescribe Meal
+              class="shrink-0 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-emerald-600/20 cursor-pointer active:scale-95 border border-emerald-400/30 flex items-center gap-2">
+              <span>🥑</span>
+              <span>Prescribe Meal</span>
             </button>
           </div>
 
-          <!-- Card 3: Multimodal Voice Consultation Mode -->
-          <div class="p-5 rounded-2xl bg-zinc-900/80 border border-zinc-800 flex items-center justify-between gap-4">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-base">🎙️</span>
-                <h4 class="text-xs font-bold uppercase font-mono text-amber-400">Gemini Bi-Directional Voice Consultation</h4>
+          <!-- Card 3: Multimodal Gemini Voice Consultation Mode -->
+          <div class="p-6 rounded-3xl bg-zinc-900/90 border border-zinc-800/80 hover:border-amber-500/40 transition-all duration-300 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div class="space-y-1.5 flex-1">
+              <div class="flex items-center gap-2.5">
+                <span class="text-xl">🎙️</span>
+                <h4 class="text-xs font-extrabold uppercase font-mono text-amber-400 tracking-wider">
+                  Gemini Bi-Directional Voice Consultation
+                </h4>
               </div>
-              <p class="text-[11px] text-zinc-400 font-mono mt-1">
-                Launch interactive AI voice guide tuned to facilitate {{ active.name }} consciousness state.
+              <p class="text-xs text-zinc-300 font-sans leading-relaxed">
+                Launch interactive AI voice guide tuned to facilitate <strong class="text-amber-300 font-semibold">{{ active.name }}</strong> consciousness state.
               </p>
             </div>
 
             <button (click)="triggerVoiceMode(active)"
-              class="shrink-0 px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-mono text-[10px] font-bold uppercase tracking-wider transition shadow-md cursor-pointer active:scale-95">
-              🎙️ Launch Voice Guide
+              class="shrink-0 px-5 py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-white font-mono text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-amber-600/20 cursor-pointer active:scale-95 border border-amber-400/30 flex items-center gap-2">
+              <span>🎙️</span>
+              <span>Launch Voice Guide</span>
             </button>
           </div>
 
         </div>
 
-        <!-- Right 5 Cols: Neuro-Biomarker & Energetic Rationale -->
-        <div class="lg:col-span-5 p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 font-mono flex flex-col justify-between">
+        <!-- Right 5 Cols: Neuro-Biomarker & Energetic Targets Summary -->
+        <div class="lg:col-span-5 p-6 rounded-3xl bg-zinc-900/95 border border-zinc-800/90 font-mono flex flex-col justify-between shadow-xl">
           <div>
-            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-2 tracking-widest">
-              🧬 Neuro-Biomarker & Energetic Targets
+            <span class="text-[10px] font-bold uppercase text-zinc-400 mb-4 tracking-widest flex items-center gap-2">
+              <span>🧬</span>
+              <span>Neuro-Biomarker & Energetic Targets</span>
             </span>
 
-            <div class="space-y-3 text-xs mb-4">
-              <div class="flex justify-between border-b border-zinc-800 pb-2">
-                <span class="text-zinc-400">Neurotransmitters:</span>
-                <span class="text-indigo-300 font-bold">{{ active.targetNeurotransmitters.join(', ') }}</span>
+            <div class="space-y-3.5 text-xs mb-6 font-sans">
+              <div class="flex justify-between items-center border-b border-zinc-800/80 pb-3">
+                <span class="text-zinc-400 font-mono text-xs">Neurotransmitters:</span>
+                <span class="text-indigo-300 font-extrabold font-mono text-right text-xs">{{ active.targetNeurotransmitters.join(', ') }}</span>
               </div>
-              <div class="flex justify-between border-b border-zinc-800 pb-2">
-                <span class="text-zinc-400">TCM Shen Status:</span>
-                <span class="text-emerald-300 font-bold">{{ active.tcmShenStatus }}</span>
+              <div class="flex justify-between items-center border-b border-zinc-800/80 pb-3">
+                <span class="text-zinc-400 font-mono text-xs">TCM Shen Status:</span>
+                <span class="text-emerald-300 font-bold text-right text-xs">{{ active.tcmShenStatus }}</span>
               </div>
-              <div class="flex justify-between border-b border-zinc-800 pb-2">
-                <span class="text-zinc-400">Ayurvedic Guna:</span>
-                <span class="text-amber-300 font-bold">{{ active.ayurvedicGuna }}</span>
+              <div class="flex justify-between items-center border-b border-zinc-800/80 pb-3">
+                <span class="text-zinc-400 font-mono text-xs">Ayurvedic Guna:</span>
+                <span class="text-amber-300 font-bold text-right text-xs">{{ active.ayurvedicGuna }}</span>
               </div>
             </div>
 
-            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-1">Clinical Rationale:</span>
-            <p class="text-[11px] text-zinc-300 font-sans leading-relaxed">
+            <span class="text-[10px] font-bold uppercase text-zinc-400 block mb-2 tracking-widest font-mono">Clinical Rationale:</span>
+            <p class="text-xs text-zinc-300 font-sans leading-relaxed p-4 rounded-2xl bg-zinc-950/60 border border-zinc-800/80">
               {{ active.clinicalRationale }}
             </p>
           </div>
 
-          <div class="pt-4 border-t border-zinc-800 text-[9.5px] text-zinc-500 flex justify-between">
-            <span>State ID: {{ active.id | uppercase }}</span>
-            <span>Physician Oversight Mandated</span>
+          <div class="pt-5 border-t border-zinc-800/80 text-[10px] font-mono text-zinc-500 flex items-center justify-between">
+            <span>STATE ID: <strong class="text-zinc-300 uppercase">{{ active.id }}</strong></span>
+            <span class="text-indigo-400 font-semibold">Physician Oversight Mandated</span>
           </div>
         </div>
 
       </div>
 
       <!-- Lyrica Generative Healing Jukebox Suite -->
-      <div class="p-6 rounded-3xl bg-zinc-900/90 border border-purple-500/30 shadow-[0_0_25px_rgba(168,85,247,0.15)] relative z-10 font-mono overflow-hidden">
+      <div class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-purple-950/40 via-zinc-900/90 to-slate-950/80 border border-purple-500/30 shadow-[0_0_35px_rgba(168,85,247,0.15)] relative z-10 font-mono overflow-hidden">
         
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-5">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-lg text-purple-300">
+        <!-- Jukebox Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800/80 pb-5 mb-6">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-xl text-purple-300 shadow-md">
               📻
             </div>
             <div>
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold uppercase tracking-tight text-purple-200">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <h3 class="text-base font-extrabold uppercase tracking-tight text-purple-200">
                   Lyrica Generative Healing Jukebox
                 </h3>
-                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">
+                <span class="text-[9.5px] font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 uppercase tracking-wider">
                   Solfeggio & Binaural Synth
                 </span>
               </div>
-              <p class="text-[11px] text-zinc-400 font-sans mt-0.5">
-                Generates therapeutic ambient soundscapes, Solfeggio carrier waves, and spoken Lyrica healing affirmations tuned to {{ active.name }}.
+              <p class="text-xs text-zinc-400 font-sans mt-0.5">
+                Generates therapeutic ambient soundscapes, Solfeggio carrier waves, and spoken Lyrica healing affirmations tuned to <strong>{{ active.name }}</strong>.
               </p>
             </div>
           </div>
 
-          <!-- Controls -->
-          <div class="flex items-center gap-2">
+          <!-- Jukebox Controls -->
+          <div class="flex items-center gap-2.5 shrink-0">
             @if (!isPlayingJukebox()) {
               <button (click)="toggleJukebox()"
-                class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-lg flex items-center gap-2 cursor-pointer active:scale-95">
+                class="px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-purple-600/30 flex items-center gap-2 cursor-pointer active:scale-95 border border-purple-400/30">
                 <span>▶ Play Soundscape</span>
               </button>
             } @else {
               <button (click)="toggleJukebox()"
-                class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-lg flex items-center gap-2 cursor-pointer active:scale-95">
+                class="px-5 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-rose-600/30 flex items-center gap-2 cursor-pointer active:scale-95 border border-rose-400/30">
                 <span>⏸ Pause Jukebox</span>
               </button>
             }
 
             <button (click)="generateNewLyricaTrack()"
-              class="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold uppercase tracking-wider transition cursor-pointer border border-zinc-700 active:scale-95 flex items-center gap-1.5">
-              <span>🎲 New Track</span>
+              class="px-4 py-2.5 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold uppercase tracking-wider transition cursor-pointer border border-zinc-700 active:scale-95 flex items-center gap-1.5 shadow-md">
+              <span>🎲 Next Track</span>
             </button>
           </div>
         </div>
 
-        <!-- Jukebox Main Content: Track Info, Audio Visualizer & Lyrica Teleprompter -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+        <!-- Jukebox Main Body -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           
           <!-- Column 1: Active Track Spec & Solfeggio Tuning -->
-          <div class="md:col-span-5 space-y-3">
-            <div class="p-3.5 rounded-2xl bg-zinc-950/80 border border-zinc-800">
-              <span class="text-[9.5px] text-purple-400 uppercase tracking-widest block font-bold">Now Playing</span>
-              <h4 class="text-xs font-bold text-zinc-100 mt-1 font-sans">
+          <div class="md:col-span-5 space-y-4">
+            <div class="p-5 rounded-2xl bg-zinc-950/80 border border-zinc-800/80 shadow-inner space-y-2">
+              <span class="text-[10px] text-purple-400 uppercase tracking-widest font-bold block">Now Playing Track Spec</span>
+              <h4 class="text-sm font-bold text-white font-sans leading-snug">
                 {{ activeJukeboxTrack().title }}
               </h4>
-              <div class="flex items-center gap-2 text-[10.5px] text-zinc-400 mt-1">
-                <span class="text-purple-300 font-bold">🎵 {{ activeJukeboxTrack().solfeggioFreq }} Hz {{ activeJukeboxTrack().tuningName }}</span>
-                <span>•</span>
-                <span class="text-indigo-300">🧠 {{ activeJukeboxTrack().binauralBeatHz }} Hz Binaural</span>
+              <div class="flex flex-wrap items-center gap-2 text-xs pt-1">
+                <span class="text-purple-300 font-bold bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-500/30">
+                  🎵 {{ activeJukeboxTrack().solfeggioFreq }} Hz {{ activeJukeboxTrack().tuningName }}
+                </span>
+                <span class="text-indigo-300 font-bold bg-indigo-950/60 px-2.5 py-1 rounded-lg border border-indigo-500/30">
+                  🧠 {{ activeJukeboxTrack().binauralBeatHz }} Hz Binaural
+                </span>
               </div>
             </div>
 
-            <!-- Volume Slider -->
-            <div class="flex items-center gap-3 px-1">
-              <span class="text-xs text-zinc-400">🔊 Volume</span>
+            <!-- Volume Control -->
+            <div class="flex items-center gap-3 px-2 py-1">
+              <span class="text-xs text-zinc-400 font-mono">🔊 Volume</span>
               <input type="range" min="0" max="1" step="0.05" [value]="jukeboxVolume()" (input)="updateVolume($event)"
-                class="w-full accent-purple-500 bg-zinc-800 rounded-lg h-1.5 cursor-pointer">
-              <span class="text-xs text-purple-300 font-bold min-w-[32px] text-right">{{ Math.round(jukeboxVolume() * 100) }}%</span>
+                class="w-full accent-purple-500 bg-zinc-800 rounded-lg h-2 cursor-pointer">
+              <span class="text-xs text-purple-300 font-bold min-w-[40px] text-right font-mono">{{ Math.round(jukeboxVolume() * 100) }}%</span>
             </div>
           </div>
 
-          <!-- Column 2: Ambient Equalizer Visualizer & Scrolling Healing Lyrica Text -->
-          <div class="md:col-span-7 p-4 rounded-2xl bg-zinc-950/90 border border-purple-500/20 relative overflow-hidden space-y-3">
+          <!-- Column 2: Audio Equalizer & Spoken Lyrica Ticker -->
+          <div class="md:col-span-7 p-5 rounded-2xl bg-zinc-950/90 border border-purple-500/20 relative overflow-hidden space-y-4 shadow-xl">
             
-            <!-- Animated Soundwave Equalizer Bars -->
-            <div class="flex items-end justify-between gap-1 h-10 px-2">
+            <!-- Soundwave Equalizer Bars -->
+            <div class="flex items-end justify-between gap-1.5 h-12 px-2">
               @for (bar of visualizerBars(); track $index) {
-                <div class="w-full bg-gradient-to-t from-purple-600 via-indigo-500 to-emerald-400 rounded-t transition-all duration-300"
+                <div class="w-full bg-gradient-to-t from-purple-600 via-indigo-500 to-emerald-400 rounded-t-md transition-all duration-300 shadow-sm"
                   [style.height.%]="isPlayingJukebox() ? bar : 15"></div>
               }
             </div>
 
-            <!-- Lyrica Healing Teleprompter Affirmation -->
-            <div class="border-t border-zinc-800/80 pt-2.5">
-              <div class="flex items-center justify-between text-[9px] text-zinc-500 uppercase tracking-widest mb-1">
+            <!-- Spoken Lyrica Affirmation Ticker -->
+            <div class="border-t border-zinc-800/80 pt-3">
+              <div class="flex items-center justify-between text-[10px] text-zinc-400 uppercase tracking-widest mb-1.5">
                 <span>Spoken Lyrica Affirmation</span>
-                <span class="text-emerald-400 flex items-center gap-1">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-emerald-400 flex items-center gap-1.5 font-bold">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                   Healing Frequency Active
                 </span>
               </div>
@@ -357,25 +443,24 @@ export interface IConsciousnessState {
               </p>
             </div>
 
-            <!-- Gemini Generative Mind Visual Mandala Banner -->
-            <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30 flex items-center justify-between gap-3">
-              <div class="flex items-center gap-2">
-                <span class="text-sm">🎨</span>
+            <!-- Gemini Mind Mandala Visual Art Generator -->
+            <div class="p-3.5 rounded-2xl bg-purple-950/40 border border-purple-500/30 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <span class="text-base">🎨</span>
                 <div>
                   <span class="text-[10px] font-bold text-purple-300 uppercase tracking-wider block">Gemini Mind Mandala Art</span>
-                  <span class="text-[11px] text-zinc-300 font-sans">
+                  <span class="text-xs text-zinc-300 font-sans">
                     Visual: {{ activeJukeboxTrack().artTheme }}
                   </span>
                 </div>
               </div>
               <button (click)="synthesizeMindVisual()"
-                class="px-2.5 py-1.5 rounded-lg bg-purple-600/40 hover:bg-purple-600/70 border border-purple-400/40 text-purple-200 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer active:scale-95">
+                class="px-3 py-1.5 rounded-xl bg-purple-600/50 hover:bg-purple-600/80 border border-purple-400/50 text-purple-100 text-xs font-bold uppercase tracking-wider transition cursor-pointer active:scale-95 shrink-0">
                 ✨ Generate Art
               </button>
             </div>
 
           </div>
-
 
         </div>
 
@@ -405,6 +490,11 @@ export class MoodConsciousnessMatrixComponent {
       subtitle: 'Peak Cognition & Executive Clarity',
       emoji: '⚡',
       color: 'indigo',
+      gradientBg: 'from-indigo-950/80 via-zinc-900 to-cyan-950/80',
+      borderColor: 'border-indigo-500/40',
+      glowColor: 'shadow-[0_0_25px_rgba(99,102,241,0.25)]',
+      accentText: 'text-indigo-400',
+      pillBg: 'bg-indigo-600',
       targetEEG: '40 Hz Gamma',
       targetNeurotransmitters: ['Dopamine D2', 'Acetylcholine', 'Norepinephrine'],
       prescribedMeal: {
@@ -427,6 +517,11 @@ export class MoodConsciousnessMatrixComponent {
       subtitle: 'Parasympathetic Vagal Relaxation',
       emoji: '🧘',
       color: 'emerald',
+      gradientBg: 'from-emerald-950/80 via-zinc-900 to-teal-950/80',
+      borderColor: 'border-emerald-500/40',
+      glowColor: 'shadow-[0_0_25px_rgba(16,185,129,0.25)]',
+      accentText: 'text-emerald-400',
+      pillBg: 'bg-emerald-600',
       targetEEG: '10 Hz Alpha',
       targetNeurotransmitters: ['GABA-A', 'Glycine', 'Serotonin 5-HT1A'],
       prescribedMeal: {
@@ -449,6 +544,11 @@ export class MoodConsciousnessMatrixComponent {
       subtitle: 'Delta Glymphatic Clearance',
       emoji: '🌙',
       color: 'purple',
+      gradientBg: 'from-purple-950/80 via-zinc-900 to-indigo-950/80',
+      borderColor: 'border-purple-500/40',
+      glowColor: 'shadow-[0_0_25px_rgba(168,85,247,0.25)]',
+      accentText: 'text-purple-400',
+      pillBg: 'bg-purple-600',
       targetEEG: '2 Hz Delta',
       targetNeurotransmitters: ['Melatonin', 'GABA-B', 'Adenosine'],
       prescribedMeal: {
@@ -471,6 +571,11 @@ export class MoodConsciousnessMatrixComponent {
       subtitle: 'Hypnagogic Insight & Association',
       emoji: '🎨',
       color: 'amber',
+      gradientBg: 'from-amber-950/80 via-zinc-900 to-fuchsia-950/80',
+      borderColor: 'border-amber-500/40',
+      glowColor: 'shadow-[0_0_25px_rgba(245,158,11,0.25)]',
+      accentText: 'text-amber-400',
+      pillBg: 'bg-amber-600',
       targetEEG: '6 Hz Theta',
       targetNeurotransmitters: ['Anandamide', 'Dopamine D1', 'Acetylcholine'],
       prescribedMeal: {
@@ -493,6 +598,11 @@ export class MoodConsciousnessMatrixComponent {
       subtitle: 'Somatic Emotional Stability',
       emoji: '🛡️',
       color: 'rose',
+      gradientBg: 'from-rose-950/80 via-zinc-900 to-orange-950/80',
+      borderColor: 'border-rose-500/40',
+      glowColor: 'shadow-[0_0_25px_rgba(244,63,94,0.25)]',
+      accentText: 'text-rose-400',
+      pillBg: 'bg-rose-600',
       targetEEG: '8 Hz Low Alpha',
       targetNeurotransmitters: ['Endorphins', 'Neuropeptide Y', 'GABA'],
       prescribedMeal: {
@@ -529,6 +639,90 @@ export class MoodConsciousnessMatrixComponent {
     if (!pId) return 'Charles Darwin';
     const patient = this.patientManagement.patients().find(p => p.id === pId);
     return patient ? patient.name : 'Charles Darwin';
+  });
+
+  stateTheme = computed(() => {
+    const s = this.selectedState();
+    switch (s.id) {
+      case 'focus':
+        return {
+          glowBg: 'bg-indigo-500',
+          glowSecondary: 'bg-cyan-500',
+          dotBg: 'bg-indigo-500',
+          dotShadow: 'shadow-[0_0_12px_rgba(99,102,241,0.8)]',
+          accentText: 'text-indigo-400',
+          borderColor: 'border-indigo-500/40',
+          pillBg: 'bg-indigo-500/20',
+          strokeColor: '#818cf8',
+          cardBg: 'bg-gradient-to-br from-indigo-950/80 via-zinc-900 to-cyan-950/80'
+        };
+      case 'calm':
+        return {
+          glowBg: 'bg-emerald-500',
+          glowSecondary: 'bg-teal-500',
+          dotBg: 'bg-emerald-500',
+          dotShadow: 'shadow-[0_0_12px_rgba(16,185,129,0.8)]',
+          accentText: 'text-emerald-400',
+          borderColor: 'border-emerald-500/40',
+          pillBg: 'bg-emerald-500/20',
+          strokeColor: '#34d399',
+          cardBg: 'bg-gradient-to-br from-emerald-950/80 via-zinc-900 to-teal-950/80'
+        };
+      case 'sleep':
+        return {
+          glowBg: 'bg-purple-500',
+          glowSecondary: 'bg-indigo-600',
+          dotBg: 'bg-purple-500',
+          dotShadow: 'shadow-[0_0_12px_rgba(168,85,247,0.8)]',
+          accentText: 'text-purple-400',
+          borderColor: 'border-purple-500/40',
+          pillBg: 'bg-purple-500/20',
+          strokeColor: '#c084fc',
+          cardBg: 'bg-gradient-to-br from-purple-950/80 via-zinc-900 to-indigo-950/80'
+        };
+      case 'creativity':
+        return {
+          glowBg: 'bg-amber-500',
+          glowSecondary: 'bg-rose-500',
+          dotBg: 'bg-amber-500',
+          dotShadow: 'shadow-[0_0_12px_rgba(245,158,11,0.8)]',
+          accentText: 'text-amber-400',
+          borderColor: 'border-amber-500/40',
+          pillBg: 'bg-amber-500/20',
+          strokeColor: '#fbbf24',
+          cardBg: 'bg-gradient-to-br from-amber-950/80 via-zinc-900 to-fuchsia-950/80'
+        };
+      case 'grounding':
+        return {
+          glowBg: 'bg-rose-500',
+          glowSecondary: 'bg-orange-500',
+          dotBg: 'bg-rose-500',
+          dotShadow: 'shadow-[0_0_12px_rgba(244,63,94,0.8)]',
+          accentText: 'text-rose-400',
+          borderColor: 'border-rose-500/40',
+          pillBg: 'bg-rose-500/20',
+          strokeColor: '#fb7185',
+          cardBg: 'bg-gradient-to-br from-rose-950/80 via-zinc-900 to-orange-950/80'
+        };
+    }
+  });
+
+  eegWavePath = computed(() => {
+    const hz = this.selectedState().avsTarget.frequencyHz;
+    const cycles = Math.max(2, Math.min(24, Math.round(hz / 2)));
+    const points: string[] = [];
+    const width = 600;
+    const height = 60;
+    const midY = height / 2;
+    const amp = 18;
+
+    for (let x = 0; x <= width; x += 5) {
+      const angle = (x / width) * cycles * 2 * Math.PI;
+      const y = midY + Math.sin(angle) * amp;
+      points.push(`${x},${y.toFixed(1)}`);
+    }
+
+    return `M 0,${midY} L ` + points.join(' L ');
   });
 
   selectState(state: IConsciousnessState) {
@@ -572,7 +766,6 @@ export class MoodConsciousnessMatrixComponent {
     });
   }
 
-
   prescribedMealState(state: IConsciousnessState) {
     const noteText = `🥑 Prescribed Mood Meal: ${state.prescribedMeal.emoji} ${state.prescribedMeal.name} (${state.prescribedMeal.activeCompounds})`;
     this.patientState.addClinicalNote({
@@ -589,7 +782,6 @@ export class MoodConsciousnessMatrixComponent {
     }
   }
 
-  // Lyrica Generative Healing Jukebox State & Web Audio Synthesizer
   Math = Math;
   isPlayingJukebox = signal<boolean>(false);
   jukeboxVolume = signal<number>(0.5);
@@ -626,7 +818,6 @@ export class MoodConsciousnessMatrixComponent {
     });
     alert(`✨ Synthesized Gemini Mind Visual: ${track.artTheme}\nPrompted for ${track.solfeggioFreq} Hz Solfeggio & ${track.binauralBeatHz} Hz EEG Target.`);
   }
-
 
   private audioCtx: AudioContext | null = null;
   private oscLeft: OscillatorNode | null = null;
@@ -673,7 +864,6 @@ export class MoodConsciousnessMatrixComponent {
       const carrierFreq = track.solfeggioFreq;
       const beatFreq = track.binauralBeatHz;
 
-      // Create stereo panners for binaural beat separation (Left: Carrier, Right: Carrier + Beat)
       const pannerLeft = this.audioCtx.createStereoPanner ? this.audioCtx.createStereoPanner() : null;
       const pannerRight = this.audioCtx.createStereoPanner ? this.audioCtx.createStereoPanner() : null;
 
@@ -709,13 +899,11 @@ export class MoodConsciousnessMatrixComponent {
 
       this.isPlayingJukebox.set(true);
 
-      // Start animated visualizer pulse
       this.visualizerInterval = setInterval(() => {
         const newBars = Array.from({ length: 12 }, () => Math.floor(Math.random() * 70) + 30);
         this.visualizerBars.set(newBars);
       }, 300);
 
-      // Speak spoken Lyrica affirmation using Web Speech API SpeechSynthesis if available
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(this.currentLyricaLyric());
@@ -747,4 +935,3 @@ export class MoodConsciousnessMatrixComponent {
     }
   }
 }
-
