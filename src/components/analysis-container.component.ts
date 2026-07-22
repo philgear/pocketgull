@@ -103,6 +103,18 @@ import { GamificationService } from '../services/gamification.service';
               }
               
               @if (!intelligence.isLoading()) {
+                <!-- PDF Care Plan Export Button -->
+                <button type="button" (click)="exportPdf()" title="Export Printable PDF Care Plan"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
+                  <span>📄</span> PDF
+                </button>
+
+                <!-- FHIR R4 Export Button -->
+                <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
+                  <span>🔥</span> FHIR R4
+                </button>
+
                 <pocket-gull-button (click)="intelligence.clearCache()"
                   variant="ghost"
                   size="sm"
@@ -165,9 +177,34 @@ export class AnalysisContainerComponent {
   cache = inject(AiCacheService);
   intelligence = inject(ClinicalIntelligenceService);
   game = inject(GamificationService);
+  exportService = inject(ExportService);
   ClinicalIcons = ClinicalIcons;
 
   justGenerated = signal(false);
+
+  exportPdf() {
+    const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
+    this.exportService.exportPdfReport(
+      reportText || 'Sample Patient Care Plan',
+      this.state.patientName() || 'Patient'
+    );
+  }
+
+  exportFhir() {
+    const patientName = this.state.patientName() || 'Patient';
+    const bundle = this.exportService.buildFhirR4Bundle({
+      id: 'p001',
+      name: patientName,
+      issues: this.state.issues()
+    });
+    const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fhir_bundle_${patientName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.json`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
  
   triggerAnalysisGenerate() {
     this.justGenerated.set(true);

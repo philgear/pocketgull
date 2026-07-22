@@ -346,6 +346,12 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             }
         });
 
+        // React to active philosophy (Western vs Eastern TCM vs Ayurvedic) for 3D Meridian/Organ Heatmap Sync
+        effect(() => {
+            const philosophy = this.state.activePhilosophy();
+            this.updatePartColors();
+        });
+
         // React to AVS session activation to toggle neural globe visibility instantly
         effect(() => {
             const avsActive = this.state.isAvsSessionActive();
@@ -1081,17 +1087,22 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 }
 
                 if (isSelected) {
+                    const philosophy = this.state.activePhilosophy();
+                    const paradigmEmissive = philosophy === 'western' ? 0x0284c7 : (philosophy === 'eastern' ? 0x059669 : 0xd97706);
                     if (layer === 'skin') {
                         (material as THREE.MeshStandardMaterial).color.setHex(0x1C1C1C);
-                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
-                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.2;
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(paradigmEmissive);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.4;
                     } else if (layer !== 'molecular') {
-                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
-                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.3;
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(paradigmEmissive);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.5;
                     }
                 } else {
+                    const philosophy = this.state.activePhilosophy();
+                    const paradigmEmissive = philosophy === 'western' ? 0x0284c7 : (philosophy === 'eastern' ? 0x059669 : 0xd97706);
                     if (layer === 'organ') {
-                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.2;
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(paradigmEmissive);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.25;
                     } else if (layer === 'bone' && maxPain > 0) {
                         (material as THREE.MeshStandardMaterial).emissive.setHex(0xff3333);
                     } else if (layer !== 'molecular') {

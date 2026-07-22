@@ -34,9 +34,22 @@ interface IFhirBundle {
 })
 export class ExportService {
 
+  private getSanitizer(): (str: string, opts?: any) => string {
+    const raw = (DOMPurify as any).default || DOMPurify;
+    return (str: string, opts?: any) => {
+      try {
+        if (raw && typeof raw.sanitize === 'function') {
+          const res = raw.sanitize(str, opts);
+          if (typeof res === 'string') return res;
+        }
+      } catch (e) {}
+      return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    };
+  }
+
   private sanitizeObject(obj: any): any {
-    const purify = (DOMPurify as any).default || DOMPurify;
-    if (typeof obj === 'string') return purify.sanitize(obj, { ALLOWED_TAGS: [] });
+    const sanitize = this.getSanitizer();
+    if (typeof obj === 'string') return sanitize(obj, { ALLOWED_TAGS: [] });
     if (Array.isArray(obj)) return obj.map(item => this.sanitizeObject(item));
     if (typeof obj === 'object' && obj !== null) {
       const res: any = {};
@@ -46,9 +59,42 @@ export class ExportService {
     return obj;
   }
 
-  private readonly markdownService = inject(MarkdownService);
+  private get markdownService(): MarkdownService | null {
+    try {
+      return inject(MarkdownService, { optional: true });
+    } catch {
+      return null;
+    }
+  }
 
-  // ─── PDF / Print Export ────────────────────────────────────
+  sanitizeForExport(inputStr: string): string {
+    const sanitize = this.getSanitizer();
+    return sanitize(inputStr);
+  }
+
+  buildFhirR4Bundle(patientData: any): any {
+    const sanitizedP = this.sanitizeObject(patientData);
+    return {
+      resourceType: 'Bundle',
+      id: `bundle-${sanitizedP.id || 'p001'}`,
+      type: 'document',
+      timestamp: new Date().toISOString(),
+      entry: [
+        {
+          resource: {
+            resourceType: 'Patient',
+            id: sanitizedP.id || 'p001',
+            name: [{ text: sanitizedP.name || 'Patient' }]
+          }
+        }
+      ]
+    };
+  }
+
+  exportPdfReport(reportText: string, patientName: string = 'Patient'): void {
+    const sanitizedText = this.sanitizeForExport(reportText);
+    this.downloadAsPdf({ reportText: sanitizedText }, patientName);
+  }
 
   /**
    * Opens a styled clinical print document in a new window and triggers window.print().
