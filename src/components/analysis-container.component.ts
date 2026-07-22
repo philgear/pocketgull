@@ -27,69 +27,78 @@ import { GamificationService } from '../services/gamification.service';
           @let isEastern = state.activePhilosophy() === 'eastern';
           @let isAyurvedic = state.activePhilosophy() === 'ayurvedic';
 
-          <div class="h-16 bg-white dark:bg-[#09090b] border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 shrink-0 relative z-10">
+          <div class="min-h-[56px] py-2 bg-white dark:bg-[#09090b] border-b border-gray-200 dark:border-zinc-800 flex flex-wrap sm:flex-nowrap items-center justify-between px-3 sm:px-6 shrink-0 relative z-10 font-mono gap-2">
               
-            <!-- Philosophy Selector -->
-            <div class="flex items-center gap-1 bg-gray-50 dark:bg-zinc-900/40 p-1 rounded-xl border border-gray-200/60 dark:border-zinc-800/80">
+            <!-- Geographical Clinical Paradigm Selector -->
+            <div class="flex items-center gap-1 bg-gray-100 dark:bg-zinc-900 p-1 rounded-md border border-gray-300 dark:border-zinc-800 overflow-x-auto max-w-full">
+              <span class="hidden md:inline text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-400 px-1">
+                Paradigm:
+              </span>
+
+              <!-- Western Clinical (North America & Europe) -->
               <button (click)="selectPhilosophy('western')"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
+                title="Western Clinical Medicine (North America & Europe)"
+                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-mono font-extrabold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-md"
                 [class.bg-white]="isWestern"
-                [class.dark:bg-zinc-800]="isWestern"
-                [class.text-sky-600]="isWestern"
-                [class.dark:text-sky-400]="isWestern"
-                [class.shadow-sm]="isWestern"
-                [class.border]="isWestern"
-                [class.border-gray-200/50]="isWestern"
-                [class.dark:border-zinc-700/50]="isWestern"
-                [class.text-gray-500]="!isWestern"
+                [class.dark:bg-zinc-950]="isWestern"
+                [class.text-sky-700]="isWestern"
+                [class.dark:text-sky-300]="isWestern"
+                [class.border-sky-500]="isWestern"
+                [class.shadow-xs]="isWestern"
+                [class.text-slate-600]="!isWestern"
                 [class.dark:text-zinc-400]="!isWestern"
-                [class.hover:text-gray-700]="!isWestern"
-                [class.dark:hover:text-zinc-200]="!isWestern">
-                <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
-                Western
+                [class.border-transparent]="!isWestern"
+                [class.hover:bg-slate-200/50]="!isWestern"
+                [class.dark:hover:bg-zinc-800/50]="!isWestern">
+                <span class="w-2 h-2 rounded-md bg-sky-500 shrink-0"></span>
+                <span>🏥 Western</span>
               </button>
+
+              <!-- Eastern TCM (East Asia Zang-Fu) -->
               <button (click)="selectPhilosophy('eastern')"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
+                title="Eastern TCM Medicine (East Asian Zang-Fu)"
+                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-mono font-extrabold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-md"
                 [class.bg-white]="isEastern"
-                [class.dark:bg-zinc-800]="isEastern"
-                [class.text-emerald-600]="isEastern"
-                [class.dark:text-emerald-400]="isEastern"
-                [class.shadow-sm]="isEastern"
-                [class.border]="isEastern"
-                [class.border-gray-200/50]="isEastern"
-                [class.dark:border-zinc-700/50]="isEastern"
-                [class.text-gray-500]="!isEastern"
+                [class.dark:bg-zinc-950]="isEastern"
+                [class.text-emerald-700]="isEastern"
+                [class.dark:text-emerald-300]="isEastern"
+                [class.border-emerald-500]="isEastern"
+                [class.shadow-xs]="isEastern"
+                [class.text-slate-600]="!isEastern"
                 [class.dark:text-zinc-400]="!isEastern"
-                [class.hover:text-gray-700]="!isEastern"
-                [class.dark:hover:text-zinc-200]="!isEastern">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                Eastern (TCM)
+                [class.border-transparent]="!isEastern"
+                [class.hover:bg-slate-200/50]="!isEastern"
+                [class.dark:hover:bg-zinc-800/50]="!isEastern">
+                <span class="w-2 h-2 rounded-md bg-emerald-500 shrink-0"></span>
+                <span>☯️ Eastern</span>
               </button>
+
+              <!-- Ayurvedic (South Asia Vedic) -->
               <button (click)="selectPhilosophy('ayurvedic')"
-                class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all duration-200 select-none cursor-pointer"
+                title="Ayurvedic Medicine (South Asian Vedic Dosha)"
+                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-mono font-extrabold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-md"
                 [class.bg-white]="isAyurvedic"
-                [class.dark:bg-zinc-800]="isAyurvedic"
-                [class.text-amber-600]="isAyurvedic"
-                [class.dark:text-amber-400]="isAyurvedic"
-                [class.shadow-sm]="isAyurvedic"
-                [class.border]="isAyurvedic"
-                [class.border-gray-200/50]="isAyurvedic"
-                [class.dark:border-zinc-700/50]="isAyurvedic"
-                [class.text-gray-500]="!isAyurvedic"
+                [class.dark:bg-zinc-950]="isAyurvedic"
+                [class.text-amber-700]="isAyurvedic"
+                [class.dark:text-amber-300]="isAyurvedic"
+                [class.border-amber-500]="isAyurvedic"
+                [class.shadow-xs]="isAyurvedic"
+                [class.text-slate-600]="!isAyurvedic"
                 [class.dark:text-zinc-400]="!isAyurvedic"
-                [class.hover:text-gray-700]="!isAyurvedic"
-                [class.dark:hover:text-zinc-200]="!isAyurvedic">
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                Ayurvedic
+                [class.border-transparent]="!isAyurvedic"
+                [class.hover:bg-slate-200/50]="!isAyurvedic"
+                [class.dark:hover:bg-zinc-800/50]="!isAyurvedic">
+                <span class="w-2 h-2 rounded-md bg-amber-500 shrink-0"></span>
+                <span>🪷 Ayurvedic</span>
               </button>
             </div>
 
-            <!-- Export Actions & Status -->
-            <div class="flex items-center gap-4">
+            <!-- Export Actions & Mobile Refresh Analysis -->
+            <div class="flex items-center gap-2 sm:gap-3 ml-auto">
               @if (justGenerated() && hasReport() && !intelligence.isLoading()) {
-                <div class="hidden md:flex items-center gap-2 mr-2 animate-in fade-in duration-500">
-                   <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                   <span class="text-[12px] font-bold uppercase tracking-wider text-emerald-700">Analysis Complete</span>
+                <div class="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                   <span class="w-2 h-2 rounded-md bg-emerald-500 animate-pulse"></span>
+                   <span>Analysis Synced</span>
                 </div>
               }
               
@@ -100,11 +109,13 @@ import { GamificationService } from '../services/gamification.service';
                   ariaLabel="Clear AI Cache"
                   [icon]="ClinicalIcons.Clear">
                 </pocket-gull-button>
+
                 <pocket-gull-button id="tour-generate-btn" (click)="triggerAnalysisGenerate()" [disabled]="!state.hasIssues()"
                   variant="primary"
                   size="sm"
                   [icon]="hasReport() ? 'M17.65 6.35A7.95 7.95 0 0 0 12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.66-.67 3.17-1.76 4.24l1.42 1.42A9.92 9.92 0 0 0 22 12c0-2.76-1.12-5.26-2.35-7.65z' : 'M14 5l7 7m0 0l-7 7m7-7H3'">
-                  {{ hasReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}
+                  <span class="inline sm:hidden">{{ hasReport() ? 'Refresh' : 'Generate' }}</span>
+                  <span class="hidden sm:inline">{{ hasReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}</span>
                 </pocket-gull-button>
               }
             </div>
