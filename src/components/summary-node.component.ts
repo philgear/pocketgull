@@ -248,11 +248,11 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
         }
         .claim-unit:hover .claim-toolbar { opacity:1; pointer-events:auto; }
         .claim-action {
-            width:20px; height:20px; border-radius:4px; border:none;
+            min-width:44px; min-height:44px; width:44px; height:44px; border-radius:8px; border:none;
             background:rgba(255,255,255,.9); cursor:pointer;
             display:flex; align-items:center; justify-content:center;
             box-shadow:0 1px 3px rgba(0,0,0,.12); transition:all .1s;
-            flex-shrink:0;
+            flex-shrink:0; position:relative; z-index:10;
         }
         .claim-action:hover { transform:scale(1.12); }
         .claim-action--bracket { color:#689F38; }

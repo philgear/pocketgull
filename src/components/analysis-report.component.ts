@@ -242,32 +242,32 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
 
             <button (click)="changeLens('Maternal & Postpartum')"
               [class]="activeLens() === 'Maternal & Postpartum' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🤰</span> Maternal & Postpartum
             </button>
 
             <button (click)="changeLens('Grow-Thyself Education')"
               [class]="activeLens() === 'Grow-Thyself Education' ? '!bg-emerald-600 !text-white dark:!bg-emerald-600 dark:!text-white border-emerald-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-emerald-50 dark:hover:bg-zinc-800 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🌱</span> Grow-Thyself Education
             </button>
 
             <button (click)="changeLens('Epigenetic Longevity')"
               [class]="activeLens() === 'Epigenetic Longevity' ? '!bg-purple-600 !text-white dark:!bg-purple-600 dark:!text-white border-purple-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-purple-50 dark:hover:bg-zinc-800 hover:text-purple-700 dark:hover:text-purple-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>⌛</span> Epigenetic Longevity
             </button>
 
             <button (click)="changeLens('Pre-Conception & Family Health')"
               [class]="activeLens() === 'Pre-Conception & Family Health' ? '!bg-teal-600 !text-white dark:!bg-teal-600 dark:!text-white border-teal-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-teal-50 dark:hover:bg-zinc-800 hover:text-teal-700 dark:hover:text-teal-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🧬</span> Family & Pre-Conception
             </button>
 
             @if (state.isEmergencyMode()) {
               <button (click)="changeLens('EMT Handoff')"
                 [class]="activeLens() === 'EMT Handoff' ? '!bg-red-600 !text-white border-red-600 shadow-md font-extrabold scale-[1.02]' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/40 hover:bg-red-600 hover:text-white font-semibold'"
-                class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+                class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
                 <span>🚑</span> EMT Handoff
               </button>
             }
