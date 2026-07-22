@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, computed, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
+import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { PatientStateService } from '../services/patient-state.service';
 
 export interface IGleeTrack {
@@ -20,7 +21,7 @@ export interface IGleeTrack {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-actuarial-glee-album',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent],
+  imports: [CommonModule, PocketGullButtonComponent, PocketGullBadgeComponent],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in">
       

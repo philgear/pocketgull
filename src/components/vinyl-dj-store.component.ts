@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal, computed, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
+import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { IGleeTrack } from './actuarial-glee-album.component';
 import { PatientStateService } from '../services/patient-state.service';
 
@@ -8,7 +9,7 @@ import { PatientStateService } from '../services/patient-state.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-vinyl-dj-store',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent],
+  imports: [CommonModule, PocketGullButtonComponent, PocketGullBadgeComponent],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-lg animate-in">
       
