@@ -55,13 +55,14 @@ export interface IPrintPageThumbnail {
         </div>
       </div>
 
-      <!-- Language / Philosophy Selector Buttons -->
-      <div class="mb-6 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 font-mono text-xs">
-        <div>
-          <span class="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider block mb-1">
-            🌐 Cognitive Output Language & Medical Philosophy:
-          </span>
+      <!-- Language / Philosophy & Cognitive Literacy Selector Buttons -->
+      <div class="mb-6 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-200/60 dark:border-zinc-800/80 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 font-mono text-xs">
+        <div class="space-y-2">
+          <!-- Medical Philosophy Selector -->
           <div class="flex flex-wrap items-center gap-2">
+            <span class="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider text-[11px]">
+              🌐 Diagnostic Philosophy:
+            </span>
             <button (click)="selectPhilosophy('western')"
               [class.bg-sky-600]="activePhilosophy() === 'western'"
               [class.text-white]="activePhilosophy() === 'western'"
@@ -69,7 +70,7 @@ export interface IPrintPageThumbnail {
               [class.text-zinc-700]="activePhilosophy() !== 'western'"
               [class.dark:bg-zinc-800]="activePhilosophy() !== 'western'"
               [class.dark:text-zinc-300]="activePhilosophy() !== 'western'"
-              class="px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
               🔵 Western Allopathic
             </button>
             <button (click)="selectPhilosophy('eastern')"
@@ -79,7 +80,7 @@ export interface IPrintPageThumbnail {
               [class.text-zinc-700]="activePhilosophy() !== 'eastern'"
               [class.dark:bg-zinc-800]="activePhilosophy() !== 'eastern'"
               [class.dark:text-zinc-300]="activePhilosophy() !== 'eastern'"
-              class="px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
               🟢 Eastern (TCM)
             </button>
             <button (click)="selectPhilosophy('ayurvedic')"
@@ -89,8 +90,55 @@ export interface IPrintPageThumbnail {
               [class.text-zinc-700]="activePhilosophy() !== 'ayurvedic'"
               [class.dark:bg-zinc-800]="activePhilosophy() !== 'ayurvedic'"
               [class.dark:text-zinc-300]="activePhilosophy() !== 'ayurvedic'"
-              class="px-3 py-1.5 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
               🟡 Ayurvedic Medicine
+            </button>
+          </div>
+
+          <!-- Cognitive Assessment Export Level Selector -->
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-wider text-[11px]">
+              🧠 Cognitive Assessment Level:
+            </span>
+            <button (click)="selectCognitiveLevel('standard')"
+              [class.bg-indigo-600]="activeCognitiveLevel() === 'standard'"
+              [class.text-white]="activeCognitiveLevel() === 'standard'"
+              [class.bg-zinc-200]="activeCognitiveLevel() !== 'standard'"
+              [class.text-zinc-700]="activeCognitiveLevel() !== 'standard'"
+              [class.dark:bg-zinc-800]="activeCognitiveLevel() !== 'standard'"
+              [class.dark:text-zinc-300]="activeCognitiveLevel() !== 'standard'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              ⚙️ Standard MD
+            </button>
+            <button (click)="selectCognitiveLevel('simplified')"
+              [class.bg-teal-600]="activeCognitiveLevel() === 'simplified'"
+              [class.text-white]="activeCognitiveLevel() === 'simplified'"
+              [class.bg-zinc-200]="activeCognitiveLevel() !== 'simplified'"
+              [class.text-zinc-700]="activeCognitiveLevel() !== 'simplified'"
+              [class.dark:bg-zinc-800]="activeCognitiveLevel() !== 'simplified'"
+              [class.dark:text-zinc-300]="activeCognitiveLevel() !== 'simplified'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              📄 Simplified Grade 8
+            </button>
+            <button (click)="selectCognitiveLevel('dyslexia')"
+              [class.bg-orange-600]="activeCognitiveLevel() === 'dyslexia'"
+              [class.text-white]="activeCognitiveLevel() === 'dyslexia'"
+              [class.bg-zinc-200]="activeCognitiveLevel() !== 'dyslexia'"
+              [class.text-zinc-700]="activeCognitiveLevel() !== 'dyslexia'"
+              [class.dark:bg-zinc-800]="activeCognitiveLevel() !== 'dyslexia'"
+              [class.dark:text-zinc-300]="activeCognitiveLevel() !== 'dyslexia'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              📖 Dyslexia-Friendly
+            </button>
+            <button (click)="selectCognitiveLevel('child')"
+              [class.bg-purple-600]="activeCognitiveLevel() === 'child'"
+              [class.text-white]="activeCognitiveLevel() === 'child'"
+              [class.bg-zinc-200]="activeCognitiveLevel() !== 'child'"
+              [class.text-zinc-700]="activeCognitiveLevel() !== 'child'"
+              [class.dark:bg-zinc-800]="activeCognitiveLevel() !== 'child'"
+              [class.dark:text-zinc-300]="activeCognitiveLevel() !== 'child'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              🧸 Child-Friendly (Grade 4)
             </button>
           </div>
         </div>
@@ -302,6 +350,7 @@ export class CarePlanPrintPreviewComponent {
   toggleGenomics = signal<boolean>(true);
 
   activePhilosophy = computed(() => this.patientState.activePhilosophy());
+  activeCognitiveLevel = computed(() => this.patientState.selectedCognitiveLevel());
 
   activePatientName = computed(() => {
     const pId = this.patientManagement.selectedPatientId();
@@ -353,6 +402,12 @@ export class CarePlanPrintPreviewComponent {
     this.patientState.selectPhilosophy(philosophy);
   }
 
+  selectCognitiveLevel(level: 'standard' | 'simplified' | 'dyslexia' | 'child') {
+    this.patientState.selectedCognitiveLevel.set(level);
+    const readingLabel = level === 'standard' ? 'standard' : level === 'dyslexia' ? 'Dyslexia-Friendly' : level === 'child' ? 'Child-Friendly (Grade 4)' : 'Simplified Patient Summary (Grade 8)';
+    this.patientState.selectedReadingLevel.set(readingLabel);
+  }
+
   updateNotes(event: Event) {
     const val = (event.target as HTMLTextAreaElement).value;
     this.editableNotes.set(val);
@@ -387,6 +442,8 @@ export class CarePlanPrintPreviewComponent {
     const data = {
       report: this.intelligence.analysisResults(),
       summary: this.editableNotes(),
+      cognitiveLevel: this.activeCognitiveLevel(),
+      language: this.patientState.selectedLanguage(),
       options: {
         includeVitals: this.toggleVitals(),
         includeSideBySideComparison: this.toggleSideBySide(),

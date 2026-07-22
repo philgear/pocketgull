@@ -54,6 +54,9 @@ export class PatientStateService {
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
   readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
+  readonly selectedCognitiveLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
+  readonly selectedLanguage = signal<string>('English');
+  readonly selectedReadingLevel = signal<string>('standard');
 
   // --- ML Treatment Cost-Benefit Matrix State & Pharmacogenomics ---
   readonly genomicProfile = signal<import('./patient.types').IFhirGenomicObservation[]>([

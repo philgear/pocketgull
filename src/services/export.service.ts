@@ -103,6 +103,19 @@ export class ExportService {
 
     const report = typeof data.report === 'object' ? data.report : {};
     const summary = data.summary || '';
+    const cognitiveLevel = data.cognitiveLevel || 'standard';
+    const language = data.language || 'English';
+
+    const cognitiveBadgeHtml = (cognitiveLevel !== 'standard' || (language && language.toLowerCase() !== 'english')) ? `
+            <div style="margin-bottom: 24px; padding: 12px 18px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; font-family: monospace; font-size: 9pt; color: #c2410c; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <span style="font-weight: 700; text-transform: uppercase;">🧠 Cognitive Assessment Export Target:</span>
+                <span style="font-weight: 600; margin-left: 6px; color: #ea580c;">
+                  ${cognitiveLevel === 'dyslexia' ? '📖 Dyslexia-Friendly (OpenDyslexic & High-Contrast Spacing)' : cognitiveLevel === 'child' ? '🧸 Child-Friendly Health Literacy (Grade 4)' : cognitiveLevel === 'simplified' ? '📄 Simplified Patient Summary (Grade 8)' : `Translated to ${language}`}
+                </span>
+              </div>
+              <span style="font-size: 8pt; background: rgba(234,88,12,0.15); padding: 2px 8px; border-radius: 4px; font-weight: 700;">HEALTH LITERACY EXPORT</span>
+            </div>` : '';
 
     const sectionsHtml = Object.entries(lensLabels).map(([key, label]) => {
       const content = report[key] || '';
@@ -210,6 +223,23 @@ export class ExportService {
       padding: 0;
       margin: 0;
     }
+
+    ${cognitiveLevel === 'dyslexia' ? `
+      body, p, li, td, th, h1, h2, h3, div {
+        font-family: 'OpenDyslexic', 'Comic Sans MS', 'Trebuchet MS', sans-serif !important;
+        line-height: 1.95 !important;
+        letter-spacing: 0.05em !important;
+        word-spacing: 0.12em !important;
+      }
+      p, li { margin-bottom: 14px !important; }
+    ` : ''}
+
+    ${cognitiveLevel === 'child' ? `
+      body, p, li, td, th {
+        font-size: 11pt !important;
+        line-height: 1.85 !important;
+      }
+    ` : ''}
 
     /* ─── Page Layout ───────────────────────────────── */
     .page-wrap {
@@ -531,6 +561,8 @@ export class ExportService {
           <div><strong>Classification</strong> Confidential – Clinical Use Only</div>
         </div>
       </header>
+
+      ${cognitiveBadgeHtml}
 
       <!-- Patient Banner -->
       <div class="patient-banner">
