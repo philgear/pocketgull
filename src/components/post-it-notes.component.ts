@@ -86,7 +86,7 @@ export class PostItService {
           
           <!-- Actions & Template Adders -->
           <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-800 pb-4">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Quick Templates:</span>
               <button (click)="addTemplate('sun')" class="px-2.5 py-1 text-xs font-bold rounded bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition cursor-pointer">
                 + ☀️ Sun Reset
@@ -96,6 +96,12 @@ export class PostItService {
               </button>
               <button (click)="addTemplate('tea')" class="px-2.5 py-1 text-xs font-bold rounded bg-rose-100 text-rose-800 border border-rose-300 hover:bg-rose-200 transition cursor-pointer">
                 + 🍵 Elixir Tea
+              </button>
+              <button (click)="addTemplate('hawking')" class="px-2.5 py-1 text-xs font-bold rounded bg-purple-100 text-purple-800 border border-purple-300 hover:bg-purple-200 transition cursor-pointer">
+                + 🎵 Hawking / Stars
+              </button>
+              <button (click)="addTemplate('water')" class="px-2.5 py-1 text-xs font-bold rounded bg-cyan-100 text-cyan-800 border border-cyan-300 hover:bg-cyan-200 transition cursor-pointer">
+                + 🌊 Lao Tzu Water
               </button>
             </div>
 
@@ -210,7 +216,7 @@ export class PostItNotesComponent {
     }
   }
 
-  addTemplate(type: 'sun' | 'vagal' | 'tea') {
+  addTemplate(type: 'sun' | 'vagal' | 'tea' | 'hawking' | 'water') {
     const id = 'n_' + Date.now();
     if (type === 'sun') {
       this.notes.update(list => [...list, {
@@ -241,6 +247,26 @@ export class PostItNotesComponent {
         color: 'rose',
         rotation: Math.floor(Math.random() * 6) - 3,
         pinnedArea: 'Liver / Kidney Essence'
+      }]);
+    } else if (type === 'hawking') {
+      this.notes.update(list => [...list, {
+        id,
+        title: '🎵 Look Up at the Stars',
+        category: 'happiness',
+        text: '"Look up at the stars and not down at your feet. Try to make sense of what you see." — Hawking / Coldplay',
+        color: 'lavender',
+        rotation: Math.floor(Math.random() * 6) - 3,
+        pinnedArea: 'Prefrontal Cortex / Vision'
+      }]);
+    } else if (type === 'water') {
+      this.notes.update(list => [...list, {
+        id,
+        title: '🌊 Be Like Water',
+        category: 'vagal_calm',
+        text: '"Be like water making its way through cracks. Adjust to the object and find a way through." — Lao Tzu / Bruce Lee',
+        color: 'mint',
+        rotation: Math.floor(Math.random() * 6) - 3,
+        pinnedArea: 'Autonomic System / Liver Qi'
       }]);
     }
   }

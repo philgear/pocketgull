@@ -6,6 +6,7 @@ import { PatientManagementService } from '../services/patient-management.service
 import { HistoryEntry } from '../services/patient.types';
 import { MarkdownService } from '../services/markdown.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
+import { ParadigmLyricsService } from '../services/paradigm-lyrics.service';
 import { DictationService } from '../services/dictation.service';
 import { generate } from 'lean-qr';
 
@@ -385,9 +386,28 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
                     Mapping biomarkers and constitutional trends to the Tridosha framework (Vata/Pitta/Kapha), evaluating Agni (digestive fire) and Ama (cellular load).
                   }
                 </p>
-              </div>
             </div>
           </div>
+
+          <!-- Paradigm Lyric & Observational Wisdom Card -->
+          @if (lyricsService.getRandomLyricForParadigm(state.activePhilosophy()); as lyric) {
+            <div class="mb-6 p-4 rounded-xl border border-dashed flex items-start gap-3 transition-all"
+                 [class]="lyric.color">
+              <span class="text-lg">🎵</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[11px] font-mono font-bold uppercase tracking-wider">{{ lyric.context }}</span>
+                  <span class="text-[10px] font-serif italic text-slate-500 dark:text-zinc-400">— {{ lyric.source }}</span>
+                </div>
+                <p class="text-xs font-serif italic leading-snug text-slate-800 dark:text-zinc-200">
+                  "{{ lyric.quote }}"
+                </p>
+                <p class="text-[11px] font-sans mt-2 text-slate-600 dark:text-zinc-400">
+                  <span class="font-bold">Observational Impact:</span> {{ lyric.clinicalImpact }}
+                </p>
+              </div>
+            </div>
+          }
         }
 
         @if (activeLens() === 'Y-BOCs Screener') {
@@ -1283,6 +1303,7 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly export = inject(ExportService);
   protected readonly actMapper = inject(ClinicalActLensMapperService);
   private readonly medicalDecoder = inject(MedicalDecoderService);
+  protected readonly lyricsService = inject(ParadigmLyricsService);
 
   flowToastMessage = signal<string | null>(null);
   showHandoffModal = signal<boolean>(false);
