@@ -16,12 +16,13 @@ import { FamilyTreePedigreeComponent } from './family-tree-pedigree.component';
 import { PatientStoryModalComponent } from './patient-story-modal.component';
 import { PostItNotesComponent } from './post-it-notes.component';
 import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
+import { VinylDjStoreComponent } from './vinyl-dj-store.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -151,6 +152,12 @@ import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition cursor-pointer">
                   <span>🎵</span> Actuarial Glee
                 </button>
+
+                <!-- Vinyl Music Store & DJ Deck Button -->
+                <button type="button" (click)="showVinylModal.set(true)" title="Open Retro Vinyl Music Store & DJ Turntable Station"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
+                  <span>📻</span> Vinyl Lounge
+                </button>
                 <!-- FHIR R4 Export Button -->
                 <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
@@ -221,6 +228,9 @@ import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
 
     <!-- 12-Track Actuarial Glee Duet Singalong Album Modal -->
     <app-actuarial-glee-album *ngIf="showGleeModal()" (closeModal)="showGleeModal.set(false)"></app-actuarial-glee-album>
+
+    <!-- Retro Vinyl Music Store & DJ Turntable Station Modal -->
+    <app-vinyl-dj-store *ngIf="showVinylModal()" (closeModal)="showVinylModal.set(false)"></app-vinyl-dj-store>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -247,6 +257,7 @@ export class AnalysisContainerComponent {
   showStoryModal = signal(false);
   showPostItModal = signal(false);
   showGleeModal = signal(false);
+  showVinylModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
