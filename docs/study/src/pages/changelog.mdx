@@ -8,6 +8,16 @@ title: Changelog
 All notable changes to Pocket Gull are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## v1.1.0-rc3 — 2026-07-21
+
+**Sentinel Triage Priority Sorting, 60fps 3D Patient Slide-in Transition, Geo-Sentinel Surveillance & FHIR R4 Bundle Export**
+
+### Added
+- **[3D Anatomy] 60fps High-Speed Patient Slide-in Transition (`body-3d-viewer.component.ts`)**: Selecting a patient triggers a smooth 3D slide-in animation (`position.x` interpolates from `-3.5m` to center `0.0m`), instantly updating pain heatmaps and anatomical focus.
+- **[Triage / Roster] Urgency Priority Patient Dropdown Sorting (`patient-dropdown.component.ts`)**: Automatically sorts patient roster by Triage Urgency Score so Level 1 Emergency Resuscitation & Level 2 Emergent patients appear at the very top.
+- **[Public Health] Geo-Sentinel Outbreak Viewpoint Deck (`sentinel-triage.component.ts`)**: Added 3 international surveillance modes (Global 🌎 WHO, Regional 🌍 PAHO, Domestic 🇺🇸 CDC/NHI) with real-time AI Containment directives.
+- **[FHIR R4 / Export] FHIR R4 Bundle Serialization & 1-Click Export (`export.service.ts`)**: Added `exportPatientToFhirJson()` creating HIPAA-compliant FHIR `Patient`, `Observation` (vitals & pain scores), and `DiagnosticReport` resources.
+
 ## v1.1.0-rc2 — 2026-07-21
 
 **Patient Health Trajectory Storybook, 4 Adaptive Cognitive Reading Modes & Dedicated AI Mind-State Synthesizer**

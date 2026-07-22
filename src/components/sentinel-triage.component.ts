@@ -41,6 +41,37 @@ interface ISentinelPacket {
         <span class="text-xs text-zinc-400 dark:text-zinc-500 font-mono">Registry v4.12</span>
       </div>
 
+      <!-- Geo-Sentinel Outbreak Surveillance Viewpoint Selector Bar -->
+      <div class="mb-5 p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-400">
+          <span>📡</span>
+          <span>Sentinel Outbreak Viewpoint:</span>
+        </div>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button (click)="setGeoViewpoint('global')"
+            [class.bg-blue-600]="geoViewpoint() === 'global'"
+            [class.text-white]="geoViewpoint() === 'global'"
+            [class.text-zinc-400]="geoViewpoint() !== 'global'"
+            class="px-2.5 py-1 text-[11px] font-bold uppercase rounded-lg border border-blue-500/30 transition cursor-pointer flex items-center gap-1">
+            🌎 Global (WHO)
+          </button>
+          <button (click)="setGeoViewpoint('regional')"
+            [class.bg-emerald-600]="geoViewpoint() === 'regional'"
+            [class.text-white]="geoViewpoint() === 'regional'"
+            [class.text-zinc-400]="geoViewpoint() !== 'regional'"
+            class="px-2.5 py-1 text-[11px] font-bold uppercase rounded-lg border border-emerald-500/30 transition cursor-pointer flex items-center gap-1">
+            🌍 Regional (PAHO)
+          </button>
+          <button (click)="setGeoViewpoint('american')"
+            [class.bg-purple-600]="geoViewpoint() === 'american'"
+            [class.text-white]="geoViewpoint() === 'american'"
+            [class.text-zinc-400]="geoViewpoint() !== 'american'"
+            class="px-2.5 py-1 text-[11px] font-bold uppercase rounded-lg border border-purple-500/30 transition cursor-pointer flex items-center gap-1">
+            🇺🇸 American (CDC/NHI)
+          </button>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- Left: Connectivity Map Canvas -->
@@ -179,11 +210,39 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
   mapCanvas = viewChild<ElementRef<HTMLCanvasElement>>('mapCanvas');
 
   // Interactive metrics
+  geoViewpoint = signal<'global' | 'regional' | 'american'>('global');
   isAlertActive = signal(false);
   activeLatency = signal(45);
   activeNodesCount = signal(5);
   activeBps = signal(128);
   isGeneratingProtocol = signal(false);
+
+  setGeoViewpoint(v: 'global' | 'regional' | 'american') {
+    this.geoViewpoint.set(v);
+    if (v === 'global') {
+      this.containmentRecommendation.set(
+        '🌎 [WHO Global Outbreak Surveillance Directive]\n' +
+        '1. Establish international pandemic isolation protocols & border entry screening.\n' +
+        '2. Synchronize SIR/ODE epidemiological models with global health bureaus.\n' +
+        '3. Rapid-deploy mobile containment teams to high-transmission nodes.\n' +
+        '4. Prioritize mitochondrial ATP defense and senolytic clearance for vulnerable cohorts.'
+      );
+    } else if (v === 'regional') {
+      this.containmentRecommendation.set(
+        '🌍 [PAHO Regional Epidemic Surveillance Directive]\n' +
+        '1. Activate trans-boundary vector control and micro-climate quarantine perimeters.\n' +
+        '2. Stream regional clinic EHR data for real-time cluster tracing.\n' +
+        '3. Dispatch targeted nutritional bypass packs to isolated regional hubs.'
+      );
+    } else {
+      this.containmentRecommendation.set(
+        '🇺🇸 [CDC / NHI Domestic Lifespan Protection Net Directive]\n' +
+        '1. Monitor domestic hospital ICU bed capacity and mechanical ventilation reserves.\n' +
+        '2. Deploy anti-inflammatory telomere defense protocols for preventable loss-of-life mitigation.\n' +
+        '3. Integrate continuous PhysioNet bio-telemetry with local emergency dispatch.'
+      );
+    }
+  }
 
   // Active containment protocol
   containmentRecommendation = signal<string>(

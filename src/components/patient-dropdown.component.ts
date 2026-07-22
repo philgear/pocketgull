@@ -30,9 +30,27 @@ import { GamificationService } from '../services/gamification.service';
         <div class="origin-top-left absolute left-0 mt-2 w-72 max-w-[calc(100vw-24px)] rounded-sm shadow-xl bg-white dark:bg-[#09090b] ring-1 ring-black dark:ring-white/10 ring-opacity-5 focus:outline-none overflow-hidden flex flex-col max-h-[60dvh]">
           
           <div class="bg-gray-50 dark:bg-zinc-900 px-4 py-2 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between shrink-0">
-             <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Active Roster</span>
+             <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Active Roster (Sorted by Triage Urgency)</span>
              <span class="text-xs font-bold text-gray-500 dark:text-zinc-400">{{ filteredPatients().length }}</span>
           </div>
+
+          <!-- Fast Patient Data Read Executive Summary Card -->
+          @if (selectedPatientObj(); as activeP) {
+            <div class="p-3 bg-gradient-to-r from-slate-900 to-indigo-950 text-white border-b border-indigo-500/30 shrink-0 font-mono text-xs">
+              <div class="flex items-center justify-between gap-1 mb-1">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-300">⚡ Fast Patient Read</span>
+                <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded" [class]="getTriageBadge(activeP).bgClass">
+                  {{ getTriageBadge(activeP).label }}
+                </span>
+              </div>
+              <p class="font-bold text-sm text-amber-300 truncate">{{ activeP.name }} ({{ activeP.age }}y, {{ activeP.gender }})</p>
+              <div class="grid grid-cols-3 gap-1 mt-1.5 text-[10px] text-zinc-300 bg-black/40 p-1.5 rounded border border-white/10">
+                <div>BP: <strong class="text-white">{{ activeP.vitals?.bp || '120/80' }}</strong></div>
+                <div>HR: <strong class="text-white">{{ activeP.vitals?.hr || '72' }}</strong></div>
+                <div>SpO2: <strong class="text-white">{{ activeP.vitals?.spO2 || '98%' }}</strong></div>
+              </div>
+            </div>
+          }
 
           <div class="p-2 border-b border-gray-100 dark:border-zinc-800 shrink-0">
             <div class="relative">
@@ -93,6 +111,9 @@ import { GamificationService } from '../services/gamification.service';
                     @if (isSentinelCase(patient)) {
                       <span class="text-[12px] font-bold text-amber-800 dark:text-amber-400">🔦 Sentinel</span>
                     }
+                    <span class="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded shadow-xs ml-auto shrink-0 font-mono" [class]="getTriageBadge(patient).bgClass">
+                      {{ getTriageBadge(patient).label }}
+                    </span>
                   </div>
                   <div class="text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
                      <span class="whitespace-nowrap">{{ patient.age }} YRS</span>
@@ -135,6 +156,14 @@ import { GamificationService } from '../services/gamification.service';
                icon="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12">
                 Import IPatient
              </pocket-gull-button>
+             <pocket-gull-button 
+               (click)="exportActiveFhir()" 
+               variant="ghost" 
+               size="sm" 
+               class="w-full"
+               icon="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                Export FHIR R4
+             </pocket-gull-button>
           </div>
         </div>
       }
@@ -164,6 +193,24 @@ export class PatientDropdownComponent {
   isSentinelCase(patient: any): boolean {
     return !!patient && (patient.name.toLowerCase().includes('sentinel') || ['p004', 'p005', 'p006', 'p007'].includes(patient.id));
   }
+
+  getPatientTriageScore(p: any): number {
+    if (!p) return 0;
+    if (p.name.toLowerCase().includes('frida kahlo') || p.id === 'p005') return 100; // Level 1 Emergency Resuscitation
+    if (this.isSentinelCase(p)) return 90; // Level 2 Emergent Sentinel Case
+    if (p.name.toLowerCase().includes('charles darwin')) return 75; // Level 3 Urgent Assessment
+    if (p.name.toLowerCase().includes('florence nightingale')) return 60; // Level 3 Urgent
+    return 40; // Level 4/5 Routine Care
+  }
+
+  getTriageBadge(p: any): { label: string; bgClass: string } {
+    const score = this.getPatientTriageScore(p);
+    if (score >= 95) return { label: '🚨 L1 EMERGENCY', bgClass: 'bg-rose-500 text-white font-mono' };
+    if (score >= 85) return { label: '🟠 L2 EMERGENT', bgClass: 'bg-orange-500 text-white font-mono' };
+    if (score >= 65) return { label: '🟡 L3 URGENT', bgClass: 'bg-amber-500 text-black font-mono' };
+    return { label: '🟢 L4 STABLE', bgClass: 'bg-emerald-600 text-white font-mono' };
+  }
+
   exportService = inject(ExportService);
   game = inject(GamificationService);
   elementRef = inject(ElementRef);
@@ -171,22 +218,36 @@ export class PatientDropdownComponent {
   importStatus = signal<{ type: 'success' | 'error'; message: string } | null>(null);
   searchQuery = signal('');
 
+  exportActiveFhir() {
+    const active = this.selectedPatientObj();
+    if (active) {
+      this.exportService.exportPatientToFhirJson(active);
+    }
+  }
+
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   filteredPatients = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     const patients = this.patientManagement.patients();
-    if (!query) return patients;
-    
-    return patients.filter(p => 
-      p.name.toLowerCase().includes(query) || 
-      p.gender?.toLowerCase().includes(query) ||
-      p.age?.toString().includes(query) ||
-      // Assuming state might store condition, but we don't have direct access here 
-      // without injecting PatientStateService or adding it to Patient interface.
-      // Searching by ID as a fallback for advanced users
-      p.id.toLowerCase().includes(query)
-    );
+    let result = patients;
+
+    if (query) {
+      result = patients.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        p.gender?.toLowerCase().includes(query) ||
+        p.age?.toString().includes(query) ||
+        p.id.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort patients so those needing help first appear FIRST at top of dropdown!
+    return [...result].sort((a, b) => this.getPatientTriageScore(b) - this.getPatientTriageScore(a));
+  });
+
+  selectedPatientObj = computed(() => {
+    const id = this.patientManagement.selectedPatientId();
+    return this.patientManagement.patients().find(p => p.id === id) || null;
   });
 
   currentPatientName() {

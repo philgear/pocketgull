@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed, ElementRe
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
+import { ExportService } from '../services/export.service';
 
 export interface IDistantFamilyTree {
   id: string;
@@ -40,6 +41,10 @@ export interface IDistantFamilyTree {
         </div>
 
         <div class="flex items-center gap-2 pointer-events-auto">
+          <button (click)="exportFhir()" 
+            class="px-3 py-1.5 rounded-full font-bold uppercase transition backdrop-blur-md border border-zinc-700/60 text-[10px] bg-zinc-950/70 text-zinc-200 hover:bg-zinc-800 cursor-pointer">
+            📥 FHIR R4
+          </button>
           <button (click)="toggleBreathingGuide()" 
             class="px-3 py-1.5 rounded-full font-bold uppercase transition backdrop-blur-md border border-zinc-700/60 text-[10px]"
             [class.bg-emerald-500]="isBreathingActive()"
@@ -94,10 +99,43 @@ export interface IDistantFamilyTree {
           </p>
         </div>
 
-        <div class="flex items-center gap-3 font-mono text-xs">
-          <div class="text-right text-zinc-400 text-[10px]">
-            <div>Horizon: <strong class="text-emerald-400">{{ familyTrees.length }} Distant Family Trees</strong></div>
-            <div>Soil: <strong class="text-amber-400">Ancestral Roots Anchored</strong></div>
+        <div class="flex flex-col gap-1 font-mono text-xs w-full md:w-auto">
+          <div class="flex items-center gap-1 overflow-x-auto">
+            <button (click)="selectParadigm('western')"
+              [class.bg-red-600]="activeParadigm() === 'western'"
+              [class.text-white]="activeParadigm() === 'western'"
+              [class.bg-zinc-900]="activeParadigm() !== 'western'"
+              [class.text-zinc-400]="activeParadigm() !== 'western'"
+              class="px-2 py-1 text-[9px] font-bold uppercase rounded-lg border border-red-500/30 transition cursor-pointer flex items-center gap-1">
+              🍎 Red Oak
+            </button>
+            <button (click)="selectParadigm('functional')"
+              [class.bg-emerald-600]="activeParadigm() === 'functional'"
+              [class.text-white]="activeParadigm() === 'functional'"
+              [class.bg-zinc-900]="activeParadigm() !== 'functional'"
+              [class.text-zinc-400]="activeParadigm() !== 'functional'"
+              class="px-2 py-1 text-[9px] font-bold uppercase rounded-lg border border-emerald-500/30 transition cursor-pointer flex items-center gap-1">
+              🍏 Green Apple
+            </button>
+            <button (click)="selectParadigm('tcm')"
+              [class.bg-amber-600]="activeParadigm() === 'tcm'"
+              [class.text-white]="activeParadigm() === 'tcm'"
+              [class.bg-zinc-900]="activeParadigm() !== 'tcm'"
+              [class.text-zinc-400]="activeParadigm() !== 'tcm'"
+              class="px-2 py-1 text-[9px] font-bold uppercase rounded-lg border border-amber-500/30 transition cursor-pointer flex items-center gap-1">
+              🍊 Golden Citrus
+            </button>
+            <button (click)="selectParadigm('ayurvedic')"
+              [class.bg-purple-600]="activeParadigm() === 'ayurvedic'"
+              [class.text-white]="activeParadigm() === 'ayurvedic'"
+              [class.bg-zinc-900]="activeParadigm() !== 'ayurvedic'"
+              [class.text-zinc-400]="activeParadigm() !== 'ayurvedic'"
+              class="px-2 py-1 text-[9px] font-bold uppercase rounded-lg border border-purple-500/30 transition cursor-pointer flex items-center gap-1">
+              🥭 Sacred Fig
+            </button>
+          </div>
+          <div class="text-[9px] text-zinc-300 truncate max-w-[320px]">
+            <strong class="text-amber-300">{{ activeParadigmInfo().treeName }}</strong>: {{ activeParadigmInfo().fruitDescription }}
           </div>
         </div>
       </div>
@@ -114,6 +152,41 @@ export class PatientUnderTreeComponent implements AfterViewInit, OnDestroy {
   isBreathingActive = signal<boolean>(false);
   harvestedCount = signal<number>(2);
   selectedFamilyTree = signal<IDistantFamilyTree | null>(null);
+
+  activeParadigm = signal<'western' | 'functional' | 'tcm' | 'ayurvedic'>('western');
+
+  selectParadigm(p: 'western' | 'functional' | 'tcm' | 'ayurvedic') {
+    this.activeParadigm.set(p);
+  }
+
+  activeParadigmInfo = computed(() => {
+    const p = this.activeParadigm();
+    if (p === 'western') {
+      return {
+        treeName: '🍎 Red Oak of Evidence',
+        fruitEmoji: '🍎',
+        fruitDescription: 'Red Golden Apple — Anatomy, Vital Telemetry & Clinical Trial Data'
+      };
+    } else if (p === 'functional') {
+      return {
+        treeName: '🍏 Orchard of Resiliency',
+        fruitEmoji: '🍏',
+        fruitDescription: 'Crisp Green Apple — Mitochondrial ATP Defense & Telomere Protection'
+      };
+    } else if (p === 'tcm') {
+      return {
+        treeName: '🍊 Five Elements Tree',
+        fruitEmoji: '🍊',
+        fruitDescription: 'Golden Citrus Pomegranate — Zang-Fu Meridians & Vagal Qi Flow'
+      };
+    } else {
+      return {
+        treeName: '🥭 Sacred Fig Tree',
+        fruitEmoji: '🥭',
+        fruitDescription: 'Golden Mango Fig — Vata-Pitta-Kapha Tridosha & Ojas Vitality'
+      };
+    }
+  });
 
   private animFrameId: number | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
@@ -170,6 +243,16 @@ export class PatientUnderTreeComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     if (this.animFrameId !== null) {
       cancelAnimationFrame(this.animFrameId);
+    }
+  }
+
+  private readonly exportService = inject(ExportService);
+
+  exportFhir() {
+    const id = this.patientManagement.selectedPatientId();
+    const patient = this.patientManagement.patients().find(p => p.id === id);
+    if (patient) {
+      this.exportService.exportPatientToFhirJson(patient);
     }
   }
 

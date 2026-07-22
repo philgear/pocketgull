@@ -8,6 +8,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { USDZLoader } from 'three/examples/jsm/loaders/USDZLoader.js';
 import { PatientStateService } from '../services/patient-state.service';
+import { PatientManagementService } from '../services/patient-management.service';
 
 const PART_NAMES: Record<string, string> = {
     'head': 'Head & Neck',
@@ -146,6 +147,7 @@ const PART_NAMES: Record<string, string> = {
 })
 export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private readonly state = inject(PatientStateService);
+    private readonly patientManagement = inject(PatientManagementService);
     private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
@@ -162,6 +164,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly showDermatomeLayer = signal<boolean>(false);
     readonly activeCameraPreset = signal<'front' | 'back' | 'left' | 'right' | 'cranial' | 'spinal' | 'visceral' | 'peripheral' | 'systemic'>('front');
     readonly isAutoSpinning = signal<boolean>(false);
+
+    private isSlidingPatient = false;
+
+    triggerPatientSlideTransition() {
+      if (!this.mannequinGroup) return;
+      this.isSlidingPatient = true;
+      this.mannequinGroup.position.x = -3.5;
+      if (this.customModelGroup) this.customModelGroup.position.x = -3.5;
+    }
 
     readonly sentinelTriageLevel = computed(() => {
       const issues = this.state.issues();
@@ -296,6 +307,14 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     };
 
     constructor() {
+        // React to patient selection changes -> Trigger 3D Slide-to-Right Transition!
+        effect(() => {
+            const patientId = this.patientManagement.selectedPatientId();
+            if (patientId && this.mannequinGroup) {
+                this.triggerPatientSlideTransition();
+            }
+        });
+
         // React to selection changes in the state
         effect(() => {
             const selectedId = this.state.selectedPartId();
@@ -432,11 +451,11 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             const loader = new USDZLoader();
             loader.load(
                 url,
-                (usdz) => {
+                (usdz: any) => {
                     this.processLoadedModel(usdz);
                 },
                 undefined,
-                (error) => {
+                (error: any) => {
                     console.error('Failed to load USDZ model:', error);
                 }
             );
@@ -1323,6 +1342,20 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                         const mode = this.anatomyViewMode();
                         this.bloomPass.strength = (mode === 'organs' || mode === 'molecular') ? 0.3 : 0.15;
                     }
+                }
+            }
+
+            // High-speed interpolation for Patient 3D Slide-to-Right Transition
+            if (this.isSlidingPatient) {
+                if (this.mannequinGroup) {
+                    this.mannequinGroup.position.x += (0 - this.mannequinGroup.position.x) * 0.22;
+                    if (Math.abs(this.mannequinGroup.position.x) < 0.01) {
+                        this.mannequinGroup.position.x = 0;
+                        this.isSlidingPatient = false;
+                    }
+                }
+                if (this.customModelGroup) {
+                    this.customModelGroup.position.x += (0 - this.customModelGroup.position.x) * 0.22;
                 }
             }
 

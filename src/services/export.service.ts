@@ -2041,8 +2041,44 @@ export class ExportService {
     }
   }
 
-
-
+  exportPatientToFhirJson(patient: IPatient): void {
+    const sanitizedP = this.sanitizeObject(patient);
+    const bundle: IFhirBundle = {
+      resourceType: 'Bundle',
+      id: `bundle-${sanitizedP.id}-${Date.now()}`,
+      type: 'collection',
+      timestamp: new Date().toISOString(),
+      meta: {
+        tag: [{ system: 'https://pocketgull.health/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Sanitized Clinical Export' }]
+      },
+      entry: [
+        {
+          resource: {
+            resourceType: 'Patient',
+            id: sanitizedP.id,
+            name: [{ text: sanitizedP.name }],
+            gender: this._toFhirGender(sanitizedP.gender),
+            birthDate: this._estimateBirthYear(sanitizedP.age)
+          }
+        },
+        {
+          resource: {
+            resourceType: 'Observation',
+            id: `vitals-${sanitizedP.id}`,
+            status: 'final',
+            code: { coding: [{ system: 'http://loinc.org', code: '85354-9', display: 'Vital Signs Panel' }] },
+            subject: { reference: `Patient/${sanitizedP.id}` },
+            effectiveDateTime: sanitizedP.lastVisit || new Date().toISOString(),
+            component: [
+              { code: { coding: [{ system: 'http://loinc.org', code: '8867-4', display: 'Heart rate' }] }, valueQuantity: { value: parseFloat(sanitizedP.vitals?.hr || '72'), unit: 'beats/min' } },
+              { code: { coding: [{ system: 'http://loinc.org', code: '59408-5', display: 'Oxygen saturation' }] }, valueQuantity: { value: parseFloat(sanitizedP.vitals?.spO2 || '98'), unit: '%' } }
+            ]
+          }
+        }
+      ]
+    };
+    this._downloadJson(bundle, `fhir_bundle_${sanitizedP.id}_${Date.now()}.json`);
+  }
 
   // ─── Helpers ──────────────────────────────────────────────
 
