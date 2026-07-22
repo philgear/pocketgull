@@ -2,11 +2,13 @@ import { Component, signal, computed, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PetAuditoryService } from '../services/pet-auditory.service';
 import { PatientStateService } from '../services/patient-state.service';
+import { MoodConsciousnessMatrixComponent } from './mood-consciousness-matrix.component';
+import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
 
 @Component({
   selector: 'app-instant-patient-action-suite',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MoodConsciousnessMatrixComponent, PatientHealthTrajectoryStorybookComponent],
   template: `
     <div class="w-full max-w-4xl mx-auto my-6 p-6 rounded-lg border-2 border-indigo-500/40 dark:border-indigo-500/50 bg-gradient-to-br from-indigo-50/90 via-white to-purple-50/90 dark:from-zinc-900 dark:via-zinc-900 dark:to-indigo-950/60 shadow-lg text-slate-900 dark:text-zinc-100 no-print">
       
@@ -27,18 +29,34 @@ import { PatientStateService } from '../services/patient-state.service';
             Instant Somatic Relief & Companion Co-Regulation
           </h2>
           <p class="text-xs text-slate-600 dark:text-zinc-400 mt-0.5 font-medium">
-            Select an instant protocol below to regulate your nervous system, co-regulate with a service animal, or simulate cellular recovery.
+            Select an instant protocol below to regulate your nervous system, read your health storybook, co-regulate with a service animal, or simulate cellular recovery.
           </p>
         </div>
 
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex flex-wrap items-center gap-2 shrink-0">
           <button type="button" (click)="toggleTab('relief')"
             [class.bg-indigo-600]="activeTab() === 'relief'"
             [class.text-white]="activeTab() === 'relief'"
             [class.bg-white]="activeTab() !== 'relief'"
             [class.dark:bg-zinc-800]="activeTab() !== 'relief'"
             class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
-            🧘 Instant Relief
+            🧘 Relief
+          </button>
+          <button type="button" (click)="toggleTab('storybook')"
+            [class.bg-amber-600]="activeTab() === 'storybook'"
+            [class.text-white]="activeTab() === 'storybook'"
+            [class.bg-white]="activeTab() !== 'storybook'"
+            [class.dark:bg-zinc-800]="activeTab() !== 'storybook'"
+            class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-amber-400 dark:border-amber-600 transition cursor-pointer">
+            📖 Storybook
+          </button>
+          <button type="button" (click)="toggleTab('matrix')"
+            [class.bg-indigo-600]="activeTab() === 'matrix'"
+            [class.text-white]="activeTab() === 'matrix'"
+            [class.bg-white]="activeTab() !== 'matrix'"
+            [class.dark:bg-zinc-800]="activeTab() !== 'matrix'"
+            class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
+            🔮 Mind Matrix
           </button>
           <button type="button" (click)="toggleTab('pet')"
             [class.bg-indigo-600]="activeTab() === 'pet'"
@@ -46,7 +64,7 @@ import { PatientStateService } from '../services/patient-state.service';
             [class.bg-white]="activeTab() !== 'pet'"
             [class.dark:bg-zinc-800]="activeTab() !== 'pet'"
             class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
-            🐕 Service Animal
+            🐕 Service Pet
           </button>
           <button type="button" (click)="toggleTab('simulator')"
             [class.bg-indigo-600]="activeTab() === 'simulator'"
@@ -54,7 +72,7 @@ import { PatientStateService } from '../services/patient-state.service';
             [class.bg-white]="activeTab() !== 'simulator'"
             [class.dark:bg-zinc-800]="activeTab() !== 'simulator'"
             class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
-            🎮 Health Simulator
+            🎮 Simulator
           </button>
         </div>
       </div>
@@ -248,6 +266,20 @@ import { PatientStateService } from '../services/patient-state.service';
         </div>
       }
 
+      <!-- Tab 4: Neuro-Consciousness & Mood Optimization Matrix -->
+      @if (activeTab() === 'matrix') {
+        <div class="animate-in fade-in duration-300">
+          <app-mood-consciousness-matrix></app-mood-consciousness-matrix>
+        </div>
+      }
+
+      <!-- Tab 5: Patient Health Trajectory Storybook -->
+      @if (activeTab() === 'storybook') {
+        <div class="animate-in fade-in duration-300">
+          <app-patient-health-trajectory-storybook></app-patient-health-trajectory-storybook>
+        </div>
+      }
+
     </div>
   `
 })
@@ -255,7 +287,7 @@ export class InstantPatientActionSuiteComponent implements OnDestroy {
   protected readonly petAuditory = inject(PetAuditoryService);
   protected readonly patientState = inject(PatientStateService);
 
-  activeTab = signal<'relief' | 'pet' | 'simulator'>('relief');
+  activeTab = signal<'relief' | 'matrix' | 'pet' | 'simulator' | 'storybook'>('relief');
 
   // Breathing Pacer State
   isBreathingActive = signal(false);
@@ -292,7 +324,7 @@ export class InstantPatientActionSuiteComponent implements OnDestroy {
     return 'scale(0.85)';
   });
 
-  toggleTab(tab: 'relief' | 'pet' | 'simulator') {
+  toggleTab(tab: 'relief' | 'matrix' | 'pet' | 'simulator' | 'storybook') {
     this.activeTab.set(tab);
   }
 

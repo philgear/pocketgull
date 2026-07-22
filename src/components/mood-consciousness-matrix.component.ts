@@ -80,6 +80,74 @@ export interface IConsciousnessState {
             <span class="text-[9.5px] text-zinc-400 block mt-0.5">{{ state.targetEEG }}</span>
           </button>
         }
+      <!-- Dedicated AI Mind-State Suggestions & Clinical Prescription Card -->
+      <div class="mb-8 p-6 rounded-3xl bg-gradient-to-br from-indigo-950/80 via-zinc-900 to-purple-950/80 border border-indigo-500/40 shadow-2xl relative z-10 font-mono">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-indigo-500/30 pb-4 mb-5">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">{{ selectedState().emoji }}</span>
+            <div>
+              <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block">Dedicated AI Suggestions</span>
+              <h3 class="text-base font-extrabold uppercase tracking-wide text-white mt-0.5">
+                {{ selectedState().name }} — Dedicated Mind-State Prescription
+              </h3>
+              <p class="text-xs text-zinc-300 font-sans mt-0.5">
+                {{ selectedState().subtitle }} • Targeted for <strong class="text-cyan-400 font-bold uppercase">{{ activePatientName() }}</strong>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <button (click)="generateDedicatedPrescription()"
+              [class.animate-pulse]="isGeneratingPrescription()"
+              class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2 cursor-pointer active:scale-95">
+              <span>⚡</span>
+              <span>{{ isGeneratingPrescription() ? 'Synthesizing...' : 'Synthesize Dedicated AI Plan' }}</span>
+            </button>
+          </div>
+        </div>
+
+        @if (dedicatedPrescription(); as plan) {
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-zinc-900/90 border border-indigo-500/30 space-y-2">
+              <div class="flex items-center gap-2 text-indigo-400 font-bold uppercase text-[11px]">
+                <span>🧠</span> EEG & Neurotransmitter Profile
+              </div>
+              <p class="text-zinc-200 font-bold">{{ plan.targetEEG }}</p>
+              <p class="text-zinc-400 text-[11px]">
+                Neurotransmitters: <span class="text-indigo-300 font-bold">{{ plan.neurotransmitters }}</span>
+              </p>
+              <p class="text-zinc-400 text-[11px] font-sans">
+                {{ plan.neuroRationale }}
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-zinc-900/90 border border-emerald-500/30 space-y-2">
+              <div class="flex items-center gap-2 text-emerald-400 font-bold uppercase text-[11px]">
+                <span>🥗</span> Nootropic Culinary Prescription
+              </div>
+              <p class="text-zinc-200 font-bold">{{ plan.mealEmoji }} {{ plan.mealName }}</p>
+              <p class="text-emerald-300 text-[11px] font-mono">
+                Active: {{ plan.mealActiveCompounds }}
+              </p>
+              <button (click)="prescribedMealState(selectedState())"
+                class="w-full mt-2 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/60 text-emerald-200 border border-emerald-500/40 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer">
+                🥑 Prescribe Meal to Care Plan
+              </button>
+            </div>
+
+            <div class="p-4 rounded-xl bg-zinc-900/90 border border-amber-500/30 space-y-2">
+              <div class="flex items-center gap-2 text-amber-400 font-bold uppercase text-[11px]">
+                <span>☯️</span> Multi-Paradigm Shen & Guna
+              </div>
+              <p class="text-amber-300 font-bold text-[11px]">TCM: {{ plan.tcmShen }}</p>
+              <p class="text-amber-200 font-bold text-[11px]">Ayurveda: {{ plan.ayurvedaGuna }}</p>
+              <button (click)="applyAvsState(selectedState())"
+                class="w-full mt-2 py-1.5 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-200 border border-indigo-500/40 text-[10px] font-bold uppercase tracking-wider transition cursor-pointer">
+                ⚡ Activate AVS Target
+              </button>
+            </div>
+          </div>
+        }
       </div>
 
       <!-- Aquatic Consciousness & Floating City Archipelagos Component -->
@@ -444,6 +512,17 @@ export class MoodConsciousnessMatrixComponent {
   ];
 
   selectedState = signal<IConsciousnessState>(this.states[0]);
+  isGeneratingPrescription = signal<boolean>(false);
+  dedicatedPrescription = signal<any | null>({
+    targetEEG: '40 Hz Gamma Wave • 6 BPM Resonant Breathing',
+    neurotransmitters: 'Dopamine D2, Acetylcholine, Norepinephrine',
+    neuroRationale: 'Enhances prefrontal cortex gamma band coherence, upregulates cholinergic synaptic transmission, and sharpens executive working memory.',
+    mealEmoji: '🍫',
+    mealName: 'Dark Cacao & L-Theanine Nootropic Elixir',
+    mealActiveCompounds: 'Theobromine 150mg + L-Theanine 200mg + Bacopa 300mg',
+    tcmShen: 'Shen Bright & Focused in Heart Channel',
+    ayurvedaGuna: 'Rajas (Action)'
+  });
 
   activePatientName = computed(() => {
     const pId = this.patientManagement.selectedPatientId();
@@ -454,6 +533,25 @@ export class MoodConsciousnessMatrixComponent {
 
   selectState(state: IConsciousnessState) {
     this.selectedState.set(state);
+    this.generateDedicatedPrescription();
+  }
+
+  generateDedicatedPrescription() {
+    this.isGeneratingPrescription.set(true);
+    setTimeout(() => {
+      const state = this.selectedState();
+      this.dedicatedPrescription.set({
+        targetEEG: `${state.avsTarget.waveType} Wave (${state.avsTarget.frequencyHz} Hz) • ${state.avsTarget.breathingRateBpm} BPM Resonant Breathing`,
+        neurotransmitters: state.targetNeurotransmitters.join(', '),
+        neuroRationale: state.clinicalRationale,
+        mealEmoji: state.prescribedMeal.emoji,
+        mealName: state.prescribedMeal.name,
+        mealActiveCompounds: state.prescribedMeal.activeCompounds,
+        tcmShen: state.tcmShenStatus,
+        ayurvedaGuna: state.ayurvedicGuna
+      });
+      this.isGeneratingPrescription.set(false);
+    }, 400);
   }
 
   applyAvsState(state: IConsciousnessState) {

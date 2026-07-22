@@ -39,6 +39,7 @@ import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboar
 import { GeolocationalHealthRelocationComponent } from './geolocational-health-relocation.component';
 import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapper.service';
 import { InstantPatientActionSuiteComponent } from './instant-patient-action-suite.component';
+import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -70,7 +71,8 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
     LensInsightSparkShieldComponent,
     ParadigmClinicalDashboardComponent,
     GeolocationalHealthRelocationComponent,
-    InstantPatientActionSuiteComponent
+    InstantPatientActionSuiteComponent,
+    PatientHealthTrajectoryStorybookComponent
   ],
 
 
@@ -861,6 +863,11 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
         <!-- Patient Education Lens Only: UK RIO PubMed Sourcing & Evidence Hierarchy Panel -->
         @if (activeLens() === 'Patient Education' && hasAnyReport()) {
           <app-uk-rio-pubmed-sourcing></app-uk-rio-pubmed-sourcing>
+        }
+
+        <!-- Patient Education & Summary Overview Lens: Interactive Health Trajectory Storybook -->
+        @if ((activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
+          <app-patient-health-trajectory-storybook></app-patient-health-trajectory-storybook>
         }
 
 
