@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, signal, computed, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
+import { PatientStateService } from '../services/patient-state.service';
 
 export interface IGleeTrack {
   trackNumber: number;
@@ -12,6 +13,7 @@ export interface IGleeTrack {
   qalyBonus: number;
   bpm: number;
   icon: string;
+  biologicalMechanism?: string;
 }
 
 @Component({
@@ -62,7 +64,7 @@ export interface IGleeTrack {
             <h3 class="text-xs font-mono uppercase tracking-widest text-purple-400 mb-2">12-Track Regeneration Album</h3>
             
             <div class="flex-1 overflow-y-auto space-y-2 max-h-[60vh] pr-1">
-              <button *ngFor="let track of tracks; let i = index"
+              <button *ngFor="let track of orderedTracks(); let i = index"
                 (click)="selectTrack(i)"
                 [class.border-purple-500]="selectedTrackIndex() === i"
                 [class.bg-purple-950\/40]="selectedTrackIndex() === i"
@@ -363,7 +365,18 @@ export class ActuarialGleeAlbumComponent {
     }
   ];
 
-  activeTrack = computed(() => this.tracks[this.selectedTrackIndex()]);
+  state = inject(PatientStateService);
+
+  orderedTracks = computed(() => {
+    const philosophy = this.state.activePhilosophy();
+    return [...this.tracks].sort((a, b) => {
+      if (a.paradigm === philosophy && b.paradigm !== philosophy) return -1;
+      if (b.paradigm === philosophy && a.paradigm !== philosophy) return 1;
+      return a.trackNumber - b.trackNumber;
+    });
+  });
+
+  activeTrack = computed(() => this.orderedTracks()[this.selectedTrackIndex()] || this.tracks[0]);
   totalQalyGain = computed(() => this.tracks.reduce((acc, t) => acc + t.qalyBonus, 0));
 
   currentLyricText = computed(() => {

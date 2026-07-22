@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, signal, computed, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { IGleeTrack } from './actuarial-glee-album.component';
+import { PatientStateService } from '../services/patient-state.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,7 +70,7 @@ import { IGleeTrack } from './actuarial-glee-album.component';
             <!-- Crate Grid of Vinyl Albums -->
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
               
-              <div *ngFor="let track of tracks; let i = index" 
+              <div *ngFor="let track of orderedTracks(); let i = index" 
                 (click)="cueTrackOnTurntable(i)"
                 class="group relative rounded-2xl bg-stone-900 border border-stone-800 p-3 hover:border-amber-500 transition-all duration-300 cursor-pointer shadow-lg hover:-translate-y-1">
                 
@@ -222,10 +223,20 @@ import { IGleeTrack } from './actuarial-glee-album.component';
                   </div>
 
                   <!-- Synchronized Lyric Display -->
-                  <div class="my-6 p-4 rounded-2xl bg-amber-950/30 border border-amber-500/20 text-center space-y-2">
+                  <div class="my-4 p-4 rounded-2xl bg-amber-950/30 border border-amber-500/20 text-center space-y-2">
                     <span class="text-[9px] font-mono font-bold uppercase tracking-widest text-amber-400">Duet Lyric Cue</span>
                     <p class="text-base font-serif italic font-bold text-amber-100 leading-snug">
                       "{{ track.lyrics[currentLyricIdx()]?.text || track.lyrics[0].text }}"
+                    </p>
+                  </div>
+
+                  <!-- Grow-Thyself Biological Mechanism Liner Notes -->
+                  <div class="p-3 rounded-xl bg-purple-950/20 border border-purple-500/30 space-y-1">
+                    <div class="flex items-center gap-1.5 text-[10px] font-mono font-bold text-purple-300 uppercase">
+                      <span>🌱 Grow-Thyself Mechanism:</span>
+                    </div>
+                    <p class="text-[11px] text-purple-100/90 leading-snug">
+                      Singing this track co-regulates vagal nerve parasympathetic outflow, reducing salivary cortisol and boosting endothelial nitric oxide synthesis for cell regeneration.
                     </p>
                   </div>
 
@@ -415,7 +426,18 @@ export class VinylDjStoreComponent {
     }
   ];
 
-  selectedTrack = computed(() => this.tracks[this.selectedTrackIndex()]);
+  state = inject(PatientStateService);
+
+  orderedTracks = computed(() => {
+    const philosophy = this.state.activePhilosophy();
+    return [...this.tracks].sort((a, b) => {
+      if (a.paradigm === philosophy && b.paradigm !== philosophy) return -1;
+      if (b.paradigm === philosophy && a.paradigm !== philosophy) return 1;
+      return a.trackNumber - b.trackNumber;
+    });
+  });
+
+  selectedTrack = computed(() => this.orderedTracks()[this.selectedTrackIndex()] || this.tracks[0]);
 
   cueTrackOnTurntable(index: number) {
     this.selectedTrackIndex.set(index);
