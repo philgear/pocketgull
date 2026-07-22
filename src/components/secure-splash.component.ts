@@ -1,6 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef, viewChild, input, output, computed, PLATFORM_ID, OnInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SessionStateService } from '../services/session-state.service';
@@ -16,7 +15,7 @@ import { environment } from '../environments/environment';
 @Component({
   selector: 'app-secure-splash',
   standalone: true,
-  imports: [CommonModule, FormsModule, SafeHtmlPipe],
+  imports: [CommonModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="fixed inset-0 z-[999] flex flex-col items-center justify-center p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-y-auto">
