@@ -42,6 +42,7 @@ import { TypologyBadgeComponent } from './typology-badge.component';
 import { InstantPatientActionSuiteComponent } from './instant-patient-action-suite.component';
 import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
 import { HandoffModalComponent } from './handoff-modal.component';
+import { SdohNavigatorComponent } from './sdoh-navigator.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -76,7 +77,8 @@ import { HandoffModalComponent } from './handoff-modal.component';
     InstantPatientActionSuiteComponent,
     PatientHealthTrajectoryStorybookComponent,
     TypologyBadgeComponent,
-    HandoffModalComponent
+    HandoffModalComponent,
+    SdohNavigatorComponent
   ],
 
 
@@ -894,6 +896,7 @@ import { HandoffModalComponent } from './handoff-modal.component';
         <!-- Patient Education & Summary Overview Lens: Interactive Health Trajectory Storybook -->
         @if ((activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
           <app-patient-health-trajectory-storybook></app-patient-health-trajectory-storybook>
+          <app-sdoh-navigator></app-sdoh-navigator>
         }
 
 
