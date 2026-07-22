@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -56,20 +56,86 @@ const PART_NAMES: Record<string, string> = {
         <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">3D view unavailable on this device</span>
         <span *ngIf="webglError()" class="text-[12px] text-red-500 mt-2 max-w-xs break-words">{{ webglError() }}</span>
       </div>
-      <!-- Spine & Dermatome Layer Controls Overlay -->
-      <div *ngIf="webglSupported()" class="absolute top-2 right-2 flex items-center gap-1.5 z-20">
-        <button 
-          type="button" 
-          (click)="toggleDermatomeLayer()" 
-          class="px-2.5 py-1.5 rounded-lg border text-[10.5px] font-bold uppercase tracking-wider transition shadow-sm backdrop-blur-md flex items-center gap-1"
-          [class]="showDermatomeLayer() ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/40' : 'bg-white/70 dark:bg-zinc-900/70 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800'"
-        >
-          <span>🦴 Spine & Dermatomes</span>
-        </button>
+      <!-- All-Around 360 Camera & Sentinel Triage Viewpoints Overlay -->
+      <div *ngIf="webglSupported()" class="absolute top-2 right-2 left-2 flex flex-wrap items-center justify-between gap-2 z-20 font-mono pointer-events-none">
+        
+        <!-- Live Sentinel Triage Priority Badge (Top Left) -->
+        <div class="pointer-events-auto p-1.5 px-3 rounded-xl border backdrop-blur-md shadow-lg flex items-center gap-2"
+             [class]="sentinelTriageLevel().bg">
+          <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+          <div>
+            <span class="text-[9px] font-extrabold uppercase tracking-widest text-zinc-300 block">Sentinel Triage Risk</span>
+            <span class="text-xs font-black uppercase tracking-tight block" [class]="sentinelTriageLevel().color">
+              {{ sentinelTriageLevel().level }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Sentinel Viewpoint Presets Toolbar (Top Right) -->
+        <div class="pointer-events-auto flex flex-wrap items-center gap-1 bg-zinc-900/90 p-1.5 rounded-xl border border-zinc-700/60 backdrop-blur-md shadow-lg">
+          <span class="text-[9.5px] font-extrabold text-indigo-400 uppercase tracking-wider px-1">Sentinel Views:</span>
+          
+          <button (click)="setCameraPreset('cranial')"
+            [class.bg-indigo-600]="activeCameraPreset() === 'cranial'"
+            [class.text-white]="activeCameraPreset() === 'cranial'"
+            [class.text-zinc-300]="activeCameraPreset() !== 'cranial'"
+            class="px-2 py-1 text-[10px] font-bold uppercase rounded-lg transition hover:bg-zinc-700 cursor-pointer flex items-center gap-1">
+            <span>🧠</span> Cranial
+          </button>
+          
+          <button (click)="setCameraPreset('spinal')"
+            [class.bg-indigo-600]="activeCameraPreset() === 'spinal'"
+            [class.text-white]="activeCameraPreset() === 'spinal'"
+            [class.text-zinc-300]="activeCameraPreset() !== 'spinal'"
+            class="px-2 py-1 text-[10px] font-bold uppercase rounded-lg transition hover:bg-zinc-700 cursor-pointer flex items-center gap-1">
+            <span>🦴</span> Spine/Nerve
+          </button>
+          
+          <button (click)="setCameraPreset('visceral')"
+            [class.bg-indigo-600]="activeCameraPreset() === 'visceral'"
+            [class.text-white]="activeCameraPreset() === 'visceral'"
+            [class.text-zinc-300]="activeCameraPreset() !== 'visceral'"
+            class="px-2 py-1 text-[10px] font-bold uppercase rounded-lg transition hover:bg-zinc-700 cursor-pointer flex items-center gap-1">
+            <span>🫀</span> Visceral
+          </button>
+          
+          <button (click)="setCameraPreset('peripheral')"
+            [class.bg-indigo-600]="activeCameraPreset() === 'peripheral'"
+            [class.text-white]="activeCameraPreset() === 'peripheral'"
+            [class.text-zinc-300]="activeCameraPreset() !== 'peripheral'"
+            class="px-2 py-1 text-[10px] font-bold uppercase rounded-lg transition hover:bg-zinc-700 cursor-pointer flex items-center gap-1">
+            <span>🦵</span> Peripheral
+          </button>
+
+          <button (click)="setCameraPreset('systemic')"
+            [class.bg-amber-600]="activeCameraPreset() === 'systemic'"
+            [class.text-white]="activeCameraPreset() === 'systemic'"
+            [class.text-zinc-300]="activeCameraPreset() !== 'systemic'"
+            class="px-2 py-1 text-[10px] font-bold uppercase rounded-lg transition hover:bg-zinc-700 cursor-pointer flex items-center gap-1">
+            <span>🛡️</span> Systemic
+          </button>
+
+          <button 
+            type="button" 
+            (click)="toggleDermatomeLayer()" 
+            class="px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition shadow-sm flex items-center gap-1 cursor-pointer"
+            [class]="showDermatomeLayer() ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'"
+          >
+            <span>⚡ Dermatomes</span>
+          </button>
+
+          <button 
+            type="button" 
+            (click)="shufflePainLevels()" 
+            class="px-2 py-1 rounded-lg border border-rose-500/40 text-[10px] font-bold uppercase tracking-wider transition shadow-sm bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 flex items-center gap-1 cursor-pointer active:scale-95"
+          >
+            <span>🔀</span> Shuffle Pain
+          </button>
+        </div>
       </div>
-      <div *ngIf="webglSupported()" class="absolute bottom-2 left-2 flex flex-col gap-1 pointer-events-none">
-        <span class="text-[12px] font-bold text-gray-500 uppercase tracking-tighter">Left Click: Select Part</span>
-        <span class="text-[12px] font-bold text-gray-500 uppercase tracking-tighter">Right Click: Orbit</span>
+      <div *ngIf="webglSupported()" class="absolute bottom-2 left-2 flex flex-col gap-1 pointer-events-none font-mono">
+        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-tighter">Left Click: Select Part</span>
+        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-tighter">Right Click: Orbit 360°</span>
       </div>
     </div>
   `,
@@ -94,9 +160,108 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly webglSupported = signal<boolean>(true);
     readonly webglError = signal<string>('');
     readonly showDermatomeLayer = signal<boolean>(false);
+    readonly activeCameraPreset = signal<'front' | 'back' | 'left' | 'right' | 'cranial' | 'spinal' | 'visceral' | 'peripheral' | 'systemic'>('front');
+    readonly isAutoSpinning = signal<boolean>(false);
+
+    readonly sentinelTriageLevel = computed(() => {
+      const issues = this.state.issues();
+      let maxPain = 0;
+      let criticalSystem = 'Baseline Baseline';
+
+      Object.entries(issues).forEach(([part, list]) => {
+        list.forEach(i => {
+          if (i.painLevel > maxPain) {
+            maxPain = i.painLevel;
+            criticalSystem = PART_NAMES[part] || part;
+          }
+        });
+      });
+
+      if (maxPain >= 8) return { level: 'Level 1 - Emergency Resuscitation', code: 'L1-RED', color: 'text-rose-400', bg: 'bg-rose-950/80 border-rose-500/50', system: criticalSystem, pain: maxPain };
+      if (maxPain >= 6) return { level: 'Level 2 - Emergent Triage', code: 'L2-ORANGE', color: 'text-orange-400', bg: 'bg-orange-950/80 border-orange-500/50', system: criticalSystem, pain: maxPain };
+      if (maxPain >= 4) return { level: 'Level 3 - Urgent Assessment', code: 'L3-YELLOW', color: 'text-amber-300', bg: 'bg-amber-950/80 border-amber-500/50', system: criticalSystem, pain: maxPain };
+      return { level: 'Level 4/5 - Stable Routine Care', code: 'L4-GREEN', color: 'text-emerald-400', bg: 'bg-emerald-950/80 border-emerald-500/50', system: criticalSystem, pain: maxPain };
+    });
 
     toggleDermatomeLayer(): void {
       this.showDermatomeLayer.set(!this.showDermatomeLayer());
+      this.updateTransparency(this.anatomyViewMode());
+    }
+
+    setCameraPreset(preset: 'front' | 'back' | 'left' | 'right' | 'cranial' | 'spinal' | 'visceral' | 'peripheral' | 'systemic'): void {
+      this.activeCameraPreset.set(preset);
+      this.isAutoSpinning.set(false);
+      if (!this.camera || !this.controls) return;
+
+      if (preset === 'front') {
+        this.camera.position.set(0, 1.2, 5);
+        this.controls.target.set(0, 1, 0);
+      } else if (preset === 'back') {
+        this.camera.position.set(0, 1.2, -5); // Directly view posterior spinal column & dermatomes!
+        this.controls.target.set(0, 1, 0);
+      } else if (preset === 'left') {
+        this.camera.position.set(-5, 1.2, 0);
+        this.controls.target.set(0, 1, 0);
+      } else if (preset === 'right') {
+        this.camera.position.set(5, 1.2, 0);
+        this.controls.target.set(0, 1, 0);
+      } else if (preset === 'cranial') {
+        // Cranial Neuro Sentinel View (Head / Brain & Cervical Spine C1-C8)
+        this.camera.position.set(0, 1.75, 2.2);
+        this.controls.target.set(0, 1.7, 0);
+      } else if (preset === 'spinal') {
+        // Spinal & Dermatomal Sentinel View (Posterior Thoracic/Lumbar Spine & Sciatic Nerve)
+        this.camera.position.set(0, 1.15, -3.8);
+        this.controls.target.set(0, 1.1, 0);
+        this.showDermatomeLayer.set(true);
+      } else if (preset === 'visceral') {
+        // Visceral & Cardiopulmonary Sentinel View (Heart, Lungs, Liver, Kidneys)
+        this.camera.position.set(-1.2, 1.25, 2.8);
+        this.controls.target.set(0, 1.1, 0);
+      } else if (preset === 'peripheral') {
+        // Peripheral Dermatome Sentinel View (Bilateral limbs & Nerve pathways)
+        this.camera.position.set(1.5, 0.4, 3.2);
+        this.controls.target.set(0, 0.4, 0);
+        this.showDermatomeLayer.set(true);
+      } else if (preset === 'systemic') {
+        // Systemic Whole-Body Sentinel Orbit View
+        this.camera.position.set(0, 1.2, 5);
+        this.controls.target.set(0, 1, 0);
+        this.isAutoSpinning.set(true);
+      }
+
+      this.controls.update();
+      this.updateTransparency(this.anatomyViewMode());
+    }
+
+    toggleAutoSpin(): void {
+      this.isAutoSpinning.set(!this.isAutoSpinning());
+    }
+
+    shufflePainLevels(): void {
+      const partIds = [
+        'spine_cervical', 'spine_thoracic', 'spine_lumbar', 'spine_sacral',
+        'dermatome_c6_c8', 'dermatome_l4_l5', 'head', 'chest', 'heart', 'lungs',
+        'abdomen', 'r_shoulder', 'l_shoulder', 'r_arm', 'l_arm'
+      ];
+      const currentIssues = { ...this.state.issues() };
+      partIds.forEach(id => {
+        const randomPain = Math.floor(Math.random() * 10);
+        if (randomPain > 2) {
+          currentIssues[id] = [{
+            id,
+            noteId: `shuffled-${id}-${Date.now()}`,
+            name: `Shuffled Pain Signal (${randomPain}/10)`,
+            painLevel: randomPain,
+            description: `Pain level ${randomPain}/10 registered during Sentinel Triage scan.`,
+            symptoms: []
+          }];
+        } else {
+          delete currentIssues[id];
+        }
+      });
+      this.state.issues.set(currentIssues);
+      this.updatePartColors();
     }
 
     private renderer!: THREE.WebGLRenderer;
@@ -687,6 +852,76 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             rBox(0.50, 0.27, 0.32), molecularMaterial, { y: 0.7 }
         );
 
+        // 4b. Posterior Spinal Column Segments (Cervical C1-C8, Thoracic T1-T12, Lumbar L1-L5, Sacral S1-S5)
+        this.addPartComplex('spine_cervical',
+            rSkin(0.06, 0.15, 0.06), skinMaterial, { y: 1.55, z: -0.10 },
+            rSkin(0.05, 0.14, 0.05), muscleMaterial, { y: 1.55, z: -0.10 },
+            rBone(0.15, 0.035), boneMaterial, { y: 1.55, z: -0.10 },
+            undefined, undefined, undefined,
+            rSkin(0.07, 0.16, 0.07), molecularMaterial, { y: 1.55, z: -0.10 }
+        );
+        this.addPartComplex('spine_thoracic',
+            rSkin(0.08, 0.38, 0.08), skinMaterial, { y: 1.28, z: -0.14 },
+            rSkin(0.07, 0.36, 0.07), muscleMaterial, { y: 1.28, z: -0.14 },
+            rBone(0.38, 0.045), boneMaterial, { y: 1.28, z: -0.14 },
+            undefined, undefined, undefined,
+            rSkin(0.09, 0.40, 0.09), molecularMaterial, { y: 1.28, z: -0.14 }
+        );
+        this.addPartComplex('spine_lumbar',
+            rSkin(0.10, 0.28, 0.10), skinMaterial, { y: 0.95, z: -0.15 },
+            rSkin(0.09, 0.26, 0.09), muscleMaterial, { y: 0.95, z: -0.15 },
+            rBone(0.28, 0.055), boneMaterial, { y: 0.95, z: -0.15 },
+            undefined, undefined, undefined,
+            rSkin(0.11, 0.30, 0.11), molecularMaterial, { y: 0.95, z: -0.15 }
+        );
+        this.addPartComplex('spine_sacral',
+            rSkin(0.11, 0.18, 0.08), skinMaterial, { y: 0.70, z: -0.14 },
+            rSkin(0.10, 0.16, 0.07), muscleMaterial, { y: 0.70, z: -0.14 },
+            rBox(0.12, 0.16, 0.06), boneMaterial, { y: 0.70, z: -0.14 },
+            undefined, undefined, undefined,
+            rSkin(0.12, 0.20, 0.09), molecularMaterial, { y: 0.70, z: -0.14 }
+        );
+
+        // 4c. Neural Dermatome Layer Overlays (C6-C8 Radial/Ulnar & L4-L5 Sciatic Nerve)
+        const dermatomeMaterialC6C8 = new THREE.MeshStandardMaterial({
+            color: 0xf59e0b, emissive: 0xd97706, emissiveIntensity: 0.6, transparent: true, opacity: 0.85, depthWrite: true, wireframe: true
+        });
+        const dermatomeMaterialL4L5 = new THREE.MeshStandardMaterial({
+            color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.6, transparent: true, opacity: 0.85, depthWrite: true, wireframe: true
+        });
+
+        // C6-C8 Dermatome Mesh Group
+        const dermC6C8Group = new THREE.Group();
+        const meshC6 = new THREE.Mesh(rSkin(0.10, 0.42, 0.10), dermatomeMaterialC6C8.clone());
+        meshC6.position.set(-0.42, 1.15, 0.05);
+        meshC6.userData['layer'] = 'dermatome';
+        meshC6.userData['id'] = 'dermatome_c6_c8';
+        dermC6C8Group.add(meshC6);
+        const meshC8 = new THREE.Mesh(rSkin(0.10, 0.42, 0.10), dermatomeMaterialC6C8.clone());
+        meshC8.position.set(0.42, 1.15, 0.05);
+        meshC8.userData['layer'] = 'dermatome';
+        meshC8.userData['id'] = 'dermatome_c6_c8';
+        dermC6C8Group.add(meshC8);
+        dermC6C8Group.userData['id'] = 'dermatome_c6_c8';
+        this.mannequinGroup.add(dermC6C8Group);
+        this.parts.set('dermatome_c6_c8', dermC6C8Group);
+
+        // L4-L5 Sciatic Dermatome Mesh Group
+        const dermL4L5Group = new THREE.Group();
+        const meshL4 = new THREE.Mesh(rSkin(0.14, 0.9, 0.14), dermatomeMaterialL4L5.clone());
+        meshL4.position.set(-0.18, 0.05, 0.02);
+        meshL4.userData['layer'] = 'dermatome';
+        meshL4.userData['id'] = 'dermatome_l4_l5';
+        dermL4L5Group.add(meshL4);
+        const meshL5 = new THREE.Mesh(rSkin(0.14, 0.9, 0.14), dermatomeMaterialL4L5.clone());
+        meshL5.position.set(0.18, 0.05, 0.02);
+        meshL5.userData['layer'] = 'dermatome';
+        meshL5.userData['id'] = 'dermatome_l4_l5';
+        dermL4L5Group.add(meshL5);
+        dermL4L5Group.userData['id'] = 'dermatome_l4_l5';
+        this.mannequinGroup.add(dermL4L5Group);
+        this.parts.set('dermatome_l4_l5', dermL4L5Group);
+
         // 5. Appendages (Arms & Legs)
         this.addPartComplex('r_shoulder', rJoint(0.12), skinMaterial, { x: -0.32, y: 1.45 }, rJoint(0.11), muscleMaterial, { x: -0.32, y: 1.45 }, rJoint(0.06), boneMaterial, { x: -0.32, y: 1.45 }, undefined, undefined, undefined, rJoint(0.13), molecularMaterial, { x: -0.32, y: 1.45 });
         this.addPartComplex('r_arm', rSkin(0.08, 0.4, 0.08), skinMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rSkin(0.07, 0.38, 0.07), muscleMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, rBone(0.4), boneMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 }, undefined, undefined, undefined, rSkin(0.09, 0.42, 0.09), molecularMaterial, { x: -0.42, y: 1.15, z: 0.05, rx: 0.1 });
@@ -1091,12 +1326,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 }
             }
 
-            // Sync external rotation
-            if (this.mannequinGroup) {
-                this.mannequinGroup.rotation.y = this.rotation();
-            }
-            if (this.customModelGroup) {
-                this.customModelGroup.rotation.y = this.rotation();
+            // Sync external rotation or 360 Auto-Spinning Sentinel Orbit
+            if (this.isAutoSpinning()) {
+                if (this.mannequinGroup) this.mannequinGroup.rotation.y += 0.008;
+                if (this.customModelGroup) this.customModelGroup.rotation.y += 0.008;
+            } else {
+                if (this.mannequinGroup) {
+                    this.mannequinGroup.rotation.y = this.rotation();
+                }
+                if (this.customModelGroup) {
+                    this.customModelGroup.rotation.y = this.rotation();
+                }
             }
 
             if (this.composer) {
