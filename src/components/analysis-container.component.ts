@@ -17,6 +17,7 @@ import { PatientStoryModalComponent } from './patient-story-modal.component';
 import { PostItNotesComponent } from './post-it-notes.component';
 import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
 import { VinylDjStoreComponent } from './vinyl-dj-store.component';
+import { GcpHealthcareService } from '../services/gcp-healthcare.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -164,6 +165,12 @@ import { VinylDjStoreComponent } from './vinyl-dj-store.component';
                   <span>🔥</span> FHIR R4
                 </button>
 
+                <!-- GCP Healthcare API Sync Button -->
+                <button type="button" (click)="syncGcpHealthcare()" title="Sync FHIR R4 Care Plan to Google Cloud Healthcare API (gen-lang-client-0540208645)"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition cursor-pointer">
+                  <span>☁️</span> GCP Sync
+                </button>
+
                 <pocket-gull-button (click)="intelligence.clearCache()"
                   variant="ghost"
                   size="sm"
@@ -248,7 +255,13 @@ export class AnalysisContainerComponent {
   intelligence = inject(ClinicalIntelligenceService);
   game = inject(GamificationService);
   exportService = inject(ExportService);
+  gcpHealthcare = inject(GcpHealthcareService);
   ClinicalIcons = ClinicalIcons;
+
+  async syncGcpHealthcare() {
+    const res = await this.gcpHealthcare.syncToGcpHealthcareApi();
+    alert(res.message);
+  }
 
   justGenerated = signal(false);
   showPactModal = signal(false);
