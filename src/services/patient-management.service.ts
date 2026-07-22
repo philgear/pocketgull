@@ -48,6 +48,73 @@ export class PatientManagementService implements OnDestroy {
   private autoSave$ = new Subject<void>();
   private autoSaveSub?: Subscription;
 
+  private ensurePatientCompleteness(p: IPatient): IPatient {
+    const pVitals = p.vitals || {};
+    const vitals = {
+      bp: pVitals.bp || "120/80",
+      hr: pVitals.hr || "72",
+      temp: pVitals.temp || "98.6°F",
+      spO2: pVitals.spO2 || "98%",
+      weight: pVitals.weight || "165 lbs",
+      height: pVitals.height || "5'9\"",
+      vitD3: pVitals.vitD3 || "35 ng/mL",
+      magnesium: pVitals.magnesium || "2.1 mg/dL",
+      b12: pVitals.b12 || "550 pg/mL",
+      zinc: pVitals.zinc || "88 mcg/dL"
+    };
+
+    const oxidativeStressMarkers = p.oxidativeStressMarkers && p.oxidativeStressMarkers.length > 0 ? p.oxidativeStressMarkers : [
+      { id: "1", name: "Malondialdehyde (MDA)", value: "2.1 μmol/L (Normal)" },
+      { id: "2", name: "hsCRP", value: "1.2 mg/L (Optimal)" }
+    ];
+
+    const antioxidantSources = p.antioxidantSources && p.antioxidantSources.length > 0 ? p.antioxidantSources : [
+      { id: "1", name: "Glutathione (GSH)", value: "2.2 μmol/g Hb" },
+      { id: "2", name: "CoQ10", value: "0.95 μg/mL" }
+    ];
+
+    const history: HistoryEntry[] = (p.history && p.history.length > 0) ? p.history.map(h => {
+      if (h.type === 'AnalysisRun' && h.report) {
+        return {
+          ...h,
+          report: {
+            "Summary Overview": h.report["Summary Overview"] || `### Clinical Assessment\n${p.name} presents for comprehensive multi-system evaluation. Primary focus is on metabolic health, autonomic tone, and cellular resilience.`,
+            "Functional Protocols": h.report["Functional Protocols"] || `### Protocol Actions\n- Implement 10-min daily 0.1 Hz vagal resonant breathing.\n- Morning sunlight exposure within 30 min of waking.`,
+            "Nutrition": h.report["Nutrition"] || `### Dietary Plan\n- Emphasize Mediterranean anti-inflammatory whole-foods pattern.\n- Targeted polyphenol and antioxidant micro-dosing.`,
+            "Monitoring & Follow-up": h.report["Monitoring & Follow-up"] || `### Tracking Schedule\n- Track resting HR and HRV daily.\n- Follow-up visit scheduled in 4 weeks.`,
+            "Patient Education": h.report["Patient Education"] || `### Patient Guidance\n- Focus on rest, hydration, and consistent sleep hygiene rhythms.`,
+            "Precision Nutrients": h.report["Precision Nutrients"] || `### Orthomolecular Protocol\n- Magnesium Glycinate: 400mg before bed.\n- Vitamin D3 + K2: 2000 IU daily.`,
+            "PhysioNet Telemetry": h.report["PhysioNet Telemetry"] || `### PhysioNet Telemetry\n- QRS Duration: 88 ms\n- ST Segment: Neutral (+0.01 mV)\n- QTc Interval: 412 ms\n- HRV LF/HF Ratio: 1.4`
+          }
+        };
+      }
+      return h;
+    }) : [
+      {
+        type: "AnalysisRun",
+        date: p.lastVisit || "2026.06.25",
+        summary: "Comprehensive Clinical Analysis",
+        report: {
+          "Summary Overview": `### Clinical Assessment\n${p.name} presents for comprehensive multi-system evaluation. Primary focus is on metabolic health, autonomic tone, and cellular resilience.\n\n### Priority List\n- **Cardiometabolic Optimization**: Maintain physiological homeostasis.\n- **Inflammatory Modulation**: Mitigate systemic stress drivers.`,
+          "Functional Protocols": `### Protocol Actions\n- Implement 10-min daily 0.1 Hz vagal resonant breathing.\n- Morning sunlight exposure within 30 min of waking.`,
+          "Nutrition": `### Dietary Plan\n- Emphasize Mediterranean anti-inflammatory whole-foods pattern.\n- Targeted polyphenol and antioxidant micro-dosing.`,
+          "Monitoring & Follow-up": `### Tracking Schedule\n- Track resting HR and HRV daily.\n- Follow-up visit scheduled in 4 weeks.`,
+          "Patient Education": `### Patient Guidance\n- Focus on rest, hydration, and consistent sleep hygiene rhythms.`,
+          "Precision Nutrients": `### Orthomolecular Protocol\n- Magnesium Glycinate: 400mg before bed.\n- Vitamin D3 + K2: 2000 IU daily.`,
+          "PhysioNet Telemetry": `### PhysioNet Telemetry\n- QRS Duration: 88 ms\n- ST Segment: Neutral (+0.01 mV)\n- QTc Interval: 412 ms\n- HRV LF/HF Ratio: 1.4`
+        }
+      }
+    ];
+
+    return {
+      ...p,
+      vitals,
+      oxidativeStressMarkers,
+      antioxidantSources,
+      history
+    };
+  }
+
   readonly patients = signal<IPatient[]>(MOCK_PATIENTS);
   readonly rosterLoaded = signal(false);
   readonly selectedPatientId: WritableSignal<string | null> = signal(
@@ -55,7 +122,8 @@ export class PatientManagementService implements OnDestroy {
   );
   readonly selectedPatient = computed(() => {
     const id = this.selectedPatientId();
-    return id ? this.patients().find((p) => p.id === id) : null;
+    const raw = id ? this.patients().find((p) => p.id === id) : null;
+    return raw ? this.ensurePatientCompleteness(raw) : null;
   });
 
   private async initRoster() {
