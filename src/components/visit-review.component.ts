@@ -19,26 +19,24 @@ interface INotesByPart {
   template: `
     <div class="h-full flex flex-col bg-white dark:bg-[#09090b]">
       <!-- Header -->
-      <div class="h-14 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-[#09090b] shrink-0">
-        <div class="flex flex-col">
-           <span class="text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-400">Visit Review</span>
-           <span class="text-xs text-gray-500 dark:text-zinc-400">Read-only view of notes from {{ visit().date }}</span>
+      <div class="h-14 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between px-6 bg-white dark:bg-[#09090b] shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Visit Review</span>
+          <span class="text-xs text-gray-300">|</span>
+          <span class="text-xs font-semibold text-gray-900 dark:text-zinc-100">{{ visit().date }}</span>
         </div>
-        <pocket-gull-button 
-           (click)="close()" 
-           variant="ghost" 
-           size="sm"
-           icon='<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>'>
-        </pocket-gull-button>
+        <button (click)="close()" class="text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-8 space-y-8">
+      <div class="flex-1 overflow-y-auto p-6 space-y-8">
         <div>
-          <h2 class="text-2xl font-light text-[#1C1C1C] dark:text-zinc-100 mb-1">Visit Summary</h2>
-          <p class="text-sm text-gray-600 dark:text-zinc-400 italic">"{{ visit().summary }}"</p>
+          <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">Clinical Summary</h3>
+          <p class="text-sm text-gray-800 dark:text-zinc-200 leading-relaxed">{{ visit().summary }}</p>
         </div>
 
-        <div class="pt-8 border-t border-[#EEEEEE] dark:border-zinc-800 space-y-6">
+        <div class="pt-8 border-t border-slate-200 dark:border-zinc-800 space-y-6">
             @for (part of notesByPart(); track part.partId) {
                 <div>
                     <h3 class="text-sm font-bold text-[#1C1C1C] dark:text-zinc-100 mb-3">{{ part.partName }}</h3>

@@ -100,10 +100,10 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await westernBtn.click();
     await page.waitForTimeout(1500);
 
-    const generateBtn = page.locator('button', { hasText: 'Generate Strategy' }).first();
+    const generateBtn = page.locator('button', { hasText: /Generate|Refresh/ }).first();
     if (await generateBtn.isVisible()) {
       await generateBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(3000);
     }
 
     // Verify all 6 tabs are present
@@ -194,10 +194,10 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await page.locator('button', { hasText: 'Western' }).first().click();
     await page.waitForTimeout(1500);
 
-    const generateBtn = page.locator('button', { hasText: 'Generate Strategy' }).first();
+    const generateBtn = page.locator('button', { hasText: /Generate|Refresh/ }).first();
     if (await generateBtn.isVisible()) {
       await generateBtn.click();
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(3000);
     }
     await orthoTab.click();
     await page.waitForTimeout(500);

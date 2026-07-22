@@ -361,7 +361,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
             <button 
               type="button" 
               (click)="showCompanionSyncModal.set(true)"
-              class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-full text-xs font-bold uppercase tracking-wider transition shadow-sm"
+              class="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-md text-xs font-bold uppercase tracking-wider transition shadow-xs focus:ring-2 focus:ring-indigo-500/50 outline-none"
               title="Generate FHIR R4 Smart Launch QR for Patient/Doctor Mobile Companion">
               <span>📱 Sync Companion</span>
             </button>
@@ -536,8 +536,8 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
             <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400 pl-4 border-l border-gray-100 dark:border-zinc-800">
               <!-- Gamified Points & Level HUD capsule -->
               <div class="relative group tracking-normal">
-                <div class="flex items-center gap-2.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 rounded-full hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer shadow-sm select-none">
-                  <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
+                <div class="flex items-center gap-2.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 rounded-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer shadow-xs select-none">
+                  <div class="w-2.5 h-2.5 rounded-xs bg-amber-500 animate-pulse"></div>
                   <span class="text-[12px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
                     {{ game.levelTitle() }} (Lvl {{ game.level() }})
                   </span>
@@ -546,7 +546,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                   </span>
                   
                   <!-- Tiny progress bar -->
-                  <div class="w-12 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden shrink-0">
+                  <div class="w-12 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-xs overflow-hidden shrink-0">
                     <div class="h-full bg-amber-500 transition-all duration-500" [style.width.%]="game.progressPercentage()"></div>
                   </div>
                 </div>

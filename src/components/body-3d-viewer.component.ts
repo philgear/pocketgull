@@ -127,6 +127,15 @@ const PART_NAMES: Record<string, string> = {
 
           <button 
             type="button" 
+            (click)="toggleAutoSpin()" 
+            class="px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition shadow-sm flex items-center gap-1 cursor-pointer"
+            [class]="isAutoSpinning() ? 'bg-indigo-500/30 text-indigo-300 border-indigo-500/50 animate-pulse' : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'"
+          >
+            <span>🔄 3D Orbit</span>
+          </button>
+
+          <button 
+            type="button" 
             (click)="shufflePainLevels()" 
             class="px-2 py-1 rounded-lg border border-rose-500/40 text-[10px] font-bold uppercase tracking-wider transition shadow-sm bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 flex items-center gap-1 cursor-pointer active:scale-95"
           >
@@ -335,6 +344,12 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             if (this.bloomPass) {
                 this.bloomPass.strength = (mode === 'organs' || mode === 'molecular') ? 0.3 : 0.15;
             }
+        });
+
+        // React to active philosophy (Western vs Eastern TCM vs Ayurvedic) for 3D Meridian/Organ Heatmap Sync
+        effect(() => {
+            const philosophy = this.state.activePhilosophy();
+            this.updatePartColors();
         });
 
         // React to AVS session activation to toggle neural globe visibility instantly
@@ -1072,17 +1087,22 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 }
 
                 if (isSelected) {
+                    const philosophy = this.state.activePhilosophy();
+                    const paradigmEmissive = philosophy === 'western' ? 0x0284c7 : (philosophy === 'eastern' ? 0x059669 : 0xd97706);
                     if (layer === 'skin') {
                         (material as THREE.MeshStandardMaterial).color.setHex(0x1C1C1C);
-                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
-                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.2;
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(paradigmEmissive);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.4;
                     } else if (layer !== 'molecular') {
-                        (material as THREE.MeshStandardMaterial).emissive.setHex(0x76B362);
-                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.3;
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(paradigmEmissive);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.5;
                     }
                 } else {
+                    const philosophy = this.state.activePhilosophy();
+                    const paradigmEmissive = philosophy === 'western' ? 0x0284c7 : (philosophy === 'eastern' ? 0x059669 : 0xd97706);
                     if (layer === 'organ') {
-                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.2;
+                        (material as THREE.MeshStandardMaterial).emissive.setHex(paradigmEmissive);
+                        (material as THREE.MeshStandardMaterial).emissiveIntensity = 0.25;
                     } else if (layer === 'bone' && maxPain > 0) {
                         (material as THREE.MeshStandardMaterial).emissive.setHex(0xff3333);
                     } else if (layer !== 'molecular') {

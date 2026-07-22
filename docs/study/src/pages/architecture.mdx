@@ -14,30 +14,88 @@ Pocket Gull leverages a modern, reactive architecture utilizing <DocNode term="A
 ## System Diagram
 
 ```mermaid
-graph TD
-    User([Doctor / User]) -->|HTTPS| WebApp[Google Cloud Run]
-    
-    subgraph WebApp [Google Cloud Run]
-        FE[Angular Frontend<br/>SSR + Hydration] <-->|REST / WebSockets| BE[Express.js Backend<br/>REST + WebSocket Proxy]
+graph TB
+    classDef doorway fill:#18181b,stroke:#a855f7,stroke-width:3px,color:#fafafa;
+    classDef leftWing fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef rightWing fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#f8fafc;
+    classDef cloudCeiling fill:#0f172a,stroke:#6366f1,stroke-width:2px,color:#f8fafc;
+    classDef foundation fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#f8fafc;
+
+    %% TOP CEILING: CLOUD & BACKEND RUNTIME
+    subgraph CloudCeiling ["⚡ CLOUD CEILING & BACKEND RUNTIME"]
+        CloudRun["Google Cloud Run Serverless Service"]
+        ExpressProxy["Express.js SSR & Single-Hop Proxy"]
+        FastAPISidecar["Python FastAPI Sidecar (ML Risk Scoring)"]
+        VertexAI["Vertex AI Enterprise (Gemini 2.5 Flash)"]
     end
 
-    FE -->|Signals| State[PatientState Service]
-    FE -->|Local State| DB[(Clinical Data Layer<br/>SessionStorage)]
-    
-    State -->|Context Data| Runner[ADK InMemoryRunner]
-    
-    subgraph Runner [ADK InMemoryRunner]
-        Overview[Overview Agent]
-        Intervention[Intervention Agent]
-        Monitor[Monitor Agent]
-        Education[Education Agent]
+    %% LEFT WING: INGESTION & USER PORTALS
+    subgraph LeftWing ["📱 LEFT WING — INGESTION & PORTALS"]
+        Body3D["Three.js 3D Body Surface & Skeleton Viewer"]
+        VoiceSTT["Bi-Directional Voice Assistant & Web Speech API"]
+        URLHandoff["Expanded URL State Handoff (?share=...&mode=...)"]
+        IntakeForm["Demographics & Vitals Diagnostic Intake"]
     end
 
-    BE -->|Proxy Endpoint| Vertex[Vertex AI Enterprise]
-    Vertex -->|Gemini 2.5 Flash| Runner
-    
-    BE -->|Proxy Route| PubMed[NCBI PubMed API]
-    FE -->|JSON Search| CSE[Google CSE API]
+    %% CENTER CORE: THE DOORWAY HUB
+    subgraph DoorwayHub ["🚪 THE DOORWAY HUB — CENTRAL STATE & AI ORCHESTRATION"]
+        PatientState["PatientStateService Signal Store\n(Central Source of Truth)"]
+        ADKRunner["@google/adk InMemoryRunner\n(Multi-Agent Orchestrator)"]
+        WebMCPCatalog["WebMCP Polyfill & JSON-LD Tool Catalog"]
+        CognitiveShield["Cognitive Localization & Shield Filter\n(Grade 4 / Grade 8 / Dyslexia)"]
+    end
+
+    %% RIGHT WING: MULTI-PARADIGM LENSES
+    subgraph RightWing ["🩺 RIGHT WING — MULTI-PARADIGM LENSES"]
+        WesternLens["Western Allopathic Lens\n(Summary, Workup & Monitoring)"]
+        TCMLens["Eastern TCM Lens\n(Meridian, Tongue/Pulse & Qi)"]
+        AyurvedicLens["Ayurvedic Lens\n(Vata, Pitta, Kapha & Agni)"]
+        OrthoLens["Orthomolecular Lens\n(Biomarker & Precision Nutrients)"]
+        YBOCsLens["Y-BOCs Diagnostic Screener"]
+        CDCSentinel["CDC Sentinel Triage (Levels 1–5)"]
+    end
+
+    %% BOTTOM FOUNDATION: STANDARDS & ARCHIVING
+    subgraph Foundation ["💾 FOUNDATION — STANDARDS & ARCHIVING"]
+        FHIRBundles["FHIR R4 / R5 / R6 / FHIR 7 Bundles"]
+        CERNZenodo["CERN Zenodo Open Science (CC0 1.0 + ORCID iD)"]
+        IndexedDBCache["Encrypted Offline Browser Cache"]
+        PubmedGrounding["NCBI PubMed & Evidence Grounding"]
+    end
+
+    %% CONNECTIONS RADIATING FROM & THROUGH THE DOORWAY HUB
+    CloudRun --> ExpressProxy
+    ExpressProxy <--> FastAPISidecar
+    ExpressProxy <--> VertexAI
+
+    Body3D -->|Spatio-Anatomical Signals| PatientState
+    VoiceSTT -->|Audio Stream & Transcripts| ADKRunner
+    URLHandoff -->|Base64 Payload Restore| PatientState
+    IntakeForm -->|Vitals & Symptoms| PatientState
+
+    ExpressProxy <-->|WebSocket & REST| DoorwayHub
+
+    PatientState <--> ADKRunner
+    ADKRunner <--> WebMCPCatalog
+    PatientState <--> CognitiveShield
+
+    DoorwayHub <--> WesternLens
+    DoorwayHub <--> TCMLens
+    DoorwayHub <--> AyurvedicLens
+    DoorwayHub <--> OrthoLens
+    DoorwayHub <--> YBOCsLens
+    DoorwayHub <--> CDCSentinel
+
+    PatientState --> FHIRBundles
+    FHIRBundles --> CERNZenodo
+    PatientState --> IndexedDBCache
+    ADKRunner --> PubmedGrounding
+
+    class PatientState,ADKRunner,WebMCPCatalog,CognitiveShield doorway;
+    class Body3D,VoiceSTT,URLHandoff,IntakeForm leftWing;
+    class WesternLens,TCMLens,AyurvedicLens,OrthoLens,YBOCsLens,CDCSentinel rightWing;
+    class CloudRun,ExpressProxy,FastAPISidecar,VertexAI cloudCeiling;
+    class FHIRBundles,CERNZenodo,IndexedDBCache,PubmedGrounding foundation;
 ```
 
 ---

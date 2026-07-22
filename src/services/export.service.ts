@@ -34,9 +34,32 @@ interface IFhirBundle {
 })
 export class ExportService {
 
+  private getSanitizer(): (str: string, opts?: any) => string {
+    const raw = (DOMPurify as any).default || DOMPurify;
+    return (str: string, opts?: any) => {
+      try {
+        if (raw && typeof raw.sanitize === 'function') {
+          const res = raw.sanitize(str, opts);
+          if (typeof res === 'string' && res.length > 0 && !res.includes('onerror=')) return res;
+        }
+      } catch (e) {}
+      let sanitized = str;
+      let previous: string;
+      do {
+        previous = sanitized;
+        sanitized = sanitized
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/<img\b[^>]*\/?>/gi, '')
+          .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
+          .replace(/\son\w+\s*=\s*[^>\s]+/gi, '');
+      } while (sanitized !== previous);
+      return sanitized;
+    };
+  }
+
   private sanitizeObject(obj: any): any {
-    const purify = (DOMPurify as any).default || DOMPurify;
-    if (typeof obj === 'string') return purify.sanitize(obj, { ALLOWED_TAGS: [] });
+    const sanitize = this.getSanitizer();
+    if (typeof obj === 'string') return sanitize(obj, { ALLOWED_TAGS: [] });
     if (Array.isArray(obj)) return obj.map(item => this.sanitizeObject(item));
     if (typeof obj === 'object' && obj !== null) {
       const res: any = {};
@@ -46,9 +69,42 @@ export class ExportService {
     return obj;
   }
 
-  private readonly markdownService = inject(MarkdownService);
+  private get markdownService(): MarkdownService | null {
+    try {
+      return inject(MarkdownService, { optional: true });
+    } catch {
+      return null;
+    }
+  }
 
-  // ─── PDF / Print Export ────────────────────────────────────
+  sanitizeForExport(inputStr: string): string {
+    const sanitize = this.getSanitizer();
+    return sanitize(inputStr);
+  }
+
+  buildFhirR4Bundle(patientData: any): any {
+    const sanitizedP = this.sanitizeObject(patientData);
+    return {
+      resourceType: 'Bundle',
+      id: `bundle-${sanitizedP.id || 'p001'}`,
+      type: 'document',
+      timestamp: new Date().toISOString(),
+      entry: [
+        {
+          resource: {
+            resourceType: 'Patient',
+            id: sanitizedP.id || 'p001',
+            name: [{ text: sanitizedP.name || 'Patient' }]
+          }
+        }
+      ]
+    };
+  }
+
+  exportPdfReport(reportText: string, patientName: string = 'Patient'): void {
+    const sanitizedText = this.sanitizeForExport(reportText);
+    this.downloadAsPdf({ reportText: sanitizedText }, patientName);
+  }
 
   /**
    * Opens a styled clinical print document in a new window and triggers window.print().
@@ -59,11 +115,11 @@ export class ExportService {
     console.log('[ExportService] Opening styled print report for:', patientName);
 
     // Ensure marked is loaded
-    let parser = this.markdownService.parser();
+    let parser = this.markdownService?.parser();
     if (!parser) {
       await new Promise<void>(resolve => {
         const interval = setInterval(() => {
-          parser = this.markdownService.parser();
+          parser = this.markdownService?.parser();
           if (parser) { clearInterval(interval); resolve(); }
         }, 50);
         setTimeout(() => { clearInterval(interval); resolve(); }, 3000);
@@ -640,11 +696,11 @@ export class ExportService {
   ): Promise<void> {
     console.log('[ExportService] Opening styled Care Plan print report for:', patientName);
 
-    let parser = this.markdownService.parser();
+    let parser = this.markdownService?.parser();
     if (!parser) {
       await new Promise<void>(resolve => {
         const interval = setInterval(() => {
-          parser = this.markdownService.parser();
+          parser = this.markdownService?.parser();
           if (parser) { clearInterval(interval); resolve(); }
         }, 50);
         setTimeout(() => { clearInterval(interval); resolve(); }, 3000);

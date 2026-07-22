@@ -29,7 +29,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
         <!-- Anatomical Search & Quick-Select Overlay (Top Left) -->
         <div class="absolute top-4 left-4 z-30 no-print flex flex-col gap-2 max-w-[280px] sm:max-w-[340px]">
           <!-- Search Input Bar -->
-          <div class="relative flex items-center bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-[#EEEEEE] dark:border-zinc-800 rounded-lg shadow-md p-1.5 transition-all focus-within:ring-2 focus-within:ring-lime-500/50">
+          <div class="relative flex items-center bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-slate-200 dark:border-zinc-800 rounded-lg shadow-md p-1.5 transition-all focus-within:ring-2 focus-within:ring-lime-500/50">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 dark:text-zinc-500 ml-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input 
               type="text" 
@@ -78,52 +78,83 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
           </div>
         </div>
         
-        <!-- 2D/3D & Anatomy Layer Toggles (Top Right) -->
-        <div class="absolute top-4 right-4 flex flex-col gap-2 z-20 no-print">
-          <!-- View Modes -->
-          <div class="flex flex-col gap-1 bg-white dark:bg-zinc-800 p-1 rounded-sm shadow-sm border border-[#EEEEEE] dark:border-zinc-700">
-            <button (click)="state.bodyViewerMode.set('3d')" [class.bg-black]="state.bodyViewerMode() === '3d'" [class.dark:bg-white]="state.bodyViewerMode() === '3d'" [class.text-white]="state.bodyViewerMode() === '3d'" [class.dark:text-black]="state.bodyViewerMode() === '3d'"
-                    title="3D View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-            </button>
-            <button (click)="state.bodyViewerMode.set('2d')" [class.bg-black]="state.bodyViewerMode() === '2d'" [class.dark:bg-white]="state.bodyViewerMode() === '2d'" [class.text-white]="state.bodyViewerMode() === '2d'" [class.dark:text-black]="state.bodyViewerMode() === '2d'"
-                    title="2D View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-            </button>
-          </div>
+        <!-- Unified Anatomical Control HUD (Layers, Regions, 3D Orbit & Ghost Overlay) -->
+        <div class="absolute bottom-3 left-3 right-3 z-30 no-print flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 dark:bg-zinc-950/95 backdrop-blur-md p-2 rounded-xl border border-slate-700/60 dark:border-zinc-800 shadow-2xl">
+          
+          <!-- 2D / 3D Mode & Layers Segment -->
+          <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar">
+            <!-- 2D vs 3D Viewport Selector -->
+            <div class="flex items-center bg-zinc-800/80 p-0.5 rounded-lg border border-zinc-700/50 mr-1.5">
+              <button (click)="state.bodyViewerMode.set('3d')"
+                      [class.bg-indigo-600]="state.bodyViewerMode() === '3d'"
+                      [class.text-white]="state.bodyViewerMode() === '3d'"
+                      [class.text-zinc-400]="state.bodyViewerMode() !== '3d'"
+                      class="px-2.5 py-1.5 text-[10.5px] font-mono font-bold uppercase rounded-md transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
+                <span>🧊</span> 3D
+              </button>
+              <button (click)="state.bodyViewerMode.set('2d')"
+                      [class.bg-indigo-600]="state.bodyViewerMode() === '2d'"
+                      [class.text-white]="state.bodyViewerMode() === '2d'"
+                      [class.text-zinc-400]="state.bodyViewerMode() !== '2d'"
+                      class="px-2.5 py-1.5 text-[10.5px] font-mono font-bold uppercase rounded-md transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
+                <span>🗺️</span> 2D
+              </button>
+            </div>
 
-          <!-- Anatomy Layers -->
-          <div class="flex flex-col gap-1 bg-white dark:bg-zinc-800 p-1 rounded-sm shadow-sm border border-[#EEEEEE] dark:border-zinc-700">
-            <button (click)="state.anatomyViewMode.set('skin')" [class.bg-black]="state.anatomyViewMode() === 'skin'" [class.dark:bg-white]="state.anatomyViewMode() === 'skin'" [class.text-white]="state.anatomyViewMode() === 'skin'" [class.dark:text-black]="state.anatomyViewMode() === 'skin'"
-                    title="Skin View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <!-- Anatomical Layers Pill Strip -->
+            <span class="text-[9.5px] font-mono font-extrabold text-zinc-400 uppercase tracking-widest px-1 hidden sm:inline">Layer:</span>
+            <button (click)="state.anatomyViewMode.set('skin')"
+                    [class.bg-zinc-100]="state.anatomyViewMode() === 'skin'"
+                    [class.text-zinc-950]="state.anatomyViewMode() === 'skin'"
+                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'skin'"
+                    [class.text-zinc-300]="state.anatomyViewMode() !== 'skin'"
+                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>👤</span> Skin
             </button>
-            <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-black]="state.anatomyViewMode() === 'muscle'" [class.dark:bg-white]="state.anatomyViewMode() === 'muscle'" [class.text-white]="state.anatomyViewMode() === 'muscle'" [class.dark:text-black]="state.anatomyViewMode() === 'muscle'"
-                    title="Muscle View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="6.5"></line></svg>
+            <button (click)="state.anatomyViewMode.set('muscle')"
+                    [class.bg-zinc-100]="state.anatomyViewMode() === 'muscle'"
+                    [class.text-zinc-950]="state.anatomyViewMode() === 'muscle'"
+                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'muscle'"
+                    [class.text-zinc-300]="state.anatomyViewMode() !== 'muscle'"
+                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🦾</span> Muscle
             </button>
-            <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-black]="state.anatomyViewMode() === 'skeleton'" [class.dark:bg-white]="state.anatomyViewMode() === 'skeleton'" [class.text-white]="state.anatomyViewMode() === 'skeleton'" [class.dark:text-black]="state.anatomyViewMode() === 'skeleton'"
-                    title="Skeletal View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 2v20"></path><path d="M7 7h10"></path><path d="M5 12h14"></path><path d="M7 17h10"></path></svg>
+            <button (click)="state.anatomyViewMode.set('skeleton')"
+                    [class.bg-zinc-100]="state.anatomyViewMode() === 'skeleton'"
+                    [class.text-zinc-950]="state.anatomyViewMode() === 'skeleton'"
+                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'skeleton'"
+                    [class.text-zinc-300]="state.anatomyViewMode() !== 'skeleton'"
+                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🦴</span> Skeleton
             </button>
-            <button (click)="state.anatomyViewMode.set('organs')" [class.bg-black]="state.anatomyViewMode() === 'organs'" [class.dark:bg-white]="state.anatomyViewMode() === 'organs'" [class.text-white]="state.anatomyViewMode() === 'organs'" [class.dark:text-black]="state.anatomyViewMode() === 'organs'"
-                    title="Organ View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            <button (click)="state.anatomyViewMode.set('organs')"
+                    [class.bg-zinc-100]="state.anatomyViewMode() === 'organs'"
+                    [class.text-zinc-950]="state.anatomyViewMode() === 'organs'"
+                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'organs'"
+                    [class.text-zinc-300]="state.anatomyViewMode() !== 'organs'"
+                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🫀</span> Organ
             </button>
-            <button (click)="state.anatomyViewMode.set('molecular')" [class.bg-black]="state.anatomyViewMode() === 'molecular'" [class.dark:bg-white]="state.anatomyViewMode() === 'molecular'" [class.text-white]="state.anatomyViewMode() === 'molecular'" [class.dark:text-black]="state.anatomyViewMode() === 'molecular'"
-                    title="Molecular View" class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><circle cx="12" cy="12" r="3"></circle><path d="m14 14 6 6"></path><circle cx="20" cy="20" r="3"></circle><path d="m14 10 6-6"></path><circle cx="20" cy="4" r="3"></circle><path d="m10 14-6 6"></path><circle cx="4" cy="20" r="3"></circle><path d="m10 10-6-6"></path><circle cx="4" cy="4" r="3"></circle></svg>
+            <button (click)="state.anatomyViewMode.set('molecular')"
+                    [class.bg-zinc-100]="state.anatomyViewMode() === 'molecular'"
+                    [class.text-zinc-950]="state.anatomyViewMode() === 'molecular'"
+                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'molecular'"
+                    [class.text-zinc-300]="state.anatomyViewMode() !== 'molecular'"
+                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🔬</span> Molecular
             </button>
-            <!-- Ghost Reference Overlay -->
+
+            <!-- Ghost Baseline Reference -->
             <button (click)="state.showGhostOverlay.update(v => !v)"
-                    [class.bg-indigo-600]="state.showGhostOverlay()"
+                    [class.bg-teal-600]="state.showGhostOverlay()"
                     [class.text-white]="state.showGhostOverlay()"
-                    title="Toggle ghost reference overlay (healthy-baseline comparison)"
-                    class="p-2 rounded-sm hover:bg-gray-100 dark:hover:bg-zinc-700 transition-all flex items-center justify-center text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-zinc-100">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    [class.bg-zinc-800\/60]="!state.showGhostOverlay()"
+                    [class.text-zinc-400]="!state.showGhostOverlay()"
+                    title="Toggle healthy baseline ghost comparison"
+                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>👻</span> Ghost
             </button>
           </div>
-
         </div>
 
         @if (state.bodyViewerMode() === '3d') {
