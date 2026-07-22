@@ -1089,6 +1089,55 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
                 </pocket-gull-card>
               </div>
             }
+
+            <!-- Actionable Lens Flow Dock (Dieter Rams Grid & Continuous Flow) -->
+            <div class="mt-6 p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-md font-mono text-xs no-print">
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm">🧭</span>
+                    <span class="font-extrabold uppercase tracking-wider text-slate-800 dark:text-zinc-100">
+                      Lens Action Flow: {{ activeLens() }}
+                    </span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30">
+                      Step {{ activeLensIndex() + 1 }} of {{ availableLenses.length }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-slate-500 dark:text-zinc-400 font-sans mt-0.5">
+                    Complete this lens analysis by logging findings into the care plan or advancing to the next specialized lens.
+                  </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5">
+                  <button type="button" (click)="logLensFindingsToCarePlan()"
+                    class="px-3.5 py-2 rounded-md bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 text-[11px] font-bold uppercase tracking-wider transition-all border border-slate-300 dark:border-zinc-700 cursor-pointer flex items-center gap-1.5 focus:ring-2 focus:ring-indigo-500/50 outline-none">
+                    <span>📌</span>
+                    <span>Log Findings to Plan</span>
+                  </button>
+
+                  <button type="button" (click)="launchSpecialistHandoffModal()"
+                    class="px-3.5 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold uppercase tracking-wider transition-all shadow-sm cursor-pointer flex items-center gap-1.5 focus:ring-2 focus:ring-purple-400 outline-none">
+                    <span>⚡</span>
+                    <span>AI Consult on {{ activeLens() }}</span>
+                  </button>
+
+                  @if (hasNextLens()) {
+                    <button type="button" (click)="navigateToNextLens()"
+                      class="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-extrabold uppercase tracking-wider transition-all shadow-md cursor-pointer active:scale-95 flex items-center gap-2 focus:ring-2 focus:ring-indigo-400 outline-none">
+                      <span>Advance to {{ getNextLensName() }}</span>
+                      <span class="text-sm">➡️</span>
+                    </button>
+                  }
+                </div>
+              </div>
+
+              @if (flowToastMessage(); as toast) {
+                <div class="mt-3 p-2.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold flex items-center gap-2 animate-in fade-in duration-200">
+                  <span>✅</span>
+                  <span>{{ toast }}</span>
+                </div>
+              }
+            </div>
           </div>
           
           <!-- AI Co-Pilot Transparency Watermark -->
@@ -1158,6 +1207,8 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly export = inject(ExportService);
   protected readonly actMapper = inject(ClinicalActLensMapperService);
 
+  flowToastMessage = signal<string | null>(null);
+  showHandoffModal = signal<boolean>(false);
   lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
 
   availableLenses: (AnalysisLens | 'Y-BOCs Screener')[] = [
@@ -1178,6 +1229,38 @@ export class AnalysisReportComponent implements OnDestroy {
     return idx >= 0 ? idx : 0;
   });
 
+  hasNextLens = computed(() => {
+    return this.activeLensIndex() < this.availableLenses.length - 1;
+  });
+
+  getNextLensName = computed((): string => {
+    return this.hasNextLens() ? this.availableLenses[this.activeLensIndex() + 1] : '';
+  });
+
+  navigateToNextLens(): void {
+    if (this.hasNextLens()) {
+      const nextLens = this.getNextLensName();
+      if (nextLens) {
+        this.changeLens(nextLens as any);
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 180, behavior: 'smooth' });
+        }
+      }
+    }
+  }
+
+  logLensFindingsToCarePlan(): void {
+    const lens = this.activeLens();
+    this.flowToastMessage.set(`Logged ${lens} clinical findings directly into Patient Care Plan.`);
+    setTimeout(() => {
+      this.flowToastMessage.set(null);
+    }, 3500);
+  }
+
+  launchSpecialistHandoffModal(): void {
+    this.showHandoffModal.set(true);
+  }
+
   scrollLenses(direction: 'left' | 'right'): void {
     const el = this.lensCarousel()?.nativeElement;
     if (el) {
@@ -1193,7 +1276,6 @@ export class AnalysisReportComponent implements OnDestroy {
   activeActProposal = computed(() => {
     return this.actMapper.getActProposal(this.activeLens());
   });
-  showHandoffModal = signal<boolean>(false);
   isCprMetronomeActive = signal<boolean>(false);
   private cprIntervalId: any = null;
   private audioCtx: AudioContext | null = null;
