@@ -14,12 +14,13 @@ import { HumanDignityPactComponent } from './human-dignity-pact.component';
 import { MyChartBriefModalComponent } from './mychart-brief-modal.component';
 import { FamilyTreePedigreeComponent } from './family-tree-pedigree.component';
 import { PatientStoryModalComponent } from './patient-story-modal.component';
+import { PostItNotesComponent } from './post-it-notes.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -138,6 +139,12 @@ import { PatientStoryModalComponent } from './patient-story-modal.component';
                   <span>📖</span> Patient Story
                 </button>
 
+                <!-- 3D Post-It Notes Button -->
+                <button type="button" (click)="showPostItModal.set(true)" title="Open 3D Interactive Prescription Post-It Notes"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
+                  <span>📌</span> 3D Post-Its
+                </button>
+
                 <!-- FHIR R4 Export Button -->
                 <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
@@ -202,6 +209,9 @@ import { PatientStoryModalComponent } from './patient-story-modal.component';
 
     <!-- TED-Style Patient Hero Journey Story Reader Modal -->
     <app-patient-story-modal *ngIf="showStoryModal()" (closeModal)="showStoryModal.set(false)"></app-patient-story-modal>
+
+    <!-- 3D Interactive Prescription Post-It Notes Modal -->
+    <app-post-it-notes *ngIf="showPostItModal()" (closeModal)="showPostItModal.set(false)"></app-post-it-notes>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -226,6 +236,7 @@ export class AnalysisContainerComponent {
   showMyChartModal = signal(false);
   showPedigreeModal = signal(false);
   showStoryModal = signal(false);
+  showPostItModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
