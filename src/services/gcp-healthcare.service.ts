@@ -27,8 +27,9 @@ export class GcpHealthcareService {
    */
   buildGcpFhirR4Bundle(): any {
     const sanitize = (val: string) => {
-      const DOMP = (DOMPurify as any).default || DOMPurify;
-      return DOMP.sanitize ? DOMP.sanitize(val || '') : val || '';
+      const hasOwnDefault = Object.prototype.hasOwnProperty.call(DOMPurify, 'default');
+      const DOMP = hasOwnDefault ? (DOMPurify as any).default : DOMPurify;
+      return DOMP && typeof DOMP.sanitize === 'function' ? DOMP.sanitize(val || '') : val || '';
     };
 
     const vitals = this.state.vitals();

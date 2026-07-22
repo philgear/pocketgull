@@ -35,7 +35,8 @@ interface IFhirBundle {
 export class ExportService {
 
   public sanitizeForExport(inputStr: string): string {
-    const raw = (DOMPurify as any).default || DOMPurify;
+    const hasOwnDefault = Object.prototype.hasOwnProperty.call(DOMPurify, 'default');
+    const raw = hasOwnDefault ? (DOMPurify as any).default : DOMPurify;
     if (raw && typeof raw.sanitize === 'function') {
       return raw.sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe'], FORBID_ATTR: ['onerror', 'onload', 'onclick'] });
     }
