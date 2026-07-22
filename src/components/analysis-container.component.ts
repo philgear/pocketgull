@@ -19,12 +19,13 @@ import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
 import { VinylDjStoreComponent } from './vinyl-dj-store.component';
 import { GcpHealthcareService } from '../services/gcp-healthcare.service';
 import { AmbientLivingSpaceDashboardComponent } from './ambient-living-space-dashboard.component';
+import { GreenRoomLoungeComponent } from './green-room-lounge.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -178,6 +179,12 @@ import { AmbientLivingSpaceDashboardComponent } from './ambient-living-space-das
                   <span>🏡</span> Living Space
                 </button>
 
+                <!-- Green Room Restorative Lounge Button -->
+                <button type="button" (click)="showGreenRoomModal.set(true)" title="Open Green Room Clinician & Patient Compassionate Lounge"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer">
+                  <span>🌿</span> Green Room
+                </button>
+
                 <pocket-gull-button (click)="intelligence.clearCache()"
                   variant="ghost"
                   size="sm"
@@ -248,6 +255,9 @@ import { AmbientLivingSpaceDashboardComponent } from './ambient-living-space-das
 
     <!-- Main Living Space Ambient Display Studio Modal -->
     <app-ambient-living-space-dashboard *ngIf="showLivingSpaceModal()" (closeModal)="showLivingSpaceModal.set(false)" (openGleeAlbum)="showLivingSpaceModal.set(false); showGleeModal.set(true)"></app-ambient-living-space-dashboard>
+
+    <!-- Restorative Green Room Clinician & Patient Lounge Modal -->
+    <app-green-room-lounge *ngIf="showGreenRoomModal()" (closeModal)="showGreenRoomModal.set(false)" (openGleeAlbum)="showGreenRoomModal.set(false); showGleeModal.set(true)"></app-green-room-lounge>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -282,6 +292,7 @@ export class AnalysisContainerComponent {
   showGleeModal = signal(false);
   showVinylModal = signal(false);
   showLivingSpaceModal = signal(false);
+  showGreenRoomModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
