@@ -38,6 +38,7 @@ import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.com
 import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboard.component';
 import { GeolocationalHealthRelocationComponent } from './geolocational-health-relocation.component';
 import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapper.service';
+import { TypologyBadgeComponent } from './typology-badge.component';
 import { InstantPatientActionSuiteComponent } from './instant-patient-action-suite.component';
 import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
 
@@ -72,7 +73,8 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
     ParadigmClinicalDashboardComponent,
     GeolocationalHealthRelocationComponent,
     InstantPatientActionSuiteComponent,
-    PatientHealthTrajectoryStorybookComponent
+    PatientHealthTrajectoryStorybookComponent,
+    TypologyBadgeComponent
   ],
 
 
@@ -307,6 +309,16 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
                           [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"></span>
                     Expert: {{ activeAgentName() }}
                   </div>
+                </div>
+
+                <!-- Higher-Order Paradigm Typology Badge -->
+                <div class="mt-2.5 flex items-center gap-2">
+                  <app-typology-badge 
+                    [paradigm]="state.activePhilosophy() === 'eastern' ? 'tcm' : (state.activePhilosophy() === 'ayurvedic' ? 'ayurvedic' : 'western')"
+                    [lens]="activeLens()"
+                    [evidenceGrade]="'A'"
+                    [systemTag]="activeLens() === 'Summary Overview' ? 'Pathophysiological' : (activeLens() === 'Treatment Matrix' ? 'Multi-Modal Intervention' : (activeLens() === 'Functional Protocols' ? 'Biochemical & Circadian' : (activeLens() === 'Nutrition' ? 'Metabolic & Oxidative' : (activeLens() === 'Precision Nutrients' ? 'Orthomolecular Dosing' : 'Cognitive Localization'))))">
+                  </app-typology-badge>
                 </div>
                 
                 <p class="text-xs mt-1 text-gray-600 dark:text-zinc-400 leading-relaxed font-sans">
