@@ -34,7 +34,7 @@ const serverConfig: ApplicationConfig = {
             provide: IntelligenceProviderToken,
             useClass: HybridProvider
         },
-        provideClientHydration(withEventReplay())
+        provideClientHydration()
     ]
 };
 
