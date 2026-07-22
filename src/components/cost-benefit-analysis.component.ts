@@ -61,7 +61,7 @@ interface ISentinelContainmentOption {
               <h3 class="text-base font-bold text-gray-900 dark:text-zinc-150 uppercase tracking-widest">
                 {{ isSentinel() ? 'Outbreak & Clinical Strategy Matrix' : (activeMode() === 'treatment' ? 'Treatment Cost-Benefit Matrix' : 'Patient Prevention Protocols') }}
               </h3>
-              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">
+              <span class="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">
                 🧠 5 ML Innovations Active
               </span>
             </div>

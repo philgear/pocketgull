@@ -765,7 +765,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
                                     class="rm-model-frame absolute inset-0 w-full h-full">
                                   </app-medical-3d-viewer>
                                 } @placeholder {
-                                  <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-[#FDFDFD] border border-[#EEEEEE]">
+                                  <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-[#FDFDFD] dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800">
                                     <div class="w-6 h-6 rounded-sm border-2 border-gray-300 border-t-black animate-spin"></div>
                                   </div>
                                 }

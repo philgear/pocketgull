@@ -226,7 +226,15 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
     }
 
     <!--Content Area-->
-    <div #contentArea class="flex-1 mx-4 sm:mx-8 mb-6 mt-2 overflow-y-auto overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 min-h-0">
+    <div #contentArea class="flex-1 mx-4 sm:mx-8 mb-6 mt-2 overflow-y-auto overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 min-h-0 relative">
+      <!-- Dieter Rams Industrial Precision Ventilation Grill -->
+      <div class="h-1 flex gap-[1.5px] opacity-25 px-4 pt-1.5 no-print">
+        <div class="flex-1 bg-slate-400 dark:bg-zinc-600 rounded-full h-0.5"></div>
+        <div class="flex-1 bg-slate-400 dark:bg-zinc-600 rounded-full h-0.5"></div>
+        <div class="flex-1 bg-slate-400 dark:bg-zinc-600 rounded-full h-0.5"></div>
+        <div class="flex-1 bg-slate-400 dark:bg-zinc-600 rounded-full h-0.5"></div>
+      </div>
+
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
         

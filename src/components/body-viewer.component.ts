@@ -29,7 +29,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
         <!-- Anatomical Search & Quick-Select Overlay (Top Left) -->
         <div class="absolute top-4 left-4 z-30 no-print flex flex-col gap-2 max-w-[280px] sm:max-w-[340px]">
           <!-- Search Input Bar -->
-          <div class="relative flex items-center bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-[#EEEEEE] dark:border-zinc-800 rounded-lg shadow-md p-1.5 transition-all focus-within:ring-2 focus-within:ring-lime-500/50">
+          <div class="relative flex items-center bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-slate-200 dark:border-zinc-800 rounded-lg shadow-md p-1.5 transition-all focus-within:ring-2 focus-within:ring-lime-500/50">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 dark:text-zinc-500 ml-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input 
               type="text" 

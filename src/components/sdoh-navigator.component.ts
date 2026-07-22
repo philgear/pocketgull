@@ -41,7 +41,7 @@ export interface ISdohMetric {
         </div>
 
         <div class="flex items-center gap-2">
-          <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
+          <span class="text-xs font-mono font-bold px-3 py-1 rounded-md bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
             SDOH Composite: {{ overallSdohScore() }}/100
           </span>
         </div>
@@ -74,7 +74,7 @@ export interface ISdohMetric {
                   {{ metric.domain }}
                 </h3>
               </div>
-              <span class="text-[10px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-full"
+              <span class="text-[10px] font-mono font-extrabold uppercase px-2 py-0.5 rounded-md"
                     [class.bg-emerald-100]="metric.status === 'Optimal'"
                     [class.text-emerald-800]="metric.status === 'Optimal'"
                     [class.bg-amber-100]="metric.status === 'Moderate Risk'"
