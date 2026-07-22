@@ -165,6 +165,7 @@ import { HumanDignityPactComponent } from './human-dignity-pact.component';
                 <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
               </div>
             </div>
+          }
         </div>
       </div>
     </div>
