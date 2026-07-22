@@ -169,6 +169,15 @@ export class PostItNotesComponent {
 
   notes = signal<IPostItNote[]>([
     {
+      id: 'n_rx',
+      title: '🎵 Mandatory Clinical Prescription',
+      category: 'longevity',
+      text: 'Prescribed: Actuarial Glee 12-Track Duet Singalong Album (+12.0 QALYs). Sing daily with partner/family for vagal co-regulation.',
+      color: 'yellow',
+      rotation: 0,
+      pinnedArea: 'Universal Mandatory Rx'
+    },
+    {
       id: 'n1',
       title: '☀️ Morning Circadian Sun Reset',
       category: 'happiness',

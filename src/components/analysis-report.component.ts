@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked, output } from '@angular/core';
 import { CommonModule, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
@@ -305,6 +305,29 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
         
+        <!-- Mandatory Prescribed Therapeutic Album Banner -->
+        @if (hasAnyReport()) {
+          <div class="mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-900/10 via-indigo-900/10 to-slate-900/10 dark:from-purple-950/40 dark:to-slate-900/40 border border-purple-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl p-2 rounded-xl bg-purple-500/20 text-purple-300">🎵</span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30">Mandatory Clinical Prescription</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-purple-200">+12.0 QALYs Recovery</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">Actuarial Glee: 12-Track Duet Singalong Album</h4>
+                <p class="text-[11px] text-slate-600 dark:text-zinc-400">Prescribed for daily autonomic co-regulation, vagal tone activation, and multi-generational family healthspan</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <pocket-gull-button (click)="openGleeAlbumFromReport()" variant="primary" size="xs">
+                Play Prescribed Album
+              </pocket-gull-button>
+            </div>
+          </div>
+        }
+
         <!-- Active Medicine Mode Info Banner -->
         @if (hasAnyReport() && activeLens() !== 'EMT Handoff') {
           <div class="mb-6 p-4 rounded-xl border transition-all duration-300"
@@ -1294,6 +1317,7 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
   `
 })
 export class AnalysisReportComponent implements OnDestroy {
+  openGleeModal = output<void>();
   protected readonly intel = inject(ClinicalIntelligenceService);
   protected readonly state = inject(PatientStateService);
   protected readonly patientManager = inject(PatientManagementService);
@@ -1307,6 +1331,10 @@ export class AnalysisReportComponent implements OnDestroy {
   flowToastMessage = signal<string | null>(null);
   showHandoffModal = signal<boolean>(false);
   lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
+
+  openGleeAlbumFromReport() {
+    this.openGleeModal.emit();
+  }
 
   availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health')[] = [
     'Summary Overview',
