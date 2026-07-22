@@ -264,7 +264,9 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
         }
 
         @if (activeLens() === 'Y-BOCs Screener') {
-          <app-ybocs-screener></app-ybocs-screener>
+          <div class="w-full">
+            <app-ybocs-screener></app-ybocs-screener>
+          </div>
         } @else {
           <!-- ACM §1.3: AI-Generated Content Disclosure -->
           @if (hasAnyReport()) {
@@ -363,7 +365,7 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
 
         <!-- Theatrical Clinical Proposal Act Banner -->
         @if (activeActProposal(); as act) {
-          <div class="mb-6 p-4 rounded-md border-l-4 border-indigo-600 dark:border-indigo-400 bg-slate-50 dark:bg-zinc-900/80 border-t border-b border-r border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
+          <div class="mb-6 p-4 rounded-md border-l-4 border-l-indigo-600 dark:border-l-indigo-400 border-t border-b border-r border-t-slate-200 border-b-slate-200 border-r-slate-200 dark:border-t-zinc-800 dark:border-b-zinc-800 dark:border-r-zinc-800 bg-slate-50 dark:bg-zinc-900/80 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
             <div class="flex items-center gap-3">
               <span class="text-2xl">{{ act.icon }}</span>
               <div>
