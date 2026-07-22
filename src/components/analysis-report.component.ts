@@ -50,6 +50,7 @@ import { CyclingErgonomicsDualRevealComponent } from './cycling-ergonomics-dual-
 import { StormAnalysisComponent } from './storm-analysis.component';
 import { AigaTelemetryLensComponent } from './aiga-telemetry-lens.component';
 import { AndroscogginForagingPhytoncideComponent } from './androscoggin-foraging-phytoncide.component';
+import { ProceduralInvestmentMatrixComponent } from './procedural-investment-matrix.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -90,7 +91,8 @@ import { AndroscogginForagingPhytoncideComponent } from './androscoggin-foraging
     CyclingErgonomicsDualRevealComponent,
     StormAnalysisComponent,
     AigaTelemetryLensComponent,
-    AndroscogginForagingPhytoncideComponent
+    AndroscogginForagingPhytoncideComponent,
+    ProceduralInvestmentMatrixComponent
   ],
 
 
@@ -478,12 +480,13 @@ import { AndroscogginForagingPhytoncideComponent } from './androscoggin-foraging
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
             </div>
 
-            <!-- Multi-Paradigm Switchable Clinical Dashboard, Storm Analysis, AIGA Telemetry, Androscoggin Foraging & Life-Stage Perils Matrix -->
+            <!-- Multi-Paradigm Switchable Clinical Dashboard, Storm Analysis, AIGA Telemetry, Androscoggin Foraging, Procedural Investment & Life-Stage Perils Matrix -->
             <div class="col-span-full mb-4 space-y-4">
               <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
               <app-storm-analysis></app-storm-analysis>
               <app-aiga-telemetry-lens></app-aiga-telemetry-lens>
               <app-androscoggin-foraging-phytoncide></app-androscoggin-foraging-phytoncide>
+              <app-procedural-investment-matrix></app-procedural-investment-matrix>
               <app-life-perils-paradigm-matrix></app-life-perils-paradigm-matrix>
             </div>
 
