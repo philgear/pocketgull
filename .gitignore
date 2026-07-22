@@ -117,6 +117,7 @@ gcp-*.json
 **/.pub-cache/
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
+**/gradle/wrapper/gradle-wrapper.jar
 
 # --- Local PHI & Hive Database Security ---
 *.hive
