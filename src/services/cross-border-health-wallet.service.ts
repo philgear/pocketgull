@@ -5,12 +5,13 @@ import DOMPurify from 'dompurify';
 export interface ICrossBorderEmergencyWallet {
   walletId: string;
   timestamp: string;
-  language: string;
+  language: 'English' | 'Spanish' | 'French' | 'Mandarin';
   patientAgeGender: string;
   vitalsSummary: string;
   activeConditionsIcd11: string[];
   prescribedAlbum: string;
   emergencyContactDirective: string;
+  multilingualDirective: string;
 }
 
 @Injectable({
@@ -22,7 +23,7 @@ export class CrossBorderHealthWalletService {
   /**
    * Generates a de-identified international emergency medical wallet passport payload
    */
-  generateEmergencyWallet(targetLanguage: string = 'English'): ICrossBorderEmergencyWallet {
+  generateEmergencyWallet(targetLanguage: 'English' | 'Spanish' | 'French' | 'Mandarin' = 'English'): ICrossBorderEmergencyWallet {
     const sanitize = (val: string) => {
       const hasOwnDefault = Object.prototype.hasOwnProperty.call(DOMPurify, 'default');
       const DOMP = hasOwnDefault ? (DOMPurify as any).default : DOMPurify;
@@ -47,6 +48,13 @@ export class CrossBorderHealthWalletService {
       activeConditions.push('General Healthspan Optimization & Functional Preventive Care (ICD-11: QC40)');
     }
 
+    const directives: Record<'English' | 'Spanish' | 'French' | 'Mandarin', string> = {
+      English: 'Emergency Telemetry: De-identified medical record for international first responders.',
+      Spanish: 'Telemetría de Emergencia: Registro médico desidentificado para socorristas internacionales.',
+      French: 'Télémétrie d\'Urgence: Dossier médical anonymisé pour les premiers intervenants internationaux.',
+      Mandarin: '紧急医疗遥测：适用于国际急救人员的去标识化医疗记录。'
+    };
+
     return {
       walletId: `PG-INTL-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
       timestamp: new Date().toISOString(),
@@ -55,7 +63,8 @@ export class CrossBorderHealthWalletService {
       vitalsSummary: sanitize(`BP: ${vitals.bp || '120/80'} mmHg | HR: ${vitals.hr || '72'} BPM | SpO2: ${vitals.spO2 || '98'}% | Temp: ${vitals.temp || '98.6'}°F`),
       activeConditionsIcd11: activeConditions,
       prescribedAlbum: 'Actuarial Glee: 12-Track Duet Singalong Album (+12.0 QALYs Prescribed)',
-      emergencyContactDirective: 'Offline De-Identified Medical Telemetry. Accessible via QR Reader Abroad.'
+      emergencyContactDirective: 'Offline De-Identified Medical Telemetry. Accessible via QR Reader Abroad.',
+      multilingualDirective: directives[targetLanguage] || directives.English
     };
   }
 }
