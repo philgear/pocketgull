@@ -23,6 +23,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
 import { ClinicalTrendComponent } from './clinical-trend.component';
 import { AiCacheService } from '../services/ai-cache.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
+import { MedicalDecoderService } from '../services/medical-decoder.service';
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
 import { YbocsScreenerComponent } from './ybocs-screener.component';
@@ -1281,6 +1282,7 @@ export class AnalysisReportComponent implements OnDestroy {
   private audit = inject(AuditService);
   protected readonly export = inject(ExportService);
   protected readonly actMapper = inject(ClinicalActLensMapperService);
+  private readonly medicalDecoder = inject(MedicalDecoderService);
 
   flowToastMessage = signal<string | null>(null);
   showHandoffModal = signal<boolean>(false);
@@ -2112,7 +2114,8 @@ export class AnalysisReportComponent implements OnDestroy {
 
   private renderInteractiveContent(markdown: string): string {
     const parser = this.markdownService.parser();
-    return parser ? parser.parse(markdown) as string : '';
+    const rawHtml = parser ? parser.parse(markdown) as string : '';
+    return this.medicalDecoder.annotateText(rawHtml);
   }
 
   handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: any) {
