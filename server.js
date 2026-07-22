@@ -33,8 +33,8 @@ app.use('/docs', apiLimiter);
 app.use('/api-docs', apiLimiter);
 app.use('/health', apiLimiter);
 
-// Trust the Google Cloud Run proxy so req.hostname resolves correctly
-app.set('trust proxy', true);
+// Trust single hop Google Cloud Run load balancer proxy
+app.set('trust proxy', 1);
 
 // Redirect legacy URLs and alternative domains to the primary pocketgull.app domain
 const legacyRedirectHosts = new Set([

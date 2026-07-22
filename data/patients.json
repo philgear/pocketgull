@@ -95,7 +95,8 @@
           "Nutrition": "### Biochemical Assessment\nAnalysis of Robert's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Robert should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
           "Patient Education": "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
-          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nRobert's clinical markers suggest mild-to-moderate nutrient depletions corresponding to high-demand physiological stress and chronic condition burdens.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| Vitamin D3 | Sub-optimal | Immunomodulation / Serotonin |\n| Magnesium | Low-normal | Muscle / Sleep / Nervous System |\n| B-Complex | Sub-optimal | Methylation / Energy Co-factors |\n\n### Detected Deficiencies\n- **Intracellular Magnesium (Sub-optimal)**: Contributes to muscular tension, elevated vascular tone, and sleep disruptions.\n- **Vitamin D3 (Deficient/Sub-optimal)**: Common driver of compromised immune tolerance and lower neuroplastic resilience.\n\n### Orthomolecular Protocol\n- **Magnesium Glycinate**: 400mg before bed.\n- **Vitamin D3 + K2**: 5000 IU daily with breakfast.\n- **Methylated B12/Folate**: 1 capsule AM."
+          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nRobert's clinical markers suggest mild-to-moderate nutrient depletions corresponding to high-demand physiological stress and chronic condition burdens.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| Vitamin D3 | Sub-optimal | Immunomodulation / Serotonin |\n| Magnesium | Low-normal | Muscle / Sleep / Nervous System |\n| B-Complex | Sub-optimal | Methylation / Energy Co-factors |\n\n### Detected Deficiencies\n- **Intracellular Magnesium (Sub-optimal)**: Contributes to muscular tension, elevated vascular tone, and sleep disruptions.\n- **Vitamin D3 (Deficient/Sub-optimal)**: Common driver of compromised immune tolerance and lower neuroplastic resilience.\n\n### Orthomolecular Protocol\n- **Magnesium Glycinate**: 400mg before bed.\n- **Vitamin D3 + K2**: 5000 IU daily with breakfast.\n- **Methylated B12/Folate**: 1 capsule AM.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Digital Signal & Electrophysiology Summary\nIntegrated EDF/PhysioNet waveform metrics captured from high-frequency BLE telemetry sensors and continuous multi-lead ECG monitoring.\n\n### Electrocardiographic Waveform Morphology\n- **QRS Interval Duration**: 92 ms (Normal baseline: < 120 ms).\n- **ST-Segment**: Neutral ST morphology (+0.04 mV deviation).\n- **QTc Interval (Fridericia)**: 418 ms (Normal baseline: < 450 ms).\n\n### Heart Rate Variability (HRV) Spectral Power Density\n- **LF/HF Ratio**: 2.4 (Elevated sympathetic load)\n- **RMSSD**: 22 ms (Suppressed parasympathetic tone)"
         }
       },
       {
@@ -233,12 +234,28 @@
         "value": "118/72"
       }
     ],
-    "oxidativeStressMarkers": [],
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "Malondialdehyde (MDA)",
+        "value": "2.4 μmol/L"
+      },
+      {
+        "id": "2",
+        "name": "F2-Isoprostanes",
+        "value": "38 pg/mg creatinine"
+      }
+    ],
     "antioxidantSources": [
       {
         "id": "1",
         "name": "Vitamin C",
         "value": "1.2 mg/dL"
+      },
+      {
+        "id": "2",
+        "name": "Glutathione (GSH)",
+        "value": "1.8 μmol/g Hb"
       }
     ],
     "medications": [
@@ -286,7 +303,8 @@
           "Nutrition": "### Biochemical Assessment\nAnalysis of Sarah's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
           "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Sarah should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
           "Patient Education": "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
-          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nSarah's clinical markers suggest mild-to-moderate nutrient depletions corresponding to high-demand physiological stress and chronic condition burdens.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| Vitamin D3 | Sub-optimal | Immunomodulation / Serotonin |\n| Magnesium | Low-normal | Muscle / Sleep / Nervous System |\n| B-Complex | Sub-optimal | Methylation / Energy Co-factors |\n\n### Detected Deficiencies\n- **Intracellular Magnesium (Sub-optimal)**: Contributes to muscular tension, elevated vascular tone, and sleep disruptions.\n- **Vitamin D3 (Deficient/Sub-optimal)**: Common driver of compromised immune tolerance and lower neuroplastic resilience.\n\n### Orthomolecular Protocol\n- **Magnesium Glycinate**: 400mg before bed.\n- **Vitamin D3 + K2**: 5000 IU daily with breakfast.\n- **Methylated B12/Folate**: 1 capsule AM."
+          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nSarah's clinical markers suggest mild-to-moderate nutrient depletions corresponding to high-demand physiological stress and chronic condition burdens.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| Vitamin D3 | Sub-optimal | Immunomodulation / Serotonin |\n| Magnesium | Low-normal | Muscle / Sleep / Nervous System |\n| B-Complex | Sub-optimal | Methylation / Energy Co-factors |\n\n### Detected Deficiencies\n- **Intracellular Magnesium (Sub-optimal)**: Contributes to muscular tension, elevated vascular tone, and sleep disruptions.\n- **Vitamin D3 (Deficient/Sub-optimal)**: Common driver of compromised immune tolerance and lower neuroplastic resilience.\n\n### Orthomolecular Protocol\n- **Magnesium Glycinate**: 400mg before bed.\n- **Vitamin D3 + K2**: 5000 IU daily with breakfast.\n- **Methylated B12/Folate**: 1 capsule AM.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Digital Signal & Electrophysiology Summary\nIntegrated EDF/PhysioNet waveform metrics captured from high-frequency BLE telemetry sensors and continuous multi-lead ECG monitoring.\n\n### Electrocardiographic Waveform Morphology\n- **QRS Interval Duration**: 86 ms (Normal baseline: < 120 ms).\n- **ST-Segment**: Neutral ST morphology across Lead II, V2, V5 (+0.01 mV deviation).\n- **QTc Interval (Fridericia)**: 405 ms (Normal baseline: < 450 ms).\n\n### Heart Rate Variability (HRV) Spectral Power Density\n- **LF/HF Ratio**: 1.6 (Mild sympathetic tone)\n- **RMSSD**: 36 ms (Baseline parasympathetic resilience)"
         }
       },
       {
@@ -369,30 +387,39 @@
     "lastVisit": "2024.12.05",
     "preexistingConditions": [
       "Ischemic Heart Disease",
-      "Chronic Kidney Disease",
+      "Chronic Kidney Disease (Stage 3a)",
       "Mild Cognitive Impairment / Early Alzheimer's",
       "Osteoarthritis",
-      "Fall Risk"
+      "PhysioNet 2026 Challenge: Synaptic Waveform & Gait Telemetry Instability Challenge"
     ],
-    "patientGoals": "Family requested evaluation for increased confusion and recent fall at home.",
+    "patientGoals": "Family requested evaluation for increased confusion, recent fall at home, and gait instability.",
     "vitals": {
       "bp": "135/82",
       "hr": "68",
       "temp": "97.9°F",
       "spO2": "97%",
       "weight": "162 lbs",
-      "height": "5'9\""
+      "height": "5'9\"",
+      "vitD3": "22 ng/mL (Sub-optimal)",
+      "magnesium": "1.7 mg/dL (Low-normal)",
+      "b12": "410 pg/mL",
+      "zinc": "72 mcg/dL"
     },
     "oxidativeStressMarkers": [
       {
         "id": "1",
         "name": "8-OHdG",
-        "value": "15 ng/mg creatinine"
+        "value": "15 ng/mg creatinine (Elevated)"
       },
       {
         "id": "2",
         "name": "Lipid Peroxides",
-        "value": "12 nmol/mL"
+        "value": "12 nmol/mL (Elevated)"
+      },
+      {
+        "id": "3",
+        "name": "Amyloid-Beta 42/40 Ratio",
+        "value": "0.08 (Sub-optimal)"
       }
     ],
     "antioxidantSources": [
@@ -400,6 +427,16 @@
         "id": "1",
         "name": "Alpha-Tocopherol",
         "value": "11.5 mg/L"
+      },
+      {
+        "id": "2",
+        "name": "CoQ10 (Ubiquinol)",
+        "value": "0.52 μg/mL (Low)"
+      },
+      {
+        "id": "3",
+        "name": "Glutathione (GSH)",
+        "value": "1.3 μmol/g Hb"
       }
     ],
     "medications": [
@@ -420,8 +457,30 @@
       },
       {
         "id": "4",
-        "name": "Acetaminophen",
-        "value": "500mg PRN OA Pain"
+        "name": "Memantine",
+        "value": "10mg BID"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2024-11-15T08:00:00Z",
+        "type": "hr",
+        "value": "72"
+      },
+      {
+        "timestamp": "2024-12-01T08:00:00Z",
+        "type": "hr",
+        "value": "70"
+      },
+      {
+        "timestamp": "2024-12-05T08:00:00Z",
+        "type": "hr",
+        "value": "68"
+      },
+      {
+        "timestamp": "2024-12-05T08:00:00Z",
+        "type": "bp",
+        "value": "135/82"
       }
     ],
     "issues": {
@@ -429,118 +488,68 @@
         {
           "id": "head",
           "noteId": "note_p003_head_1",
-          "name": "Brain & Cognition",
-          "painLevel": 0,
-          "description": "Daughter reports patient got lost returning from the grocery store yesterday. Requires prompting for ADLs. MoCA score: 18/30.",
-          "symptoms": []
+          "name": "Neuro-Cognitive Decline & Memory",
+          "painLevel": 2,
+          "description": "Progressive short-term memory impairment with occasional disorientation during late afternoon.",
+          "symptoms": [
+            {
+              "name": "Short-term memory loss",
+              "type": "Cognitive",
+              "verified": true,
+              "timeline": "Chronic"
+            },
+            {
+              "name": "Sundowning confusion",
+              "type": "Neurological",
+              "verified": true,
+              "timeline": "Episodic"
+            }
+          ]
         }
       ],
-      "r_arm": [
+      "limbs": [
         {
-          "id": "r_arm",
-          "noteId": "note_p003_arm_1",
-          "name": "Right Arm / Wrist",
-          "painLevel": 4,
-          "description": "Bruising and tenderness from mechanical fall two days ago. X-ray negative for fracture.",
-          "symptoms": []
+          "id": "r_thigh",
+          "noteId": "note_p003_limbs_1",
+          "name": "Right Hip & Knee Osteoarthritis",
+          "painLevel": 5,
+          "description": "Moderate right hip joint stiffness contributing to antalgic gait and fall risk.",
+          "symptoms": [
+            {
+              "name": "Gait instability",
+              "type": "Musculoskeletal",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
         }
       ]
     },
     "history": [
       {
         "type": "AnalysisRun",
-        "date": "2026.06.25",
+        "date": "2024.12.05",
         "summary": "Comprehensive Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nWilliam Henderson presents with a complex clinical picture primarily characterized by Brain & Cognition, Right Arm / Wrist. Functional status remains stable, though specific risk factors require targeted intervention to prevent disease progression.\n\n### Priority List\n*   **Metabolic Optimization**: Immediate support needed for ongoing systemic stress.\n*   **Inflammatory Control**: Address underlying drivers of chronic inflammation.\n*   **Symptom Management**: Provide relief for primary presenting complaints.\n\n### Plan of Care\n*   Initiate targeted anti-inflammatory protocol.\n*   Begin functional medicine assessment for underlying root causes.\n*   Schedule follow-up to re-evaluate response to initial interventions.\n\n### Goals\n*   **Short-term (2 weeks)**: 15% reduction in primary symptom severity.\n*   **Long-term (3 months)**: Stabilization of key biomarkers and improved quality of life.\n\n### References\n*   **Smith, J. et al.** (2025). *Integrative Approaches to Chronic Disease*. Journal of Functional Medicine. [DOI:10.1234/jfm.2025.001](https://doi.org/10.1234/jfm.2025.001). Peer-Reviewed.",
-          "Functional Protocols": "### Immediate Actions (To start within 72 hours)\n*   Begin comprehensive elimination diet to identify potential food triggers.\n*   Implement strict sleep hygiene protocol (7-8 hours uninterrupted).\n\n### Foundation (Diet & Lifestyle)\n*   Transition to a Mediterranean-style, whole-foods diet.\n*   Engage in 150 minutes of moderate-intensity zone 2 cardio weekly.\n*   Incorporate daily 10-minute mindfulness or breathwork practice.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Omega-3 EPA/DHA | 2000mg | With meals | Anti-inflammatory support |\n| Vitamin D3 + K2 | 5000 IU | AM | Immune modulation |\n| Magnesium Glycinate | 400mg | Before bed | Nervous system relaxation |\n\n### Functional Protocols\nA comprehensive **HPA Axis Support** protocol is recommended to address systemic fatigue and optimize stress resilience. This includes targeted adaptogens and circadian rhythm realignment.",
-          "Nutrition": "### Biochemical Assessment\nAnalysis of William's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
-          "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. William should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education": "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
-          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nWilliam's clinical markers suggest mild-to-moderate nutrient depletions corresponding to high-demand physiological stress and chronic condition burdens.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| Vitamin D3 | Sub-optimal | Immunomodulation / Serotonin |\n| Magnesium | Low-normal | Muscle / Sleep / Nervous System |\n| B-Complex | Sub-optimal | Methylation / Energy Co-factors |\n\n### Detected Deficiencies\n- **Intracellular Magnesium (Sub-optimal)**: Contributes to muscular tension, elevated vascular tone, and sleep disruptions.\n- **Vitamin D3 (Deficient/Sub-optimal)**: Common driver of compromised immune tolerance and lower neuroplastic resilience.\n\n### Orthomolecular Protocol\n- **Magnesium Glycinate**: 400mg before bed.\n- **Vitamin D3 + K2**: 5000 IU daily with breakfast.\n- **Methylated B12/Folate**: 1 capsule AM."
-        }
-      },
-      {
-        "type": "Visit",
-        "date": "2024.06.12",
-        "summary": "6-month geriatric assessment.",
-        "state": {
-          "patientGoals": "Routine check, family notes mild forgetfulness.",
-          "vitals": {
-            "bp": "130/80",
-            "hr": "70",
-            "temp": "98.1°F",
-            "spO2": "98%",
-            "weight": "165 lbs",
-            "height": "5'9\""
-          },
-          "oxidativeStressMarkers": [
-            {
-              "id": "1",
-              "name": "8-OHdG",
-              "value": "10 ng/mg creatinine"
-            }
-          ],
-          "antioxidantSources": [
-            {
-              "id": "1",
-              "name": "Alpha-Tocopherol",
-              "value": "12.0 mg/L"
-            }
-          ],
-          "medications": [
-            {
-              "id": "1",
-              "name": "Donepezil",
-              "value": "5mg Daily"
-            },
-            {
-              "id": "2",
-              "name": "Aspirin",
-              "value": "81mg Daily"
-            },
-            {
-              "id": "3",
-              "name": "Furosemide",
-              "value": "20mg Daily"
-            }
-          ],
-          "issues": {
-            "head": [
-              {
-                "id": "head",
-                "noteId": "note_p003_head_hist2",
-                "name": "Brain & Cognition",
-                "painLevel": 0,
-                "description": "Mild short-term memory deficits noted.",
-                "symptoms": []
-              }
-            ]
-          }
+          "Summary Overview": "### Clinical Assessment\nWilliam Henderson is an 81-year-old male presenting with mild cognitive impairment, gait instability, and fall risk. Primary focus is on neuro-protection, fall prevention, and renal safety.\n\n### Priority List\n- **Fall Risk & Gait Telemetry**: PhysioNet 2026 gait sensor monitoring to prevent hip fracture.\n- **Neuro-Protection**: Optimize cholinergic signaling and reduce central oxidative stress.\n- **Renal Preservation**: Stage 3a CKD requires careful fluid and blood pressure balancing.\n\n### Goals\n- **Short-term**: Zero falls over next 30 days; complete occupational therapy home safety assessment.\n- **Long-term**: Maintain MoCA cognitive score >= 22; preserve ADL independence.",
+          "Functional Protocols": "### Immediate Actions (Within 72 hours)\n- Initiate physical therapy balance training with gait sensor telemetry.\n- Remove home trip hazards (loose rugs, dim lighting).\n- Implement bedtime magnesium threonate for synaptic plastic support.",
+          "Nutrition": "### MIND Diet Protocol\n- High polyphenol berry and green leafy vegetable intake.\n- Olive oil as primary dietary fat; wild salmon 2x/week.\n- Acetyl-L-Carnitine 500mg daily for mitochondrial transport.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Monthly MoCA and MMSE cognitive reassessment.\n- Bi-weekly renal eGFR and serum creatinine monitoring.\n- PhysioNet continuous accelerometer gait telemetry tracking.",
+          "Patient Education": "### Family & Patient Guide\n- Keep daily routine structured and predictable to reduce sundowning.\n- Ensure adequate hydration throughout the day.",
+          "Precision Nutrients": "### Orthomolecular Matrix\n- **Magnesium L-Threonate**: 1000mg (crosses blood-brain barrier).\n- **Omega-3 DHA**: 1000mg daily (neuronal membrane support).\n- **Vitamin B Complex (Methylated)**: 1 cap daily.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Synaptic Waveform & Gait Telemetry\n- **ECG QRS Duration**: 96 ms (Normal)\n- **ST Segment**: Neutral\n- **Gait Asymmetry Index**: 14.2% (Elevated fall risk threshold: > 10%)\n- **Postural Sway Velocity**: 2.8 cm/s"
         }
       }
     ],
     "bookmarks": [],
     "scans": [
       {
-        "id": "scan_004",
-        "type": "CT Scan",
-        "title": "Non-Contrast Head CT",
-        "date": "2024.12.04",
-        "bodyPartId": "head",
-        "description": "Mild diffuse age-related volume loss. No acute intracranial hemorrhage or mass effect. Tiny focal areas of chronic microvascular ischemic disease.",
-        "status": "Reviewed",
-        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/CT_scan_of_the_brain.jpg/640px-CT_scan_of_the_brain.jpg"
-      },
-      {
-        "id": "scan_005",
-        "type": "X-Ray",
-        "title": "Right Forearm/Wrist",
-        "date": "2024.12.04",
-        "bodyPartId": "r_arm",
-        "description": "No acute displaced fracture or dislocation. Degenerative changes in radiocarpal joint.",
-        "status": "Reviewed",
-        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/X-Ray_of_Colles_Fracture.jpg/640px-X-Ray_of_Colles_Fracture.jpg"
+        "id": "scan_p003_1",
+        "title": "Brain MRI Volumetric Study",
+        "type": "MRI",
+        "date": "2024.11.10",
+        "description": "Mild hippocampal volume loss bilateral; non-specific microvascular white matter ischemic changes (Fazekas Grade 1).",
+        "status": "Reviewed"
       }
     ]
   },
@@ -554,7 +563,8 @@
       "Ischemic Heart Disease (IHD)",
       "Chronic Obstructive Pulmonary Disease (COPD)",
       "Type 2 Diabetes Mellitus (T2DM)",
-      "Chronic Kidney Disease (CKD) Stage 3a"
+      "Chronic Kidney Disease (CKD) Stage 3a",
+      "PhysioNet 2026 Challenge: Multi-Lead ECG Ischemia & ST-Elevation Telemetry Challenge"
     ],
     "patientGoals": "Optimize oxygenation, stabilize blood glucose, manage exertional chest tightness, and protect renal function.",
     "vitals": {
@@ -563,8 +573,85 @@
       "temp": "98.6°F",
       "spO2": "92%",
       "weight": "172 lbs",
-      "height": "5'9\""
+      "height": "5'9\"",
+      "vitD3": "26 ng/mL",
+      "magnesium": "1.9 mg/dL",
+      "b12": "490 pg/mL",
+      "zinc": "78 mcg/dL"
     },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "hsCRP",
+        "value": "4.5 mg/L (Elevated)"
+      },
+      {
+        "id": "2",
+        "name": "NT-proBNP",
+        "value": "450 pg/mL (Borderline High)"
+      },
+      {
+        "id": "3",
+        "name": "HbA1c",
+        "value": "7.4%"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "CoQ10 (Ubiquinol)",
+        "value": "0.62 μg/mL"
+      },
+      {
+        "id": "2",
+        "name": "Glutathione (GSH)",
+        "value": "1.4 μmol/g Hb"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Atorvastatin",
+        "value": "40mg PM"
+      },
+      {
+        "id": "2",
+        "name": "Metformin",
+        "value": "1000mg BID"
+      },
+      {
+        "id": "3",
+        "name": "Spiriva (Tiotropium)",
+        "value": "18mcg Daily Inhalation"
+      },
+      {
+        "id": "4",
+        "name": "Empagliflozin (SGLT2i)",
+        "value": "10mg AM"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2026-03-01T08:00:00Z",
+        "type": "hr",
+        "value": "76"
+      },
+      {
+        "timestamp": "2026-03-05T08:00:00Z",
+        "type": "hr",
+        "value": "75"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "hr",
+        "value": "74"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "bp",
+        "value": "138/82"
+      }
+    ],
     "issues": {
       "chest": [
         {
@@ -585,12 +672,6 @@
               "type": "Cardiovascular",
               "verified": true,
               "timeline": "Chronic"
-            },
-            {
-              "name": "Chronic productive cough",
-              "type": "Respiratory",
-              "verified": true,
-              "timeline": "Chronic"
             }
           ]
         }
@@ -604,33 +685,10 @@
           "description": "Longstanding type 2 diabetes with eGFR of 52 mL/min/1.73m² (Stage 3a CKD). Patient shows signs of mild fluid retention.",
           "symptoms": [
             {
-              "name": "Polyuria & mild polydipsia",
-              "type": "Metabolic",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Bilateral ankle edema",
+              "name": "Mild pedal edema",
               "type": "Renal",
               "verified": true,
-              "timeline": "Intermittent"
-            }
-          ]
-        }
-      ],
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_p004_head_1",
-          "name": "Cerebrovascular & Cognitive Risk",
-          "painLevel": 1,
-          "description": "History of transient ischemic attack (TIA) in 2023. Reports mild subjective cognitive decline and difficulty with short-term recall.",
-          "symptoms": [
-            {
-              "name": "Subjective memory lapses",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Progressive"
+              "timeline": "Chronic"
             }
           ]
         }
@@ -639,37 +697,30 @@
     "history": [
       {
         "type": "AnalysisRun",
-        "date": "2026.06.25",
-        "summary": "Cardiopulmonary and Renal Protective Assessment",
-        "report": {
-          "Summary Overview": "### Clinical Assessment\nGlobal Sentinel represents a classic complex multi-morbid presentation reflecting the leading causes of global mortality: cardiovascular disease (IHD), chronic respiratory disease (COPD), metabolic disease (T2DM), and renal impairment (CKD Stage 3a). The primary therapeutic objectives are to mitigate cardiovascular risk, improve pulmonary function/oxygenation, achieve glycemic control, and slow the decline of kidney function.\n\n### Priority List\n*   **Cardiopulmonary Stabilization**: Manage exertional dyspnea and optimize coronary perfusion.\n*   **Renoprotection**: Control blood pressure and glycemic markers to preserve eGFR.\n*   **Metabolic Optimization**: Improve insulin sensitivity and lower HbA1c below 7.0%.\n\n### Plan of Care\n*   Implement low-sodium, low-glycemic, kidney-friendly nutritional protocol.\n*   Encourage daily pulmonary clearance exercises and structured Zone 1-2 physical activity as tolerated.\n*   Monitor daily vitals (BP, SpO2, blood glucose) closely.\n\n### Goals\n*   **Short-term (2 weeks)**: Stabilize resting SpO2 at or above 93%; blood glucose under 140 mg/dL fasting.\n*   **Long-term (3 months)**: Maintain eGFR > 50 mL/min; reduce HbA1c to < 6.8%; eliminate exertional chest tightness.",
-          "Functional Protocols": "### Immediate Actions (To start within 72 hours)\n*   Initiate daily home pulse oximetry tracking (morning and post-exertion).\n*   Transition to a potassium-balanced, low-glycemic whole foods plan.\n*   Establish a diaphragmatic breathing schedule (5 minutes, three times daily).\n\n### Foundation (Diet & Lifestyle)\n*   **Diet**: Whole-food plant-forward, restricting refined carbohydrates and maintaining moderate protein intake (0.8g/kg) to support renal filtration.\n*   **Exercise**: 20 minutes of daily light walking; avoid heavy isometric straining to keep BP stable.\n*   **Sleep**: Elevate head of bed by 15 degrees to optimize nighttime oxygenation and reduce morning cough.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Coenzyme Q10 (Ubiquinol) | 200mg | With breakfast | Mitochondrial & myocardial support |\n| Magnesium Malate | 300mg | With dinner | Vascular smooth muscle relaxation, insulin sensitivity |\n| N-Acetyl Cysteine (NAC) | 600mg | Morning | Mucolytic support for chronic cough & COPD |",
-          "Nutrition": "### Biochemical Assessment\nOxidative stress, endothelial dysfunction, and chronic low-grade inflammation are driving the progression of both cardiovascular and renal pathology. Dietary adjustments must balance glycemic load with renal phosphorus/potassium management.\n\n### Nutrition Targets\n*   **Endothelial Support**: Nitrate-rich vegetables (arugula, beets) in moderation to support nitric oxide synthesis.\n*   **Glycemic Control**: High-fiber, complex carbohydrates to stabilize blood glucose curves.\n*   **Renal Sparing**: Limit sodium to < 2000mg/day and control protein density.\n\n### Dietary Adjustments\nEmphasize steamed cruciferous vegetables, garlic, and onions to support endogenous detoxification. Integrate small portions of healthy fats (olive oil, avocados) while avoiding processed foods and trans-fats.",
-          "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Check fasting blood glucose and post-prandial readings daily.\n2.  Log blood pressure twice daily (target < 130/80).\n3.  Follow up in 4 weeks with basic renal panel (BUN/creatinine) and electrolytes.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| resting SpO2 | >= 93% | Daily | Drop below 90% at rest |\n| Blood Pressure | < 130/80 mmHg | Twice daily | BP > 150/95 mmHg on 2 readings |\n| Fasting Glucose | 90-130 mg/dL | Daily | Glucose > 200 mg/dL persistently |\n\n### Long-term Trajectory (6+ months)\nAnnual cardiology consultation and semi-annual nephrology follow-up. Target stable eGFR and stable pulmonary function tests (PFTs).",
-          "Patient Education": "### Understanding Your Conditions\nYour body's cardiovascular, respiratory, and metabolic systems are closely interconnected. A strain on one (like your lungs) can affect the others (like your heart and kidneys). By managing your blood sugar and blood pressure, you are protecting both your heart and your kidneys.\n\n### What Was Found\n*   **Reduced Lung Capacity**: Your airways have chronic irritation, which is why your oxygen levels sit slightly lower.\n*   **Kidney Stress**: Your kidneys are filtering at a slightly reduced rate, requiring us to avoid excessive protein and sodium.\n*   **Metabolic Slowdown**: Your cells are resistant to insulin, causing glucose to remain in the blood rather than being used for energy.\n\n### Current Plan\n*   **Gentle Breathing Exercises**: To maximize lung volume and support oxygenation.\n*   **Renal-Protective Diet**: Reducing salt and eating clean to take the pressure off your kidneys.\n*   **Gentle Movement**: Walking daily to maintain cardiovascular fitness without overloading the heart.",
-          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nEvaluation of renal and cardiovascular co-factors highlights the need for cardiovascular support that does not stress renal clearance.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| eGFR | 52 mL/min/1.73m² | Renal Clearance (Stage 3a) |\n| HbA1c | 7.2% | Glycated Hemoglobin (Sub-optimal) |\n| Serum Potassium | 4.4 mEq/L | Electrolyte Balance (Normal) |\n\n### Key Interventions\n- **NAC (600mg)**: Thin mucus secretions and support pulmonary pathways.\n- **CoQ10 (200mg)**: Promote cellular energy production within myocardial tissues.\n- **Magnesium Malate (300mg)**: Support insulin action and blood vessel relaxation."
-        }
-      },
-      {
-        "type": "Visit",
         "date": "2026.03.12",
-        "summary": "Initial evaluation of cardiopulmonary, metabolic, and renal multimorbidity. Vitals stable but showing sub-optimal oxygenation and mild hypertension.",
-        "state": {
-          "patientGoals": "Evaluate global mortality risks and complex multi-morbid presentation.",
-          "vitals": {
-            "bp": "138/82",
-            "hr": "74",
-            "temp": "98.6°F",
-            "spO2": "92%",
-            "weight": "172 lbs",
-            "height": "5'9\""
-          },
-          "issues": {}
+        "summary": "Comprehensive Clinical Analysis",
+        "report": {
+          "Summary Overview": "### Clinical Assessment\nGlobal Sentinel presents with comorbid ischemic heart disease, moderate COPD, and Stage 3a CKD. Focus is on cardiopulmonary protection, maintaining SpO2 > 92%, and avoiding nephrotoxic agents.\n\n### Priority List\n- **Cardiopulmonary Stabilization**: SpO2 tracking and exertional dyspnea management.\n- **SGLT2i Renal Protection**: Maintain renal perfusion and glycemic control.\n- **PhysioNet 2026 Telemetry**: Real-time ST segment & ECG ischemia monitoring.\n\n### Goals\n- **Short-term**: Maintain resting SpO2 >= 93% without supplemental O2.\n- **Long-term**: Prevent COPD exacerbations; preserve eGFR > 50 mL/min.",
+          "Functional Protocols": "### Immediate Actions (Within 72 hours)\n- Pulmonary rehabilitation and pursed-lip breathing exercises.\n- Inhaled bronchodilator compliance check.\n- Daily morning weight tracking for fluid balance.",
+          "Nutrition": "### Cardiorenal Diet Protocol\n- Low sodium (< 2000mg/day) and potassium-balanced Mediterranean meal pattern.\n- Beetroot juice dietary nitrate trial for endothelial vasodilation.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Daily SpO2 and blood pressure logs.\n- Monthly eGFR, cystatin-C, and urine albumin-to-creatinine ratio (uACR).\n- Continuous PhysioNet BLE multi-lead ECG stream.",
+          "Patient Education": "### Patient Guidance\n- Use pursed-lip breathing during physical activity.\n- Report any sudden weight increase > 3 lbs in 2 days immediately.",
+          "Precision Nutrients": "### Orthomolecular Matrix\n- **CoQ10 (Ubiquinol)**: 200mg daily (mitochondrial cardiac support).\n- **Magnesium Citrate**: 200mg daily (vascular smooth muscle tone).\n- **Omega-3 EPA/DHA**: 2000mg daily.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Multi-Lead ECG Ischemia & ST-Elevation Telemetry\n- **QRS Interval Duration**: 102 ms\n- **ST Segment Deviation**: +0.08 mV Lead II (Transient ischemic monitoring)\n- **QTc Interval**: 432 ms\n- **Respiratory Rate**: 18 breaths/min"
         }
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [
+      {
+        "id": "scan_p004_1",
+        "title": "12-Lead Electrocardiogram & Echocardiogram",
+        "type": "Lab Report",
+        "date": "2026.03.01",
+        "description": "Left ventricular ejection fraction 52%; mild concentric LV hypertrophy; zero acute ST elevation.",
+        "status": "Reviewed"
+      }
+    ]
   },
   {
     "id": "p005",
@@ -681,7 +732,8 @@
       "Hypertensive Heart Disease",
       "Type 2 Diabetes Mellitus (T2DM)",
       "Nephritis / Chronic Kidney Disease (Stage 3b)",
-      "Mild Cognitive Impairment (Early Alzheimer's)"
+      "Mild Cognitive Impairment (Early Alzheimer's)",
+      "PhysioNet 2026 Challenge: Cardiorenal Fluid Retentive Hemodynamic Challenge"
     ],
     "patientGoals": "Manage blood pressure, optimize glycemic status, protect renal clearance, and support cognitive function and fall prevention.",
     "vitals": {
@@ -690,8 +742,85 @@
       "temp": "98.4°F",
       "spO2": "94%",
       "weight": "195 lbs",
-      "height": "5'9\""
+      "height": "5'9\"",
+      "vitD3": "20 ng/mL (Deficient)",
+      "magnesium": "1.6 mg/dL (Low)",
+      "b12": "380 pg/mL",
+      "zinc": "65 mcg/dL"
     },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "hsCRP",
+        "value": "5.2 mg/L (Elevated)"
+      },
+      {
+        "id": "2",
+        "name": "Serum Creatinine",
+        "value": "1.8 mg/dL"
+      },
+      {
+        "id": "3",
+        "name": "eGFR",
+        "value": "44 mL/min/1.73m² (Stage 3b CKD)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "1.1 μmol/g Hb"
+      },
+      {
+        "id": "2",
+        "name": "CoQ10",
+        "value": "0.45 μg/mL"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Valsartan",
+        "value": "160mg Daily"
+      },
+      {
+        "id": "2",
+        "name": "Amlodipine",
+        "value": "5mg Daily"
+      },
+      {
+        "id": "3",
+        "name": "Linagliptin",
+        "value": "5mg Daily"
+      },
+      {
+        "id": "4",
+        "name": "Donepezil",
+        "value": "5mg PM"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2026-03-01T08:00:00Z",
+        "type": "hr",
+        "value": "85"
+      },
+      {
+        "timestamp": "2026-03-05T08:00:00Z",
+        "type": "hr",
+        "value": "84"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "hr",
+        "value": "82"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "bp",
+        "value": "148/92"
+      }
+    ],
     "issues": {
       "chest": [
         {
@@ -729,35 +858,6 @@
               "type": "Renal",
               "verified": true,
               "timeline": "Chronic"
-            },
-            {
-              "name": "Frequent urination",
-              "type": "Metabolic",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_p005_head_1",
-          "name": "Neurocognitive Health (Early Alzheimer's Profile)",
-          "painLevel": 1,
-          "description": "Evaluated for mild cognitive decline. Demonstrates difficulties with word-finding, short-term memory retrieval, and orientation in complex layouts.",
-          "symptoms": [
-            {
-              "name": "Word-finding difficulties",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Progressive"
-            },
-            {
-              "name": "Subjective memory loss",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Progressive"
             }
           ]
         }
@@ -766,36 +866,30 @@
     "history": [
       {
         "type": "AnalysisRun",
-        "date": "2026.06.25",
-        "summary": "CDC Sentinel Cardiovascular and Neurodegenerative Screening",
-        "report": {
-          "Summary Overview": "### Clinical Assessment\nCDC Sentinel represents the major chronic disease burdens in the United States, including heart disease, stroke risk, diabetes, chronic kidney disease (nephritis), and Alzheimer's disease. The patient requires a structured approach balancing blood pressure management, blood glucose regulation, renoprotective diet, and neuro-supportive nutrients.\n\n### Priority List\n*   **Blood Pressure Control**: Strict target of < 130/80 mmHg to reduce stroke and kidney failure risk.\n*   **Cognitive Preservation**: Support acetylcholine synthesis and reduce neuroinflammation.\n*   **Kidney Clearance Support**: Reduce glomerular pressure and control fluid accumulation.\n\n### Plan of Care\n*   Prescribe low-glycemic, anti-inflammatory, low-sodium dietary protocol (DASH diet variant).\n*   Introduce mild daily balance and cognitive exercise (Tai Chi, brain exercises).\n*   Monitor blood pressure and cognitive performance indicators monthly.\n\n### Goals\n*   **Short-term (2 weeks)**: Bring BP to < 135/80; reduce ankle edema by 50%.\n*   **Long-term (3 months)**: Stabilize eGFR above 40 mL/min; maintain baseline cognitive scores (MMSE/MOCA); HbA1c < 7.0%.",
-          "Functional Protocols": "### Immediate Actions (To start within 72 hours)\n*   Scale down dietary sodium intake to 1500mg daily.\n*   Begin daily blood pressure tracking in the morning and evening.\n*   Begin supplementation with clean Omega-3 fatty acids for cognitive and lipid support.\n\n### Foundation (Diet & Lifestyle)\n*   **Diet**: Plant-forward DASH diet, emphasizing green leafy vegetables, healthy fats, and clean protein (< 0.8g/kg due to CKD).\n*   **Exercise**: 15 minutes of Tai Chi daily for balance, core strength, and mindfulness.\n*   **Cognitive Activity**: Word puzzles and reading daily for 20 minutes.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Phosphatidylserine | 200mg | PM | Neuro-membrane support and cortisol modulation |\n| Alpha-GPC | 300mg | AM | Acetylcholine precursor for cognitive performance |\n| Vitamin D3 + K2 | 2000 IU | AM | Cardiovascular and bone density support |\n| CoQ10 | 100mg | AM | Mitigate left ventricular strain |",
-          "Nutrition": "### Biochemical Assessment\nNutritional management focuses on reducing vascular inflammation, mitigating glycemic excursions, and avoiding high renal excretion stress.\n\n### Nutrition Targets\n*   **Renal Integrity**: Restrict high-phosphorus foods and monitor potassium to keep serum values stable.\n*   **Neuroprotection**: High-antioxidant foods (blueberries, walnuts) to limit brain oxidative stress.\n*   **Vascular Health**: High dietary fiber to optimize bowel transit and support lipid levels.\n\n### Dietary Adjustments\nIncrease intake of celery and beets (nitrates) to support vessel relaxation. Strictly avoid high-fructose corn syrup, trans fats, and excess dietary sodium.",
-          "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Set up weekly pill planner to ensure medication adherence.\n2.  Monitor daily morning weights (escalate if weight gains > 3 lbs in 48 hours, suggesting fluid retention).\n3.  Follow up in 4 weeks for renal panels and blood pressure assessment.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Blood Pressure | < 130/80 | Daily | > 150/90 on consecutive readings |\n| Morning Weight | +/- 2 lbs | Daily | > 3 lbs gain in 48 hours |\n| MMSE Score | >= 25/30 | Every 3 months | Drop in score > 2 points |",
-          "Patient Education": "### Understanding Your Conditions\nManaging your health involves a partnership between your heart, your kidneys, and your brain. When we keep your blood pressure low, we protect the blood vessels in your kidneys and the blood vessels in your brain. This prevents further kidney strain and helps keep your memory sharp.\n\n### What Was Found\n*   **Hypertension**: Your heart is pumping against high resistance, causing strain.\n*   **Renal Strain**: Your kidney filters are working harder, which can cause you to hold onto extra fluid (ankle swelling).\n*   **Memory Changes**: The brain's messaging centers need extra support to maintain memory and processing speeds.\n\n### Current Plan\n*   **DASH Nutrition**: Eating plenty of fresh vegetables, limiting salt, and enjoying healthy fats.\n*   **Daily Balance Exercises**: Tai Chi helps build strong joints and improves balance to prevent falls.\n*   **Brain Workouts**: Daily puzzles to stimulate nerve pathways."
-        }
-      },
-      {
-        "type": "Visit",
         "date": "2026.03.12",
-        "summary": "Review of US-specific mortality risks. Identified mild left-ventricular overload, renal filtration strain, and subjective cognitive decline.",
-        "state": {
-          "patientGoals": "Evaluate US mortality risks and complex multimorbidity presentation.",
-          "vitals": {
-            "bp": "142/78",
-            "hr": "68",
-            "temp": "98.4°F",
-            "spO2": "95%",
-            "weight": "162 lbs",
-            "height": "5'4\""
-          },
-          "issues": {}
+        "summary": "Comprehensive Clinical Analysis",
+        "report": {
+          "Summary Overview": "### Clinical Assessment\nCDC Sentinel is a 78-year-old female with Stage 3b CKD, hypertensive heart disease, and mild cognitive impairment. Primary clinical focus is blood pressure stabilization below 130/80 without causing renal hypoperfusion.\n\n### Priority List\n- **Blood Pressure & ARB Optimization**: Valsartan dose titration under renal function monitoring.\n- **Fluid Balance & Edema Control**: Monitor lower limb swelling and sodium intake.\n- **PhysioNet 2026 Telemetry**: Cardiorenal fluid retentive hemodynamic modeling.\n\n### Goals\n- **Short-term**: Reduce BP to < 135/85; maintain eGFR stable at >= 44 mL/min.\n- **Long-term**: Prevent progression to Stage 4 CKD; support cognitive retention.",
+          "Functional Protocols": "### Immediate Actions (Within 72 hours)\n- Implement strict low-sodium dietary regimen (< 1500mg/day).\n- Daily morning ankle circumference and weight measurement log.\n- Cognition support via 0.1 Hz vagal audio-visual stimulation.",
+          "Nutrition": "### Renal-Protective Nutrition Protocol\n- Moderate protein restriction (0.8g/kg/day) to lower nitrogenous waste.\n- High antioxidant polyphenol intake (wild blueberries, green tea catechins).\n- Active Vitamin D (Calcitriol) consultation.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Bi-weekly serum potassium and BUN/creatinine panels.\n- Daily home blood pressure log (AM & PM).\n- PhysioNet continuous fluid retention & bio-impedance telemetry.",
+          "Patient Education": "### Patient Guidance\n- Avoid all OTC NSAIDs (ibuprofen, naproxen) as they worsen kidney function.\n- Elevate legs for 20 minutes in afternoon to reduce lower leg swelling.",
+          "Precision Nutrients": "### Orthomolecular Matrix\n- **Methylated Folate (L-5-MTHF)**: 1000mcg daily (supports homocysteine clearance).\n- **CoQ10**: 150mg daily (mitochondrial renal endothelial support).\n- **Magnesium Glycinate**: 200mg nightly.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Cardiorenal Fluid Retentive Hemodynamic Challenge\n- **QRS Interval Duration**: 98 ms\n- **ST Segment**: Neutral (+0.02 mV)\n- **Pulse Wave Velocity (PWV)**: 11.2 m/s (Elevated arterial stiffness)\n- **Bio-Impedance Fluid Index**: +1.8 L surplus"
         }
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [
+      {
+        "id": "scan_p005_1",
+        "title": "Renal Ultrasound & Echocardiogram",
+        "type": "Ultrasound",
+        "date": "2026.02.20",
+        "description": "Bilateral kidneys display increased cortical echogenicity consistent with chronic parenchymal disease. Concentric LV hypertrophy.",
+        "status": "Reviewed"
+      }
+    ]
   },
   {
     "id": "p006",
@@ -806,7 +900,8 @@
     "preexistingConditions": [
       "Preterm Birth History (32 weeks gestation)",
       "Mild-Intermittent Asthma",
-      "Recent Rotavirus Enteritis (Resolving)"
+      "Recent Rotavirus Enteritis (Resolving)",
+      "PhysioNet 2026 Challenge: Pediatric Autonomic Airway Reactivity & Dehydration Challenge"
     ],
     "patientGoals": "Rehydrate after diarrhoeal episode, reduce airway hyperreactivity, and support pediatric immune health.",
     "vitals": {
@@ -815,8 +910,70 @@
       "temp": "99.1°F",
       "spO2": "96%",
       "weight": "34 lbs",
-      "height": "3'4\""
+      "height": "3'4\"",
+      "vitD3": "34 ng/mL",
+      "magnesium": "2.0 mg/dL",
+      "b12": "610 pg/mL",
+      "zinc": "75 mcg/dL"
     },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "hsCRP",
+        "value": "1.8 mg/L"
+      },
+      {
+        "id": "2",
+        "name": "Serum Electrolytes",
+        "value": "Na 136 mEq/L, K 4.1 mEq/L"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Vitamin C (Pediatric)",
+        "value": "1.4 mg/dL"
+      },
+      {
+        "id": "2",
+        "name": "Zinc Bio-Availability",
+        "value": "75 mcg/dL"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Albuterol Nebulizer",
+        "value": "1.25mg PRN wheeze"
+      },
+      {
+        "id": "2",
+        "name": "Oral Rehydration Solution (ORS)",
+        "value": "50mL/kg over 4 hours"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2026-03-10T08:00:00Z",
+        "type": "hr",
+        "value": "120"
+      },
+      {
+        "timestamp": "2026-03-11T08:00:00Z",
+        "type": "hr",
+        "value": "115"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "hr",
+        "value": "112"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "bp",
+        "value": "95/60"
+      }
+    ],
     "issues": {
       "chest": [
         {
@@ -854,29 +1011,6 @@
               "type": "Gastrointestinal",
               "verified": true,
               "timeline": "Acute"
-            },
-            {
-              "name": "Dry mouth & increased thirst",
-              "type": "Gastrointestinal",
-              "verified": true,
-              "timeline": "Acute"
-            }
-          ]
-        }
-      ],
-      "full_body": [
-        {
-          "id": "full_body",
-          "noteId": "note_p006_full_1",
-          "name": "Preterm History & Growth Monitoring",
-          "painLevel": 0,
-          "description": "Born prematurely at 32 weeks. Currently tracking steadily along the 25th percentile curves for height and weight. Motor milestones intact.",
-          "symptoms": [
-            {
-              "name": "History of preterm delivery complications",
-              "type": "Neonatal",
-              "verified": true,
-              "timeline": "Chronic"
             }
           ]
         }
@@ -885,35 +1019,30 @@
     "history": [
       {
         "type": "AnalysisRun",
-        "date": "2026.06.25",
-        "summary": "Pediatric Sentinel Health and Development Assessment",
-        "report": {
-          "Summary Overview": "### Clinical Assessment\nPediatric Sentinel is a 4-year-old male recovering from childhood diarrhoeal illness and post-viral bronchial hyperreactivity (asthma flare). Born prematurely at 32 weeks, he requires careful respiratory support, rapid oral rehydration therapy, zinc supplementation to shorten diarrhoeal course, and gut flora rebuilding.\n\n### Priority List\n*   **Rehydration & Electrolyte Restoration**: Replace fluid losses and support gastrointestinal mucosal recovery.\n*   **Respiratory Optimization**: Calm reactive airways and reduce wheezing episodes.\n*   **Nutritional Optimization**: Replete micronutrients (especially Zinc and Vitamin A) essential for childhood mucosal immunity.\n\n### Plan of Care\n*   Implement strict Oral Rehydration Therapy (ORT) protocol with electrolyte solution.\n*   Administer Zinc drops daily for 10-14 days to reduce diarrhoeal recurrence.\n*   Utilize cool-mist humidifier at night; administer albuterol as prescribed for wheezing.\n\n### Goals\n*   **Short-term (48 hours)**: Complete resolution of dehydration signs (moist mucous membranes, normal urine output).\n*   **Long-term (1 month)**: No expiratory wheezing at rest; return to solid baseline diet with age-appropriate weight progression.",
-          "Functional Protocols": "### Immediate Actions (To start within 24 hours)\n*   Give 50-100 mL of Oral Rehydration Solution (ORS) after each loose stool.\n*   Initiate pediatric zinc supplementation.\n*   Keep child upright for 30 minutes after eating to minimize cough triggers.\n\n### Foundation (Diet & Lifestyle)\n*   **Diet**: Simple, nutrient-dense, easily digestible foods (bananas, rice, applesauce, toast, soft broths). Avoid high-sugar juices that worsen diarrhea.\n*   **Environment**: Dust-free, allergen-free bedroom environment; enforce hands-off smoke exposure policies.\n*   **Sleep**: Humidified air at night to keep bronchial secretions thin.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Oral Rehydration Salts (ORS) | As needed | Throughout day | Rehydrate and replace lost electrolytes |\n| Zinc Sulfate | 20mg | Morning | WHO guideline for under-5 diarrhoeal recovery |\n| Lactobacillus rhamnosus GG | 5 billion CFU | Afternoon | Re-establish beneficial gut bacteria post-enteritis |\n| Vitamin A | 100,000 IU (one-time dose) | AM | Support mucosal epithelial barrier integrity |",
-          "Nutrition": "### Biochemical Assessment\nDiarrhoeal losses deplete vital trace minerals and dehydrate epithelial tissue. Restoring tight junctions in both the gut and respiratory tract is paramount.\n\n### Nutrition Targets\n*   **Epithelial Recovery**: Vitamin A and Zinc are core co-factors in epithelial tissue synthesis.\n*   **Microbiome Stabilization**: Probiotics reduce duration of acute infectious diarrhea.\n*   **Osmotic Balance**: Low-sugar liquids to prevent osmotic pull into the colon.\n\n### Dietary Adjustments\nOffer frequent small sips of broth, coconut water, or ORS. Transition to steamed carrots, pureed squash, and oatmeal as tolerance improves.",
-          "Monitoring & Follow-up": "### Immediate Next Steps (0-7 days)\n1.  Assess hydration status every 4 hours (urine output, tears when crying, skin turgor).\n2.  Log stool frequency and consistency.\n3.  Monitor respiratory rate during sleep (target < 30 breaths/minute).\n\n### Ongoing (Month 1)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Hydration State | Moist mouth, tears present | Daily | No wet diapers/urination for 8+ hours |\n| Respiratory Rate | < 28 breaths/min at rest | Daily | Retractions (chest pulling in) or tachypnea |\n| Diarrheal Stools | 0-1 per day | Daily | Blood in stool or fever > 102°F |"
-        }
-      },
-      {
-        "type": "Visit",
         "date": "2026.03.12",
-        "summary": "Evaluation of pediatric mortality risks. Addressed childhood bronchial hyperreactivity and diarrhoeal enteritis recovery.",
-        "state": {
-          "patientGoals": "Evaluate global pediatric mortality risks (Under 5).",
-          "vitals": {
-            "bp": "95/60",
-            "hr": "110",
-            "temp": "99.1°F",
-            "spO2": "96%",
-            "weight": "35 lbs",
-            "height": "3'4\""
-          },
-          "issues": {}
+        "summary": "Comprehensive Clinical Analysis",
+        "report": {
+          "Summary Overview": "### Clinical Assessment\nPediatric Sentinel is a 4-year-old male recovering from rotavirus gastroenteritis with post-viral airway hyperreactivity. Primary focus is oral rehydration therapy (ORS) and respiratory monitoring.\n\n### Priority List\n- **Fluid Balance**: Electrolyte restoration via WHO ORS.\n- **Airway Support**: PRN albuterol for mild wheezing.\n- **PhysioNet 2026 Telemetry**: Pediatric acoustic respiratory audio & pulse oximetry.\n\n### Goals\n- **Short-term**: Normal skin turgor and moist mucous membranes within 24 hours.\n- **Long-term**: Zero asthma exacerbations requiring ED visit.",
+          "Functional Protocols": "### Immediate Actions (Within 24 hours)\n- Continue WHO Oral Rehydration Salts (ORS) solution.\n- Cool-mist humidifier in bedroom during night sleep.",
+          "Nutrition": "### Pediatric Recovery Diet\n- BRAT diet transition (Bananas, Rice, Applesauce, Toast).\n- Probiotic (Lactobacillus rhamnosus GG) 5B CFU daily to restore intestinal microbiome.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Track wet diapers / voiding frequency (target: >= 4/day).\n- Re-evaluate respiratory rate and SpO2 in 48 hours.",
+          "Patient Education": "### Parent Guidance\n- Continue small, frequent sips of ORS every 5-10 minutes.\n- Seek urgent care if child becomes lethargic or develops high fever (> 102°F).",
+          "Precision Nutrients": "### Pediatric Orthomolecular Matrix\n- **Zinc Sulfate**: 10mg daily x 14 days (reduces diarrhea duration).\n- **Probiotic GG**: 1 cap dissolved in water daily.\n- **Vitamin D3 Drops**: 400 IU daily.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Pediatric Autonomic Airway Reactivity & Dehydration Challenge\n- **Heart Rate**: 112 bpm (Appropriate for age 4)\n- **Respiratory Rate**: 24 breaths/min\n- **SpO2**: 96%\n- **Acoustic Cough Count**: 4 coughs / hour"
         }
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [
+      {
+        "id": "scan_p006_1",
+        "title": "Pediatric Chest X-Ray",
+        "type": "X-Ray",
+        "date": "2026.03.10",
+        "description": "Mild peribronchial cuffing; no focal consolidation or pneumothorax.",
+        "status": "Normal"
+      }
+    ]
   },
   {
     "id": "p007",
@@ -924,7 +1053,8 @@
     "preexistingConditions": [
       "Gestational Hypertension",
       "Primigravida (32 Weeks Gestation)",
-      "Iron-Deficiency Anemia of Pregnancy"
+      "Iron-Deficiency Anemia of Pregnancy",
+      "PhysioNet 2026 Challenge: Maternal-Fetal Hemodynamic & Uterine Artery Doppler Challenge"
     ],
     "patientGoals": "Optimize blood pressure, correct anemia, track fetal movements, and establish a postpartum hemorrhage prevention plan.",
     "vitals": {
@@ -933,8 +1063,80 @@
       "temp": "98.8°F",
       "spO2": "98%",
       "weight": "165 lbs",
-      "height": "5'6\""
+      "height": "5'6\"",
+      "vitD3": "28 ng/mL",
+      "magnesium": "1.8 mg/dL",
+      "b12": "450 pg/mL",
+      "zinc": "70 mcg/dL"
     },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "Hemoglobin",
+        "value": "9.8 g/dL (Low)"
+      },
+      {
+        "id": "2",
+        "name": "Serum Ferritin",
+        "value": "12 ng/mL (Deficient)"
+      },
+      {
+        "id": "3",
+        "name": "Urine Protein/Creatinine Ratio",
+        "value": "0.18 (Normal, < 0.3)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Vitamin C",
+        "value": "1.3 mg/dL"
+      },
+      {
+        "id": "2",
+        "name": "Elemental Iron Bio-Availability",
+        "value": "65mg elemental"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Ferrous Bisglycinate",
+        "value": "65mg elemental Iron BID with Vitamin C"
+      },
+      {
+        "id": "2",
+        "name": "Prenatal Multivitamin",
+        "value": "1 tablet Daily"
+      },
+      {
+        "id": "3",
+        "name": "Labetalol",
+        "value": "100mg BID PRN BP > 140/90"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2026-03-01T08:00:00Z",
+        "type": "hr",
+        "value": "94"
+      },
+      {
+        "timestamp": "2026-03-06T08:00:00Z",
+        "type": "hr",
+        "value": "92"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "hr",
+        "value": "90"
+      },
+      {
+        "timestamp": "2026-03-12T08:00:00Z",
+        "type": "bp",
+        "value": "135/85"
+      }
+    ],
     "issues": {
       "pelvis": [
         {
@@ -972,10 +1174,171 @@
               "type": "Hematologic",
               "verified": true,
               "timeline": "Chronic"
-            },
+            }
+          ]
+        }
+      ]
+    },
+    "history": [
+      {
+        "type": "AnalysisRun",
+        "date": "2026.03.12",
+        "summary": "Comprehensive Clinical Analysis",
+        "report": {
+          "Summary Overview": "### Clinical Assessment\nMaternal Sentinel is a 28-year-old primigravida at 32 weeks gestation with gestational hypertension and iron deficiency anemia. Primary clinical focus is pre-eclampsia surveillance and optimization of maternal-fetal oxygen transport.\n\n### Priority List\n- **Pre-eclampsia Surveillance**: Daily BP and urine protein screening.\n- **Hematologic Restoration**: High bioavailability iron bisglycinate.\n- **PhysioNet 2026 Telemetry**: Uterine artery Doppler flow and fetal HR variability.\n\n### Goals\n- **Short-term**: Hemoglobin > 11.0 g/dL by week 36; BP < 135/85.\n- **Long-term**: Full-term delivery (>= 39 weeks) without pre-eclampsia escalation.",
+          "Functional Protocols": "### Immediate Actions (Within 48 hours)\n- Daily fetal kick count tracking (target: >= 10 movements in 2 hours).\n- Left lateral recumbent rest position to optimize placental perfusion.",
+          "Nutrition": "### Gestational Nutrition Protocol\n- Iron-rich foods (grass-fed beef, lentils, spinach) paired with citrus Vitamin C.\n- Hydration > 3L filtered water daily to maintain amniotic volume.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Bi-weekly non-stress tests (NST) and fetal growth biophysical profiles.\n- Weekly uACR and platelet counts.\n- PhysioNet continuous maternal ECG & uterine tone telemetry.",
+          "Patient Education": "### Patient Guidance\n- Immediately contact labor triage if experiencing severe headaches, visual scotomas, or upper right abdominal pain.",
+          "Precision Nutrients": "### Orthomolecular Matrix\n- **Ferrous Bisglycinate**: 65mg with 500mg Vitamin C.\n- **Choline**: 450mg daily (fetal neurodevelopment).\n- **DHA**: 300mg daily (fetal brain lipid accretion).",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Maternal-Fetal Hemodynamic & Uterine Artery Doppler Challenge\n- **Maternal HR**: 90 bpm\n- **Fetal Heart Rate Baseline**: 142 bpm (Normal reactive)\n- **Uterine Artery Pulsatility Index (PI)**: 0.95 (Normal resistance)\n- **Accelerations**: 2 in 20 minutes (Category I Tracing)"
+        }
+      }
+    ],
+    "bookmarks": [],
+    "scans": [
+      {
+        "id": "scan_p007_1",
+        "title": "Obstetric Ultrasound & Doppler Biometry",
+        "type": "Ultrasound",
+        "date": "2026.03.05",
+        "description": "Estimated fetal weight 4th percentile for 32 weeks (1850g). Amniotic fluid index 14 cm (Normal).",
+        "status": "Reviewed"
+      }
+    ]
+  },
+  {
+    "id": "p008",
+    "name": "Linus P (Orthomolecular Profile)",
+    "age": 93,
+    "gender": "Male",
+    "lastVisit": "2024.12.10",
+    "preexistingConditions": [
+      "Prostate Cancer (Sustained Remission)",
+      "Coronary Artery Disease (Pauling Protocol Managed)",
+      "Macular Degeneration",
+      "PhysioNet 2026 Challenge: Orthomolecular High-Dose Ascorbate & Lp(a) Binding Challenge"
+    ],
+    "patientGoals": "Evaluate high-dose ascorbic acid therapy, Lp(a) binding neutralization, and cellular longevity.",
+    "vitals": {
+      "bp": "125/78",
+      "hr": "68",
+      "temp": "98.2°F",
+      "spO2": "98%",
+      "weight": "165 lbs",
+      "height": "5'10\"",
+      "vitD3": "85 ng/mL (Optimal)",
+      "magnesium": "2.8 mg/dL (Optimal)",
+      "b12": "1200 pg/mL (Optimal)",
+      "zinc": "120 mcg/dL (Optimal)"
+    },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "Malondialdehyde (MDA)",
+        "value": "0.8 μmol/L (Ultra-Low)"
+      },
+      {
+        "id": "2",
+        "name": "Lp(a) Lipoprotein",
+        "value": "14 mg/dL (Controlled)"
+      },
+      {
+        "id": "3",
+        "name": "hsCRP",
+        "value": "0.4 mg/L (Minimal)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Plasma Ascorbic Acid (Vit C)",
+        "value": "18.5 mg/dL (High-Therapeutic)"
+      },
+      {
+        "id": "2",
+        "name": "Glutathione (GSH)",
+        "value": "3.2 μmol/g Hb (Optimal)"
+      },
+      {
+        "id": "3",
+        "name": "CoQ10 (Ubiquinol)",
+        "value": "2.8 μg/mL (Optimal)"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Ascorbic Acid (Vitamin C)",
+        "value": "12g Daily (Divided Doses)"
+      },
+      {
+        "id": "2",
+        "name": "L-Lysine",
+        "value": "6g Daily (Lp(a) Binding Inhibitor)"
+      },
+      {
+        "id": "3",
+        "name": "L-Proline",
+        "value": "2g Daily (Atheroma Support)"
+      },
+      {
+        "id": "4",
+        "name": "Alpha-Tocopherol (Vit E)",
+        "value": "800 IU Daily"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2024-11-01T08:00:00Z",
+        "type": "hr",
+        "value": "70"
+      },
+      {
+        "timestamp": "2024-11-20T08:00:00Z",
+        "type": "hr",
+        "value": "69"
+      },
+      {
+        "timestamp": "2024-12-10T08:00:00Z",
+        "type": "hr",
+        "value": "68"
+      },
+      {
+        "timestamp": "2024-12-10T08:00:00Z",
+        "type": "bp",
+        "value": "125/78"
+      }
+    ],
+    "issues": {
+      "chest": [
+        {
+          "id": "chest",
+          "noteId": "note_p008_chest_1",
+          "name": "Cardiovascular & Endothelial Integrity",
+          "painLevel": 1,
+          "description": "Mild angina on heavy exertion. Controlled via Pauling Lp(a) binding inhibition protocol.",
+          "symptoms": [
             {
-              "name": "Orthostatic lightheadedness",
+              "name": "Exertional tightness",
               "type": "Cardiovascular",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ],
+      "pelvis": [
+        {
+          "id": "pelvis",
+          "noteId": "note_p008_pelvis_1",
+          "name": "Prostate & Cellular Health",
+          "painLevel": 2,
+          "description": "PSA stable at 4.2 ng/mL. High-dose antioxidant status maintaining cellular defense.",
+          "symptoms": [
+            {
+              "name": "Prostate hypertrophy",
+              "type": "Oncologic",
               "verified": true,
               "timeline": "Chronic"
             }
@@ -986,282 +1349,30 @@
     "history": [
       {
         "type": "AnalysisRun",
-        "date": "2026.06.25",
-        "summary": "Maternal Sentinel Third-Trimester Risk Assessment",
-        "report": {
-          "Summary Overview": "### Clinical Assessment\nMaternal Sentinel is a 28-year-old female at 32 weeks gestation presenting with gestational hypertension and iron deficiency anemia. The main clinical priorities are to control blood pressure to prevent progression to pre-eclampsia/eclampsia, correct maternal iron levels to prevent postpartum hemorrhage complications, and optimize fetal developmental nutrients.\n\n### Priority List\n*   **Pre-eclampsia Surveillance**: Monitor blood pressure and scan for signs like severe headaches, visual disturbances, or right upper quadrant pain.\n*   **Hematologic Recovery**: Replete iron reserves safely to optimize oxygen delivery and build a buffer against delivery blood loss.\n*   **Vascular & Endothelial Health**: Maintain maternal blood vessel elasticity and support uterine blood flow.\n\n### Plan of Care\n*   Implement low-stress lifestyle with daily rest periods; monitor blood pressure twice daily.\n*   Recommend gentle prenatal yoga and pelvic floor preparation exercises.\n*   Optimize iron intake through dietary and supplemental routes; take iron with Vitamin C to enhance absorption.\n\n### Goals\n*   **Short-term (2 weeks)**: Maintain BP below 140/90 mmHg; increase hemoglobin above 10.5 g/dL.\n*   **Long-term (Birth)**: Safe delivery at term (39-40 weeks) with minimal postpartum blood loss and healthy birth weight.",
-          "Functional Protocols": "### Immediate Actions (To start within 24 hours)\n*   Establish a home BP logging routine (morning and afternoon).\n*   Verify fetal movement count daily (10 movements within 2 hours).\n*   Begin prenatal-safe iron supplementation with Vitamin C.\n\n### Foundation (Diet & Lifestyle)\n*   **Diet**: Mediterranean-style diet high in organic iron sources (spinach, lentils, clean grass-fed beef in moderation) paired with citrus fruits. Ensure adequate protein (1.2g/kg) and hydration (80-100 oz of water daily).\n*   **Activity**: Daily 15-20 minute gentle walk; avoid overheating or intense exercises.\n*   **Rest**: Sleep on the left side to maximize uterine blood flow and kidney filtration.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Iron Bisglycinate | 25mg | PM, empty stomach | Highly absorbable iron, gentle on stomach |\n| Methylated Prenatal Vitamin | 1 daily | With breakfast | Comprehensive fetal co-factors |\n| Magnesium Glycinate | 300mg | Bedtime | Support vascular relaxation and reduce leg cramps |\n| Vitamin C | 500mg | PM, with Iron | Optimize non-heme iron absorption |",
-          "Nutrition": "### Biochemical Assessment\nGestational physiology requires a significant increase in red blood cell volume. Lack of adequate iron reserves leads to tissue hypoxia and maternal exhaustion, while endothelial stress raises pre-eclampsia risk.\n\n### Nutrition Targets\n*   **Erythropoiesis Support**: Iron, Folate, and B12 are critical co-factors for RBC production.\n*   **Vascular Smooth Muscle Support**: Magnesium, Calcium, and Potassium support proper vascular tone.\n*   **Hydration Density**: Electrolyte balance prevents rapid blood volume contractions.\n\n### Dietary Adjustments\nEmphasize iron-rich plant foods combined with ascorbic acid. Limit simple sugars and processed foods that trigger systemic vascular inflammation.",
-          "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Log daily fetal kick counts.\n2.  Log daily blood pressures.\n3.  Follow up in 2 weeks for complete blood count (CBC) and urine protein check.\n\n### Ongoing (Month 8 to Delivery)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Blood Pressure | < 140/90 | Twice daily | BP >= 140/90 or headache/vision change |\n| Fetal Kicks | >= 10 in 2 hrs | Daily | < 10 kicks in 2 hours (go to triage) |\n| Urine Protein | Negative | Every 2 weeks | Traces or +1 protein |"
-        }
-      },
-      {
-        "type": "Visit",
-        "date": "2026.03.12",
-        "summary": "Third-trimester evaluation of maternal health. Identified borderline gestational hypertension and moderate iron deficiency anemia. Fetal movements normal.",
-        "state": {
-          "patientGoals": "Evaluate global maternal mortality risks.",
-          "vitals": {
-            "bp": "135/85",
-            "hr": "90",
-            "temp": "98.8°F",
-            "spO2": "98%",
-            "weight": "165 lbs",
-            "height": "5'6\""
-          },
-          "issues": {}
-        }
-      }
-    ],
-    "bookmarks": [],
-    "scans": []
-  },
-  {
-    "id": "p008",
-    "name": "Linus P (Orthomolecular Profile)",
-    "age": 93,
-    "gender": "Male",
-    "lastVisit": "2024.12.10",
-    "preexistingConditions": [
-      "Prostate Cancer",
-      "Coronary Artery Disease",
-      "Macular Degeneration"
-    ],
-    "patientGoals": "Evaluate high-dose ascorbic acid therapy and Lp(a) management.",
-    "vitals": {
-      "bp": "125/78",
-      "hr": "68",
-      "temp": "98.2°F",
-      "spO2": "98%",
-      "weight": "165 lbs",
-      "height": "5'10\"",
-      "vitC": "10000",
-      "vitD3": "85",
-      "magnesium": "6.5",
-      "zinc": "120",
-      "b12": "1200"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Oxidative Stress",
-        "value": "2.5"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Antioxidant Status",
-        "value": "9.2"
-      }
-    ],
-    "medications": [],
-    "issues": {
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_p008_chest_1",
-          "name": "Cardiovascular",
-          "painLevel": 1,
-          "description": "Mild angina on heavy exertion. Managing with Pauling therapy.",
-          "symptoms": []
-        }
-      ],
-      "pelvis": [
-        {
-          "id": "pelvis",
-          "noteId": "note_p008_pelvis_1",
-          "name": "Prostate",
-          "painLevel": 2,
-          "description": "PSA stable at 4.2. Monitoring oxidative stress markers.",
-          "symptoms": []
-        }
-      ]
-    },
-    "history": [
-      {
-        "type": "AnalysisRun",
-        "date": "2026.06.25",
+        "date": "2024.12.10",
         "summary": "Comprehensive Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nLinus P (Orthomolecular Profile) presents with a complex clinical picture primarily characterized by Cardiovascular, Prostate. Functional status remains stable, though specific risk factors require targeted intervention to prevent disease progression.\n\n### Priority List\n*   **Metabolic Optimization**: Immediate support needed for ongoing systemic stress.\n*   **Inflammatory Control**: Address underlying drivers of chronic inflammation.\n*   **Symptom Management**: Provide relief for primary presenting complaints.\n\n### Plan of Care\n*   Initiate targeted anti-inflammatory protocol.\n*   Begin functional medicine assessment for underlying root causes.\n*   Schedule follow-up to re-evaluate response to initial interventions.\n\n### Goals\n*   **Short-term (2 weeks)**: 15% reduction in primary symptom severity.\n*   **Long-term (3 months)**: Stabilization of key biomarkers and improved quality of life.\n\n### References\n*   **Smith, J. et al.** (2025). *Integrative Approaches to Chronic Disease*. Journal of Functional Medicine. [DOI:10.1234/jfm.2025.001](https://doi.org/10.1234/jfm.2025.001). Peer-Reviewed.",
-          "Functional Protocols": "### Immediate Actions (To start within 72 hours)\n*   Begin comprehensive elimination diet to identify potential food triggers.\n*   Implement strict sleep hygiene protocol (7-8 hours uninterrupted).\n\n### Foundation (Diet & Lifestyle)\n*   Transition to a Mediterranean-style, whole-foods diet.\n*   Engage in 150 minutes of moderate-intensity zone 2 cardio weekly.\n*   Incorporate daily 10-minute mindfulness or breathwork practice.\n\n### Supplementation\n| Intervention | Dose | Timing | Rationale |\n| :--- | :--- | :--- | :--- |\n| Omega-3 EPA/DHA | 2000mg | With meals | Anti-inflammatory support |\n| Vitamin D3 + K2 | 5000 IU | AM | Immune modulation |\n| Magnesium Glycinate | 400mg | Before bed | Nervous system relaxation |\n\n### Functional Protocols\nA comprehensive **HPA Axis Support** protocol is recommended to address systemic fatigue and optimize stress resilience. This includes targeted adaptogens and circadian rhythm realignment.",
-          "Nutrition": "### Biochemical Assessment\nAnalysis of Linus's nutritional profile suggests a high oxidative burden and potential micronutrient insufficiencies. Markers indicate a need for enhanced cellular support and targeted antioxidant therapy.\n\n### Nutrition Targets\n*   **Oxidative Stress Reduction**: High priority due to systemic inflammatory presentation.\n*   **Mitochondrial Support**: Essential for resolving ongoing energy deficits.\n*   **Methylation Pathway Optimization**: Suggested by historical clinical context.\n\n### Nutritional Interventions\n| Nutrient/Compound | Therapeutic Dose | Delivery Method | Targeted Pathway |\n| :--- | :--- | :--- | :--- |\n| Liposomal Glutathione | 500mg | Oral | Phase II Detoxification |\n| CoQ10 (Ubiquinol) | 200mg | Oral | Electron Transport Chain |\n| B-Complex (Methylated) | 1 cap | Oral | One-Carbon Metabolism |\n\n### Dietary Adjustments\nIncrease intake of sulfur-rich cruciferous vegetables (broccoli sprouts, kale) to naturally support glutathione synthesis. Focus on deep-pigmented polyphenols (blueberries, pomegranate) for antioxidant defense.",
-          "Monitoring & Follow-up": "### Immediate Next Steps (0-30 days)\n1.  Complete baseline advanced functional laboratory panels.\n2.  Initiate foundational diet and lifestyle modifications.\n3.  Two-week check-in to assess tolerance to new interventions and supplement protocols.\n\n### Ongoing (Month 1-3)\n| Parameter | Target | Frequency | Escalation Trigger |\n| :--- | :--- | :--- | :--- |\n| Primary Symptom Severity | < 4/10 | Weekly | Score > 7/10 for 3 consecutive days |\n| Sleep Duration | > 7 hours | Daily | < 5 hours for 2+ nights |\n| Energy Levels | > 6/10 | Daily | Severe crash preventing daily activities |\n\n### Long-term Trajectory (6+ months)\nExpect gradual but sustained improvement across major functional domains. Linus should reach a new baseline of health resilience, requiring only periodic maintenance check-ins and minor protocol adjustments based on seasonal or stress-related fluctuations.",
-          "Patient Education": "### Understanding Your Condition\nYour current symptoms are your body's way of signaling that its internal systems are out of balance. We are looking at a combination of factors including inflammation and metabolic stress that are contributing to how you feel right now.\n\n### What Was Found\n*   **Systemic Stress**: Your body is working harder than usual to maintain its normal functions.\n*   **Nutrient Needs**: There are specific areas where your cells could use more support to heal and repair.\n*   **Imbalanced Systems**: Some of your body's communication pathways need to be gently recalibrated.\n\n### Current Plan\n*   **Targeted Nutrition**: Providing the exact building blocks your body is missing.\n*   **Lifestyle Adjustments**: Making small, manageable changes to your daily routine that yield big results over time.\n*   **Careful Monitoring**: We will track your progress closely to ensure the plan is working for you.\n\n### Important Notes\n> 💡 Please reach out to your care team if you experience any unexpected reactions to the new supplements or if your primary symptoms significantly worsen. Stay hydrated and prioritize rest as you begin this new protocol.",
-          "Precision Nutrients": "### Biochemical & Biomarker Matrix\nLinus's clinical markers suggest mild-to-moderate nutrient depletions corresponding to high-demand physiological stress and chronic condition burdens.\n\n| Nutrient/Biomarker | Level | Pathway / Target |\n| :--- | :--- | :--- |\n| Vitamin D3 | Sub-optimal | Immunomodulation / Serotonin |\n| Magnesium | Low-normal | Muscle / Sleep / Nervous System |\n| B-Complex | Sub-optimal | Methylation / Energy Co-factors |\n\n### Detected Deficiencies\n- **Intracellular Magnesium (Sub-optimal)**: Contributes to muscular tension, elevated vascular tone, and sleep disruptions.\n- **Vitamin D3 (Deficient/Sub-optimal)**: Common driver of compromised immune tolerance and lower neuroplastic resilience.\n\n### Orthomolecular Protocol\n- **Magnesium Glycinate**: 400mg before bed.\n- **Vitamin D3 + K2**: 5000 IU daily with breakfast.\n- **Methylated B12/Folate**: 1 capsule AM."
-        }
-      },
-      {
-        "type": "ChartArchived",
-        "date": "2024.10.10",
-        "summary": "Initiated Pauling Therapy (Vit C + Lysine + Proline).",
-        "state": {
-          "patientGoals": "Reduce lipoprotein(a) levels and arterial plaque.",
-          "vitals": {
-            "bp": "135/85",
-            "hr": "72",
-            "temp": "98.4°F",
-            "spO2": "97%",
-            "weight": "168 lbs",
-            "height": "5'10\"",
-            "vitC": "3000",
-            "vitD3": "45",
-            "magnesium": "4.2",
-            "zinc": "85",
-            "b12": "600"
-          },
-          "oxidativeStressMarkers": [
-            {
-              "id": "1",
-              "name": "Oxidative Stress",
-              "value": "6.8"
-            }
-          ],
-          "antioxidantSources": [
-            {
-              "id": "1",
-              "name": "Antioxidant Status",
-              "value": "4.5"
-            }
-          ],
-          "medications": [],
-          "dynamicNutrients": [
-            {
-              "id": "1",
-              "name": "L-Lysine",
-              "value": "3000 mg"
-            },
-            {
-              "id": "2",
-              "name": "L-Proline",
-              "value": "1500 mg"
-            },
-            {
-              "id": "3",
-              "name": "Lipoprotein(a)",
-              "value": "150 mg/dL"
-            }
-          ],
-          "issues": {}
-        }
-      },
-      {
-        "type": "ChartArchived",
-        "date": "2024.11.10",
-        "summary": "One month follow-up on Pauling Therapy.",
-        "state": {
-          "patientGoals": "Titrating dose to bowel tolerance.",
-          "vitals": {
-            "bp": "130/80",
-            "hr": "70",
-            "temp": "98.3°F",
-            "spO2": "98%",
-            "weight": "166 lbs",
-            "height": "5'10\"",
-            "vitC": "6000",
-            "vitD3": "65",
-            "magnesium": "5.5",
-            "zinc": "105",
-            "b12": "900"
-          },
-          "oxidativeStressMarkers": [
-            {
-              "id": "1",
-              "name": "Oxidative Stress",
-              "value": "4.2"
-            }
-          ],
-          "antioxidantSources": [
-            {
-              "id": "1",
-              "name": "Antioxidant Status",
-              "value": "7.1"
-            }
-          ],
-          "medications": [],
-          "dynamicNutrients": [
-            {
-              "id": "1",
-              "name": "L-Lysine",
-              "value": "5000 mg"
-            },
-            {
-              "id": "2",
-              "name": "L-Proline",
-              "value": "2500 mg"
-            },
-            {
-              "id": "3",
-              "name": "Lipoprotein(a)",
-              "value": "95 mg/dL"
-            }
-          ],
-          "issues": {}
-        }
-      },
-      {
-        "type": "Visit",
-        "date": "2024.12.10",
-        "summary": "Two month follow-up. Symptoms improving.",
-        "state": {
-          "patientGoals": "Evaluate high-dose ascorbic acid therapy and Lp(a) management.",
-          "vitals": {
-            "bp": "125/78",
-            "hr": "68",
-            "temp": "98.2°F",
-            "spO2": "98%",
-            "weight": "165 lbs",
-            "height": "5'10\"",
-            "vitC": "10000",
-            "vitD3": "85",
-            "magnesium": "6.5",
-            "zinc": "120",
-            "b12": "1200"
-          },
-          "oxidativeStressMarkers": [
-            {
-              "id": "1",
-              "name": "Oxidative Stress",
-              "value": "2.5"
-            }
-          ],
-          "antioxidantSources": [
-            {
-              "id": "1",
-              "name": "Antioxidant Status",
-              "value": "9.2"
-            }
-          ],
-          "medications": [],
-          "dynamicNutrients": [
-            {
-              "id": "1",
-              "name": "L-Lysine",
-              "value": "6000 mg"
-            },
-            {
-              "id": "2",
-              "name": "L-Proline",
-              "value": "3000 mg"
-            },
-            {
-              "id": "3",
-              "name": "Lipoprotein(a)",
-              "value": "30 mg/dL"
-            },
-            {
-              "id": "4",
-              "name": "CoQ10",
-              "value": "400 mg"
-            }
-          ],
-          "issues": {}
+          "Summary Overview": "### Clinical Assessment\nLinus Pauling profile demonstrates optimal orthomolecular saturation. High-dose ascorbic acid (12g/day) combined with L-lysine and L-proline effectively neutralizes Lp(a) arterial binding sites.\n\n### Priority List\n- **Lp(a) Binding Inhibition**: Prevent atherosclerotic plaque adhesion.\n- **Endothelial Matrix Strength**: Collagen synthesis via ascorbate-proline hydroxylase.\n- **PhysioNet 2026 Telemetry**: High-resolution arterial elasticity waveform monitoring.\n\n### Goals\n- **Short-term**: Maintain plasma ascorbate > 15 mg/dL; Lp(a) < 20 mg/dL.\n- **Long-term**: Zero ischemic cardiac events; optimal neuro-visual longevity.",
+          "Functional Protocols": "### Immediate Actions (Within 24 hours)\n- Continue divided-dose ascorbic acid protocol with meals.\n- Morning and evening L-lysine + L-proline powder infusion.",
+          "Nutrition": "### Orthomolecular High-Density Nutrition\n- High antioxidant plant polyphenol diet (citrus, berries, dark greens).\n- Zero refined sugars to prevent competitive inhibition of GLUT1 ascorbate transport.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Monthly plasma ascorbate, Lp(a), and serum ferritin panels.\n- Bi-weekly renal stone risk screening (urine oxalate monitoring).\n- PhysioNet continuous arterial compliance telemetry.",
+          "Patient Education": "### Patient Guidance\n- Maintain adequate fluid intake (2.5L/day) to support renal clearance during high-dose ascorbate therapy.",
+          "Precision Nutrients": "### Orthomolecular Matrix\n- **Ascorbic Acid**: 12,000mg Daily.\n- **L-Lysine**: 6,000mg Daily.\n- **L-Proline**: 2,000mg Daily.\n- **CoQ10 (Ubiquinol)**: 300mg Daily.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Orthomolecular High-Dose Ascorbate & Lp(a) Binding Challenge\n- **Heart Rate**: 68 bpm\n- **QRS Interval**: 88 ms\n- **ST Segment**: Neutral (+0.01 mV)\n- **Arterial Stiffness Index**: 6.2 m/s (Optimal youthful elasticity)"
         }
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [
+      {
+        "id": "scan_p008_1",
+        "title": "Coronary Artery Calcium (CAC) Scan",
+        "type": "CT Scan",
+        "date": "2024.11.15",
+        "description": "CAC score stable; calcified plaque display zero progression compared to 2022 baseline.",
+        "status": "Reviewed"
+      }
+    ]
   },
   {
     "id": "p_mara_santos",
@@ -1570,7 +1681,8 @@
       "Severe streetcar accident trauma (1925)",
       "Multiple spinal fractures & pelvic fractures",
       "Right foot amputation (1953)",
-      "Chronic neuropathic pain"
+      "Chronic neuropathic pain",
+      "PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge"
     ],
     "patientGoals": "Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.",
     "vitals": {
@@ -1579,8 +1691,70 @@
       "temp": "98.4°F",
       "spO2": "97%",
       "weight": "110 lbs",
-      "height": "5'3\""
+      "height": "5'3\"",
+      "vitD3": "18 ng/mL (Deficient)",
+      "magnesium": "1.6 mg/dL (Low)",
+      "b12": "320 pg/mL",
+      "zinc": "62 mcg/dL"
     },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "hsCRP",
+        "value": "8.4 mg/L (Severe Inflammation)"
+      },
+      {
+        "id": "2",
+        "name": "Substance P",
+        "value": "220 pg/mL (Elevated Nociception)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "0.9 μmol/g Hb (Low)"
+      },
+      {
+        "id": "2",
+        "name": "Vitamin C",
+        "value": "0.8 mg/dL"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Demerol (Meperidine)",
+        "value": "50mg PRN Severe Pain"
+      },
+      {
+        "id": "2",
+        "name": "Morphine Sulfate",
+        "value": "10mg SC PRN"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "1954-07-01T08:00:00Z",
+        "type": "hr",
+        "value": "88"
+      },
+      {
+        "timestamp": "1954-07-10T08:00:00Z",
+        "type": "hr",
+        "value": "84"
+      },
+      {
+        "timestamp": "1954-07-13T08:00:00Z",
+        "type": "hr",
+        "value": "82"
+      },
+      {
+        "timestamp": "1954-07-13T08:00:00Z",
+        "type": "bp",
+        "value": "115/75"
+      }
+    ],
     "issues": {
       "spine": [
         {
@@ -1625,24 +1799,31 @@
     },
     "history": [
       {
-        "type": "NoteCreated",
-        "date": "1925.09.17",
-        "summary": "Survived catastrophic streetcar collision resulting in an iron handrail piercing her pelvis and multiple spinal/foot fractures.",
-        "partId": "spine",
-        "noteId": "note_frida_spine_1"
-      },
-      {
         "type": "AnalysisRun",
         "date": "1954.07.13",
-        "summary": "Historical Clinical Analysis",
+        "summary": "Comprehensive Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nFrida Kahlo presents with complex, refractory chronic neuropathic pain secondary to childhood polio and subsequent high-impact orthopedic trauma. She is post-amputation of the right lower extremity, experiencing severe phantom limb pain, spinal subluxation/pain, and dependency on strong analgesics (Demerol, alcohol).\n\n### Plan of Care\n- **Mirror Box Therapy**: Initiate visual feedback sessions targeting the right lower extremity phantom sensations.\n- **Somatic Myofascial Release**: Gentle upper spine/cervical therapy to reduce strain from wearing structural corsets.\n- **Neuropathic Pain Support**: Utilize high-dose liposomal palmitoylethanolamide (PEA) and alpha-lipoic acid.",
-          "Functional Protocols": "### Immediate Actions\n- Start Mirror Box training 15 mins BID.\n- Implement daily heart rate variability (HRV) breathing exercises to modulate sympathetic tone."
+          "Summary Overview": "### Clinical Assessment\nFrida Kahlo presents with severe, multi-site chronic pain stemming from childhood poliomyelitis, severe traumatic spinal/pelvic fractures (1925 streetcar collision), 30+ surgical revisions, and right lower leg amputation (1953). Main clinical challenge is controlling central sensitization and phantom limb pain without excessive sedation.\n\n### Priority List\n- **Phantom Limb & Nociceptive Pain**: Address peripheral neuro-inflammation and central pain wind-up.\n- **Spinal Stabilization**: Plaster and steel corset support optimization.\n- **PhysioNet 2026 Telemetry**: Neuromuscular EMG and central sensitization mapping.\n\n### Goals\n- **Short-term**: Reduce VAS pain score from 9/10 to <= 5/10; restore restorative sleep.\n- **Long-term**: Prevent surgical site breakdown and maintain artistic output capacity.",
+          "Functional Protocols": "### Immediate Actions (Within 24 hours)\n- Mirror visual feedback therapy for phantom right limb pain.\n- Transcutaneous Electrical Nerve Stimulation (TENS) along spinal sensory dermatomes.\n- Solfeggio 174 Hz / 528 Hz acoustic nerve dampening soundscape.",
+          "Nutrition": "### Anti-Inflammatory Recovery Nutrition\n- High polyphenol dietary pattern (papaya, avocado, Mexican oregano tea).\n- Curcumin extract 1000mg with black pepper piperine for COX-2 cytokine dampening.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Daily VAS pain score and phantom sensation log.\n- Weekly surgical stump skin integrity check.\n- PhysioNet continuous EEG/EMG central sensitization telemetry.",
+          "Patient Education": "### Patient Guidance\n- Practice mirror box therapy for 15 minutes twice daily to retrain cortical somatosensory map.",
+          "Precision Nutrients": "### Orthomolecular Matrix\n- **PEA (Palmitoylethanolamide)**: 600mg BID (glual microglial anti-inflammatory).\n- **Alpha-Lipoic Acid**: 600mg Daily (diabetic & post-surgical neuropathic support).\n- **Magnesium Glycinate**: 400mg before bed.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge\n- **Heart Rate**: 82 bpm\n- **QRS Interval**: 90 ms\n- **ST Segment**: Neutral\n- **EMG Phantom Spiking Frequency**: 14 spikes/min (Central wind-up active)"
         }
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [
+      {
+        "id": "scan_frida_1",
+        "title": "Spine AP & Lateral Radiograph",
+        "type": "X-Ray",
+        "date": "1954.06.10",
+        "description": "Severe lumbar scoliosis, post-fusion metallic hardware artifacts, and pelvic tilt consistent with limb length inequality.",
+        "status": "Abnormal"
+      }
+    ]
   },
   {
     "id": "p_edwin_smith_3",
@@ -1653,7 +1834,8 @@
     "preexistingConditions": [
       "Traumatic Skull Fracture",
       "Meningeal exposure",
-      "Cervical rigidity"
+      "Cervical rigidity",
+      "PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge"
     ],
     "patientGoals": "Stabilize acute head injury, wound care, and address neck stiffness.",
     "vitals": {
@@ -1662,8 +1844,60 @@
       "temp": "99.2°F",
       "spO2": "95%",
       "weight": "150 lbs",
-      "height": "5'7\""
+      "height": "5'7\"",
+      "vitD3": "30 ng/mL",
+      "magnesium": "2.0 mg/dL",
+      "b12": "500 pg/mL",
+      "zinc": "80 mcg/dL"
     },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "hsCRP",
+        "value": "12.5 mg/L (Severe Acute Trauma)"
+      },
+      {
+        "id": "2",
+        "name": "WBC Count",
+        "value": "14,200 /μL (Leukocytosis)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Honey (Honey & Lint Dressing)",
+        "value": "High Enzymatic Osmotic Defense"
+      },
+      {
+        "id": "2",
+        "name": "Glutathione (GSH)",
+        "value": "1.6 μmol/g Hb"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Fresh Meat & Grease Dressing",
+        "value": "Day 1 Hemostasis"
+      },
+      {
+        "id": "2",
+        "name": "Honey & Lint Poultice",
+        "value": "Daily Antimicrobial Wound Shield"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "-1600-01-01T08:00:00Z",
+        "type": "hr",
+        "value": "64"
+      },
+      {
+        "timestamp": "-1600-01-01T08:00:00Z",
+        "type": "bp",
+        "value": "110/70"
+      }
+    ],
     "issues": {
       "head": [
         {
@@ -1691,24 +1925,31 @@
     },
     "history": [
       {
-        "type": "NoteCreated",
-        "date": "-1600.01.01",
-        "summary": "Edwin Smith Papyrus Case 3 record: An ailment not to be treated. Bind with fresh meat on the first day, followed by grease, honey, and lint daily.",
-        "partId": "head",
-        "noteId": "note_smith_head_1"
-      },
-      {
         "type": "AnalysisRun",
         "date": "-1600.01.01",
         "summary": "Historical Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nPatient presents with a severe, acute open traumatic brain injury (TBI) with exposed skull fractures and significant cervical rigidity. Historically classified as 'an ailment not to be treated' due to high mortality.\n\n### Plan of Care\n- Immediate wound stabilization and sterile debridement (modern equivalent of grease/honey dressing).\n- Immobilization of the cervical spine to prevent secondary spinal cord injury.\n- Close intracranial pressure (ICP) monitoring.",
-          "Functional Protocols": "### Immediate Actions\n- Rigid cervical collar placement.\n- High-potency topical antimicrobial honey dressing (Medihoney) to promote tissue recovery and prevent wound contamination."
+          "Summary Overview": "### Clinical Assessment\nEdwin Smith Case 3 presents with open penetrating cranial trauma and severe cervical rigidity. Ancient Egyptian surgical classification: *An ailment to be contended with*.\n\n### Priority List\n- **Wound Hemostasis & Infection Barrier**: Application of fresh meat dressing followed by honey-lint poultice.\n- **Cervical Spine Immobilization**: Prevent further spinal cord trauma during cervical neck stiffness.\n- **PhysioNet 2026 Telemetry**: Cervical vertebral dislocation and intracranial pressure (ICP) monitoring.\n\n### Goals\n- **Short-term**: Hemostasis within 12 hours; maintain clean wound margins.\n- **Long-term**: Granulation tissue formation and preservation of motor neurological function.",
+          "Functional Protocols": "### Immediate Actions (Day 1-3)\n- Day 1: Bind wound with fresh meat to promote local coagulation.\n- Day 2+: Transition to honey poultice (natural osmotic antibacterial) and lint wraps.\n- Strict neck immobilization using head support blocks.",
+          "Nutrition": "### Ancient Surgical Healing Protocol\n- High protein broth (wild game, bone broth).\n- Honey & pomegranate syrup for cellular repair co-factors.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Daily inspection for signs of suppurative infection or meningeal escalation.\n- PhysioNet continuous ICP and neck alignment telemetry.",
+          "Patient Education": "### Practitioner Notes\n- Keep patient lying flat on back with head supported by linen rolls.",
+          "Precision Nutrients": "### Ancient Orthomolecular Matrix\n- **Honey MGO**: High osmotic antibacterial shield.\n- **Zinc & Minerals**: Bio-available bone broth minerals.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge\n- **Heart Rate**: 64 bpm (Bradycardic autonomic response)\n- **QRS Duration**: 92 ms\n- **Intracranial Pressure (ICP)**: 16 mmHg (Borderline elevated)\n- **Cervical Alignment Angle**: 12° Kyphotic tilt"
         }
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [
+      {
+        "id": "scan_smith_1",
+        "title": "Cranial & Cervical Spine Inspection",
+        "type": "Document",
+        "date": "-1600.01.01",
+        "description": "Gaping skull fracture with visible meningeal pulsation; cervical spine rigidity upon passive lateral rotation.",
+        "status": "Abnormal"
+      }
+    ]
   },
   {
     "id": "p_charles_darwin",
@@ -1720,7 +1961,8 @@
       "Chronic Gastrointestinal Disease",
       "Cyclic Vomiting Syndrome (suspected)",
       "Systemic eczema & skin rashes",
-      "Mitochondrial dysfunction / Chagas disease (suspected)"
+      "Mitochondrial dysfunction / Chagas disease (suspected)",
+      "PhysioNet 2026 Challenge: Trypanosoma Cardiac Conduction & Vagal Gastric Dysmotility Challenge"
     ],
     "patientGoals": "Resolve debilitating chronic fatigue, severe episodic vomiting, flatulence, and chest palpitations.",
     "vitals": {
@@ -1729,8 +1971,75 @@
       "temp": "98.2°F",
       "spO2": "96%",
       "weight": "148 lbs",
-      "height": "5'11\""
+      "height": "5'11\"",
+      "vitD3": "24 ng/mL",
+      "magnesium": "1.7 mg/dL (Low-normal)",
+      "b12": "420 pg/mL",
+      "zinc": "68 mcg/dL"
     },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "Trypanosoma cruzi Antibodies",
+        "value": "Positive (Suspected Chagas exposure 1835)"
+      },
+      {
+        "id": "2",
+        "name": "hsCRP",
+        "value": "3.8 mg/L (Elevated)"
+      },
+      {
+        "id": "3",
+        "name": "Lactate/Pyruvate Ratio",
+        "value": "24 (Mitochondrial Overload)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "1.2 μmol/g Hb"
+      },
+      {
+        "id": "2",
+        "name": "CoQ10",
+        "value": "0.48 μg/mL"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Bismuth Subnitrate",
+        "value": "Gastrointestinal soothing"
+      },
+      {
+        "id": "2",
+        "name": "Hydrotherapy (Malvern Water Cure)",
+        "value": "Cold compress & spa regimen"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "1882-04-01T08:00:00Z",
+        "type": "hr",
+        "value": "72"
+      },
+      {
+        "timestamp": "1882-04-10T08:00:00Z",
+        "type": "hr",
+        "value": "70"
+      },
+      {
+        "timestamp": "1882-04-19T08:00:00Z",
+        "type": "hr",
+        "value": "68"
+      },
+      {
+        "timestamp": "1882-04-19T08:00:00Z",
+        "type": "bp",
+        "value": "110/70"
+      }
+    ],
     "issues": {
       "abdomen": [
         {
@@ -1771,76 +2080,48 @@
             }
           ]
         }
-      ],
-      "full_body": [
-        {
-          "id": "full_body",
-          "noteId": "note_darwin_systemic_1",
-          "name": "Systemic Fatigue & Dermatological Flare-ups",
-          "painLevel": 5,
-          "description": "Profound, post-exertional fatigue rendering him bedridden for days, accompanied by weeping eczema and skin rashes.",
-          "symptoms": [
-            {
-              "name": "Chronic fatigue",
-              "type": "Systemic/Mitochondrial",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Eczematous skin rashes",
-              "type": "Dermatological",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
       ]
     },
     "history": [
       {
-        "type": "NoteCreated",
-        "date": "1839.12.31",
-        "summary": "Onboard HMS Beagle, exposed to various tropical diseases (including suspected Triatoma infestans bites, vector of Chagas disease).",
-        "partId": "full_body",
-        "noteId": "note_darwin_systemic_1"
-      },
-      {
         "type": "AnalysisRun",
         "date": "1882.04.19",
-        "summary": "Historical Clinical Analysis",
+        "summary": "Comprehensive Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nCharles Darwin presents with a multi-systemic syndrome characterized by chronic gut-brain axis dysfunction, cyclical hyperemesis (cyclic vomiting syndrome), cardiac palpitations, and system-wide eczematous skin flare-ups. His presentation suggests chronic dysbiosis, systemic food intolerances (celiac/lactose sensitivity), and mitochondrial dysfunction, potentially exacerbated by historical exposure to Chagas disease (HMS Beagle bites).\n\n### Priority List\n- **Gluten & Casein Elimination**: Highest priority to resolve chronic mucosal irritation, flatulence, and cyclical emesis.\n- **Mitochondrial & Cardiac Optimization**: Support heart rhythm and energy production with key cofactors.\n- **Vagal Tone Enhancement**: Coregulate the hyperactive gut-brain axis through diaphragmatic breathing and cold hydrotherapy.\n\n### Plan of Care\n- Transition immediately to a grain-free, dairy-free diet utilizing local, nutrient-dense whole foods.\n- Supplement daily mitochondrial cofactors to address cellular fatigue.\n- Implement vagal nerve stimulation exercises twice daily to lower emotional and physiological stress triggers.",
-          "Functional Protocols": "### Immediate Actions\n- **Dietary Purge**: Remove all wheat, barley, rye, and dairy products. Cook all vegetables thoroughly to reduce lectins and fiber-induced gas.\n- **Mitochondrial Therapy**: Supplement CoQ10 (200mg/day) and Riboflavin (B2, 400mg/day) to restore cellular energy output.\n- **Hydrotherapy**: Daily 3-minute cold water chest compresses to stimulate vagal response.\n\n### Vagal & Circadian Rhythm Support\n- Diaphragmatic breathing exercises (5 seconds in, 5 seconds out) for 10 minutes prior to eating to optimize digestive enzyme secretion.",
-          "Nutrition": "### Victorian Dietary Context & Abundance\nLiving at Down House in Kent, Mr. Darwin has access to an abundance of high-quality, whole foods that can replace inflammatory Victorian staples (like heavy wheat-flour puddings, unpasteurized milk, and refined sugar):\n\n- **Kentish Coast Wild Seafood**: Wild mackerel, herring, and native oysters are abundant and rich in anti-inflammatory Omega-3 fatty acids to resolve his eczema and cardiac palpitations.\n- **Down House Kitchen Gardens**: Thoroughly cooked leafy greens (spinach, cabbage), root vegetables, and herbs provide critical trace minerals and antioxidants without triggering his flatulence.\n- **Orchard & Poultry Coops**: Freshly collected chicken/duck eggs provide highly bioavailable proteins and choline for brain health, while stewed apples/pears (cooked to break down complex sugars) support intestinal barrier repair.\n\n### Inflammatory Victorian Foods to Avoid\n- **Heavy Yeasted Breads & Suet Puddings**: Highly inflammatory wheat gluten triggers his gut barrier breakdown.\n- **Raw Cow's Milk**: Lactose and A1 casein promote gut inflammation and cyclic emesis.\n- **Mercury-laden Patent Medicines**: Discontinue all 'blue pill' formulations as they degrade the gut lining and neurological function.",
-          "Precision Nutrients": "### Orthomolecular Co-Factor Protocol\n\n| Nutrient | Victorian Food Source | Supplement Dose | Clinical Target |\n| :--- | :--- | :--- | :--- |\n| **Coenzyme Q10** | Mackerel, Heart Meats | 200 mg / day | Mitochondrial ETC / Palpitations |\n| **Riboflavin (B2)** | Egg Yolks, Wild Game | 400 mg / day | Krebs Cycle Energy Production |\n| **Omega-3 (EPA/DHA)** | Oysters, Mackerel | 3000 mg / day | Eczema Resolution & Cellular Membranes |\n| **L-Carnitine** | Mutton, Beef | 1000 mg / day | Fatty Acid Transportation |\n| **Magnesium** | Spinach, Sea Salt | 400 mg / day | Smooth Muscle Relaxation & Vagal Tone |\n\n### Clinical Notes\nEnsure all supplements are administered with fat-containing meals (such as egg yolks or pheasant fat) to optimize absorption of fat-soluble cofactors.",
-          "Monitoring & Follow-up": "### Key Clinical Milestones\n\n1. **Weeks 1-2**: Assess frequency of cyclic vomiting episodes. Target is zero hyperemesis events.\n2. **Week 4**: Evaluate skin integrity. Eczema should show a 30% reduction in surface area and weeping.\n3. **Month 3**: Re-evaluate cardiac palpitations and flatulence. Monitor energy levels during cognitive exertion (writing/researching).\n\n| Parameter | Target | Frequency | Action Trigger |\n| :--- | :--- | :--- | :--- |\n| **Vomiting Episodes** | 0 episodes | Weekly | Any episode requires immediate dietary audit |\n| **Flatulence Severity** | Mild/None | Daily | Severe gas indicates high-lectin vegetable load |\n| **Cardiac Palpitations** | < 2 per week | Daily | Daily episodes trigger magnesium dose adjustment |\n\n### Long-Term Prognosis\nBy adhering to a clean, non-inflammatory dietary regime that bypasses Victorian gut-toxins, Mr. Darwin's systemic fatigue should subside, allowing for prolonged periods of intellectual focus and scientific research without triggering cyclic physical collapses.",
-          "Patient Education": "### Understanding Your Gut-Brain Connection\nYour severe stomach issues, headaches, and chest palpitations are not isolated symptoms; they are closely connected. When your gut lining becomes irritated by wheat (gluten) and dairy (casein), it sends stress signals directly to your heart and brain via the vagus nerve.\n\n### Critical Actions\n1. **Eat Simply**: Stick to game meats, wild fish, eggs, and well-cooked garden vegetables.\n2. **Avoid Victorian Comforts**: Say no to milk, beer, and sweet puddings.\n3. **Breathe & Rest**: Do not engage in intense scientific writing immediately after meals. Give your body 30 minutes of rest to digest simply and cleanly."
+          "Summary Overview": "### Clinical Assessment\nCharles Darwin presents with chronic debilitating GI distress, cyclic vomiting, and cardiac conduction palpitations. Differential includes Chagas disease (Trypanosoma cruzi acquired in South America during HMS Beagle voyage), histamine intolerance, and mitochondrial dysfunction.\n\n### Priority List\n- **Autonomic & Vagal Alignment**: Regulate enteric nervous system and gastric emptying.\n- **Cardiac Conduction Protection**: Monitor for Chagasic AV block / bundle branch block.\n- **PhysioNet 2026 Telemetry**: Enteric vagal dysmotility & cardiac electrophysiology.\n\n### Goals\n- **Short-term**: Reduce vomiting frequency to 0 episodes per month.\n- **Long-term**: Maintain stable cardiac AV conduction and resolve post-prandial fatigue.",
+          "Functional Protocols": "### Immediate Actions (Within 24 hours)\n- Eliminate high-histamine foods (aged cheeses, fermented wines, nightshades).\n- Implement 0.1 Hz vagal resonant breathing before meals to stimulate parasympathetic digestive agni.\n- Short daily walks in Down House gardens.",
+          "Nutrition": "### Chrono-Nutrition & Easy-Digest Protocol\n- Low FODMAP, easily digestible warm soups (stewed apple, ginger-carrot puree).\n- Gingerol (500mg) and peppermint oil for gastric motility support.",
+          "Monitoring & Follow-up": "### Tracking Schedule\n- Daily symptom diary correlating food intake, mental work, and nausea.\n- Monthly ECG for PR/QRS interval elongation.\n- PhysioNet continuous gastric dysmotility and HRV telemetry.",
+          "Patient Education": "### Patient Guidance\n- Take short breaks during writing sessions; avoid intense intellectual stress directly following meals.",
+          "Precision Nutrients": "### Orthomolecular Matrix\n- **CoQ10 (Ubiquinol)**: 200mg daily (mitochondrial ATP transport).\n- **Magnesium Glycinate**: 400mg PM.\n- **DAO (Diamine Oxidase)**: 1 cap before meals.",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Trypanosoma Cardiac Conduction & Vagal Gastric Dysmotility Challenge\n- **Heart Rate**: 68 bpm\n- **PR Interval**: 198 ms (Borderline 1st degree AV block)\n- **QRS Duration**: 94 ms\n- **Gastric Slow-Wave Frequency**: 2.2 cpm (Tachygastria/Bradygastria dysrhythmia)"
         }
       }
     ],
     "bookmarks": [],
-    "scans": []
+    "scans": [
+      {
+        "id": "scan_darwin_1",
+        "title": "Electrocardiographic & Gastric Motility Study",
+        "type": "Lab Report",
+        "date": "1882.04.10",
+        "description": "Borderline PR interval prolongations; gastric dysrhythmia during post-prandial recording.",
+        "status": "Reviewed"
+      }
+    ]
   },
   {
-    "id": "emergency_casualty",
-    "name": "Emergency Casualty",
-    "age": 30,
-    "gender": "Other",
-    "lastVisit": "2026-07-21T20:54:51.476Z",
-    "preexistingConditions": [],
-    "history": [
-      {
-        "type": "FinalizedPatientSummary",
-        "date": "2026.07.21",
-        "summary": "Patient Summary updated (auto-saved).",
-        "report": {},
-        "annotations": {}
-      }
+    "id": "p_phil_gear",
+    "name": "Phil Gear",
+    "age": 42,
+    "gender": "Male",
+    "lastVisit": "2026.05.20",
+    "preexistingConditions": [
+      "Hypertension",
+      "Mild Sleep Apnea",
+      "Google Health Integration"
     ],
-    "bookmarks": [],
-    "issues": {},
-    "patientGoals": "Immediate trauma and emergency life support bypass mode.",
-    "dietaryProtocol": "",
+    "patientGoals": "",
     "vitals": {
       "bp": "",
       "hr": "",
@@ -1854,87 +2135,38 @@
       "zinc": "",
       "b12": ""
     },
-    "dynamicNutrients": [],
     "oxidativeStressMarkers": [],
     "antioxidantSources": [],
     "medications": [],
-    "clinicalNotes": [],
-    "checklist": [],
-    "shoppingList": [],
-    "activePhilosophy": "western",
-    "ayurvedicStatus": {},
-    "biometricHistory": []
-  },
-  {
-    "id": "p_phil_gear",
-    "name": "Phil Gear",
-    "age": 42,
-    "gender": "Male",
-    "lastVisit": "2026.05.20",
-    "preexistingConditions": [
-      "Hypertension",
-      "Mild Sleep Apnea",
-      "Google Health Integration"
-    ],
-    "patientGoals": "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
-    "vitals": {
-      "bp": "122/82",
-      "hr": "68",
-      "temp": "98.6°F",
-      "spO2": "98%",
-      "weight": "178 lbs",
-      "height": "5'10\""
-    },
-    "oxidativeStressMarkers": [],
-    "antioxidantSources": [],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Lisinopril",
-        "value": "10mg Daily"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2026-05-20T08:00:00Z",
-        "type": "hr",
-        "value": "68"
-      },
-      {
-        "timestamp": "2026-05-20T08:00:00Z",
-        "type": "bp",
-        "value": "122/82"
-      }
-    ],
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_phil_head_1",
-          "name": "Head & Neck",
-          "painLevel": 2,
-          "description": "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
-          "symptoms": []
-        }
-      ]
-    },
+    "biometricHistory": [],
+    "issues": {},
     "history": [
       {
         "type": "AnalysisRun",
         "date": "2026.05.20",
         "summary": "Comprehensive Clinical Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Focus is on optimization of metabolic pathways, screen time hygiene, and real-time biometric telemetry tracking.\n\n### Goals\n*   **Short-term**: Reduce sleep latency to < 20 minutes.\n*   **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
-          "Functional Protocols": "### Diagnostic Workup & Lifestyle\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.",
-          "Nutrition": "### Nutritional Interventions\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.",
-          "Monitoring & Follow-up": "### Immediate (24-72 hours) & Clinical Tracking\n- Monitor daily resting heart rate and sleep cycles using Fitbit/Google Health Connect.\n- Follow up in 4 weeks.",
+          "Summary Overview": "### Clinical Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Focus is on optimization of metabolic pathways, screen time hygiene, and real-time biometric telemetry tracking.\n\n### Priority List\n- **Sleep Latency & BMAL1 Rhythm**: Circadian realignment to achieve rapid sleep onset (< 20 mins).\n- **Autonomic Vagal Regulation**: 0.1 Hz resonant breathing for sympathetic dampening.\n- **Biometric Integration**: Google Health Connect and continuous telemetry monitoring.\n\n### Goals\n- **Short-term**: Reduce sleep latency to < 20 minutes.\n- **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
+          "Functional Protocols": "### Diagnostic Workup & Lifestyle\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.\n- 0.1 Hz vagal resonant breathing session for 10 minutes before sleep.",
+          "Nutrition": "### Nutritional Interventions\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.\n- Incorporate 7-day Chrono-Nutrition fast-break porridge and afternoon dark cacao nibs.",
+          "Monitoring & Follow-up": "### Immediate (24-72 hours) & Clinical Tracking\n- Monitor daily resting heart rate and sleep cycles using Fitbit/Google Health Connect.\n- Follow up in 4 weeks for HRV spectral power density review.",
           "Patient Education": "### Understanding Your Health Path\nWe are focusing on tuning your body's daily rhythms, syncing Fitbit metrics, and optimizing cellular nutrients to resolve evening tension.",
-          "Precision Nutrients": "### Biomarker Matrix\n\n- **Magnesium**: Sub-optimal (ATP Synthesis / NMDA)\n- **Vitamin D3**: Sub-optimal (Immune / Bone)\n- **Vitamin B12**: Optimal (Methylation)\n- **Zinc**: Optimal (Immune / Hormones)"
+          "Precision Nutrients": "### Biomarker Matrix\n\n- **Magnesium**: Sub-optimal (ATP Synthesis / NMDA)\n- **Vitamin D3**: Sub-optimal (Immune / Bone)\n- **Vitamin B12**: Optimal (Methylation)\n- **Zinc**: Optimal (Immune / Hormones)",
+          "PhysioNet Telemetry": "### PhysioNet 2026 Digital Signal & Electrophysiology Summary\nIntegrated EDF/PhysioNet waveform metrics captured from high-frequency BLE telemetry sensors and continuous multi-lead ECG monitoring.\n\n### Electrocardiographic Waveform Morphology\n- **QRS Interval Duration**: 88 ms (Normal baseline: < 120 ms).\n- **ST-Segment**: Neutral ST morphology across Lead II, V2, V5 (+0.02 mV deviation).\n- **QTc Interval (Fridericia)**: 412 ms (Normal baseline: < 450 ms).\n\n### Heart Rate Variability (HRV) Spectral Power Density\n- **LF/HF Ratio**: 1.25 (Balanced autonomic tone)\n- **RMSSD**: 48 ms (Good parasympathetic rebound)"
         }
       }
     ],
     "bookmarks": [],
-    "scans": [],
+    "scans": [
+      {
+        "id": "scan_phil_1",
+        "title": "Polysomnography Sleep Study",
+        "type": "Lab Report",
+        "date": "2026.04.15",
+        "description": "Mild sleep latency elevation; zero central sleep apnea. AHI 4.2/hr (Mild), Sleep Efficiency 88%.",
+        "status": "Reviewed"
+      }
+    ],
     "dietaryProtocol": "",
     "dynamicNutrients": [],
     "clinicalNotes": [],

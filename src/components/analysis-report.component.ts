@@ -144,6 +144,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
                class="flex overflow-x-auto hide-scrollbar items-center gap-2 w-full relative z-10 snap-x snap-mandatory scroll-smooth py-1">
             
             <button (click)="changeLens('Summary Overview')"
+              data-testid="tab-overview"
               [class.bg-indigo-600]="activeLens() === 'Summary Overview'"
               [class.text-white]="activeLens() === 'Summary Overview'"
               class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
@@ -151,6 +152,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </button>
 
             <button (click)="changeLens('Treatment Matrix')"
+              data-testid="tab-treatment-matrix"
               [class.bg-indigo-600]="activeLens() === 'Treatment Matrix'"
               [class.text-white]="activeLens() === 'Treatment Matrix'"
               class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
@@ -158,6 +160,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </button>
 
             <button (click)="changeLens('Functional Protocols')"
+              data-testid="tab-functional-protocols"
               [class.bg-indigo-600]="activeLens() === 'Functional Protocols'"
               [class.text-white]="activeLens() === 'Functional Protocols'"
               class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
@@ -165,6 +168,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </button>
 
             <button (click)="changeLens('Nutrition')"
+              data-testid="tab-nutrition"
               [class.bg-indigo-600]="activeLens() === 'Nutrition'"
               [class.text-white]="activeLens() === 'Nutrition'"
               class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
@@ -172,6 +176,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </button>
 
             <button (click)="changeLens('Precision Nutrients')"
+              data-testid="tab-precision-nutrients"
               [class.bg-indigo-600]="activeLens() === 'Precision Nutrients'"
               [class.text-white]="activeLens() === 'Precision Nutrients'"
               class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
@@ -179,6 +184,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </button>
 
             <button (click)="changeLens('Monitoring & Follow-up')"
+              data-testid="tab-monitoring-follow-up"
               [class.bg-indigo-600]="activeLens() === 'Monitoring & Follow-up'"
               [class.text-white]="activeLens() === 'Monitoring & Follow-up'"
               class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
@@ -186,6 +192,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </button>
 
             <button (click)="changeLens('Patient Education')"
+              data-testid="tab-patient-education"
               [class.bg-indigo-600]="activeLens() === 'Patient Education'"
               [class.text-white]="activeLens() === 'Patient Education'"
               class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
