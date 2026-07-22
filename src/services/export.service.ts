@@ -40,10 +40,14 @@ export class ExportService {
       try {
         if (raw && typeof raw.sanitize === 'function') {
           const res = raw.sanitize(str, opts);
-          if (typeof res === 'string') return res;
+          if (typeof res === 'string' && res.length > 0 && !res.includes('onerror=')) return res;
         }
       } catch (e) {}
-      return str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+      return str
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<img\b[^>]*\/?>/gi, '')
+        .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
+        .replace(/\son\w+\s*=\s*[^>\s]+/gi, '');
     };
   }
 
