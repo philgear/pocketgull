@@ -13,11 +13,11 @@ Pocket Gull bridges the gap between conventional medicine, traditional paradigms
 
 ## 🌐 1. HL7 FHIR R4 Bundle Conversion
 
-The bi-directional clinical data mapper in <DocNode term="ExportService" category="Web Client" hint="Generates PDF print templates and exports/imports compliant HL7 FHIR R4 Bundles." link="file:///c:/Users/philg/Pocketgull/pg2/pocketgull/src/services/export.service.ts" linkLabel="export.service.ts →" icon="https://angular.dev/favicon.ico">`ExportService`</DocNode> translates the transient patient profile into a standard FHIR R4 Bundle Collection:
+The bi-directional clinical data mapper in `ExportService` translates the transient patient profile into a standard FHIR R4 Bundle Collection:
 
 ```mermaid
 graph LR
-    AppPatient["Pocket Gull Patient State"] <-->|Bidirectional Map| FhirBundle["FHIR R4 Bundle Collection"]
+    AppPatient["Pocket Gull Patient State"] --- |Bidirectional Map| FhirBundle["FHIR R4 Bundle Collection"]
     FhirBundle --> PatientRes["1. Patient Resource"]
     FhirBundle --> ConditionRes["2. Condition Resources"]
     FhirBundle --> ObservationVitals["3. Observation Vitals Signs (LOINC)"]
@@ -44,16 +44,16 @@ graph LR
 
 ## ☯️ 2. Holistic Clinical Paradigms
 
-When a clinician toggles the paradigm selectors, the system instructions in <DocNode term="ClinicalIntelligenceService" category="Services" hint="Configures ADK runner, system instructions, and handles AI completions." link="file:///c:/Users/philg/Pocketgull/pg2/pocketgull/src/services/clinical-intelligence.service.ts" linkLabel="clinical-intelligence.service.ts →" icon="https://angular.dev/favicon.ico">`ClinicalIntelligenceService`</DocNode> instruct the Google Gemini models to synthesize the patient's biochemical markers and vitals into distinct clinical frameworks:
+When a clinician toggles the paradigm selectors, the system instructions in `ClinicalIntelligenceService` instruct the Google Gemini models to synthesize the patient's biochemical markers and vitals into distinct clinical frameworks:
 
 ### 🟢 Eastern (Traditional Chinese Medicine) Mode
 * **Diagnostic Lenses**: Evaluates Zang-Fu organ systems disharmonies, Yin/Yang balance, Qi dynamics, and blood stagnation (e.g., Qi Stasis in the Liver).
 * **Interventions**: Suggests acupoints, meridian channels, moxibustion guidelines, and thermal-energetic dietary adjustments (warming vs. cooling foods).
 * **Biomarker-to-Meridian Bridge**: Directs the AI to translate and map modern Western lab values directly to TCM pathways:
-  - **Zinc** $\rightarrow$ mapped to **Kidney Essence (Jing)** regulation.
-  - **Magnesium** $\rightarrow$ mapped to **Heart/Liver Qi flow** regulation.
-  - **Vitamin D3** $\rightarrow$ mapped to **Yang Vitality** stimulation.
-  - **B12 / Iron** $\rightarrow$ mapped to **Spleen Blood generation**.
+  - **Zinc** → mapped to **Kidney Essence (Jing)** regulation.
+  - **Magnesium** → mapped to **Heart/Liver Qi flow** regulation.
+  - **Vitamin D3** → mapped to **Yang Vitality** stimulation.
+  - **B12 / Iron** → mapped to **Spleen Blood generation**.
 
 ### 🟡 Ayurvedic Medicine Mode
 * **Diagnostic Lenses**: Evaluates Tridosha imbalances (Vata, Pitta, Kapha), metabolic fire (**Agni**), undigested metabolic toxicity (**Ama**), core vitality (**Ojas**), and attributes (**Gunas**).
@@ -64,10 +64,10 @@ When a clinician toggles the paradigm selectors, the system instructions in <Doc
   - **Kapha (Guru/Manda Gunas)**: Triggered by sluggishness or congestion.
 * **Interventions**: Integrates customized *Dinacharya* (daily circadian regimens like *Gandusha* oil pulling, *Nasya* drops, and *Abhyanga* warm massage), local therapies (such as *Kati Basti* oil pooling), spice energetics, and alternate nostril breathing (*Nadi Shodhana*).
 * **Biomarker-to-Dhatu Bridge**: Maps micronutrients to the seven traditional bodily tissues (**Dhatus**) and core vitality (**Ojas**):
-  - **Calcium / Vitamin D3** $\rightarrow$ mapped to **Asthi Dhatu** (bone/cartilage tissue) and *Asthivaha Srotas*.
-  - **Iron / B12** $\rightarrow$ mapped to **Rakta Dhatu** (blood tissue) and *Raktavaha Srotas*.
-  - **Zinc / Magnesium** $\rightarrow$ mapped to **Majja Dhatu** (nervous tissue) and *Majjavaha Srotas*.
-  - **Antioxidant capacity** $\rightarrow$ mapped to **Ojas replenishment** and *Manovaha Srotas* (mind channel).
+  - **Calcium / Vitamin D3** → mapped to **Asthi Dhatu** (bone/cartilage tissue) and *Asthivaha Srotas*.
+  - **Iron / B12** → mapped to **Rakta Dhatu** (blood tissue) and *Raktavaha Srotas*.
+  - **Zinc / Magnesium** → mapped to **Majja Dhatu** (nervous tissue) and *Majjavaha Srotas*.
+  - **Antioxidant capacity** → mapped to **Ojas replenishment** and *Manovaha Srotas* (mind channel).
 
 ---
 
@@ -80,13 +80,13 @@ Focuses on mitochondrial health, cortisol dynamics, autonomic nervous system bal
 
 ### Secular Integration Translator
 Pocket Gull actively strips theological or dogmatic language from clinical findings, translating ancient world frameworks into physiological and psychological domains:
-- **Enso (Zen)** $\rightarrow$ Translates to somatic mindfulness and psychological self-compassion for chronic conditions.
-- **Golden Mean (Aristotle)** $\rightarrow$ Translates to moderation in diet/biohacking, preventing toxic over-supplementation.
-- **Hygge (Danish)** $\rightarrow$ Translates to down-regulating the sympathetic nervous system via cozy rest spaces.
-- **Ikigai (Japanese)** $\rightarrow$ Translates to long-term physical activation, cognitive engagement, and sense of purpose.
-- **Mizan (Islamic)** $\rightarrow$ Translates to systemic bodily homeostasis and clean, wholesome (Tayyib) nutrition.
-- **Ubuntu (African)** $\rightarrow$ Translates to family co-regulation and communal support circles to lower isolation stress.
-- **Tikkun Olam (Jewish)** $\rightarrow$ Translates to personal physical healing as a prerequisite for community service.
+- **Enso (Zen)** → Translates to somatic mindfulness and psychological self-compassion for chronic conditions.
+- **Golden Mean (Aristotle)** → Translates to moderation in diet/biohacking, preventing toxic over-supplementation.
+- **Hygge (Danish)** → Translates to down-regulating the sympathetic nervous system via cozy rest spaces.
+- **Ikigai (Japanese)** → Translates to long-term physical activation, cognitive engagement, and sense of purpose.
+- **Mizan (Islamic)** → Translates to systemic bodily homeostasis and clean, wholesome (Tayyib) nutrition.
+- **Ubuntu (African)** → Translates to family co-regulation and communal support circles to lower isolation stress.
+- **Tikkun Olam (Jewish)** → Translates to personal physical healing as a prerequisite for community service.
 
 ---
 

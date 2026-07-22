@@ -261,9 +261,9 @@ export class PatientManagementService implements OnDestroy {
       });
     });
 
-    // Handle debouncing and sync outside of Angular change detection cycle
+    // Handle debouncing and sync outside of Angular change detection cycle (1s fast auto-save)
     this.autoSaveSub = this.autoSave$.pipe(
-      debounceTime(3000)
+      debounceTime(1000)
     ).subscribe({
       next: async () => {
         const patientId = untracked(() => this.selectedPatientId());
@@ -273,6 +273,16 @@ export class PatientManagementService implements OnDestroy {
         }
       }
     });
+
+    // Auto-save on window unload/tab close
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => {
+        const patientId = untracked(() => this.selectedPatientId());
+        if (patientId) {
+          this.saveCurrentPatientState();
+        }
+      });
+    }
 
     // This effect runs whenever the selected patient changes.
     // It's the central point for orchestrating app state updates.
