@@ -12,12 +12,13 @@ import { GamificationService } from '../services/gamification.service';
 
 import { HumanDignityPactComponent } from './human-dignity-pact.component';
 import { MyChartBriefModalComponent } from './mychart-brief-modal.component';
+import { FamilyTreePedigreeComponent } from './family-tree-pedigree.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -124,6 +125,12 @@ import { MyChartBriefModalComponent } from './mychart-brief-modal.component';
                   <span>🏥</span> MyChart Brief
                 </button>
 
+                <!-- Pedigree Tree Risk Pruning Button -->
+                <button type="button" (click)="showPedigreeModal.set(true)" title="Open Family Health Pedigree Tree & Risk Branch Pruning"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer">
+                  <span>🌳</span> Pedigree Tree
+                </button>
+
                 <!-- FHIR R4 Export Button -->
                 <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
@@ -182,6 +189,9 @@ import { MyChartBriefModalComponent } from './mychart-brief-modal.component';
 
     <!-- Epic MyChart Physician Brief & Longevity Lab Modal -->
     <app-mychart-brief-modal *ngIf="showMyChartModal()" (closeModal)="showMyChartModal.set(false)"></app-mychart-brief-modal>
+
+    <!-- Family Health Pedigree Tree & Risk Branch Pruning Modal -->
+    <app-family-tree-pedigree *ngIf="showPedigreeModal()" (closeModal)="showPedigreeModal.set(false)"></app-family-tree-pedigree>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -204,6 +214,7 @@ export class AnalysisContainerComponent {
   justGenerated = signal(false);
   showPactModal = signal(false);
   showMyChartModal = signal(false);
+  showPedigreeModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
