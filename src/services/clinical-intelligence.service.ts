@@ -924,5 +924,15 @@ Feel free to reference their research areas and publications if it supports the 
         }
         return null;
     }
+
+    /**
+     * Replaces negative-valence hype and alarmist/fear-inducing terms with constructive clinical terminology.
+     */
+    filterNegativeValenceHype(text: string): string {
+        if (!text) return text;
+        return text
+            .replace(/\b(disastrous|catastrophic|terrifying|dire warning|fatal breakdown)\b/gi, 'clinical observation')
+            .replace(/\b(hopeless|uncontrollable crisis)\b/gi, 'manageable clinical priority');
+    }
 }
 
