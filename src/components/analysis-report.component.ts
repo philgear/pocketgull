@@ -887,8 +887,8 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
         }
 
 
-        <!-- Cost-Benefit Analysis (Treatment Matrix Lens Only) -->
-        @if (activeLens() === 'Treatment Matrix' && hasAnyReport()) {
+        <!-- Cost-Benefit Analysis (Summary Overview & Treatment Matrix Lenses) -->
+        @if ((activeLens() === 'Summary Overview' || activeLens() === 'Treatment Matrix') && hasAnyReport()) {
           <app-cost-benefit-analysis [reportText]="activeReport()"></app-cost-benefit-analysis>
         }
 
