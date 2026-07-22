@@ -11,12 +11,13 @@ import { ClinicalIcons } from '../assets/clinical-icons';
 import { GamificationService } from '../services/gamification.service';
 
 import { HumanDignityPactComponent } from './human-dignity-pact.component';
+import { MyChartBriefModalComponent } from './mychart-brief-modal.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -117,6 +118,12 @@ import { HumanDignityPactComponent } from './human-dignity-pact.component';
                   <span>📄</span> PDF
                 </button>
 
+                <!-- MyChart Pre-Visit Brief Button -->
+                <button type="button" (click)="showMyChartModal.set(true)" title="Generate Epic MyChart Pre-Visit Brief & Longevity Lab Navigator"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20 transition cursor-pointer">
+                  <span>🏥</span> MyChart Brief
+                </button>
+
                 <!-- FHIR R4 Export Button -->
                 <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
@@ -172,6 +179,9 @@ import { HumanDignityPactComponent } from './human-dignity-pact.component';
 
     <!-- Human Dignity Health Charter Modal -->
     <app-human-dignity-pact *ngIf="showPactModal()" (closeModal)="showPactModal.set(false)"></app-human-dignity-pact>
+
+    <!-- Epic MyChart Physician Brief & Longevity Lab Modal -->
+    <app-mychart-brief-modal *ngIf="showMyChartModal()" (closeModal)="showMyChartModal.set(false)"></app-mychart-brief-modal>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -193,6 +203,7 @@ export class AnalysisContainerComponent {
 
   justGenerated = signal(false);
   showPactModal = signal(false);
+  showMyChartModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
