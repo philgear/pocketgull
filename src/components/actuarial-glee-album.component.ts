@@ -37,7 +37,7 @@ export interface IGleeTrack {
             <div>
               <div class="flex items-center gap-2">
                 <h2 class="text-xl font-black tracking-tight text-white">Actuarial Glee: Progressive Regeneration</h2>
-                <pocket-gull-badge variant="primary" size="xs">12-Track Duet Album</pocket-gull-badge>
+                <pocket-gull-badge label="12-Track Duet Album" severity="info"></pocket-gull-badge>
               </div>
               <p class="text-xs text-purple-200/80">Interactive 2-Player Singalong Game for Epigenetic Healthspan & Joy</p>
             </div>

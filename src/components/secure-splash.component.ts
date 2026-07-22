@@ -204,7 +204,7 @@ import { environment } from '../environments/environment';
                
                <div class="relative w-[220px] h-[220px] flex items-center justify-center">
                   <!-- Guidelines background SVG (Dynamic Daily Beach Item guide) -->
-                  <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5" [innerHTML]="todayBeachItem().svgGuide | safeHtml">
+                  <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5" [innerHTML]="todayBeachItem().svgGuide">
                   </svg>
                  
                  <canvas

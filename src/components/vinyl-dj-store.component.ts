@@ -25,7 +25,7 @@ import { PatientStateService } from '../services/patient-state.service';
             <div>
               <div class="flex items-center gap-2">
                 <h2 class="text-xl font-black tracking-wider uppercase text-amber-100">Actuarial Glee Vinyl Lounge & DJ Deck</h2>
-                <pocket-gull-badge variant="warning" size="xs">ANALOG 33/45 RPM DECK</pocket-gull-badge>
+                <pocket-gull-badge label="ANALOG 33/45 RPM DECK" severity="warning"></pocket-gull-badge>
               </div>
               <p class="text-xs text-amber-200/70">Record Store Crate Digging & Interactive Turntable Music Video Station</p>
             </div>

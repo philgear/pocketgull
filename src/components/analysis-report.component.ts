@@ -409,6 +409,7 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
                     Mapping biomarkers and constitutional trends to the Tridosha framework (Vata/Pitta/Kapha), evaluating Agni (digestive fire) and Ama (cellular load).
                   }
                 </p>
+              </div>
             </div>
           </div>
 
@@ -431,6 +432,7 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               </div>
             </div>
           }
+        }
 
         @if (activeLens() === 'Y-BOCs Screener') {
           <div class="w-full">
