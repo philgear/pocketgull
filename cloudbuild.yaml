@@ -1,5 +1,55 @@
+# Google Cloud Build CI/CD Pipeline for Pocket Gull
+# Project: gen-lang-client-0540208645
+# Service: pocket-gull (Google Cloud Run)
+
 steps:
+  # 1. Build Production Container Image with Docker BuildKit
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/gen-lang-client-0540208645/pocket-gull:latest', '.']
+    id: 'build-container'
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/pocket-gull:latest'
+      - '.'
+
+  # 2. Push Docker Images to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-latest'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/pocket-gull:latest'
+
+  # 3. Deploy to Google Cloud Run (us-central1) with Scale-to-Zero Cost Strategy
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-cloud-run'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'pocket-gull'
+      - '--image=gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+      - '--region=us-central1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--min-instances=0'
+      - '--max-instances=10'
+      - '--memory=1Gi'
+      - '--cpu=1'
+      - '--update-env-vars=OTEL_SDK_DISABLED=true'
+
 images:
-  - 'gcr.io/gen-lang-client-0540208645/pocket-gull:latest'
+  - 'gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/pocket-gull:latest'
+
+timeout: '1800s'
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: 'CLOUD_LOGGING_ONLY'
