@@ -408,7 +408,6 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               </div>
             </div>
           }
-        }
 
         @if (activeLens() === 'Y-BOCs Screener') {
           <div class="w-full">
