@@ -19,7 +19,7 @@ import { AigaModelAugmentationService } from '../services/aiga-model-augmentatio
           <div>
             <div class="flex items-center gap-2">
               <span class="text-xs font-mono font-bold uppercase tracking-widest text-purple-400">AIGA 2025/2026 AI Model Suite</span>
-              <pocket-gull-badge label="Enriched Diagnostic Omics" severity="purple"></pocket-gull-badge>
+              <pocket-gull-badge label="Enriched Diagnostic Omics" severity="info"></pocket-gull-badge>
             </div>
             <h3 class="text-lg font-extrabold text-white tracking-tight mt-0.5">AIGA Neural Model Telemetry & Omics Telemetry</h3>
           </div>
@@ -106,7 +106,7 @@ import { AigaModelAugmentationService } from '../services/aiga-model-augmentatio
 
           <div class="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between">
             <span class="text-slate-400 font-mono">Cellular Glutathione:</span>
-            <span class="font-bold text-emerald-400 font-semibold">{{ telemetry().nmrMetabolomics.glutathioneStatus }}</span>
+            <span class="font-bold text-emerald-400">{{ telemetry().nmrMetabolomics.glutathioneStatus }}</span>
           </div>
 
         </div>
