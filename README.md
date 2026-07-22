@@ -70,53 +70,88 @@ Moving beyond simple translation, the **COLO Engine** adjusts the "Clinical Stra
 Pocket Gull utilizes a hybrid client-server-edge architecture designed for low-latency live consults, privacy-first offline operation, and continuous multi-lens clinical reasoning.
 
 ```mermaid
-graph TD
-    classDef client fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
-    classDef server fill:#0f172a,stroke:#34d399,stroke-width:2px,color:#f8fafc;
-    classDef ai fill:#0f172a,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
-    classDef db fill:#0f172a,stroke:#fbbf24,stroke-width:2px,color:#f8fafc;
-    classDef sec fill:#0f172a,stroke:#f43f5e,stroke-width:2px,color:#f8fafc;
+graph TB
+    classDef doorway fill:#18181b,stroke:#a855f7,stroke-width:3px,color:#fafafa;
+    classDef leftWing fill:#0f172a,stroke:#38bdf8,stroke-width:2px,color:#f8fafc;
+    classDef rightWing fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#f8fafc;
+    classDef cloudCeiling fill:#0f172a,stroke:#6366f1,stroke-width:2px,color:#f8fafc;
+    classDef foundation fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#f8fafc;
 
-    subgraph ClientLayer ["📱 Frontend Client (Angular 22 + Three.js + WebMCP)"]
-        UI["Clinical Workspace UI (Dieter Rams 90° Design)"]
-        Viewer["3D Body Viewer & Anatomical Search"]
-        Handoff["URL Intake State Handoff Engine (?share=...&mode=...)"]
-        WebMCP["WebMCP Polyfill & JSON-LD Tool Catalog"]
+    %% TOP CEILING: CLOUD & BACKEND RUNTIME
+    subgraph CloudCeiling ["⚡ CLOUD CEILING & BACKEND RUNTIME"]
+        CloudRun["Google Cloud Run Serverless Service"]
+        ExpressProxy["Express.js SSR & Single-Hop Proxy"]
+        FastAPISidecar["Python FastAPI Sidecar (ML Risk Scoring)"]
+        VertexAI["Vertex AI Enterprise (Gemini 2.5 Flash)"]
     end
 
-    subgraph BackendLayer ["⚡ Node.js SSR + FastAPI Sidecar + GCP Cloud Run"]
-        Express["Express Server / Proxy (Single-Hop Trust Proxy)"]
-        FastAPI["Python FastAPI Sidecar (ML Risk Scoring)"]
+    %% LEFT WING: INGESTION & USER PORTALS
+    subgraph LeftWing ["📱 LEFT WING — INGESTION & PORTALS"]
+        Body3D["Three.js 3D Body Surface & Skeleton Viewer"]
+        VoiceSTT["Bi-Directional Voice Assistant & Web Speech API"]
+        URLHandoff["Expanded URL State Handoff (?share=...&mode=...)"]
+        IntakeForm["Demographics & Vitals Diagnostic Intake"]
     end
 
-    subgraph AILayer ["🧠 Multimodal AI & Medical Intelligence"]
-        Gemini["Google Gemini 2.5 / Live API (Bidi Voice)"]
-        PubMed["NCBI PubMed / Google Search Grounding"]
-        Genkit["Genkit Microservice Workflows"]
+    %% CENTER CORE: THE DOORWAY HUB
+    subgraph DoorwayHub ["🚪 THE DOORWAY HUB — CENTRAL STATE & AI ORCHESTRATION"]
+        PatientState["PatientStateService Signal Store\n(Central Source of Truth)"]
+        ADKRunner["@google/adk InMemoryRunner\n(Multi-Agent Orchestrator)"]
+        WebMCPCatalog["WebMCP Polyfill & JSON-LD Tool Catalog"]
+        CognitiveShield["Cognitive Localization & Shield Filter\n(Grade 4 / Grade 8 / Dyslexia)"]
     end
 
-    subgraph StorageLayer ["💾 Data & Archiving Standards"]
-        FHIR["FHIR R4 / R5 / R6 / FHIR 7 Bundles"]
-        Zenodo["CERN Zenodo Open Science (CC0 1.0 + ORCID iD)"]
-        IndexedDB["Local Encrypted Browser Cache"]
+    %% RIGHT WING: MULTI-PARADIGM LENSES
+    subgraph RightWing ["🩺 RIGHT WING — MULTI-PARADIGM LENSES"]
+        WesternLens["Western Allopathic Lens\n(Summary, Workup & Monitoring)"]
+        TCMLens["Eastern TCM Lens\n(Meridian, Tongue/Pulse & Qi)"]
+        AyurvedicLens["Ayurvedic Lens\n(Vata, Pitta, Kapha & Agni)"]
+        OrthoLens["Orthomolecular Lens\n(Biomarker & Precision Nutrients)"]
+        YBOCsLens["Y-BOCs Diagnostic Screener"]
+        CDCSentinel["CDC Sentinel Triage (Levels 1–5)"]
     end
 
-    UI --> Viewer
-    UI --> Handoff
-    UI --> WebMCP
-    UI <-->|"WebSocket / REST"| Express
-    Express <-->|"gRPC / Multimodal"| Gemini
-    Express <-->|"Pydantic API"| FastAPI
-    Gemini --> PubMed
-    Express --> Genkit
-    Handoff --> FHIR
-    FHIR --> Zenodo
-    UI --> IndexedDB
+    %% BOTTOM FOUNDATION: STANDARDS & ARCHIVING
+    subgraph Foundation ["💾 FOUNDATION — STANDARDS & ARCHIVING"]
+        FHIRBundles["FHIR R4 / R5 / R6 / FHIR 7 Bundles"]
+        CERNZenodo["CERN Zenodo Open Science (CC0 1.0 + ORCID iD)"]
+        IndexedDBCache["Encrypted Offline Browser Cache"]
+        PubmedGrounding["NCBI PubMed & Evidence Grounding"]
+    end
 
-    class UI,Viewer,Handoff,WebMCP client;
-    class Express,FastAPI server;
-    class Gemini,PubMed,Genkit ai;
-    class FHIR,Zenodo,IndexedDB db;
+    %% CONNECTIONS RADIATING FROM & THROUGH THE DOORWAY HUB
+    CloudRun --> ExpressProxy
+    ExpressProxy <--> FastAPISidecar
+    ExpressProxy <--> VertexAI
+
+    Body3D -->|Spatio-Anatomical Signals| PatientState
+    VoiceSTT -->|Audio Stream & Transcripts| ADKRunner
+    URLHandoff -->|Base64 Payload Restore| PatientState
+    IntakeForm -->|Vitals & Symptoms| PatientState
+
+    ExpressProxy <-->|WebSocket & REST| DoorwayHub
+
+    PatientState <--> ADKRunner
+    ADKRunner <--> WebMCPCatalog
+    PatientState <--> CognitiveShield
+
+    DoorwayHub <--> WesternLens
+    DoorwayHub <--> TCMLens
+    DoorwayHub <--> AyurvedicLens
+    DoorwayHub <--> OrthoLens
+    DoorwayHub <--> YBOCsLens
+    DoorwayHub <--> CDCSentinel
+
+    PatientState --> FHIRBundles
+    FHIRBundles --> CERNZenodo
+    PatientState --> IndexedDBCache
+    ADKRunner --> PubmedGrounding
+
+    class PatientState,ADKRunner,WebMCPCatalog,CognitiveShield doorway;
+    class Body3D,VoiceSTT,URLHandoff,IntakeForm leftWing;
+    class WesternLens,TCMLens,AyurvedicLens,OrthoLens,YBOCsLens,CDCSentinel rightWing;
+    class CloudRun,ExpressProxy,FastAPISidecar,VertexAI cloudCeiling;
+    class FHIRBundles,CERNZenodo,IndexedDBCache,PubmedGrounding foundation;
 ```
 
 A highly interactive, aesthetically minimal user interface (Industrial Grace) designed for immediate clinical insight.
