@@ -38,6 +38,7 @@ import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.com
 import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboard.component';
 import { GeolocationalHealthRelocationComponent } from './geolocational-health-relocation.component';
 import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapper.service';
+import { InstantPatientActionSuiteComponent } from './instant-patient-action-suite.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -68,7 +69,8 @@ import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapp
     DietaryAllergyShieldComponent,
     LensInsightSparkShieldComponent,
     ParadigmClinicalDashboardComponent,
-    GeolocationalHealthRelocationComponent
+    GeolocationalHealthRelocationComponent,
+    InstantPatientActionSuiteComponent
   ],
 
 
@@ -385,6 +387,9 @@ import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapp
               </span>
             </div>
           </div>
+        <!-- Instant Patient Action Suite (Somatic Relief, Service Animal & Health Simulator) -->
+        @if (hasAnyReport()) {
+          <app-instant-patient-action-suite></app-instant-patient-action-suite>
         }
 
 

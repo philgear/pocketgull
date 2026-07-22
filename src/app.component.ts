@@ -47,6 +47,7 @@ import { ConsentModalComponent } from './components/consent-modal.component';
 import { ResearchTabComponent } from './components/research-tab.component';
 import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
 import { CompanionSyncModalComponent } from './components/companion-sync-modal.component';
+import { InstantPatientActionSuiteComponent } from './components/instant-patient-action-suite.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -70,7 +71,8 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
     PocketGullInputComponent,
     ConsentModalComponent,
     ZamecznikCanvasComponent,
-    CompanionSyncModalComponent
+    CompanionSyncModalComponent,
+    InstantPatientActionSuiteComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
