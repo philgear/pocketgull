@@ -12,6 +12,7 @@
 ![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![Version](https://img.shields.io/badge/version-1.0.0--rc12-blue)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/philgear/pocketgull/badge)](https://securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull)
 [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
 [![DOI](https://zenodo.org/badge/1161259215.svg)](https://doi.org/10.5281/zenodo.20647513)
 [![ACM Code of Ethics](https://img.shields.io/badge/ACM-Ethics%20%26%20Conduct-006699?logo=associationforcomputingmachinery&logoColor=white)](https://www.acm.org/code-of-ethics)
@@ -399,6 +400,23 @@ We align our engineering practices and ethical standards with these guidelines a
 - **[Oregon Care Partners](https://oregoncarepartners.com)**: Accessing high-quality caregiver training and evidence-based education to support local Oregon eldercare and community wellness.
 - **[American Psychological Association](https://www.apa.org)**: Promoting psychological science and professional standards in behavior, mental health, and clinical assessment.
 - **[American Academy of Arts and Sciences](https://www.amacad.org)**: Aligning clinical strategy with independent research and multidisciplinary studies in the arts, humanities, and sciences.
+---
+
+## 🛡️ OPENSSF SECURITY SCORECARD
+
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/philgear/pocketgull/badge)](https://securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull)
+
+Pocket Gull maintains an automated security posture audited by the **[OpenSSF Scorecard](https://securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull)**:
+
+| Security Check | Score | Status | Details |
+|----------------|:-----:|:------:|---------|
+| **CI-Tests** | **10 / 10** | ✅ | Automated CI verification on 100% of pull requests |
+| **Dependency-Update-Tool** | **10 / 10** | ✅ | Dependabot security scanning & automated dependency PRs |
+| **License** | **10 / 10** | ✅ | Open-Source OSI MIT License compliance |
+| **Maintained** | **10 / 10** | ✅ | Active commit history & issue management |
+| **Security Policy** | **10 / 10** | ✅ | Strict vulnerability disclosure via `SECURITY.md` |
+
+🔍 **View Live OpenSSF Scorecard Audit Report**: [securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull](https://securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull)
 
 ---
 

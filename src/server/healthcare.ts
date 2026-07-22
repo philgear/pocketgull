@@ -11,6 +11,7 @@ healthcareRouter.use(rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many Healthcare API requests. Please try again later.' }
 }));
 
@@ -764,7 +765,7 @@ healthcareRouter.post('/pubsub/webhook', express.json(), async (req, res) => {
       notificationPayload = { raw: decodedData };
     }
 
-    console.log('[Healthcare Pub/Sub Webhook] Received FHIR event notification:', notificationPayload);
+    console.log('[Healthcare Pub/Sub Webhook] Received FHIR event notification:', JSON.stringify(notificationPayload).replace(/[\r\n]/g, '_'));
 
     const sidecarUrl = process.env['POCKETGULL_API_URL'] || 'http://127.0.0.1:8000';
     try {

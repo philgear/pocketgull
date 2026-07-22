@@ -692,10 +692,10 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                                  [class.text-blue-700]="showCDCBaseline()"
                                  [class.dark:text-blue-300]="showCDCBaseline()"
                                  [class.font-bold]="showCDCBaseline()">
-                            <input type="checkbox" [checked]="showCDCBaseline()" (change)="showCDCBaseline.set(!showCDCBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#4285F4] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <input id="cdc-baseline-checkbox" name="showCDCBaseline" aria-label="Toggle CDC Baselines Overlay" type="checkbox" [checked]="showCDCBaseline()" (change)="showCDCBaseline.set(!showCDCBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#4285F4] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
                             <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap"><div class="w-1.5 md:w-2 h-0.5 bg-[#4285F4] rounded-full"></div> CDC Baselines</span>
                           </label>
-                          <label class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
+                          <label for="who-baseline-checkbox" class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
                                  [class.bg-green-50]="showWHOBaseline()"
                                  [class.dark:bg-green-950/40]="showWHOBaseline()"
                                  [class.ring-1]="showWHOBaseline()"
@@ -704,10 +704,10 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                                  [class.text-green-700]="showWHOBaseline()"
                                  [class.dark:text-green-300]="showWHOBaseline()"
                                  [class.font-bold]="showWHOBaseline()">
-                            <input type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#689F38] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <input id="who-baseline-checkbox" name="showWHOBaseline" aria-label="Toggle WHO Baselines Overlay" type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#689F38] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
                             <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap"><div class="w-1.5 md:w-2 h-0.5 bg-[#689F38] rounded-full"></div> WHO Baselines</span>
                           </label>
-                          <label class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
+                          <label for="bq-baseline-checkbox" class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
                                  [class.bg-red-50]="showBQBaseline()"
                                  [class.dark:bg-red-950/40]="showBQBaseline()"
                                  [class.ring-1]="showBQBaseline()"
@@ -716,7 +716,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                                  [class.text-red-700]="showBQBaseline()"
                                  [class.dark:text-red-300]="showBQBaseline()"
                                  [class.font-bold]="showBQBaseline()">
-                            <input type="checkbox" [checked]="showBQBaseline()" (change)="showBQBaseline.set(!showBQBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#EA4335] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
+                            <input id="bq-baseline-checkbox" name="showBQBaseline" aria-label="Toggle BigQuery OMOP Baselines Overlay" type="checkbox" [checked]="showBQBaseline()" (change)="showBQBaseline.set(!showBQBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#EA4335] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
                             <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap">
                               <div class="w-1.5 md:w-2 h-0.5 bg-[#EA4335] rounded-full"></div> 
                               BigQuery OMOP 

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 
-export type MedicalParadigmMode = 'western' | 'functional' | 'tcm' | 'ayurveda' | 'chronobiology';
+export type MedicalParadigmMode = 'western' | 'functional' | 'tcm' | 'ayurveda' | 'chronobiology' | 'blend_all' | 'blend_west_tcm' | 'blend_west_ayurveda' | 'blend_tcm_ayurveda';
 
 export interface IParadigmInfo {
   id: MedicalParadigmMode;
@@ -21,67 +21,213 @@ export interface IParadigmInfo {
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mb-8 p-6 sm:p-8 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl font-sans relative overflow-hidden">
+    <div class="mb-8 p-6 sm:p-8 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl relative overflow-hidden font-mono">
       
-      <!-- Background Glow Effect -->
-      <div [class]="activeParadigmGlowClass()" class="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl pointer-events-none transition-all duration-700"></div>
-
-      <!-- Header & Selector -->
+      <!-- Header & Selector (Dieter Rams Braun Aesthetic) -->
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-zinc-800 pb-5 mb-6 relative z-10 font-mono">
         <div>
-          <div class="flex items-center gap-3">
-            <span class="w-3 h-3 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.8)] animate-pulse"></span>
-            <h2 class="text-xl font-bold uppercase tracking-tight text-zinc-100">
-              🩺 Multi-Paradigm Clinical Overview Dashboard
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]"></span>
+            <h2 class="text-base font-black uppercase tracking-tight text-zinc-100">
+              🩺 Multi-Paradigm Integrative Clinical Dashboard
             </h2>
-            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase">
-              Paradigm Switcher Engine
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-orange-400 border border-zinc-800 uppercase">
+              Integrative Blend Engine
             </span>
           </div>
-          <p class="text-xs text-zinc-400 mt-1.5 font-sans">
-            View patient health state through distinct medical paradigms: Western Allopathic, IFM Functional Systems, TCM Zang-Fu, Ayurveda Tridosha, or Chronobiology.
+          <p class="text-xs text-zinc-400 mt-1 font-mono">
+            View patient health state individually or blend multiple paradigms side-by-side: Western Allopathic, TCM Zang-Fu, and Ayurveda Tridosha.
           </p>
         </div>
 
         <div class="text-right text-[11px] text-zinc-400 font-mono">
-          <span>Active Patient: <strong class="text-cyan-400 font-bold uppercase">{{ activePatientName() }}</strong></span>
+          <span>Active Patient: <strong class="text-orange-400 font-bold uppercase">{{ activePatientName() }}</strong></span>
         </div>
       </div>
 
-      <!-- Paradigm Switcher Tabs -->
+      <!-- Multi-Paradigm Blend & Selection Toolbar -->
       <div class="flex flex-wrap items-center gap-2 mb-6 relative z-10 font-mono">
+        
+        <!-- Multi-Paradigm Blend Presets -->
+        <span class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mr-1">Integrative Blends:</span>
+
+        <button (click)="selectBlend('blend_all')"
+          [class]="activeMode() === 'blend_all'
+            ? 'px-3.5 py-2 rounded-xl bg-purple-600 text-white border border-purple-400 text-xs font-mono font-bold transition cursor-pointer flex items-center gap-1.5 shadow-lg scale-[1.02]'
+            : 'px-3 py-1.5 rounded-xl bg-purple-950/40 border border-purple-500/40 text-xs font-mono font-bold text-purple-300 transition cursor-pointer hover:bg-purple-900/60 flex items-center gap-1.5'">
+          <span>🌐 All 3 (West + TCM + Ayurveda)</span>
+        </button>
+
+        <button (click)="selectBlend('blend_west_tcm')"
+          [class]="activeMode() === 'blend_west_tcm'
+            ? 'px-3.5 py-2 rounded-xl bg-sky-600 text-white border border-sky-400 text-xs font-mono font-bold transition cursor-pointer flex items-center gap-1.5 shadow-lg scale-[1.02]'
+            : 'px-3 py-1.5 rounded-xl bg-sky-950/40 border border-sky-500/40 text-xs font-mono font-bold text-sky-300 transition cursor-pointer hover:bg-sky-900/60 flex items-center gap-1.5'">
+          <span>🔵 Western + 🟢 TCM</span>
+        </button>
+
+        <button (click)="selectBlend('blend_west_ayurveda')"
+          [class]="activeMode() === 'blend_west_ayurveda'
+            ? 'px-3.5 py-2 rounded-xl bg-amber-600 text-white border border-amber-400 text-xs font-mono font-bold transition cursor-pointer flex items-center gap-1.5 shadow-lg scale-[1.02]'
+            : 'px-3 py-1.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-xs font-mono font-bold text-amber-300 transition cursor-pointer hover:bg-amber-900/60 flex items-center gap-1.5'">
+          <span>🔵 Western + 🟡 Ayurveda</span>
+        </button>
+
+        <button (click)="selectBlend('blend_tcm_ayurveda')"
+          [class]="activeMode() === 'blend_tcm_ayurveda'
+            ? 'px-3.5 py-2 rounded-xl bg-emerald-600 text-white border border-emerald-400 text-xs font-mono font-bold transition cursor-pointer flex items-center gap-1.5 shadow-lg scale-[1.02]'
+            : 'px-3 py-1.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-xs font-mono font-bold text-emerald-300 transition cursor-pointer hover:bg-emerald-900/60 flex items-center gap-1.5'">
+          <span>🟢 TCM + 🟡 Ayurveda</span>
+        </button>
+
+        <!-- Divider -->
+        <span class="text-zinc-700 mx-1">|</span>
+
+        <!-- Single Paradigm Selectors -->
         @for (p of paradigms; track p.id) {
-          <button (click)="activeMode.set(p.id)"
-            [class.bg-zinc-800]="activeMode() === p.id"
-            [class.border-cyan-500/50]="activeMode() === p.id"
-            [class.text-cyan-300]="activeMode() === p.id"
-            class="px-3.5 py-2 rounded-2xl bg-zinc-900/90 border border-zinc-800 text-xs font-bold text-zinc-400 transition cursor-pointer hover:border-zinc-700 flex items-center gap-2 shadow-sm">
+          <button (click)="selectBlend(p.id)"
+            [class]="activeMode() === p.id
+              ? 'px-3.5 py-2 rounded-xl bg-orange-500 text-zinc-950 border border-orange-400/50 text-xs font-mono font-bold transition cursor-pointer flex items-center gap-2 shadow-md'
+              : 'px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono font-bold text-zinc-400 transition cursor-pointer hover:border-zinc-700 hover:text-zinc-200 flex items-center gap-2'">
             <span>{{ p.icon }}</span>
             <span>{{ p.name }}</span>
           </button>
         }
       </div>
 
-      <!-- Active Paradigm Principles Banner -->
-      <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 font-mono">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">{{ currentParadigm().icon }}</span>
-          <div>
-            <h3 class="text-xs font-bold uppercase tracking-tight text-zinc-100 font-mono">{{ currentParadigm().name }} Paradigm</h3>
-            <span class="text-[10.5px] text-zinc-400 block font-sans">{{ currentParadigm().subtitle }}</span>
+      <!-- MULTI-PARADIGM BLEND VIEW (All 3 or Selected Blends) -->
+      @if (isBlendMode()) {
+        <div class="space-y-6 relative z-10 font-sans animate-in fade-in duration-300">
+          
+          <!-- Integrative Clinical Cross-Talk Insight Box -->
+          <div class="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/40 font-mono text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-inner">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🔗</span>
+              <div>
+                <strong class="block font-extrabold uppercase text-purple-300">Integrative Multi-Paradigm Cross-Talk Analysis</strong>
+                <span class="text-[11px] text-zinc-300 font-sans">
+                  Synthesizing allopathic L4-L5 radiculopathy with TCM Spleen/Kidney Qi deficiency and Ayurvedic Vata aggravation.
+                </span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded bg-purple-500/20 text-purple-200 border border-purple-400/30">
+                Triple-Validated Accord
+              </span>
+            </div>
+          </div>
+
+          <!-- Comparative Grid of Enabled Paradigms -->
+          <div class="grid grid-cols-1 gap-6" [class.lg:grid-cols-3]="activeMode() === 'blend_all'" [class.lg:grid-cols-2]="activeMode() !== 'blend_all'">
+            
+            <!-- Column 1: Western Allopathic -->
+            @if (showWestern()) {
+              <div class="p-5 rounded-3xl bg-zinc-900 border border-sky-500/40 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3 font-mono">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl">🔵</span>
+                    <h3 class="text-xs font-extrabold text-sky-300 uppercase">Western Allopathic</h3>
+                  </div>
+                  <span class="text-[9.5px] font-bold px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">ICD-10 / Labs</span>
+                </div>
+
+                <div class="space-y-3 font-sans text-xs">
+                  <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
+                    <span class="font-bold text-sky-300 block mb-0.5">🫀 Vitals & Labs</span>
+                    <span class="text-zinc-200 font-mono">72 BPM · 118/76 mmHg · Glucose 92 mg/dL</span>
+                    <span class="text-zinc-400 text-[11px] block mt-1">Normal sinus rhythm. Mild vascular stiffness index.</span>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
+                    <span class="font-bold text-rose-300 block mb-0.5">🦴 Musculoskeletal (ICD-10 M54.16)</span>
+                    <span class="text-zinc-200 font-mono">L4-L5 Disc Radiculopathy · VAS 6/10</span>
+                    <span class="text-zinc-400 text-[11px] block mt-1">NSAID anti-inflammatory & McKenzie Physical Therapy protocol.</span>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Column 2: Traditional Chinese Medicine (TCM) -->
+            @if (showTcm()) {
+              <div class="p-5 rounded-3xl bg-zinc-900 border border-emerald-500/40 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3 font-mono">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl">🟢</span>
+                    <h3 class="text-xs font-extrabold text-emerald-300 uppercase">TCM Zang-Fu & Meridian</h3>
+                  </div>
+                  <span class="text-[9.5px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Wu Xing 5-Element</span>
+                </div>
+
+                <div class="space-y-3 font-sans text-xs">
+                  <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
+                    <span class="font-bold text-emerald-300 block mb-0.5">🌿 Wood & Water Meridian Flow</span>
+                    <span class="text-zinc-200 font-mono">Liver Qi Stagnation · Kidney Jing Deficiency</span>
+                    <span class="text-zinc-400 text-[11px] block mt-1">Nourishing Spleen Qi to resolve dampness and clear lumbar channel blockages.</span>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
+                    <span class="font-bold text-emerald-300 block mb-0.5">🍵 Classic Botanical Protocol</span>
+                    <span class="text-zinc-200 font-mono">Jin Gui Shen Qi Wan · Ginger Jujube Elixir</span>
+                    <span class="text-zinc-400 text-[11px] block mt-1">Warm botanical teas and acupoints (BL23, GB34) to unblock meridian pathways.</span>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Column 3: Ayurveda Tridosha -->
+            @if (showAyurveda()) {
+              <div class="p-5 rounded-3xl bg-zinc-900 border border-amber-500/40 space-y-4 shadow-xl">
+                <div class="flex items-center justify-between border-b border-zinc-800 pb-3 font-mono">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl">🟡</span>
+                    <h3 class="text-xs font-extrabold text-amber-300 uppercase">Ayurveda Tridosha</h3>
+                  </div>
+                  <span class="text-[9.5px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">Prakriti / Vikriti</span>
+                </div>
+
+                <div class="space-y-3 font-sans text-xs">
+                  <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
+                    <span class="font-bold text-amber-300 block mb-0.5">🌬️ Vata / Pitta / Kapha Imbalance</span>
+                    <span class="text-zinc-200 font-mono">Vata Aggravated · Vishama Agni</span>
+                    <span class="text-zinc-400 text-[11px] block mt-1">Spinal dryness and nerve firing driven by Vata space element. Pitta is balanced.</span>
+                  </div>
+
+                  <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800">
+                    <span class="font-bold text-amber-300 block mb-0.5">🪔 Rasayana & Dinacharya Care</span>
+                    <span class="text-zinc-200 font-mono">Warm Sesame Abhyanga · Ashwagandha & Triphala</span>
+                    <span class="text-zinc-400 text-[11px] block mt-1">Grounding daily routines and six-taste (Shad Rasa) meals to kindle Agni and clear Ama.</span>
+                  </div>
+                </div>
+              </div>
+            }
+
+          </div>
+
+        </div>
+      }
+
+      <!-- SINGLE PARADIGM PRINCIPLES BANNER -->
+      @if (!isBlendMode()) {
+        <div class="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10 font-mono">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">{{ currentParadigm().icon }}</span>
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-tight text-zinc-100 font-mono">{{ currentParadigm().name }} Paradigm</h3>
+              <span class="text-[10.5px] text-zinc-400 block font-sans">{{ currentParadigm().subtitle }}</span>
+            </div>
+          </div>
+          
+          <div class="flex flex-wrap gap-1.5">
+            @for (principle of currentParadigm().focusPrinciples; track principle) {
+              <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700 font-mono">
+                {{ principle }}
+              </span>
+            }
           </div>
         </div>
-        
-        <div class="flex flex-wrap gap-1.5">
-          @for (principle of currentParadigm().focusPrinciples; track principle) {
-            <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700 font-mono">
-              {{ principle }}
-            </span>
-          }
-        </div>
-      </div>
+      }
 
-      <!-- PARADIGM VIEW 1: WESTERN ALLOPATHIC -->
+      <!-- SINGLE PARADIGM VIEW 1: WESTERN ALLOPATHIC -->
       @if (activeMode() === 'western') {
         <div class="space-y-6 relative z-10 font-sans">
           <!-- Organ System Grid -->
@@ -125,7 +271,7 @@ export interface IParadigmInfo {
         </div>
       }
 
-      <!-- PARADIGM VIEW 2: FUNCTIONAL SYSTEMS (IFM MATRIX) -->
+      <!-- SINGLE PARADIGM VIEW 2: FUNCTIONAL SYSTEMS (IFM MATRIX) -->
       @if (activeMode() === 'functional') {
         <div class="space-y-6 relative z-10 font-sans">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -156,7 +302,7 @@ export interface IParadigmInfo {
         </div>
       }
 
-      <!-- PARADIGM VIEW 3: TRADITIONAL CHINESE MEDICINE (TCM) -->
+      <!-- SINGLE PARADIGM VIEW 3: TRADITIONAL CHINESE MEDICINE (TCM) -->
       @if (activeMode() === 'tcm') {
         <div class="space-y-6 relative z-10 font-sans">
           <!-- Wu Xing 5-Elements Pentagram Grid -->
@@ -199,7 +345,7 @@ export interface IParadigmInfo {
         </div>
       }
 
-      <!-- PARADIGM VIEW 4: AYURVEDA TRIDOSHA -->
+      <!-- SINGLE PARADIGM VIEW 4: AYURVEDA TRIDOSHA -->
       @if (activeMode() === 'ayurveda') {
         <div class="space-y-6 relative z-10 font-sans">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
@@ -230,7 +376,7 @@ export interface IParadigmInfo {
         </div>
       }
 
-      <!-- PARADIGM VIEW 5: CHRONOBIOLOGY & ENVIRONMENTAL -->
+      <!-- SINGLE PARADIGM VIEW 5: CHRONOBIOLOGY & ENVIRONMENTAL -->
       @if (activeMode() === 'chronobiology') {
         <div class="space-y-6 relative z-10 font-sans">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono">
@@ -262,7 +408,7 @@ export class ParadigmClinicalDashboardComponent {
   patientState = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);
 
-  activeMode = signal<MedicalParadigmMode>('western');
+  activeMode = signal<MedicalParadigmMode>('blend_all');
 
   paradigms: IParadigmInfo[] = [
     {
@@ -312,18 +458,40 @@ export class ParadigmClinicalDashboardComponent {
     }
   ];
 
+  selectBlend(mode: MedicalParadigmMode) {
+    this.activeMode.set(mode);
+    if (mode === 'western') {
+      this.patientState.activePhilosophy.set('western');
+    } else if (mode === 'tcm') {
+      this.patientState.activePhilosophy.set('eastern');
+    } else if (mode === 'ayurveda') {
+      this.patientState.activePhilosophy.set('ayurvedic');
+    }
+  }
+
+  isBlendMode = computed(() => {
+    const m = this.activeMode();
+    return m.startsWith('blend_');
+  });
+
+  showWestern = computed(() => {
+    const m = this.activeMode();
+    return m === 'western' || m === 'blend_all' || m === 'blend_west_tcm' || m === 'blend_west_ayurveda';
+  });
+
+  showTcm = computed(() => {
+    const m = this.activeMode();
+    return m === 'tcm' || m === 'blend_all' || m === 'blend_west_tcm' || m === 'blend_tcm_ayurveda';
+  });
+
+  showAyurveda = computed(() => {
+    const m = this.activeMode();
+    return m === 'ayurveda' || m === 'blend_all' || m === 'blend_west_ayurveda' || m === 'blend_tcm_ayurveda';
+  });
+
   currentParadigm = computed(() => {
     const mode = this.activeMode();
     return this.paradigms.find(p => p.id === mode) || this.paradigms[0];
-  });
-
-  activeParadigmGlowClass = computed(() => {
-    const mode = this.activeMode();
-    if (mode === 'western') return 'bg-cyan-500/10';
-    if (mode === 'functional') return 'bg-purple-500/10';
-    if (mode === 'tcm') return 'bg-emerald-500/10';
-    if (mode === 'ayurveda') return 'bg-amber-500/10';
-    return 'bg-indigo-500/10';
   });
 
   activePatientName = computed(() => {

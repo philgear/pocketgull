@@ -203,7 +203,7 @@ app.use((req, res, next) => {
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; " +
     "img-src 'self' https: data:; " +
     "font-src 'self'; " +
-    "connect-src 'self' https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; " +
+    "connect-src 'self' http: https: ws: wss: http://localhost:9399 http://localhost:4000 http://localhost:4200 http://localhost:8000 http://localhost:5000 http://127.0.0.1:9399 http://127.0.0.1:4000 ws://localhost:9399 ws://localhost:4000 ws://localhost:4200 https://eutils.ncbi.nlm.nih.gov https://generativelanguage.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; " +
     "frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://insightspark-82c75.web.app; " +
     "frame-ancestors 'self'; " +
     "object-src 'none'; " +

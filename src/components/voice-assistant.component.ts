@@ -255,13 +255,13 @@ export interface IChatEntry {
                             <!-- Smart Suggestions -->
                             @if (agentState() === 'idle') {
                               <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
                                      What is the most critical evidence?
                                  </button>
-                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
                                      Alternative interventions?
                                  </button>
-                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
+                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
                                      Explain rationale simply
                                  </button>
                               </div>
@@ -273,10 +273,10 @@ export interface IChatEntry {
                               </div>
                             }
 
-                            <form (submit)="sendMessage($event)" class="w-full flex items-center gap-2 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-700 shadow-2xl rounded-full p-2 focus-within:border-gray-300 dark:focus-within:border-zinc-600 transition-all">
+                            <form (submit)="sendMessage($event)" class="w-full flex items-center gap-2 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-gray-200 dark:border-zinc-700 shadow-2xl rounded-2xl p-2 focus-within:border-gray-300 dark:focus-within:border-zinc-600 transition-all">
                                 <button type="button" (click)="toggleListening()" [disabled]="agentState() !== 'idle' || !!permissionError()"
                                         title="Start/Stop Voice Capture"
-                                        class="w-12 h-12 flex items-center justify-center rounded-full disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
+                                        class="w-12 h-12 flex items-center justify-center rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shrink-0"
                                         [class.bg-red-500]="live.isListening()" [class.text-white]="live.isListening()"
                                         [class.bg-gray-100]="!live.isListening()" [class.dark:bg-zinc-800]="!live.isListening()" [class.text-gray-600]="!live.isListening()" [class.dark:text-zinc-300]="!live.isListening()"
                                         [class.hover:bg-red-600]="live.isListening()" [class.hover:bg-gray-200]="!live.isListening()" [class.dark:hover:bg-zinc-700]="!live.isListening()">
@@ -296,7 +296,7 @@ export interface IChatEntry {
                                     </pocket-gull-input>
                                 </div>
 
-                                 <button type="button" class="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
+                                 <button type="button" class="w-10 h-10 flex items-center justify-center rounded-xl transition-colors"
                                          (click)="isResearchMode.set(!isResearchMode())"
                                          [class.bg-blue-100]="isResearchMode()" [class.dark:bg-blue-900]="isResearchMode()" [class.text-blue-600]="isResearchMode()" [class.dark:text-blue-300]="isResearchMode()"
                                          [class.text-gray-500]="!isResearchMode()" [class.hover:bg-gray-100]="!isResearchMode()" [class.dark:hover:bg-zinc-800]="!isResearchMode()"
@@ -304,7 +304,7 @@ export interface IChatEntry {
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                                 </button>
 
-                                 <button type="button" class="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-50" (click)="triggerFileInput()" [disabled]="agentState() !== 'idle'" title="Attach Files">
+                                 <button type="button" class="w-10 h-10 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 disabled:opacity-50" (click)="triggerFileInput()" [disabled]="agentState() !== 'idle'" title="Attach Files">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                                 </button>
                                 <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*,application/pdf" multiple class="hidden">
@@ -312,7 +312,7 @@ export interface IChatEntry {
                                 <button 
                                     type="submit" 
                                     [disabled]="!messageText().trim() && selectedFiles().length === 0 || agentState() !== 'idle'"
-                                    class="w-12 h-12 rounded-full flex items-center justify-center bg-black text-white disabled:bg-gray-300 dark:disabled:bg-zinc-700 hover:bg-gray-800 transition-colors shrink-0">
+                                    class="w-12 h-12 rounded-xl flex items-center justify-center bg-black text-white disabled:bg-gray-300 dark:disabled:bg-zinc-700 hover:bg-gray-800 transition-colors shrink-0">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                                 </button>
                             </form>

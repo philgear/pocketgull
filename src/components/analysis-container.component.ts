@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject, computed, ViewChild } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, computed, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalysisReportComponent } from './analysis-report.component';
 import { PatientStateService } from '../services/patient-state.service';
@@ -38,164 +38,85 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
           @let isEastern = state.activePhilosophy() === 'eastern';
           @let isAyurvedic = state.activePhilosophy() === 'ayurvedic';
 
-          <div class="min-h-[56px] py-2 bg-white dark:bg-[#09090b] border-b border-gray-200 dark:border-zinc-800 flex flex-wrap sm:flex-nowrap items-center justify-between px-3 sm:px-6 shrink-0 relative z-10 font-mono gap-2">
+          <div class="min-h-[56px] py-2.5 bg-zinc-950 border-b border-zinc-800 flex flex-wrap items-center justify-between px-3 sm:px-6 shrink-0 relative z-10 font-mono gap-2 text-zinc-100">
               
             <!-- Geographical Clinical Paradigm Selector -->
-            <div class="flex items-center gap-1 bg-gray-100 dark:bg-zinc-900 p-1 rounded-md border border-gray-300 dark:border-zinc-800 overflow-x-auto max-w-full">
-              <span class="hidden md:inline text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-400 px-1">
+            <div class="flex items-center gap-1.5 bg-zinc-900 p-1 rounded-xl border border-zinc-800 overflow-x-auto max-w-full font-mono">
+              <span class="hidden md:inline text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-400 px-1">
                 Paradigm:
               </span>
 
               <!-- Western Clinical (North America & Europe) -->
               <button (click)="selectPhilosophy('western')"
                 title="Western Clinical Medicine (North America & Europe)"
-                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-mono font-extrabold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-md"
-                [class.bg-white]="isWestern"
-                [class.dark:bg-zinc-950]="isWestern"
-                [class.text-sky-700]="isWestern"
-                [class.dark:text-sky-300]="isWestern"
-                [class.border-sky-500]="isWestern"
-                [class.shadow-xs]="isWestern"
-                [class.text-slate-600]="!isWestern"
-                [class.dark:text-zinc-400]="!isWestern"
-                [class.border-transparent]="!isWestern"
-                [class.hover:bg-slate-200/50]="!isWestern"
-                [class.dark:hover:bg-zinc-800/50]="!isWestern">
-                <span class="w-2 h-2 rounded-md bg-sky-500 shrink-0"></span>
+                [class]="isWestern
+                  ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-lg bg-orange-500 text-zinc-950 border-orange-400/50 shadow-sm'
+                  : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-lg bg-zinc-900 text-zinc-400 border-transparent hover:text-zinc-200 hover:bg-zinc-850'">
                 <span>🏥 Western</span>
               </button>
 
               <!-- Eastern TCM (East Asia Zang-Fu) -->
               <button (click)="selectPhilosophy('eastern')"
                 title="Eastern TCM Medicine (East Asian Zang-Fu)"
-                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-mono font-extrabold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-md"
-                [class.bg-white]="isEastern"
-                [class.dark:bg-zinc-950]="isEastern"
-                [class.text-emerald-700]="isEastern"
-                [class.dark:text-emerald-300]="isEastern"
-                [class.border-emerald-500]="isEastern"
-                [class.shadow-xs]="isEastern"
-                [class.text-slate-600]="!isEastern"
-                [class.dark:text-zinc-400]="!isEastern"
-                [class.border-transparent]="!isEastern"
-                [class.hover:bg-slate-200/50]="!isEastern"
-                [class.dark:hover:bg-zinc-800/50]="!isEastern">
-                <span class="w-2 h-2 rounded-md bg-emerald-500 shrink-0"></span>
+                [class]="isEastern
+                  ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-lg bg-orange-500 text-zinc-950 border-orange-400/50 shadow-sm'
+                  : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-lg bg-zinc-900 text-zinc-400 border-transparent hover:text-zinc-200 hover:bg-zinc-850'">
                 <span>☯️ Eastern</span>
               </button>
 
               <!-- Ayurvedic (South Asia Vedic) -->
               <button (click)="selectPhilosophy('ayurvedic')"
                 title="Ayurvedic Medicine (South Asian Vedic Dosha)"
-                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-mono font-extrabold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-md"
-                [class.bg-white]="isAyurvedic"
-                [class.dark:bg-zinc-950]="isAyurvedic"
-                [class.text-amber-700]="isAyurvedic"
-                [class.dark:text-amber-300]="isAyurvedic"
-                [class.border-amber-500]="isAyurvedic"
-                [class.shadow-xs]="isAyurvedic"
-                [class.text-slate-600]="!isAyurvedic"
-                [class.dark:text-zinc-400]="!isAyurvedic"
-                [class.border-transparent]="!isAyurvedic"
-                [class.hover:bg-slate-200/50]="!isAyurvedic"
-                [class.dark:hover:bg-zinc-800/50]="!isAyurvedic">
-                <span class="w-2 h-2 rounded-md bg-amber-500 shrink-0"></span>
+                [class]="isAyurvedic
+                  ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-lg bg-orange-500 text-zinc-950 border-orange-400/50 shadow-sm'
+                  : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold tracking-wider uppercase transition-all select-none cursor-pointer border rounded-lg bg-zinc-900 text-zinc-400 border-transparent hover:text-zinc-200 hover:bg-zinc-850'">
                 <span>🪷 Ayurvedic</span>
               </button>
             </div>
 
-            <!-- Export Actions & Mobile Refresh Analysis -->
-            <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+            <!-- Export Actions & Streamlined Interactive Suite Drawer Button -->
+            <div class="flex items-center gap-2 sm:gap-2.5 ml-auto font-mono">
               @if (justGenerated() && hasReport() && !intelligence.isLoading()) {
-                <div class="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-mono font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
-                   <span class="w-2 h-2 rounded-md bg-emerald-500 animate-pulse"></span>
+                <div class="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[10px] font-mono font-bold uppercase tracking-wider text-orange-400">
+                   <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
                    <span>Analysis Synced</span>
                 </div>
               }
               
               @if (!intelligence.isLoading()) {
-                <!-- Human Dignity Health Charter Button -->
-                <button type="button" (click)="showPactModal.set(true)" title="Human Dignity Health Charter & Voluntary Opt-In"
-                  class="hidden sm:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer">
-                  <span>🕊️</span> Dignity Charter
-                </button>
-
                 <!-- PDF Care Plan Export Button -->
                 <button type="button" (click)="exportPdf()" title="Export Printable PDF Care Plan"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
+                  class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition cursor-pointer shadow-sm">
                   <span>📄</span> PDF
                 </button>
 
-                <!-- MyChart Pre-Visit Brief Button -->
-                <button type="button" (click)="showMyChartModal.set(true)" title="Generate Epic MyChart Pre-Visit Brief & Longevity Lab Navigator"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20 transition cursor-pointer">
-                  <span>🏥</span> MyChart Brief
-                </button>
-
-                <!-- Pedigree Tree Risk Pruning Button -->
-                <button type="button" (click)="showPedigreeModal.set(true)" title="Open Family Health Pedigree Tree & Risk Branch Pruning"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer">
-                  <span>🌳</span> Pedigree Tree
-                </button>
-
-                <!-- TED Patient Hero Story Button -->
-                <button type="button" (click)="showStoryModal.set(true)" title="Open TED-Style Patient Hero Journey Story Reader"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition cursor-pointer">
-                  <span>📖</span> Patient Story
-                </button>
-
-                <!-- 3D Post-It Notes Button -->
-                <button type="button" (click)="showPostItModal.set(true)" title="Open 3D Interactive Prescription Post-It Notes"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
-                  <span>📌</span> 3D Post-Its
-                </button>
-
-                <!-- Actuarial Glee Singalong Album Button -->
-                <button type="button" (click)="showGleeModal.set(true)" title="Open 12-Track Duet Singalong Game for Progressive Regeneration"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition cursor-pointer">
-                  <span>🎵</span> Actuarial Glee
-                </button>
-
-                <!-- Vinyl Music Store & DJ Deck Button -->
-                <button type="button" (click)="showVinylModal.set(true)" title="Open Retro Vinyl Music Store & DJ Turntable Station"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
-                  <span>📻</span> Vinyl Lounge
-                </button>
                 <!-- FHIR R4 Export Button -->
                 <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
+                  class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase rounded-xl border border-zinc-800 bg-zinc-900 text-orange-400 hover:bg-zinc-800 transition cursor-pointer shadow-sm">
                   <span>🔥</span> FHIR R4
                 </button>
 
-                <!-- GCP Healthcare API Sync Button -->
-                <button type="button" (click)="syncGcpHealthcare()" title="Sync FHIR R4 Care Plan to Google Cloud Healthcare API (gen-lang-client-0540208645)"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition cursor-pointer">
-                  <span>☁️</span> GCP Sync
-                </button>
-
-                <!-- Living Space Ambient Display Button -->
-                <button type="button" (click)="showLivingSpaceModal.set(true)" title="Open Living Room Ambient Display & Co-Regulation Studio"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
-                  <span>🏡</span> Living Space
-                </button>
-
-                <!-- Green Room Restorative Lounge Button -->
-                <button type="button" (click)="showGreenRoomModal.set(true)" title="Open Green Room Clinician & Patient Compassionate Lounge"
-                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer">
-                  <span>🌿</span> Green Room
+                <!-- Clinical Tools & Engagement Suites Drawer Toggle Button -->
+                <button type="button" (click)="showToolsMenu.set(!showToolsMenu())" title="Open Clinical Tools & Engagement Suites Drawer"
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer shadow-sm">
+                  <span>🎛️</span> Clinical Suites ▾
                 </button>
 
                 <pocket-gull-button (click)="intelligence.clearCache()"
                   variant="ghost"
                   size="sm"
-                  ariaLabel="Clear AI Cache"
-                  [icon]="ClinicalIcons.Clear">
+                  title="Clear AI completion cache and force model re-inference"
+                  className="!text-xs !py-1.5 !px-2.5 hover:!bg-red-500/20 hover:!text-red-400 border border-transparent hover:border-red-500/40">
+                  <span>🗑️ Clear</span>
                 </pocket-gull-button>
+              }
 
-                <pocket-gull-button id="tour-generate-btn" (click)="triggerAnalysisGenerate()" [disabled]="!state.hasIssues()"
+              @if (hasReport()) {
+                <pocket-gull-button (click)="triggerAnalysisGenerate()"
                   variant="primary"
                   size="sm"
-                  [icon]="hasReport() ? 'M17.65 6.35A7.95 7.95 0 0 0 12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.66-.67 3.17-1.76 4.24l1.42 1.42A9.92 9.92 0 0 0 22 12c0-2.76-1.12-5.26-2.35-7.65z' : 'M14 5l7 7m0 0l-7 7m7-7H3'">
+                  [disabled]="intelligence.isLoading()"
+                  className="!text-xs !py-1.5 !px-3 font-bold">
                   <span class="inline sm:hidden">{{ hasReport() ? 'Refresh' : 'Generate' }}</span>
                   <span class="hidden sm:inline">{{ hasReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}</span>
                 </pocket-gull-button>
@@ -206,7 +127,7 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
 
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
           <div class="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden transition-all duration-300">
-            <div class="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden relative">
+            <div class="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden relative" [class.slide-in-panel]="isSlidingIn()">
                 <app-analysis-report (openGleeModal)="showGleeModal.set(true)"></app-analysis-report>
             </div>
           </div>
@@ -231,6 +152,85 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
         </div>
       </div>
     </div>
+
+    <!-- Popover Clinical Tools & Engagement Suites Drawer -->
+    @if (showToolsMenu()) {
+      <div class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 font-mono animate-in fade-in duration-150">
+        <div class="w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-3xl p-6 text-zinc-100 shadow-2xl space-y-5">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="text-xl p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30">🎛️</span>
+              <div>
+                <h3 class="text-base font-black uppercase text-white tracking-wide">Clinical Tools & Engagement Suites</h3>
+                <p class="text-xs text-zinc-400 font-sans mt-0.5">Select specialized modules, exports, or patient engagement lounges</p>
+              </div>
+            </div>
+            <button (click)="showToolsMenu.set(false)" class="text-zinc-400 hover:text-white text-xl font-bold p-1 cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+          <!-- Categorized Tools Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-sans">
+            
+            <!-- Category 1: Clinical Documents & Briefs -->
+            <div class="space-y-2 p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span class="text-[10px] font-mono font-bold uppercase text-sky-400 block tracking-wider">📄 Documents & Briefs</span>
+              <button (click)="showMyChartModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>🏥</span> MyChart Brief
+              </button>
+              <button (click)="showPedigreeModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>🌳</span> Pedigree Tree
+              </button>
+              <button (click)="showStoryModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>📖</span> Patient Story
+              </button>
+            </div>
+
+            <!-- Category 2: Interactive Prescriptions -->
+            <div class="space-y-2 p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span class="text-[10px] font-mono font-bold uppercase text-orange-400 block tracking-wider">📌 Prescriptions & Music</span>
+              <button (click)="showPostItModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>📌</span> 3D Post-Its
+              </button>
+              <button (click)="showGleeModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>🎵</span> Actuarial Glee
+              </button>
+              <button (click)="showVinylModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>📻</span> Vinyl Lounge
+              </button>
+            </div>
+
+            <!-- Category 3: Restorative Lounges & Ethics -->
+            <div class="space-y-2 p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800">
+              <span class="text-[10px] font-mono font-bold uppercase text-emerald-400 block tracking-wider">🌿 Lounges & Ethics</span>
+              <button (click)="showPactModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>🕊️</span> Dignity Charter
+              </button>
+              <button (click)="showLivingSpaceModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>🏡</span> Living Space
+              </button>
+              <button (click)="showGreenRoomModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>🌿</span> Green Room
+              </button>
+              <button (click)="syncGcpHealthcare(); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
+                <span>☁️</span> GCP Healthcare Sync
+              </button>
+            </div>
+
+          </div>
+
+          <div class="pt-2 border-t border-zinc-800 flex justify-end">
+            <button (click)="showToolsMenu.set(false)" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-mono text-xs font-bold uppercase tracking-wider transition cursor-pointer">
+              Close Suites
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }
 
     <!-- Human Dignity Health Charter Modal -->
     <app-human-dignity-pact *ngIf="showPactModal()" (closeModal)="showPactModal.set(false)"></app-human-dignity-pact>
@@ -266,17 +266,63 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
       from { transform: translateX(-100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+
+    @keyframes slideInRight3D {
+      0% {
+        transform: translateX(100%) scale(0.96);
+        opacity: 0;
+        filter: blur(4px);
+        box-shadow: -20px 0 60px rgba(0, 0, 0, 0.4);
+      }
+      70% {
+        transform: translateX(-0.5%) scale(1.002);
+        opacity: 1;
+        filter: blur(0);
+      }
+      100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+        filter: blur(0);
+        box-shadow: none;
+      }
+    }
+
+    .slide-in-panel {
+      animation: slideInRight3D 0.48s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      will-change: transform, opacity, filter;
+    }
   `]
 })
 export class AnalysisContainerComponent {
   @ViewChild(AnalysisReportComponent) reportComp!: AnalysisReportComponent;
   state = inject(PatientStateService);
+  patientManagement = inject(PatientManagementService);
   cache = inject(AiCacheService);
   intelligence = inject(ClinicalIntelligenceService);
   game = inject(GamificationService);
   exportService = inject(ExportService);
   gcpHealthcare = inject(GcpHealthcareService);
   ClinicalIcons = ClinicalIcons;
+
+  isSlidingIn = signal(true);
+
+  constructor() {
+    // Re-trigger 3D slide-in animation whenever a patient is selected or analysis completes
+    effect(() => {
+      const pId = this.patientManagement.selectedPatientId();
+      const lastRefresh = this.intelligence.lastRefreshTime();
+      if (pId || lastRefresh) {
+        this.triggerSlideIn();
+      }
+    });
+  }
+
+  triggerSlideIn() {
+    this.isSlidingIn.set(false);
+    setTimeout(() => {
+      this.isSlidingIn.set(true);
+    }, 20);
+  }
 
   async syncGcpHealthcare() {
     const res = await this.gcpHealthcare.syncToGcpHealthcareApi();
@@ -293,6 +339,7 @@ export class AnalysisContainerComponent {
   showVinylModal = signal(false);
   showLivingSpaceModal = signal(false);
   showGreenRoomModal = signal(false);
+  showToolsMenu = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
@@ -321,6 +368,7 @@ export class AnalysisContainerComponent {
   triggerAnalysisGenerate() {
     this.justGenerated.set(true);
     this.game.completeQuest('generate_care_plan');
+    this.triggerSlideIn();
 
     if (this.reportComp) {
       this.reportComp.generate();
@@ -329,7 +377,9 @@ export class AnalysisContainerComponent {
 
   selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
     this.state.selectPhilosophy(philosophy);
+    this.triggerSlideIn();
   }
 
   hasReport = computed(() => Object.keys(this.intelligence.analysisResults()).length > 0);
 }
+

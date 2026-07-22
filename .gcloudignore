@@ -1,14 +1,13 @@
-#!include:.gitignore
 .git
 .gcloudignore
 node_modules/
-
 .angular/
 dist/
 tmp/
 .vscode/
 .idea/
 pocketgull_flutter/
+companion-apps/
 contests/
 models/
 trained_models/
@@ -33,5 +32,3 @@ trained_physio_models/
 *.hea
 *.atr
 *.rec
-
-

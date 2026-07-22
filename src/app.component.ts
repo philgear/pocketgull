@@ -2417,7 +2417,7 @@ export class AppComponent implements OnDestroy {
 
     const emergencyPatient: any = {
       id: 'emergency_casualty',
-      name: 'Emergency Casualty',
+      name: 'Emergency Patient',
       age: 30,
       gender: 'Other',
       lastVisit: new Date().toISOString(),

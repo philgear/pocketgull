@@ -9,7 +9,7 @@ export default defineConfig({
   workers: process.env['CI'] ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:4200',
+    baseURL: process.env['BASE_URL'] || 'http://localhost:4000',
     trace: 'on-first-retry',
     bypassCSP: true,
     permissions: ['microphone'],
@@ -29,9 +29,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npx cross-env PORT=4200 GEMINI_API_KEY="" SKIP_HEALTHCARE_PROVISION=true node dist/server/server.mjs',
-    url: 'http://localhost:4200',
-    reuseExistingServer: !process.env['CI'],
+    command: 'npx cross-env PORT=4000 GEMINI_API_KEY="" SKIP_HEALTHCARE_PROVISION=true node dist/server/server.mjs',
+    url: process.env['BASE_URL'] || 'http://localhost:4000',
+    reuseExistingServer: true,
     timeout: 120000,
   },
 });

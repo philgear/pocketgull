@@ -20,23 +20,23 @@ export interface IPedigreeMember {
   standalone: true,
   imports: [CommonModule, PocketGullButtonComponent],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in font-mono">
       
-      <!-- Modal Container -->
-      <div class="w-full max-w-5xl max-h-[92vh] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col font-['Inter']">
+      <!-- Dieter Rams Braun Functional Shell -->
+      <div class="w-full max-w-5xl max-h-[92vh] bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-800 overflow-hidden flex flex-col font-['Inter'] text-zinc-100">
         
         <!-- Header -->
-        <div class="p-6 bg-slate-50 dark:bg-zinc-850 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-600/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl font-bold">
+        <div class="p-6 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between font-mono">
+          <div class="flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 text-orange-400 flex items-center justify-center text-xl font-bold shadow-inner">
               🌳
             </div>
             <div>
-              <h2 class="text-lg font-bold text-slate-900 dark:text-zinc-100">Family Health Pedigree Tree & Risk Branch Pruning</h2>
-              <p class="text-xs text-slate-500 dark:text-zinc-400">Trace hereditary risk lineages, drill down into biomarkers, and neutralize hazard branches</p>
+              <h2 class="text-base font-black uppercase text-zinc-100 tracking-wide">Family Health Pedigree Tree & Risk Branch Pruning</h2>
+              <p class="text-xs text-zinc-400 font-sans mt-0.5">Trace hereditary risk lineages, drill down into biomarkers, and neutralize hazard branches</p>
             </div>
           </div>
-          <button (click)="closeModal.emit()" class="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 text-2xl font-semibold p-1 cursor-pointer">
+          <button (click)="closeModal.emit()" class="text-zinc-400 hover:text-white text-2xl font-semibold p-1 cursor-pointer">
             &times;
           </button>
         </div>
@@ -45,23 +45,23 @@ export interface IPedigreeMember {
         <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
           
           <!-- Tree Visualizer Canvas -->
-          <div class="flex-1 p-6 overflow-y-auto space-y-6 bg-slate-100/60 dark:bg-zinc-950">
+          <div class="flex-1 p-6 overflow-y-auto space-y-6 bg-zinc-950 font-mono">
             
             <!-- Generation 1: Grandparents -->
             <div class="space-y-2">
-              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Generation 1 — Grandparents (Senior Caretaking)</span>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Generation 1 — Grandparents (Senior Caretaking)</span>
               <div class="grid grid-cols-2 gap-4">
                 <div *ngFor="let member of getMembersByGen('grandparents')" 
                   (click)="selectMember(member)"
-                  [class.ring-2]="selectedMember()?.id === member.id"
-                  [class.ring-teal-500]="selectedMember()?.id === member.id"
-                  class="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between">
+                  [class]="selectedMember()?.id === member.id
+                    ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
+                    : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
                   <div>
-                    <span class="text-[10px] font-bold uppercase text-slate-400">{{ member.relation }}</span>
-                    <h4 class="text-xs font-bold text-slate-800 dark:text-zinc-200">{{ member.name }}</h4>
-                    <p class="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{{ member.riskLabel }}</p>
+                    <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
+                    <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
+                    <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
                   </div>
-                  <span [class]="getStatusBadgeClass(member.status)" class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+                  <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
                     {{ getStatusText(member.status) }}
                   </span>
                 </div>
@@ -70,24 +70,24 @@ export interface IPedigreeMember {
 
             <!-- Connecting Connector Line -->
             <div class="flex justify-center">
-              <div class="w-0.5 h-6 bg-slate-300 dark:bg-zinc-700"></div>
+              <div class="w-0.5 h-6 bg-zinc-800"></div>
             </div>
 
             <!-- Generation 2: Parents -->
             <div class="space-y-2">
-              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Generation 2 — Parents (Pre-Conception & Mid-Life)</span>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Generation 2 — Parents (Pre-Conception & Mid-Life)</span>
               <div class="grid grid-cols-2 gap-4">
                 <div *ngFor="let member of getMembersByGen('parents')" 
                   (click)="selectMember(member)"
-                  [class.ring-2]="selectedMember()?.id === member.id"
-                  [class.ring-teal-500]="selectedMember()?.id === member.id"
-                  class="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between">
+                  [class]="selectedMember()?.id === member.id
+                    ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
+                    : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
                   <div>
-                    <span class="text-[10px] font-bold uppercase text-slate-400">{{ member.relation }}</span>
-                    <h4 class="text-xs font-bold text-slate-800 dark:text-zinc-200">{{ member.name }}</h4>
-                    <p class="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{{ member.riskLabel }}</p>
+                    <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
+                    <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
+                    <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
                   </div>
-                  <span [class]="getStatusBadgeClass(member.status)" class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+                  <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
                     {{ getStatusText(member.status) }}
                   </span>
                 </div>
@@ -96,24 +96,24 @@ export interface IPedigreeMember {
 
             <!-- Connecting Connector Line -->
             <div class="flex justify-center">
-              <div class="w-0.5 h-6 bg-slate-300 dark:bg-zinc-700"></div>
+              <div class="w-0.5 h-6 bg-zinc-800"></div>
             </div>
 
             <!-- Generation 3: Offspring -->
             <div class="space-y-2">
-              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Generation 3 — Offspring (Protected Healthspan)</span>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Generation 3 — Offspring (Protected Healthspan)</span>
               <div class="grid grid-cols-1 gap-4">
                 <div *ngFor="let member of getMembersByGen('offspring')" 
                   (click)="selectMember(member)"
-                  [class.ring-2]="selectedMember()?.id === member.id"
-                  [class.ring-teal-500]="selectedMember()?.id === member.id"
-                  class="p-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition cursor-pointer flex items-center justify-between">
+                  [class]="selectedMember()?.id === member.id
+                    ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
+                    : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
                   <div>
-                    <span class="text-[10px] font-bold uppercase text-slate-400">{{ member.relation }}</span>
-                    <h4 class="text-xs font-bold text-slate-800 dark:text-zinc-200">{{ member.name }}</h4>
-                    <p class="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">{{ member.riskLabel }}</p>
+                    <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
+                    <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
+                    <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
                   </div>
-                  <span [class]="getStatusBadgeClass(member.status)" class="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase">
+                  <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
                     {{ getStatusText(member.status) }}
                   </span>
                 </div>
@@ -123,26 +123,26 @@ export interface IPedigreeMember {
           </div>
 
           <!-- Drill-Down Detail Drawer -->
-          <div *ngIf="selectedMember() as member" class="w-full lg:w-96 p-6 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col justify-between overflow-y-auto space-y-6">
+          <div *ngIf="selectedMember() as member" class="w-full lg:w-96 p-6 border-t lg:border-t-0 lg:border-l border-zinc-800 bg-zinc-900 flex flex-col justify-between overflow-y-auto space-y-6 font-mono">
             
             <div class="space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 pb-3">
+              <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <div>
-                  <span class="text-[10px] font-bold uppercase text-slate-400">Drill-Down Member Detail</span>
-                  <h3 class="text-sm font-bold text-slate-900 dark:text-zinc-100">{{ member.name }} ({{ member.relation }})</h3>
+                  <span class="text-[10px] font-bold uppercase text-zinc-400">Drill-Down Member Detail</span>
+                  <h3 class="text-sm font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }} ({{ member.relation }})</h3>
                 </div>
-                <span [class]="getStatusBadgeClass(member.status)" class="text-[10px] px-2.5 py-1 rounded-full font-bold uppercase">
+                <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2.5 py-1 rounded font-bold uppercase border">
                   {{ getStatusText(member.status) }}
                 </span>
               </div>
 
               <!-- Biomarker Matrix -->
               <div class="space-y-2">
-                <span class="text-[10px] font-bold uppercase text-slate-400">Key Biomarker & Variant Metrics</span>
+                <span class="text-[10px] font-bold uppercase text-zinc-400">Key Biomarker & Variant Metrics</span>
                 <div class="space-y-1.5">
-                  <div *ngFor="let bio of member.biomarkers" class="flex items-center justify-between p-2 rounded bg-slate-50 dark:bg-zinc-800/60 text-xs">
-                    <span class="text-slate-600 dark:text-zinc-400">{{ bio.name }}</span>
-                    <span class="font-bold" [class.text-red-500]="bio.status === 'high'" [class.text-emerald-500]="bio.status === 'optimal'">
+                  <div *ngFor="let bio of member.biomarkers" class="flex items-center justify-between p-2 rounded-lg bg-zinc-950 border border-zinc-800 text-xs">
+                    <span class="text-zinc-400 font-sans text-xs">{{ bio.name }}</span>
+                    <span class="font-bold" [class.text-orange-400]="bio.status === 'high'" [class.text-emerald-400]="bio.status === 'optimal'">
                       {{ bio.value }}
                     </span>
                   </div>
@@ -151,35 +151,32 @@ export interface IPedigreeMember {
 
               <!-- Target Protocol -->
               <div class="space-y-1">
-                <span class="text-[10px] font-bold uppercase text-slate-400">Multi-Paradigm Neutralization Protocol</span>
-                <p class="text-xs font-medium text-slate-800 dark:text-zinc-200 bg-teal-500/10 p-3 rounded-lg border border-teal-500/20">
+                <span class="text-[10px] font-bold uppercase text-zinc-400">Multi-Paradigm Neutralization Protocol</span>
+                <p class="text-xs font-medium text-zinc-200 bg-zinc-950 p-3 rounded-xl border border-zinc-800 font-sans leading-relaxed">
                   {{ member.intervention }}
                 </p>
               </div>
 
               <!-- Epigenetic Delta -->
-              <div class="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs">
-                <span class="text-[10px] font-bold uppercase text-emerald-600 dark:text-emerald-400 block mb-0.5">Actuarial Epigenetic Delta</span>
-                <p class="font-bold text-emerald-700 dark:text-emerald-300">
+              <div class="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 text-xs">
+                <span class="text-[10px] font-bold uppercase text-orange-400 block mb-0.5">Actuarial Epigenetic Delta</span>
+                <p class="font-bold text-zinc-200">
                   Biological Age Delta: {{ member.bioAgeDelta }} yrs
                 </p>
               </div>
             </div>
 
             <!-- Risk Pruning Action Button -->
-            <div class="pt-4 border-t border-slate-200 dark:border-zinc-800 space-y-2">
-              <pocket-gull-button 
+            <div class="pt-4 border-t border-zinc-800 space-y-2">
+              <button 
                 *ngIf="member.status === 'active_risk'"
                 (click)="neutralizeBranch(member.id)" 
-                variant="primary" 
-                size="sm" 
-                icon="M13 10V3L4 14h7v7l9-11h-7z"
-                class="w-full">
+                class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 font-bold text-xs uppercase tracking-wider transition shadow-md cursor-pointer border border-orange-400/50">
                 Prune & Neutralize Risk Branch
-              </pocket-gull-button>
+              </button>
 
-              <p *ngIf="member.status !== 'active_risk'" class="text-center text-xs text-emerald-600 dark:text-emerald-400 font-bold py-2">
-                ✓ Risk Branch Successfully Neutralized
+              <p *ngIf="member.status !== 'active_risk'" class="text-center text-xs text-emerald-400 font-bold py-2">
+                ✓ Risk Branch Neutralized
               </p>
             </div>
 
@@ -187,8 +184,8 @@ export interface IPedigreeMember {
         </div>
 
         <!-- Footer -->
-        <div class="p-4 bg-slate-50 dark:bg-zinc-850 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between">
-          <span class="text-xs text-slate-500 dark:text-zinc-400">Interactive Family Pedigree Tree • Prune branches to expand offspring healthspan</span>
+        <div class="p-4 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between font-mono text-xs text-zinc-400">
+          <span>Family Pedigree Tree • Prune branches to expand offspring healthspan</span>
           <pocket-gull-button (click)="closeModal.emit()" variant="secondary" size="sm">
             Close Visualizer
           </pocket-gull-button>
@@ -254,31 +251,31 @@ export class FamilyTreePedigreeComponent {
       name: 'David Miller',
       generation: 'parents',
       status: 'neutralized',
-      riskLabel: 'Spermatogenic Stress Neutralized',
+      riskLabel: 'Normal Epigenetic Profile',
       biomarkers: [
-        { name: 'Sperm DFI', value: '12%', status: 'optimal' },
-        { name: 'Fasting Insulin', value: '5.2 µIU/mL', status: 'optimal' }
+        { name: 'Fasting Insulin', value: '4.2 µIU/mL', status: 'optimal' },
+        { name: 'HbA1c', value: '5.1%', status: 'optimal' }
       ],
-      intervention: 'Zinc Picolinate 30mg + L-Carnitine + Organic Whole Foods',
-      bioAgeDelta: -3.8
+      intervention: 'Standard Zone 2 Aerobic Biogenesis Protocol',
+      bioAgeDelta: -3.0
     },
     {
-      id: 'o_child',
-      relation: 'Offspring / Child',
-      name: 'Leo Miller',
+      id: 'offspring_1',
+      relation: 'Offspring (Target)',
+      name: 'Charles Darwin Jr.',
       generation: 'offspring',
       status: 'optimal',
-      riskLabel: 'Protected Healthspan & Clean Methylation',
+      riskLabel: 'Protected Offspring Epigenome',
       biomarkers: [
-        { name: 'Folate Methylation', value: 'Optimal', status: 'optimal' },
-        { name: 'Mitochondrial Reserve', value: 'High', status: 'optimal' }
+        { name: 'Telomere Length Ratio', value: '1.24 T/S', status: 'optimal' },
+        { name: 'DNAm Age Delta', value: '-4.2 Years', status: 'optimal' }
       ],
-      intervention: 'Pre-Conception Epigenetic Optimization Complete (+8.4 QALYs)',
-      bioAgeDelta: -5.6
+      intervention: 'Pre-conception Methylation Optimization + Multimodal Care Plan',
+      bioAgeDelta: -4.2
     }
   ]);
 
-  selectedMember = signal<IPedigreeMember | null>(this.members()[2]); // Default to Mother
+  selectedMember = signal<IPedigreeMember | null>(this.members()[0]);
 
   getMembersByGen(gen: 'grandparents' | 'parents' | 'offspring') {
     return this.members().filter(m => m.generation === gen);
@@ -288,33 +285,29 @@ export class FamilyTreePedigreeComponent {
     this.selectedMember.set(member);
   }
 
-  neutralizeBranch(id: string) {
-    this.members.update(list => list.map(m => {
-      if (m.id === id) {
-        return {
-          ...m,
-          status: 'neutralized',
-          bioAgeDelta: parseFloat((m.bioAgeDelta - 4.0).toFixed(1))
-        };
-      }
-      return m;
-    }));
-
-    if (this.selectedMember()?.id === id) {
-      const updated = this.members().find(m => m.id === id);
-      if (updated) this.selectedMember.set(updated);
+  neutralizeBranch(memberId: string) {
+    this.members.update(list => list.map(m => m.id === memberId ? { ...m, status: 'neutralized' } : m));
+    if (this.selectedMember()?.id === memberId) {
+      this.selectedMember.update(m => m ? { ...m, status: 'neutralized' } : null);
     }
   }
 
-  getStatusBadgeClass(status: string) {
-    if (status === 'active_risk') return 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/30';
-    if (status === 'neutralized') return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30';
-    return 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30';
+  getStatusBadgeClass(status: 'active_risk' | 'neutralized' | 'optimal') {
+    switch (status) {
+      case 'active_risk':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/40';
+      case 'neutralized':
+        return 'bg-zinc-800 text-zinc-300 border-zinc-700';
+      case 'optimal':
+        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+    }
   }
 
-  getStatusText(status: string) {
-    if (status === 'active_risk') return 'Active Risk Branch';
-    if (status === 'neutralized') return 'Risk Branch Neutralized';
-    return 'Optimal Protection';
+  getStatusText(status: 'active_risk' | 'neutralized' | 'optimal') {
+    switch (status) {
+      case 'active_risk': return 'Active Risk';
+      case 'neutralized': return 'Neutralized';
+      case 'optimal': return 'Protected';
+    }
   }
 }

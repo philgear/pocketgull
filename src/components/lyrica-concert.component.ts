@@ -188,14 +188,38 @@ export interface IConcertAct {
               ✕
             </button>
 
-            <!-- Poster Header Artwork -->
-            <div class="text-center border-b border-purple-500/30 pb-6 mb-6 space-y-2">
-              <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-purple-400 block">Pocket-Gull Generative Concert Series</span>
+            <!-- Poster Header Artwork & Generative Cover Art -->
+            <div class="text-center border-b border-purple-500/30 pb-6 mb-6 space-y-3">
+              <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-purple-400 block">Pocket-Gull Generative Concert & Album Series</span>
+              
+              <!-- Generative Album Cover Art Preview Badge -->
+              <div class="w-48 h-48 mx-auto my-3 rounded-2xl bg-gradient-to-br from-purple-900 via-indigo-950 to-zinc-950 border-2 border-purple-400/50 shadow-[0_0_30px_rgba(168,85,247,0.4)] flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent animate-pulse"></div>
+                <span class="text-5xl mb-1 animate-spin" style="animation-duration: 20s;">☸️</span>
+                <span class="text-[9px] font-mono font-bold uppercase tracking-widest text-purple-300 relative z-10">Bioluminescent Lotus Cover</span>
+                <span class="text-[8px] font-mono text-zinc-400 relative z-10">528Hz Solfeggio Resonator</span>
+              </div>
+
               <h1 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white concert-title-glow font-sans">
                 {{ activePatientName() }}
               </h1>
               <p class="text-sm font-bold text-purple-300 tracking-widest uppercase">THE RECOVERY WORLD TOUR: LIVE IN HEALING CONCERT</p>
               <p class="text-xs text-zinc-400 font-sans">Venue: Pocket-Gull Mind-State Arena &bull; Target Frequencies: 174Hz – 963Hz Solfeggio</p>
+            </div>
+
+            <!-- Official Album Liner Notes -->
+            <div class="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 mb-6 font-sans text-xs">
+              <h4 class="text-[11px] font-mono font-bold uppercase tracking-wider text-purple-300 mb-2 flex items-center gap-2">
+                <span>📖</span> Official Album Liner Notes & Clinical Credits
+              </h4>
+              <p class="text-zinc-300 leading-relaxed mb-2">
+                <strong>Executive Producer:</strong> Google Gemini 2.5 Clinical Intelligence Engine<br>
+                <strong>Lead Vocalist & Beneficiary:</strong> {{ activePatientName() }}<br>
+                <strong>Acoustic Architecture:</strong> 528 Hz transformation carrier waves, 432 Hz prefrontal gamma entrainment, and 639 Hz Shen heart-anchoring sonnets.
+              </p>
+              <p class="text-zinc-400 text-[11px] italic leading-normal border-t border-purple-500/20 pt-2">
+                "Engineered for daily autonomic co-regulation, vagal tone activation, and multi-generational family healthspan."
+              </p>
             </div>
 
             <!-- Setlist Program -->
@@ -228,9 +252,14 @@ export interface IConcertAct {
             </div>
 
             <!-- Action Buttons -->
-            <div class="mt-6 flex justify-end gap-3">
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <button (click)="saveAlbumArtToRecord()"
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition cursor-pointer flex items-center gap-1.5 border border-emerald-400/40">
+                <span>📌</span> Save Album Art & Liner Notes to Record
+              </button>
+
               <button (click)="isPosterModalOpen.set(false)"
-                class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition">
+                class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition cursor-pointer">
                 Close Ticket & Poster
               </button>
             </div>
@@ -379,7 +408,7 @@ export class LyricaConcertComponent implements OnDestroy {
     // Start canvas animation loop when music video opens
     effect(() => {
       if (this.isMusicVideoOpen()) {
-        setTimeout(() => this.startCanvasRender(), 100);
+        setTimeout(() => this.startCanvasVisualizer(), 100);
       } else {
         if (this.canvasAnimFrame) cancelAnimationFrame(this.canvasAnimFrame);
       }
@@ -482,16 +511,16 @@ export class LyricaConcertComponent implements OnDestroy {
     }
   }
 
-  private startCanvasRender() {
-    const canvasRef = this.visualizerCanvas();
-    if (!canvasRef) return;
-
-    const canvas = canvasRef.nativeElement;
+  private startCanvasVisualizer() {
+    if (!this.isMusicVideoOpen()) return;
+    const canvasEl = this.visualizerCanvas();
+    if (!canvasEl) return;
+    const canvas = canvasEl.nativeElement;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = canvas.clientWidth || 1280;
-    canvas.height = canvas.clientHeight || 720;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     let angle = 0;
 
@@ -501,46 +530,87 @@ export class LyricaConcertComponent implements OnDestroy {
       const act = this.setlist[this.activeActIndex()];
       const width = canvas.width;
       const height = canvas.height;
+      const cx = width / 2;
+      const cy = height / 2;
 
-      ctx.fillStyle = 'rgba(5, 5, 10, 0.15)';
+      // Dark background trailing wash
+      ctx.fillStyle = 'rgba(5, 5, 10, 0.2)';
       ctx.fillRect(0, 0, width, height);
 
-      angle += 0.02;
+      angle += 0.008;
 
-      // Draw Generative Visualizer Mandala / Waves
-      ctx.save();
-      ctx.translate(width / 2, height / 2);
+      // Primary color themes per act
+      const primaryColor = act.actNumber === 1 ? '#6366f1' : (act.actNumber === 2 ? '#34d399' : (act.actNumber === 3 ? '#fbbf24' : '#c084fc'));
+      const secondaryColor = act.actNumber === 1 ? '#a855f7' : (act.actNumber === 2 ? '#10b981' : (act.actNumber === 3 ? '#f59e0b' : '#ec4899'));
 
-      const numPoints = 8;
-      const radius = 150 + Math.sin(angle * 2) * 30;
+      // Render 12-fold Generative Mandala Cover Art Petals
+      const petalRings = [180, 130, 80, 45];
+      petalRings.forEach((radius, ringIdx) => {
+        const petalCount = 12 + ringIdx * 4;
+        const ringRotation = angle * (ringIdx % 2 === 0 ? 1 : -1);
+
+        for (let i = 0; i < petalCount; i++) {
+          const theta = (i * 2 * Math.PI) / petalCount + ringRotation;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(theta);
+
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(radius / 2, radius / 2, 0, radius);
+          ctx.quadraticCurveTo(-radius / 2, radius / 2, 0, 0);
+
+          ctx.fillStyle = ringIdx % 2 === 0 ? primaryColor : secondaryColor;
+          ctx.globalAlpha = 0.2 + 0.15 * Math.sin(angle * 4 + ringIdx);
+          ctx.fill();
+
+          ctx.strokeStyle = ringIdx % 2 === 0 ? secondaryColor : primaryColor;
+          ctx.lineWidth = 2;
+          ctx.globalAlpha = 0.7;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+      });
+
+      // Central Pulsing Solfeggio Core
+      const corePulse = 25 + 8 * Math.sin(angle * 6);
+      const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, corePulse * 2.5);
+      coreGlow.addColorStop(0, '#ffffff');
+      coreGlow.addColorStop(0.4, primaryColor);
+      coreGlow.addColorStop(1, 'transparent');
 
       ctx.beginPath();
-      for (let i = 0; i <= numPoints; i++) {
-        const theta = (i / numPoints) * Math.PI * 2 + angle;
-        const r = radius + Math.sin(theta * 5 + angle * 3) * 40;
-        const x = Math.cos(theta) * r;
-        const y = Math.sin(theta) * r;
+      ctx.arc(cx, cy, corePulse, 0, 2 * Math.PI);
+      ctx.fillStyle = coreGlow;
+      ctx.globalAlpha = 0.9;
+      ctx.fill();
 
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-
-      if (act.actNumber === 1) ctx.strokeStyle = 'rgba(99, 102, 241, 0.8)';
-      else if (act.actNumber === 2) ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
-      else if (act.actNumber === 3) ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
-      else ctx.strokeStyle = 'rgba(168, 85, 247, 0.8)';
-
-      ctx.lineWidth = 4;
-      ctx.shadowBlur = 20;
-      ctx.shadowColor = ctx.strokeStyle;
+      // Outer Pulsing Wave Ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, 220 + 15 * Math.sin(angle * 2), 0, 2 * Math.PI);
+      ctx.strokeStyle = secondaryColor;
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.4;
+      ctx.setLineDash([6, 8]);
       ctx.stroke();
-
-      ctx.restore();
+      ctx.setLineDash([]);
 
       this.canvasAnimFrame = requestAnimationFrame(render);
     };
 
     render();
+  }
+
+  saveAlbumArtToRecord() {
+    const patientName = this.activePatientName();
+    const noteText = `🎨 Generative Album Cover Art & Tour Liner Notes Saved: "Actuarial Glee: 12-Track Duet & Solfeggio Symphony" (Lead Artist: ${patientName}). Includes Bioluminescent Lotus Cover Art, 528 Hz transformation acoustics, and VIP Tour Poster Credits.`;
+    this.patientState.addClinicalNote({
+      id: `album-art-${Date.now()}`,
+      text: noteText,
+      sourceLens: 'Functional Protocols',
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+    });
+    alert(`🎨 Saved Generative Album Cover Art & Concert Liner Notes to ${patientName}'s active medical record!`);
   }
 }

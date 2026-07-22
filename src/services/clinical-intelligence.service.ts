@@ -141,8 +141,12 @@ export class ClinicalIntelligenceService {
         const activeName = this.patientState.patientName() || 'Patient';
         const currentPhilosophy = this.patientState.activePhilosophy() || 'western';
         const dynamicMock = this.generateDynamicMockReport(activeName, currentPhilosophy);
-        this.analysisResults.set({ ...dynamicMock, ...report });
+        const fullReport = { ...dynamicMock, ...report };
+        this.analysisResults.set(fullReport);
         this.lastRefreshTime.set(new Date());
+
+        // Compute visual metrics for the loaded patient report
+        this.generateVisualMetrics(fullReport as Record<string, string>);
     }
 
     private async generateVisualMetrics(report: Record<string, string>): Promise<void> {

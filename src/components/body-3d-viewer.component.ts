@@ -58,10 +58,10 @@ const PART_NAMES: Record<string, string> = {
         <span *ngIf="webglError()" class="text-[12px] text-red-500 mt-2 max-w-xs break-words">{{ webglError() }}</span>
       </div>
       <!-- All-Around 360 Camera & Sentinel Triage Viewpoints Overlay -->
-      <div *ngIf="webglSupported()" class="absolute top-2 right-2 left-2 flex flex-wrap items-center justify-between gap-2 z-20 font-mono pointer-events-none">
+      <div *ngIf="webglSupported()" class="absolute top-2 right-2 left-2 flex flex-wrap items-center justify-between gap-1.5 z-20 font-mono pointer-events-none max-w-[calc(100%-16px)]">
         
         <!-- Live Sentinel Triage Priority Badge (Top Left) -->
-        <div class="pointer-events-auto p-1.5 px-3 rounded-xl border backdrop-blur-md shadow-lg flex items-center gap-2"
+        <div class="pointer-events-auto p-1.5 px-3 rounded-xl border backdrop-blur-md shadow-lg flex items-center gap-2 shrink-0"
              [class]="sentinelTriageLevel().bg">
           <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
           <div>
@@ -73,7 +73,7 @@ const PART_NAMES: Record<string, string> = {
         </div>
 
         <!-- Sentinel Viewpoint Presets Toolbar (Top Right) -->
-        <div class="pointer-events-auto flex flex-wrap items-center gap-1 bg-zinc-900/90 p-1.5 rounded-xl border border-zinc-700/60 backdrop-blur-md shadow-lg">
+        <div class="pointer-events-auto flex flex-wrap items-center gap-1 bg-zinc-900/90 p-1 rounded-xl border border-zinc-700/60 backdrop-blur-md shadow-lg max-w-full overflow-x-auto hide-scrollbar shrink min-w-0">
           <span class="text-[9.5px] font-extrabold text-indigo-400 uppercase tracking-wider px-1">Sentinel Views:</span>
           
           <button (click)="setCameraPreset('cranial')"

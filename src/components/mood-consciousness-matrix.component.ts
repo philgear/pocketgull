@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
+import { ActuarialGleeAudioService } from '../services/actuarial-glee-audio.service';
 import { FloatingWaterConsciousnessComponent } from './floating-water-consciousness.component';
 import { SocialHealthGravitationComponent } from './social-health-gravitation.component';
 import { LyricaConcertComponent } from './lyrica-concert.component';
@@ -370,6 +371,15 @@ export interface IConsciousnessState {
 
           <!-- Jukebox Controls -->
           <div class="flex items-center gap-2.5 shrink-0">
+            <!-- Master Audio Mute Toggle Button -->
+            <button (click)="audioService.toggleMute()"
+              [class]="audioService.isMuted()
+                ? 'px-3.5 py-2.5 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold font-mono transition cursor-pointer hover:bg-amber-500/30'
+                : 'px-3.5 py-2.5 rounded-2xl bg-zinc-800 text-purple-300 border border-purple-500/30 text-xs font-bold font-mono transition cursor-pointer hover:bg-zinc-700'"
+              [attr.aria-label]="audioService.isMuted() ? 'Unmute Audio' : 'Mute Audio'">
+              <span>{{ audioService.isMuted() ? '🔇 Audio Muted' : '🔊 Sound On' }}</span>
+            </button>
+
             @if (!isPlayingJukebox()) {
               <button (click)="toggleJukebox()"
                 class="px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider transition shadow-lg shadow-purple-600/30 flex items-center gap-2 cursor-pointer active:scale-95 border border-purple-400/30">
@@ -411,8 +421,8 @@ export interface IConsciousnessState {
 
             <!-- Volume Control -->
             <div class="flex items-center gap-3 px-2 py-1">
-              <span class="text-xs text-zinc-400 font-mono">🔊 Volume</span>
-              <input type="range" min="0" max="1" step="0.05" [value]="jukeboxVolume()" (input)="updateVolume($event)"
+              <label for="jukebox-volume-slider" class="text-xs text-zinc-400 font-mono">🔊 Volume</label>
+              <input id="jukebox-volume-slider" name="jukeboxVolume" aria-label="Jukebox Audio Volume Level" type="range" min="0" max="1" step="0.05" [value]="jukeboxVolume()" (input)="updateVolume($event)"
                 class="w-full accent-purple-500 bg-zinc-800 rounded-lg h-2 cursor-pointer">
               <span class="text-xs text-purple-300 font-bold min-w-[40px] text-right font-mono">{{ Math.round(jukeboxVolume() * 100) }}%</span>
             </div>
@@ -476,10 +486,55 @@ export interface IConsciousnessState {
         <app-social-health-gravitation></app-social-health-gravitation>
       </div>
 
+      <!-- Interactive Gemini Mind Mandala Visual Art Modal -->
+      @if (showMandalaModal()) {
+        <div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div class="w-full max-w-lg p-6 rounded-3xl bg-zinc-950/95 border border-purple-500/40 shadow-[0_0_60px_rgba(168,85,247,0.35)] font-mono text-zinc-100 relative flex flex-col items-center">
+            
+            <!-- Modal Header -->
+            <div class="w-full flex items-center justify-between pb-4 border-b border-zinc-800 mb-4">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl p-2 rounded-xl bg-purple-500/20 text-purple-300">✨</span>
+                <div>
+                  <h3 class="text-base font-extrabold text-white uppercase tracking-wider">Gemini Mind Mandala Art</h3>
+                  <span class="text-xs text-purple-300 font-sans">Theme: {{ activeJukeboxTrack().artTheme }}</span>
+                </div>
+              </div>
+
+              <button (click)="closeMandalaModal()" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold flex items-center justify-center transition cursor-pointer">
+                ✕
+              </button>
+            </div>
+
+            <!-- Mandala Canvas Container -->
+            <div class="relative w-full aspect-square max-w-[380px] my-2 flex items-center justify-center rounded-2xl bg-zinc-950 border border-purple-900/60 shadow-inner overflow-hidden">
+              <canvas #mandalaCanvas width="400" height="400" class="w-full h-full object-contain rounded-2xl"></canvas>
+            </div>
+
+            <!-- Modal Footer Controls -->
+            <div class="w-full mt-4 pt-3 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+              <div class="text-[11px] text-zinc-400 font-sans">
+                Resonant Frequency: <strong class="text-purple-300">{{ activeJukeboxTrack().solfeggioFreq }} Hz Solfeggio</strong>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button (click)="downloadMandalaPng()" class="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer shadow-md flex items-center gap-1.5">
+                  💾 Export PNG
+                </button>
+                <button (click)="closeMandalaModal()" class="px-3.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-zinc-700">
+                  Close
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      }
+
     </div>
   `
 })
-export class MoodConsciousnessMatrixComponent {
+export class MoodConsciousnessMatrixComponent implements OnDestroy {
   patientState = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);
 
@@ -621,6 +676,7 @@ export class MoodConsciousnessMatrixComponent {
     }
   ];
 
+  audioService = inject(ActuarialGleeAudioService);
   selectedState = signal<IConsciousnessState>(this.states[0]);
   isGeneratingPrescription = signal<boolean>(false);
   dedicatedPrescription = signal<any | null>({
@@ -642,69 +698,17 @@ export class MoodConsciousnessMatrixComponent {
   });
 
   stateTheme = computed(() => {
-    const s = this.selectedState();
-    switch (s.id) {
-      case 'focus':
-        return {
-          glowBg: 'bg-indigo-500',
-          glowSecondary: 'bg-cyan-500',
-          dotBg: 'bg-indigo-500',
-          dotShadow: 'shadow-[0_0_12px_rgba(99,102,241,0.8)]',
-          accentText: 'text-indigo-400',
-          borderColor: 'border-indigo-500/40',
-          pillBg: 'bg-indigo-500/20',
-          strokeColor: '#818cf8',
-          cardBg: 'bg-gradient-to-br from-indigo-950/80 via-zinc-900 to-cyan-950/80'
-        };
-      case 'calm':
-        return {
-          glowBg: 'bg-emerald-500',
-          glowSecondary: 'bg-teal-500',
-          dotBg: 'bg-emerald-500',
-          dotShadow: 'shadow-[0_0_12px_rgba(16,185,129,0.8)]',
-          accentText: 'text-emerald-400',
-          borderColor: 'border-emerald-500/40',
-          pillBg: 'bg-emerald-500/20',
-          strokeColor: '#34d399',
-          cardBg: 'bg-gradient-to-br from-emerald-950/80 via-zinc-900 to-teal-950/80'
-        };
-      case 'sleep':
-        return {
-          glowBg: 'bg-purple-500',
-          glowSecondary: 'bg-indigo-600',
-          dotBg: 'bg-purple-500',
-          dotShadow: 'shadow-[0_0_12px_rgba(168,85,247,0.8)]',
-          accentText: 'text-purple-400',
-          borderColor: 'border-purple-500/40',
-          pillBg: 'bg-purple-500/20',
-          strokeColor: '#c084fc',
-          cardBg: 'bg-gradient-to-br from-purple-950/80 via-zinc-900 to-indigo-950/80'
-        };
-      case 'creativity':
-        return {
-          glowBg: 'bg-amber-500',
-          glowSecondary: 'bg-rose-500',
-          dotBg: 'bg-amber-500',
-          dotShadow: 'shadow-[0_0_12px_rgba(245,158,11,0.8)]',
-          accentText: 'text-amber-400',
-          borderColor: 'border-amber-500/40',
-          pillBg: 'bg-amber-500/20',
-          strokeColor: '#fbbf24',
-          cardBg: 'bg-gradient-to-br from-amber-950/80 via-zinc-900 to-fuchsia-950/80'
-        };
-      case 'grounding':
-        return {
-          glowBg: 'bg-rose-500',
-          glowSecondary: 'bg-orange-500',
-          dotBg: 'bg-rose-500',
-          dotShadow: 'shadow-[0_0_12px_rgba(244,63,94,0.8)]',
-          accentText: 'text-rose-400',
-          borderColor: 'border-rose-500/40',
-          pillBg: 'bg-rose-500/20',
-          strokeColor: '#fb7185',
-          cardBg: 'bg-gradient-to-br from-rose-950/80 via-zinc-900 to-orange-950/80'
-        };
-    }
+    return {
+      glowBg: 'bg-orange-500/10',
+      glowSecondary: 'bg-zinc-800',
+      dotBg: 'bg-orange-500',
+      dotShadow: 'shadow-[0_0_10px_rgba(249,115,22,0.6)]',
+      accentText: 'text-orange-400',
+      borderColor: 'border-orange-500/40',
+      pillBg: 'bg-orange-500/20',
+      strokeColor: '#f97316',
+      cardBg: 'bg-zinc-900'
+    };
   });
 
   eegWavePath = computed(() => {
@@ -807,6 +811,11 @@ export class MoodConsciousnessMatrixComponent {
 
   currentLyricaLyric = signal<string>(this.lyricaAffirmations[0]);
 
+  showMandalaModal = signal(false);
+  @ViewChild('mandalaCanvas') mandalaCanvasRef!: ElementRef<HTMLCanvasElement>;
+  private mandalaAnimId: number | null = null;
+  private mandalaRotation = 0;
+
   synthesizeMindVisual() {
     const track = this.activeJukeboxTrack();
     const noteText = `🎨 Synthesized Gemini Mood Visual Mandala: ${track.artTheme} (${track.solfeggioFreq} Hz Solfeggio, ${track.binauralBeatHz} Hz Binaural)`;
@@ -816,7 +825,122 @@ export class MoodConsciousnessMatrixComponent {
       sourceLens: 'Functional Protocols',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
     });
-    alert(`✨ Synthesized Gemini Mind Visual: ${track.artTheme}\nPrompted for ${track.solfeggioFreq} Hz Solfeggio & ${track.binauralBeatHz} Hz EEG Target.`);
+
+    this.showMandalaModal.set(true);
+    setTimeout(() => this.startMandalaAnimation(), 50);
+  }
+
+  closeMandalaModal() {
+    this.showMandalaModal.set(false);
+    if (this.mandalaAnimId) {
+      cancelAnimationFrame(this.mandalaAnimId);
+      this.mandalaAnimId = null;
+    }
+  }
+
+  downloadMandalaPng() {
+    if (!this.mandalaCanvasRef) return;
+    const canvas = this.mandalaCanvasRef.nativeElement;
+    const link = document.createElement('a');
+    link.download = `Gemini_Mind_Mandala_${this.activeJukeboxTrack().artTheme.replace(/\s+/g, '_')}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  }
+
+  private startMandalaAnimation() {
+    if (!this.mandalaCanvasRef) return;
+    const canvas = this.mandalaCanvasRef.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const track = this.activeJukeboxTrack();
+    const isGold = track.artTheme.includes('Golden');
+    const isRose = track.artTheme.includes('Rose');
+    const isEmerald = track.artTheme.includes('Emerald');
+
+    const primaryColor = isGold ? '#fbbf24' : (isRose ? '#f43f5e' : (isEmerald ? '#34d399' : '#818cf8'));
+    const secondaryColor = isGold ? '#f59e0b' : (isRose ? '#ec4899' : (isEmerald ? '#10b981' : '#c084fc'));
+
+    const render = () => {
+      this.mandalaRotation += 0.008;
+      const width = canvas.width;
+      const height = canvas.height;
+      const cx = width / 2;
+      const cy = height / 2;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Radial background glow
+      const bgGlow = ctx.createRadialGradient(cx, cy, 10, cx, cy, width / 2);
+      bgGlow.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
+      bgGlow.addColorStop(0.5, 'rgba(30, 27, 75, 0.85)');
+      bgGlow.addColorStop(1, 'rgba(9, 9, 11, 0.98)');
+      ctx.fillStyle = bgGlow;
+      ctx.fillRect(0, 0, width, height);
+
+      // Render 12-fold Petal Rings
+      const petalRings = [120, 85, 55, 30];
+      petalRings.forEach((radius, ringIdx) => {
+        const petalCount = 12 + ringIdx * 4;
+        const ringRotation = this.mandalaRotation * (ringIdx % 2 === 0 ? 1 : -1);
+
+        for (let i = 0; i < petalCount; i++) {
+          const angle = (i * 2 * Math.PI) / petalCount + ringRotation;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(angle);
+
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(radius / 2, radius / 2, 0, radius);
+          ctx.quadraticCurveTo(-radius / 2, radius / 2, 0, 0);
+
+          ctx.fillStyle = ringIdx % 2 === 0 ? primaryColor : secondaryColor;
+          ctx.globalAlpha = 0.25 + 0.15 * Math.sin(this.mandalaRotation * 3 + ringIdx);
+          ctx.fill();
+
+          ctx.strokeStyle = ringIdx % 2 === 0 ? secondaryColor : primaryColor;
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = 0.8;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+      });
+
+      // Central Pulsing Core
+      const corePulse = 18 + 5 * Math.sin(this.mandalaRotation * 5);
+      const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, corePulse * 2);
+      coreGlow.addColorStop(0, '#ffffff');
+      coreGlow.addColorStop(0.4, primaryColor);
+      coreGlow.addColorStop(1, 'transparent');
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, corePulse, 0, 2 * Math.PI);
+      ctx.fillStyle = coreGlow;
+      ctx.globalAlpha = 0.9;
+      ctx.fill();
+
+      // Outer Sacred Geometry Circle
+      ctx.beginPath();
+      ctx.arc(cx, cy, 140, 0, 2 * Math.PI);
+      ctx.strokeStyle = secondaryColor;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.4;
+      ctx.setLineDash([4, 6]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      this.mandalaAnimId = requestAnimationFrame(render);
+    };
+
+    if (this.mandalaAnimId) cancelAnimationFrame(this.mandalaAnimId);
+    render();
+  }
+
+  ngOnDestroy() {
+    this.closeMandalaModal();
+    this.stopAudioSynth();
   }
 
   private audioCtx: AudioContext | null = null;

@@ -48,6 +48,52 @@ export class PatientManagementService implements OnDestroy {
   private autoSave$ = new Subject<void>();
   private autoSaveSub?: Subscription;
 
+  private generatePersonalizedNutritionReport(p: IPatient): { nutrition: string; precisionNutrients: string } {
+    const conds = (p.preexistingConditions || []).map(c => c.toLowerCase());
+    const name = p.name || 'Patient';
+    const bp = p.vitals?.bp || '120/80';
+    const sys = parseInt(bp.split('/')[0], 10) || 120;
+
+    let dietaryPattern = '';
+    let functionalFoods = '';
+    let avoidFoods = '';
+    let chronoWindow = '';
+    let orthomolecularProtocol = '';
+
+    if (conds.some(c => c.includes('diabetes') || c.includes('metabolic') || c.includes('obesity') || c.includes('hypertension'))) {
+      dietaryPattern = `### Precision Cardiometabolic & Low-Glycemic Anti-Inflammatory Pattern\nPrimary focus for ${name}: Low Glycemic Load (<20 GI), high-fiber monounsaturated fat emphasis to improve insulin receptor sensitivity, reduce hepatic steatosis, and stabilize vascular endothelial nitric oxide.`;
+      functionalFoods = `- **Cold-Pressed EVOO & Avocado**: 2 tbsp daily to deliver Oleic Acid and endogenous Glutathione support.\n- **Wild Alaskan Sockeye Salmon**: 3x/week for SPM (Specialized Pro-Resolving Mediators) EPA/DHA resolution.\n- **Steamed Bok Choy & Broccoli Sprouts**: Sulforaphane Nrf2 phase II liver detoxification.`;
+      avoidFoods = `- **Refined Carbohydrates & High-Fructose Corn Syrup**: Eliminates postprandial glucose spikes.\n- **High Sodium (>2,000mg/day)**: Protects against vascular stiffness given BP of ${bp}.\n- **Trans Fats & Seed Oils**: Prevents oxLDL endothelial injury.`;
+      chronoWindow = `8-Hour Restricted Feeding Window (10:00 AM — 6:00 PM) to align with peak liver insulin sensitivity (BMAL1 gene activation).`;
+      orthomolecularProtocol = `### Personalized Orthomolecular Protocol for ${name}\n- **Berberine HCl**: 500mg TID before meals (AMPK activation & blood glucose modulation).\n- **Magnesium Glycinate**: 400mg at bedtime (Vascular smooth muscle relaxation for BP ${bp}).\n- **Chromium Picolinate**: 500mcg daily (Insulin receptor phosphorylation).\n- **CoQ10 (Ubiquinol)**: 100mg daily (Endothelial mitochondrial bioenergetics).`;
+    } else if (conds.some(c => c.includes('pain') || c.includes('opioid') || c.includes('spine') || c.includes('back') || c.includes('trauma') || c.includes('arthritis'))) {
+      dietaryPattern = `### Neuro-Inflammatory & Pain Resolution Protocol\nPrimary focus for ${name}: High Specialized Pro-Resolving Mediators (SPMs), targeted bioflavonoids, and collagenous extracellular matrix substrates to accelerate musculoskeletal repair and quiet central sensitization.`;
+      functionalFoods = `- **Wild Blueberry & Ashwagandha Compote**: Crosses BBB to modulate neuro-inflammation and support GABAergic tone.\n- **Grass-Fed Bone Broth**: Proline, Glycine, and Hydroxyproline for connective tissue and spinal disc repair.\n- **Fresh Turmeric Root & Piperine**: Curcuminoid NF-kB downregulation.`;
+      avoidFoods = `- **Arachidonic Acid-Rich Foods**: Limit excessive corn-fed red meats to suppress inflammatory PGE2 prostaglandins.\n- **Nightshades (Solanaceae)**: Temporarily restrict if joint stiffness flares.\n- **Ultra-Processed Additives**: Avoid excitotoxic monosodium glutamate (MSG).`;
+      chronoWindow = `10-Hour Circadian Feeding Window (08:30 AM — 06:30 PM) to ensure overnight 14-hour autophagic joint tissue repair.`;
+      orthomolecularProtocol = `### Personalized Orthomolecular Protocol for ${name}\n- **Palmitoylethanolamide (PEA)**: 600mg BID (Endogenous endocannabinoid signaling for pain resolution).\n- **Curcumin Phytosome (Meriva)**: 500mg BID (Musculoskeletal inflammatory pathway regulation).\n- **Omega-3 Fish Oil (High EPA)**: 2,400mg daily (SPM precursor for tissue clearing).\n- **Vitamin D3 + K2 (MK-7)**: 5,000 IU daily (Bone matrix mineralization & immune balance).`;
+    } else if (conds.some(c => c.includes('stomach') || c.includes('dyspepsia') || c.includes('ibs') || c.includes('fatigue') || c.includes('chagas') || c.includes('vat'))) {
+      dietaryPattern = `### Warm Digestive Agni & Vata-Pacifying Restorative Pattern\nPrimary focus for ${name}: Warm, cooked, easily-assimilated nutrient-dense foods to soothe gastric motility, pacify Vata dryness, and kindle digestive Agni.`;
+      functionalFoods = `- **Ayurvedic Mung Bean & Basmati Kitchari**: Cooked with Ghee, Ginger, Cumin, and Ajwain for effortless assimilation.\n- **Gingerol-Rich Lemongrass Decoction**: Stimulates gastric motility and disperses TCM Spleen Dampness.\n- **Warm Stewed Apples with Cinnamon**: Pectin substrate for gut mucosal barrier integrity.`;
+      avoidFoods = `- **Raw Cold Salads & Ice Water**: Extinguishes digestive Agni and worsens gastric spasm.\n- **Coarse Raw Bran & Cruciferous Vegetables**: Causes abdominal distension and Vata aggravation.\n- **Fermented High-Histamine Foods**: Avoid during active gastric flare.`;
+      chronoWindow = `Warm Light Evening Meal before 6:30 PM to avoid nocturnal gastric reflux and support parasympathetic sleep.`;
+      orthomolecularProtocol = `### Personalized Orthomolecular Protocol for ${name}\n- **Deglycyrrhizinated Licorice (DGL)**: 400mg chewed 20 min before meals (Gastric mucosal barrier defense).\n- **CoQ10 (Ubiquinol)**: 200mg daily (Mitochondrial bioenergetics for smooth muscle fatigue).\n- **L-Glutamine**: 5g morning on empty stomach (Intestinal enterocyte repair).\n- **Zinc Carnosine**: 75mg BID (Gastric mucosal lining stabilization).`;
+    } else {
+      dietaryPattern = `### Anti-Inflammatory Longevity & Whole-Foods Pattern\nPrimary focus for ${name}: Mediterranean-Okinawan hybrid whole-foods pattern optimized for cellular resilience, DNA methylation stability, and autophagic clearance.`;
+      functionalFoods = `- **Polyphenol Rich Extra Virgin Olive Oil**: Single-estate oleocanthal for COX enzyme inhibition.\n- **Wild Berries & Dark Leafy Greens**: Folate methyl donors and anthocyanin antioxidant protection.\n- **Fermented Foods (Kefir/Kimchi)**: Microbiome diversity & short-chain fatty acid (butyrate) production.`;
+      avoidFoods = `- **Ultra-Processed Sugar & Refined Grains**: Preserves Horvath DNAm epigenetic clock stability.\n- **Industrial Seed Oils**: Mitigates linoleic acid peroxidation.`;
+      chronoWindow = `12:12 Circadian Feeding Balance (08:00 AM — 08:00 PM) for optimal metabolic flexibility.`;
+      orthomolecularProtocol = `### Personalized Orthomolecular Protocol for ${name}\n- **Magnesium L-Threonate**: 300mg at bedtime (Synaptic density & restorative sleep).\n- **Vitamin D3 + K2**: 2,000 IU daily (Immune homeostasis & arterial calcium clearance).\n- **Trans-Resveratrol + NMN**: 500mg morning (Sirtuin SIR1 activation & NAD+ boosting).`;
+    }
+
+    const nutritionText = `${dietaryPattern}\n\n### Key Functional Foods for ${name}\n${functionalFoods}\n\n### Dietary Restrictions & Contraindications\n${avoidFoods}\n\n### Circadian Feeding Window\n${chronoWindow}`;
+
+    return {
+      nutrition: nutritionText,
+      precisionNutrients: orthomolecularProtocol
+    };
+  }
+
   private ensurePatientCompleteness(p: IPatient): IPatient {
     const pVitals = (p.vitals || {}) as Record<string, any>;
     const vitals = {
@@ -73,6 +119,8 @@ export class PatientManagementService implements OnDestroy {
       { id: "2", name: "CoQ10", value: "0.95 μg/mL" }
     ];
 
+    const personalized = this.generatePersonalizedNutritionReport(p);
+
     const history: HistoryEntry[] = (p.history && p.history.length > 0) ? p.history.map(h => {
       if (h.type === 'AnalysisRun' && h.report) {
         return {
@@ -80,10 +128,10 @@ export class PatientManagementService implements OnDestroy {
           report: {
             "Summary Overview": h.report["Summary Overview"] || `### Clinical Assessment\n${p.name} presents for comprehensive multi-system evaluation. Primary focus is on metabolic health, autonomic tone, and cellular resilience.`,
             "Functional Protocols": h.report["Functional Protocols"] || `### Protocol Actions\n- Implement 10-min daily 0.1 Hz vagal resonant breathing.\n- Morning sunlight exposure within 30 min of waking.`,
-            "Nutrition": h.report["Nutrition"] || `### Dietary Plan\n- Emphasize Mediterranean anti-inflammatory whole-foods pattern.\n- Targeted polyphenol and antioxidant micro-dosing.`,
+            "Nutrition": h.report["Nutrition"] || personalized.nutrition,
             "Monitoring & Follow-up": h.report["Monitoring & Follow-up"] || `### Tracking Schedule\n- Track resting HR and HRV daily.\n- Follow-up visit scheduled in 4 weeks.`,
             "Patient Education": h.report["Patient Education"] || `### Patient Guidance\n- Focus on rest, hydration, and consistent sleep hygiene rhythms.`,
-            "Precision Nutrients": h.report["Precision Nutrients"] || `### Orthomolecular Protocol\n- Magnesium Glycinate: 400mg before bed.\n- Vitamin D3 + K2: 2000 IU daily.`,
+            "Precision Nutrients": h.report["Precision Nutrients"] || personalized.precisionNutrients,
             "PhysioNet Telemetry": h.report["PhysioNet Telemetry"] || `### PhysioNet Telemetry\n- QRS Duration: 88 ms\n- ST Segment: Neutral (+0.01 mV)\n- QTc Interval: 412 ms\n- HRV LF/HF Ratio: 1.4`
           }
         };
@@ -97,10 +145,10 @@ export class PatientManagementService implements OnDestroy {
         report: {
           "Summary Overview": `### Clinical Assessment\n${p.name} presents for comprehensive multi-system evaluation. Primary focus is on metabolic health, autonomic tone, and cellular resilience.\n\n### Priority List\n- **Cardiometabolic Optimization**: Maintain physiological homeostasis.\n- **Inflammatory Modulation**: Mitigate systemic stress drivers.`,
           "Functional Protocols": `### Protocol Actions\n- Implement 10-min daily 0.1 Hz vagal resonant breathing.\n- Morning sunlight exposure within 30 min of waking.`,
-          "Nutrition": `### Dietary Plan\n- Emphasize Mediterranean anti-inflammatory whole-foods pattern.\n- Targeted polyphenol and antioxidant micro-dosing.`,
+          "Nutrition": personalized.nutrition,
           "Monitoring & Follow-up": `### Tracking Schedule\n- Track resting HR and HRV daily.\n- Follow-up visit scheduled in 4 weeks.`,
           "Patient Education": `### Patient Guidance\n- Focus on rest, hydration, and consistent sleep hygiene rhythms.`,
-          "Precision Nutrients": `### Orthomolecular Protocol\n- Magnesium Glycinate: 400mg before bed.\n- Vitamin D3 + K2: 2000 IU daily.`,
+          "Precision Nutrients": personalized.precisionNutrients,
           "PhysioNet Telemetry": `### PhysioNet Telemetry\n- QRS Duration: 88 ms\n- ST Segment: Neutral (+0.01 mV)\n- QTc Interval: 412 ms\n- HRV LF/HF Ratio: 1.4`
         }
       }
@@ -299,10 +347,8 @@ export class PatientManagementService implements OnDestroy {
             this.patientState.loadState(patient);
             this.findAndLoadActivePatientSummary(patient.history);
 
-            // Reset the AI analysis first, then load the existing one if we have it
-            if (!(this.patientState.isDemoMode() && patientId === 'p002')) {
-              this.geminiService.resetAIState();
-            }
+            // Reset the AI analysis first, then load the selected patient's report
+            this.geminiService.resetAIState();
 
             console.log('[PatientManagementService] selected patient:', patientId, 'history length:', patient.history.length);
             const latestAnalysis = patient.history.find(
@@ -311,12 +357,12 @@ export class PatientManagementService implements OnDestroy {
                 entry.type === "FinalizedPatientSummary",
             );
             console.log('[PatientManagementService] latestAnalysis:', latestAnalysis ? latestAnalysis.type : 'none');
-            if (latestAnalysis && !(this.patientState.isDemoMode() && patientId === 'p002')) {
-              if (latestAnalysis.type === "AnalysisRun") {
-                this.geminiService.loadArchivedAnalysis(latestAnalysis.report);
-              } else if (latestAnalysis.type === "FinalizedPatientSummary") {
-                this.geminiService.loadArchivedAnalysis(latestAnalysis.report);
-              }
+            if (latestAnalysis && latestAnalysis.report) {
+              this.geminiService.loadArchivedAnalysis(latestAnalysis.report);
+            } else {
+              const activePhilosophy = this.patientState.activePhilosophy() || 'western';
+              const dynamicReport = (this.geminiService as any).generateDynamicMockReport(patient.name, activePhilosophy);
+              this.geminiService.loadArchivedAnalysis(dynamicReport);
             }
           }
         } else if (!patientId) {

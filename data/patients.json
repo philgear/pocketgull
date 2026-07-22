@@ -2121,96 +2121,25 @@
       "Mild Sleep Apnea",
       "Google Health Integration"
     ],
-    "patientGoals": "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
+    "patientGoals": "",
     "vitals": {
-      "bp": "122/82",
-      "hr": "68",
-      "temp": "98.6°F",
-      "spO2": "98%",
-      "weight": "178 lbs",
-      "height": "5'10\"",
-      "vitD3": "32 ng/mL",
-      "magnesium": "2.1 mg/dL",
-      "b12": "580 pg/mL",
-      "zinc": "92 mcg/dL"
+      "bp": "",
+      "hr": "",
+      "temp": "",
+      "spO2": "",
+      "weight": "",
+      "height": "",
+      "vitC": "",
+      "vitD3": "",
+      "magnesium": "",
+      "zinc": "",
+      "b12": ""
     },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Malondialdehyde (MDA)",
-        "value": "1.8 μmol/L (Normal)"
-      },
-      {
-        "id": "2",
-        "name": "hsCRP",
-        "value": "0.9 mg/L (Optimal)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "2.4 μmol/g Hb (Optimal)"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10",
-        "value": "1.1 μg/mL (Normal)"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Lisinopril",
-        "value": "10mg Daily"
-      },
-      {
-        "id": "2",
-        "name": "Magnesium Glycinate",
-        "value": "400mg PM"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2026-05-18T08:00:00Z",
-        "type": "hr",
-        "value": "70"
-      },
-      {
-        "timestamp": "2026-05-19T08:00:00Z",
-        "type": "hr",
-        "value": "69"
-      },
-      {
-        "timestamp": "2026-05-20T08:00:00Z",
-        "type": "hr",
-        "value": "68"
-      },
-      {
-        "timestamp": "2026-05-20T08:00:00Z",
-        "type": "bp",
-        "value": "122/82"
-      }
-    ],
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_phil_head_1",
-          "name": "Head & Neck",
-          "painLevel": 2,
-          "description": "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
-          "symptoms": [
-            {
-              "name": "Occidental tension headache",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Episodic"
-            }
-          ]
-        }
-      ]
-    },
+    "oxidativeStressMarkers": [],
+    "antioxidantSources": [],
+    "medications": [],
+    "biometricHistory": [],
+    "issues": {},
     "history": [
       {
         "type": "AnalysisRun",

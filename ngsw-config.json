@@ -43,6 +43,7 @@
   ],
   "navigationUrls": [
     "/**",
+    "!/api/**",
     "!/docs",
     "!/docs/**",
     "!/api-docs",

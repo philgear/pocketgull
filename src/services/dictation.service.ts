@@ -20,6 +20,52 @@ export class DictationService {
   readonly permissionError = signal<string | null>(null);
   readonly initialText = signal('');
   readonly lastCommand = signal<string | null>(null);
+  readonly selectedLanguage = signal<string>('en-US');
+
+  readonly supportedLanguages = [
+    { code: 'en-US', name: 'English (US)' },
+    { code: 'es-ES', name: 'Spanish (Español)' },
+    { code: 'fr-FR', name: 'French (Français)' },
+    { code: 'zh-CN', name: 'Mandarin (中文)' },
+    { code: 'de-DE', name: 'German (Deutsch)' },
+    { code: 'ar-SA', name: 'Arabic (العربية)' },
+    { code: 'hi-IN', name: 'Hindi (हिन्दी)' },
+    { code: 'pt-BR', name: 'Portuguese (Português)' },
+    { code: 'vi-VN', name: 'Vietnamese (Tiếng Việt)' },
+    { code: 'ja-JP', name: 'Japanese (日本語)' },
+    { code: 'ko-KR', name: 'Korean (한국어)' },
+    { code: 'ru-RU', name: 'Russian (Русский)' },
+    { code: 'tl-PH', name: 'Tagalog (Filipino)' },
+    { code: 'it-IT', name: 'Italian (Italiano)' },
+    { code: 'nl-NL', name: 'Dutch (Nederlands)' },
+    { code: 'pl-PL', name: 'Polish (Polski)' },
+    { code: 'uk-UA', name: 'Ukrainian (Українська)' },
+    { code: 'sw-KE', name: 'Swahili (Kiswahili)' },
+    { code: 'tr-TR', name: 'Turkish (Türkçe)' },
+    { code: 'el-GR', name: 'Greek (Ελληνικά)' },
+    { code: 'he-IL', name: 'Hebrew (עברית)' },
+    { code: 'th-TH', name: 'Thai (ไทย)' },
+    { code: 'id-ID', name: 'Indonesian (Bahasa Indonesia)' },
+    { code: 'ms-MY', name: 'Malay (Bahasa Melayu)' },
+    { code: 'sv-SE', name: 'Swedish (Svenska)' },
+    { code: 'no-NO', name: 'Norwegian (Norsk)' },
+    { code: 'da-DK', name: 'Danish (Dansk)' },
+    { code: 'fi-FI', name: 'Finnish (Suomi)' },
+    { code: 'hu-HU', name: 'Hungarian (Magyar)' },
+    { code: 'cs-CZ', name: 'Czech (Čeština)' },
+    { code: 'ro-RO', name: 'Romanian (Română)' },
+    { code: 'sk-SK', name: 'Slovak (Slovenčina)' },
+    { code: 'bg-BG', name: 'Bulgarian (Български)' },
+    { code: 'hr-HR', name: 'Croatian (Hrvatski)' },
+    { code: 'sr-RS', name: 'Serbian (Српски)' },
+    { code: 'bn-BD', name: 'Bengali (বাংলা)' },
+    { code: 'ta-IN', name: 'Tamil (தமிழ்)' },
+    { code: 'te-IN', name: 'Telugu (తెలుగు)' },
+    { code: 'ur-PK', name: 'Urdu (اردو)' },
+    { code: 'fa-IR', name: 'Persian (فارسی)' },
+    { code: 'km-KH', name: 'Khmer (ភាសាខ្មែរ)' },
+    { code: 'am-ET', name: 'Amharic (አማርኛ)' }
+  ];
 
   private recognition: any;
   private onAcceptCallback: ((text: string) => void) | null = null;
@@ -43,7 +89,7 @@ export class DictationService {
 
     this.recognition = new SpeechRecognitionAPI();
     this.recognition.continuous = true;
-    this.recognition.lang = 'en-US';
+    this.recognition.lang = this.selectedLanguage();
     this.recognition.interimResults = true;
 
     this.recognition.onstart = () => {
@@ -182,5 +228,12 @@ export class DictationService {
 
   registerResultHandler(callback: (text: string, isFinal: boolean) => void) {
     this.resultCallback = callback;
+  }
+
+  setLanguage(langCode: string) {
+    this.selectedLanguage.set(langCode);
+    if (this.recognition) {
+      this.recognition.lang = langCode;
+    }
   }
 }

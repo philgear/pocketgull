@@ -27,11 +27,6 @@ import { environment } from '../environments/environment';
         
 
 
-        <!-- Oregon Coast Buoy Telemetry Info -->
-        <div class="absolute bottom-4 left-4 z-30 bg-black/30 dark:bg-black/50 text-[12px] font-bold text-white px-3 py-1 rounded-md border border-white/10 tracking-widest uppercase pointer-events-auto">
-          📡 Buoy 46050 (Oregon Coast): {{ waveHeight() }}m @ {{ wavePeriod() }}s
-        </div>
-
         <!-- Paper Waves (Layered vector curves representing paper hills) -->
         <!-- Layer 1: Back Ocean Waves (46% height) -->
         <svg class="absolute bottom-0 left-0 w-[200%] h-[46%] paper-hill-back opacity-90 wave-layer"
@@ -263,10 +258,11 @@ import { environment } from '../environments/environment';
 
                <!-- Reduced Motion Toggle -->
                <div class="mt-4 flex justify-center z-30">
-                 <label class="flex items-center gap-2 cursor-pointer group">
+                 <label for="reduce-motion-lock" class="flex items-center gap-2 cursor-pointer group">
                    <input type="checkbox"
                           id="reduce-motion-lock"
                           name="reduce-motion-lock"
+                          aria-label="Reduce Motion"
                           [checked]="theme.reduceMotion()"
                           (change)="theme.setReduceMotion(!theme.reduceMotion())"
                           class="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700/50 bg-zinc-50 dark:bg-black/40 text-[#3ebc9e] focus:ring-[#3ebc9e]/30 focus:ring-offset-0 cursor-pointer transition-colors">
@@ -407,8 +403,8 @@ import { environment } from '../environments/environment';
                 </div>
 
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Passcode/PIN (4-digits)</label>
-                  <input type="password" required maxlength="4" pattern="[0-9]{4}"
+                  <label for="signupPinInput" class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Passcode/PIN (4-digits)</label>
+                  <input type="password" id="signupPinInput" aria-label="Passcode or 4-digit PIN" required maxlength="4" pattern="[0-9]{4}"
                          [(ngModel)]="signupForm().pin"
                          name="signupPin"
                          placeholder="1234" 
@@ -469,6 +465,7 @@ import { environment } from '../environments/environment';
                   <input type="checkbox"
                          id="reduce-motion-auth"
                          name="reduce-motion-auth"
+                         aria-label="Reduce Motion"
                          [checked]="theme.reduceMotion()"
                          (change)="theme.setReduceMotion(!theme.reduceMotion())"
                          class="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700/50 bg-zinc-50 dark:bg-black/40 text-[#3ebc9e] focus:ring-[#3ebc9e]/30 focus:ring-offset-0 cursor-pointer transition-colors">

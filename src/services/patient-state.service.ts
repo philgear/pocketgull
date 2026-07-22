@@ -29,6 +29,11 @@ import { createCarePlan, createConsultationSession } from '../lib/dataconnect';
 })
 export class PatientStateService {
   // --- UI State ---
+  readonly isPlainLanguageMode = signal<boolean>(false);
+  
+  togglePlainLanguageMode() {
+    this.isPlainLanguageMode.update(val => !val);
+  }
   readonly selectedPartId = signal<string | null>(null);
   readonly loadedPatientId = signal<string | null>(null);
   readonly selectedNoteId = signal<string | null>(null);

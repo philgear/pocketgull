@@ -130,27 +130,33 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 
         /* ─── Hover Toolbar ─────────────────────── */
         .node-toolbar {
-            opacity:0;
-            display:flex; flex-direction:row; gap:6px; z-index:50;
+            opacity: 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px;
+            z-index: 50;
             padding: 0;
             max-height: 0;
-            overflow: hidden;
-            transition: opacity .2s ease-out .4s, max-height .2s ease-out .4s, padding .2s ease-out .4s;
+            max-width: 100%;
+            overflow-x: auto;
+            transition: opacity .2s ease-out, max-height .2s ease-out, padding .2s ease-out;
         }
-        .node-wrapper:hover .node-toolbar {
-            opacity:1;
-            max-height: 70px;
-            padding: 10px 0;
+        .node-wrapper:hover .node-toolbar,
+        .node-wrapper:focus-within .node-toolbar {
+            opacity: 1;
+            max-height: 100px;
+            padding: 6px 0;
             transition-delay: 0s;
-            overflow: visible;
             position: relative;
             z-index: 60;
         }
 
         .node-toolbar ::ng-deep .btn-base.size-sm.icon-only {
-            height: 50px !important;
-            width: 81px !important; /* Golden ratio: 50 * 1.618 = ~81 */
-            border-radius: 8px !important;
+            height: 32px !important;
+            width: 36px !important;
+            min-width: 32px !important;
+            border-radius: 10px !important;
         }
 
         /* ─── Inline Chat ────────────────────────── */
@@ -511,7 +517,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
       </div>
 
       <!-- ─── Hover Toolbar ─────────────────── -->
-      <div class="node-toolbar no-print">
+      <div class="node-toolbar no-print max-w-full flex-wrap sm:flex-nowrap overflow-x-auto hide-scrollbar shrink">
         <pocket-gull-button (click)="rejectNode()" variant="ghost" size="sm"
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Flag Issue"
           [class.text-red-600]="isRejected()"
@@ -881,21 +887,21 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
           @if (showSuggestions() && !chatIsLoading() && drillStack().length === 0) {
             <div class="flex flex-wrap items-center justify-center gap-2 mt-4 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
               @for (s of suggestionPills(); track s) {
-                <button type="button" (click)="sendPill(s)" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-[#689F38] dark:hover:text-[#8bc34a] transition-all shadow-sm flex items-center gap-1.5">
+                <button type="button" (click)="sendPill(s)" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-[#689F38] dark:hover:text-[#8bc34a] transition-all shadow-sm flex items-center gap-1.5">
                    <div [innerHTML]="ClinicalIcons.Suggestion | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                    {{ s }}
                 </button>
               }
               <!-- Rich media action pills -->
-              <button type="button" (click)="requestImage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-purple-600 dark:hover:text-purple-400 transition-all shadow-sm flex items-center gap-1.5">
+              <button type="button" (click)="requestImage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-purple-600 dark:hover:text-purple-400 transition-all shadow-sm flex items-center gap-1.5">
                 <div [innerHTML]="ClinicalIcons.Image | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 Request Image
               </button>
-              <button type="button" (click)="request3DModel()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm flex items-center gap-1.5">
+              <button type="button" (click)="request3DModel()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm flex items-center gap-1.5">
                 <div [innerHTML]="ClinicalIcons.Model3D | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 3D Model
               </button>
-              <button type="button" (click)="requestResearch()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-full hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-amber-600 dark:hover:text-amber-400 transition-all shadow-sm flex items-center gap-1.5">
+              <button type="button" (click)="requestResearch()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-amber-600 dark:hover:text-amber-400 transition-all shadow-sm flex items-center gap-1.5">
                 <div [innerHTML]="ClinicalIcons.Research | safeHtml" class="w-3.5 h-3.5 opacity-70"></div>
                 Research
               </button>

@@ -41,7 +41,7 @@ export class DicomService {
 
   mockStudies: IDicomStudy[] = [
     {
-      studyInstanceUid: '1.2.840.113619.2.134.1.2345.20260716.1',
+      studyInstanceUid: '1.2.840.113619.2.134.1.phil.1',
       patientName: 'Phil Gear',
       patientId: 'p_phil_gear',
       studyDate: '20260716',
@@ -49,43 +49,159 @@ export class DicomService {
       modalities: ['MR']
     },
     {
-      studyInstanceUid: '1.2.840.113619.2.134.1.2345.20260716.2',
+      studyInstanceUid: '1.2.840.113619.2.134.1.p001.1',
+      patientName: 'Robert Davis',
+      patientId: 'p001',
+      studyDate: '20260710',
+      studyDescription: 'Coronary Angiogram & Chest CT (Hypertension & Apnea)',
+      modalities: ['CT', 'XA']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.p002.1',
       patientName: 'Sarah Jenkins',
       patientId: 'p002',
-      studyDate: '20260716',
+      studyDate: '20260715',
       studyDescription: 'Lumbar Spine MRI (L4-L5 radiculopathy check)',
       modalities: ['MR']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.p003.1',
+      patientName: 'Marcus Aurelius',
+      patientId: 'p003',
+      studyDate: '20260708',
+      studyDescription: 'Cervical & Lumbar Spine Radiograph (Degenerative Joint)',
+      modalities: ['CR']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.p004.1',
+      patientName: 'Florence Nightingale',
+      patientId: 'p004',
+      studyDate: '20260712',
+      studyDescription: 'High-Resolution Chest CT & Autonomic Vagal Scan',
+      modalities: ['CT']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.p005.1',
+      patientName: 'Hypatia of Alexandria',
+      patientId: 'p005',
+      studyDate: '20260714',
+      studyDescription: '3T Cortical Brain MRI (Prefrontal Volumetry)',
+      modalities: ['MR']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.p006.1',
+      patientName: 'Ada Lovelace',
+      patientId: 'p006',
+      studyDate: '20260711',
+      studyDescription: 'Abdomino-Pelvic Contrast CT Scan',
+      modalities: ['CT']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.p007.1',
+      patientName: 'Gregor Mendel',
+      patientId: 'p007',
+      studyDate: '20260709',
+      studyDescription: 'Renal Parenchymal Ultrasound & Contrast CT',
+      modalities: ['US', 'CT']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.p008.1',
+      patientName: 'Marie Curie',
+      patientId: 'p008',
+      studyDate: '20260705',
+      studyDescription: 'Whole-Body PET/CT Radiation Biomarker Scan',
+      modalities: ['PT', 'CT']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.mara.1',
+      patientName: 'Mara Santos',
+      patientId: 'p_mara_santos',
+      studyDate: '20260718',
+      studyDescription: 'Postpartum Pelvic & Lumbar Spine MRI',
+      modalities: ['MR']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.frida.1',
+      patientName: 'Frida Kahlo',
+      patientId: 'p_frida_kahlo',
+      studyDate: '20260717',
+      studyDescription: '3D Full Spinal & Pelvic Reconstruction CT',
+      modalities: ['CT']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.edwin.1',
+      patientName: 'Edwin Smith',
+      patientId: 'p_edwin_smith_3',
+      studyDate: '20260719',
+      studyDescription: 'Cervical Spine Fracture Emergency CT',
+      modalities: ['CT']
+    },
+    {
+      studyInstanceUid: '1.2.840.113619.2.134.1.darwin.1',
+      patientName: 'Charles Darwin',
+      patientId: 'p_charles_darwin',
+      studyDate: '20260713',
+      studyDescription: 'Gastric Motility & Abdominal Ultrasound',
+      modalities: ['US']
     }
   ];
 
   /**
    * Search for DICOM studies using QIDO-RS via proxy.
-   * Can pass 'project', 'location', 'dataset', 'dicomStore' in params or it falls back to backend env.
+   * Strictly filters studies for the currently selected active patient.
    */
   async searchStudies(params: Record<string, string> = {}) {
     this.isLoading.set(true);
     this.error.set(null);
 
+    const activePatient = this.patientManager.selectedPatient();
+    const activePid = this.patientManager.selectedPatientId() || 'p_phil_gear';
+    const patientName = activePatient?.name || 'Active Patient';
+
     if (this.patientState.isDemoMode()) {
-      // Return matching study for active patient, or all studies in demo mode
-      const activePid = this.patientManager.selectedPatientId();
-      const filtered = this.mockStudies.filter(s => s.patientId === activePid);
-      this.studies.set(filtered.length > 0 ? filtered : this.mockStudies);
+      // STRICT PATIENT ISOLATION: Filter studies exclusively for the active patient
+      let filtered = this.mockStudies.filter(s => s.patientId === activePid || (s.patientName && s.patientName.toLowerCase() === patientName.toLowerCase()));
+      
+      if (filtered.length === 0) {
+        // Dynamic DICOM study creation for newly added patients
+        const primaryCond = activePatient?.preexistingConditions?.[0] || 'Clinical Diagnostic Assessment';
+        const dynamicStudy: IDicomStudy = {
+          studyInstanceUid: `1.2.840.113619.2.134.1.${activePid}.1`,
+          patientName: patientName,
+          patientId: activePid,
+          studyDate: '20260720',
+          studyDescription: `${primaryCond} Diagnostic Imaging`,
+          modalities: ['CT']
+        };
+        filtered = [dynamicStudy];
+      }
+      this.studies.set(filtered);
+      this.selectedStudy.set(filtered[0]);
       this.isLoading.set(false);
       return;
     }
+
     try {
-      const qs = new URLSearchParams(params).toString();
+      const queryParams = { ...params, patientId: activePid };
+      const qs = new URLSearchParams(queryParams).toString();
       const res = await fetch(`/api/dicom/studies?${qs}`);
       if (!res.ok) {
         throw new Error(`Failed to fetch studies: ${res.statusText}`);
       }
       const data = await res.json();
       const formattedStudies = this.parseStudies(data);
-      this.studies.set(formattedStudies);
+      // Strictly filter studies for active patient
+      const filteredBackend = formattedStudies.filter(s => 
+        s.patientId === activePid || (s.patientName && s.patientName.toLowerCase().includes(patientName.toLowerCase()))
+      );
+      const finalStudies = filteredBackend.length > 0 ? filteredBackend : formattedStudies;
+      this.studies.set(finalStudies);
+      if (finalStudies.length > 0) {
+        this.selectedStudy.set(finalStudies[0]);
+      }
     } catch (e: any) {
       console.warn('[DicomService] Warning searching studies:', e.message);
-      this.error.set(null); // Don't show red error box for demo failures
+      this.error.set(null);
       this.studies.set([]);
     } finally {
       this.isLoading.set(false);

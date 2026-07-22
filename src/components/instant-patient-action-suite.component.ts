@@ -236,30 +236,30 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             <!-- Sleep Hours Slider -->
             <div class="p-3 rounded bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700">
               <div class="flex justify-between items-center mb-1">
-                <span class="font-extrabold text-slate-700 dark:text-zinc-200">😴 Sleep Duration</span>
+                <label for="sim-sleep-input" class="font-extrabold text-slate-700 dark:text-zinc-200">😴 Sleep Duration</label>
                 <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">{{ simSleep() }} hrs</span>
               </div>
-              <input type="range" min="4" max="10" step="0.5" [value]="simSleep()" (input)="updateSleep($event)"
+              <input id="sim-sleep-input" name="simSleep" aria-label="Simulated Sleep Duration Hours" type="range" min="4" max="10" step="0.5" [value]="simSleep()" (input)="updateSleep($event)"
                 class="w-full h-2 bg-slate-200 dark:bg-zinc-700 rounded appearance-none cursor-pointer accent-indigo-600" />
             </div>
 
             <!-- Hydration Slider -->
             <div class="p-3 rounded bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700">
               <div class="flex justify-between items-center mb-1">
-                <span class="font-extrabold text-slate-700 dark:text-zinc-200">💧 Daily Hydration</span>
+                <label for="sim-hydration-input" class="font-extrabold text-slate-700 dark:text-zinc-200">💧 Daily Hydration</label>
                 <span class="font-mono font-bold text-sky-600 dark:text-sky-400">{{ simHydration() }} L</span>
               </div>
-              <input type="range" min="1.0" max="4.5" step="0.25" [value]="simHydration()" (input)="updateHydration($event)"
+              <input id="sim-hydration-input" name="simHydration" aria-label="Simulated Daily Hydration Liters" type="range" min="1.0" max="4.5" step="0.25" [value]="simHydration()" (input)="updateHydration($event)"
                 class="w-full h-2 bg-slate-200 dark:bg-zinc-700 rounded appearance-none cursor-pointer accent-sky-600" />
             </div>
 
             <!-- Stress Level Slider -->
             <div class="p-3 rounded bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700">
               <div class="flex justify-between items-center mb-1">
-                <span class="font-extrabold text-slate-700 dark:text-zinc-200">🧘 Stress Load</span>
+                <label for="sim-stress-input" class="font-extrabold text-slate-700 dark:text-zinc-200">🧘 Stress Load</label>
                 <span class="font-mono font-bold text-rose-600 dark:text-rose-400">{{ simStress() }} / 10</span>
               </div>
-              <input type="range" min="1" max="10" step="1" [value]="simStress()" (input)="updateStress($event)"
+              <input id="sim-stress-input" name="simStress" aria-label="Simulated Stress Load Level Out of 10" type="range" min="1" max="10" step="1" [value]="simStress()" (input)="updateStress($event)"
                 class="w-full h-2 bg-slate-200 dark:bg-zinc-700 rounded appearance-none cursor-pointer accent-rose-600" />
             </div>
           </div>

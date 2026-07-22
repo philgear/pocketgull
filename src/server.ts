@@ -76,8 +76,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Trust the Google Cloud Run proxy so req.hostname resolves correctly
-app.set('trust proxy', true);
+// Trust the 1st hop Google Cloud Run proxy so req.hostname and rate limiting resolve securely
+app.set('trust proxy', 1);
 
 // Forced domain redirect to pocketgull.app
 const targetDomain = 'pocketgull.app';
@@ -254,7 +254,11 @@ app.use((req, res, next) => {
     ? `'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.googleapis.com`
     : `'self' 'nonce-${nonce}' https://apis.google.com https://*.googleapis.com`;
 
-  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; script-src-elem ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:* https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
+  const connectSrc = isDev
+    ? `'self' http: https: ws: wss: http://localhost:9399 http://localhost:4000 http://localhost:4200 http://localhost:8000 http://localhost:5000 http://127.0.0.1:9399 http://127.0.0.1:4000 ws://localhost:9399 ws://localhost:4000 ws://localhost:4200 https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com`
+    : `'self' http://localhost:9399 http://localhost:4000 http://localhost:4200 http://127.0.0.1:9399 ws://localhost:9399 https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com`;
+
+  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; script-src-elem ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src ${connectSrc}; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');

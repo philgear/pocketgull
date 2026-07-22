@@ -1798,3 +1798,18 @@ html.dark textarea.dyslexia-textarea {
     color: #e3ded6 !important; /* Soft sand-colored text */
     border-color: #3f3747 !important;
 }
+
+/* ─── High-Performance Hardware Composition & Layout Containment ─── */
+.hardware-accelerated {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.content-contain {
+  contain: content;
+}
+
+.layout-contain {
+  contain: layout style;
+}

@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY package*.json ./
 COPY docs/study/package.json ./docs/study/
 COPY companion-apps/avs-therapy/package.json ./companion-apps/avs-therapy/
 COPY pocketgull_api/package.json ./pocketgull_api/
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 
 # Copy source and build the docs/study Astro sub-project + Angular SSR app
 COPY . .
@@ -25,7 +25,7 @@ RUN npm prune --omit=dev
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd
+FROM node:24-alpine
 
 WORKDIR /app
 

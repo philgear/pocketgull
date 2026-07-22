@@ -38,7 +38,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
               placeholder="Search body part or organ (e.g. Heart, Knee)..." 
               class="w-full bg-transparent text-xs text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 px-2 py-1 outline-none font-medium" />
             @if (searchQuery()) {
-              <button (click)="clearSearch()" class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">
+              <button (click)="clearSearch()" class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             }
@@ -79,10 +79,10 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
         </div>
         
         <!-- Unified Anatomical Control HUD (Layers, Regions, 3D Orbit & Ghost Overlay) -->
-        <div class="absolute bottom-3 left-3 right-3 z-30 no-print flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 dark:bg-zinc-950/95 backdrop-blur-md p-2 rounded-xl border border-slate-700/60 dark:border-zinc-800 shadow-2xl">
+        <div class="absolute bottom-2 left-2 right-2 z-30 no-print flex flex-wrap items-center justify-between gap-1.5 bg-slate-900/90 dark:bg-zinc-950/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/60 dark:border-zinc-800 shadow-2xl max-w-[calc(100%-16px)] overflow-x-auto hide-scrollbar">
           
           <!-- 2D / 3D Mode & Layers Segment -->
-          <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar">
+          <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar shrink min-w-0">
             <!-- 2D vs 3D Viewport Selector -->
             <div class="flex items-center bg-zinc-800/80 p-0.5 rounded-lg border border-zinc-700/50 mr-1.5">
               <button (click)="state.bodyViewerMode.set('3d')"
