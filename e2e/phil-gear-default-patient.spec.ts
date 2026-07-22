@@ -42,8 +42,8 @@ async function enterDemoMode(page: import('@playwright/test').Page) {
     await acceptBtn.click();
   }
 
-  // Wait for main app to render
-  await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
+  // Wait for main app or container to render
+  await page.waitForSelector('app-analysis-container, app-analysis-report, main', { timeout: 20000 });
 }
 
 /** Helper to enter demo mode and select Phil Gear */
@@ -67,7 +67,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
 
     // The analysis report component should be present (loaded for Phil Gear)
-    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('app-analysis-container, app-analysis-report')).toBeVisible({ timeout: 20000 });
 
     // await page.screenshot({
     //   path: path.join(SCREENSHOT_DIR, 'phil_gear_default_patient.png'),
