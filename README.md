@@ -75,45 +75,48 @@ graph TD
     classDef server fill:#0f172a,stroke:#34d399,stroke-width:2px,color:#f8fafc;
     classDef ai fill:#0f172a,stroke:#c084fc,stroke-width:2px,color:#f8fafc;
     classDef db fill:#0f172a,stroke:#fbbf24,stroke-width:2px,color:#f8fafc;
+    classDef sec fill:#0f172a,stroke:#f43f5e,stroke-width:2px,color:#f8fafc;
 
-    subgraph ClientLayer ["📱 Frontend Client (Angular 22 + Three.js)"]
-        UI["Clinical Workspace UI"]
+    subgraph ClientLayer ["📱 Frontend Client (Angular 22 + Three.js + WebMCP)"]
+        UI["Clinical Workspace UI (Dieter Rams 90° Design)"]
         Viewer["3D Body Viewer & Anatomical Search"]
-        Intake["Viewport-Contextual CMP Intake"]
-        PWA["On-Device Nano AI (window.ai)"]
+        Handoff["URL Intake State Handoff Engine (?share=...&mode=...)"]
+        WebMCP["WebMCP Polyfill & JSON-LD Tool Catalog"]
     end
 
-    subgraph BackendLayer ["⚡ Node.js SSR + FastAPI Sidecar"]
-        Express["Express Server / Proxy (/ws/gemini-live)"]
+    subgraph BackendLayer ["⚡ Node.js SSR + FastAPI Sidecar + GCP Cloud Run"]
+        Express["Express Server / Proxy (Single-Hop Trust Proxy)"]
         FastAPI["Python FastAPI Sidecar (ML Risk Scoring)"]
     end
 
     subgraph AILayer ["🧠 Multimodal AI & Medical Intelligence"]
-        Gemini["Google Gemini 1.5 / Live API (Bidi Voice)"]
+        Gemini["Google Gemini 2.5 / Live API (Bidi Voice)"]
         PubMed["NCBI PubMed / Google Search Grounding"]
         Genkit["Genkit Microservice Workflows"]
     end
 
-    subgraph StorageLayer ["💾 Data & Standards Compliance"]
+    subgraph StorageLayer ["💾 Data & Archiving Standards"]
         FHIR["FHIR R4 / R5 / R6 / FHIR 7 Bundles"]
+        Zenodo["CERN Zenodo Open Science (CC0 1.0 + ORCID iD)"]
         IndexedDB["Local Encrypted Browser Cache"]
     end
 
     UI --> Viewer
-    UI --> Intake
-    Intake --> PWA
+    UI --> Handoff
+    UI --> WebMCP
     UI <-->|"WebSocket / REST"| Express
     Express <-->|"gRPC / Multimodal"| Gemini
     Express <-->|"Pydantic API"| FastAPI
     Gemini --> PubMed
     Express --> Genkit
-    Intake --> FHIR
+    Handoff --> FHIR
+    FHIR --> Zenodo
     UI --> IndexedDB
 
-    class UI,Viewer,Intake,PWA client;
+    class UI,Viewer,Handoff,WebMCP client;
     class Express,FastAPI server;
     class Gemini,PubMed,Genkit ai;
-    class FHIR,IndexedDB db;
+    class FHIR,Zenodo,IndexedDB db;
 ```
 
 A highly interactive, aesthetically minimal user interface (Industrial Grace) designed for immediate clinical insight.
