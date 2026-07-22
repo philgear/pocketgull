@@ -29,7 +29,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
@@ -402,7 +402,23 @@ Quantitative Gompertz-Makeham hazard modeling indicates a biological age delta o
 ### Multi-Paradigm Cell Longevity Protocol
 - **Western Epigenetic Support**: Sirtuin activation (NAD+/NMN), AMPK activation, HRV vagal tone.
 - **Eastern TCM Essence**: Zang-Fu meridian balancing, sleep architecture, Jing preservation.
-- **Ayurvedic Rasayana**: Ama detoxification, Agni metabolic fire, adaptogenic rejuvenation.`
+- **Ayurvedic Rasayana**: Ama detoxification, Agni metabolic fire, adaptogenic rejuvenation.`,
+
+                'Pre-Conception & Family Health': `### Pre-Conception Parental Epigenetic Matrix
+| Optimization Vector | Targeted Biomarker | Parental Protocol | Fetal Healthspan Impact |
+| :--- | :--- | :--- | :--- |
+| Folate Methylation | MTHFR C677T / Homocysteine | L-5-MTHF (800 mcg) + B12 | Neural tube & DNA fidelity |
+| Maternal Mitochondria | CoQ10 Ubiquinol / Fasting Insulin | Ubiquinol (300 mg) + Alpha-Lipoic | High oocyte cleavage ATP |
+| Paternal Spermatogenesis | Sperm DNA DFI / Zinc | Zinc (30 mg) + Selenium + Carnitine | Lower germline mutational load |
+| Environmental Detox | Heavy metals & Endocrine Disruptors | Filtered water & organic whole foods | Reduced epigenetic transgenerational risk |
+
+### Senior & Geriatric Caretaking Strategy
+- **Autonomic Vagal Tone**: HRV SDNN 6.0 bpm resonant breathing sessions to reduce agitation and improve sleep.
+- **TCM Kidney Jing & Shen**: Warm bone broths, Rehmannia, and Gingko Biloba to nourish brain marrow (*Sui Hai*).
+- **Ayurvedic Vata Pacification**: Warm sesame Abhyanga massage & Bacopa Monnieri (Brahmi) for joint/cognitive support.
+
+### Voluntary ACOG/ACMG Carrier Screening Guidance
+Recommends voluntary pre-conception carrier screening for autosomal recessive traits. Pre-conception optimization ensures offspring inherit optimal epigenetic programming while preserving human dignity.`
             };
         }
     }

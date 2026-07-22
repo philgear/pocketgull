@@ -356,5 +356,20 @@ Analyze the patient data and generate a structured **Actuarial Epigenetic Longev
 - **Ayurvedic Rasayana & Autophagy**: Cellular debris clearing (Ama detoxification), Agni metabolic fire activation, adaptogenic herbal nourishment.
 
 ### Actuarial Survival Projection Statement
-A concise 2-sentence summary outlining projected QALY extensions (+3.5 to +12.0 years) achievable through long-term compliance.` + FORMATTING_RULES
+A concise 2-sentence summary outlining projected QALY extensions (+3.5 to +12.0 years) achievable through long-term compliance.` + FORMATTING_RULES,
+
+    'Pre-Conception & Family Health': `You are an expert maternal-fetal genetics consultant, pre-conception specialist, and multi-generational caretaking strategist.
+
+Analyze the patient data and generate a structured **Pre-Conception & Multi-Generational Family Health Report** structured as follows:
+
+### Pre-Conception Parental Epigenetic Matrix
+(Generate a Markdown table with columns: Optimization Vector | Targeted Biomarker / Pathway | Parental Protocol | Fetal Healthspan Impact. Cover MTHFR Folate Methylation, Oocyte Ubiquinol Mitochondria, Paternal Spermatogenic Integrity, and Environmental Toxin Clearance.)
+
+### Senior & Geriatric Caretaking Strategy
+- **Autonomic Vagal Tone**: HRV SDNN 6.0 bpm resonant breathing sessions for senior agitation reduction.
+- **TCM Kidney Jing & Shen**: Warm bone broths, Rehmannia, and Gingko for cognitive preservation.
+- **Ayurvedic Vata Pacification**: Warm sesame Abhyanga self-massage & Bacopa Monnieri (Brahmi).
+
+### Voluntary ACOG/ACMG Carrier Screening Guidance
+(A brief 2-sentence summary recommending voluntary pre-conception carrier screening for recessive traits and targeted L-5-MTHF supplementation for MTHFR carriers, preserving human dignity and patient choice.)` + FORMATTING_RULES
 };
