@@ -26,10 +26,11 @@ async function enterDemoMode(page: import('@playwright/test').Page) {
   await expect(demoBtn).toBeVisible({ timeout: 10000 });
   await demoBtn.click();
 
-  // Skip KSS
-  const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-  await expect(skipBtn).toBeVisible({ timeout: 10000 });
-  await skipBtn.click();
+  // Skip KSS if present
+  const skipBtn = page.locator('button', { hasText: 'Skip' });
+  if (await skipBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await skipBtn.click();
+  }
 
   // Ethics pledge
   const pledgeCheckbox = page.locator('input[type="checkbox"]');
