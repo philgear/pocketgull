@@ -127,6 +127,15 @@ const PART_NAMES: Record<string, string> = {
 
           <button 
             type="button" 
+            (click)="toggleAutoSpin()" 
+            class="px-2 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition shadow-sm flex items-center gap-1 cursor-pointer"
+            [class]="isAutoSpinning() ? 'bg-indigo-500/30 text-indigo-300 border-indigo-500/50 animate-pulse' : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:bg-zinc-700'"
+          >
+            <span>🔄 3D Orbit</span>
+          </button>
+
+          <button 
+            type="button" 
             (click)="shufflePainLevels()" 
             class="px-2 py-1 rounded-lg border border-rose-500/40 text-[10px] font-bold uppercase tracking-wider transition shadow-sm bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 flex items-center gap-1 cursor-pointer active:scale-95"
           >
