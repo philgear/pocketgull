@@ -66,21 +66,27 @@ export class ThemeService {
     }
 
     // Listen to OS prefers-color-scheme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', (e) => {
-      if (this.currentTheme() === 'system') {
-        this.activeTheme.set(e.matches ? 'dark' : 'light');
-      }
-    });
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      mediaQuery.addEventListener?.('change', (e) => {
+        if (this.currentTheme() === 'system') {
+          this.activeTheme.set(e.matches ? 'dark' : 'light');
+        }
+      });
+    }
   }
 
   private saveTheme(theme: AppTheme) {
-    localStorage.setItem('pocket_gull_theme', theme);
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('pocket_gull_theme', theme);
+    }
   }
 
   private resolveTheme(theme: AppTheme) {
     if (theme === 'system') {
-      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isSystemDark = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+        : false;
       this.activeTheme.set(isSystemDark ? 'dark' : 'light');
     } else if (theme === 'spark') {
       this.activeTheme.set('dark');
