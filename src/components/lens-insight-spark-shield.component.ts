@@ -31,13 +31,13 @@ export interface IInsightSpark {
           <div class="flex items-center gap-3">
             <span class="text-2xl animate-pulse">💡</span>
             <div>
-              <h2 class="text-lg font-bold uppercase tracking-tight text-zinc-100 flex items-center gap-2">
+              <h2 class="text-lg font-bold uppercase tracking-tight text-slate-800 dark:text-zinc-100 flex items-center gap-2">
                 <span>Lens Innovation Shield & Insight Sparks</span>
-                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 uppercase">
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 uppercase">
                   {{ activeLens() }} Shield Active
                 </span>
               </h2>
-              <p class="text-xs text-zinc-400 font-sans mt-0.5">
+              <p class="text-xs text-slate-600 dark:text-zinc-400 font-sans mt-0.5">
                 Targeted clinical safety shields and translational research sparks for <strong>{{ activePatientName() }}</strong>.
               </p>
             </div>
@@ -54,18 +54,18 @@ export interface IInsightSpark {
       </div>
 
       <!-- Lens-Specific Active Innovation Shield Banner -->
-      <div class="p-5 rounded-xl bg-zinc-900/90 border border-indigo-900/50 mb-6 font-mono">
-        <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-3">
+      <div class="p-5 rounded-xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-indigo-900/50 mb-6 font-mono shadow-xs">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-zinc-800 pb-3 mb-3">
           <div class="flex items-center gap-2 text-xs">
             <span class="text-lg">{{ getLensIcon(activeLens()) }}</span>
-            <span class="font-bold uppercase text-indigo-300">{{ activeLens() }} Innovation Shield Protocol</span>
+            <span class="font-bold uppercase text-indigo-700 dark:text-indigo-300">{{ activeLens() }} Innovation Shield Protocol</span>
           </div>
-          <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
             PROTECTION ENGAGED
           </span>
         </div>
 
-        <p class="text-xs text-zinc-300 font-sans leading-relaxed">
+        <p class="text-xs text-slate-700 dark:text-zinc-300 font-sans leading-relaxed">
           {{ getLensShieldSummary(activeLens()) }}
         </p>
       </div>
@@ -73,29 +73,29 @@ export interface IInsightSpark {
       <!-- Insight Sparks Cards Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @for (spark of activeSparks(); track spark.id) {
-          <div class="p-5 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-indigo-500 transition flex flex-col justify-between group">
+          <div class="p-5 rounded-xl bg-white dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800 hover:border-indigo-500 dark:hover:border-indigo-500 transition flex flex-col justify-between group shadow-xs">
             
             <div>
-              <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2.5 font-mono text-[10px]">
-                <span class="px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-bold uppercase border border-indigo-500/30">
+              <div class="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-2 mb-2.5 font-mono text-[10px]">
+                <span class="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold uppercase border border-indigo-500/30">
                   ⚡ {{ spark.innovationBadge }}
                 </span>
-                <span class="text-zinc-400">Translational Research Spark</span>
+                <span class="text-slate-500 dark:text-zinc-400">Translational Research Spark</span>
               </div>
 
-              <h4 class="text-xs font-bold text-zinc-100 group-hover:text-indigo-400 transition-colors leading-snug mb-1">
+              <h4 class="text-xs font-bold text-slate-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug mb-1">
                 {{ spark.title }}
               </h4>
 
-              <p class="text-[11px] text-zinc-300 font-sans leading-relaxed mb-3">
+              <p class="text-[11px] text-slate-700 dark:text-zinc-300 font-sans leading-relaxed mb-3">
                 <strong>Hypothesis:</strong> {{ spark.hypothesis }}
               </p>
 
               <div class="mb-3">
-                <span class="text-[10px] font-mono text-zinc-400 font-bold uppercase block mb-1">Key Biomarkers / Metrics:</span>
+                <span class="text-[10px] font-mono text-slate-500 dark:text-zinc-400 font-bold uppercase block mb-1">Key Biomarkers / Metrics:</span>
                 <div class="flex flex-wrap gap-1 font-mono text-[9.5px]">
                   @for (bio of spark.keyBiomarkers; track bio) {
-                    <span class="px-2 py-0.5 rounded-md bg-zinc-950 text-indigo-300 border border-zinc-800">
+                    <span class="px-2 py-0.5 rounded-md bg-indigo-50/50 dark:bg-zinc-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-zinc-800">
                       🧪 {{ bio }}
                     </span>
                   }
@@ -104,14 +104,14 @@ export interface IInsightSpark {
             </div>
 
             <!-- Footer Action Buttons (Rams 8px Grid Spacing & Focus Accessibility) -->
-            <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between font-mono text-[10px]">
+            <div class="pt-3 border-t border-slate-100 dark:border-zinc-800/80 flex items-center justify-between font-mono text-[10px]">
               <button (click)="launchPubMedSearch(spark)"
-                class="text-indigo-400 hover:text-indigo-300 hover:underline font-bold flex items-center gap-1 focus:ring-1 focus:ring-indigo-400 outline-none rounded-xs px-1">
+                class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline font-bold flex items-center gap-1 focus:ring-1 focus:ring-indigo-400 outline-none rounded-xs px-1">
                 <span>📚 Launch PubMed Search</span>
               </button>
 
               <button (click)="bookmarkSpark(spark)"
-                class="px-2.5 py-1 rounded-md bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[9.5px] font-bold uppercase transition cursor-pointer active:scale-95 border border-zinc-700/60 focus:ring-2 focus:ring-indigo-500/50 outline-none">
+                class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-zinc-700 text-slate-800 dark:text-zinc-200 text-[9.5px] font-bold uppercase transition cursor-pointer active:scale-95 border border-slate-300 dark:border-zinc-700/60 focus:ring-2 focus:ring-indigo-500/50 outline-none">
                 📌 Log Research Hypothesis
               </button>
             </div>
