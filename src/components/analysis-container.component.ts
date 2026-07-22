@@ -144,7 +144,6 @@ import { PostItNotesComponent } from './post-it-notes.component';
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
                   <span>📌</span> 3D Post-Its
                 </button>
-
                 <!-- FHIR R4 Export Button -->
                 <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
@@ -199,8 +198,6 @@ import { PostItNotesComponent } from './post-it-notes.component';
     </div>
 
     <!-- Human Dignity Health Charter Modal -->
-    <app-human-dignity-pact *ngIf="showPactModal()" (closeModal)="showPactModal.set(false)"></app-human-dignity-pact>
-
     <!-- Epic MyChart Physician Brief & Longevity Lab Modal -->
     <app-mychart-brief-modal *ngIf="showMyChartModal()" (closeModal)="showMyChartModal.set(false)"></app-mychart-brief-modal>
 

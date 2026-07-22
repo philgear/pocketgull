@@ -22,8 +22,13 @@ Pocket Gull exposes native WebMCP tools and 13 specialized clinical lenses for a
 - `connect_ble_wearable`: Connects to Apple Watch / Garmin Web Bluetooth GATT Heart Rate Service (`0x180D`).
 - `toggle_dermatome_layer`: Activates interactive WebGL 3D spine & dermatome nerve root mapping.
 - `generate_companion_sync_link`: Produces dynamic FHIR R4 Smart Launch QR code and deep links (`pocketgull://sync?...`).
+<<<<<<< HEAD
 - `generate_specialist_handoff`: Serializes patient state into an expanded base64 handoff URL and SBAR note for specialist referrals.
 - `generate_care_plan`: Triggers multi-paradigm clinical strategy generation across all 13 specialized lenses.
+=======
+- `generate_specialist_handoff`: Serializes patient state into an expanded base64 handoff URL and SBAR note for world-class specialist referrals.
+- `generate_care_plan`: Triggers multi-paradigm clinical strategy generation across 6 specialized lenses (Western, TCM, Ayurvedic, Longevity).
+>>>>>>> origin/main
 - `get_webmcp_tool_catalog`: Exposes schema tool catalog at `/api/webmcp/tools` for agentic browser tool discovery.
 
 ## Key Documentation & References

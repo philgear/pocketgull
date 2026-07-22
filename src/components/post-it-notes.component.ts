@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy, signal, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
-import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 
 export interface IPostItNote {
   id: string;
@@ -59,7 +58,7 @@ export class PostItService {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-post-it-notes',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent],
+  imports: [CommonModule, PocketGullButtonComponent],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in">
       
