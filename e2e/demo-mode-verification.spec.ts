@@ -5,7 +5,7 @@ import { setupE2ePage } from './utils/setup';
 async function selectPatientByName(page: import('@playwright/test').Page, name: string) {
   const dropdownBtn = page.locator('app-patient-dropdown button').first();
   await dropdownBtn.click();
-  const option = page.locator('.origin-top-left button', { hasText: name }).first();
+  const option = page.locator('app-patient-dropdown button', { hasText: name }).first();
   await expect(option).toBeVisible({ timeout: 10000 });
   await option.click();
   await page.waitForTimeout(1000);
@@ -76,7 +76,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // --- Western Philosophy Verification ---
     console.log('[Verification] Testing Western Paradigm...');
-    const westernBtn = page.locator('button', { hasText: 'Western' });
+    const westernBtn = page.locator('button', { hasText: 'Western' }).first();
     await westernBtn.click();
     await page.waitForTimeout(1000); // Wait for transition/mock load
 
@@ -115,7 +115,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // --- Eastern (TCM) Philosophy Verification ---
     console.log('[Verification] Testing Eastern Paradigm...');
-    const easternBtn = page.locator('button', { hasText: 'Eastern (TCM)' });
+    const easternBtn = page.locator('button', { hasText: 'Eastern (TCM)' }).first();
     await easternBtn.click();
     await page.waitForTimeout(1000);
 
@@ -134,7 +134,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // --- Ayurvedic Philosophy Verification ---
     console.log('[Verification] Testing Ayurvedic Paradigm...');
-    const ayurvedicBtn = page.locator('button', { hasText: 'Ayurvedic' });
+    const ayurvedicBtn = page.locator('button', { hasText: 'Ayurvedic' }).first();
     await ayurvedicBtn.click();
     await page.waitForTimeout(1000);
 
@@ -198,7 +198,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     await generateBtn.click();
     await page.waitForTimeout(2000);
 
-    const fridaText = page.locator('app-analysis-report').locator('text=Frida Kahlo');
+    const fridaText = page.locator('app-analysis-report').locator('text=Frida Kahlo').first();
     await expect(fridaText).toBeVisible({ timeout: 5000 });
 
     // Verify Charles Darwin
@@ -207,7 +207,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     await generateBtn.click();
     await page.waitForTimeout(2000);
 
-    const darwinText = page.locator('app-analysis-report').locator('text=Charles Darwin');
+    const darwinText = page.locator('app-analysis-report').locator('text=Charles Darwin').first();
     await expect(darwinText).toBeVisible({ timeout: 5000 });
   });
 });
