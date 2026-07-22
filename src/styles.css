@@ -400,10 +400,124 @@
     background: rgba(6, 78, 59, 0.2); 
 }
 
-/* Responsive table wrapper */
-.rams-typography .table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+/* APA 7th Edition & UK RIO Academic Citation Styling */
+.rams-typography .apa-citation-block,
+.apa-citation-block {
+    border-left: 4px solid #6366f1;
+    padding: 1rem 1.25rem;
+    background: rgba(248, 250, 252, 0.85);
+    border-radius: 4px;
+    margin: 1.5rem 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: #1e293b;
+    border-top: 1px solid #e2e8f0;
+    border-right: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+.dark .rams-typography .apa-citation-block,
+.dark .apa-citation-block {
+    background: rgba(15, 23, 42, 0.7);
+    border-color: #1e293b;
+    border-left-color: #818cf8;
+    color: #e2e8f0;
+}
+
+/* Dieter Rams Rectilinear Task Brackets (Replacing Rounded Pills) */
+.rams-task-bracket {
+    display: inline-flex;
+    items-center: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 2px;
+    border: 1.5px solid currentColor;
+    background: transparent;
+}
+.rams-task-bracket.approved {
+    color: #059669;
+    border-color: #059669;
+    background: rgba(16, 185, 129, 0.08);
+}
+.dark .rams-task-bracket.approved {
+    color: #34d399;
+    border-color: #34d399;
+    background: rgba(52, 211, 153, 0.12);
+}
+.rams-task-bracket.in-progress {
+    color: #d97706;
+    border-color: #d97706;
+    background: rgba(245, 158, 11, 0.08);
+}
+.dark .rams-task-bracket.in-progress {
+    color: #fbbf24;
+    border-color: #fbbf24;
+    background: rgba(251, 191, 36, 0.12);
+}
+
+/* Barbara Oakley Deep Learning Cognitive Chunking Cards */
+.oakley-cognitive-chunk {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: #ffffff;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+.dark .oakley-cognitive-chunk {
+    border-color: #1e293b;
+    background: #09090b;
+}
+.oakley-chunk-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.dark .oakley-chunk-header {
+    background: #0f172a;
+    border-bottom-color: #1e293b;
+}
+
+/* Expanded 48px Rams Drill-Down Action Buttons */
+.btn-rams-drilldown {
+    min-height: 48px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    transition: all 0.15s ease-in-out;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+}
+.btn-rams-drilldown-primary {
+    background: #0f172a;
+    color: #ffffff;
+    border-color: #0f172a;
+}
+.dark .btn-rams-drilldown-primary {
+    background: #f8fafc;
+    color: #0f172a;
+    border-color: #f8fafc;
+}
+.btn-rams-drilldown-primary:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+}
+.dark .btn-rams-drilldown-primary:hover {
+    background: #e2e8f0;
 }
 
 /* Imagineering Scroll & Reveal Animations */

@@ -88,61 +88,61 @@ import { GeolocationalHealthRelocationComponent } from './geolocational-health-r
     @if (hasAnyReport() || state.isEmergencyMode()) {
       <div class="px-4 sm:px-8 py-2 sm:py-3 no-print overflow-x-auto w-full">
         <div class="max-w-4xl mx-auto min-w-0 relative">
-          <div id="tour-lens-tabs" class="flex overflow-x-auto hide-scrollbar items-center gap-1 border-b border-gray-300 dark:border-zinc-700 w-full relative z-10">
+          <div id="tour-lens-tabs" class="flex overflow-x-auto hide-scrollbar items-center gap-1.5 border-b-2 border-slate-200 dark:border-zinc-800 w-full relative z-10">
             <button (click)="changeLens('Summary Overview')"
               data-testid="tab-overview"
               [class.border-b-2]="activeLens() === 'Summary Overview'"
               [class.border-transparent]="activeLens() !== 'Summary Overview'"
-              [ngClass]="activeLens() === 'Summary Overview' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Summary Overview' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               Overview
             </button>
             <button (click)="changeLens('Treatment Matrix')"
               data-testid="tab-treatment-matrix"
               [class.border-b-2]="activeLens() === 'Treatment Matrix'"
               [class.border-transparent]="activeLens() !== 'Treatment Matrix'"
-              [ngClass]="activeLens() === 'Treatment Matrix' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Treatment Matrix' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               Treatment Matrix
             </button>
             <button (click)="changeLens('Functional Protocols')"
               data-testid="tab-functional-protocols"
               [class.border-b-2]="activeLens() === 'Functional Protocols'"
               [class.border-transparent]="activeLens() !== 'Functional Protocols'"
-              [ngClass]="activeLens() === 'Functional Protocols' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Functional Protocols' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               Functional Protocols
             </button>
             <button (click)="changeLens('Nutrition')"
               data-testid="tab-nutrition"
               [class.border-b-2]="activeLens() === 'Nutrition'"
               [class.border-transparent]="activeLens() !== 'Nutrition'"
-              [ngClass]="activeLens() === 'Nutrition' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Nutrition' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               Nutrition
             </button>
             <button (click)="changeLens('Precision Nutrients')"
               data-testid="tab-precision-nutrients"
               [class.border-b-2]="activeLens() === 'Precision Nutrients'"
               [class.border-transparent]="activeLens() !== 'Precision Nutrients'"
-              [ngClass]="activeLens() === 'Precision Nutrients' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Precision Nutrients' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               Precision Nutrients
             </button>
             <button (click)="changeLens('Monitoring & Follow-up')"
               data-testid="tab-monitoring-follow-up"
               [class.border-b-2]="activeLens() === 'Monitoring & Follow-up'"
               [class.border-transparent]="activeLens() !== 'Monitoring & Follow-up'"
-              [ngClass]="activeLens() === 'Monitoring & Follow-up' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Monitoring & Follow-up' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               Monitoring & Follow-up
             </button>
             <button (click)="changeLens('Patient Education')"
               data-testid="tab-patient-education"
               [class.border-b-2]="activeLens() === 'Patient Education'"
               [class.border-transparent]="activeLens() !== 'Patient Education'"
-              [ngClass]="activeLens() === 'Patient Education' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Patient Education' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               Patient Education
             </button>
 
@@ -150,8 +150,8 @@ import { GeolocationalHealthRelocationComponent } from './geolocational-health-r
               data-testid="tab-physionet-telemetry"
               [class.border-b-2]="activeLens() === 'PhysioNet Telemetry'"
               [class.border-transparent]="activeLens() !== 'PhysioNet Telemetry'"
-              [ngClass]="activeLens() === 'PhysioNet Telemetry' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'PhysioNet Telemetry' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               📡 PhysioNet Waveforms
             </button>
 
@@ -159,8 +159,8 @@ import { GeolocationalHealthRelocationComponent } from './geolocational-health-r
               data-testid="tab-ybocs-screener"
               [class.border-b-2]="activeLens() === 'Y-BOCs Screener'"
               [class.border-transparent]="activeLens() !== 'Y-BOCs Screener'"
-              [ngClass]="activeLens() === 'Y-BOCs Screener' ? activeTabClasses() : 'border-b-2 border-transparent text-gray-700 dark:text-zinc-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-zinc-200 dark:hover:border-zinc-600'"
-              class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-800/30 outline-none focus:outline-none">
+              [ngClass]="activeLens() === 'Y-BOCs Screener' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
+              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
               🧠 Y-BOCs Screener
             </button>
 
@@ -169,8 +169,8 @@ import { GeolocationalHealthRelocationComponent } from './geolocational-health-r
                 data-testid="tab-emt-handoff"
                 [class.border-b-2]="activeLens() === 'EMT Handoff'"
                 [class.border-transparent]="activeLens() !== 'EMT Handoff'"
-                [ngClass]="activeLens() === 'EMT Handoff' ? 'border-[#EF4444] dark:border-red-500 text-red-600 dark:text-red-400 font-bold' : 'border-b-2 border-transparent text-red-500 dark:text-red-400 hover:text-red-700 hover:border-red-300 dark:hover:text-red-300 dark:hover:border-red-800'"
-                class="py-2.5 px-4 -mb-px font-bold uppercase tracking-widest text-[12px] whitespace-nowrap transition-all duration-200 hover:bg-red-50/20 dark:hover:bg-red-950/10 outline-none focus:outline-none">
+                [ngClass]="activeLens() === 'EMT Handoff' ? 'border-red-600 dark:border-red-500 text-red-600 dark:text-red-400 font-extrabold' : 'border-b-2 border-transparent text-red-600 dark:text-red-400 hover:text-red-800 hover:border-red-400 dark:hover:text-red-300 dark:hover:border-red-700'"
+                class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-red-500/10 hover:bg-red-500/20 outline-none focus:outline-none flex items-center justify-center">
                 🚑 EMT Handoff
               </button>
             }
@@ -1466,6 +1466,27 @@ export class AnalysisReportComponent implements OnDestroy {
                 highlightedHtml = highlightedHtml.replace(issue.claim, highlightSpan);
               }
             }
+
+            // Academic APA 7th & UK RIO Sourcing Citation Styling
+            if (highlightedHtml.includes('DOI:') || highlightedHtml.includes('doi.org') || highlightedHtml.includes('Journal of') || highlightedHtml.includes('Peer-Reviewed')) {
+              highlightedHtml = `<div class="apa-citation-block flex flex-col gap-1 my-3 font-sans">
+                <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-extrabold">
+                  <span>📖 APA 7th Edition & UK RIO Verified Citation</span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span class="text-emerald-600 dark:text-emerald-400">Peer-Reviewed Evidence</span>
+                </div>
+                <div class="text-xs leading-relaxed text-slate-800 dark:text-slate-200 font-medium">
+                  ${highlightedHtml}
+                </div>
+              </div>`;
+            }
+
+            // Dieter Rams Rectilinear Task Bracketing (Replacing Pills)
+            highlightedHtml = highlightedHtml
+              .replace(/\[✓\s*APPROVED\]/gi, '<span class="rams-task-bracket approved">✓ APPROVED</span>')
+              .replace(/\[⚡\s*IN-PROGRESS\]/gi, '<span class="rams-task-bracket in-progress">⚡ IN-PROGRESS</span>')
+              .replace(/\[⏳\s*PENDING\]/gi, '<span class="rams-task-bracket">⏳ PENDING</span>');
+
             return highlightedHtml;
           };
 
