@@ -71,6 +71,28 @@ interface ISentinelContainmentOption {
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
+            <!-- ACA Mandate vs Cash-Pay Compliance Switcher -->
+            <div class="flex bg-gray-200/80 dark:bg-zinc-800/60 p-0.5 rounded-xl border border-gray-300/30">
+              <button (click)="compliancePricingMode.set('cash')"
+                [class.bg-white]="compliancePricingMode() === 'cash'"
+                [class.dark:bg-zinc-700]="compliancePricingMode() === 'cash'"
+                [class.shadow-sm]="compliancePricingMode() === 'cash'"
+                [class.text-indigo-600]="compliancePricingMode() === 'cash'"
+                [class.dark:text-indigo-300]="compliancePricingMode() === 'cash'"
+                class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer text-gray-500 dark:text-zinc-400">
+                💵 Cash-Pay Autonomy
+              </button>
+              <button (click)="compliancePricingMode.set('aca')"
+                [class.bg-white]="compliancePricingMode() === 'aca'"
+                [class.dark:bg-zinc-700]="compliancePricingMode() === 'aca'"
+                [class.shadow-sm]="compliancePricingMode() === 'aca'"
+                [class.text-purple-600]="compliancePricingMode() === 'aca'"
+                [class.dark:text-purple-300]="compliancePricingMode() === 'aca'"
+                class="px-2.5 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer text-gray-500 dark:text-zinc-400">
+                🏛️ ACA Mandated EHB
+              </button>
+            </div>
+
             <!-- Mode Switcher (Treatment vs Prevention) -->
             <div class="flex bg-gray-200/80 dark:bg-zinc-800/60 p-0.5 rounded-xl border border-gray-300/30">
               <button (click)="activeMode.set('treatment')"
@@ -546,6 +568,7 @@ export class CostBenefitAnalysisComponent {
 
   // Active view: treatment options or preventive protocols
   activeMode = signal<'treatment' | 'prevention'>('treatment');
+  compliancePricingMode = signal<'cash' | 'aca'>('cash');
 
   // Preference engine state
   prefs = signal({

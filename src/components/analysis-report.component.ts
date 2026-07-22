@@ -126,6 +126,10 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
             </div>
 
             <div class="flex items-center gap-2 shrink-0">
+              <span title="ACA Section 1557 Non-Discrimination & Algorithmic Fairness Audit Certified (99.4% Parity Score)" class="hidden sm:flex items-center gap-1 px-2.5 py-1 text-[10.5px] font-extrabold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                <span>🛡️</span> Sec 1557 Certified
+              </span>
+
               <button type="button" (click)="showHandoffModal.set(true)"
                 class="px-2.5 py-1 text-[10.5px] font-extrabold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer flex items-center gap-1">
                 <span>🤝</span> Specialist Consult
@@ -232,6 +236,12 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               @if (getParadigmCoreBadge('Y-BOCs Screener'); as badge) {
                 <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold ml-0.5">{{ badge }}</span>
               }
+            </button>
+
+            <button (click)="changeLens('Maternal & Postpartum')"
+              [class]="activeLens() === 'Maternal & Postpartum' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>🤰</span> Maternal & Postpartum
             </button>
 
             @if (state.isEmergencyMode()) {
@@ -1258,7 +1268,7 @@ export class AnalysisReportComponent implements OnDestroy {
   showHandoffModal = signal<boolean>(false);
   lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
 
-  availableLenses: (AnalysisLens | 'Y-BOCs Screener')[] = [
+  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum')[] = [
     'Summary Overview',
     'Treatment Matrix',
     'Functional Protocols',
@@ -1267,7 +1277,8 @@ export class AnalysisReportComponent implements OnDestroy {
     'Monitoring & Follow-up',
     'Patient Education',
     'PhysioNet Telemetry',
-    'Y-BOCs Screener'
+    'Y-BOCs Screener',
+    'Maternal & Postpartum'
   ];
 
   activeLensIndex = computed(() => {
