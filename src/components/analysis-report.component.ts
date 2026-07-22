@@ -128,79 +128,69 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
             
             <button (click)="changeLens('Summary Overview')"
               data-testid="tab-overview"
-              [class.bg-indigo-600]="activeLens() === 'Summary Overview'"
-              [class.text-white]="activeLens() === 'Summary Overview'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Summary Overview' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>📋</span> Overview
             </button>
 
             <button (click)="changeLens('Treatment Matrix')"
               data-testid="tab-treatment-matrix"
-              [class.bg-indigo-600]="activeLens() === 'Treatment Matrix'"
-              [class.text-white]="activeLens() === 'Treatment Matrix'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Treatment Matrix' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>💊</span> Treatment Matrix
             </button>
 
             <button (click)="changeLens('Functional Protocols')"
               data-testid="tab-functional-protocols"
-              [class.bg-indigo-600]="activeLens() === 'Functional Protocols'"
-              [class.text-white]="activeLens() === 'Functional Protocols'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Functional Protocols' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🧠</span> Functional Protocols
             </button>
 
             <button (click)="changeLens('Nutrition')"
               data-testid="tab-nutrition"
-              [class.bg-indigo-600]="activeLens() === 'Nutrition'"
-              [class.text-white]="activeLens() === 'Nutrition'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Nutrition' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🥗</span> Nutrition
             </button>
 
             <button (click)="changeLens('Precision Nutrients')"
               data-testid="tab-precision-nutrients"
-              [class.bg-indigo-600]="activeLens() === 'Precision Nutrients'"
-              [class.text-white]="activeLens() === 'Precision Nutrients'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Precision Nutrients' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🧬</span> Precision Nutrients
             </button>
 
             <button (click)="changeLens('Monitoring & Follow-up')"
               data-testid="tab-monitoring-follow-up"
-              [class.bg-indigo-600]="activeLens() === 'Monitoring & Follow-up'"
-              [class.text-white]="activeLens() === 'Monitoring & Follow-up'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Monitoring & Follow-up' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>📈</span> Monitoring & Follow-up
             </button>
 
             <button (click)="changeLens('Patient Education')"
               data-testid="tab-patient-education"
-              [class.bg-indigo-600]="activeLens() === 'Patient Education'"
-              [class.text-white]="activeLens() === 'Patient Education'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Patient Education' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12.5px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>📚</span> Patient Education
             </button>
 
             <button (click)="changeLens('PhysioNet Telemetry')"
-              [class.bg-indigo-600]="activeLens() === 'PhysioNet Telemetry'"
-              [class.text-white]="activeLens() === 'PhysioNet Telemetry'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'PhysioNet Telemetry' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>📡</span> PhysioNet Waveforms
             </button>
 
             <button (click)="changeLens('Y-BOCs Screener')"
-              [class.bg-indigo-600]="activeLens() === 'Y-BOCs Screener'"
-              [class.text-white]="activeLens() === 'Y-BOCs Screener'"
-              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              [class]="activeLens() === 'Y-BOCs Screener' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🧠</span> Y-BOCs Screener
             </button>
 
             @if (state.isEmergencyMode()) {
               <button (click)="changeLens('EMT Handoff')"
-                [class.bg-red-600]="activeLens() === 'EMT Handoff'"
-                [class.text-white]="activeLens() === 'EMT Handoff'"
-                class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-red-500 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white flex items-center gap-1.5 shrink-0 cursor-pointer">
+                [class]="activeLens() === 'EMT Handoff' ? '!bg-red-600 !text-white border-red-600 shadow-md font-extrabold scale-[1.02]' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/40 hover:bg-red-600 hover:text-white font-semibold'"
+                class="snap-start py-2.5 px-4 min-h-[44px] rounded-md tracking-wider text-[12px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
                 <span>🚑</span> EMT Handoff
               </button>
             }
