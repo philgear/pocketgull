@@ -115,10 +115,29 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </div>
                 </div>
 
-                <!-- Live Biometric Telemetry Dashboard (Display Only) -->
-                <section class="mb-8">
-                  <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-4">Live Biometric Telemetry</h2>
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Live Biometric Telemetry Dashboard (Collapsible Caret Accordion) -->
+                <section class="mb-8 bg-white dark:bg-zinc-900/60 rounded-xl border border-gray-200 dark:border-zinc-800 p-4 transition-all">
+                  <button type="button" (click)="toggleBiometrics()" 
+                    class="w-full flex items-center justify-between gap-2 text-left cursor-pointer group">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Live Biometric Telemetry</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                          {{ isBiometricsExpanded() ? 'EXPANDED' : 'COLLAPSED' }}
+                        </span>
+                      </div>
+                      <span *ngIf="!isBiometricsExpanded()" class="text-xs font-mono text-slate-600 dark:text-zinc-400 truncate">
+                        BP {{ state.vitals().bp || '120/80' }} • HR {{ state.vitals().hr || '72' }} bpm • SpO2 {{ state.vitals().spO2 || '98%' }}
+                      </span>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-zinc-200 text-xs font-bold transition">
+                      <span>{{ isBiometricsExpanded() ? 'Hide Readouts' : 'Expand Biometrics' }}</span>
+                      <span [class.rotate-180]="isBiometricsExpanded()" class="inline-block transition-transform duration-200 text-sm">▼</span>
+                    </div>
+                  </button>
+
+                  <div *ngIf="isBiometricsExpanded()" class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 grid grid-cols-2 md:grid-cols-4 gap-4 animate-in">
                     <app-metric-card
                       title="Blood Pressure"
                       [value]="state.vitals().bp || '--'"
@@ -607,6 +626,57 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     }
                 </section>
 
+                <!-- Expansive Custom Patient Data Fields & Notes -->
+                <section class="mb-8">
+                  <div class="flex justify-between items-center mb-4">
+                    <div>
+                      <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Expansive Custom Patient Data Fields</h2>
+                      <p class="text-[11px] text-gray-400 dark:text-zinc-500">Add custom biomarkers, goals, dietary preferences, or clinical notes</p>
+                    </div>
+                    <pocket-gull-button 
+                      variant="ghost" 
+                      size="xs" 
+                      (click)="addCustomField()" 
+                      icon="M12 4v16m8-8H4">
+                      Add Custom Field
+                    </pocket-gull-button>
+                  </div>
+
+                  <div *ngIf="customFields().length > 0; else noCustomFields" class="flex flex-col gap-3 mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8">
+                    <div *ngFor="let field of customFields(); let i = index" class="flex items-center gap-3">
+                      <div class="w-1/3">
+                        <pocket-gull-input
+                          [value]="field.key"
+                          (valueChange)="updateCustomField(i, 'key', $event)"
+                          placeholder="Label (e.g. NMN Dose, Goal)"
+                          class="w-full">
+                        </pocket-gull-input>
+                      </div>
+                      <div class="flex-1">
+                        <pocket-gull-input
+                          [value]="field.value"
+                          (valueChange)="updateCustomField(i, 'value', $event)"
+                          placeholder="Value / Readout"
+                          class="w-full">
+                        </pocket-gull-input>
+                      </div>
+                      <pocket-gull-button 
+                        variant="ghost" 
+                        size="sm" 
+                        (click)="removeCustomField(i)" 
+                        icon="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        ariaLabel="Remove Custom Field">
+                      </pocket-gull-button>
+                    </div>
+                  </div>
+
+                  <ng-template #noCustomFields>
+                    <div class="mb-8 border-b border-gray-100 dark:border-zinc-800 pb-8 text-center text-xs font-light text-gray-500 dark:text-zinc-400 bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-4 border border-dashed">
+                      No custom fields added yet. Click "Add Custom Field" to record tailored biomarkers, supplements, or clinical notes.
+                    </div>
+                  </ng-template>
+                </section>
+
                 <!-- Patient Trends Chart -->
                 @defer (on viewport) {
                   <section>
@@ -793,6 +863,37 @@ export class MedicalChartSummaryComponent {
   showExportMenu = signal(false);
   showEpicSuccess = signal(false);
   isExporting = signal(false);
+
+  // Mobile Biometric Accordion Signal
+  isBiometricsExpanded = signal<boolean>(false);
+
+  toggleBiometrics() {
+    this.isBiometricsExpanded.update(v => !v);
+  }
+
+  // Expansive Custom Patient Fields Signal & Methods
+  customFields = signal<{ key: string; value: string }[]>([
+    { key: 'Custom Supplementation', value: 'NMN 500mg daily + Trans-Resveratrol' },
+    { key: 'Personal Healthspan Goal', value: 'Achieve 10,000 steps & 6.0 bpm Vagal Resonant Breathing' }
+  ]);
+
+  addCustomField() {
+    this.customFields.update(list => [...list, { key: '', value: '' }]);
+  }
+
+  updateCustomField(index: number, prop: 'key' | 'value', val: string) {
+    this.customFields.update(list => {
+      const copy = [...list];
+      if (copy[index]) {
+        copy[index][prop] = val;
+      }
+      return copy;
+    });
+  }
+
+  removeCustomField(index: number) {
+    this.customFields.update(list => list.filter((_, i) => i !== index));
+  }
 
   // BigQuery Healthcare Baseline Overlays
   baselines = signal<any>(null);

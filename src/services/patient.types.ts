@@ -231,6 +231,8 @@ export interface IPatientState {
     avsProtocol?: IAvsProtocol;
     /** Selected medical paradigm / philosophy mode. */
     activePhilosophy?: 'western' | 'eastern' | 'ayurvedic';
+    /** Custom expansive key-value biomarker and note fields. */
+    customFields?: { key: string; value: string }[];
 }
 
 /**
