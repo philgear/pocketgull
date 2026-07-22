@@ -45,6 +45,7 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
 import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
 import { HandoffModalComponent } from './handoff-modal.component';
 import { SdohNavigatorComponent } from './sdoh-navigator.component';
+import { LifePerilsParadigmMatrixComponent } from './life-perils-paradigm-matrix.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -80,7 +81,8 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
     PatientHealthTrajectoryStorybookComponent,
     TypologyBadgeComponent,
     HandoffModalComponent,
-    SdohNavigatorComponent
+    SdohNavigatorComponent,
+    LifePerilsParadigmMatrixComponent
   ],
 
 
@@ -468,9 +470,10 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
             </div>
 
-            <!-- Multi-Paradigm Switchable Clinical Dashboard -->
-            <div class="col-span-full mb-2">
+            <!-- Multi-Paradigm Switchable Clinical Dashboard & Life-Stage Perils Matrix -->
+            <div class="col-span-full mb-4 space-y-4">
               <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
+              <app-life-perils-paradigm-matrix></app-life-perils-paradigm-matrix>
             </div>
 
             <app-clinical-gauge
