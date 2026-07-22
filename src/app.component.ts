@@ -1045,43 +1045,57 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                       <button (click)="applyCustomLanguage()" 
                               [disabled]="isTranslating() || !customLanguage().trim()"
                               class="px-4 py-1.5 bg-[#1C1C1C] dark:bg-white text-white dark:text-[#111111] text-[12px] uppercase tracking-wider font-bold hover:bg-[#ff4500] dark:hover:bg-[#ff4500] dark:hover:text-white transition-all">
-                        Apply
-                      </button>
-                    </div>
-                  }
-                </div>
+                        Appl                <!-- Animal Comfort Protocols & Service Animal Healing Suite -->
+                <div class="mt-6 p-6 border-2 border-amber-500/30 dark:border-amber-500/40 rounded-md bg-amber-50/20 dark:bg-amber-950/15 shadow-sm text-center flex flex-col items-center max-w-2xl mx-auto w-full">
+                  
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="text-2xl animate-bounce">🐕</span>
+                    <span class="font-mono text-[10px] font-extrabold uppercase tracking-widest text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800">
+                      Service Animal & Pet Co-Regulation
+                    </span>
+                  </div>
 
-                <!-- Pet Auditory Modes -->
-                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
-                  <p class="text-[12px] font-semibold uppercase tracking-wider text-gray-500 mb-2">Animal Comfort Protocols</p>
-                  <div class="flex flex-wrap gap-2">
+                  <h3 class="text-sm font-extrabold text-slate-900 dark:text-zinc-100 uppercase tracking-wider mb-2">
+                    Is a service dog, therapy animal, or comforting companion in the room helping you heal right now?
+                  </h3>
+
+                  <p class="text-xs text-slate-600 dark:text-zinc-400 max-w-lg leading-relaxed mb-4 font-medium">
+                    Auditory purring, canine baroreflex frequency entrainment, cetacean acoustic bio-waves, and soothing avian bio-sonics can actively synchronize with your companion animal to lower stress, calm heart rate variability, and accelerate healing.
+                  </p>
+
+                  <div class="flex flex-wrap items-center justify-center gap-3 w-full">
                     <button (click)="petAuditory.playCanineHeartbeat()" 
-                      [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 0 0 9-9H3a9 9 0 0 0 9 9Z"/><path d="M3 12c0-3 2-6 5-6s5 3 5 3 2-3 5-3 5 3 5 6"/></svg>
-                      Canine Comfort
+                      [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-600 text-white border-amber-700 shadow-md scale-105' : 'bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-700 hover:border-amber-500'"
+                      class="min-h-[48px] px-5 py-2.5 text-[12px] uppercase tracking-wider font-extrabold rounded-md border transition-all flex items-center gap-2.5 cursor-pointer">
+                      <span>🐕</span>
+                      <span>Canine Service Comfort</span>
                     </button>
                     <button (click)="petAuditory.playFelinePurr()"
-                      [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5c.67 0 1.33.09 2 .26 1.78-1.55 3-.94 3-.94.83 2.22.3 3.86.15 4.27C18.66 10.14 19 11.96 19 14c0 4.97-3.13 7-7 7s-7-2.03-7-7c0-2.04.34-3.86 1.85-5.41-.15-.41-.68-2.05.15-4.27 0 0 1.22-.61 3 .94.65-.17 1.33-.26 2-.26Z" /><path d="M9 13v.01M15 13v.01" /><path d="M12 16l-1-1h2Z" /></svg>
-                      Feline Comfort
+                      [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-600 text-white border-emerald-700 shadow-md scale-105' : 'bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-700 hover:border-emerald-500'"
+                      class="min-h-[48px] px-5 py-2.5 text-[12px] uppercase tracking-wider font-extrabold rounded-md border transition-all flex items-center gap-2.5 cursor-pointer">
+                      <span>🐈</span>
+                      <span>Feline Purr Therapy</span>
                     </button>
                     <button (click)="petAuditory.playCetaceanTherapy()"
-                      [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-1.5-2.5-3-3.5-6-3.5A4.5 4.5 0 0 1 1.5 12c0-2.5 1.5-3.5 4.5-3.5 3 0 4.5 1 6 3.5 1.5-2.5 3-3.5 6-3.5a4.5 4.5 0 0 1 4.5 4.5c0 2.5-1.5 3.5-4.5 3.5-3 0-4.5 1-6 3.5Z" /><path d="M12 12v4" /></svg>
-                      Cetacean Comfort
+                      [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-600 text-white border-sky-700 shadow-md scale-105' : 'bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-700 hover:border-sky-500'"
+                      class="min-h-[48px] px-5 py-2.5 text-[12px] uppercase tracking-wider font-extrabold rounded-md border transition-all flex items-center gap-2.5 cursor-pointer">
+                      <span>🐬</span>
+                      <span>Cetacean Acoustic Bio-Waves</span>
                     </button>
                     <button (click)="petAuditory.playAvianTherapy()"
-                      [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/60' : 'bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'"
-                      class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border hover:border-gray-300 dark:hover:border-zinc-600 transition-all flex items-center gap-2">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h.01" /><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20" /><path d="m20 7 2 .5-2 .5" /><path d="M10 18v3" /><path d="M14 17.75V21" /><path d="M7 18a6 6 0 0 0 3.84-10.61" /></svg>
-                      Avian Comfort
+                      [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-600 text-white border-indigo-700 shadow-md scale-105' : 'bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-700 hover:border-indigo-500'"
+                      class="min-h-[48px] px-5 py-2.5 text-[12px] uppercase tracking-wider font-extrabold rounded-md border transition-all flex items-center gap-2.5 cursor-pointer">
+                      <span>🦜</span>
+                      <span>Avian Dawn Chorus</span>
                     </button>
                     @if(petAuditory.isCurrentlyPlaying) {
-                      <button (click)="petAuditory.stop()" class="px-4 py-2 text-[12px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-all">
-                        Stop
+                      <button (click)="petAuditory.stop()" class="min-h-[48px] px-5 py-2.5 text-[12px] uppercase tracking-wider font-extrabold rounded-md border border-red-500/80 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-all flex items-center gap-2 cursor-pointer">
+                        <span>⏹</span>
+                        <span>Pause Animal Audio</span>
+                      </button>
+                    }
+                  </div>
+                </div> Stop
                       </button>
                     }
                   </div>
