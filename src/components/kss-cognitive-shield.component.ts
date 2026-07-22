@@ -29,7 +29,7 @@ export interface IKssLevel {
             <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 uppercase font-mono tracking-widest">
               😴 Karolinska Sleepiness Scale (KSS) Adaptive Shield
             </h3>
-            <span class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase"
+            <span aria-live="polite" class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase"
               [class.bg-emerald-500/10]="kssScore() <= 4"
               [class.text-emerald-600]="kssScore() <= 4"
               [class.bg-amber-500/10]="kssScore() >= 5 && kssScore() <= 6"

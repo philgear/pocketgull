@@ -31,7 +31,9 @@ describe('Responsible AI & E2E Safety Test Suite', () => {
       'Treatment Matrix',
       'PhysioNet Telemetry',
       'Maternal & Postpartum',
-      'Grow-Thyself Education'
+      'Grow-Thyself Education',
+      'Epigenetic Longevity',
+      'Pre-Conception & Family Health'
     ];
 
     requiredLenses.forEach(lens => {

@@ -1,32 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 import * as path from 'path';
 
 test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
   test.beforeEach(async ({ page }) => {
-    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-    // Intercept config endpoint to return a mock API key
-    await page.route('**/api/config', async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ apiKey: 'AIzaMockKeyForTestingChaos12345' })
-      });
-    });
-
-    // Intercept hardware telemetry to prevent 500 error warnings
-    await page.route('**/api/hardware/telemetry', async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          gpus: [],
-          cpuName: 'Mock CPU',
-          cpuLoadPercent: 12,
-          systemMemoryUsedGb: 4.5,
-          systemMemoryTotalGb: 16.0
-        })
-      });
-    });
+    await setupE2ePage(page);
 
     // Intercept clinical changes check
     await page.route('**/api/ai/changes', async route => {
@@ -117,16 +95,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
 
   test('Resilience - App offline override simulates offline banner & warns user', async ({ page }) => {
     const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
-    await page.goto('/');
-
-    // 1. Enter PIN Code
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 10000 });
-    await pinInput.fill('1234');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
-
-    // Ensure roster loading and client-side loadState has completed
+    await enterDemoMode(page);
     await rosterResponsePromise;
     await page.waitForTimeout(500);
 
@@ -176,16 +145,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     });
 
     const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
-    await page.goto('/');
-
-    // Enter PIN Code
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 10000 });
-    await pinInput.fill('1234');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
-
-    // Ensure roster loading and client-side loadState has completed
+    await enterDemoMode(page);
     await rosterResponsePromise;
     await page.waitForTimeout(500);
 
@@ -222,16 +182,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     });
 
     const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
-    await page.goto('/');
-
-    // Enter PIN Code
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 10000 });
-    await pinInput.fill('1234');
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('app-analysis-report')).toBeVisible({ timeout: 10000 });
-
-    // Ensure roster loading and client-side loadState has completed
+    await enterDemoMode(page);
     await rosterResponsePromise;
     await page.waitForTimeout(500);
 

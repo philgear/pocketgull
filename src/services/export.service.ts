@@ -34,55 +34,16 @@ interface IFhirBundle {
 })
 export class ExportService {
 
-  private getSanitizer(): (str: string, opts?: any) => string {
-    const raw = (DOMPurify as any).default || DOMPurify;
-    return (str: string, opts?: any) => {
-      try {
-        if (raw && typeof raw.sanitize === 'function') {
-          const res = raw.sanitize(str, opts);
-          if (typeof res === 'string' && res.length > 0 && !res.includes('onerror=')) return res;
-        }
-      } catch (e) {}
-      let sanitized = str;
-      let previous: string;
-      do {
-        previous = sanitized;
-        sanitized = sanitized
-          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-          .replace(/<img\b[^>]*\/?>/gi, '')
-          .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
-          .replace(/\son\w+\s*=\s*[^>\s]+/gi, '');
-      } while (sanitized !== previous);
-      return sanitized;
-    };
-  }
-
-  private sanitizeObject(obj: any): any {
-    const sanitize = this.getSanitizer();
-    if (typeof obj === 'string') return sanitize(obj, { ALLOWED_TAGS: [] });
-    if (Array.isArray(obj)) return obj.map(item => this.sanitizeObject(item));
-    if (typeof obj === 'object' && obj !== null) {
-      const res: any = {};
-      for (const key of Object.keys(obj)) res[key] = this.sanitizeObject(obj[key]);
-      return res;
+  public sanitizeForExport(inputStr: string): string {
+    const hasOwnDefault = Object.prototype.hasOwnProperty.call(DOMPurify, 'default');
+    const raw = hasOwnDefault ? (DOMPurify as any).default : DOMPurify;
+    if (raw && typeof raw.sanitize === 'function') {
+      return raw.sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe'], FORBID_ATTR: ['onerror', 'onload', 'onclick'] });
     }
-    return obj;
+    return inputStr;
   }
 
-  private get markdownService(): MarkdownService | null {
-    try {
-      return inject(MarkdownService, { optional: true });
-    } catch {
-      return null;
-    }
-  }
-
-  sanitizeForExport(inputStr: string): string {
-    const sanitize = this.getSanitizer();
-    return sanitize(inputStr);
-  }
-
-  buildFhirR4Bundle(patientData: any): any {
+  public buildFhirR4Bundle(patientData: any): any {
     const sanitizedP = this.sanitizeObject(patientData);
     return {
       resourceType: 'Bundle',
@@ -101,10 +62,30 @@ export class ExportService {
     };
   }
 
-  exportPdfReport(reportText: string, patientName: string = 'Patient'): void {
-    const sanitizedText = this.sanitizeForExport(reportText);
-    this.downloadAsPdf({ reportText: sanitizedText }, patientName);
+  async exportPdfReport(data: any, patientName: string = 'Patient'): Promise<void> {
+    return this.downloadAsPdf(data, patientName);
   }
+
+  private sanitizeObject(obj: any): any {
+    if (typeof obj === 'string') return this.sanitizeForExport(obj);
+    if (Array.isArray(obj)) return obj.map(item => this.sanitizeObject(item));
+    if (typeof obj === 'object' && obj !== null) {
+      const res: any = {};
+      for (const key of Object.keys(obj)) res[key] = this.sanitizeObject(obj[key]);
+      return res;
+    }
+    return obj;
+  }
+
+  private get markdownService(): MarkdownService | null {
+    try {
+      return inject(MarkdownService, { optional: true });
+    } catch {
+      return null;
+    }
+  }
+
+  // ─── PDF / Print Export ────────────────────────────────────
 
   /**
    * Opens a styled clinical print document in a new window and triggers window.print().

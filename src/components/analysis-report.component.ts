@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked, output } from '@angular/core';
 import { CommonModule, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
@@ -6,6 +6,7 @@ import { PatientManagementService } from '../services/patient-management.service
 import { HistoryEntry } from '../services/patient.types';
 import { MarkdownService } from '../services/markdown.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
+import { ParadigmLyricsService } from '../services/paradigm-lyrics.service';
 import { DictationService } from '../services/dictation.service';
 import { generate } from 'lean-qr';
 
@@ -23,6 +24,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
 import { ClinicalTrendComponent } from './clinical-trend.component';
 import { AiCacheService } from '../services/ai-cache.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
+import { MedicalDecoderService } from '../services/medical-decoder.service';
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
 import { YbocsScreenerComponent } from './ybocs-screener.component';
@@ -43,6 +45,12 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
 import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
 import { HandoffModalComponent } from './handoff-modal.component';
 import { SdohNavigatorComponent } from './sdoh-navigator.component';
+import { LifePerilsParadigmMatrixComponent } from './life-perils-paradigm-matrix.component';
+import { CyclingErgonomicsDualRevealComponent } from './cycling-ergonomics-dual-reveal.component';
+import { StormAnalysisComponent } from './storm-analysis.component';
+import { AigaTelemetryLensComponent } from './aiga-telemetry-lens.component';
+import { AndroscogginForagingPhytoncideComponent } from './androscoggin-foraging-phytoncide.component';
+import { ProceduralInvestmentMatrixComponent } from './procedural-investment-matrix.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -78,7 +86,13 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
     PatientHealthTrajectoryStorybookComponent,
     TypologyBadgeComponent,
     HandoffModalComponent,
-    SdohNavigatorComponent
+    SdohNavigatorComponent,
+    LifePerilsParadigmMatrixComponent,
+    CyclingErgonomicsDualRevealComponent,
+    StormAnalysisComponent,
+    AigaTelemetryLensComponent,
+    AndroscogginForagingPhytoncideComponent,
+    ProceduralInvestmentMatrixComponent
   ],
 
 
@@ -240,26 +254,32 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
 
             <button (click)="changeLens('Maternal & Postpartum')"
               [class]="activeLens() === 'Maternal & Postpartum' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🤰</span> Maternal & Postpartum
             </button>
 
             <button (click)="changeLens('Grow-Thyself Education')"
               [class]="activeLens() === 'Grow-Thyself Education' ? '!bg-emerald-600 !text-white dark:!bg-emerald-600 dark:!text-white border-emerald-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-emerald-50 dark:hover:bg-zinc-800 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>🌱</span> Grow-Thyself Education
             </button>
 
             <button (click)="changeLens('Epigenetic Longevity')"
               [class]="activeLens() === 'Epigenetic Longevity' ? '!bg-purple-600 !text-white dark:!bg-purple-600 dark:!text-white border-purple-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-purple-50 dark:hover:bg-zinc-800 hover:text-purple-700 dark:hover:text-purple-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
               <span>⌛</span> Epigenetic Longevity
+            </button>
+
+            <button (click)="changeLens('Pre-Conception & Family Health')"
+              [class]="activeLens() === 'Pre-Conception & Family Health' ? '!bg-teal-600 !text-white dark:!bg-teal-600 dark:!text-white border-teal-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-teal-50 dark:hover:bg-zinc-800 hover:text-teal-700 dark:hover:text-teal-300 font-semibold'"
+              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>🧬</span> Family & Pre-Conception
             </button>
 
             @if (state.isEmergencyMode()) {
               <button (click)="changeLens('EMT Handoff')"
                 [class]="activeLens() === 'EMT Handoff' ? '!bg-red-600 !text-white border-red-600 shadow-md font-extrabold scale-[1.02]' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/40 hover:bg-red-600 hover:text-white font-semibold'"
-                class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+                class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
                 <span>🚑</span> EMT Handoff
               </button>
             }
@@ -297,6 +317,29 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
         
+        <!-- Mandatory Prescribed Therapeutic Album Banner -->
+        @if (hasAnyReport()) {
+          <div class="mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-900/10 via-indigo-900/10 to-slate-900/10 dark:from-purple-950/40 dark:to-slate-900/40 border border-purple-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl p-2 rounded-xl bg-purple-500/20 text-purple-300">🎵</span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30">Mandatory Clinical Prescription</span>
+                  <span class="text-xs font-bold text-slate-800 dark:text-purple-200">+12.0 QALYs Recovery</span>
+                </div>
+                <h4 class="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">Actuarial Glee: 12-Track Duet Singalong Album</h4>
+                <p class="text-[11px] text-slate-600 dark:text-zinc-400">Prescribed for daily autonomic co-regulation, vagal tone activation, and multi-generational family healthspan</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <pocket-gull-button (click)="openGleeAlbumFromReport()" variant="primary" size="xs">
+                Play Prescribed Album
+              </pocket-gull-button>
+            </div>
+          </div>
+        }
+
         <!-- Active Medicine Mode Info Banner -->
         @if (hasAnyReport() && activeLens() !== 'EMT Handoff') {
           <div class="mb-6 p-4 rounded-xl border transition-all duration-300"
@@ -381,6 +424,26 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               </div>
             </div>
           </div>
+
+          <!-- Paradigm Lyric & Observational Wisdom Card -->
+          @if (lyricsService.getRandomLyricForParadigm(state.activePhilosophy()); as lyric) {
+            <div class="mb-6 p-4 rounded-xl border border-dashed flex items-start gap-3 transition-all"
+                 [class]="lyric.color">
+              <span class="text-lg">🎵</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                  <span class="text-[11px] font-mono font-bold uppercase tracking-wider">{{ lyric.context }}</span>
+                  <span class="text-[10px] font-serif italic text-slate-500 dark:text-zinc-400">— {{ lyric.source }}</span>
+                </div>
+                <p class="text-xs font-serif italic leading-snug text-slate-800 dark:text-zinc-200">
+                  "{{ lyric.quote }}"
+                </p>
+                <p class="text-[11px] font-sans mt-2 text-slate-600 dark:text-zinc-400">
+                  <span class="font-bold">Observational Impact:</span> {{ lyric.clinicalImpact }}
+                </p>
+              </div>
+            </div>
+          }
         }
 
         @if (activeLens() === 'Y-BOCs Screener') {
@@ -417,9 +480,14 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
             </div>
 
-            <!-- Multi-Paradigm Switchable Clinical Dashboard -->
-            <div class="col-span-full mb-2">
+            <!-- Multi-Paradigm Switchable Clinical Dashboard, Storm Analysis, AIGA Telemetry, Androscoggin Foraging, Procedural Investment & Life-Stage Perils Matrix -->
+            <div class="col-span-full mb-4 space-y-4">
               <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
+              <app-storm-analysis></app-storm-analysis>
+              <app-aiga-telemetry-lens></app-aiga-telemetry-lens>
+              <app-androscoggin-foraging-phytoncide></app-androscoggin-foraging-phytoncide>
+              <app-procedural-investment-matrix></app-procedural-investment-matrix>
+              <app-life-perils-paradigm-matrix></app-life-perils-paradigm-matrix>
             </div>
 
             <app-clinical-gauge
@@ -482,6 +550,9 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
             {{ intel.error() }}
           </div>
         }
+
+        <!-- Outdoor Cycling & Dual-Insight Synchronized Reveal Engine -->
+        <app-cycling-ergonomics-dual-reveal></app-cycling-ergonomics-dual-reveal>
 
         <!-- Theatrical Clinical Proposal Act Banner -->
         @if (activeActProposal(); as act) {
@@ -1268,6 +1339,7 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
   `
 })
 export class AnalysisReportComponent implements OnDestroy {
+  openGleeModal = output<void>();
   protected readonly intel = inject(ClinicalIntelligenceService);
   protected readonly state = inject(PatientStateService);
   protected readonly patientManager = inject(PatientManagementService);
@@ -1275,12 +1347,18 @@ export class AnalysisReportComponent implements OnDestroy {
   private audit = inject(AuditService);
   protected readonly export = inject(ExportService);
   protected readonly actMapper = inject(ClinicalActLensMapperService);
+  private readonly medicalDecoder = inject(MedicalDecoderService);
+  protected readonly lyricsService = inject(ParadigmLyricsService);
 
   flowToastMessage = signal<string | null>(null);
   showHandoffModal = signal<boolean>(false);
   lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
 
-  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity')[] = [
+  openGleeAlbumFromReport() {
+    this.openGleeModal.emit();
+  }
+
+  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health')[] = [
     'Summary Overview',
     'Treatment Matrix',
     'Functional Protocols',
@@ -1292,7 +1370,8 @@ export class AnalysisReportComponent implements OnDestroy {
     'Y-BOCs Screener',
     'Maternal & Postpartum',
     'Grow-Thyself Education',
-    'Epigenetic Longevity'
+    'Epigenetic Longevity',
+    'Pre-Conception & Family Health'
   ];
 
   activeLensIndex = computed(() => {
@@ -2105,7 +2184,8 @@ export class AnalysisReportComponent implements OnDestroy {
 
   private renderInteractiveContent(markdown: string): string {
     const parser = this.markdownService.parser();
-    return parser ? parser.parse(markdown) as string : '';
+    const rawHtml = parser ? parser.parse(markdown) as string : '';
+    return this.medicalDecoder.annotateText(rawHtml);
   }
 
   handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: any) {

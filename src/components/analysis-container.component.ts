@@ -11,12 +11,21 @@ import { ClinicalIcons } from '../assets/clinical-icons';
 import { GamificationService } from '../services/gamification.service';
 
 import { HumanDignityPactComponent } from './human-dignity-pact.component';
+import { MyChartBriefModalComponent } from './mychart-brief-modal.component';
+import { FamilyTreePedigreeComponent } from './family-tree-pedigree.component';
+import { PatientStoryModalComponent } from './patient-story-modal.component';
+import { PostItNotesComponent } from './post-it-notes.component';
+import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
+import { VinylDjStoreComponent } from './vinyl-dj-store.component';
+import { GcpHealthcareService } from '../services/gcp-healthcare.service';
+import { AmbientLivingSpaceDashboardComponent } from './ambient-living-space-dashboard.component';
+import { GreenRoomLoungeComponent } from './green-room-lounge.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -117,10 +126,63 @@ import { HumanDignityPactComponent } from './human-dignity-pact.component';
                   <span>📄</span> PDF
                 </button>
 
+                <!-- MyChart Pre-Visit Brief Button -->
+                <button type="button" (click)="showMyChartModal.set(true)" title="Generate Epic MyChart Pre-Visit Brief & Longevity Lab Navigator"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-teal-500/40 bg-teal-500/10 text-teal-700 dark:text-teal-300 hover:bg-teal-500/20 transition cursor-pointer">
+                  <span>🏥</span> MyChart Brief
+                </button>
+
+                <!-- Pedigree Tree Risk Pruning Button -->
+                <button type="button" (click)="showPedigreeModal.set(true)" title="Open Family Health Pedigree Tree & Risk Branch Pruning"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer">
+                  <span>🌳</span> Pedigree Tree
+                </button>
+
+                <!-- TED Patient Hero Story Button -->
+                <button type="button" (click)="showStoryModal.set(true)" title="Open TED-Style Patient Hero Journey Story Reader"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition cursor-pointer">
+                  <span>📖</span> Patient Story
+                </button>
+
+                <!-- 3D Post-It Notes Button -->
+                <button type="button" (click)="showPostItModal.set(true)" title="Open 3D Interactive Prescription Post-It Notes"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
+                  <span>📌</span> 3D Post-Its
+                </button>
+
+                <!-- Actuarial Glee Singalong Album Button -->
+                <button type="button" (click)="showGleeModal.set(true)" title="Open 12-Track Duet Singalong Game for Progressive Regeneration"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-500/20 transition cursor-pointer">
+                  <span>🎵</span> Actuarial Glee
+                </button>
+
+                <!-- Vinyl Music Store & DJ Deck Button -->
+                <button type="button" (click)="showVinylModal.set(true)" title="Open Retro Vinyl Music Store & DJ Turntable Station"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
+                  <span>📻</span> Vinyl Lounge
+                </button>
                 <!-- FHIR R4 Export Button -->
                 <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
                   <span>🔥</span> FHIR R4
+                </button>
+
+                <!-- GCP Healthcare API Sync Button -->
+                <button type="button" (click)="syncGcpHealthcare()" title="Sync FHIR R4 Care Plan to Google Cloud Healthcare API (gen-lang-client-0540208645)"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-sky-500/40 bg-sky-500/10 text-sky-700 dark:text-sky-300 hover:bg-sky-500/20 transition cursor-pointer">
+                  <span>☁️</span> GCP Sync
+                </button>
+
+                <!-- Living Space Ambient Display Button -->
+                <button type="button" (click)="showLivingSpaceModal.set(true)" title="Open Living Room Ambient Display & Co-Regulation Studio"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
+                  <span>🏡</span> Living Space
+                </button>
+
+                <!-- Green Room Restorative Lounge Button -->
+                <button type="button" (click)="showGreenRoomModal.set(true)" title="Open Green Room Clinician & Patient Compassionate Lounge"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition cursor-pointer">
+                  <span>🌿</span> Green Room
                 </button>
 
                 <pocket-gull-button (click)="intelligence.clearCache()"
@@ -145,7 +207,7 @@ import { HumanDignityPactComponent } from './human-dignity-pact.component';
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
           <div class="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden transition-all duration-300">
             <div class="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden relative">
-                <app-analysis-report></app-analysis-report>
+                <app-analysis-report (openGleeModal)="showGleeModal.set(true)"></app-analysis-report>
             </div>
           </div>
           
@@ -172,6 +234,30 @@ import { HumanDignityPactComponent } from './human-dignity-pact.component';
 
     <!-- Human Dignity Health Charter Modal -->
     <app-human-dignity-pact *ngIf="showPactModal()" (closeModal)="showPactModal.set(false)"></app-human-dignity-pact>
+
+    <!-- Epic MyChart Physician Brief & Longevity Lab Modal -->
+    <app-mychart-brief-modal *ngIf="showMyChartModal()" (closeModal)="showMyChartModal.set(false)"></app-mychart-brief-modal>
+
+    <!-- Family Health Pedigree Tree & Risk Branch Pruning Modal -->
+    <app-family-tree-pedigree *ngIf="showPedigreeModal()" (closeModal)="showPedigreeModal.set(false)"></app-family-tree-pedigree>
+
+    <!-- TED-Style Patient Hero Journey Story Reader Modal -->
+    <app-patient-story-modal *ngIf="showStoryModal()" (closeModal)="showStoryModal.set(false)"></app-patient-story-modal>
+
+    <!-- 3D Interactive Prescription Post-It Notes Modal -->
+    <app-post-it-notes *ngIf="showPostItModal()" (closeModal)="showPostItModal.set(false)"></app-post-it-notes>
+
+    <!-- 12-Track Actuarial Glee Duet Singalong Album Modal -->
+    <app-actuarial-glee-album *ngIf="showGleeModal()" (closeModal)="showGleeModal.set(false)"></app-actuarial-glee-album>
+
+    <!-- Retro Vinyl Music Store & DJ Turntable Station Modal -->
+    <app-vinyl-dj-store *ngIf="showVinylModal()" (closeModal)="showVinylModal.set(false)"></app-vinyl-dj-store>
+
+    <!-- Main Living Space Ambient Display Studio Modal -->
+    <app-ambient-living-space-dashboard *ngIf="showLivingSpaceModal()" (closeModal)="showLivingSpaceModal.set(false)" (openGleeAlbum)="showLivingSpaceModal.set(false); showGleeModal.set(true)"></app-ambient-living-space-dashboard>
+
+    <!-- Restorative Green Room Clinician & Patient Lounge Modal -->
+    <app-green-room-lounge *ngIf="showGreenRoomModal()" (closeModal)="showGreenRoomModal.set(false)" (openGleeAlbum)="showGreenRoomModal.set(false); showGleeModal.set(true)"></app-green-room-lounge>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -189,10 +275,24 @@ export class AnalysisContainerComponent {
   intelligence = inject(ClinicalIntelligenceService);
   game = inject(GamificationService);
   exportService = inject(ExportService);
+  gcpHealthcare = inject(GcpHealthcareService);
   ClinicalIcons = ClinicalIcons;
+
+  async syncGcpHealthcare() {
+    const res = await this.gcpHealthcare.syncToGcpHealthcareApi();
+    alert(res.message);
+  }
 
   justGenerated = signal(false);
   showPactModal = signal(false);
+  showMyChartModal = signal(false);
+  showPedigreeModal = signal(false);
+  showStoryModal = signal(false);
+  showPostItModal = signal(false);
+  showGleeModal = signal(false);
+  showVinylModal = signal(false);
+  showLivingSpaceModal = signal(false);
+  showGreenRoomModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');

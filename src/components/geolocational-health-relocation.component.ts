@@ -468,6 +468,43 @@ export class GeolocationalHealthRelocationComponent {
           povertyRatePct: 11.0,
           blueZoneIndex: 98
         }
+      },
+      {
+        id: 'dest_lewiston',
+        cityName: 'Lewiston & Auburn (Androscoggin River)',
+        stateCountry: 'Maine, USA',
+        climateZone: 'Northern Temperate Conifer & River Valley',
+        matchScore: 96,
+        aqiScore: 12,
+        walkScore: 82,
+        sunshineDays: 215,
+        greenSpaceIndex: 94,
+        whyIdealForPatient: 'Situated along the Androscoggin River in southwestern Maine (34 mi NNE of Portland). Rich in pine terpene phytoncides, seasonal riverbank foraging (wild berries, fiddlehead ferns), and cold-climate brown fat metabolic activation.',
+        keyBenefits: [
+          'High pine & spruce terpene phytoncides boost NK cell immunity',
+          'Androscoggin River trail networks for low-impact joint walking',
+          'Proximity to Portland medical infrastructure & Bates College research'
+        ],
+        recommendedHobbies: [
+          {
+            title: 'Androscoggin Riverbank Foraging & Trail Walking',
+            category: 'Nature Therapy',
+            description: 'Seasonal foraging for wild elderberry, chaga, and fiddlehead ferns along riverbank trails.',
+            icon: '🫐'
+          },
+          {
+            title: 'Cold-Climate Thermal Brown Fat Adaptation',
+            category: 'Hydrotherapy',
+            description: 'Brisk autumnal morning walks and river mist respiration to trigger metabolic brown fat thermogenesis.',
+            icon: '🌲'
+          }
+        ],
+        censusSdohData: {
+          medianAge: 39.8,
+          healthcareAccessScore: 92,
+          povertyRatePct: 12.2,
+          blueZoneIndex: 94
+        }
       }
     ];
   });
