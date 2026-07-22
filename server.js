@@ -257,6 +257,44 @@ app.get('/api/pubmed/summary', async (req, res) => {
   }
 });
 
+// WebMCP JSON-LD Tool Catalog Endpoint for Agentic Browsing & Discovery
+app.get('/api/webmcp/tools', (req, res) => {
+  res.json({
+    '@context': 'https://schema.org',
+    '@type': 'WebMCPToolCatalog',
+    'name': 'Pocket Gull WebMCP Clinical Tool Catalog',
+    'url': 'https://pocketgull.app',
+    'version': '1.0.0',
+    'description': 'Real-time Medical Care Plan Strategy and Live AI Consult Engine WebMCP Tools',
+    'tools': [
+      {
+        'name': 'get_patient_state',
+        'description': 'Returns current patient vitals, symptoms, selected issues, and active paradigm',
+        'parameters': {}
+      },
+      {
+        'name': 'generate_clinical_analysis',
+        'description': 'Triggers multi-agent LLM analysis across Western, TCM, and Ayurvedic lenses',
+        'parameters': {
+          'paradigm': { 'type': 'string', 'enum': ['western', 'eastern', 'ayurvedic'] }
+        }
+      },
+      {
+        'name': 'generate_specialist_handoff',
+        'description': 'Serializes patient state into an expanded base64 handoff URL and SBAR note for specialists',
+        'parameters': {
+          'specialty': { 'type': 'string', 'enum': ['do_osteopathic', 'gastroenterology', 'orthomolecular', 'tcm_master', 'ayurvedic_vaidya', 'psychiatry_ybocs'] }
+        }
+      },
+      {
+        'name': 'export_fhir_bundle',
+        'description': 'Exports patient clinical history as an HL7 FHIR R4 Bundle JSON payload',
+        'parameters': {}
+      }
+    ]
+  });
+});
+
 // ORCID Proxy Endpoint
 app.get('/api/orcid/:id', async (req, res) => {
   try {
