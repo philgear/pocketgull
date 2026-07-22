@@ -1045,7 +1045,13 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                       <button (click)="applyCustomLanguage()" 
                               [disabled]="isTranslating() || !customLanguage().trim()"
                               class="px-4 py-1.5 bg-[#1C1C1C] dark:bg-white text-white dark:text-[#111111] text-[12px] uppercase tracking-wider font-bold hover:bg-[#ff4500] dark:hover:bg-[#ff4500] dark:hover:text-white transition-all">
-                        Appl                <!-- Animal Comfort Protocols & Service Animal Healing Suite -->
+                        Apply
+                      </button>
+                    </div>
+                  }
+                </div>
+
+                <!-- Animal Comfort Protocols & Service Animal Healing Suite -->
                 <div class="mt-6 p-6 border-2 border-amber-500/30 dark:border-amber-500/40 rounded-md bg-amber-50/20 dark:bg-amber-950/15 shadow-sm text-center flex flex-col items-center max-w-2xl mx-auto w-full">
                   
                   <div class="flex items-center gap-2 mb-2">
@@ -1092,10 +1098,6 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                       <button (click)="petAuditory.stop()" class="min-h-[48px] px-5 py-2.5 text-[12px] uppercase tracking-wider font-extrabold rounded-md border border-red-500/80 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 transition-all flex items-center gap-2 cursor-pointer">
                         <span>⏹</span>
                         <span>Pause Animal Audio</span>
-                      </button>
-                    }
-                  </div>
-                </div> Stop
                       </button>
                     }
                   </div>

@@ -361,7 +361,7 @@ import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapp
 
         <!-- Theatrical Clinical Proposal Act Banner -->
         @if (activeActProposal(); as act) {
-          <div class="mb-6 p-4 rounded-md border-l-4 border-indigo-600 dark:border-indigo-400 bg-slate-50 dark:bg-zinc-900/80 border border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
+          <div class="mb-6 p-4 rounded-md border-l-4 border-indigo-600 dark:border-indigo-400 bg-slate-50 dark:bg-zinc-900/80 border-y border-r border-slate-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
             <div class="flex items-center gap-3">
               <span class="text-2xl">{{ act.icon }}</span>
               <div>
