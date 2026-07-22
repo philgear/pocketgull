@@ -36,6 +36,7 @@ import { PatientFruitTreeComponent } from './patient-fruit-tree.component';
 import { DietaryAllergyShieldComponent } from './dietary-allergy-shield.component';
 import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.component';
 import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboard.component';
+import { GeolocationalHealthRelocationComponent } from './geolocational-health-relocation.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -65,7 +66,8 @@ import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboar
     PatientFruitTreeComponent,
     DietaryAllergyShieldComponent,
     LensInsightSparkShieldComponent,
-    ParadigmClinicalDashboardComponent
+    ParadigmClinicalDashboardComponent,
+    GeolocationalHealthRelocationComponent
   ],
 
 
@@ -749,6 +751,7 @@ import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboar
         <!-- Functional Protocols Lens Only: Neuro-Consciousness & Mood Optimization Matrix -->
         @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
           <app-mood-consciousness-matrix></app-mood-consciousness-matrix>
+          <app-geolocational-health-relocation></app-geolocational-health-relocation>
         }
 
         <!-- Summary Overview Lens Only: Living Health Fruit Tree -->
