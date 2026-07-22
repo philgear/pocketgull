@@ -18,12 +18,13 @@ import { PostItNotesComponent } from './post-it-notes.component';
 import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
 import { VinylDjStoreComponent } from './vinyl-dj-store.component';
 import { GcpHealthcareService } from '../services/gcp-healthcare.service';
+import { AmbientLivingSpaceDashboardComponent } from './ambient-living-space-dashboard.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -171,6 +172,12 @@ import { GcpHealthcareService } from '../services/gcp-healthcare.service';
                   <span>☁️</span> GCP Sync
                 </button>
 
+                <!-- Living Space Ambient Display Button -->
+                <button type="button" (click)="showLivingSpaceModal.set(true)" title="Open Living Room Ambient Display & Co-Regulation Studio"
+                  class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition cursor-pointer">
+                  <span>🏡</span> Living Space
+                </button>
+
                 <pocket-gull-button (click)="intelligence.clearCache()"
                   variant="ghost"
                   size="sm"
@@ -238,6 +245,9 @@ import { GcpHealthcareService } from '../services/gcp-healthcare.service';
 
     <!-- Retro Vinyl Music Store & DJ Turntable Station Modal -->
     <app-vinyl-dj-store *ngIf="showVinylModal()" (closeModal)="showVinylModal.set(false)"></app-vinyl-dj-store>
+
+    <!-- Main Living Space Ambient Display Studio Modal -->
+    <app-ambient-living-space-dashboard *ngIf="showLivingSpaceModal()" (closeModal)="showLivingSpaceModal.set(false)" (openGleeAlbum)="showLivingSpaceModal.set(false); showGleeModal.set(true)"></app-ambient-living-space-dashboard>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -271,6 +281,7 @@ export class AnalysisContainerComponent {
   showPostItModal = signal(false);
   showGleeModal = signal(false);
   showVinylModal = signal(false);
+  showLivingSpaceModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');
