@@ -43,11 +43,17 @@ export class ExportService {
           if (typeof res === 'string' && res.length > 0 && !res.includes('onerror=')) return res;
         }
       } catch (e) {}
-      return str
-        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-        .replace(/<img\b[^>]*\/?>/gi, '')
-        .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
-        .replace(/\son\w+\s*=\s*[^>\s]+/gi, '');
+      let sanitized = str;
+      let previous: string;
+      do {
+        previous = sanitized;
+        sanitized = sanitized
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/<img\b[^>]*\/?>/gi, '')
+          .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '')
+          .replace(/\son\w+\s*=\s*[^>\s]+/gi, '');
+      } while (sanitized !== previous);
+      return sanitized;
     };
   }
 
