@@ -244,6 +244,12 @@ import { SdohNavigatorComponent } from './sdoh-navigator.component';
               <span>🤰</span> Maternal & Postpartum
             </button>
 
+            <button (click)="changeLens('Grow-Thyself Education')"
+              [class]="activeLens() === 'Grow-Thyself Education' ? '!bg-emerald-600 !text-white dark:!bg-emerald-600 dark:!text-white border-emerald-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-emerald-50 dark:hover:bg-zinc-800 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold'"
+              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>🌱</span> Grow-Thyself Education
+            </button>
+
             @if (state.isEmergencyMode()) {
               <button (click)="changeLens('EMT Handoff')"
                 [class]="activeLens() === 'EMT Handoff' ? '!bg-red-600 !text-white border-red-600 shadow-md font-extrabold scale-[1.02]' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/40 hover:bg-red-600 hover:text-white font-semibold'"
@@ -1268,7 +1274,7 @@ export class AnalysisReportComponent implements OnDestroy {
   showHandoffModal = signal<boolean>(false);
   lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
 
-  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum')[] = [
+  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum' | 'Grow-Thyself Education')[] = [
     'Summary Overview',
     'Treatment Matrix',
     'Functional Protocols',
@@ -1278,7 +1284,8 @@ export class AnalysisReportComponent implements OnDestroy {
     'Patient Education',
     'PhysioNet Telemetry',
     'Y-BOCs Screener',
-    'Maternal & Postpartum'
+    'Maternal & Postpartum',
+    'Grow-Thyself Education'
   ];
 
   activeLensIndex = computed(() => {

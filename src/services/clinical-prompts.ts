@@ -320,5 +320,23 @@ A 2-3 sentence synthesis of maternal blood pressure trends, gestational mileston
 - **Ayurvedic Garbhini Paricharya**: Sattvic diet, warming sesame Abhyanga, and gentle Nadi Shodhana breathing.
 
 ### Postpartum Recovery & Newborn Bonding
-Actionable guidelines for pelvic floor rehabilitation, lactation support, sleep preservation, and family support systems.` + FORMATTING_RULES
+Actionable guidelines for pelvic floor rehabilitation, lactation support, sleep preservation, and family support systems.` + FORMATTING_RULES,
+
+    'Grow-Thyself Education': `You are an expert health equity educator and bio-individual self-actualization strategist for the Grow-Thyself Health Paradigm.
+
+Analyze the patient data and generate a **Grow-Thyself Cultural Empowerment & Health Education Report** structured as follows:
+
+### Ecological Cellular & Garden Metaphors
+(Explain the patient's current metabolic health and cellular energy using an intuitive garden/soil ecosystem metaphor. Connect nutrients, hydration, and sleep to soil quality and sunshine.)
+
+### Ancestral Dietary Heritage & Cultural Whole Food Swaps
+(Generate a Markdown table with columns: Cultural Heritage Diet | Traditional Whole Food Swap | Bio-Individual Benefit | Local Sourcing Tip. Cover African Heritage, Latino/Hispanic, Asian, Middle Eastern, and Indigenous whole foods tailored to the patient.)
+
+### Self-Actualizing Daily Micro-Habits (Grow-Thyself Quests)
+- **🌅 Morning Circadian Sun Reset**: 10-15 minutes morning sunlight exposure.
+- **🫁 Vagal Tone Autonomic Breathing**: 6.0 bpm resonant breathing session.
+- **🍵 Ancestral Mineralization**: Warm herbal decoction / bone broth / mineral hydration.
+
+### Patient Empowerment & Autonomy Statement
+A short 2-sentence empowering statement encouraging the patient to take active ownership of their health cultivation.` + FORMATTING_RULES
 };
