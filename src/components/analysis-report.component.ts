@@ -46,6 +46,7 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
 import { HandoffModalComponent } from './handoff-modal.component';
 import { SdohNavigatorComponent } from './sdoh-navigator.component';
 import { LifePerilsParadigmMatrixComponent } from './life-perils-paradigm-matrix.component';
+import { CyclingErgonomicsDualRevealComponent } from './cycling-ergonomics-dual-reveal.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -82,7 +83,8 @@ import { LifePerilsParadigmMatrixComponent } from './life-perils-paradigm-matrix
     TypologyBadgeComponent,
     HandoffModalComponent,
     SdohNavigatorComponent,
-    LifePerilsParadigmMatrixComponent
+    LifePerilsParadigmMatrixComponent,
+    CyclingErgonomicsDualRevealComponent
   ],
 
 
@@ -536,6 +538,9 @@ import { LifePerilsParadigmMatrixComponent } from './life-perils-paradigm-matrix
             {{ intel.error() }}
           </div>
         }
+
+        <!-- Outdoor Cycling & Dual-Insight Synchronized Reveal Engine -->
+        <app-cycling-ergonomics-dual-reveal></app-cycling-ergonomics-dual-reveal>
 
         <!-- Theatrical Clinical Proposal Act Banner -->
         @if (activeActProposal(); as act) {
