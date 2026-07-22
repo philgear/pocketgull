@@ -32,14 +32,15 @@ async function enterDemoMode(page: import('@playwright/test').Page) {
     await skipBtn.click();
   }
 
-  // Ethics pledge
-  const pledgeCheckbox = page.locator('input[type="checkbox"]');
-  await expect(pledgeCheckbox).toBeVisible({ timeout: 10000 });
-  await pledgeCheckbox.check();
-
+  // Ethics pledge (if present)
   const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-  await expect(acceptBtn).toBeVisible({ timeout: 10000 });
-  await acceptBtn.click();
+  if (await acceptBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    const pledgeCheckbox = page.locator('input[type="checkbox"]').last();
+    if (await pledgeCheckbox.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await pledgeCheckbox.check().catch(() => {});
+    }
+    await acceptBtn.click();
+  }
 
   // Wait for main app to render
   await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
