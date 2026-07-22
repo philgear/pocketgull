@@ -87,97 +87,148 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
   template: `
 
 
-    <!--Analysis Tabs-->
+    <!-- Analysis & Paradigm Carousel Navigation Bar (Pixel 9 Pro Mobile Optimized) -->
     @if (hasAnyReport() || state.isEmergencyMode()) {
-      <div class="px-4 sm:px-8 py-2 sm:py-3 no-print overflow-x-auto w-full">
-        <div class="max-w-4xl mx-auto min-w-0 relative">
-          <div id="tour-lens-tabs" class="flex overflow-x-auto hide-scrollbar items-center gap-1.5 border-b-2 border-slate-200 dark:border-zinc-800 w-full relative z-10">
+      <div class="px-2 sm:px-8 py-2 sm:py-3 no-print w-full bg-slate-100/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-800">
+        <div class="max-w-4xl mx-auto min-w-0 relative flex flex-col gap-2">
+          
+          <!-- Paradigm Mobile Quick Selector Pill Bar -->
+          <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1 hide-scrollbar">
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-400">
+                Paradigm:
+              </span>
+              <button (click)="state.selectPhilosophy('western')"
+                [class.bg-sky-600]="state.activePhilosophy() === 'western'"
+                [class.text-white]="state.activePhilosophy() === 'western'"
+                [class.bg-white]="state.activePhilosophy() !== 'western'"
+                [class.dark:bg-zinc-900]="state.activePhilosophy() !== 'western'"
+                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-sky-500 transition-all cursor-pointer flex items-center gap-1">
+                <span>🔵</span> Western
+              </button>
+              <button (click)="state.selectPhilosophy('eastern')"
+                [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'"
+                [class.text-white]="state.activePhilosophy() === 'eastern'"
+                [class.bg-white]="state.activePhilosophy() !== 'eastern'"
+                [class.dark:bg-zinc-900]="state.activePhilosophy() !== 'eastern'"
+                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-emerald-500 transition-all cursor-pointer flex items-center gap-1">
+                <span>🟢</span> Eastern (TCM)
+              </button>
+              <button (click)="state.selectPhilosophy('ayurvedic')"
+                [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'"
+                [class.text-white]="state.activePhilosophy() === 'ayurvedic'"
+                [class.bg-white]="state.activePhilosophy() !== 'ayurvedic'"
+                [class.dark:bg-zinc-900]="state.activePhilosophy() !== 'ayurvedic'"
+                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-amber-500 transition-all cursor-pointer flex items-center gap-1">
+                <span>🟡</span> Ayurvedic
+              </button>
+            </div>
+
+            <!-- Touch Carousel Chevrons -->
+            <div class="flex items-center gap-1 shrink-0">
+              <button type="button" (click)="scrollLenses('left')" aria-label="Scroll left"
+                class="w-8 h-8 rounded-full border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-zinc-800 transition active:scale-95 cursor-pointer">
+                ‹
+              </button>
+              <button type="button" (click)="scrollLenses('right')" aria-label="Scroll right"
+                class="w-8 h-8 rounded-full border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-zinc-800 transition active:scale-95 cursor-pointer">
+                ›
+              </button>
+            </div>
+          </div>
+
+          <!-- Touch Snap Horizontal Carousel Strip -->
+          <div #lensCarousel id="tour-lens-tabs" 
+               class="flex overflow-x-auto hide-scrollbar items-center gap-2 w-full relative z-10 snap-x snap-mandatory scroll-smooth py-1">
+            
             <button (click)="changeLens('Summary Overview')"
-              data-testid="tab-overview"
-              [class.border-b-2]="activeLens() === 'Summary Overview'"
-              [class.border-transparent]="activeLens() !== 'Summary Overview'"
-              [ngClass]="activeLens() === 'Summary Overview' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              Overview
+              [class.bg-indigo-600]="activeLens() === 'Summary Overview'"
+              [class.text-white]="activeLens() === 'Summary Overview'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>📋</span> Overview
             </button>
+
             <button (click)="changeLens('Treatment Matrix')"
-              data-testid="tab-treatment-matrix"
-              [class.border-b-2]="activeLens() === 'Treatment Matrix'"
-              [class.border-transparent]="activeLens() !== 'Treatment Matrix'"
-              [ngClass]="activeLens() === 'Treatment Matrix' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              Treatment Matrix
+              [class.bg-indigo-600]="activeLens() === 'Treatment Matrix'"
+              [class.text-white]="activeLens() === 'Treatment Matrix'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>💊</span> Treatment Matrix
             </button>
+
             <button (click)="changeLens('Functional Protocols')"
-              data-testid="tab-functional-protocols"
-              [class.border-b-2]="activeLens() === 'Functional Protocols'"
-              [class.border-transparent]="activeLens() !== 'Functional Protocols'"
-              [ngClass]="activeLens() === 'Functional Protocols' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              Functional Protocols
+              [class.bg-indigo-600]="activeLens() === 'Functional Protocols'"
+              [class.text-white]="activeLens() === 'Functional Protocols'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>🧠</span> Functional Protocols
             </button>
+
             <button (click)="changeLens('Nutrition')"
-              data-testid="tab-nutrition"
-              [class.border-b-2]="activeLens() === 'Nutrition'"
-              [class.border-transparent]="activeLens() !== 'Nutrition'"
-              [ngClass]="activeLens() === 'Nutrition' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              Nutrition
+              [class.bg-indigo-600]="activeLens() === 'Nutrition'"
+              [class.text-white]="activeLens() === 'Nutrition'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>🥗</span> Nutrition
             </button>
+
             <button (click)="changeLens('Precision Nutrients')"
-              data-testid="tab-precision-nutrients"
-              [class.border-b-2]="activeLens() === 'Precision Nutrients'"
-              [class.border-transparent]="activeLens() !== 'Precision Nutrients'"
-              [ngClass]="activeLens() === 'Precision Nutrients' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              Precision Nutrients
+              [class.bg-indigo-600]="activeLens() === 'Precision Nutrients'"
+              [class.text-white]="activeLens() === 'Precision Nutrients'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>🧬</span> Precision Nutrients
             </button>
+
             <button (click)="changeLens('Monitoring & Follow-up')"
-              data-testid="tab-monitoring-follow-up"
-              [class.border-b-2]="activeLens() === 'Monitoring & Follow-up'"
-              [class.border-transparent]="activeLens() !== 'Monitoring & Follow-up'"
-              [ngClass]="activeLens() === 'Monitoring & Follow-up' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              Monitoring & Follow-up
+              [class.bg-indigo-600]="activeLens() === 'Monitoring & Follow-up'"
+              [class.text-white]="activeLens() === 'Monitoring & Follow-up'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>📈</span> Monitoring & Follow-up
             </button>
+
             <button (click)="changeLens('Patient Education')"
-              data-testid="tab-patient-education"
-              [class.border-b-2]="activeLens() === 'Patient Education'"
-              [class.border-transparent]="activeLens() !== 'Patient Education'"
-              [ngClass]="activeLens() === 'Patient Education' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              Patient Education
+              [class.bg-indigo-600]="activeLens() === 'Patient Education'"
+              [class.text-white]="activeLens() === 'Patient Education'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>📚</span> Patient Education
             </button>
 
             <button (click)="changeLens('PhysioNet Telemetry')"
-              data-testid="tab-physionet-telemetry"
-              [class.border-b-2]="activeLens() === 'PhysioNet Telemetry'"
-              [class.border-transparent]="activeLens() !== 'PhysioNet Telemetry'"
-              [ngClass]="activeLens() === 'PhysioNet Telemetry' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              📡 PhysioNet Waveforms
+              [class.bg-indigo-600]="activeLens() === 'PhysioNet Telemetry'"
+              [class.text-white]="activeLens() === 'PhysioNet Telemetry'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>📡</span> PhysioNet Waveforms
             </button>
 
             <button (click)="changeLens('Y-BOCs Screener')"
-              data-testid="tab-ybocs-screener"
-              [class.border-b-2]="activeLens() === 'Y-BOCs Screener'"
-              [class.border-transparent]="activeLens() !== 'Y-BOCs Screener'"
-              [ngClass]="activeLens() === 'Y-BOCs Screener' ? activeTabClasses() : 'border-b-2 border-transparent text-slate-700 dark:text-zinc-300 hover:text-slate-900 hover:border-slate-400 dark:hover:text-zinc-100 dark:hover:border-zinc-500'"
-              class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-slate-50/50 dark:bg-zinc-900/40 hover:bg-slate-100 dark:hover:bg-zinc-800/60 outline-none focus:outline-none flex items-center justify-center">
-              🧠 Y-BOCs Screener
+              [class.bg-indigo-600]="activeLens() === 'Y-BOCs Screener'"
+              [class.text-white]="activeLens() === 'Y-BOCs Screener'"
+              class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 hover:border-indigo-500 flex items-center gap-1.5 shrink-0 cursor-pointer">
+              <span>🧠</span> Y-BOCs Screener
             </button>
 
             @if (state.isEmergencyMode()) {
               <button (click)="changeLens('EMT Handoff')"
-                data-testid="tab-emt-handoff"
-                [class.border-b-2]="activeLens() === 'EMT Handoff'"
-                [class.border-transparent]="activeLens() !== 'EMT Handoff'"
-                [ngClass]="activeLens() === 'EMT Handoff' ? 'border-red-600 dark:border-red-500 text-red-600 dark:text-red-400 font-extrabold' : 'border-b-2 border-transparent text-red-600 dark:text-red-400 hover:text-red-800 hover:border-red-400 dark:hover:text-red-300 dark:hover:border-red-700'"
-                class="py-3.5 px-5 min-h-[48px] -mb-[2px] font-extrabold uppercase tracking-wider text-[12.5px] whitespace-nowrap transition-all duration-150 bg-red-500/10 hover:bg-red-500/20 outline-none focus:outline-none flex items-center justify-center">
-                🚑 EMT Handoff
+                [class.bg-red-600]="activeLens() === 'EMT Handoff'"
+                [class.text-white]="activeLens() === 'EMT Handoff'"
+                class="snap-start py-2.5 px-4 min-h-[44px] rounded-xl font-extrabold uppercase tracking-wider text-[12px] whitespace-nowrap transition-all border border-red-500 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white flex items-center gap-1.5 shrink-0 cursor-pointer">
+                <span>🚑</span> EMT Handoff
               </button>
             }
           </div>
+
+          <!-- Carousel Pagination Dot Indicators -->
+          <div class="flex items-center justify-center gap-1.5 pt-1">
+            @for (lens of availableLenses; track lens; let i = $index) {
+              <button (click)="changeLens(lens)" [attr.aria-label]="'Go to lens ' + lens"
+                [class.w-4]="activeLensIndex() === i"
+                [class.bg-indigo-600]="activeLensIndex() === i"
+                [class.dark:bg-indigo-400]="activeLensIndex() === i"
+                [class.w-1.5]="activeLensIndex() !== i"
+                [class.bg-slate-300]="activeLensIndex() !== i"
+                [class.dark:bg-zinc-700]="activeLensIndex() !== i"
+                class="h-1.5 rounded-full transition-all duration-300 cursor-pointer">
+              </button>
+            }
+          </div>
+
         </div>
       </div>
     }
@@ -389,6 +440,8 @@ import { InstantPatientActionSuiteComponent } from './instant-patient-action-sui
               </span>
             </div>
           </div>
+        }
+
         <!-- Instant Patient Action Suite (Somatic Relief, Service Animal & Health Simulator) -->
         @if (hasAnyReport()) {
           <app-instant-patient-action-suite></app-instant-patient-action-suite>
@@ -1059,6 +1112,34 @@ export class AnalysisReportComponent implements OnDestroy {
   private audit = inject(AuditService);
   protected readonly export = inject(ExportService);
   protected readonly actMapper = inject(ClinicalActLensMapperService);
+
+  lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
+
+  availableLenses: (AnalysisLens | 'Y-BOCs Screener')[] = [
+    'Summary Overview',
+    'Treatment Matrix',
+    'Functional Protocols',
+    'Nutrition',
+    'Precision Nutrients',
+    'Monitoring & Follow-up',
+    'Patient Education',
+    'PhysioNet Telemetry',
+    'Y-BOCs Screener'
+  ];
+
+  activeLensIndex = computed(() => {
+    const current = this.activeLens();
+    const idx = this.availableLenses.indexOf(current as any);
+    return idx >= 0 ? idx : 0;
+  });
+
+  scrollLenses(direction: 'left' | 'right'): void {
+    const el = this.lensCarousel()?.nativeElement;
+    if (el) {
+      const scrollAmount = direction === 'left' ? -220 : 220;
+      el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  }
 
   activeActTitle = computed(() => {
     return this.actMapper.getActTitleForLens(this.activeLens(), this.state.activePhilosophy());

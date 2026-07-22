@@ -59,8 +59,8 @@ graph TD
     end
 
     subgraph Visual3D [3D Visualization & Kinetic Canvas]
-        Body3D[Body 3D Viewer<br/>body-3d-viewer.component.ts] <-->|Camera Focus| State
-        Zamecznik[Zamecznik Calibrator<br/>zamecznik-canvas.component.ts] <-->|Box Breathing 4-4-4-4| State
+        Body3D[Body 3D Viewer<br/>body-3d-viewer.component.ts] --- |Camera Focus| State
+        Zamecznik[Zamecznik Calibrator<br/>zamecznik-canvas.component.ts] --- |Box Breathing 4-4-4-4| State
     end
 
     subgraph AIEngine [Google GenAI & ADK Multi-Agent Core]
@@ -84,7 +84,7 @@ graph TD
 | **📡 PhysioNet Telemetry** | `qtcFridericia` | Fridericia Corrected QT | `380 – 440` | `ms` |
 | **📡 PhysioNet Telemetry** | `stSegmentDev` | ST Elevation / Depression | `-0.05 – +0.05` | `mV` |
 | **📡 PhysioNet Telemetry** | `hrvLfHfRatio` | Sympathovagal Balance | `0.8 – 1.5` | `ratio` |
-| **🧪 CMP Lab Panel** | `troponinI` | High-Sensitivity Cardiac Troponin | `< 0.04` | `ng/mL` |
+| **🧪 CMP Lab Panel** | `troponinI` | High-Sensitivity Cardiac Troponin | `&lt; 0.04` | `ng/mL` |
 | **🧪 CMP Lab Panel** | `eGfr` | Glomerular Filtration Rate | `> 90` | `mL/min/1.73m²` |
 | **🧪 CMP Lab Panel** | `altAstRatio` | Hepatic Transaminases | `0.8 – 1.2` | `ratio` |
 | **🫁 Somatic Box Breathing** | `boxCycleDuration` | Square Breathing (4-4-4-4) | `16.0` | `seconds` |
