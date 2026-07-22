@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef, viewChild, input, output, computed, PLATFORM_ID, OnInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { SessionStateService } from '../services/session-state.service';
@@ -15,7 +16,7 @@ import { environment } from '../environments/environment';
 @Component({
   selector: 'app-secure-splash',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main class="fixed inset-0 z-[999] flex flex-col items-center justify-center p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-y-auto">
@@ -203,7 +204,7 @@ import { environment } from '../environments/environment';
                
                <div class="relative w-[220px] h-[220px] flex items-center justify-center">
                   <!-- Guidelines background SVG (Dynamic Daily Beach Item guide) -->
-                  <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5" [innerHTML]="todayBeachItem().svgGuide">
+                  <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5" [innerHTML]="todayBeachItem().svgGuide | safeHtml">
                   </svg>
                  
                  <canvas

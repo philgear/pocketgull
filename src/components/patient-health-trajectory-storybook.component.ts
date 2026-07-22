@@ -165,7 +165,7 @@ export interface IStorybookChapter {
                  [class.first-letter:text-amber-600]="$index === 0"
                  [class.first-letter:mr-2]="$index === 0"
                  [class.first-letter:float-left]="$index === 0"
-                 [innerHTML]="formatParagraphText(p)"></p>
+                 [innerHTML]="formatParagraphText(p) | safeHtml"></p>
             }
           </div>
 
