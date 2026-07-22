@@ -27,7 +27,7 @@ jobs:
           persist-credentials: false
 
       - name: Run OSSF Scorecard
-        uses: ossf/scorecard-action@05b42c624433fc40578a4040d5cf5e36ddca94c2 # v2.4.2
+        uses: ossf/scorecard-action@f49aab0e59842e35e68b446a0b22ebd165241470 # v2.4.0
         with:
           results_file: results.sarif
           results_format: sarif
@@ -35,6 +35,6 @@ jobs:
           publish_results: true
 
       - name: Upload Scorecard Results to Security Tab
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@df409f7d9260372bd5f19e5b04e83cb3c43714ae # v3.27.9
         with:
           sarif_file: results.sarif

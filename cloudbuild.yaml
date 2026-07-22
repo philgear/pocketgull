@@ -3,13 +3,13 @@
 # Service: pocket-gull (Google Cloud Run)
 
 steps:
-  # 1. Build Production Container Image with Docker BuildKit
+  # 1. Build Production Container Image with Docker
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-container'
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/pocket-gull:$BUILD_ID'
       - '-t'
       - 'gcr.io/$PROJECT_ID/pocket-gull:latest'
       - '.'
@@ -19,7 +19,7 @@ steps:
     id: 'push-image'
     args:
       - 'push'
-      - 'gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+      - 'gcr.io/$PROJECT_ID/pocket-gull:$BUILD_ID'
 
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-latest'
@@ -35,7 +35,7 @@ steps:
       - 'run'
       - 'deploy'
       - 'pocket-gull'
-      - '--image=gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+      - '--image=gcr.io/$PROJECT_ID/pocket-gull:$BUILD_ID'
       - '--region=us-central1'
       - '--platform=managed'
       - '--allow-unauthenticated'
@@ -46,7 +46,7 @@ steps:
       - '--update-env-vars=OTEL_SDK_DISABLED=true'
 
 images:
-  - 'gcr.io/$PROJECT_ID/pocket-gull:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/pocket-gull:$BUILD_ID'
   - 'gcr.io/$PROJECT_ID/pocket-gull:latest'
 
 timeout: '1800s'

@@ -1637,7 +1637,8 @@ export class AnalysisReportComponent implements OnDestroy {
             }
 
             // Academic APA 7th & UK RIO Sourcing Citation Styling
-            if (highlightedHtml.includes('DOI:') || highlightedHtml.includes('doi.org') || highlightedHtml.includes('Journal of') || highlightedHtml.includes('Peer-Reviewed')) {
+            const hasDoiMatch = /(?:doi\.org\/10\.\d{4,9}\/|10\.\d{4,9}\/[-._;()/:A-Z0-9]+|Journal of|Peer-Reviewed)/i.test(highlightedHtml);
+            if (hasDoiMatch || highlightedHtml.includes('DOI:')) {
               highlightedHtml = `<div class="apa-citation-block flex flex-col gap-1 my-3 font-sans">
                 <div class="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-indigo-600 dark:text-indigo-400 font-extrabold">
                   <span>📖 APA 7th Edition & UK RIO Verified Citation</span>

@@ -676,12 +676,18 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
           Type = ImportedType;
       }
 
-      const sanitizedInstruction = typeof systemInstruction === 'string'
-        ? `Clinical Safety Directive: Maintain medical assistant role.\n${systemInstruction.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim().slice(0, 4000)}`
-        : 'Act strictly as Pocketgull clinical assistant.';
+      const BASE_CLINICAL_PROMPT = 'You are Pocket Gull Clinical Intelligence Engine. Maintain evidence-based clinical safety and HIPAA compliance at all times.';
+      const rawInstruction = typeof systemInstruction === 'string' ? systemInstruction : '';
+      const sanitizedInstruction = rawInstruction
+        .replace(/(?:ignore|override|disregard|forget)\s+(?:previous|all|system)\s+(?:instructions|prompts|directives)/gi, '')
+        .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+        .trim()
+        .slice(0, 3000);
+
+      const safeSystemInstruction = `${BASE_CLINICAL_PROMPT}\nClinical Directive Context: ${sanitizedInstruction}`;
 
       const configOptions: any = {
-          systemInstruction: sanitizedInstruction,
+          systemInstruction: safeSystemInstruction,
           temperature: temperature ?? 0.1
       };
 

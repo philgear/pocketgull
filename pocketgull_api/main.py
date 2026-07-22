@@ -739,9 +739,15 @@ async def read_hdf5_segment(
         if file_path.suffix.lower() != ".hdf5":
             raise HTTPException(status_code=400, detail="Invalid HDF5 filename extension.")
 
-        safe_filename = os.path.basename(file)
-        hdf5_path = (_HDF5_DATA_DIR / safe_filename).resolve()
-        if not hdf5_path.is_relative_to(_HDF5_DATA_DIR.resolve()):
+        safe_filename = Path(file).name
+        if not safe_filename or safe_filename != file or os.path.isabs(file) or ".." in file:
+            raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
+        
+        base_dir = _HDF5_DATA_DIR.resolve()
+        hdf5_path = (base_dir / safe_filename).resolve()
+        try:
+            hdf5_path.relative_to(base_dir)
+        except ValueError:
             raise HTTPException(status_code=400, detail="Invalid HDF5 filename.")
 
         if not hdf5_path.exists():
