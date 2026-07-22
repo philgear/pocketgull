@@ -198,46 +198,57 @@
 .rams-typography {
     overflow-wrap: break-word;
     word-break: break-word;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .rams-typography h1 {
     font-family: 'Inter', sans-serif;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #111827;
-    margin-top: 3rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #E5E7EB;
-    padding-bottom: 1rem;
+    color: #0f172a;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.85rem;
     letter-spacing: -0.025em;
 }
-.dark .rams-typography h1 { color: #f3f4f6; border-bottom-color: #3f3f46; }
+.dark .rams-typography h1 { 
+    color: #f8fafc; 
+    border-bottom-color: #334155; 
+}
 
 .rams-typography h2 {
     font-family: 'Inter', sans-serif;
     font-size: 1.25rem;
     font-weight: 800;
-    color: #1F2937;
-    margin-top: 2.5rem;
-    margin-bottom: 1.25rem;
-    border-bottom: 1px solid #F3F4F6;
-    padding-bottom: 0.75rem;
+    color: #1e293b;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 0.65rem;
     letter-spacing: -0.02em;
 }
-.dark .rams-typography h2 { color: #e5e7eb; border-bottom-color: #27272a; }
+.dark .rams-typography h2 { 
+    color: #f1f5f9; 
+    border-bottom-color: #1e293b; 
+}
 
 .rams-typography h3 {
     font-family: 'Inter', sans-serif;
-    font-size: 11px;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
     font-weight: 800;
-    color: #6B7280;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
+    color: #10b981;
+    margin-top: 1.75rem;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px dashed rgba(16, 185, 129, 0.25);
 }
-.dark .rams-typography h3 { color: #a1a1aa; }
+.dark .rams-typography h3 { 
+    color: #34d399; 
+    border-bottom-color: rgba(52, 211, 153, 0.25); 
+}
 
 .rams-typography h4,
 .rams-typography h5,
@@ -245,11 +256,13 @@
     font-family: 'Inter', sans-serif;
     font-size: 0.95rem;
     font-weight: 800;
-    color: #111827;
+    color: #0f172a;
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
 }
-.dark .rams-typography h4, .dark .rams-typography h5, .dark .rams-typography h6 { color: #f3f4f6; }
+.dark .rams-typography h4, .dark .rams-typography h5, .dark .rams-typography h6 { 
+    color: #f8fafc; 
+}
 
 .rams-typography p,
 .rams-typography li,
@@ -258,16 +271,20 @@
     font-family: 'Inter', sans-serif;
     font-size: 0.9375rem;
     font-weight: 500;
-    line-height: 1.6;
-    color: #374151;
+    line-height: 1.7;
+    color: #334155;
 }
-.dark .rams-typography p, .dark .rams-typography li, .dark .rams-typography td, .dark .rams-typography th { color: #d1d5db; }
+.dark .rams-typography p, .dark .rams-typography li, .dark .rams-typography td, .dark .rams-typography th { 
+    color: #cbd5e1; 
+}
 
 .rams-typography strong {
     font-weight: 800;
-    color: #111827;
+    color: #0f172a;
 }
-.dark .rams-typography strong { color: #f9fafb; }
+.dark .rams-typography strong { 
+    color: #f8fafc; 
+}
 
 .rams-typography ul {
     list-style: none;
@@ -279,77 +296,109 @@
     margin-bottom: 0.75rem;
     padding: 0.5rem 0.75rem 0.5rem 2rem;
     position: relative;
+    background: rgba(248, 250, 252, 0.6);
+    border-radius: 8px;
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    transition: all 0.15s ease-in-out;
+}
+.dark .rams-typography li {
+    background: rgba(15, 23, 42, 0.4);
+    border-color: rgba(30, 41, 59, 0.6);
+}
+.rams-typography li:hover {
+    border-color: rgba(16, 185, 129, 0.3);
 }
 
 .rams-typography li::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    background: #9CA3AF;
-    border-radius: 50%;
+    content: '•';
+    color: #10b981;
+    font-size: 1.25rem;
+    font-weight: 900;
     position: absolute;
-    left: 0.75rem;
-    top: 1.15em;
+    left: 0.85rem;
+    top: 0.45rem;
 }
-.dark .rams-typography li::before { background: #52525b; }
+.dark .rams-typography li::before { 
+    color: #34d399; 
+}
 
 .rams-typography blockquote {
-    border-left: 4px solid #689F38;
-    padding: 1rem 1.5rem;
-    background-color: #F9FAFB;
+    border-left: 4px solid #10b981;
+    padding: 1.15rem 1.5rem;
+    background: linear-gradient(135deg, rgba(240, 253, 244, 0.8) 0%, rgba(248, 250, 252, 0.6) 100%);
     font-style: italic;
     font-weight: 500;
-    color: #4B5563;
+    color: #1e293b;
     margin: 2rem 0;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 12px 12px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
-.dark .rams-typography blockquote { background-color: #18181b; color: #a1a1aa; border-left-color: #8bc34a; }
+.dark .rams-typography blockquote { 
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.25) 0%, rgba(15, 23, 42, 0.6) 100%); 
+    color: #e2e8f0; 
+    border-left-color: #34d399; 
+}
 
 /* Tables — AI-generated tables for labs, medication, and monitoring */
 .rams-typography table {
     width: 100%;
-    border-collapse: collapse;
-    margin: 1.5rem 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1.75rem 0;
     font-size: 0.875rem;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
-.dark .rams-typography table { border-color: #27272a; }
+.dark .rams-typography table { 
+    border-color: #1e293b; 
+}
 
 .rams-typography thead {
-    background: #F3F4F6;
+    background: #f8fafc;
 }
-.dark .rams-typography thead { background: #18181b; }
+.dark .rams-typography thead { 
+    background: #0f172a; 
+}
 
 .rams-typography th {
     text-align: left;
-    padding: 0.75rem 1rem;
-    font-weight: 700;
+    padding: 0.85rem 1.15rem;
+    font-weight: 800;
     font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #6B7280;
-    border-bottom: 2px solid #E5E7EB;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
 }
-.dark .rams-typography th { color: #a1a1aa; border-bottom-color: #27272a; }
+.dark .rams-typography th { 
+    color: #94a3b8; 
+    border-bottom-color: #1e293b; 
+}
 
 .rams-typography td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #F3F4F6;
+    padding: 0.85rem 1.15rem;
+    border-bottom: 1px solid #f1f5f9;
     vertical-align: top;
 }
-.dark .rams-typography td { border-bottom-color: #27272a; }
+.dark .rams-typography td { 
+    border-bottom-color: #1e293b; 
+}
 
 .rams-typography tbody tr:nth-child(even) {
-    background: #FAFBFC;
+    background: rgba(248, 250, 252, 0.5);
 }
-.dark .rams-typography tbody tr:nth-child(even) { background: #09090b; }
+.dark .rams-typography tbody tr:nth-child(even) { 
+    background: rgba(15, 23, 42, 0.3); 
+}
 
 .rams-typography tbody tr:hover {
-    background: #F0FDF4;
+    background: rgba(236, 253, 245, 0.7);
 }
-.dark .rams-typography tbody tr:hover { background: #14532d; }
+.dark .rams-typography tbody tr:hover { 
+    background: rgba(6, 78, 59, 0.2); 
+}
 
 /* Responsive table wrapper */
 .rams-typography .table-wrapper {
