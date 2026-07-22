@@ -848,4 +848,27 @@ Pain Areas:   `;
 
     return prompt;
   }
+
+  readonly selectedIssues = computed(() => {
+    return Object.values(this.issues()).flat();
+  });
+
+  generateExpandedShareUrl(): string {
+    if (typeof window === 'undefined') return '';
+    try {
+      const stateObj = {
+        patientId: this.patientId(),
+        philosophy: this.activePhilosophy(),
+        vitals: this.vitals(),
+        reason: this.reasonForVisit() || this.patientGoals(),
+        issuesCount: this.selectedIssues().length,
+        timestamp: Date.now()
+      };
+      const base64State = btoa(JSON.stringify(stateObj));
+      const baseUrl = window.location.origin + window.location.pathname;
+      return `${baseUrl}?share=${encodeURIComponent(base64State)}&mode=handoff`;
+    } catch {
+      return window.location.href;
+    }
+  }
 }
