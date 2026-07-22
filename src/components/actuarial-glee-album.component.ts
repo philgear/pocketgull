@@ -23,10 +23,10 @@ export interface IGleeTrack {
   standalone: true,
   imports: [CommonModule, PocketGullButtonComponent, PocketGullBadgeComponent],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/30 backdrop-blur-2xl animate-in">
       
-      <!-- Container -->
-      <div class="w-full max-w-5xl max-h-[92vh] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-purple-500/30 overflow-hidden flex flex-col font-['Inter']">
+      <!-- Glassmorphic Container -->
+      <div class="w-full max-w-5xl max-h-[92vh] bg-slate-950/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden flex flex-col font-['Inter']">
         
         <!-- Header -->
         <div class="p-6 bg-gradient-to-r from-purple-900/40 via-indigo-900/40 to-slate-900 border-b border-purple-500/20 flex items-center justify-between">

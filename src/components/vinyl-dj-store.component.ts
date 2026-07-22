@@ -11,10 +11,10 @@ import { PatientStateService } from '../services/patient-state.service';
   standalone: true,
   imports: [CommonModule, PocketGullButtonComponent, PocketGullBadgeComponent],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-lg animate-in">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/30 backdrop-blur-2xl animate-in">
       
-      <!-- Vinyl Lounge Container -->
-      <div class="w-full max-w-6xl max-h-[94vh] bg-stone-900 rounded-3xl shadow-2xl border border-amber-500/30 overflow-hidden flex flex-col font-['Inter']">
+      <!-- Vinyl Lounge Glassmorphic Container -->
+      <div class="w-full max-w-6xl max-h-[94vh] bg-stone-950/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden flex flex-col font-['Inter']">
         
         <!-- Retro Header -->
         <div class="p-5 bg-gradient-to-r from-amber-950 via-stone-900 to-amber-900 border-b border-amber-500/20 flex items-center justify-between">
