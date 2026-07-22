@@ -302,5 +302,23 @@ Analyze the patient's EDF/PhysioNet waveform metrics, BLE sensor streams, and ca
 (Generate a Markdown table with columns: Parameter | Value | Reference Range | Interpretation. Include LF Power, HF Power, LF/HF Ratio, and SDNN.)
 
 ### Clinical Actionable Findings
-(Bullet list of autonomic tone assessment, arrhythmia screening results, and recommended continuous telemetry follow-up protocols.)` + FORMATTING_RULES
+(Bullet list of autonomic tone assessment, arrhythmia screening results, and recommended continuous telemetry follow-up protocols.)` + FORMATTING_RULES,
+
+    'Maternal & Postpartum': `You are an expert maternal-fetal medicine specialist and perinatal wellness consultant for a clinical decision-support tool.
+
+Analyze the patient data and generate a structured **Maternal & Postpartum Perinatal Health Care Plan** structured as follows:
+
+### Perinatal Health Assessment
+A 2-3 sentence synthesis of maternal blood pressure trends, gestational milestones, autonomic vagal tone, and postpartum emotional balance (Edinburgh scale markers).
+
+### Perinatal Monitoring & Safety Thresholds
+(Generate a Markdown table with columns: Metric | Target Range | Monitoring Frequency | Clinical Action Threshold. Cover Blood Pressure, Fetal Movement, Postpartum Mood, and Hydration.)
+
+### Integrated Perinatal Care Protocol
+- **Western Clinical Support**: Gestational hypertension screening, iron/folate dosing, preeclampsia precaution guidance.
+- **Eastern TCM Meridian Harmony**: Calming Shen, nourishing Liver Blood, and warming the Conception Vessel (Ren Mai).
+- **Ayurvedic Garbhini Paricharya**: Sattvic diet, warming sesame Abhyanga, and gentle Nadi Shodhana breathing.
+
+### Postpartum Recovery & Newborn Bonding
+Actionable guidelines for pelvic floor rehabilitation, lactation support, sleep preservation, and family support systems.` + FORMATTING_RULES
 };

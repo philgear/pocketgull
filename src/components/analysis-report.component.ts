@@ -1445,7 +1445,7 @@ export class AnalysisReportComponent implements OnDestroy {
     this.historyEntries.set(entries.filter(e => e.value?._isSnapshot));
   }
 
-  activeLens = signal<AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener'>('Summary Overview');
+  activeLens = signal<AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener' | 'Maternal & Postpartum'>('Summary Overview');
   showRawFhir = signal(false);
 
   activeAgentName = computed(() => {
@@ -2209,7 +2209,7 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   }
 
-  changeLens(lens: AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener') {
+  changeLens(lens: AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener' | 'Maternal & Postpartum') {
     this.audit.logAction('VIEW_LENS', this.patientManager.selectedPatientId(), { lens });
     this.flushAutoSave();
     this.activeLens.set(lens);

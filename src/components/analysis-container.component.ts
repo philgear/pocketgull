@@ -10,11 +10,13 @@ import { PatientManagementService } from '../services/patient-management.service
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { GamificationService } from '../services/gamification.service';
 
+import { HumanDignityPactComponent } from './human-dignity-pact.component';
+
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent],
+  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent],
   template: `
     <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -103,6 +105,12 @@ import { GamificationService } from '../services/gamification.service';
               }
               
               @if (!intelligence.isLoading()) {
+                <!-- Human Dignity Health Charter Button -->
+                <button type="button" (click)="showPactModal.set(true)" title="Human Dignity Health Charter & Voluntary Opt-In"
+                  class="hidden sm:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer">
+                  <span>🕊️</span> Dignity Charter
+                </button>
+
                 <!-- PDF Care Plan Export Button -->
                 <button type="button" (click)="exportPdf()" title="Export Printable PDF Care Plan"
                   class="hidden md:flex items-center gap-1 px-2.5 py-1 text-xs font-mono font-bold uppercase rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition cursor-pointer">
@@ -157,10 +165,12 @@ import { GamificationService } from '../services/gamification.service';
                 <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
               </div>
             </div>
-          }
         </div>
       </div>
     </div>
+
+    <!-- Human Dignity Health Charter Modal -->
+    <app-human-dignity-pact *ngIf="showPactModal()" (closeModal)="showPactModal.set(false)"></app-human-dignity-pact>
   `,
   styles: [`
     :host { display: block; height: 100%; width: 100%; }
@@ -181,6 +191,7 @@ export class AnalysisContainerComponent {
   ClinicalIcons = ClinicalIcons;
 
   justGenerated = signal(false);
+  showPactModal = signal(false);
 
   exportPdf() {
     const reportText = Object.values(this.intelligence.analysisResults()).filter(Boolean).join('\n\n');

@@ -105,11 +105,11 @@ export class ExportService {
     console.log('[ExportService] Opening styled print report for:', patientName);
 
     // Ensure marked is loaded
-    let parser = this.markdownService.parser();
+    let parser = this.markdownService?.parser();
     if (!parser) {
       await new Promise<void>(resolve => {
         const interval = setInterval(() => {
-          parser = this.markdownService.parser();
+          parser = this.markdownService?.parser();
           if (parser) { clearInterval(interval); resolve(); }
         }, 50);
         setTimeout(() => { clearInterval(interval); resolve(); }, 3000);
@@ -686,11 +686,11 @@ export class ExportService {
   ): Promise<void> {
     console.log('[ExportService] Opening styled Care Plan print report for:', patientName);
 
-    let parser = this.markdownService.parser();
+    let parser = this.markdownService?.parser();
     if (!parser) {
       await new Promise<void>(resolve => {
         const interval = setInterval(() => {
-          parser = this.markdownService.parser();
+          parser = this.markdownService?.parser();
           if (parser) { clearInterval(interval); resolve(); }
         }, 50);
         setTimeout(() => { clearInterval(interval); resolve(); }, 3000);
