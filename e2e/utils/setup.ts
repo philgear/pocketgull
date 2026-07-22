@@ -96,3 +96,41 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
     }
   }, options.mockClinician);
 }
+
+/** Shared login + demo mode entry flow for all E2E tests */
+export async function enterDemoMode(page: Page) {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+
+  // PIN entry
+  const pinInput = page.locator('input[placeholder="1234"]');
+  if (await pinInput.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await pinInput.fill('1234');
+    await pinInput.press('Enter');
+  }
+
+  // Demo Mode button
+  const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
+  if (await demoBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await demoBtn.click();
+  }
+
+  // Skip KSS if present
+  const skipBtn = page.locator('button', { hasText: 'Skip' });
+  if (await skipBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await skipBtn.click();
+  }
+
+  // Ethics pledge (if present)
+  const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
+  if (await acceptBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+    const pledgeCheckbox = page.locator('input[type="checkbox"]').last();
+    if (await pledgeCheckbox.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await pledgeCheckbox.check().catch(() => {});
+    }
+    await acceptBtn.click();
+  }
+
+  // Wait for main app or container to render
+  await page.waitForSelector('app-analysis-container, app-analysis-report, main', { timeout: 20000 });
+}

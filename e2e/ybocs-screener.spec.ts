@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 test.describe('Y-BOCs Diagnostic Screener E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,36 +11,7 @@ test.describe('Y-BOCs Diagnostic Screener E2E Tests', () => {
     // Enable console logging to see page issues if any
     page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
-    // Go to home page
-    await page.goto('/');
-
-    // 1. PIN Code Entry
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 10000 });
-    await pinInput.fill('1234');
-    await pinInput.press('Enter');
-
-    // 2. Demo Mode button
-    const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-    await expect(demoBtn).toBeVisible({ timeout: 10000 });
-    await demoBtn.click();
-
-    // 3. Skip KSS
-    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-    await expect(skipBtn).toBeVisible({ timeout: 10000 });
-    await skipBtn.click();
-
-    // 4. Ethics pledge
-    const pledgeCheckbox = page.locator('input[type="checkbox"]');
-    await expect(pledgeCheckbox).toBeVisible({ timeout: 10000 });
-    await pledgeCheckbox.check();
-
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-    await expect(acceptBtn).toBeVisible({ timeout: 10000 });
-    await acceptBtn.click();
-
-    // Wait for the main viewport to load
-    await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
+    await enterDemoMode(page);
 
     // Click patient dropdown to select Phil Gear
     const dropdownBtn = page.locator('app-patient-dropdown button').first();
