@@ -41,6 +41,7 @@ import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapp
 import { TypologyBadgeComponent } from './typology-badge.component';
 import { InstantPatientActionSuiteComponent } from './instant-patient-action-suite.component';
 import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
+import { HandoffModalComponent } from './handoff-modal.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -74,7 +75,8 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
     GeolocationalHealthRelocationComponent,
     InstantPatientActionSuiteComponent,
     PatientHealthTrajectoryStorybookComponent,
-    TypologyBadgeComponent
+    TypologyBadgeComponent,
+    HandoffModalComponent
   ],
 
 
@@ -125,6 +127,11 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
                 [class.dark:bg-zinc-900]="state.activePhilosophy() !== 'ayurvedic'"
                 class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-amber-500 transition-all cursor-pointer flex items-center gap-1">
                 <span>🟡</span> Ayurvedic
+              </button>
+
+              <button type="button" (click)="showHandoffModal.set(true)"
+                class="px-2.5 py-1 text-[11px] font-extrabold uppercase rounded-full border border-indigo-500 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-600 hover:text-white transition cursor-pointer flex items-center gap-1">
+                <span>🤝</span> Handoff
               </button>
             </div>
 
@@ -1164,6 +1171,9 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
         (closed)="nodeAgentDialogData.set(null)">
       </app-node-agent-dialog>
     }
+
+    <!-- Clinician-to-Clinician Handoff Modal -->
+    <app-handoff-modal [isOpen]="showHandoffModal()" (close)="showHandoffModal.set(false)"></app-handoff-modal>
   `
 })
 export class AnalysisReportComponent implements OnDestroy {
@@ -1210,6 +1220,7 @@ export class AnalysisReportComponent implements OnDestroy {
   activeActProposal = computed(() => {
     return this.actMapper.getActProposal(this.activeLens());
   });
+  showHandoffModal = signal<boolean>(false);
   isCprMetronomeActive = signal<boolean>(false);
   private cprIntervalId: any = null;
   private audioCtx: AudioContext | null = null;
