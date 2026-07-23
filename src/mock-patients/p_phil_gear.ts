@@ -94,6 +94,16 @@ export const p_phil_gear: IPatient = {
         "PhysioNet Telemetry":
           "### PhysioNet 2026 Digital Signal & Electrophysiology Summary\nIntegrated EDF/PhysioNet waveform metrics captured from high-frequency BLE telemetry sensors and continuous multi-lead ECG monitoring.\n\n### Electrocardiographic Waveform Morphology\n- **QRS Interval Duration**: 88 ms (Normal baseline: < 120 ms).\n- **ST-Segment**: Neutral ST morphology across Lead II, V2, V5 (+0.02 mV deviation).\n- **QTc Interval (Fridericia)**: 412 ms (Normal baseline: < 450 ms).\n\n### Heart Rate Variability (HRV) Spectral Power Density\n- **LF/HF Ratio**: 1.25 (Balanced autonomic tone)\n- **RMSSD**: 48 ms (Good parasympathetic rebound)"
       }
+    },
+    {
+      type: "Y-BOCsAssessment",
+      date: "2026.05.20",
+      summary: "Y-BOCS Assessment completed: Subclinical OCD score 4/40",
+      assessment: {
+        totalScore: 4,
+        severityCategory: "Subclinical",
+        dateCreated: "2026-05-20T10:00:00Z"
+      }
     }
   ],
   bookmarks: [],

@@ -33,7 +33,7 @@ SECRET_PATTERNS = {
 }
 
 # Directories to ignore
-IGNORE_DIRS = set()
+IGNORE_DIRS = {"node_modules", ".git", "dist", "dist-ssr", ".angular", "tmp", "test-results", "playwright-report"}
 
 # Extensions to skip (binary/large assets)
 SKIP_EXTENSIONS = {
@@ -154,7 +154,7 @@ def is_third_party_or_build(relative_path: str) -> bool:
     parts = relative_path.split(os.sep)
     vendor_dirs = {
         "node_modules", ".git", ".angular", "dist", "playwright-report",
-        "test-results", ".husky", "build", ".dart_tool", "ios", "android",
+        "test-results", "tmp", ".husky", "build", ".dart_tool", "ios", "android",
         "windows", "linux", "macos", "web", "sandbox", "flutter", "venv", ".venv"
     }
     if any(part in vendor_dirs for part in parts):

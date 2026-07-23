@@ -215,8 +215,9 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     await toggleAgentBtn.click();
 
     // 3. Send a message to the voice assistant
-    const chatInput = page.locator('input[placeholder="Ask a follow-up or say \'Done\' to exit..."]');
-    await expect(chatInput).toBeVisible({ timeout: 5000 });
+    await page.waitForSelector('app-voice-assistant input', { timeout: 15000 });
+    const chatInput = page.locator('app-voice-assistant input').first();
+    await expect(chatInput).toBeVisible({ timeout: 10000 });
     await chatInput.fill('What is the most critical evidence here?');
     await chatInput.press('Enter');
 

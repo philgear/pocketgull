@@ -4,7 +4,8 @@ import { Page } from '@playwright/test';
  * Polls the backend until it is fully responsive to prevent E2E race conditions on CI.
  */
 async function waitForBackendToBeReady() {
-  const url = 'http://localhost:4200/api/config';
+  const baseUrl = process.env['BASE_URL'] || 'http://localhost:4000';
+  const url = `${baseUrl}/api/config`;
   for (let i = 0; i < 30; i++) {
     try {
       const res = await fetch(url);

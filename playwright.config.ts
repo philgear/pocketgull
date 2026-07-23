@@ -1,10 +1,15 @@
 import { defineConfig, devices } from '@playwright/test';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: path.resolve(__dirname, 'e2e'),
   testMatch: '**/*.spec.ts',
-  testIgnore: ['**/src/**'],
-  outputDir: './tmp/playwright-results',
+  testIgnore: ['**/src/**', '**/node_modules/**'],
+  outputDir: path.resolve(__dirname, 'tmp/playwright-results'),
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,

@@ -312,6 +312,16 @@ export const p_mara_santos: IPatient = {
           ]
         }
       }
+    },
+    {
+      type: "Y-BOCsAssessment",
+      date: "2026.05.19",
+      summary: "Y-BOCS Assessment completed: Moderate OCD score 18/40",
+      assessment: {
+        totalScore: 18,
+        severityCategory: "Moderate",
+        dateCreated: "2026-05-19T14:30:00Z"
+      }
     }
   ],
   "bookmarks": [],
