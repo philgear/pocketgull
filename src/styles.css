@@ -3311,11 +3311,13 @@ html.theme-dream-team {
   /* 🏀 1996 Dream Team Official Game Ball Pebble Leather Grain Texture */
   background-color: #0C2340 !important;
   background-image: 
+    url('/assets/images/textures/dream_team_texture.png'),
     radial-gradient(circle at 50% 50%, rgba(225, 27, 34, 0.15) 0%, transparent 85%),
     radial-gradient(#FFC72C 0.85px, transparent 0.85px), 
     radial-gradient(rgba(0, 0, 0, 0.45) 0.85px, #0C2340 0.85px) !important;
-  background-size: 100% 100%, 12px 12px, 12px 12px !important;
-  background-position: 0 0, 0 0, 6px 6px !important;
+  background-size: cover, 100% 100%, 12px 12px, 12px 12px !important;
+  background-position: center, 0 0, 0 0, 6px 6px !important;
+  background-blend-mode: overlay, normal, normal, normal !important;
 }
 
 html.theme-dream-team body {
