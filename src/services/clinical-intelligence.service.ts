@@ -10,6 +10,8 @@ import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
 import { OrcidService } from './orcid.service';
 import { WebLLMProvider } from './ai/webllm.provider';
+import { PetAuditoryService } from './pet-auditory.service';
+import { ThemeService } from './theme.service';
 import {
     DEMO_ANALYSIS_REPORT_WESTERN,
     DEMO_ANALYSIS_REPORT_EASTERN,
@@ -49,6 +51,8 @@ export class ClinicalIntelligenceService {
     private patientState = inject(PatientStateService);
     private orcid = inject(OrcidService);
     private webgpu = inject(WebLLMProvider);
+    private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch { return null; } })();
+    private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch { return null; } })();
 
     readonly isLoading = signal<boolean>(false);
     readonly webgpuProgress = this.webgpu.loadingProgress;
@@ -466,6 +470,9 @@ Recommends voluntary pre-conception carrier screening for autosomal recessive tr
 
         if (!isEmergency && this.patientState.isDemoMode()) {
             this.isLoading.set(true);
+            if (this.themeService?.currentTheme() === 'dream-team' || this.themeService?.analogyLensMode() === 'coach') {
+                this.petAuditory?.playCrowdCheer();
+            }
             this.error.set(null);
             this.analysisResults.set({});
             this.analysisMetrics.set(null);

@@ -632,4 +632,61 @@ export class PetAuditoryService {
     osc.start(startTime);
     osc.stop(startTime + 0.15);
   }
+
+  /**
+   * Procedurally synthesizes a 1996 Stadium Crowd Cheer & Championship Horn
+   * when generating AI clinical analysis.
+   */
+  public playCrowdCheer() {
+    this.initContext();
+    if (!this.audioCtx) return;
+    const ctx = this.audioCtx;
+    const now = ctx.currentTime;
+
+    // 1. Stadium Horn (380 Hz & 475 Hz dual brass chord)
+    const horn1 = ctx.createOscillator();
+    const horn2 = ctx.createOscillator();
+    const hornGain = ctx.createGain();
+
+    horn1.type = 'sawtooth';
+    horn2.type = 'sawtooth';
+    horn1.frequency.setValueAtTime(380, now);
+    horn2.frequency.setValueAtTime(475, now);
+
+    hornGain.gain.setValueAtTime(0, now);
+    hornGain.gain.linearRampToValueAtTime(0.04, now + 0.05);
+    hornGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+    horn1.connect(hornGain);
+    horn2.connect(hornGain);
+    hornGain.connect(ctx.destination);
+
+    horn1.start(now);
+    horn2.start(now);
+    horn1.stop(now + 0.65);
+    horn2.stop(now + 0.65);
+
+    // 2. Crowd Cheer Roar (filtered noise swell)
+    const crowdGain = ctx.createGain();
+    const crowdFilter = ctx.createBiquadFilter();
+    crowdFilter.type = 'bandpass';
+    crowdFilter.frequency.value = 1200;
+    crowdFilter.Q.value = 1.5;
+
+    const noiseOsc = ctx.createOscillator();
+    noiseOsc.type = 'triangle';
+    noiseOsc.frequency.setValueAtTime(180, now);
+    noiseOsc.frequency.linearRampToValueAtTime(320, now + 1.2);
+
+    crowdGain.gain.setValueAtTime(0, now);
+    crowdGain.gain.linearRampToValueAtTime(0.05, now + 0.3);
+    crowdGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+    noiseOsc.connect(crowdFilter);
+    crowdFilter.connect(crowdGain);
+    crowdGain.connect(ctx.destination);
+
+    noiseOsc.start(now);
+    noiseOsc.stop(now + 1.85);
+  }
 }
