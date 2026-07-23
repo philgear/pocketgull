@@ -544,8 +544,9 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         if (!container) return;
         const w = container.clientWidth;
         const h = container.clientHeight;
+        if (w === 0 || h === 0) return;
         if (this.camera) {
-            this.camera.aspect = w / h;
+            this.camera.aspect = w / (h || 1);
             this.camera.updateProjectionMatrix();
         }
         if (this.renderer) {

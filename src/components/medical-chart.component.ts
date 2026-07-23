@@ -104,9 +104,9 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
         </div>
 
         @if(isViewerExpanded()) {
-          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-black/20 shrink-0">
+          <div class="body-viewer-container min-h-[540px] sm:min-h-[580px] xl:min-h-[640px] overflow-hidden bg-white dark:bg-black/20 shrink-0 flex flex-col">
             @defer (on immediate) {
-              <app-body-viewer></app-body-viewer>
+              <app-body-viewer class="h-full w-full flex-1 flex flex-col"></app-body-viewer>
             } @placeholder {
               <div class="h-full w-full flex items-center justify-center text-gray-500 dark:text-zinc-400 bg-gray-50/50 dark:bg-zinc-800/50">
                 <div class="flex flex-col items-center gap-3">

@@ -122,7 +122,7 @@ import { ThemeService } from '../services/theme.service';
       }
 
       <!-- 2. Center 3D Viewport Window (Holographic Diagnostic Twin - Luminous Papyrus/Light Canvas) -->
-      <div class="flex-1 w-full relative min-h-[420px] overflow-hidden bg-[#FAF8F0] dark:bg-zinc-950 border border-gray-300 dark:border-zinc-800 rounded-lg shadow-xl">
+      <div class="flex-1 w-full relative min-h-[320px] sm:min-h-[420px] overflow-hidden bg-[#FAF8F0] dark:bg-zinc-950 border border-gray-300 dark:border-zinc-800 rounded-lg shadow-xl">
         @if (state.bodyViewerMode() === '3d') {
           @defer {
             @if (state.anatomyViewMode() === 'arboreal') {
