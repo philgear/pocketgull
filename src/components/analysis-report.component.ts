@@ -62,6 +62,9 @@ import { getPersonaPropBadge } from '../services/agent-personas';
 import { ThemeService, AppTheme } from '../services/theme.service';
 import { ShantyKaraokeDeckComponent } from './shanty-karaoke-deck.component';
 
+import { ChronoClockDecisionRailComponent } from './chrono-clock-decision-rail.component';
+import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.component';
+
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
@@ -109,7 +112,9 @@ import { ShantyKaraokeDeckComponent } from './shanty-karaoke-deck.component';
     Sec1557AuditModalComponent,
     BystanderActionSuiteComponent,
     FhirPassportModalComponent,
-    ShantyKaraokeDeckComponent
+    ShantyKaraokeDeckComponent,
+    ChronoClockDecisionRailComponent,
+    ChronoWeeklyMealPlannerComponent
   ],
 
 
@@ -421,6 +426,26 @@ import { ShantyKaraokeDeckComponent } from './shanty-karaoke-deck.component';
               </div>
             </div>
           </div>
+
+          <!-- Circadian Chronobiology & Functional Medicine Biomarker Telemetry -->
+          @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+            <div class="my-6 space-y-6 font-mono no-print">
+              <!-- Circadian Chronobiology Clock Decision Rail (Nutrition & Functional Protocols) -->
+              @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols') {
+                <app-chrono-clock-decision-rail></app-chrono-clock-decision-rail>
+              }
+
+              <!-- 7-Day Chrono-Nutrition Meal Planner (Nutrition) -->
+              @if (activeLens() === 'Nutrition') {
+                <app-chrono-weekly-meal-planner></app-chrono-weekly-meal-planner>
+              }
+
+              <!-- Functional Medicine Biomarker Matrix (Protocols, Nutrients, Monitoring) -->
+              @if (activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+                <app-biomarker-matrix></app-biomarker-matrix>
+              }
+            </div>
+          }
         }
 
           @if (activeLens() === 'ASSESSMENTS') {
