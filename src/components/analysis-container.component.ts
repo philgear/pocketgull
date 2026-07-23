@@ -21,6 +21,8 @@ import { GcpHealthcareService } from '../services/gcp-healthcare.service';
 import { AmbientLivingSpaceDashboardComponent } from './ambient-living-space-dashboard.component';
 import { GreenRoomLoungeComponent } from './green-room-lounge.component';
 
+import { DomainSuitesNavigatorComponent } from './suites/domain-suites-navigator.component';
+
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
@@ -28,7 +30,7 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
   host: {
     'class': 'flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]'
   },
-  imports: [CommonModule, AnalysisReportComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent],
+  imports: [CommonModule, AnalysisReportComponent, DomainSuitesNavigatorComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent],
   template: `
     <div class="flex flex-col flex-1 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)] bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -88,10 +90,17 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
               
               @if (!intelligence.isLoading()) {
 
+                <!-- View Mode Switcher: Classic Lenses vs Functional Domain Suites -->
+                <button type="button" (click)="viewMode.set(viewMode() === 'lenses' ? 'suites' : 'lenses')"
+                  title="Toggle between Classic Multi-Lens Report and Functional Domain Suites (Paradigm Diff Engine)"
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-orange-500/40 bg-orange-500/10 text-orange-300 hover:bg-orange-600 hover:text-white transition cursor-pointer shadow-sm">
+                  <span>{{ viewMode() === 'lenses' ? '🧬 Domain Suites' : '📄 Classic Lenses' }}</span>
+                </button>
+
                 <!-- Clinical Tools & Engagement Suites Drawer Toggle Button -->
                 <button type="button" (click)="showToolsMenu.set(!showToolsMenu())" title="Open Clinical Tools & Engagement Suites Drawer"
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer shadow-sm">
-                  <span>🎛️</span> Clinical Suites ▾
+                  <span>🎛️</span> Clinical Tools ▾
                 </button>
               }
             </div>
@@ -99,9 +108,13 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
         }
 
         <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden relative">
-          <div class="flex-1 min-h-0 min-w-0 h-full flex flex-col overflow-hidden transition-all duration-300">
+          <div class="flex-1 min-h-0 min-w-0 h-full flex flex-col overflow-y-auto transition-all duration-300 p-4 sm:p-6">
             <div class="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden relative" [class.slide-in-panel]="isSlidingIn()">
-                <app-analysis-report class="flex-1 flex flex-col min-h-0 h-full w-full overflow-hidden" #reportRef (openGleeModal)="showGleeModal.set(true)"></app-analysis-report>
+                @if (viewMode() === 'suites') {
+                  <app-domain-suites-navigator class="w-full h-full" />
+                } @else {
+                  <app-analysis-report class="flex-1 flex flex-col min-h-0 h-full w-full overflow-hidden" #reportRef (openGleeModal)="showGleeModal.set(true)"></app-analysis-report>
+                }
             </div>
           </div>
           
@@ -113,23 +126,25 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
               <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-100/90 dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800 shadow-sm">
                 
                 <!-- Sequential Lens Stepper Buttons -->
-                <div class="flex items-center gap-2" id="tour-footer-lens-navigation">
-                  <button type="button" (click)="reportRef.navigateToPreviousLens()"
-                    [disabled]="!reportRef.hasPreviousLens()"
-                    class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700">
-                    <span>← Previous Lens</span>
-                  </button>
+                @if (viewMode() === 'lenses') {
+                  <div class="flex items-center gap-2" id="tour-footer-lens-navigation">
+                    <button type="button" (click)="reportRef?.navigateToPreviousLens()"
+                      [disabled]="!reportRef?.hasPreviousLens()"
+                      class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700">
+                      <span>← Previous Lens</span>
+                    </button>
 
-                  <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/50">
-                    {{ reportRef.activeLens() }}
-                  </span>
+                    <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/50">
+                      {{ reportRef?.activeLens() || 'Summary Overview' }}
+                    </span>
 
-                  <button type="button" (click)="reportRef.navigateToNextLens()"
-                    [disabled]="!reportRef.hasNextLens()"
-                    class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500 shadow-sm">
-                    <span>Next Lens →</span>
-                  </button>
-                </div>
+                    <button type="button" (click)="reportRef?.navigateToNextLens()"
+                      [disabled]="!reportRef?.hasNextLens()"
+                      class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500 shadow-sm">
+                      <span>Next Lens →</span>
+                    </button>
+                  </div>
+                }
 
                 <!-- Footer Refresh Analysis & PAIR Data Card Actions -->
                 <div class="flex items-center gap-2">
@@ -314,7 +329,7 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
   `]
 })
 export class AnalysisContainerComponent {
-  @ViewChild(AnalysisReportComponent) reportComp!: AnalysisReportComponent;
+  @ViewChild(AnalysisReportComponent) reportRef?: AnalysisReportComponent;
   state = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);
   cache = inject(AiCacheService);
@@ -325,6 +340,7 @@ export class AnalysisContainerComponent {
   ClinicalIcons = ClinicalIcons;
 
   isSlidingIn = signal(true);
+  viewMode = signal<'lenses' | 'suites'>('lenses');
 
   constructor() {
     // Re-trigger 3D slide-in animation whenever a patient is selected or analysis completes
@@ -390,8 +406,8 @@ export class AnalysisContainerComponent {
     this.game.completeQuest('generate_care_plan');
     this.triggerSlideIn();
 
-    if (this.reportComp) {
-      this.reportComp.generate();
+    if (this.reportRef) {
+      this.reportRef.generate();
     }
   }
 
