@@ -1813,6 +1813,29 @@ export class ExportService {
           });
         });
 
+      // 6. Macro Fleet Sentinel Telemetry Observation
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `macro-sentinel-${Date.now()}`,
+          status: 'final',
+          category: [{
+            coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey' }]
+          }],
+          code: {
+            coding: [{ system: 'http://pocketgull.app/fhir/StructureDefinition/macro-sentinel', code: 'macro-fleet', display: 'Global Sentinel Macro Fleet Telemetry' }],
+            text: 'Global Sentinel Macro Fleet Telemetry'
+          },
+          subject: { reference: patientRef },
+          component: [
+            { code: { text: 'Arboristic Canopy Biomass Index' }, valueString: '94.2% Photosynthetic Flux' },
+            { code: { text: 'Vehicle Fleet Powertrain Harmonic' }, valueString: '480 Hz Engine Resonance' },
+            { code: { text: 'Eastern Clockwork Escapement Cadence' }, valueString: '18,000 bph' },
+            { code: { text: 'Ayurvedic Solfeggio Resonator Tone' }, valueString: '528 Hz DNA Repair' }
+          ]
+        }
+      });
+
       const bundle: IFhirBundle = {
         resourceType: 'Bundle',
         id: `pocket-gull-bundle-${Date.now()}`,

@@ -42,14 +42,19 @@ export class AdkLiveService {
     if (this.isConnected()) return;
     this.connectionError.set(null);
 
-    // Enhance system instruction with vocal prosody directives for natural human speech
+    // Enhance system instruction with vocal prosody directives & Macro Fleet Sentinel Context
     const enhancedInstruction = `${systemInstruction}
 
 Vocal & Speech Delivery Style:
 - Speak in a warm, conversational, empathetic, and reassuring voice.
 - Use natural speech cadence with appropriate pauses for breathing and emphasis.
 - Dynamically adjust pitch and intonation to match clinical context.
-- Avoid robotic or rapid-fire delivery.`;
+- Avoid robotic or rapid-fire delivery.
+
+Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
+- Arboristic Canopy Sweeps: Provide real-time acoustic feedback on forest canopy photosynthetic flux and xylem hydration dynamics.
+- Mechanical Vehicle Chassis Diagnostics: Analyze powertrain harmonic resonance (480 Hz) and acoustic engine vibration.
+- Gentleman & Muse Entrainment: Synchronize clockwork escapement rhythm and 528 Hz solfeggio audio tones.`;
 
     try {
       // We use the standard WebSocket approach directly to the Gemini API since the 

@@ -126,7 +126,8 @@ export class CompanionSyncModalComponent {
   deepLinkUrl = computed(() => {
     const pId = this.patientMgmt.selectedPatientId() || 'p005';
     const mode = this.syncMode();
-    return `pocketgull://sync?patientId=${pId}&mode=${mode}&fhirStore=cloud-run&vitals=hr_bp_spo2`;
+    const scope = this.patientState.sentinelScope();
+    return `pocketgull://sync?patientId=${pId}&mode=${mode}&scope=${scope}&fhirStore=cloud-run&vitals=hr_bp_spo2_macro`;
   });
 
   copyLink(): void {
