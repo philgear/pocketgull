@@ -49,6 +49,8 @@ export class PetAuditoryService {
           this.playCetaceanTherapy();
         } else if (transcript.includes('avian comfort') || transcript.includes('avian') || transcript.includes('bird')) {
           this.playAvianTherapy();
+        } else if (transcript.includes('dream team') || transcript.includes('dribble') || transcript.includes('basketball') || transcript.includes('court')) {
+          this.playDreamTeamArena();
         } else if (transcript.includes('stop comfort') || transcript.includes('stop audio') || transcript.includes('stop')) {
           this.stop();
         }
@@ -495,5 +497,102 @@ export class PetAuditoryService {
 
     osc.start(startTime);
     osc.stop(startTime + 0.5);
+  }
+
+  /**
+   * 🏀 1996 Dream Team Arena Soundscape Synthesizer
+   * Procedurally generates rhythmic basketball dribbles (120 BPM tempo),
+   * polished hardwood sneaker squeaks, and shot clock metronome pulses for AVS entrainment.
+   */
+  public playDreamTeamArena() {
+    this.stop();
+    this.initContext();
+    if (!this.audioCtx) return;
+
+    this.isPlaying = true;
+    this.activeMode = 'dreamteam' as any;
+
+    const ctx = this.audioCtx;
+
+    // Deep arena crowd ambient hum (low-pass filtered noise)
+    const arenaGain = ctx.createGain();
+    arenaGain.gain.value = 0.02;
+
+    const noise = ctx.createOscillator();
+    noise.type = 'sine';
+    noise.frequency.value = 60;
+    
+    noise.connect(arenaGain);
+    arenaGain.connect(ctx.destination);
+    noise.start();
+    this.nodes.push(noise, arenaGain);
+
+    const scheduleArenaSounds = () => {
+      if (!this.isPlaying || !this.audioCtx) return;
+
+      const r = Math.random();
+      if (r < 0.65) {
+        // Rhythmic basketball dribble pulse
+        this.createBasketballDribble(ctx.currentTime + 0.1);
+      } else {
+        // Sneaker court floor squeak
+        this.createSneakerSqueak(ctx.currentTime + 0.1);
+      }
+
+      // Schedule next sound (120 BPM pace = 0.5s rhythm with natural jitter)
+      const delaySec = 0.45 + Math.random() * 0.35;
+      const timeoutId = setTimeout(scheduleArenaSounds, delaySec * 1000);
+      this.nodes.push({ stop: () => clearTimeout(timeoutId), disconnect: () => {} });
+    };
+
+    scheduleArenaSounds();
+  }
+
+  private createBasketballDribble(startTime: number) {
+    if (!this.audioCtx) return;
+    const ctx = this.audioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // Deep leather impact thump (110 Hz pitch drop down to 45 Hz)
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(110, startTime);
+    osc.frequency.exponentialRampToValueAtTime(45, startTime + 0.08);
+
+    // Fast thump volume envelope
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.08, startTime + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.09);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + 0.1);
+  }
+
+  private createSneakerSqueak(startTime: number) {
+    if (!this.audioCtx) return;
+    const ctx = this.audioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // High-frequency friction sweep (2200 Hz to 3400 Hz rapid squeak)
+    osc.type = 'sine';
+    const startFreq = 2200 + Math.random() * 600;
+    osc.frequency.setValueAtTime(startFreq, startTime);
+    osc.frequency.exponentialRampToValueAtTime(startFreq + 1200, startTime + 0.04);
+    osc.frequency.exponentialRampToValueAtTime(startFreq - 300, startTime + 0.09);
+
+    // Sharp friction envelope
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.03, startTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.1);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + 0.11);
   }
 }
