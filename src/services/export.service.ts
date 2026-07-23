@@ -2257,7 +2257,7 @@ export class ExportService {
       type: 'collection',
       timestamp: new Date().toISOString(),
       meta: {
-        tag: [{ system: 'https://pocketgull.health/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Sanitized Clinical Export' }]
+        tag: [{ system: 'https://pocketgull.health/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Tri-Paradigm Clinical Export' }]
       },
       entry: [
         {
@@ -2282,10 +2282,55 @@ export class ExportService {
               { code: { coding: [{ system: 'http://loinc.org', code: '59408-5', display: 'Oxygen saturation' }] }, valueQuantity: { value: parseFloat(sanitizedP.vitals?.spO2 || '98'), unit: '%' } }
             ]
           }
+        },
+        // 🎧 FHIR R4 DeviceRequest: Solfeggio AVS Audio Target
+        {
+          resource: {
+            resourceType: 'DeviceRequest',
+            id: `avs-device-${sanitizedP.id}`,
+            status: 'active',
+            intent: 'original-order',
+            codeCodeableConcept: {
+              coding: [{ system: 'https://pocketgull.health/avs', code: 'AVS-528HZ-10ALPHA', display: 'Binaural Solfeggio Audio Entrainment (528 Hz / 10 Hz Alpha)' }]
+            },
+            subject: { reference: `Patient/${sanitizedP.id}` },
+            occurrenceDateTime: new Date().toISOString()
+          }
+        },
+        // 🥑 FHIR R4 NutritionOrder: Chrono-Nutrition & Nootropic Active Compounds
+        {
+          resource: {
+            resourceType: 'NutritionOrder',
+            id: `nutrition-${sanitizedP.id}`,
+            status: 'active',
+            intent: 'order',
+            patient: { reference: `Patient/${sanitizedP.id}` },
+            dateTime: new Date().toISOString(),
+            oralDiet: {
+              type: [{ coding: [{ system: 'https://pocketgull.health/nutrition', code: 'CHRONO-CIRCADIAN', display: 'Circadian Polyphenol & Bioactive Protocol' }] }],
+              nutrient: [
+                { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '702859005', display: 'Ashwagandha KSM-66 Withanolides 30mg' }] } },
+                { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '412089004', display: 'Lion’s Mane Hericenones 50mg' }] } }
+              ]
+            }
+          }
+        },
+        // 💊 FHIR R4 MedicationRequest: Botanical TCM Formula (Xiao Yao San) & Allopathic Rx
+        {
+          resource: {
+            resourceType: 'MedicationRequest',
+            id: `tcm-botanical-${sanitizedP.id}`,
+            status: 'active',
+            intent: 'order',
+            medicationCodeableConcept: {
+              coding: [{ system: 'https://pocketgull.health/tcm', code: 'XIAO-YAO-SAN', display: 'Xiao Yao San (Free and Easy Wanderer Botanical Formula)' }]
+            },
+            subject: { reference: `Patient/${sanitizedP.id}` }
+          }
         }
       ]
     };
-    this._downloadJson(bundle, `fhir_bundle_${sanitizedP.id}_${Date.now()}.json`);
+    this._downloadJson(bundle, `fhir_tri_paradigm_bundle_${sanitizedP.id}_${Date.now()}.json`);
   }
 
   // ─── Helpers ──────────────────────────────────────────────

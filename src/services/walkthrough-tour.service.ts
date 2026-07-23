@@ -38,7 +38,7 @@ export class WalkthroughTourService {
       {
         targetId: 'tour-generate-btn',
         title: 'Step 3: One-Tap Gemini Multi-Lens Synthesis',
-        body: 'Click "Generate Clinical Strategy". Google Gemini 2.5 Flash streams real-time evidence-grounded directives across Western Allopathic, TCM Zang-Fu, and Ayurvedic Vedic paradigms.',
+        body: 'Click "Refresh Analysis". Google Gemini 2.5 Flash streams real-time evidence-grounded directives across Western Allopathic, TCM Zang-Fu, and Ayurvedic Vedic paradigms.',
         position: 'bottom',
       },
       {
@@ -54,16 +54,16 @@ export class WalkthroughTourService {
         position: 'left',
       },
       {
-        targetId: 'tour-voice-agent-trigger',
+        targetId: 'tour-voice-agent-window',
         title: 'Step 6: Live Avian Agent Consult Indicator',
-        body: 'Click this microphone button to open the Avian Voice Consult panel. You can interact with personas like Gulliver (🔭) or Swoop (⚡) using full-duplex WebSocket audio streams.',
-        position: 'bottom',
+        body: 'The Avian Voice Consult panel is active. You can interact with personas like Gulliver (🔭) or Swoop (⚡) using full-duplex WebSocket audio streams.',
+        position: 'left',
       },
       {
-        targetId: 'tour-research-frame-trigger',
-        title: 'Step 7: Literature Research Panel',
-        body: 'Toggle this Research button to open the on-the-fly medical literature panel, indexing PubMed, Europe PMC, and bioRxiv to cross-validate clinical hypotheses.',
-        position: 'bottom',
+        targetId: 'tour-research-frame-window',
+        title: 'Step 7: Literature Research Panel & Experience Suite',
+        body: 'The Literature Research panel is open and draggable. Explore integrated clinical research engines across PubMed, bioRxiv preprints, TCM herbology, and Vedic Samhita studies.',
+        position: 'left',
       },
       {
         targetId: 'tour-docs-trigger',
@@ -119,10 +119,16 @@ export class WalkthroughTourService {
     const nextIdx = step + 1;
     const nextStep = nextIdx < this.steps().length ? this.steps()[nextIdx] : null;
     
-    if (nextStep && nextStep.targetId === 'tour-voice-agent-trigger') {
+    if (nextStep && (nextStep.targetId === 'tour-voice-agent-window' || nextStep.targetId === 'tour-voice-agent-trigger')) {
       this.state.toggleLiveAgent(true);
     } else {
       this.state.toggleLiveAgent(false);
+    }
+
+    if (nextStep && (nextStep.targetId === 'tour-research-frame-window' || nextStep.targetId === 'tour-research-frame-trigger')) {
+      this.state.toggleResearchFrame(true);
+    } else {
+      this.state.toggleResearchFrame(false);
     }
 
     if (step >= this.steps().length - 1) {
@@ -138,10 +144,16 @@ export class WalkthroughTourService {
       const prevIdx = step - 1;
       const prevStep = this.steps()[prevIdx];
       
-      if (prevStep.targetId === 'tour-voice-agent-trigger') {
+      if (prevStep.targetId === 'tour-voice-agent-window' || prevStep.targetId === 'tour-voice-agent-trigger') {
         this.state.toggleLiveAgent(true);
       } else {
         this.state.toggleLiveAgent(false);
+      }
+      
+      if (prevStep.targetId === 'tour-research-frame-window' || prevStep.targetId === 'tour-research-frame-trigger') {
+        this.state.toggleResearchFrame(true);
+      } else {
+        this.state.toggleResearchFrame(false);
       }
       
       this.currentStep.set(prevIdx);
@@ -151,9 +163,9 @@ export class WalkthroughTourService {
   dismiss() {
     this.currentStep.set(-1);
     this.state.toggleLiveAgent(false);
+    this.state.toggleResearchFrame(false);
     if (typeof localStorage !== 'undefined' && typeof localStorage.setItem === 'function') {
       localStorage.setItem(TOUR_SEEN_KEY, '1');
     }
   }
 }
-

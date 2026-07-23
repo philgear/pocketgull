@@ -18,6 +18,9 @@ export interface IConcertAct {
   bgGradient: string;
   lyricaAffirmation: string;
   visualStyleName: 'Oceanic Hydrodynamics' | 'Bioluminescent DNA Helix' | 'Aurora Borealis Prism' | 'Golden Supernova Mandala';
+  tcmScale: 'Gong (Earth)' | 'Shang (Metal)' | 'Jiao (Wood)' | 'Zhi (Fire)' | 'Yu (Water)';
+  ayurvedicRaga: string;
+  allopathicTarget: string;
 }
 
 @Component({
@@ -123,6 +126,17 @@ export interface IConcertAct {
               </button>
             }
 
+            <button (click)="isMusicVideoOpen.set(true)"
+              class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg flex items-center gap-2 cursor-pointer border border-purple-400/30 active:scale-95">
+              <span>📺 Launch Visualizer</span>
+            </button>
+
+            <button (click)="triggerKinestheticImpact('golf')"
+              class="px-3.5 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/50 text-cyan-300 font-bold text-xs transition cursor-pointer active:scale-95 flex items-center gap-1.5"
+              title="Trigger Golf Driver Impact Acoustic Anchor">
+              <span>⛳ Golf Impact Anchor</span>
+            </button>
+
             <button (click)="nextAct()"
               class="p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition cursor-pointer border border-zinc-700 active:scale-95"
               title="Next Act">
@@ -131,8 +145,8 @@ export interface IConcertAct {
           </div>
         </div>
 
-        <!-- 4-Act Setlist Timeline Progress -->
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <!-- 5-Act Setlist Timeline Progress -->
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
           @for (act of setlist; track act.actNumber; let idx = $index) {
             <button (click)="selectAct(idx)"
               [class.border-purple-500]="activeActIndex() === idx"
@@ -174,6 +188,19 @@ export interface IConcertAct {
           <p class="text-sm italic text-purple-200 font-sans leading-relaxed">
             "{{ currentAct.lyricaAffirmation }}"
           </p>
+
+          <!-- Tri-Paradigm Concert Synthesis Bar -->
+          <div class="mt-3 pt-2.5 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] font-mono">
+            <div class="px-2.5 py-1.5 rounded-lg bg-cyan-950/40 border border-cyan-800/40 text-cyan-300 truncate">
+              ⚡ <strong>Allopathic:</strong> {{ currentAct.allopathicTarget }}
+            </div>
+            <div class="px-2.5 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 truncate">
+              ☯️ <strong>TCM Scale:</strong> {{ currentAct.tcmScale }}
+            </div>
+            <div class="px-2.5 py-1.5 rounded-lg bg-amber-950/40 border border-amber-800/40 text-amber-300 truncate">
+              🟡 <strong>Ayurveda:</strong> {{ currentAct.ayurvedicRaga }}
+            </div>
+          </div>
         </div>
 
       </div>
@@ -350,7 +377,10 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'indigo',
       bgGradient: 'from-indigo-950 via-zinc-900 to-black',
       lyricaAffirmation: 'My body releases all stored tension. In this sanctuary, every breath restores safety.',
-      visualStyleName: 'Oceanic Hydrodynamics'
+      visualStyleName: 'Oceanic Hydrodynamics',
+      tcmScale: 'Yu (Water)',
+      ayurvedicRaga: 'Raga Bairagi (Vata Pacifying)',
+      allopathicTarget: 'Vagal Tone Resuscitation (HRV RMSSD +15ms)'
     },
     {
       actNumber: 2,
@@ -363,7 +393,10 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'emerald',
       bgGradient: 'from-emerald-950 via-zinc-900 to-black',
       lyricaAffirmation: 'My cells resonate with vitality. Every organ vibrates in harmonious, vibrant health.',
-      visualStyleName: 'Bioluminescent DNA Helix'
+      visualStyleName: 'Bioluminescent DNA Helix',
+      tcmScale: 'Jiao (Wood)',
+      ayurvedicRaga: 'Raga Bhairav (Pitta Cooling)',
+      allopathicTarget: 'Nitric Oxide Synthesis & DNA Repair'
     },
     {
       actNumber: 3,
@@ -376,7 +409,10 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'amber',
       bgGradient: 'from-amber-950 via-zinc-900 to-black',
       lyricaAffirmation: 'My mind is clear, light, and unburdened. Wisdom and inspiration flow effortlessly through me.',
-      visualStyleName: 'Aurora Borealis Prism'
+      visualStyleName: 'Aurora Borealis Prism',
+      tcmScale: 'Zhi (Fire)',
+      ayurvedicRaga: 'Raga Yaman (Kapha Destagnation)',
+      allopathicTarget: '40Hz Microglial Cleansing & Gamma Flow'
     },
     {
       actNumber: 4,
@@ -389,7 +425,26 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'purple',
       bgGradient: 'from-purple-950 via-zinc-900 to-black',
       lyricaAffirmation: 'I am whole, radiant, and fully restored. Pure peace fills every cell of my being.',
-      visualStyleName: 'Golden Supernova Mandala'
+      visualStyleName: 'Golden Supernova Mandala',
+      tcmScale: 'Gong (Earth)',
+      ayurvedicRaga: 'Raga Malkauns (Prana Integration)',
+      allopathicTarget: 'Glymphatic Brain Autophagy Entry'
+    },
+    {
+      actNumber: 5,
+      actTitle: 'Sports Medicine Overture: Kinetic Impact & Athletic Flow',
+      subtitle: 'Golf Ball Impact Acoustic Anchor to 40Hz Motor Unit Entrainment',
+      solfeggioFreq: 528,
+      binauralBeatHz: 40,
+      waveType: 'Gamma',
+      durationSeconds: 300,
+      themeColor: 'cyan',
+      bgGradient: 'from-cyan-950 via-zinc-900 to-black',
+      lyricaAffirmation: 'My body strikes with effortless kinetic grace. Precision, strength, and motor flow harmonize in every movement.',
+      visualStyleName: 'Aurora Borealis Prism',
+      tcmScale: 'Jiao (Wood)',
+      ayurvedicRaga: 'Raga Yaman (Athletic Focus)',
+      allopathicTarget: 'Kinesthetic Impact Priming & Kinesiophobia Clearance'
     }
   ];
 
@@ -455,6 +510,35 @@ export class LyricaConcertComponent implements OnDestroy {
     }
   }
 
+  triggerKinestheticImpact(impactType: 'golf' | 'tennis' | 'baseball' = 'golf') {
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = this.audioContext || new AudioContextClass();
+
+      const impactOsc = ctx.createOscillator();
+      const impactGain = ctx.createGain();
+
+      const freqMap = { golf: 3800, tennis: 2400, baseball: 1800 };
+      const startFreq = freqMap[impactType] || 3800;
+
+      impactOsc.type = 'triangle';
+      impactOsc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+      impactOsc.frequency.exponentialRampToValueAtTime(528, ctx.currentTime + 0.18);
+
+      impactGain.gain.setValueAtTime(0.4, ctx.currentTime);
+      impactGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+
+      impactOsc.connect(impactGain);
+      impactGain.connect(ctx.destination);
+
+      impactOsc.start(ctx.currentTime);
+      impactOsc.stop(ctx.currentTime + 0.35);
+    } catch (e) {
+      console.warn('Kinesthetic impact audio failed', e);
+    }
+  }
+
   private playActSynth(act: IConcertAct) {
     this.stopSynth();
     try {
@@ -464,6 +548,11 @@ export class LyricaConcertComponent implements OnDestroy {
       this.gainNode = this.audioContext.createGain();
       this.gainNode.gain.setValueAtTime(0.15, this.audioContext.currentTime);
       this.gainNode.connect(this.audioContext.destination);
+
+      // Trigger Kinesthetic Impact Acoustic Anchor for Sports Medicine Act 5
+      if (act.actNumber === 5) {
+        this.triggerKinestheticImpact('golf');
+      }
 
       // Solfeggio Carrier Oscillator
       this.solfeggioOsc = this.audioContext.createOscillator();

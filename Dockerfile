@@ -10,17 +10,17 @@ RUN apk update && apk upgrade --no-cache
 
 # Install ALL dependencies (including devDependencies needed for ng build)
 COPY package*.json ./
-COPY docs/study/package.json ./docs/study/
-COPY companion-apps/avs-therapy/package.json ./companion-apps/avs-therapy/
-COPY pocketgull_api/package.json ./pocketgull_api/
-RUN npm ci --legacy-peer-deps
+COPY docs/study/package*.json ./docs/study/
+COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/
+COPY pocketgull_api/package*.json ./pocketgull_api/
+RUN npm install --legacy-peer-deps && npm --prefix docs/study install --legacy-peer-deps
 
 # Copy source and build the docs/study Astro sub-project + Angular SSR app
 COPY . .
 RUN npm run build
 
 # Prune devDependencies to keep production container small
-RUN npm prune --omit=dev
+RUN npm prune --omit=dev --legacy-peer-deps
 
 # ==========================================
 # Stage 2: Production

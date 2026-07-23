@@ -19,12 +19,13 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { MetricCardComponent } from './shared/metric-card.component';
+import { ClinicalDataCardComponent } from './clinical-data-card.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 
 @Component({
   selector: 'app-medical-summary',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, MetricCardComponent, SafeHtmlPipe],
+  imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, PocketGullBadgeComponent, MetricCardComponent, ClinicalDataCardComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`
     /* Tighter margin collapsing inside strategy prose to prevent padding blowouts */
@@ -117,6 +118,31 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </pocket-gull-button>
                   </div>
                 </div>
+
+                <!-- PAIR Healthsheets & AI Dataset Transparency Accordion (arXiv:2202.13028) -->
+                <section class="mb-8 bg-zinc-950 rounded-2xl border border-indigo-500/30 p-4 transition-all shadow-lg font-mono">
+                  <button type="button" (click)="showHealthsheet.set(!showHealthsheet())" 
+                    class="w-full flex items-center justify-between gap-2 text-left cursor-pointer group">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+                        🏷️ PAIR Data Cards & Healthsheet Transparency
+                      </span>
+                      <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-900/60 text-indigo-300 font-mono">
+                        arXiv:2202.13028
+                      </span>
+                    </div>
+
+                    <div class="flex items-center gap-1 text-zinc-400 group-hover:text-zinc-200 text-xs font-bold transition">
+                      <span>{{ showHealthsheet() ? 'Hide Healthsheet' : 'Inspect Dataset Lineage' }}</span>
+                      <span [class.rotate-180]="showHealthsheet()" class="inline-block transition-transform duration-200 text-sm">▼</span>
+                    </div>
+                  </button>
+
+                  <div *ngIf="showHealthsheet()" class="mt-4 pt-4 border-t border-zinc-800">
+                    <app-clinical-data-card></app-clinical-data-card>
+                  </div>
+                </section>
 
                 <!-- Live Biometric Telemetry Dashboard (Collapsible Caret Accordion) -->
                 <section class="mb-8 bg-white dark:bg-zinc-900/60 rounded-xl border border-gray-200 dark:border-zinc-800 p-4 transition-all">
@@ -1139,8 +1165,9 @@ export class MedicalChartSummaryComponent {
   showEpicSuccess = signal(false);
   isExporting = signal(false);
 
-  // Mobile Biometric Accordion Signal
+  // Mobile Biometric Accordion Signal & Healthsheet Signal
   isBiometricsExpanded = signal<boolean>(false);
+  showHealthsheet = signal<boolean>(false);
 
   toggleBiometrics() {
     this.isBiometricsExpanded.update(v => !v);

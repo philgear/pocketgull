@@ -26,14 +26,14 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
   selector: 'app-analysis-container',
   standalone: true,
   host: {
-    'class': 'flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden'
+    'class': 'flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]'
   },
   imports: [CommonModule, AnalysisReportComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent],
   template: `
-    <div class="flex flex-col flex-1 h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
+    <div class="flex flex-col flex-1 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)] bg-[#F3F4F6] dark:bg-zinc-950">
       
       <!-- Main Content Container -->
-      <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden">
+      <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]">
         
         <!-- Top Toolbar / Header -->
         @if (!state.isEmergencyMode()) {
@@ -131,25 +131,19 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
                   </button>
                 </div>
 
-                <!-- Footer Cache Clear & Refresh Analysis Actions -->
+                <!-- Footer Refresh Analysis & PAIR Data Card Actions -->
                 <div class="flex items-center gap-2">
-                  <button type="button" (click)="intelligence.clearCache()"
-                    title="Clear AI completion cache and force model re-inference"
-                    class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 hover:bg-red-500/20">
-                    <span>🗑️ Clear Cache</span>
-                  </button>
-
-                  <button type="button" (click)="triggerAnalysisGenerate()"
+                  <button id="tour-generate-btn" type="button" (click)="triggerAnalysisGenerate()"
                     [disabled]="intelligence.isLoading()"
-                    class="px-3.5 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500 disabled:opacity-50 shadow-sm">
+                    class="px-4 py-2 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500 disabled:opacity-50 shadow-md">
                     <span>🔄 Refresh Analysis</span>
                   </button>
                 </div>
 
               </div>
 
-              <!-- Metadata Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] opacity-80 hover:opacity-100 transition-opacity">
+              <!-- Metadata Grid & Isolated System Actions -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] opacity-80 hover:opacity-100 transition-opacity border-t border-zinc-200/50 dark:border-zinc-800/60 pt-3">
                 <div class="space-y-1">
                   <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">System Identification</div>
                   <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Pocket Gull Analysis Engine v 0.1</div>
@@ -158,9 +152,18 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
                   <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Analysis Metadata</div>
                   <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Generated: {{ intelligence.lastRefreshTime() | date:'yyyy.MM.dd HH:mm:ss' }}</div>
                 </div>
-                <div class="space-y-1 md:text-right">
-                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Regulatory Status</div>
-                  <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
+                <div class="space-y-1 md:text-right flex flex-col items-start md:items-end justify-between">
+                  <div>
+                    <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Regulatory Status</div>
+                    <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
+                  </div>
+
+                  <!-- Isolated Clear Cache Button (Moved far down from Refresh Analysis) -->
+                  <button type="button" (click)="intelligence.clearCache()"
+                    title="Clear AI completion cache and force model re-inference"
+                    class="mt-2 text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:text-red-400 opacity-60 hover:opacity-100 transition flex items-center gap-1 cursor-pointer">
+                    <span>🗑️ Clear AI Cache</span>
+                  </button>
                 </div>
               </div>
 

@@ -30,6 +30,11 @@ export interface IConsciousnessState {
     waveType: 'Gamma' | 'Beta' | 'Alpha' | 'Theta' | 'Delta';
     breathingRateBpm: number;
   };
+  hawkinsCalibration: number;
+  solfeggioHz: number;
+  opticalWavelengthNm: number;
+  tcmWuXingElement: string;
+  ayurvedicChakra: string;
   clinicalRationale: string;
   tcmShenStatus: string;
   ayurvedicGuna: 'Sattva (Purity)' | 'Rajas (Action)' | 'Tamas (Rest)';
@@ -158,6 +163,22 @@ export interface IConsciousnessState {
                 stroke-linecap="round"
                 class="transition-all duration-700 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
             </svg>
+          </div>
+
+          <!-- Hawkins Scale & Tri-Paradigm Consciousness Synthesis Bar -->
+          <div class="mt-3 pt-2.5 border-t border-zinc-200 dark:border-zinc-800/80 grid grid-cols-1 sm:grid-cols-4 gap-2 text-[10.5px] font-mono">
+            <div class="px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold truncate">
+              📊 Hawkins Level: <strong>{{ selectedState().hawkinsCalibration }}</strong>
+            </div>
+            <div class="px-3 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 font-bold truncate">
+              🎧 Solfeggio: <strong>{{ selectedState().solfeggioHz }} Hz</strong>
+            </div>
+            <div class="px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold truncate">
+              💡 Optical: <strong>{{ selectedState().opticalWavelengthNm }} nm</strong>
+            </div>
+            <div class="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold truncate">
+              🧘 Chakra: <strong>{{ selectedState().ayurvedicChakra }}</strong>
+            </div>
           </div>
         </div>
 
@@ -565,6 +586,11 @@ export class MoodConsciousnessMatrixComponent implements OnDestroy {
         waveType: 'Gamma',
         breathingRateBpm: 6
       },
+      hawkinsCalibration: 400,
+      solfeggioHz: 741,
+      opticalWavelengthNm: 470,
+      tcmWuXingElement: 'Metal (Lung Qi Defense)',
+      ayurvedicChakra: 'Ajna (Third Eye)',
       clinicalRationale: 'Enhances prefrontal cortex gamma band coherence, upregulates cholinergic synaptic transmission, and sharpens executive working memory.',
       tcmShenStatus: 'Shen Bright & Focused in Heart Channel',
       ayurvedicGuna: 'Rajas (Action)'
@@ -592,6 +618,11 @@ export class MoodConsciousnessMatrixComponent implements OnDestroy {
         waveType: 'Alpha',
         breathingRateBpm: 5
       },
+      hawkinsCalibration: 500,
+      solfeggioHz: 528,
+      opticalWavelengthNm: 520,
+      tcmWuXingElement: 'Wood (Liver Qi Unbinding)',
+      ayurvedicChakra: 'Anahata (Heart)',
       clinicalRationale: 'Promotes alpha wave occipital dominance, blunts HPA axis cortisol hyper-secretion, and increases heart rate variability (HRV).',
       tcmShenStatus: 'Shen Tranquilized & Anchored',
       ayurvedicGuna: 'Sattva (Purity)'
@@ -619,6 +650,11 @@ export class MoodConsciousnessMatrixComponent implements OnDestroy {
         waveType: 'Delta',
         breathingRateBpm: 4
       },
+      hawkinsCalibration: 200,
+      solfeggioHz: 396,
+      opticalWavelengthNm: 630,
+      tcmWuXingElement: 'Water (Kidney Essence)',
+      ayurvedicChakra: 'Muladhara (Root)',
       clinicalRationale: 'Facilitates slow-wave delta sleep entry, drives glymphatic metabolic waste clearance from brain parenchyma, and resets autonomic tone.',
       tcmShenStatus: 'Shen Preserved in Kidney Essence (Jing)',
       ayurvedicGuna: 'Tamas (Rest)'
@@ -646,6 +682,11 @@ export class MoodConsciousnessMatrixComponent implements OnDestroy {
         waveType: 'Theta',
         breathingRateBpm: 6
       },
+      hawkinsCalibration: 540,
+      solfeggioHz: 639,
+      opticalWavelengthNm: 420,
+      tcmWuXingElement: 'Fire (Heart Shen Brightness)',
+      ayurvedicChakra: 'Vishuddha (Throat)',
       clinicalRationale: 'Fosters theta band hippocampal-cortical crosstalk, allowing novel associative synthesis and fluid unconstrained cognitive ideation.',
       tcmShenStatus: 'Hun (Spiritual Soul) Floating Free',
       ayurvedicGuna: 'Sattva (Purity)'
@@ -673,6 +714,11 @@ export class MoodConsciousnessMatrixComponent implements OnDestroy {
         waveType: 'Alpha',
         breathingRateBpm: 5.5
       },
+      hawkinsCalibration: 310,
+      solfeggioHz: 174,
+      opticalWavelengthNm: 590,
+      tcmWuXingElement: 'Earth (Spleen Digest)',
+      ayurvedicChakra: 'Svadhishthana (Sacral)',
       clinicalRationale: 'Calms amygdala hyper-reactivity, tonifies TCM Spleen Qi and Heart Blood, and grounds somatic anxiety into equilibrium.',
       tcmShenStatus: 'Heart Blood Nourished & Shen Rooted',
       ayurvedicGuna: 'Sattva (Purity)'

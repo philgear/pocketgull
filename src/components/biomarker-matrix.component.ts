@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, input, computed, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ThemeService } from '../services/theme.service';
 
 interface IBiomarkerStatus {
   name: string;
@@ -37,8 +38,10 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             </div>
             <div class="flex-1 min-w-0">
-              <h3 class="text-sm md:text-base font-bold text-gray-900 dark:text-emerald-50 uppercase tracking-widest">Biomarker Matrix</h3>
-              <p class="text-[10px] md:text-xs text-gray-600 dark:text-emerald-400/80 uppercase tracking-widest mt-0.5">Orthomolecular Status Detected</p>
+              <h3 class="text-sm md:text-base font-bold text-gray-900 dark:text-emerald-50 uppercase tracking-widest">
+                {{ personaBiomarkerTitle() }}
+              </h3>
+              <p class="text-[10px] md:text-xs text-gray-600 dark:text-emerald-400/80 uppercase tracking-widest mt-0.5">Orthomolecular Telemetry Status</p>
             </div>
             <!-- Global WHO/CDC toggle -->
             <label class="flex items-center gap-1.5 cursor-pointer select-none group shrink-0" title="Show WHO/CDC clinical guidelines for all biomarkers">
@@ -131,6 +134,16 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
 })
 export class BiomarkerMatrixComponent {
   reportText = input<string>('');
+  protected readonly themeService = inject(ThemeService);
+
+  readonly personaBiomarkerTitle = computed(() => {
+    const mode = this.themeService.analogyLensMode();
+    if (mode === 'arborist') return '🌳 Sap & Aquifer Biomarker Telemetry';
+    if (mode === 'mechanic') return '🏎️ Fluid Line & Compression PSI Telemetry';
+    if (mode === 'gentleman') return '🎩 Brass Governor & Etheric Dial Telemetry';
+    if (mode === 'muse') return '✨ Harmonic Solfeggio Resonance Telemetry';
+    return '🔬 Biomarker Matrix Telemetry';
+  });
 
   /** Track which biomarker guideline cards are expanded */
   private expandedGuidelines = signal<Set<string>>(new Set());

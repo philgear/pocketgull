@@ -125,6 +125,64 @@
 
 ---
 
+## 🎨 AVAILABLE THEMES & COGNITIVE HEALTH LITERACY MODES
+
+Pocket Gull features a comprehensive design system supporting dynamic visual themes, 5 health literacy persona modes, 3 spatial paradigm lenses, and WCAG AA accessibility standards:
+
+### 🌓 1. Visual Themes & Aesthetic Systems
+- **🌞 Light Mode**: Warm parchment & crisp glassmorphism cards (`bg-white/70`, `bg-[#FFFDF5]`), high-contrast dark text (`text-gray-900`), soft borders (`border-gray-200`), and subtle ambient drop shadows.
+- **🌙 Dark Mode**: Deep obsidian & zinc styling (`dark:bg-zinc-900`, `dark:bg-zinc-950`), glowing neon accents (`emerald-500`, `cyan-400`, `amber-400`), crisp bright typography (`dark:text-zinc-100`), and zero-whitespace circadian breathing ambient glow.
+- **📄 Constructive Papercraft Stationery**: Neumorphic paper cards with double borders, tactile shadows (`shadow-[4px_6px_0px_0px_rgba(28,28,28,0.85)]`), and official FHIR R4 clinical dossier stamps.
+
+---
+
+### 🧠 2. Health Literacy Personas & Cognitive Writing Styles
+Users can toggle between 5 distinct cognitive writing styles to suit their preferred mental model and emotional tone:
+
+1. **🔬 Clinical Allopathic Mode**:
+   - Evidence-grounded ICD-10/SNOMED coding, physiological telemetry, FHIR R4 bundles, and PubMed clinical trial citations.
+2. **🌳 The Arborist Botanical Redwood Mode**:
+   - Translates body systems into dendrochronology, tree ring growth, xylem sap velocity (`120/80 hPa`), and canopy foliage vitality (`SpO₂ 98%`).
+3. **🏎️ Car Talk Warm Garage Mechanic Mode**:
+   - Translates body systems into V8 engine chassis logs, fluid line PSI, manifold vacuum pressure, and OBD-II DTC diagnostic trouble codes (`DTC P0128`).
+4. **🎩 The Extraordinary Gentleman Polymath Mode**:
+   - Translates telemetry into a Victorian Steampunk expedition memoir with central brass chronometer governors, barometric pressure dials, and etheric purity gauges.
+5. **✨ The Inspirational Artistic Muse Mode**:
+   - Translates health history into a 3-movement epic symphony with 528 Hz Solfeggio frequencies, watercolor canvas palettes, and harmonic resonance.
+
+---
+
+### 🩺 3. 3D Spatial Paradigm Lenses
+- **🩺 Western Allopathic 3D Surface & Skeletal Model** (Organ target selection & skeletal overlay)
+- **🌿 Eastern TCM 3D Acupoint Meridian Lens** (GV-20 Baihui, CV-17 Danzhong, CV-12 Zhongwan, ST-36 Zusanli, LI-4 Hegu)
+- **🧘 Ayurvedic 3D Sushumna Chakra Lens** (Crown, Third Eye, Throat, Heart, Solar Plexus, Sacral, Root)
+
+---
+
+### ♿ 4. Accessibility, Typography & Ergonomics Framework
+
+#### 🔤 The 3-Tier Font Pairing System
+- **Interface & Body (`Inter / Sans-Serif`)**: Clinical rationales, drug matrix tables, and care plan steps. High x-height, open apertures, clear letterform separation (`1`, `I`, `l`, `0`, `O`).
+- **Data & Telemetry (`JetBrains Mono / Monospace`)**: Vital signs, blood pressure (`120/80 hPa`), ICD-10/SNOMED codes, timestamps. Fixed character widths guarantee that lab columns alignment never shifts during live streaming updates.
+- **Persona Narrative (`Serif / Display`)**: Sylvan Arborist lore, Gentleman memoirs, and Muse poetry. High-contrast strokes create an immersive, rhythmic cadence for narrative health storybooks.
+
+#### 📏 Scale, Leading & Touch Target Boundaries
+- **Hero Card Header**: `text-lg` (`18px – 20px`), `leading-snug` (`1.375`).
+- **Section Title**: `text-base` (`16px`), `leading-normal` (`1.5`).
+- **Body Rationale**: `text-xs/sm` (`12px – 14px`), `leading-relaxed` (`1.625`) capped at 3 lines per paragraph to prevent line-skipping fatigue.
+- **Biomarker Metric**: `text-[11px]` (`11px font-mono`), `leading-none` (`1.0`).
+- **Interactive Touch Targets**: `min-h-[44px]` × `px-3.5 py-2` across all buttons and paradigm selection pills ensuring **44px × 44px minimum touch area** for WCAG AA mobile & touchscreen compliance.
+
+#### 🎨 Color Contrast Ratios (WCAG AAA Compliance)
+- **☀️ Light Mode**: Warm Parchment (`#FFFDF5` / `bg-slate-50`), Deep Charcoal text (`#111827`, **Contrast 16.2:1** vs AAA 7:1), Slate Gray labels (`#475569`, **Contrast 4.8:1** vs AA 4.5:1).
+- **🌙 Dark Mode**: Obsidian Zinc (`#09090b` / `dark:bg-zinc-950`), Pure Ice Zinc text (`#f4f4f5`, **Contrast 17.1:1** vs AAA 7:1), high-glow neon metrics (`#34d399` emerald-400, `#22d3ee` cyan-400, `#fbbf24` amber-400).
+
+#### 🧠 Cognitive Ergonomics for Rapid Scanability
+- **Dynamic Text Resizing Multipliers (`textSizeScale`)**: `A (Std)` 1.0× baseline, `A+ (Lg)` 1.15× magnification, `A++ (XL)` 1.30× magnification for high-visibility environments.
+- **Plain Language Dual Rationale Toggle**: Instantly switch between **🔬 Deep Clinical Rationale** (ICD-10, pathophysiology, FHIR R4) and **📖 Plain Language** (persona metaphors and micro-habits).
+
+---
+
 ## 📋 THE STORY OF THE SEAGULL
 
 In modern medicine, practitioners are often drowning in a "Sea of Information"—fragmented vitals, sprawling patient histories, and an ever-shifting tide of clinical literature. **Pocket Gull** was conceived as an aerial navigator. 

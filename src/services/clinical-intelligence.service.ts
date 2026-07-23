@@ -67,7 +67,7 @@ export class ClinicalIntelligenceService {
 
     readonly recentNodes = signal<INodeContext[]>([]);
 
-    readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | null>(null);
+    readonly lastActivePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic' | null>(null);
     readonly lastPatientData = signal<string | null>(null);
 
     /**
@@ -140,7 +140,8 @@ export class ClinicalIntelligenceService {
         this.resetAIState();
         const activeName = this.patientState.patientName() || 'Patient';
         const currentPhilosophy = this.patientState.activePhilosophy() || 'western';
-        const dynamicMock = this.generateDynamicMockReport(activeName, currentPhilosophy);
+        const philKey = (currentPhilosophy === 'arborist' || currentPhilosophy === 'mechanic') ? 'western' : currentPhilosophy;
+        const dynamicMock = this.generateDynamicMockReport(activeName, philKey);
         const fullReport = { ...dynamicMock, ...report };
         this.analysisResults.set(fullReport);
         this.lastRefreshTime.set(new Date());
@@ -477,6 +478,9 @@ Recommends voluntary pre-conception carrier screening for autosomal recessive tr
             
             let report: Partial<Record<AnalysisLens, string>> = {};
 
+            const activePhilosophyRaw = this.patientState.activePhilosophy();
+            const currentPhilosophy = (activePhilosophyRaw === 'arborist' || activePhilosophyRaw === 'mechanic') ? 'western' : activePhilosophyRaw;
+
             if (activeId === 'p002') {
                 report = this.getDemoReportForPhilosophy(currentPhilosophy);
             } else {
@@ -496,7 +500,7 @@ Recommends voluntary pre-conception carrier screening for autosomal recessive tr
             
             this.analysisResults.set(report);
             this.lastPatientData.set(patientData);
-            this.lastActivePhilosophy.set(currentPhilosophy);
+            this.lastActivePhilosophy.set(activePhilosophyRaw);
             this.lastRefreshTime.set(new Date());
 
             const metrics = this.getDemoMetricsForPhilosophy(currentPhilosophy);
@@ -626,7 +630,8 @@ CRITICAL EMERGENCY RULES:
                     }
                 } catch (e: any) {
                     const patientName = this.patientState.patientName() || 'Patient';
-                    const localFallbackReport = this.generateDynamicMockReport(patientName, currentPhilosophy);
+                    const philKey = (currentPhilosophy === 'arborist' || currentPhilosophy === 'mechanic') ? 'western' : currentPhilosophy;
+                    const localFallbackReport = this.generateDynamicMockReport(patientName, philKey);
                     const fallbackContent = localFallbackReport[lens as keyof typeof localFallbackReport] || `### Local WebGPU Synthesis\nGenerated local off-grid zero-cloud care plan for ${lens}.`;
                     newReport[lens] = `${fallbackContent}\n\n*⚡ Generated via Local On-Device WebGPU Zero-Cloud Inference Engine.*`;
                     this.analysisResults.update(all => ({ ...all, [lens]: newReport[lens] }));

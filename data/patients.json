@@ -1707,6 +1707,16 @@
             ]
           }
         }
+      },
+      {
+        "type": "Y-BOCsAssessment",
+        "date": "2026.05.19",
+        "summary": "Y-BOCS Assessment completed: Moderate OCD score 18/40",
+        "assessment": {
+          "totalScore": 18,
+          "severityCategory": "Moderate",
+          "dateCreated": "2026-05-19T14:30:00Z"
+        }
       }
     ],
     "bookmarks": [],
@@ -2205,7 +2215,7 @@
       "Mild Sleep Apnea",
       "Google Health Integration"
     ],
-    "patientGoals": "",
+    "patientGoals": "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
     "tcmIntake": {
       "tongueColor": "pink",
       "tongueCoating": "thin-white",
@@ -2213,38 +2223,109 @@
       "thermalPreference": "neutral",
       "sweatPattern": "normal",
       "tasteInMouth": "normal",
-      "tcmPattern": "Balanced Qi & Blood Flow"
+      "tcmPattern": "Zang-Fu Balance with Mild Liver Qi Constriction (Executive Stress)"
     },
     "ayurvedicIntake": {
-      "prakritiVata": 4,
-      "prakritiPitta": 3,
+      "prakritiVata": 3,
+      "prakritiPitta": 5,
       "prakritiKapha": 3,
-      "vikritiVata": 5,
-      "vikritiPitta": 4,
-      "vikritiKapha": 2,
+      "vikritiVata": 4,
+      "vikritiPitta": 6,
+      "vikritiKapha": 3,
       "agniType": "samagni",
-      "amaScore": 2,
-      "nadiPulseType": "swan-kapha",
-      "ashtavidhaStatus": "Balanced Tridosha State"
+      "amaScore": 1.8,
+      "nadiPulseType": "frog-pitta",
+      "ayurvedicImbalance": "Samagni Metabolic Balance with Mild Pitta Exertion"
     },
     "vitals": {
-      "bp": "",
-      "hr": "",
-      "temp": "",
-      "spO2": "",
-      "weight": "",
-      "height": "",
-      "vitC": "",
-      "vitD3": "",
-      "magnesium": "",
-      "zinc": "",
-      "b12": ""
+      "bp": "122/82",
+      "hr": "68",
+      "temp": "98.6°F",
+      "spO2": "98%",
+      "weight": "178 lbs",
+      "height": "5'10\"",
+      "vitD3": "32 ng/mL",
+      "magnesium": "2.1 mg/dL",
+      "b12": "580 pg/mL",
+      "zinc": "92 mcg/dL"
     },
-    "oxidativeStressMarkers": [],
-    "antioxidantSources": [],
-    "medications": [],
-    "biometricHistory": [],
-    "issues": {},
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "Malondialdehyde (MDA)",
+        "value": "1.8 μmol/L (Normal)"
+      },
+      {
+        "id": "2",
+        "name": "hsCRP",
+        "value": "0.9 mg/L (Optimal)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "2.4 μmol/g Hb (Optimal)"
+      },
+      {
+        "id": "2",
+        "name": "CoQ10",
+        "value": "1.1 μg/mL (Normal)"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Lisinopril",
+        "value": "10mg Daily"
+      },
+      {
+        "id": "2",
+        "name": "Magnesium Glycinate",
+        "value": "400mg PM"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2026-05-18T08:00:00Z",
+        "type": "hr",
+        "value": "70"
+      },
+      {
+        "timestamp": "2026-05-19T08:00:00Z",
+        "type": "hr",
+        "value": "69"
+      },
+      {
+        "timestamp": "2026-05-20T08:00:00Z",
+        "type": "hr",
+        "value": "68"
+      },
+      {
+        "timestamp": "2026-05-20T08:00:00Z",
+        "type": "bp",
+        "value": "122/82"
+      }
+    ],
+    "issues": {
+      "head": [
+        {
+          "id": "head",
+          "noteId": "note_phil_head_1",
+          "name": "Head & Neck",
+          "painLevel": 2,
+          "description": "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
+          "symptoms": [
+            {
+              "name": "Occidental tension headache",
+              "type": "Neurological",
+              "verified": true,
+              "timeline": "Episodic"
+            }
+          ]
+        }
+      ]
+    },
     "history": [
       {
         "type": "AnalysisRun",
@@ -2258,6 +2339,16 @@
           "Patient Education": "### Understanding Your Health Path\nWe are focusing on tuning your body's daily rhythms, syncing Fitbit metrics, and optimizing cellular nutrients to resolve evening tension.",
           "Precision Nutrients": "### Biomarker Matrix\n\n- **Magnesium**: Sub-optimal (ATP Synthesis / NMDA)\n- **Vitamin D3**: Sub-optimal (Immune / Bone)\n- **Vitamin B12**: Optimal (Methylation)\n- **Zinc**: Optimal (Immune / Hormones)",
           "PhysioNet Telemetry": "### PhysioNet 2026 Digital Signal & Electrophysiology Summary\nIntegrated EDF/PhysioNet waveform metrics captured from high-frequency BLE telemetry sensors and continuous multi-lead ECG monitoring.\n\n### Electrocardiographic Waveform Morphology\n- **QRS Interval Duration**: 88 ms (Normal baseline: < 120 ms).\n- **ST-Segment**: Neutral ST morphology across Lead II, V2, V5 (+0.02 mV deviation).\n- **QTc Interval (Fridericia)**: 412 ms (Normal baseline: < 450 ms).\n\n### Heart Rate Variability (HRV) Spectral Power Density\n- **LF/HF Ratio**: 1.25 (Balanced autonomic tone)\n- **RMSSD**: 48 ms (Good parasympathetic rebound)"
+        }
+      },
+      {
+        "type": "Y-BOCsAssessment",
+        "date": "2026.05.20",
+        "summary": "Y-BOCS Assessment completed: Subclinical OCD score 4/40",
+        "assessment": {
+          "totalScore": 4,
+          "severityCategory": "Subclinical",
+          "dateCreated": "2026-05-20T10:00:00Z"
         }
       }
     ],

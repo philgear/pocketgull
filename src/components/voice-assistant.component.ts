@@ -258,15 +258,21 @@ export interface IChatEntry {
                          <div class="w-full max-w-3xl flex flex-col gap-3 relative">
                             <!-- Smart Suggestions -->
                             @if (agentState() === 'idle') {
-                              <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
-                                     What is the most critical evidence?
+                              <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500 font-mono text-xs">
+                                 <button type="button" (click)="messageText.set('Explain my clinical health as an Arborist Tree system.'); sendMessage()" class="px-3 py-1.5 bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 rounded-xl hover:bg-emerald-900 transition-all shadow-sm flex items-center gap-1">
+                                     <span>🌳</span> Arborist Tree Consult
                                  </button>
-                                 <button type="button" (click)="messageText.set('Are there alternative interventions?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
-                                     Alternative interventions?
+                                 <button type="button" (click)="messageText.set('Explain my vitals as a Mechanic Automotive Chassis with DTC trouble codes.'); sendMessage()" class="px-3 py-1.5 bg-cyan-950/80 border border-cyan-700/60 text-cyan-300 rounded-xl hover:bg-cyan-900 transition-all shadow-sm flex items-center gap-1">
+                                     <span>🏎️</span> Mechanic Vehicle Consult
                                  </button>
-                                 <button type="button" (click)="messageText.set('Explain the clinical rationale simply.'); sendMessage()" class="hidden sm:inline-block px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-blue-500 dark:hover:text-blue-400 transition-all shadow-sm">
-                                     Explain rationale simply
+                                 <button type="button" (click)="messageText.set('Provide an erudite telemetry review as an Extraordinary Gentleman scholar.'); sendMessage()" class="px-3 py-1.5 bg-amber-950/80 border border-amber-700/60 text-amber-300 rounded-xl hover:bg-amber-900 transition-all shadow-sm flex items-center gap-1">
+                                     <span>🎩</span> Gentleman Consult
+                                 </button>
+                                 <button type="button" (click)="messageText.set('Express my physiological journey through the voice of an inspiring Artistic Muse.'); sendMessage()" class="px-3 py-1.5 bg-purple-950/80 border border-purple-700/60 text-purple-300 rounded-xl hover:bg-purple-900 transition-all shadow-sm flex items-center gap-1">
+                                     <span>✨</span> Muse Consult
+                                 </button>
+                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm">
+                                     Critical evidence?
                                  </button>
                               </div>
                             }

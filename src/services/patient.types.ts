@@ -1,5 +1,15 @@
 import { AnalysisLens } from './clinical-intelligence.service';
 
+export interface IPatientAnatomicProfile {
+  amputations: Array<'r_arm' | 'l_arm' | 'r_hand' | 'l_hand' | 'r_thigh' | 'r_shin' | 'r_foot' | 'l_thigh' | 'l_shin' | 'l_foot'>;
+  phantomLimbPain: Array<{
+    limbId: string;
+    intensity: number;
+    phantomAvsFrequencyHz: number;
+  }>;
+  customLiDARScanUrl?: string | null;
+}
+
 export const BODY_PART_NAMES: Record<string, string> = {
     'head': 'Head & Neck',
     'chest': 'Chest & Upper Torso',
@@ -230,7 +240,7 @@ export interface IPatientState {
     /** Current AI-generated AVS co-regulation protocol. */
     avsProtocol?: IAvsProtocol;
     /** Selected medical paradigm / philosophy mode. */
-    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic';
+    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic';
     /** Eastern TCM Diagnostic Intake findings. */
     tcmIntake?: ITcmIntake;
     /** Ayurvedic Tridosha & Ashtavidha Intake findings. */
@@ -281,12 +291,18 @@ export interface ITraumaFlags {
     knownTriggers: string[];
 }
 
-/**
- * Gemini-generated AVS co-regulation protocol, personalized from patient context.
- * Applied by ClinicalContextAvsService → GlobalAvsService.
- */
+export interface IAvsNarrativeStage {
+  stageNumber: number;
+  name: string; // e.g. "Stage 1: Sympathetic Induction", "Stage 2: Deep Vagal Entrainment", "Stage 3: Harmonic Integration", "Stage 4: Cognitive Awakening"
+  durationSeconds: number; // e.g. 180, 540, 240, 240
+  targetWave: 'delta' | 'theta' | 'alpha' | 'beta' | 'gamma';
+  targetHz: number; // e.g. 12, 7.83, 528, 10
+  solfeggioToneHz: number; // e.g. 174, 432, 528, 639
+  narrativeDescription: string;
+}
+
 export interface IAvsProtocol {
-    wave: 'delta' | 'theta' | 'alpha' | 'beta';
+    wave: 'delta' | 'theta' | 'alpha' | 'beta' | 'gamma';
     breathing_bpm: number;
     color_palette: 'emerald' | 'blue' | 'violet' | 'amber' | 'rose-earth';
     noise_type: 'brown' | 'pink' | 'white';
@@ -301,6 +317,12 @@ export interface IAvsProtocol {
     contraindications: string[];
     generated_at: number;
     context_hash: string;
+    /** Prescribed session duration in minutes (5-20 min range, 15 min default). */
+    session_duration_minutes?: number;
+    /** Safety auto-cutoff toggle ensuring session hard-stops when session timer expires. */
+    auto_cutoff_enabled?: boolean;
+    /** 4-Stage Therapeutic Narrative Arc Exploration. */
+    narrative_arc?: IAvsNarrativeStage[];
 }
 
 /**

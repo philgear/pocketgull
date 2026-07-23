@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
@@ -99,6 +99,55 @@ export interface IDayMealPlan {
               🍲 Full Course (30m+)
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Cephalic Phase Digestion AVS Audio Control Bar -->
+      <div class="mb-6 p-4 rounded-2xl bg-zinc-900/90 border border-emerald-500/40 relative overflow-hidden font-mono flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-lg text-emerald-300">
+            🧠
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Cephalic Phase Digestion AVS Audio Deck</span>
+              <span class="text-[9px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-black">
+                {{ activeAvsTitle() }}
+              </span>
+            </div>
+            <p class="text-[11px] text-zinc-400 font-sans mt-0.5">
+              Vagal CN-X stimulation • Solfeggio <strong>{{ activeSolfeggioHz() }}Hz</strong> + <strong>{{ activeBinauralHz() }}Hz Alpha-Theta</strong> Entrainment
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <button (click)="toggleCephalicAvs(528, 10, 'Pre-Meal Cephalic Awakening')"
+            [class]="isPlayingAvs() && activeSolfeggioHz() === 528
+              ? 'px-3 py-1.5 rounded-xl bg-emerald-500 text-zinc-950 font-bold text-xs shadow-lg transition animate-pulse cursor-pointer'
+              : 'px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-emerald-300 font-bold text-xs border border-zinc-700 transition cursor-pointer'">
+            <span>🎧 528Hz Pre-Meal</span>
+          </button>
+
+          <button (click)="toggleCephalicAvs(432, 6, 'Mindful Mastication Satiety')"
+            [class]="isPlayingAvs() && activeSolfeggioHz() === 432
+              ? 'px-3 py-1.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-xs shadow-lg transition animate-pulse cursor-pointer'
+              : 'px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-amber-300 font-bold text-xs border border-zinc-700 transition cursor-pointer'">
+            <span>🍵 432Hz Mastication</span>
+          </button>
+
+          <button (click)="toggleCephalicAvs(396, 2.5, 'Post-Prandial Rest & Digest')"
+            [class]="isPlayingAvs() && activeSolfeggioHz() === 396
+              ? 'px-3 py-1.5 rounded-xl bg-purple-500 text-zinc-950 font-bold text-xs shadow-lg transition animate-pulse cursor-pointer'
+              : 'px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-purple-300 font-bold text-xs border border-zinc-700 transition cursor-pointer'">
+            <span>🍲 396Hz Rest-Digest</span>
+          </button>
+
+          @if (isPlayingAvs()) {
+            <button (click)="stopCephalicAvs()" class="p-1.5 rounded-xl bg-red-950 text-red-300 border border-red-800 text-xs hover:bg-red-900 transition cursor-pointer">
+              ⏹ Stop
+            </button>
+          }
         </div>
       </div>
 
@@ -207,7 +256,7 @@ export interface IDayMealPlan {
     </div>
   `
 })
-export class ChronoWeeklyMealPlannerComponent {
+export class ChronoWeeklyMealPlannerComponent implements OnDestroy {
   patientState = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);
 
@@ -691,5 +740,81 @@ export class ChronoWeeklyMealPlannerComponent {
       sourceLens: 'Nutrition',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
     });
+  }
+
+  isPlayingAvs = signal<boolean>(false);
+  activeAvsTitle = signal<string>('Pre-Meal Cephalic Awakening');
+  activeSolfeggioHz = signal<number>(528);
+  activeBinauralHz = signal<number>(10);
+
+  private audioCtx: AudioContext | null = null;
+  private oscLeft: OscillatorNode | null = null;
+  private oscRight: OscillatorNode | null = null;
+  private gainNode: GainNode | null = null;
+
+  ngOnDestroy(): void {
+    this.stopCephalicAvs();
+  }
+
+  toggleCephalicAvs(solfeggioHz: number, binauralHz: number, title: string): void {
+    if (this.isPlayingAvs() && this.activeSolfeggioHz() === solfeggioHz) {
+      this.stopCephalicAvs();
+      return;
+    }
+    this.stopCephalicAvs();
+    this.startCephalicAvs(solfeggioHz, binauralHz, title);
+  }
+
+  private startCephalicAvs(solfeggioHz: number, binauralHz: number, title: string): void {
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      this.audioCtx = new AudioContextClass();
+
+      const merger = this.audioCtx.createChannelMerger(2);
+      this.gainNode = this.audioCtx.createGain();
+      this.gainNode.gain.setValueAtTime(0.12, this.audioCtx.currentTime);
+
+      this.oscLeft = this.audioCtx.createOscillator();
+      this.oscRight = this.audioCtx.createOscillator();
+
+      this.oscLeft.type = 'sine';
+      this.oscRight.type = 'sine';
+
+      this.oscLeft.frequency.setValueAtTime(solfeggioHz, this.audioCtx.currentTime);
+      this.oscRight.frequency.setValueAtTime(solfeggioHz + binauralHz, this.audioCtx.currentTime);
+
+      this.oscLeft.connect(merger, 0, 0);
+      this.oscRight.connect(merger, 0, 1);
+
+      merger.connect(this.gainNode);
+      this.gainNode.connect(this.audioCtx.destination);
+
+      this.oscLeft.start();
+      this.oscRight.start();
+
+      this.activeSolfeggioHz.set(solfeggioHz);
+      this.activeBinauralHz.set(binauralHz);
+      this.activeAvsTitle.set(title);
+      this.isPlayingAvs.set(true);
+    } catch (e) {
+      console.warn('Cephalic AVS audio playback failed', e);
+    }
+  }
+
+  stopCephalicAvs(): void {
+    if (this.oscLeft) {
+      try { this.oscLeft.stop(); this.oscLeft.disconnect(); } catch (_) {}
+      this.oscLeft = null;
+    }
+    if (this.oscRight) {
+      try { this.oscRight.stop(); this.oscRight.disconnect(); } catch (_) {}
+      this.oscRight = null;
+    }
+    if (this.audioCtx) {
+      try { this.audioCtx.close(); } catch (_) {}
+      this.audioCtx = null;
+    }
+    this.isPlayingAvs.set(false);
   }
 }

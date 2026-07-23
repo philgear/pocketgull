@@ -2,6 +2,9 @@ import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@a
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
+import { RosettaStoneAnatomyComponent } from './rosetta-stone-anatomy.component';
+import { VocalBiomarkerResonanceComponent } from './vocal-biomarker-resonance.component';
+import { ParadigmArbitrationMatrixComponent } from './paradigm-arbitration-matrix.component';
 
 export type MedicalParadigmMode = 'western' | 'functional' | 'tcm' | 'ayurveda' | 'chronobiology' | 'blend_all' | 'blend_west_tcm' | 'blend_west_ayurveda' | 'blend_tcm_ayurveda';
 
@@ -18,7 +21,7 @@ export interface IParadigmInfo {
 @Component({
   selector: 'app-paradigm-clinical-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RosettaStoneAnatomyComponent, VocalBiomarkerResonanceComponent, ParadigmArbitrationMatrixComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full mb-8 p-6 sm:p-8 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-2xl relative overflow-hidden font-sans pocket-gull-card">
@@ -96,6 +99,13 @@ export interface IParadigmInfo {
             <span>{{ p.name }}</span>
           </button>
         }
+      </div>
+
+      <!-- Impressive Paradigm Bridges Suite -->
+      <div class="space-y-6 mb-8 relative z-10 font-sans">
+        <app-rosetta-stone-anatomy />
+        <app-vocal-biomarker-resonance />
+        <app-paradigm-arbitration-matrix />
       </div>
 
       <!-- MULTI-PARADIGM BLEND VIEW (All 3 or Selected Blends) -->

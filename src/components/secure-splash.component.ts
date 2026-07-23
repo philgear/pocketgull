@@ -18,32 +18,30 @@ import { environment } from '../environments/environment';
   imports: [CommonModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <main class="fixed inset-0 z-[999] flex flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-hidden max-h-screen">
+    <main class="fixed inset-0 w-screen h-screen min-w-full min-h-full z-[999] flex flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-hidden bg-gradient-to-b from-zinc-950 via-teal-950/40 to-black">
       
-      <!-- Papercraft Layered Landscape Backdrop -->
-      <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <!-- Sun/Circadian Glow (Teal to Coral/Amber) -->
-        <div class="absolute top-[35%] left-1/2 -translate-x-1/2 w-[500px] h-[500px] sm:w-[700px] sm:h-[700px] rounded-full bg-gradient-to-r from-[#3ebc9e]/20 via-[#faa63b]/15 to-[#ef6658]/20 blur-[80px] avs-breathing-glow"></div>
-        
+      <!-- Papercraft Layered Living Breathing Landscape Backdrop -->
+      <div class="absolute inset-0 w-full h-full min-h-full overflow-hidden pointer-events-none z-0">
+        <!-- Sun/Circadian Glow (Teal to Coral/Amber) Living Breathing Pulse -->
+        <div class="absolute top-[25%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] sm:w-[900px] sm:h-[900px] rounded-full bg-gradient-to-r from-[#3ebc9e]/30 via-[#faa63b]/25 to-[#ef6658]/30 blur-[100px] avs-breathing-glow animate-pulse"></div>
 
-
-        <!-- Paper Waves (Layered vector curves representing paper hills) -->
-        <!-- Layer 1: Back Ocean Waves (46% height) -->
-        <svg class="absolute bottom-0 left-0 w-[200%] h-[46%] paper-hill-back opacity-90 wave-layer"
+        <!-- Paper Waves (Layered vector curves representing paper hills - Full Height Anchored, Zero Whitespace) -->
+        <!-- Layer 1: Back Ocean Waves (60% height) -->
+        <svg class="absolute -bottom-4 -left-[20%] w-[240%] h-[75%] paper-hill-back opacity-90 wave-layer min-w-[200vw]"
              [style.animation-duration.s]="wavePeriod() * 1.5"
              viewBox="0 0 2880 200" preserveAspectRatio="none">
           <path fill="currentColor" [attr.d]="getWavePath(1)"></path>
         </svg>
         
-        <!-- Layer 2: Mid Ocean Waves (36% height) -->
-        <svg class="absolute bottom-0 left-0 w-[200%] h-[36%] paper-hill-mid wave-layer"
+        <!-- Layer 2: Mid Ocean Waves (50% height) -->
+        <svg class="absolute -bottom-4 -left-[10%] w-[220%] h-[65%] paper-hill-mid wave-layer min-w-[200vw]"
              [style.animation-duration.s]="wavePeriod() * 1.2"
              viewBox="0 0 2880 200" preserveAspectRatio="none">
           <path fill="currentColor" [attr.d]="getWavePath(2)"></path>
         </svg>
 
-        <!-- Layer 3: Sandy Beach Front Dune (56% height) -->
-        <svg class="absolute bottom-0 left-0 w-[200%] h-[56%] paper-hill-front wave-layer"
+        <!-- Layer 3: Sandy Beach Front Dune (75% height) -->
+        <svg class="absolute -bottom-4 left-0 w-[200%] h-[80%] paper-hill-front wave-layer min-w-[200vw]"
              [style.animation-duration.s]="wavePeriod() * 0.9"
              viewBox="0 0 2880 200" preserveAspectRatio="none">
           <path fill="currentColor" [attr.d]="getWavePath(3)"></path>
@@ -271,13 +269,6 @@ import { environment } from '../environments/environment';
                     </span>
                     
                     <div class="flex flex-wrap items-center justify-center gap-2 w-full">
-                      <!-- Avian Sound Toggle -->
-                      <button type="button"
-                              (click)="toggleAvianAudio()"
-                              class="min-h-[42px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1.5 hover:bg-white dark:hover:bg-zinc-700 transition cursor-pointer shadow-2xs">
-                        🕊️ {{ isAudioPlaying() ? 'Avian Sound Active' : 'Avian Sound' }}
-                      </button>
-
                       <!-- AVS Entrainment Controller -->
                       <button type="button"
                               (click)="toggleAvs()"
@@ -298,8 +289,8 @@ import { environment } from '../environments/environment';
                     </span>
 
                     <div class="flex flex-wrap items-center justify-center gap-2 w-full">
-                      <!-- Theme Selector -->
-                      <div class="flex items-center gap-1.5">
+                      <!-- Visual Theme Selector -->
+                      <div class="flex items-center gap-1.5 flex-wrap">
                         <label for="splash-theme-select-lock" class="text-xs font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-400">
                           🎨 Theme:
                         </label>
@@ -307,14 +298,35 @@ import { environment } from '../environments/environment';
                                 [ngModel]="theme.currentTheme()"
                                 (ngModelChange)="theme.currentTheme.set($event)"
                                 class="min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                          <option value="light">☀️ Light</option>
-                          <option value="dark">🌙 Dark</option>
+                          <option value="light">☀️ Light Parchment</option>
+                          <option value="dark">🌙 Dark Obsidian</option>
+                          <option value="system">💻 System Auto</option>
                           <option value="papercraft">📦 Cardstock 3D</option>
                           <option value="hemp">🌿 Raw Hemp Paper</option>
                           <option value="rice">📜 Rice Paper (Washi)</option>
                           <option value="construction">🎨 Construction Paper</option>
+                          <option value="white-marble">🏛️ White Carrara Marble</option>
+                          <option value="black-marble">🖤 Obsidian Black Marble</option>
+                          <option value="papyrus">📜 Egyptian Papyrus</option>
+                          <option value="pool">🌊 Ocean Reflection Pool</option>
+                          <option value="mandala">🧘 Sacred Mandala</option>
                           <option value="spark">✨ Spark Mode</option>
                           <option value="calm">🧘 Serene Calm</option>
+                        </select>
+
+                        <!-- Health Literacy Persona Selector -->
+                        <label for="splash-persona-select-lock" class="text-xs font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-400 ml-1">
+                          🧠 Persona:
+                        </label>
+                        <select id="splash-persona-select-lock"
+                                [ngModel]="theme.analogyLensMode()"
+                                (ngModelChange)="theme.setAnalogyLensMode($event)"
+                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                          <option value="clinical">🔬 Clinical Allopathic</option>
+                          <option value="arborist">🌳 Sylvan Redwood Arborist</option>
+                          <option value="mechanic">🏎️ Car Talk Garage Mechanic</option>
+                          <option value="gentleman">🎩 Victorian Gentleman</option>
+                          <option value="muse">✨ 528 Hz Artistic Muse</option>
                         </select>
                       </div>
 
@@ -361,6 +373,13 @@ import { environment } from '../environments/environment';
                               [class.text-zinc-950]="petAuditory.currentMode === 'cetacean'"
                               class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
                         🐋 Cetacean
+                      </button>
+                      <button type="button"
+                              (click)="petAuditory.currentMode === 'avian' ? petAuditory.stop() : petAuditory.playAvianTherapy()"
+                              [class.bg-amber-500]="petAuditory.currentMode === 'avian'"
+                              [class.text-zinc-950]="petAuditory.currentMode === 'avian'"
+                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                        🕊️ Avian
                       </button>
                       @if (petAuditory.isCurrentlyPlaying) {
                         <button type="button"
@@ -740,43 +759,6 @@ import { environment } from '../environments/environment';
 
             </div>
           }
-
-          <!-- Animal Comfort Protocols Lock/Splash Integration -->
-          <div class="mt-3 pt-2 border-t border-zinc-200 dark:border-zinc-800/80 text-left">
-            <p class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1">
-              <svg class="w-3 h-3 text-amber-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-              Animal Comfort Protocols (Voice Activated)
-            </p>
-            <div class="flex flex-wrap gap-1">
-              <button type="button" (click)="petAuditory.playCanineHeartbeat()" 
-                [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
-                🐕 Canine
-              </button>
-              <button type="button" (click)="petAuditory.playFelinePurr()"
-                [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
-                🐈 Feline
-              </button>
-              <button type="button" (click)="petAuditory.playCetaceanTherapy()"
-                [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
-                🐋 Cetacean
-              </button>
-              <button type="button" (click)="petAuditory.playAvianTherapy()"
-                [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
-                🕊️ Avian
-              </button>
-              @if(petAuditory.isCurrentlyPlaying) {
-                <button type="button" (click)="petAuditory.stop()" class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border border-red-200 text-red-655 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all cursor-pointer">
-                  Stop
-                </button>
-              }
-            </div>
-          </div>
         </div>
 
         <!-- Emergency Bypass Button -->

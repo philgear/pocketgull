@@ -4,6 +4,7 @@ import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ExportService } from '../services/export.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
+import { ClinicalDataCardComponent } from './clinical-data-card.component';
 import { generate } from 'lean-qr';
 
 export interface IPrintPageThumbnail {
@@ -18,7 +19,7 @@ export interface IPrintPageThumbnail {
 @Component({
   selector: 'app-care-plan-print-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ClinicalDataCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-zinc-200/80 dark:border-zinc-800 shadow-xl mb-8 font-sans">
@@ -93,6 +94,26 @@ export interface IPrintPageThumbnail {
               [class.dark:text-zinc-300]="activePhilosophy() !== 'ayurvedic'"
               class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
               🟡 Ayurvedic Medicine
+            </button>
+            <button (click)="selectPhilosophy('arborist')"
+              [class.bg-emerald-700]="activePhilosophy() === 'arborist'"
+              [class.text-white]="activePhilosophy() === 'arborist'"
+              [class.bg-zinc-200]="activePhilosophy() !== 'arborist'"
+              [class.text-zinc-700]="activePhilosophy() !== 'arborist'"
+              [class.dark:bg-zinc-800]="activePhilosophy() !== 'arborist'"
+              [class.dark:text-zinc-300]="activePhilosophy() !== 'arborist'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              🌳 Arborist Order
+            </button>
+            <button (click)="selectPhilosophy('mechanic')"
+              [class.bg-cyan-600]="activePhilosophy() === 'mechanic'"
+              [class.text-white]="activePhilosophy() === 'mechanic'"
+              [class.bg-zinc-200]="activePhilosophy() !== 'mechanic'"
+              [class.text-zinc-700]="activePhilosophy() !== 'mechanic'"
+              [class.dark:bg-zinc-800]="activePhilosophy() !== 'mechanic'"
+              [class.dark:text-zinc-300]="activePhilosophy() !== 'mechanic'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              🏎️ Mechanic Inspection
             </button>
           </div>
 
@@ -388,11 +409,16 @@ export interface IPrintPageThumbnail {
               <p><strong>Resonant Breathing Cadence:</strong> {{ patientState.avsBreathingRate() }} bpm (0.1 Hz Baroreflex Vagal Tone Peak)</p>
               <p><strong>Brainwave Entrainment:</strong> {{ patientState.avsBrainwaveFrequency() | titlecase }} ({{ patientState.avsBrainwaveFrequencyHz() }} Hz)</p>
             </div>
-          } @else {
+          } @else if (currentPage.pageNumber === 4) {
             <div>
               <h2 class="text-sm font-bold border-b pb-1 mb-2">CHRONO-NUTRITION & DIETER RAMS CLINICAL MENU</h2>
               <p><strong>Circadian Pathway:</strong> BMAL1 / CLOCK Peripheral Organ Gene Synchronization</p>
               <p><strong>Prescribed Menu:</strong> 🥑 Avocado Carpaccio, 🍣 Wild Salmon with Turmeric, 🫖 Gingerol Decoction, 🫐 Blueberry Compote</p>
+            </div>
+          } @else {
+            <div class="space-y-3">
+              <h2 class="text-sm font-bold border-b pb-1 mb-2">PAIR DATA CARDS & HEALTHSHEET TRANSPARENCY (arXiv:2202.13028)</h2>
+              <app-clinical-data-card></app-clinical-data-card>
             </div>
           }
         </div>
@@ -505,6 +531,14 @@ export class CarePlanPrintPreviewComponent {
       icon: '🥑',
       previewSummary: '24-Hour Circadian meal timing clock, glycemic index ratings, and prescribed Dieter Rams clinical menu items.',
       category: 'Nutrition'
+    },
+    {
+      pageNumber: 5,
+      title: 'PAIR Data Cards & Healthsheets',
+      subtitle: 'arXiv:2202.13028 Transparency',
+      icon: '🏷️',
+      previewSummary: 'Dataset provenance, subgroup fairness metrics, missingness ratio, and human clinician verification mandate.',
+      category: 'Summary'
     }
   ];
 
@@ -512,7 +546,7 @@ export class CarePlanPrintPreviewComponent {
     this.isEditBoxOpen.update(v => !v);
   }
 
-  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
+  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic') {
     this.patientState.selectPhilosophy(philosophy);
   }
 
