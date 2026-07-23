@@ -1,0 +1,208 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "CLI: Interactive 510(k) Terminal",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/gull.js",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "Flutter: Patient App (Default)",
+      "request": "launch",
+      "type": "dart",
+      "program": "companion-apps/patient_app/lib/main.dart"
+    },
+    {
+      "name": "Flutter: Patient App (Local API)",
+      "request": "launch",
+      "type": "dart",
+      "program": "companion-apps/patient_app/lib/main.dart",
+      "toolArgs": [
+        "--dart-define=API_URL=http://127.0.0.1:4200/api"
+      ]
+    },
+    {
+      "name": "Flutter: Provider App (Default)",
+      "request": "launch",
+      "type": "dart",
+      "program": "companion-apps/provider_app/lib/main.dart"
+    },
+    {
+      "name": "Flutter: Provider App (Local API)",
+      "request": "launch",
+      "type": "dart",
+      "program": "companion-apps/provider_app/lib/main.dart",
+      "toolArgs": [
+        "--dart-define=API_URL=http://127.0.0.1:4200/api"
+      ]
+    },
+    {
+      "name": "Node: Express Server (Cloud/Healthcare)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/server.js",
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "4200",
+        "SKIP_HEALTHCARE_PROVISION": "false"
+      }
+    },
+    {
+      "name": "Node: Express Server (Offline/Mock)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/server.js",
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "development",
+        "PORT": "4200",
+        "SKIP_HEALTHCARE_PROVISION": "true",
+        "GEMINI_API_KEY": "offline_dummy_key_for_testing"
+      }
+    },
+    {
+      "name": "Web: Launch Chrome against Localhost",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Web: Attach to Existing Chrome (Port 9222)",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Web: Launch Docs (Astro Study)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4321",
+      "webRoot": "${workspaceFolder}/docs/study",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Theme Debug: 🌊 Ocean Pool Float (?theme=pool)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=pool",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Theme Debug: 📜 Papyrus Illuminated (?theme=papyrus)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=papyrus",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Theme Debug: 🌾 Rice Papercraft (?theme=rice)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=rice",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Theme Debug: 🏛️ White Marble (?theme=white-marble)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=white-marble",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Theme Debug: 🖤 Black Marble (?theme=black-marble)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=black-marble",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Theme Debug: 🔥 Spark Ember (?theme=spark)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=spark",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Theme Debug: 🧘 Solfeggio Mandala (?theme=mandala)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=mandala",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Persona Debug: 🌳 Sylvan Arborist (?lens=arborist)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?lens=arborist",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Persona Debug: 🏎️ Garage Mechanic (?lens=mechanic)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?lens=mechanic",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Persona Debug: 🎩 Victorian Gentleman (?lens=gentleman)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?lens=gentleman",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Persona Debug: ✨ Solfeggio Muse (?lens=muse)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?lens=muse",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    },
+    {
+      "name": "Persona Debug: 🔬 Clinical Specialist (?lens=clinical)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?lens=clinical",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack: Express (Offline) & Chrome",
+      "configurations": [
+        "Node: Express Server (Offline/Mock)",
+        "Web: Launch Chrome against Localhost"
+      ]
+    },
+    {
+      "name": "Full Stack: Express (Cloud) & Chrome",
+      "configurations": [
+        "Node: Express Server (Cloud/Healthcare)",
+        "Web: Launch Chrome against Localhost"
+      ]
+    }
+  ]
+}
