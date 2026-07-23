@@ -182,10 +182,34 @@ import { generate } from 'lean-qr';
 
               <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 font-mono space-y-1 print:bg-slate-50 print:border-slate-300">
                 <span class="text-purple-300 font-bold block print:text-slate-900">CoQ10 Ubiquinol</span>
-                <span class="text-zinc-400 text-[11px]">100mg daily · Mitochondrial Bioenergetics</span>
+                <span class="text-zinc-400 text-[11px]">200mg morning · Mitochondrial Substrate</span>
               </div>
             </div>
           </div>
+
+          <!-- Section 4: FHIR DeviceRequest / Active Prescribed Clinical Apps & Interventions -->
+          @if (patientState.prescribedToolsList().length > 0) {
+            <div class="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-3 font-sans print:bg-white print:border-slate-300">
+              <div class="flex items-center justify-between border-b border-zinc-800 pb-2.5 font-mono print:border-slate-300">
+                <span class="text-xs font-bold uppercase text-emerald-400 print:text-slate-900">📱 Prescribed Clinical Apps & Digital Therapeutics ({{ patientState.prescribedToolsList().length }})</span>
+                <span class="text-[9.5px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  FHIR DeviceRequest / CarePlan
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                @for (tool of patientState.prescribedToolsList(); track tool.id) {
+                  <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center gap-3 print:bg-slate-50 print:border-slate-300">
+                    <span class="text-xl shrink-0">{{ tool.icon }}</span>
+                    <div class="overflow-hidden">
+                      <strong class="block text-xs font-bold text-zinc-100 print:text-slate-900 truncate">{{ tool.name }}</strong>
+                      <span class="text-[10px] text-emerald-400 font-mono uppercase font-bold block">{{ tool.category }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
 
         </div>
 

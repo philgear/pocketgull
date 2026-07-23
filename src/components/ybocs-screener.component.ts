@@ -45,21 +45,33 @@ import { SymptomItem } from '../services/ybocs/types';
 
       <!-- Action Control Row -->
       <div class="flex flex-wrap gap-3">
+        <button (click)="saveAssessmentToTimeline()"
+          class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold uppercase tracking-wider text-xs transition shadow hover:shadow-md active:scale-95 cursor-pointer">
+          <span>💾 Commit Assessment to FHIR Timeline</span>
+        </button>
+
         <button (click)="triggerMindfulMacawVoiceInterview()"
-          class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold uppercase tracking-wider text-xs transition shadow hover:shadow-md active:scale-95">
-          <span>🎙️ Start Voice-First Interview</span>
+          class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold uppercase tracking-wider text-xs transition shadow hover:shadow-md active:scale-95 cursor-pointer">
+          <span>🎙️ Voice-First Interview</span>
         </button>
         
         <button (click)="openSomaticGroundingMode()"
-          class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wider text-xs transition shadow hover:shadow-md active:scale-95">
+          class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold uppercase tracking-wider text-xs transition shadow hover:shadow-md active:scale-95 cursor-pointer">
           <span>🧘 Somatic Grounding Loop</span>
         </button>
 
         <button (click)="ybocs.resetAssessment()"
-          class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider text-xs transition active:scale-95">
+          class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider text-xs transition active:scale-95 cursor-pointer">
           <span>🗑️ Reset Form</span>
         </button>
       </div>
+
+      @if (saveSuccessMessage()) {
+        <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-700 dark:text-emerald-300 text-xs font-mono font-bold flex items-center justify-between animate-in fade-in duration-200">
+          <span>✅ {{ saveSuccessMessage() }}</span>
+          <button (click)="saveSuccessMessage.set(null)" class="text-xs text-emerald-400 hover:text-emerald-200">✕</button>
+        </div>
+      }
 
       <!-- Main Columns: Checklist vs Severity -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -157,15 +169,15 @@ import { SymptomItem } from '../services/ybocs/types';
                       [class.dark:border-violet-850]="getSelectedScore(q.id) === opt.score"
                       [class.border-zinc-200]="getSelectedScore(q.id) !== opt.score"
                       [class.dark:border-zinc-850]="getSelectedScore(q.id) !== opt.score"
-                      class="flex items-start text-left p-2 border rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900/30 transition text-xs">
+                      class="flex items-start text-left p-2 border rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900/30 transition text-xs">
                       
                       <!-- Radio dot indicator -->
-                      <span class="w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 mr-2.5 mt-0.5"
+                      <span class="w-3.5 h-3.5 rounded-sm border flex items-center justify-center shrink-0 mr-2.5 mt-0.5"
                         [class.border-violet-600]="getSelectedScore(q.id) === opt.score"
                         [class.border-zinc-300]="getSelectedScore(q.id) !== opt.score"
                         [class.dark:border-zinc-700]="getSelectedScore(q.id) !== opt.score">
                         @if (getSelectedScore(q.id) === opt.score) {
-                          <span class="w-1.5 h-1.5 rounded-full bg-violet-600"></span>
+                          <span class="w-1.5 h-1.5 rounded-sm bg-violet-600"></span>
                         }
                       </span>
 
@@ -200,10 +212,21 @@ export class YbocsScreenerComponent {
   readonly ybocs = inject(YbocsService);
 
   readonly activeChecklistTab = signal<'obsessions' | 'compulsions'>('obsessions');
+  readonly saveSuccessMessage = signal<string | null>(null);
 
   readonly categories = symptomCategories;
   readonly items = symptomItems;
   readonly questions = severityQuestions;
+
+  saveAssessmentToTimeline() {
+    this.ybocs.saveCurrentAssessment();
+    const score = this.ybocs.totalScore();
+    const severity = this.ybocs.severityDetails().name;
+    this.saveSuccessMessage.set(`Y-BOCs Assessment (Score: ${score}/40 — ${severity}) committed to Patient FHIR Timeline & LocalStorage.`);
+    setTimeout(() => {
+      this.saveSuccessMessage.set(null);
+    }, 6000);
+  }
 
   readonly activeCategories = computed(() => {
     const isObs = this.activeChecklistTab() === 'obsessions';

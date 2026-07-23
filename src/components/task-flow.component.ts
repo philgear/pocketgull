@@ -26,16 +26,16 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
               <button (click)="activeView.set('collab')" [class.text-gray-400]="activeView() !== 'collab'" [class.dark:text-zinc-500]="activeView() !== 'collab'" class="text-xl font-medium text-[#1C1C1C] dark:text-zinc-100 transition-colors hover:text-[#1C1C1C] dark:hover:text-zinc-100 flex items-center gap-2">
                 Colleague Chat
                 <span class="flex -space-x-2">
-                  <div class="w-6 h-6 rounded-full bg-blue-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[12px] font-bold text-blue-700 z-20 shadow-sm">SC</div>
-                  <div class="w-6 h-6 rounded-full bg-indigo-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[12px] font-bold text-indigo-700 z-10 shadow-sm">JT</div>
+                  <div class="w-6 h-6 rounded-md bg-blue-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[12px] font-bold text-blue-700 z-20 shadow-sm">SC</div>
+                  <div class="w-6 h-6 rounded-md bg-indigo-100 border-2 border-white dark:border-[#09090b] flex items-center justify-center text-[12px] font-bold text-indigo-700 z-10 shadow-sm">JT</div>
                 </span>
               </button>
             </div>
           </div>
         </div>
         <div class="flex flex-col items-end gap-1 sm:gap-2">
-            <div class="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-[#689f38]/10 rounded-full border border-green-100 dark:border-[#689f38]/30">
-              <div class="w-1.5 h-1.5 rounded-full bg-green-500 dark:bg-[#689f38] animate-pulse"></div>
+            <div class="flex items-center gap-1.5 px-2 py-1 bg-green-50 dark:bg-[#689f38]/10 rounded-md border border-green-100 dark:border-[#689f38]/30">
+              <div class="w-1.5 h-1.5 rounded-full status-dot bg-green-500 dark:bg-[#689f38] animate-pulse"></div>
               <span class="text-[12px] sm:text-xs font-medium text-green-700 dark:text-[#689f38] uppercase tracking-wide">Live</span>
             </div>
             <div class="text-[12px] sm:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-widest text-right">

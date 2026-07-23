@@ -16,75 +16,86 @@ export interface ISolfeggioFrequency {
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="mb-8 p-6 sm:p-8 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl font-mono relative overflow-hidden">
+    <div class="relative w-full mb-8 p-5 sm:p-7 bg-[#F9F3D9] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 rounded-2xl border-2 border-[#F6B12B] dark:border-[#F6B12B]/80 shadow-[4px_6px_0px_0px_rgba(28,28,28,0.85)] font-mono overflow-hidden pocket-gull-card">
       
+      <!-- Background Texture & Papercraft Overlay -->
+      <div class="absolute inset-0 opacity-15 pointer-events-none mix-blend-multiply bg-[radial-gradient(#1c1c1c_1px,transparent_1px)] [background-size:12px_12px]"></div>
+
       <!-- Top Bar Header -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5 mb-6">
-        <div>
-          <div class="flex items-center gap-2.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]"></span>
-            <h3 class="text-xs font-black uppercase tracking-widest text-zinc-100">
-              🔊 Polyphonic Solfeggio & AVS Brainwave Frequency Deck
-            </h3>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-orange-400 border border-zinc-800 uppercase">
-              Web Audio Synthesizer
-            </span>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-2 border-dashed border-[#1C1C1C]/20 dark:border-zinc-800 pb-5 mb-6">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-xl bg-[#F6B12B] text-zinc-950 border-2 border-[#1C1C1C] flex items-center justify-center text-2xl shadow-[2px_2px_0px_0px_rgba(28,28,28,0.9)] animate-bounce shrink-0">
+            🎵
           </div>
-          <p class="text-xs text-zinc-400 mt-1 font-mono">
-            Select therapeutic sound frequencies to stimulate parasympathetic vagal tone and entrain cortical oscillations.
-          </p>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-mono font-extrabold uppercase tracking-widest text-[#EF6658] dark:text-orange-400">Avian Audio Entrainment</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#F6B12B] text-zinc-950 font-bold tracking-wider uppercase border border-[#1C1C1C]">
+                Swoop ⚡ Dispatch
+              </span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-white dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 border border-[#1C1C1C] uppercase">
+                Web Audio Synthesizer
+              </span>
+            </div>
+            <h3 class="text-base sm:text-lg font-black uppercase tracking-tight text-[#1C1C1C] dark:text-zinc-100 mt-1">
+              Polyphonic Solfeggio & AVS Brainwave Frequency Deck
+            </h3>
+            <p class="text-xs sm:text-sm text-[#1C1C1C]/70 dark:text-zinc-400 mt-0.5 font-sans leading-relaxed">
+              Select therapeutic sound frequencies to stimulate parasympathetic vagal tone and entrain cortical oscillations.
+            </p>
+          </div>
         </div>
 
         <!-- Master Playback Control Button -->
         <button (click)="togglePlay()"
           [class]="isPlaying()
-            ? 'px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-rose-400/30 flex items-center gap-2 shadow-md'
-            : 'px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 font-bold text-xs uppercase tracking-wider transition cursor-pointer border border-orange-400/50 flex items-center gap-2 shadow-md'">
+            ? 'px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider transition cursor-pointer border-2 border-[#1C1C1C] shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)] flex items-center gap-2'
+            : 'px-5 py-3 rounded-xl bg-[#F6B12B] text-zinc-950 font-black text-xs sm:text-sm uppercase tracking-wider transition hover:scale-105 active:scale-95 cursor-pointer border-2 border-[#1C1C1C] shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)] flex items-center gap-2'">
           <span>{{ isPlaying() ? '⏸ Stop Audio Deck' : '▶ Play Selected Frequency' }}</span>
         </button>
       </div>
 
       <!-- Frequency Preset Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         @for (item of presetFrequencies; track item.freqHz) {
           <div (click)="selectFrequency(item)"
             [class]="selectedFreq().freqHz === item.freqHz
-              ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 cursor-pointer transition shadow-md'
-              : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 cursor-pointer transition'">
+              ? 'p-5 rounded-2xl bg-[#F6B12B] text-zinc-950 border-2 border-[#1C1C1C] cursor-pointer transition shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)]'
+              : 'p-5 rounded-2xl bg-[#FFFFFF] dark:bg-zinc-900 border-2 border-[#1C1C1C] text-[#1C1C1C] dark:text-zinc-100 hover:bg-[#F6B12B]/20 cursor-pointer transition shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] sub-panel'">
             
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xl">{{ item.emoji }}</span>
-              <span class="text-[9.5px] font-bold px-2 py-0.5 rounded bg-zinc-950 text-orange-400 border border-zinc-800 uppercase font-mono">
+              <span class="text-2xl">{{ item.emoji }}</span>
+              <span class="text-xs font-black px-2.5 py-0.5 rounded-full bg-white text-zinc-950 border border-[#1C1C1C] uppercase font-mono">
                 {{ item.freqHz }} Hz
               </span>
             </div>
 
-            <h4 class="text-xs font-bold text-zinc-100 uppercase tracking-tight font-mono mb-1">{{ item.name }}</h4>
-            <p class="text-[11px] text-zinc-400 font-sans leading-relaxed">
+            <h4 class="text-xs font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight font-mono mb-1">{{ item.name }}</h4>
+            <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans leading-relaxed">
               {{ item.description }}
             </p>
           </div>
         }
       </div>
 
-      <!-- Volume & Oscillator Controls (Braun Industrial Instrument Style) -->
-      <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-wrap items-center justify-between gap-4 font-mono text-xs">
+      <!-- Volume & Oscillator Controls -->
+      <div class="relative z-10 p-5 rounded-2xl border-2 border-[#1C1C1C] bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 flex flex-wrap items-center justify-between gap-4 font-mono text-xs shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] sub-panel">
         <div class="flex items-center gap-3">
-          <label for="solfeggio-volume-slider" class="text-zinc-400 uppercase tracking-widest text-[10px]">Volume Level:</label>
+          <label for="solfeggio-volume-slider" class="text-[#1C1C1C] dark:text-zinc-200 uppercase tracking-widest text-xs font-black">Volume Level:</label>
           <input id="solfeggio-volume-slider" name="solfeggioVolume" aria-label="Solfeggio Harmonic Audio Volume Level" type="range" min="0" max="100" step="5" [value]="volumePercent()" (input)="setVolume($event)"
-            class="w-32 h-2 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-orange-500 border border-zinc-800" />
-          <span class="text-orange-400 font-bold text-[11px]">{{ volumePercent() }}%</span>
+            class="w-36 h-2.5 bg-zinc-200 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#1C1C1C] border border-[#1C1C1C]" />
+          <span class="text-orange-600 dark:text-orange-400 font-black text-xs">{{ volumePercent() }}%</span>
         </div>
 
         <div class="flex items-center gap-3">
-          <span class="text-zinc-400 uppercase tracking-widest text-[10px]">Active Sound Status:</span>
+          <span class="text-[#1C1C1C]/70 dark:text-zinc-400 uppercase tracking-widest text-xs font-bold">Active Sound Status:</span>
           @if (isPlaying()) {
-            <span class="text-orange-400 font-bold animate-pulse flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+            <span class="text-orange-700 dark:text-orange-400 font-black animate-pulse flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
               Synthesizing {{ selectedFreq().freqHz }} Hz Sine Wave...
             </span>
           } @else {
-            <span class="text-zinc-500 font-bold">Standby Mode</span>
+            <span class="text-[#1C1C1C]/60 dark:text-zinc-400 font-bold">Standby Mode</span>
           }
         </div>
       </div>

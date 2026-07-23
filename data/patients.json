@@ -13,6 +13,27 @@
       "Metabolic Syndrome"
     ],
     "patientGoals": "Discuss CPAP compliance issues and weight management strategies.",
+    "tcmIntake": {
+      "tongueColor": "pale",
+      "tongueCoating": "thick-white",
+      "pulseQuality": "slippery",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "spontaneous-day",
+      "tasteInMouth": "bland",
+      "tcmPattern": "Spleen Qi Deficiency with Phlegm-Damp Accumulation"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 3,
+      "prakritiPitta": 4,
+      "prakritiKapha": 8,
+      "vikritiVata": 4,
+      "vikritiPitta": 5,
+      "vikritiKapha": 9,
+      "agniType": "mandagni",
+      "amaScore": 7.2,
+      "nadiPulseType": "swan-kapha",
+      "ayurvedicImbalance": "Kapha Agni Suppression & Medas Dhatu Stagnation"
+    },
     "vitals": {
       "bp": "152/95",
       "hr": "88",
@@ -1388,6 +1409,27 @@
       "Vitamin D Deficiency"
     ],
     "patientGoals": "Extend relapse-free interval, manage fatigue without additional sedating medications, preserve cognitive function, and explore integrative approaches alongside DMT.",
+    "tcmIntake": {
+      "tongueColor": "pale",
+      "tongueCoating": "peeled",
+      "pulseQuality": "deep-thready",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "night-sweats",
+      "tasteInMouth": "normal",
+      "tcmPattern": "Liver & Kidney Yin Deficiency with Internal Wind & Jing Depletion"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 7,
+      "prakritiPitta": 5,
+      "prakritiKapha": 2,
+      "vikritiVata": 9,
+      "vikritiPitta": 6,
+      "vikritiKapha": 2,
+      "agniType": "vishamagni",
+      "amaScore": 6.8,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata Resurgence in Majja Dhatu (Nerve Sheath)"
+    },
     "vitals": {
       "bp": "108/68",
       "hr": "76",
@@ -1685,6 +1727,27 @@
       "PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge"
     ],
     "patientGoals": "Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.",
+    "tcmIntake": {
+      "tongueColor": "purple",
+      "tongueCoating": "peeled",
+      "pulseQuality": "choppy",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "night-sweats",
+      "tasteInMouth": "bitter",
+      "tcmPattern": "Traumatic Blood Stasis with Kidney Yin & Jing Depletion"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 6,
+      "prakritiPitta": 7,
+      "prakritiKapha": 2,
+      "vikritiVata": 9,
+      "vikritiPitta": 8,
+      "vikritiKapha": 2,
+      "agniType": "vishamagni",
+      "amaScore": 8.5,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata-Pitta Aggravation in Asthi & Majja Dhatu"
+    },
     "vitals": {
       "bp": "115/75",
       "hr": "82",
@@ -1838,6 +1901,27 @@
       "PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge"
     ],
     "patientGoals": "Stabilize acute head injury, wound care, and address neck stiffness.",
+    "tcmIntake": {
+      "tongueColor": "purple",
+      "tongueCoating": "thick-white",
+      "pulseQuality": "wiry",
+      "thermalPreference": "neutral",
+      "sweatPattern": "spontaneous-day",
+      "tasteInMouth": "metallic",
+      "tcmPattern": "Acute Traumatic Qi & Blood Stagnation in Du Mai Channel"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 5,
+      "prakritiPitta": 6,
+      "prakritiKapha": 3,
+      "vikritiVata": 9,
+      "vikritiPitta": 7,
+      "vikritiKapha": 3,
+      "agniType": "vishamagni",
+      "amaScore": 7.9,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata Wind Collapse in Pranavaha & Majjavaha Srotas"
+    },
     "vitals": {
       "bp": "110/70",
       "hr": "64",
@@ -2121,25 +2205,117 @@
       "Mild Sleep Apnea",
       "Google Health Integration"
     ],
-    "patientGoals": "",
-    "vitals": {
-      "bp": "",
-      "hr": "",
-      "temp": "",
-      "spO2": "",
-      "weight": "",
-      "height": "",
-      "vitC": "",
-      "vitD3": "",
-      "magnesium": "",
-      "zinc": "",
-      "b12": ""
+    "patientGoals": "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
+    "tcmIntake": {
+      "tongueColor": "pink",
+      "tongueCoating": "thin-white",
+      "pulseQuality": "normal",
+      "thermalPreference": "neutral",
+      "sweatPattern": "normal",
+      "tasteInMouth": "normal",
+      "tcmPattern": "Zang-Fu Balance with Mild Liver Qi Constriction (Executive Stress)"
     },
-    "oxidativeStressMarkers": [],
-    "antioxidantSources": [],
-    "medications": [],
-    "biometricHistory": [],
-    "issues": {},
+    "ayurvedicIntake": {
+      "prakritiVata": 3,
+      "prakritiPitta": 5,
+      "prakritiKapha": 3,
+      "vikritiVata": 4,
+      "vikritiPitta": 6,
+      "vikritiKapha": 3,
+      "agniType": "samagni",
+      "amaScore": 1.8,
+      "nadiPulseType": "frog-pitta",
+      "ayurvedicImbalance": "Samagni Metabolic Balance with Mild Pitta Exertion"
+    },
+    "vitals": {
+      "bp": "122/82",
+      "hr": "68",
+      "temp": "98.6°F",
+      "spO2": "98%",
+      "weight": "178 lbs",
+      "height": "5'10\"",
+      "vitD3": "32 ng/mL",
+      "magnesium": "2.1 mg/dL",
+      "b12": "580 pg/mL",
+      "zinc": "92 mcg/dL"
+    },
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "Malondialdehyde (MDA)",
+        "value": "1.8 μmol/L (Normal)"
+      },
+      {
+        "id": "2",
+        "name": "hsCRP",
+        "value": "0.9 mg/L (Optimal)"
+      }
+    ],
+    "antioxidantSources": [
+      {
+        "id": "1",
+        "name": "Glutathione (GSH)",
+        "value": "2.4 μmol/g Hb (Optimal)"
+      },
+      {
+        "id": "2",
+        "name": "CoQ10",
+        "value": "1.1 μg/mL (Normal)"
+      }
+    ],
+    "medications": [
+      {
+        "id": "1",
+        "name": "Lisinopril",
+        "value": "10mg Daily"
+      },
+      {
+        "id": "2",
+        "name": "Magnesium Glycinate",
+        "value": "400mg PM"
+      }
+    ],
+    "biometricHistory": [
+      {
+        "timestamp": "2026-05-18T08:00:00Z",
+        "type": "hr",
+        "value": "70"
+      },
+      {
+        "timestamp": "2026-05-19T08:00:00Z",
+        "type": "hr",
+        "value": "69"
+      },
+      {
+        "timestamp": "2026-05-20T08:00:00Z",
+        "type": "hr",
+        "value": "68"
+      },
+      {
+        "timestamp": "2026-05-20T08:00:00Z",
+        "type": "bp",
+        "value": "122/82"
+      }
+    ],
+    "issues": {
+      "head": [
+        {
+          "id": "head",
+          "noteId": "note_phil_head_1",
+          "name": "Head & Neck",
+          "painLevel": 2,
+          "description": "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
+          "symptoms": [
+            {
+              "name": "Occidental tension headache",
+              "type": "Neurological",
+              "verified": true,
+              "timeline": "Episodic"
+            }
+          ]
+        }
+      ]
+    },
     "history": [
       {
         "type": "AnalysisRun",
@@ -2168,11 +2344,11 @@
       }
     ],
     "dietaryProtocol": "",
+    "activePhilosophy": "western",
     "dynamicNutrients": [],
     "clinicalNotes": [],
     "checklist": [],
     "shoppingList": [],
-    "activePhilosophy": "western",
     "ayurvedicStatus": {}
   }
 ]

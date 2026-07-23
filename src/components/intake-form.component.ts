@@ -249,6 +249,134 @@ interface INoteTimelineItem extends IBodyPartIssue {
                   }
                 </div>
 
+                <!-- 2.5 Paradigm-Focused Assessment Intake (Eastern TCM & Ayurvedic Diagnostics) -->
+                <div class="p-4 bg-gradient-to-br from-slate-50 to-indigo-50/40 dark:from-zinc-900/90 dark:to-zinc-900/50 rounded-xl border border-slate-200/80 dark:border-zinc-800 shadow-2xs space-y-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold uppercase tracking-widest text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z"/></svg>
+                        Paradigm Assessment Intake Protocol
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-white dark:bg-zinc-800 p-1 rounded-lg border border-slate-200 dark:border-zinc-700">
+                      <button type="button" (click)="state.selectPhilosophy('western')" [class.bg-indigo-600]="state.activePhilosophy() === 'western'" [class.text-white]="state.activePhilosophy() === 'western'" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded transition-colors cursor-pointer">
+                        🩺 Western
+                      </button>
+                      <button type="button" (click)="state.selectPhilosophy('eastern')" [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'" [class.text-white]="state.activePhilosophy() === 'eastern'" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded transition-colors cursor-pointer">
+                        🌿 Eastern TCM
+                      </button>
+                      <button type="button" (click)="state.selectPhilosophy('ayurvedic')" [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'" [class.text-white]="state.activePhilosophy() === 'ayurvedic'" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded transition-colors cursor-pointer">
+                        🧘 Ayurvedic
+                      </button>
+                    </div>
+                  </div>
+
+                  @if (state.activePhilosophy() === 'eastern') {
+                    <!-- Eastern TCM Si Zhen & Shi Wen Intake Panel -->
+                    <div class="space-y-3 pt-2 border-t border-slate-200/60 dark:border-zinc-800">
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 block mb-1">Tongue Body Color (Wang Zhen)</label>
+                          <select [value]="state.tcmIntake().tongueColor" (change)="updateTcmField('tongueColor', $event)" class="w-full text-xs font-semibold p-2 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-slate-900 dark:text-zinc-100">
+                            <option value="pink">Pink (Normal / Healthy)</option>
+                            <option value="pale">Pale (Qi / Blood Deficiency)</option>
+                            <option value="red">Red (Heat / Fire Pattern)</option>
+                            <option value="scarlet">Scarlet (Extreme Heat / Yin Deficiency)</option>
+                            <option value="purple">Purple (Blood Stagnation)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 block mb-1">Tongue Coating (Jihva)</label>
+                          <select [value]="state.tcmIntake().tongueCoating" (change)="updateTcmField('tongueCoating', $event)" class="w-full text-xs font-semibold p-2 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-slate-900 dark:text-zinc-100">
+                            <option value="thin-white">Thin White (Normal Baseline)</option>
+                            <option value="thick-white">Thick White (Cold-Damp Retention)</option>
+                            <option value="yellow-dry">Yellow Dry (Full Heat)</option>
+                            <option value="yellow-greasy">Yellow Greasy (Damp-Heat)</option>
+                            <option value="peeled">Peeled / Geographic (Yin Exhaustion)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 block mb-1">Radial Pulse Quality (Qie Zhen)</label>
+                          <select [value]="state.tcmIntake().pulseQuality" (change)="updateTcmField('pulseQuality', $event)" class="w-full text-xs font-semibold p-2 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-slate-900 dark:text-zinc-100">
+                            <option value="normal">Balanced Smooth Pulse</option>
+                            <option value="wiry">Wiry / Xian (Liver Qi Stagnation / Pain)</option>
+                            <option value="slippery">Slippery / Hua (Phlegm-Damp / Food Stagnation)</option>
+                            <option value="deep-thready">Deep Thready / Xi (Yin & Kidney Xu)</option>
+                            <option value="floating-rapid">Floating Rapid / Fu Shu (Exterior Wind Heat)</option>
+                            <option value="choppy">Choppy / Se (Blood Stasis / Fluid Loss)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 block mb-1">Shi Wen Thermal Preference</label>
+                          <select [value]="state.tcmIntake().thermalPreference" (change)="updateTcmField('thermalPreference', $event)" class="w-full text-xs font-semibold p-2 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-slate-900 dark:text-zinc-100">
+                            <option value="neutral">Neutral Thermal Equilibrium</option>
+                            <option value="aversion-cold">Aversion to Cold (Yang Xu)</option>
+                            <option value="aversion-heat">Aversion to Heat (Full Heat)</option>
+                            <option value="afternoon-tidal-heat">Afternoon Tidal Heat (Yin Xu)</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  } @else if (state.activePhilosophy() === 'ayurvedic') {
+                    <!-- Ayurvedic Tridosha & Ashtavidha Intake Panel -->
+                    <div class="space-y-4 pt-2 border-t border-slate-200/60 dark:border-zinc-800">
+                      <!-- Tridosha Vikriti Current Imbalance Sliders -->
+                      <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-2">Tridosha Vikriti Imbalance Assessment</div>
+                        <div class="space-y-2">
+                          <div>
+                            <div class="flex justify-between text-[11px] font-semibold text-slate-700 dark:text-zinc-300">
+                              <span>🌬️ Vata (Air/Ether) Aggravation</span>
+                              <span>{{ state.ayurvedicIntake().vikritiVata }}/10</span>
+                            </div>
+                            <input type="range" min="0" max="10" [value]="state.ayurvedicIntake().vikritiVata" (input)="updateAyurvedicField('vikritiVata', $event)" class="w-full accent-cyan-500 cursor-pointer">
+                          </div>
+                          <div>
+                            <div class="flex justify-between text-[11px] font-semibold text-slate-700 dark:text-zinc-300">
+                              <span>🔥 Pitta (Fire/Water) Aggravation</span>
+                              <span>{{ state.ayurvedicIntake().vikritiPitta }}/10</span>
+                            </div>
+                            <input type="range" min="0" max="10" [value]="state.ayurvedicIntake().vikritiPitta" (input)="updateAyurvedicField('vikritiPitta', $event)" class="w-full accent-amber-500 cursor-pointer">
+                          </div>
+                          <div>
+                            <div class="flex justify-between text-[11px] font-semibold text-slate-700 dark:text-zinc-300">
+                              <span>🌿 Kapha (Earth/Water) Aggravation</span>
+                              <span>{{ state.ayurvedicIntake().vikritiKapha }}/10</span>
+                            </div>
+                            <input type="range" min="0" max="10" [value]="state.ayurvedicIntake().vikritiKapha" (input)="updateAyurvedicField('vikritiKapha', $event)" class="w-full accent-emerald-500 cursor-pointer">
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 block mb-1">Agni Digestive Fire Status</label>
+                          <select [value]="state.ayurvedicIntake().agniType" (change)="updateAyurvedicField('agniType', $event)" class="w-full text-xs font-semibold p-2 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-slate-900 dark:text-zinc-100">
+                            <option value="samagni">Samagni (Balanced Fire)</option>
+                            <option value="vishamagni">Vishamagni (Vata Irregular / Variable)</option>
+                            <option value="tikshnagni">Tikshnagni (Pitta Hyper / Acidic Fire)</option>
+                            <option value="mandagni">Mandagni (Kapha Sluggish / Slow Fire)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 block mb-1">Ama Metabolic Toxicity Score</label>
+                          <div class="flex items-center gap-2">
+                            <input type="range" min="0" max="10" [value]="state.ayurvedicIntake().amaScore" (input)="updateAyurvedicField('amaScore', $event)" class="w-full accent-rose-500 cursor-pointer">
+                            <span class="text-xs font-bold text-rose-600 dark:text-rose-400 w-8">{{ state.ayurvedicIntake().amaScore }}/10</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="text-[11px] font-medium text-slate-600 dark:text-zinc-400 leading-relaxed pt-1">
+                      Western Allopathic Assessment active. Chief complaint, organ-contextual vitals, and ICD-10 biomarkers logged above.
+                    </div>
+                  }
+                </div>
+
                 <!-- 3. Recommendations Section -->
                 <div class="space-y-3">
                   <div class="flex justify-between items-center mb-1">
@@ -1030,6 +1158,17 @@ export class IntakeFormComponent implements OnDestroy {
     if (currentNote && currentNote.isCurrent) {
       this.state.updateIssue(currentNote.id, { ...currentNote, painLevel: val });
     }
+  }
+
+  updateTcmField(field: string, event: Event) {
+    const val = (event.target as HTMLSelectElement).value;
+    this.state.updateTcmIntake({ [field]: val });
+  }
+
+  updateAyurvedicField(field: string, event: Event) {
+    const target = event.target as HTMLInputElement | HTMLSelectElement;
+    const val = target.type === 'range' ? parseInt(target.value, 10) : target.value;
+    this.state.updateAyurvedicIntake({ [field]: val });
   }
 
   updateDesc(event: Event) {

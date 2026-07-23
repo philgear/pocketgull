@@ -238,23 +238,33 @@ const versions = [
     mermaid.initialize({ startOnLoad: false, theme: 'dark' });
 
     async function renderMermaidDiagrams() {
-      const blocks = document.querySelectorAll('pre[data-language="mermaid"]');
+      const blocks = document.querySelectorAll('pre[data-language="mermaid"], pre.mermaid, code.language-mermaid, pre:has(code.language-mermaid)');
       for (let i = 0; i < blocks.length; i++) {
         const block = blocks[i];
-        const code = block.textContent.trim();
+        if (block.classList.contains('mermaid-processed')) continue;
         
+        let code = block.textContent.trim();
+        // Standardize literal escapes for Mermaid parser
+        code = code.replace(/\\n/g, '<br/>');
+
         const container = document.createElement('div');
-        container.className = 'mermaid';
-        container.id = `mermaid-${i}`;
+        container.className = 'mermaid mermaid-processed flex justify-center my-6 overflow-x-auto p-4 bg-zinc-900/60 rounded-xl border border-zinc-800';
+        container.id = `mermaid-diagram-${i}-${Date.now()}`;
         container.textContent = code;
 
-        block.parentNode.replaceChild(container, block);
+        const target = block.tagName === 'CODE' ? block.parentNode : block;
+        target.parentNode?.replaceChild(container, target);
       }
       
-      if (document.querySelectorAll('.mermaid').length > 0) {
-        await mermaid.run({
-          nodes: document.querySelectorAll('.mermaid'),
-        });
+      const unrendered = document.querySelectorAll('.mermaid-processed:not([data-processed="true"])');
+      if (unrendered.length > 0) {
+        try {
+          await mermaid.run({
+            nodes: unrendered,
+          });
+        } catch (e) {
+          console.warn('[DocsLayout] Mermaid rendering warning:', e);
+        }
       }
     }
 

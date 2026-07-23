@@ -4,6 +4,7 @@ import { PatientStateService } from '../services/patient-state.service';
 import { IBodyPartIssue } from '../services/patient.types';
 import { PatientManagementService } from '../services/patient-management.service';
 import { Body3DViewerComponent } from './body-3d-viewer.component';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-body-viewer',
@@ -11,7 +12,7 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
   imports: [CommonModule, Body3DViewerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `    
-    <div class="flex flex-col items-center justify-center h-full w-full relative">
+    <div class="flex flex-col h-full w-full bg-slate-900/90 dark:bg-zinc-950/95 text-white rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl font-sans">
       
       <!-- Tooltip -->
       @if (tooltipVisible()) {
@@ -23,152 +24,98 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
         </div>
       }
 
-      <!-- Main Viewer Area -->
-      <div class="h-full w-full relative flex items-center justify-center overflow-hidden">
-        
-        <!-- Anatomical Search & Quick-Select Overlay (Top Left) -->
-        <div class="absolute top-4 left-4 z-30 no-print flex flex-col gap-2 max-w-[280px] sm:max-w-[340px]">
-          <!-- Search Input Bar -->
-          <div class="relative flex items-center bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border border-slate-200 dark:border-zinc-800 rounded-lg shadow-md p-1.5 transition-all focus-within:ring-2 focus-within:ring-lime-500/50">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 dark:text-zinc-500 ml-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input 
-              type="text" 
-              [value]="searchQuery()" 
-              (input)="onSearchInput($event)" 
-              placeholder="Search body part or organ (e.g. Heart, Knee)..." 
-              class="w-full bg-transparent text-xs text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 px-2 py-1 outline-none font-medium" />
-            @if (searchQuery()) {
-              <button (click)="clearSearch()" class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-zinc-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            }
-          </div>
-
-          <!-- Live Search Results & Quick System Pills -->
-          @if (isSearchOpen() || filteredParts().length > 0 && searchQuery().trim()) {
-            <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border border-[#EEEEEE] dark:border-zinc-800 rounded-lg shadow-xl overflow-hidden max-h-[220px] overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800">
-              @for (part of filteredParts(); track part.id) {
-                <button (click)="onPartSearchResultClick(part)" 
-                        class="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-lime-500/10 dark:hover:bg-lime-500/20 transition-colors group">
-                  <div class="flex items-center gap-2">
-                    <span class="text-base">{{ part.icon }}</span>
-                    <div>
-                      <div class="font-semibold text-gray-800 dark:text-zinc-200 group-hover:text-lime-600 dark:group-hover:text-lime-400">{{ part.name }}</div>
-                      <div class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider">{{ part.system }}</div>
-                    </div>
-                  </div>
-                  @if (state.hasPainfulIssue(part.id)) {
-                    <span class="text-[10px] font-extrabold bg-red-500/20 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded-full border border-red-500/30">
-                      Pain Issue
-                    </span>
-                  }
-                </button>
-              } @empty {
-                <div class="p-3 text-xs text-gray-400 dark:text-zinc-500 text-center font-medium">No matching body part found</div>
-              }
-            </div>
+      <!-- 1. Top Dedicated Header Bar (OUTSIDE 3D Canvas Window) -->
+      <div class="p-3 bg-zinc-900/90 border-b border-zinc-800/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shrink-0 no-print z-20">
+        <!-- Search Bar -->
+        <div class="relative flex items-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 w-full sm:w-72 shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 mr-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input 
+            type="text" 
+            [value]="searchQuery()" 
+            (input)="onSearchInput($event)" 
+            placeholder="Search part, organ, acupoint, chakra..." 
+            class="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 outline-none font-medium" />
+          @if (searchQuery()) {
+            <button (click)="clearSearch()" class="p-1 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           }
-
-          <!-- Quick System Category Pills -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-            <button (click)="activeSystemFilter.set('all')" [class.bg-black]="activeSystemFilter() === 'all'" [class.text-white]="activeSystemFilter() === 'all'" [class.bg-white/80]="activeSystemFilter() !== 'all'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">All</button>
-            <button (click)="activeSystemFilter.set('neuro')" [class.bg-black]="activeSystemFilter() === 'neuro'" [class.text-white]="activeSystemFilter() === 'neuro'" [class.bg-white/80]="activeSystemFilter() !== 'neuro'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">Head/Neuro</button>
-            <button (click)="activeSystemFilter.set('organ')" [class.bg-black]="activeSystemFilter() === 'organ'" [class.text-white]="activeSystemFilter() === 'organ'" [class.bg-white/80]="activeSystemFilter() !== 'organ'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">Organs</button>
-            <button (click)="activeSystemFilter.set('skeletal')" [class.bg-black]="activeSystemFilter() === 'skeletal'" [class.text-white]="activeSystemFilter() === 'skeletal'" [class.bg-white/80]="activeSystemFilter() !== 'skeletal'" class="px-2 py-1 text-[10px] font-bold uppercase rounded-md shadow-xs border border-gray-200 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">Limbs/Spine</button>
-          </div>
-        </div>
-        
-        <!-- Unified Anatomical Control HUD (Layers, Regions, 3D Orbit & Ghost Overlay) -->
-        <div class="absolute bottom-2 left-2 right-2 z-30 no-print flex flex-wrap items-center justify-between gap-1.5 bg-slate-900/90 dark:bg-zinc-950/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/60 dark:border-zinc-800 shadow-2xl max-w-[calc(100%-16px)] overflow-x-auto hide-scrollbar">
-          
-          <!-- 2D / 3D Mode & Layers Segment -->
-          <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar shrink min-w-0">
-            <!-- 2D vs 3D Viewport Selector -->
-            <div class="flex items-center bg-zinc-800/80 p-0.5 rounded-lg border border-zinc-700/50 mr-1.5">
-              <button (click)="state.bodyViewerMode.set('3d')"
-                      [class.bg-indigo-600]="state.bodyViewerMode() === '3d'"
-                      [class.text-white]="state.bodyViewerMode() === '3d'"
-                      [class.text-zinc-400]="state.bodyViewerMode() !== '3d'"
-                      class="px-2.5 py-1.5 text-[10.5px] font-mono font-bold uppercase rounded-md transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
-                <span>🧊</span> 3D
-              </button>
-              <button (click)="state.bodyViewerMode.set('2d')"
-                      [class.bg-indigo-600]="state.bodyViewerMode() === '2d'"
-                      [class.text-white]="state.bodyViewerMode() === '2d'"
-                      [class.text-zinc-400]="state.bodyViewerMode() !== '2d'"
-                      class="px-2.5 py-1.5 text-[10.5px] font-mono font-bold uppercase rounded-md transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
-                <span>🗺️</span> 2D
-              </button>
-            </div>
-
-            <!-- Anatomical Layers Pill Strip -->
-            <span class="text-[9.5px] font-mono font-extrabold text-zinc-400 uppercase tracking-widest px-1 hidden sm:inline">Layer:</span>
-            <button (click)="state.anatomyViewMode.set('skin')"
-                    [class.bg-zinc-100]="state.anatomyViewMode() === 'skin'"
-                    [class.text-zinc-950]="state.anatomyViewMode() === 'skin'"
-                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'skin'"
-                    [class.text-zinc-300]="state.anatomyViewMode() !== 'skin'"
-                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
-              <span>👤</span> Skin
-            </button>
-            <button (click)="state.anatomyViewMode.set('muscle')"
-                    [class.bg-zinc-100]="state.anatomyViewMode() === 'muscle'"
-                    [class.text-zinc-950]="state.anatomyViewMode() === 'muscle'"
-                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'muscle'"
-                    [class.text-zinc-300]="state.anatomyViewMode() !== 'muscle'"
-                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
-              <span>🦾</span> Muscle
-            </button>
-            <button (click)="state.anatomyViewMode.set('skeleton')"
-                    [class.bg-zinc-100]="state.anatomyViewMode() === 'skeleton'"
-                    [class.text-zinc-950]="state.anatomyViewMode() === 'skeleton'"
-                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'skeleton'"
-                    [class.text-zinc-300]="state.anatomyViewMode() !== 'skeleton'"
-                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
-              <span>🦴</span> Skeleton
-            </button>
-            <button (click)="state.anatomyViewMode.set('organs')"
-                    [class.bg-zinc-100]="state.anatomyViewMode() === 'organs'"
-                    [class.text-zinc-950]="state.anatomyViewMode() === 'organs'"
-                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'organs'"
-                    [class.text-zinc-300]="state.anatomyViewMode() !== 'organs'"
-                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
-              <span>🫀</span> Organ
-            </button>
-            <button (click)="state.anatomyViewMode.set('molecular')"
-                    [class.bg-zinc-100]="state.anatomyViewMode() === 'molecular'"
-                    [class.text-zinc-950]="state.anatomyViewMode() === 'molecular'"
-                    [class.bg-zinc-800\/60]="state.anatomyViewMode() !== 'molecular'"
-                    [class.text-zinc-300]="state.anatomyViewMode() !== 'molecular'"
-                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
-              <span>🔬</span> Molecular
-            </button>
-
-            <!-- Ghost Baseline Reference -->
-            <button (click)="state.showGhostOverlay.update(v => !v)"
-                    [class.bg-teal-600]="state.showGhostOverlay()"
-                    [class.text-white]="state.showGhostOverlay()"
-                    [class.bg-zinc-800\/60]="!state.showGhostOverlay()"
-                    [class.text-zinc-400]="!state.showGhostOverlay()"
-                    title="Toggle healthy baseline ghost comparison"
-                    class="px-2.5 py-1.5 text-[10px] font-mono font-bold uppercase rounded-lg border border-zinc-700\/50 transition cursor-pointer flex items-center gap-1 min-h-[36px]">
-              <span>👻</span> Ghost
-            </button>
-          </div>
         </div>
 
+        <!-- Paradigm Lens Selector Bar -->
+        <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800">
+          <button (click)="state.selectPhilosophy('western')" [class.bg-sky-600]="state.activePhilosophy() === 'western'" [class.text-white]="state.activePhilosophy() === 'western'" [class.text-zinc-400]="state.activePhilosophy() !== 'western'" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer">
+            🩺 Western
+          </button>
+          <button (click)="state.selectPhilosophy('eastern')" [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'" [class.text-white]="state.activePhilosophy() === 'eastern'" [class.text-zinc-400]="state.activePhilosophy() !== 'eastern'" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer">
+            🌿 Eastern TCM
+          </button>
+          <button (click)="state.selectPhilosophy('ayurvedic')" [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'" [class.text-white]="state.activePhilosophy() === 'ayurvedic'" [class.text-zinc-400]="state.activePhilosophy() !== 'ayurvedic'" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer">
+            🧘 Ayurvedic
+          </button>
+        </div>
+      </div>
+
+      <!-- Dynamic Paradigm Quick Selection Target Bar -->
+      <div class="py-2 px-3 bg-zinc-950/80 border-b border-zinc-800 flex items-center gap-2 overflow-x-auto text-xs z-20">
+        @if (state.activePhilosophy() === 'western') {
+          <span class="text-xs font-bold uppercase tracking-wider text-sky-400 shrink-0">🩺 Western Organs:</span>
+          <button (click)="select('head', 'Head & Brain')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🧠 Head & Brain</button>
+          <button (click)="select('heart', 'Cardiac / Heart')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🫀 Heart</button>
+          <button (click)="select('lungs', 'Pulmonary / Lungs')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🫁 Lungs</button>
+          <button (click)="select('abdomen', 'Abdomen & GI')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🟡 Abdomen</button>
+          <button (click)="select('lower_back', 'Lumbar Spine')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🦴 Spine</button>
+        } @else if (state.activePhilosophy() === 'eastern') {
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 shrink-0">☯️ TCM Acupoints:</span>
+          <button (click)="select('acupoint_gv20', 'GV-20 Baihui')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">☯️ Baihui (GV-20)</button>
+          <button (click)="select('acupoint_cv17', 'CV-17 Danzhong')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🫁 Danzhong (CV-17)</button>
+          <button (click)="select('acupoint_cv12', 'CV-12 Zhongwan')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🟡 Zhongwan (CV-12)</button>
+          <button (click)="select('acupoint_st36', 'ST-36 Zusanli')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🦵 Zusanli (ST-36)</button>
+          <button (click)="select('acupoint_li4', 'LI-4 Hegu')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">✋ Hegu (LI-4)</button>
+        } @else if (state.activePhilosophy() === 'ayurvedic') {
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-400 shrink-0">🧘 Sushumna Chakras:</span>
+          <button (click)="select('chakra_crown', 'Sahasrara (Crown)')" class="px-2.5 py-1 rounded-lg bg-purple-950/80 text-purple-200 border border-purple-800/60 hover:bg-purple-900 transition text-xs font-bold shrink-0 cursor-pointer">🟣 Crown</button>
+          <button (click)="select('chakra_third_eye', 'Ajna (Third Eye)')" class="px-2.5 py-1 rounded-lg bg-indigo-950/80 text-indigo-200 border border-indigo-800/60 hover:bg-indigo-900 transition text-xs font-bold shrink-0 cursor-pointer">🔵 Third Eye</button>
+          <button (click)="select('chakra_throat', 'Vishuddha (Throat)')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🟦 Throat</button>
+          <button (click)="select('chakra_heart', 'Anahata (Heart)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🟢 Heart</button>
+          <button (click)="select('chakra_solar', 'Manipura (Solar Plexus)')" class="px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-200 border border-amber-800/60 hover:bg-amber-900 transition text-xs font-bold shrink-0 cursor-pointer">🟡 Solar</button>
+          <button (click)="select('chakra_sacral', 'Svadhisthana (Sacral)')" class="px-2.5 py-1 rounded-lg bg-orange-950/80 text-orange-200 border border-orange-800/60 hover:bg-orange-900 transition text-xs font-bold shrink-0 cursor-pointer">🟠 Sacral</button>
+          <button (click)="select('chakra_root', 'Muladhara (Root)')" class="px-2.5 py-1 rounded-lg bg-rose-950/80 text-rose-200 border border-rose-800/60 hover:bg-rose-900 transition text-xs font-bold shrink-0 cursor-pointer">🔴 Root</button>
+        }
+      </div>
+
+      <!-- Live Search Dropdown -->
+      @if (isSearchOpen() || filteredParts().length > 0 && searchQuery().trim()) {
+        <div class="bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800 p-2 max-h-[180px] overflow-y-auto divide-y divide-zinc-800 z-30">
+          @for (part of filteredParts(); track part.id) {
+            <button (click)="onPartSearchResultClick(part)" 
+                    class="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-teal-500/20 transition-colors group">
+              <div class="flex items-center gap-2">
+                <span class="text-base">{{ part.icon }}</span>
+                <div>
+                  <div class="font-semibold text-zinc-200 group-hover:text-teal-400">{{ part.name }}</div>
+                  <div class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ part.system }}</div>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      }
+
+      <!-- 2. Center Pure Unencumbered 3D Viewport Window (ZERO Overlapping Elements) -->
+      <div class="flex-1 w-full relative min-h-[380px] overflow-hidden bg-white border border-slate-200 rounded-xl shadow-xs">
         @if (state.bodyViewerMode() === '3d') {
           @defer {
             <app-body-3d-viewer 
-              class="w-full h-full"
+              class="w-full h-full block"
               [anatomyViewMode]="state.anatomyViewMode()"
               [customModelUrl]="null"
               (partSelected)="onPartSelected($event)">
             </app-body-3d-viewer>
           } @placeholder {
-            <div class="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-4">
-              <div class="w-8 h-8 rounded-sm border-2 border-gray-300 border-t-black animate-spin"></div>
-              <p class="text-sm font-medium uppercase tracking-widest text-[#1c1c1c] opacity-50">Loading 3D Engine...</p>
+            <div class="w-full h-full flex flex-col items-center justify-center text-zinc-500 gap-4">
+              <div class="w-8 h-8 rounded-sm border-2 border-zinc-700 border-t-teal-500 animate-spin"></div>
+              <p class="text-sm font-medium uppercase tracking-widest text-zinc-400">Loading 3D Engine...</p>
             </div>
           }
         } @else {
@@ -184,7 +131,6 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
                       <path class="skeleton-path" d="M100 65 V 170 M 82 75 H 118 M 80 85 C 85 95, 85 115, 80 125 M 120 85 C 115 95, 115 115, 120 125 M 82 100 H 118 M 85 115 H 115" />
                     </g>
                     <g id="regions-2d-front">
-                      <!-- Head -->
                       <path d="M100 18 C 88 18, 82 25, 82 40 V 65 H 118 V 40 C 118 25, 112 18, 100 18 Z" 
                             [class]="getPartClass('head')" 
                             (click)="select('head', 'Head & Neck')"
@@ -193,69 +139,30 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
                     </g>
                   </g>
                 }
-
-                @if (view() === 'back') {
-                  <g id="static-anatomy-back">
-                    <path class="skin-base" [attr.d]="fullBodySkinPathBack()" [class.opacity-20]="state.anatomyViewMode() !== 'skin'" />
-                    <g class="skeleton-layer" [class.opacity-100]="state.anatomyViewMode() === 'skeleton'" [class.opacity-40]="state.anatomyViewMode() !== 'skeleton'">
-                      <path class="skeleton-path" d="M100 18 C 90 18, 85 24, 85 38 V 48 H 115 V 38 C 115 24, 110 18, 100 18 Z" />
-                      <path class="skeleton-path" d="M100 65 V 170 M90 75 L80 85 L90 110 Z M110 75 L120 85 L110 110 Z" />
-                    </g>
-                    <g id="regions-2d-back">
-                      <path d="M100 18 C 88 18, 82 25, 82 40 V 65 H 118 V 40 C 118 25, 112 18, 100 18 Z"
-                            [class]="getPartClass('head')" 
-                            (click)="select('head', 'Head & Neck (Back)')"
-                            (mousemove)="showTooltip($event, 'Head & Neck (Back)')" 
-                            (mouseleave)="hideTooltip()" />
-                    </g>
-                  </g>
-                }
               </g>
             </svg>
           </div>
+        }
+      </div>
 
-          <!-- 2D Direction Controls (Local to component as they only apply to 2D) -->
-          <div class="absolute bottom-4 right-4 flex text-[12px] font-bold tracking-widest uppercase gap-1 z-20">
-            <button (click)="view.set('front')" 
-                    class="w-8 h-8 border transition-all flex items-center justify-center rounded-sm shadow-sm"
-                    [class.bg-black]="view() === 'front'"
-                    [class.text-white]="view() === 'front'"
-                    [class.bg-white]="view() !== 'front'"
-                    [class.text-black]="view() !== 'front'">F</button>
-            <button (click)="view.set('back')" 
-                    class="w-8 h-8 border transition-all flex items-center justify-center rounded-sm shadow-sm"
-                    [class.bg-black]="view() === 'back'"
-                    [class.text-white]="view() === 'back'"
-                    [class.bg-white]="view() !== 'back'"
-                    [class.text-black]="view() !== 'back'">B</button>
+      <!-- 3. Bottom Dedicated Anatomical & Biometric Control Bar (OUTSIDE 3D Canvas Window) -->
+      <div class="p-3 bg-zinc-900/90 border-t border-zinc-800/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shrink-0 font-mono text-xs no-print z-20">
+        <!-- Viewport & Layer Switcher -->
+        <div class="flex items-center gap-2 overflow-x-auto py-1">
+          <div class="flex items-center bg-zinc-950 p-1 rounded-xl border border-zinc-800">
+            <button (click)="state.bodyViewerMode.set('3d')" [class.bg-indigo-600]="state.bodyViewerMode() === '3d'" [class.text-white]="state.bodyViewerMode() === '3d'" [class.text-zinc-400]="state.bodyViewerMode() !== '3d'" class="px-3 py-1.5 text-xs font-bold rounded-lg transition min-h-[36px] cursor-pointer">🧊 3D</button>
+            <button (click)="state.bodyViewerMode.set('2d')" [class.bg-indigo-600]="state.bodyViewerMode() === '2d'" [class.text-white]="state.bodyViewerMode() === '2d'" [class.text-zinc-400]="state.bodyViewerMode() !== '2d'" class="px-3 py-1.5 text-xs font-bold rounded-lg transition min-h-[36px] cursor-pointer">🗺️ 2D</button>
           </div>
-        }
+
+          <!-- Layers Strip -->
+          <div class="flex items-center gap-1">
+            <button (click)="state.anatomyViewMode.set('skin')" [class.bg-amber-500]="state.anatomyViewMode() === 'skin'" [class.text-zinc-950]="state.anatomyViewMode() === 'skin'" [class.bg-zinc-800]="state.anatomyViewMode() !== 'skin'" [class.text-zinc-300]="state.anatomyViewMode() !== 'skin'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-zinc-700 transition min-h-[36px] cursor-pointer">📄 Skin</button>
+            <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-teal-600]="state.anatomyViewMode() === 'muscle'" [class.text-white]="state.anatomyViewMode() === 'muscle'" [class.bg-zinc-800]="state.anatomyViewMode() !== 'muscle'" [class.text-zinc-300]="state.anatomyViewMode() !== 'muscle'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-zinc-700 transition min-h-[36px] cursor-pointer">🦾 Muscle</button>
+            <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-rose-600]="state.anatomyViewMode() === 'skeleton'" [class.text-white]="state.anatomyViewMode() === 'skeleton'" [class.bg-zinc-800]="state.anatomyViewMode() !== 'skeleton'" [class.text-zinc-300]="state.anatomyViewMode() !== 'skeleton'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-zinc-700 transition min-h-[36px] cursor-pointer">🦴 Skeleton</button>
+            <button (click)="state.anatomyViewMode.set('organs')" [class.bg-purple-600]="state.anatomyViewMode() === 'organs'" [class.text-white]="state.anatomyViewMode() === 'organs'" [class.bg-zinc-800]="state.anatomyViewMode() !== 'organs'" [class.text-zinc-300]="state.anatomyViewMode() !== 'organs'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-zinc-700 transition min-h-[36px] cursor-pointer">🫀 Organ</button>
+          </div>
+        </div>
       </div>
-
-
-
-      <!-- Manual Zoom/Reset Controls (Bottom Left) -->
-      <div class="absolute bottom-4 left-4 flex flex-col gap-2 z-20 no-print">
-         <button (click)="resetControls()" 
-                 class="p-3 bg-white border border-[#EEEEEE] hover:bg-[#F8F8F8] rounded-sm shadow-sm transition-all active:scale-95 text-gray-600 hover:text-black" 
-                 title="Reset View">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-        </button>
-        @if (state.bodyViewerMode() === '3d') {
-          <button (click)="zoomIn()" 
-                  class="p-3 bg-white border border-[#EEEEEE] hover:bg-[#F8F8F8] rounded-sm shadow-sm transition-all active:scale-95 text-gray-600 hover:text-black" 
-                  title="Zoom In">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-          </button>
-          <button (click)="zoomOut()" 
-                  class="p-3 bg-white border border-[#EEEEEE] hover:bg-[#F8F8F8] rounded-sm shadow-sm transition-all active:scale-95 text-gray-600 hover:text-black" 
-                  title="Zoom Out">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>
-          </button>
-        }
-      </div>
-
-
     </div>
   `,
   styles: [`
@@ -270,16 +177,12 @@ import { Body3DViewerComponent } from './body-3d-viewer.component';
     .skeleton-path { fill: none; stroke: #EEEEEE; stroke-width: 1.5; stroke-linecap: round; }
     .skeleton-joint { fill: #EEEEEE; }
     .highlight-anim { animation: highlight-pulse 0.5s ease-out; }
-    @keyframes highlight-pulse {
-      0% { fill: rgba(104, 159, 56, 0); stroke-width: 1; }
-      50% { fill: rgba(104, 159, 56, 0.4); stroke-width: 4; }
-      100% { fill: rgba(104, 159, 56, 0.2); stroke-width: 2; }
-    }
   `]
 })
 export class BodyViewerComponent implements OnDestroy {
   state = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);
+  themeService = inject(ThemeService);
 
   view = signal<'front' | 'back' | 'side_right' | 'side_left'>('front');
 
@@ -293,6 +196,26 @@ export class BodyViewerComponent implements OnDestroy {
   searchQuery = signal<string>('');
   isSearchOpen = signal<boolean>(false);
   activeSystemFilter = signal<string>('all');
+
+  constructor() {
+    effect(() => {
+      const philosophy = this.state.activePhilosophy();
+      if (philosophy === 'eastern') {
+        this.state.anatomyViewMode.set('eastern');
+      } else if (philosophy === 'ayurvedic') {
+        this.state.anatomyViewMode.set('ayurvedic');
+      } else {
+        this.state.anatomyViewMode.set('skin');
+      }
+    });
+
+    effect(() => {
+      const theme = this.themeService.currentTheme();
+      if (theme === 'mandala') {
+        this.state.activePhilosophy.set('ayurvedic');
+      }
+    });
+  }
 
   readonly allParts = [
     { id: 'head', name: 'Head & Brain (Cranial)', system: 'neuro', icon: '🧠' },
@@ -398,26 +321,49 @@ export class BodyViewerComponent implements OnDestroy {
   select(id: string, name: string) {
     this.tempSelectedId.set(id);
 
-    // Provide a small animation window for the flash, but update the actual state immediately
-    // so the UI can react without a race condition.
+    // 1. Auto-align active philosophy paradigm & intake fields on touch target tap
+    if (id.startsWith('acupoint_')) {
+      this.state.selectPhilosophy('eastern');
+      const current = this.state.tcmIntake();
+      this.state.updateTcmIntake({
+        ...current,
+        tcmPattern: `Selected Acupoint: ${name} (Jing-Luo Channel)`
+      });
+    } else if (id.startsWith('chakra_')) {
+      this.state.selectPhilosophy('ayurvedic');
+      const current = this.state.ayurvedicIntake();
+      this.state.updateAyurvedicIntake({
+        ...current,
+        ayurvedicImbalance: `Selected Chakra Node: ${name} (Sushumna Nadi)`
+      });
+    }
+
+    // 2. Select part and update issue notes
     this.state.selectPart(id);
     const issuesForPart = this.state.issues()[id];
 
     if (issuesForPart && issuesForPart.length > 0) {
       this.state.selectNote(issuesForPart[0].noteId);
     } else if (!this.state.viewingPastVisit()) {
-      // Create a new note only if we are taking notes for current visit
       const newNoteId = `note_${Date.now()}`;
       const newNote: IBodyPartIssue = {
         id,
         noteId: newNoteId,
         name,
-        painLevel: 0,
-        description: '',
-        symptoms: []
+        painLevel: 3,
+        description: `Targeted via ${this.state.activePhilosophy().toUpperCase()} 3D Mannequin`,
+        symptoms: [name]
       };
       this.state.updateIssue(id, newNote);
       this.state.selectNote(newNoteId);
+    }
+
+    // 3. Smoothly scroll to Intake Form container to load intake protocol immediately
+    if (typeof document !== 'undefined') {
+      const intakeElement = document.querySelector('#patient-intake-section, #intake-form-container, app-intake-form');
+      if (intakeElement) {
+        intakeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     // Temporary highlight flash effect

@@ -101,6 +101,19 @@ Surface:        #050201 → #0f0704
 Scrollbars:     rgba(249, 115, 22, 0.3)
 ```
 
+### 3.5 Papercraft & Tactile Origami Palette
+Extracted directly from the social preview paper artwork:
+
+| Token | Hex / RGB | Role & Usage |
+|:---|:---|:---|
+| `--paper-mustard` | `#F6B12B` | Primary paper card stock highlight |
+| `--paper-cream` | `#F9F3D9` | Warm background left parchment texture |
+| `--paper-peach` | `#F5B98E` | Soft terracotta background right texture |
+| `--paper-teal` | `#2AA4A0` | Turquoise sub-header & QR code accent |
+| `--paper-coral` | `#EF6658` | Coral vermilion primary action accent |
+| `--paper-white` | `#FFFFFF` | Crisp origami paper cut-outs & gulls |
+| `--paper-ink` | `#1C1C1C` | High-contrast charcoal ink typography |
+
 ---
 
 ## 4. Typography
@@ -151,6 +164,11 @@ This is a direct homage to the ventilation grills on Braun audio equipment desig
 | **Secondary** | `bg-zinc-800 border-zinc-700/50 text-zinc-200` | "Explore Sandbox" |
 | **Emergency** | `bg-red-950/40 border-red-800/60 text-red-400 animate-pulse` | "Good Samaritan Bypass" |
 | **Ghost** | `text-zinc-600 hover:text-zinc-400` | "Skip assessment" |
+
+### 5.4 Papercraft Component Anatomy
+- **`.paper-card`**: Multi-layered paper stock panel with stacked drop shadows (`box-shadow: 6px 12px 24px -4px rgba(80,50,20,0.18)`), organic paper angles (`transform: rotate(-0.3deg)`), and paper texture grain.
+- **`.paper-cutout`**: Pill badges and buttons styled with directional drop shadows (`filter: drop-shadow(2px 4px 6px rgba(60,40,20,0.15))`).
+- **`<app-origami-decorations>`**: Standalone component rendering SVG origami paper gull badges, sun rays, and layered paper cloud cut-outs.
 
 ---
 
@@ -282,7 +300,8 @@ Each agent represents a specialized diagnostic lens within the `@google/adk` `In
 | **Role** | The Three.js anatomical model — skeletal, surface, and interior views |
 | **Props** | Captain's tricorn hat, a rolled-up antique anatomy chart under one wing, a brass divider compass for measuring |
 | **Personality** | Old-salt adventurer with an anatomist's precision. Maps every bone and joint like charting a new coastline. |
-| **Visual Accent** | Warm parchment and navy — `#1E3A5F` and `#F5E6D0` |
+| **Visual Accent** | Warm parchment, turquoise acetate, and coral marker — `#F9F3D9`, `#2AA4A0`, `#EF6658` |
+| **Papercraft Layering** | Interactive 3-layer flip: 📄 *Paper Skin*, 🎞️ *Acetate Film Transparency*, 💀 *Ink & Watercolor Core* |
 | **Easter Egg** | The skeleton in the viewer is internally nicknamed "Mariner's Bones" |
 
 ---
@@ -358,6 +377,14 @@ Each agent represents a specialized diagnostic lens within the `@google/adk` `In
         🌊 Breeze          💀 Mariner         🚨 Samaritan
      (Box Breathing)     (3D Body Map)     (Emergency Care)
 ```
+
+### 7.6 Contextual UI Appearances & Prop Watermarks
+Every diagnostic agent "signs" its clinical section cards with its signature SVG prop badge:
+
+- **Gulliver** (*Overview*): 🔭 **Brass Telescope & Compass Rose** watermark on Summary Overview cards.
+- **Swoop** (*Interventions*): ⚡ **Aviator Satchel & Stethoscope** watermark on Treatment Matrix & Dosing cards.
+- **Sentinel** (*Monitoring*): 🔦 **Signal Lantern & Lighthouse Cap** watermark on Recovery Trend charts.
+- **Scribes** (*Education*): 📖 **Ink Quill & Storybook** watermark on Patient Education & Dyslexia exports.
 
 ---
 

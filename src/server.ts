@@ -258,7 +258,7 @@ app.use((req, res, next) => {
     ? `'self' http: https: ws: wss: http://localhost:9399 http://localhost:4000 http://localhost:4200 http://localhost:8000 http://localhost:5000 http://127.0.0.1:9399 http://127.0.0.1:4000 ws://localhost:9399 ws://localhost:4000 ws://localhost:4200 https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com`
     : `'self' http://localhost:9399 http://localhost:4000 http://localhost:4200 http://127.0.0.1:9399 ws://localhost:9399 https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com`;
 
-  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; script-src-elem ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src ${connectSrc}; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
+  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; script-src-elem ${scriptSrc}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src ${connectSrc}; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -573,7 +573,9 @@ app.post('/api/ai/translate', express.json(), async (req, res) => {
       const { translateReadingLevelFlow } = await import('./server/genkit.js');
       const result = await translateReadingLevelFlow({
           text: req.body.text,
-          level: req.body.level
+          level: req.body.level,
+          cognitiveLevel: req.body.cognitiveLevel,
+          language: req.body.language
       });
       res.json({ text: result });
   } catch(e: any) {
@@ -1002,6 +1004,24 @@ app.use(
     redirect: false,
   }),
 );
+
+// Fallback handler for hashed CSS stylesheet requests from stale browser caches
+app.use((req, res, next) => {
+  if (req.path.endsWith('.css') || req.path.includes('styles-')) {
+    try {
+      const files = fs.readdirSync(browserDistFolder);
+      const activeCss = files.find(f => f.startsWith('styles-') && f.endsWith('.css'));
+      if (activeCss) {
+        res.setHeader('Content-Type', 'text/css');
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        return res.sendFile(join(browserDistFolder, activeCss));
+      }
+    } catch {
+      // Fallback silently
+    }
+  }
+  next();
+});
 
 /**
  * Handle all other requests by rendering the Angular application.

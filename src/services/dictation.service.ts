@@ -20,6 +20,7 @@ export class DictationService {
   readonly permissionError = signal<string | null>(null);
   readonly initialText = signal('');
   readonly lastCommand = signal<string | null>(null);
+  readonly wakeWordDetected = signal<'gulliver' | 'swoop' | 'sentinel' | 'scribes' | null>(null);
   readonly selectedLanguage = signal<string>('en-US');
 
   readonly supportedLanguages = [
@@ -153,6 +154,24 @@ export class DictationService {
             return; // Consume the command
         }
 
+        // --- ENHANCED WAKE WORD ENGINE ("Hey Gulliver", "Sentinel", "Swoop", "Scribes") ---
+        const isHeyGull = lowerFinal.includes('hey gull') || lowerFinal.includes('hey gulliver') || lowerFinal.startsWith('gulliver') || lowerFinal.startsWith('gull');
+        const isSentinel = lowerFinal.includes('sentinel') || lowerFinal.includes('hey sentinel');
+        const isSwoop = lowerFinal.includes('swoop') || lowerFinal.includes('hey swoop');
+        const isScribes = lowerFinal.includes('scribes') || lowerFinal.includes('hey scribes');
+
+        if (isHeyGull || isSentinel || isSwoop || isScribes) {
+          const persona = isSentinel ? 'sentinel' : (isSwoop ? 'swoop' : (isScribes ? 'scribes' : 'gulliver'));
+          console.log(`[Wake Word Engine] Persona Wake Word Triggered: ${persona}`);
+          this.wakeWordDetected.set(persona);
+          this.lastCommand.set(`Wake Word: ${persona.toUpperCase()}`);
+          this.playPersonaAudioFx(persona === 'sentinel' ? 110 : (persona === 'swoop' ? 528 : (persona === 'scribes' ? 432 : 880)));
+          setTimeout(() => {
+            this.wakeWordDetected.set(null);
+            this.lastCommand.set(null);
+          }, 3000);
+        }
+
         // Look for the wake word "gull" (or common mishearings like "goal", "go")
         if (lowerFinal.startsWith('gull') || lowerFinal.startsWith('goal') || lowerFinal.startsWith('go ') || lowerFinal.startsWith('girl')) {
             if (lowerFinal.includes('sync') || lowerFinal.includes('save')) {
@@ -234,6 +253,70 @@ export class DictationService {
     this.selectedLanguage.set(langCode);
     if (this.recognition) {
       this.recognition.lang = langCode;
+    }
+  }
+
+  // ─── Avian Persona Vocal Prosody & Web Audio Synthesis ──────────────────────
+
+  speakAvianPersonaText(text: string, persona: 'gulliver' | 'swoop' | 'sentinel' | 'scribes' = 'gulliver') {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Configure voice prosody parameters per Avian persona
+    switch (persona) {
+      case 'gulliver':
+        utterance.pitch = 1.0;
+        utterance.rate = 0.95;
+        this.playPersonaAudioFx(880, 'sine');
+        break;
+      case 'swoop':
+        utterance.pitch = 1.25;
+        utterance.rate = 1.1;
+        this.playPersonaAudioFx(528, 'triangle');
+        break;
+      case 'sentinel':
+        utterance.pitch = 0.75;
+        utterance.rate = 0.85;
+        this.playPersonaAudioFx(110, 'sine');
+        break;
+      case 'scribes':
+        utterance.pitch = 1.15;
+        utterance.rate = 1.0;
+        this.playPersonaAudioFx(432, 'sine');
+        break;
+    }
+
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => v.lang.startsWith(this.selectedLanguage().split('-')[0])) || voices[0];
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  private playPersonaAudioFx(freqHz: number, waveType: OscillatorType = 'sine') {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = waveType;
+      osc.frequency.setValueAtTime(freqHz, ctx.currentTime);
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch (e) {
+      // AudioContext silent fail safe
     }
   }
 }

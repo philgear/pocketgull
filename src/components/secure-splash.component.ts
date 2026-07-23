@@ -18,7 +18,7 @@ import { environment } from '../environments/environment';
   imports: [CommonModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <main class="fixed inset-0 z-[999] flex flex-col items-center justify-center p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-y-auto">
+    <main class="fixed inset-0 z-[999] flex flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-hidden max-h-screen">
       
       <!-- Papercraft Layered Landscape Backdrop -->
       <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -113,8 +113,10 @@ import { environment } from '../environments/environment';
           </div>
         }
 
-        <!-- Paper Texture Overlay -->
-        <div class="absolute inset-0 bg-noise opacity-[0.02] pointer-events-none mix-blend-overlay"></div>
+        <!-- Paper Texture & Cardstock Grain Overlay (10% Opacity Dynamic per Theme) -->
+        <div class="absolute inset-0 pointer-events-none z-10 opacity-10 mix-blend-soft-light bg-repeat"
+             [style.background-image]="'url(' + getTextureUrl(theme.currentTheme()) + ')'"></div>
+        <div class="absolute inset-0 bg-noise opacity-[0.08] pointer-events-none mix-blend-overlay"></div>
       </div>
 
       <!-- HIPAA Lock Status Header (Visible only when locked) -->
@@ -128,9 +130,9 @@ import { environment } from '../environments/environment';
       }
 
       <!-- Unified Origami Unfolding Seagull Mascot & Papercraft Heart -->
-      <div class="origami-seagull-container group drop-shadow-2xl relative z-20 pointer-events-none mb-6 avs-breathing-mascot origami-unfold-container">
+      <div class="origami-seagull-container group drop-shadow-xl relative z-20 pointer-events-none mb-2 sm:mb-3 avs-breathing-mascot origami-unfold-container">
         <svg
-          class="w-24 h-24 xs:w-32 xs:h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 hover:scale-105 active:scale-95 transition-transform origami-unfold-svg" 
+          class="w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 hover:scale-105 active:scale-95 transition-transform origami-unfold-svg" 
           viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
           <g>
             <!-- Far Wing (Teal) -->
@@ -152,7 +154,7 @@ import { environment } from '../environments/environment';
 
         <!-- Glowing Papercraft Origami Heart (Emerges at 4.5s mark) -->
         <div class="origami-heart-container">
-          <svg class="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg class="w-5 h-5 sm:w-7 sm:h-7" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <polygon points="50,85 15,45 25,20 50,35" fill="#ef6658" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round" />
             <polygon points="50,85 50,35 75,20 85,45" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
             <polygon points="50,35 25,20 50,15" fill="#f48479" stroke="#df5648" stroke-width="0.5" stroke-linejoin="round" />
@@ -162,20 +164,21 @@ import { environment } from '../environments/environment';
       </div>
 
       <div class="w-full max-w-sm relative z-10 flex flex-col items-center">
-        <!-- Dynamic Entry Panel (Theme-aware paper/obsidian card) -->
-        <div id="seagull-safe-zone" class="w-full relative shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.8)] rounded-3xl p-4 xs:p-6 sm:p-8 bg-white/90 dark:bg-zinc-950/80 border border-white/60 dark:border-zinc-800/80 animate-in slide-in-from-bottom-8 duration-700 ease-out ring-1 ring-black/5 dark:ring-white/5 overflow-hidden backdrop-blur-2xl transition-colors">
+        <!-- Dynamic Entry Panel (Pocket-Like Layered Papercraft Container) -->
+        <div id="seagull-safe-zone" class="w-full relative paper-pocket-container rounded-3xl p-3 xs:p-5 sm:p-6 animate-in slide-in-from-bottom-8 duration-700 ease-out backdrop-blur-2xl transition-all overflow-y-auto max-h-[85vh] hide-scrollbar">
           
-          <!-- Subtle Dieter Rams Grill/Detail lines at top -->
-          <div class="absolute top-0 left-0 right-0 h-1.5 flex gap-[1px] px-8 opacity-20 dark:opacity-40">
-             <div class="flex-1 bg-zinc-400 dark:bg-zinc-600"></div><div class="flex-1 bg-zinc-400 dark:bg-zinc-600"></div><div class="flex-1 bg-zinc-400 dark:bg-zinc-600"></div><div class="flex-1 bg-zinc-400 dark:bg-zinc-600"></div>
-          </div>
-
-          <div class="text-center mb-8 mt-2">
-            <h1 class="text-xl font-medium tracking-[0.15em] text-zinc-800 dark:text-zinc-100 uppercase pb-1"
-                style="letter-spacing: 0.1em;">
+          <!-- Tactile Paper Pocket Top Fold Notch -->
+          <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#2AA4A0]/40 via-[#F6B12B]/40 to-[#EF6658]/40 border-b border-amber-300/40 dark:border-zinc-700/50"></div>
+          
+          <div class="text-center mb-3 mt-1">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 border border-amber-400/30 text-amber-800 dark:text-amber-300 text-[9.5px] font-bold uppercase tracking-widest mb-1.5 shadow-2xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+              Pocket-Gull Clinician Suite
+            </div>
+            <h1 class="text-lg font-bold tracking-[0.12em] text-zinc-800 dark:text-zinc-100 uppercase pb-0.5">
               {{ isLocked() ? 'Resume Session' : 'Pocket Gull' }}
             </h1>
-            <p class="text-[12px] uppercase tracking-[0.25em] text-zinc-500 dark:text-zinc-400">
+            <p class="text-[11px] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
               {{ isLocked() ? 'Idle Timeout Protection Active' : 'Clinical Intelligence Engine' }}
             </p>
           </div>
@@ -194,18 +197,20 @@ import { environment } from '../environments/environment';
           <!-- Gesture Unlock Flow -->
           @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
-               <p class="text-[12px] text-zinc-550 dark:text-zinc-400 uppercase tracking-widest font-medium mb-1">{{ todayBeachItem().prompt }}</p>
+               <p class="text-[12px] text-zinc-600 dark:text-zinc-300 uppercase tracking-widest font-semibold mb-1">{{ todayBeachItem().prompt }}</p>
                
-               <div class="relative w-[220px] h-[220px] flex items-center justify-center">
+               <!-- Raw Fiber Hemp Paper Pad -->
+               <div class="relative w-[220px] h-[220px] flex items-center justify-center paper-hemp-panel rounded-2xl p-1 overflow-hidden">
                   <!-- Guidelines background SVG (Dynamic Daily Beach Item guide) -->
-                  <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5" [innerHTML]="todayBeachItem().svgGuide">
+                  <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5">
+                    <g [innerHTML]="todayBeachItem().svgGuide"></g>
                   </svg>
                  
                  <canvas
                    #gestureCanvas
                    width="220"
                    height="220"
-                   class="absolute inset-0 bg-transparent border border-zinc-200 dark:border-zinc-800/80 rounded-2xl shadow-inner cursor-crosshair touch-none transition-colors"
+                   class="absolute inset-0 bg-transparent rounded-2xl cursor-crosshair touch-none transition-colors"
                    [class.border-red-500]="gestureError()"
                    [class.border-emerald-500]="isChecking()"
                    (pointerdown)="startDrawing($event)"
@@ -215,10 +220,10 @@ import { environment } from '../environments/environment';
                  ></canvas>
                </div>
 
-                <!-- Daily Medical Quote & Light Humor Banner -->
-                <div class="mt-1 px-4 py-2 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 text-center max-w-xs transition-all hover:bg-white/80 dark:hover:bg-zinc-900/80">
-                  <p class="text-[11.5px] italic text-zinc-700 dark:text-zinc-300 font-serif leading-snug">{{ todayQuote().text }}</p>
-                  <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mt-1">{{ todayQuote().author }}</p>
+                <!-- Washi Rice Paper Daily Medical Quote Banner -->
+                <div class="mt-1 px-4 py-2.5 paper-rice-panel rounded-xl text-center max-w-xs transition-all hover:scale-[1.02] shadow-xs">
+                  <p class="text-[11.5px] italic text-zinc-800 dark:text-zinc-200 font-serif leading-snug">{{ todayQuote().text }}</p>
+                  <p class="text-[10px] font-bold uppercase tracking-widest text-indigo-700 dark:text-indigo-300 mt-1">{{ todayQuote().author }}</p>
                 </div>
                
                <!-- Hidden input for Playwright E2E tests compatibility -->
@@ -237,64 +242,138 @@ import { environment } from '../environments/environment';
                  style="position: absolute; width: 1px; height: 1px; opacity: 0.01; background: transparent; border: none; color: transparent;"
                >
                
-               <div class="flex items-center gap-3 mt-2 w-[220px] z-30">
+               <div class="flex items-center justify-center gap-3 mt-3 w-full max-w-[300px] z-30">
                  <button 
                    type="button"
                    (click)="clearDrawing()" 
                    [disabled]="isChecking() || (strokes.length === 0 && currentStroke.length === 0)"
-                   class="flex-1 px-4 py-2.5 text-[12px] uppercase font-bold tracking-widest bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:ring-1 hover:ring-zinc-300 dark:hover:ring-zinc-600 text-zinc-700 dark:text-zinc-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
+                   class="flex-1 min-h-[44px] px-4 py-3 text-xs uppercase font-bold tracking-widest bg-white/80 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed shadow-sm flex items-center justify-center">
                    Clear Pad
                  </button>
                  <button 
                    type="button"
                    (click)="handleUnlock()" 
                    [disabled]="isChecking()"
-                   class="flex-1 px-4 py-2.5 flex justify-center items-center gap-1.5 text-[12px] uppercase font-bold tracking-widest bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/20 dark:hover:bg-emerald-600/30 border border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed">
-                   <svg *ngIf="!isChecking()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
-                   <svg *ngIf="isChecking()" class="animate-spin w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                   class="flex-1 min-h-[44px] px-4 py-3 flex justify-center items-center gap-2 text-xs uppercase font-bold tracking-widest bg-emerald-600/20 dark:bg-emerald-600/30 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-950 dark:text-emerald-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed shadow-sm">
+                   <svg *ngIf="!isChecking()" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
+                   <svg *ngIf="isChecking()" class="animate-spin w-4 h-4 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                    <span>Biometrics</span>
                  </button>
                </div>
 
-               <!-- Reduced Motion Toggle -->
-               <div class="mt-4 flex justify-center z-30">
-                 <label for="reduce-motion-lock" class="flex items-center gap-2 cursor-pointer group">
-                   <input type="checkbox"
-                          id="reduce-motion-lock"
-                          name="reduce-motion-lock"
-                          aria-label="Reduce Motion"
-                          [checked]="theme.reduceMotion()"
-                          (change)="theme.setReduceMotion(!theme.reduceMotion())"
-                          class="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700/50 bg-zinc-50 dark:bg-black/40 text-[#3ebc9e] focus:ring-[#3ebc9e]/30 focus:ring-offset-0 cursor-pointer transition-colors">
-                   <span class="text-[12px] font-medium text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-350 transition-colors uppercase tracking-widest">
-                     Reduce Motion
-                   </span>
-                 </label>
-               </div>
-            </div>
-            @if (errorMsg()) {
-              <p class="mb-4 text-brand-red-600 dark:text-brand-red-400/90 text-[12px] uppercase font-bold tracking-[0.1em] text-center w-full animate-pulse">{{ errorMsg() }}</p>
-            }
+                <!-- Centered Protocol Suite Suite (Ordered: 1. Audio, 2. Visual, 3. Animal Comfort) -->
+                <div class="mt-4 w-full space-y-3 z-30">
 
-            <!-- Subtle AVS Lock-State Controller -->
-            <div class="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800/60 flex items-center justify-between text-[12px] text-zinc-500 dark:text-zinc-400 font-mono tracking-wider animate-in fade-in duration-700 z-30">
-               <div class="flex items-center gap-2">
-                  <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-brand-green-400' : 'bg-zinc-400 dark:bg-zinc-700'"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2" [class]="isAvsPlaying() ? 'bg-brand-green-500' : 'bg-zinc-400 dark:bg-zinc-500'"></span>
-                  </span>
-                  <span>{{ isAvsPlaying() ? 'AVS ENTRAINMENT ACTIVE' : 'AVS ENTRAINMENT MUTED' }}</span>
-               </div>
-               <button 
-                 type="button" 
-                 (click)="toggleAvs()"
-                 class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-zinc-800 dark:hover:text-white rounded-full transition border border-zinc-200 dark:border-zinc-700/40 text-[12px] uppercase font-bold tracking-widest active:scale-95 flex items-center gap-1.5"
-               >
-                  <svg *ngIf="!isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
-                  <svg *ngIf="isAvsPlaying()" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-brand-green-600 dark:text-brand-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 12V6.75A2.25 2.25 0 0 0 15 4.5h-1.5a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 13.5 19.5H15a2.25 2.25 0 0 0 2.25-2.25V12z" /></svg>
-                  <span>{{ isAvsPlaying() ? 'Mute' : 'Listen' }}</span>
-               </button>
-            </div>
+                  <!-- 1. 🎵 Audio Comfort Protocol Card -->
+                  <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
+                      🎵 Audio Comfort Protocol
+                    </span>
+                    
+                    <div class="flex flex-wrap items-center justify-center gap-2 w-full">
+                      <!-- Avian Sound Toggle -->
+                      <button type="button"
+                              (click)="toggleAvianAudio()"
+                              class="min-h-[42px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1.5 hover:bg-white dark:hover:bg-zinc-700 transition cursor-pointer shadow-2xs">
+                        🕊️ {{ isAudioPlaying() ? 'Avian Sound Active' : 'Avian Sound' }}
+                      </button>
+
+                      <!-- AVS Entrainment Controller -->
+                      <button type="button"
+                              (click)="toggleAvs()"
+                              class="min-h-[42px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1.5 hover:bg-white dark:hover:bg-zinc-700 transition cursor-pointer shadow-2xs">
+                        <span class="relative flex h-2 w-2">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-emerald-400' : 'bg-zinc-400'"></span>
+                          <span class="relative inline-flex rounded-full h-2 w-2" [class]="isAvsPlaying() ? 'bg-emerald-500' : 'bg-zinc-400'"></span>
+                        </span>
+                        <span>{{ isAvsPlaying() ? 'AVS Active' : 'AVS Entrainment' }}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- 2. 👁️ Visual Comfort Protocol Card -->
+                  <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-[0.15em] text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                      👁️ Visual Comfort Protocol
+                    </span>
+
+                    <div class="flex flex-wrap items-center justify-center gap-2 w-full">
+                      <!-- Theme Selector -->
+                      <div class="flex items-center gap-1.5">
+                        <label for="splash-theme-select-lock" class="text-xs font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-400">
+                          🎨 Theme:
+                        </label>
+                        <select id="splash-theme-select-lock"
+                                [ngModel]="theme.currentTheme()"
+                                (ngModelChange)="theme.currentTheme.set($event)"
+                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                          <option value="light">☀️ Light</option>
+                          <option value="dark">🌙 Dark</option>
+                          <option value="papercraft">📦 Cardstock 3D</option>
+                          <option value="hemp">🌿 Raw Hemp Paper</option>
+                          <option value="rice">📜 Rice Paper (Washi)</option>
+                          <option value="construction">🎨 Construction Paper</option>
+                          <option value="spark">✨ Spark Mode</option>
+                          <option value="calm">🧘 Serene Calm</option>
+                        </select>
+                      </div>
+
+                      <!-- Reduced Motion Toggle -->
+                      <label for="reduce-motion-lock" class="min-h-[40px] px-3 py-1.5 rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center gap-1.5 cursor-pointer group">
+                        <input type="checkbox"
+                               id="reduce-motion-lock"
+                               name="reduce-motion-lock"
+                               aria-label="Reduce Motion"
+                               [checked]="theme.reduceMotion()"
+                               (change)="theme.setReduceMotion(!theme.reduceMotion())"
+                               class="w-4 h-4 rounded border-zinc-300 dark:border-zinc-700/50 text-[#3ebc9e] cursor-pointer">
+                        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-300 uppercase tracking-wider">
+                          ⚡ Motion
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- 3. 🐾 Animal Comfort Protocol Card -->
+                  <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-[0.15em] text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                      🐾 Animal Comfort Protocol
+                    </span>
+
+                    <div class="flex flex-wrap items-center justify-center gap-2 w-full">
+                      <button type="button"
+                              (click)="petAuditory.currentMode === 'canine' ? petAuditory.stop() : petAuditory.playCanineHeartbeat()"
+                              [class.bg-amber-500]="petAuditory.currentMode === 'canine'"
+                              [class.text-zinc-950]="petAuditory.currentMode === 'canine'"
+                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                        🐕 Canine
+                      </button>
+                      <button type="button"
+                              (click)="petAuditory.currentMode === 'feline' ? petAuditory.stop() : petAuditory.playFelinePurr()"
+                              [class.bg-amber-500]="petAuditory.currentMode === 'feline'"
+                              [class.text-zinc-950]="petAuditory.currentMode === 'feline'"
+                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                        🐈 Feline
+                      </button>
+                      <button type="button"
+                              (click)="petAuditory.currentMode === 'cetacean' ? petAuditory.stop() : petAuditory.playCetaceanTherapy()"
+                              [class.bg-amber-500]="petAuditory.currentMode === 'cetacean'"
+                              [class.text-zinc-950]="petAuditory.currentMode === 'cetacean'"
+                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                        🐋 Cetacean
+                      </button>
+                      @if (petAuditory.isCurrentlyPlaying) {
+                        <button type="button"
+                                (click)="petAuditory.stop()"
+                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-rose-600 text-white border border-rose-500 flex items-center gap-1 transition cursor-pointer">
+                          ✕ Stop
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </div>
           }
           <!-- Restricted Entry Gateway -->
           @else if (showAuthGateway() && viewState() !== 'signup') {
@@ -317,7 +396,7 @@ import { environment } from '../environments/environment';
 
               <div class="space-y-3 pt-2">
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Clinician Email</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-zinc-500">Clinician Email</label>
                   <input type="email" 
                          [ngModel]="signinEmailInput()" 
                          (ngModelChange)="signinEmailInput.set($event)"
@@ -339,7 +418,7 @@ import { environment } from '../environments/environment';
                 <button 
                   type="button" 
                   (click)="handleSandboxDemo()"
-                  class="w-full py-4 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/50 text-zinc-700 dark:text-zinc-200 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
+                  class="w-full py-4 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800/90 border border-zinc-200/80 dark:border-zinc-700/50 text-zinc-950 dark:text-zinc-200 text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.98]"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                   <span>Explore Sandbox Demo</span>
@@ -350,7 +429,7 @@ import { environment } from '../environments/environment';
                     <div class="w-full border-t border-zinc-200 dark:border-zinc-800/80"></div>
                   </div>
                   <div class="relative flex justify-center text-xs">
-                    <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-700 dark:text-zinc-300 uppercase tracking-widest text-[10px] font-bold rounded-full">New Clinician?</span>
+                    <span class="bg-white dark:bg-zinc-950 px-3 text-zinc-700 dark:text-zinc-300 uppercase tracking-widest text-xs font-bold rounded-full">New Clinician?</span>
                   </div>
                 </div>
 
@@ -358,7 +437,7 @@ import { environment } from '../environments/environment';
                 <button 
                   type="button" 
                   (click)="viewState.set('signup'); errorMsg.set('');"
-                  class="w-full py-3 bg-zinc-50 dark:bg-zinc-900/40 hover:bg-zinc-100 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-750 dark:text-zinc-350 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300"
+                  class="w-full py-3 bg-zinc-50 dark:bg-zinc-900/40 hover:bg-zinc-100 dark:hover:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-350 text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300"
                 >
                   Create Clinician Account (Sign Up)
                 </button>
@@ -371,12 +450,12 @@ import { environment } from '../environments/environment';
             <form (submit)="handleSignup(); $event.preventDefault();" class="space-y-4 text-left animate-in fade-in duration-500">
               <div class="text-center space-y-2 mb-4">
                 <h2 class="text-sm font-bold text-zinc-800 dark:text-zinc-100 uppercase tracking-wider">Create Clinician Account</h2>
-                <p class="text-[10px] uppercase tracking-widest text-zinc-500">Access Restricted Engine</p>
+                <p class="text-xs uppercase tracking-widest text-zinc-500">Access Restricted Engine</p>
               </div>
 
               <div class="space-y-3">
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Full Name</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-zinc-500">Full Name</label>
                   <input type="text" required
                          [(ngModel)]="signupForm().name"
                          name="signupName"
@@ -385,7 +464,7 @@ import { environment } from '../environments/environment';
                 </div>
 
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Email Address</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-zinc-500">Email Address</label>
                   <input type="email" required
                          [(ngModel)]="signupForm().email"
                          name="signupEmail"
@@ -394,7 +473,7 @@ import { environment } from '../environments/environment';
                 </div>
 
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Clinic / Organization</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-zinc-500">Clinic / Organization</label>
                   <input type="text" required
                          [(ngModel)]="signupForm().clinic"
                          name="signupClinic"
@@ -403,7 +482,7 @@ import { environment } from '../environments/environment';
                 </div>
 
                 <div class="flex flex-col gap-1">
-                  <label for="signupPinInput" class="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Passcode/PIN (4-digits)</label>
+                  <label for="signupPinInput" class="text-xs font-bold uppercase tracking-wider text-zinc-500">Passcode/PIN (4-digits)</label>
                   <input type="password" id="signupPinInput" aria-label="Passcode or 4-digit PIN" required maxlength="4" pattern="[0-9]{4}"
                          [(ngModel)]="signupForm().pin"
                          name="signupPin"
@@ -429,7 +508,7 @@ import { environment } from '../environments/environment';
               <button 
                 type="button" 
                 (click)="viewState.set('auth'); errorMsg.set('');"
-                class="w-full py-3 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300"
+                class="w-full py-3 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-950 dark:text-zinc-300 text-xs font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300"
               >
                 Back to Sign In
               </button>
@@ -492,10 +571,10 @@ import { environment } from '../environments/environment';
               </div>
 
               <div class="grid grid-cols-2 gap-3 mb-3">
-                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleAiStudio()">
+                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-950 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleAiStudio()">
                   AI Studio Key
                 </button>
-                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-800 dark:hover:text-zinc-200 text-zinc-555 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleDemo()">
+                <button type="button" class="w-full py-3 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 hover:text-zinc-900 dark:hover:text-zinc-200 text-zinc-950 dark:text-zinc-400 text-[12px] uppercase tracking-[0.1em] rounded-xl transition-colors" (click)="handleDemo()">
                   Demo Mode
                 </button>
               </div>
@@ -566,7 +645,7 @@ import { environment } from '../environments/environment';
               <div class="flex flex-col gap-2 pt-2">
                 <button (click)="enterApp()"
                         [disabled]="!pledgeAccepted()"
-                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
+                        class="w-full py-3.5 bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-400 text-white dark:text-zinc-950 text-xs font-black uppercase tracking-[0.2em] transition-all rounded-2xl shadow-md border border-emerald-500 dark:border-emerald-400 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-zinc-900 disabled:dark:bg-zinc-800 disabled:text-zinc-400 disabled:border-transparent active:scale-[0.98] cursor-pointer">
                   Accept & Enter System
                 </button>
               </div>
@@ -650,11 +729,11 @@ import { environment } from '../environments/environment';
               <div class="flex flex-col gap-2">
                 <button (click)="gotoEthics()"
                         [disabled]="!clinicianKssSelected()"
-                        class="w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.2em] transition rounded-[1rem] disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98]">
+                        class="w-full py-3.5 bg-emerald-600 dark:bg-emerald-500 hover:bg-emerald-700 dark:hover:bg-emerald-400 text-white dark:text-zinc-950 text-xs font-black uppercase tracking-[0.2em] transition-all rounded-2xl shadow-md border border-emerald-500 dark:border-emerald-400 disabled:opacity-30 disabled:cursor-not-allowed disabled:bg-zinc-900 disabled:dark:bg-zinc-800 disabled:text-zinc-400 disabled:border-transparent active:scale-[0.98] cursor-pointer">
                   {{ kss.readiness()?.combinedAlert === 'high-risk' ? 'Acknowledge & Continue' : 'Continue' }}
                 </button>
                 <button (click)="gotoEthics()"
-                        class="text-[12px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-400 transition-colors text-center w-full">
+                        class="text-[11px] text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors text-center w-full cursor-pointer">
                   Skip assessment
                 </button>
               </div>
@@ -663,36 +742,36 @@ import { environment } from '../environments/environment';
           }
 
           <!-- Animal Comfort Protocols Lock/Splash Integration -->
-          <div class="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-800/80 text-left">
-            <p class="text-[12px] font-bold uppercase tracking-wider text-zinc-550 dark:text-zinc-400 mb-2 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-amber-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div class="mt-3 pt-2 border-t border-zinc-200 dark:border-zinc-800/80 text-left">
+            <p class="text-[9.5px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mb-1 flex items-center gap-1">
+              <svg class="w-3 h-3 text-amber-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
               </svg>
               Animal Comfort Protocols (Voice Activated)
             </p>
-            <div class="flex flex-wrap gap-1.5">
+            <div class="flex flex-wrap gap-1">
               <button type="button" (click)="petAuditory.playCanineHeartbeat()" 
                 [ngClass]="petAuditory.currentMode === 'canine' ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
-                Canine Comfort
+                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
+                🐕 Canine
               </button>
               <button type="button" (click)="petAuditory.playFelinePurr()"
                 [ngClass]="petAuditory.currentMode === 'feline' ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
-                Feline Comfort
+                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
+                🐈 Feline
               </button>
               <button type="button" (click)="petAuditory.playCetaceanTherapy()"
                 [ngClass]="petAuditory.currentMode === 'cetacean' ? 'bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 border-sky-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
-                Cetacean Comfort
+                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
+                🐋 Cetacean
               </button>
               <button type="button" (click)="petAuditory.playAvianTherapy()"
                 [ngClass]="petAuditory.currentMode === 'avian' ? 'bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border-indigo-500/60' : 'bg-zinc-50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-350 border-zinc-200 dark:border-zinc-800/60'"
-                class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1.5">
-                Avian Comfort
+                class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex items-center gap-1 cursor-pointer">
+                🕊️ Avian
               </button>
               @if(petAuditory.isCurrentlyPlaying) {
-                <button type="button" (click)="petAuditory.stop()" class="px-2.5 py-1.5 text-[8.5px] uppercase tracking-wider font-bold rounded-lg border border-red-200 text-red-655 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
+                <button type="button" (click)="petAuditory.stop()" class="px-2 py-0.5 text-[8px] uppercase tracking-wider font-bold rounded-md border border-red-200 text-red-655 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all cursor-pointer">
                   Stop
                 </button>
               }
@@ -704,25 +783,25 @@ import { environment } from '../environments/environment';
         <button 
           type="button" 
           (click)="handleEmergencyBypass()"
-          class="mt-6 w-full py-4 bg-red-50/80 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800/60 hover:border-red-300 dark:hover:border-red-600/80 text-red-655 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-[10.5px] font-bold uppercase tracking-[0.15em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(239,68,68,0.08)] dark:shadow-[0_4px_20px_rgba(239,68,68,0.1)] active:scale-[0.98] animate-pulse"
+          class="mt-3 w-full py-2.5 bg-red-50/80 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800/60 hover:border-red-300 dark:hover:border-red-600/80 text-red-655 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-[10px] font-bold uppercase tracking-[0.15em] rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-xs active:scale-[0.98]"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-600 dark:text-red-500 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-red-600 dark:text-red-500 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5v14M5 12h14"/>
           </svg>
           <span>Good Samaritan Mode (Bypass)</span>
         </button>
 
         <!-- Terms and Privacy Links -->
-        <div class="mt-6 flex items-center justify-center gap-4 text-[10.5px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 z-30">
+        <div class="mt-2.5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 z-30">
           <button type="button" (click)="showTermsModal.set(true)" class="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-0 cursor-pointer">Terms of Service</button>
-          <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-800"></span>
+          <span class="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-800"></span>
           <button type="button" (click)="showPrivacyModal.set(true)" class="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-0 cursor-pointer">Privacy Policy</button>
         </div>
 
-        <div class="mt-8 flex items-center justify-center gap-3">
-          <p class="text-[12px] text-zinc-555 dark:text-zinc-500 font-mono uppercase tracking-[0.3em]">v{{ appVersion }}</p>
+        <div class="mt-2 flex items-center justify-center gap-2">
+          <p class="text-[10px] text-zinc-500 dark:text-zinc-500 font-mono uppercase tracking-[0.2em]">v{{ appVersion }}</p>
           <a href="https://github.com/philgear/pocketgull" target="_blank" rel="noopener noreferrer" class="text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" aria-label="View on GitHub">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
           </a>
         </div>
 
@@ -854,6 +933,47 @@ import { environment } from '../environments/environment';
             #131024 50%,
             #0b040a 100%
         ) !important;
+    }
+
+    /* ─── 3D Papercraft Mode Theme Overrides ─── */
+    :host-context(html.papercraft-mode) .secure-splash-main,
+    html.papercraft-mode .secure-splash-main {
+        background: linear-gradient(to bottom, #F9F3D9 0%, #F5B98E 50%, #F6B12B 100%) !important;
+        color: #1C1C1C !important;
+    }
+
+    :host-context(html.papercraft-mode) .paper-hill-back,
+    html.papercraft-mode .paper-hill-back {
+        color: #F6B12B !important; /* Sunflower Amber Paper */
+        filter: drop-shadow(0px -6px 14px rgba(80, 50, 20, 0.35)) !important;
+    }
+    :host-context(html.papercraft-mode) .paper-hill-mid,
+    html.papercraft-mode .paper-hill-mid {
+        color: #2AA4A0 !important; /* Origami Teal Paper */
+        filter: drop-shadow(0px -8px 16px rgba(42, 164, 160, 0.4)) !important;
+    }
+    :host-context(html.papercraft-mode) .paper-hill-front,
+    html.papercraft-mode .paper-hill-front {
+        color: #EF6658 !important; /* Coral Paper Dune */
+        filter: drop-shadow(0px -10px 20px rgba(239, 102, 88, 0.45)) !important;
+    }
+
+    :host-context(html.papercraft-mode) #seagull-safe-zone,
+    html.papercraft-mode #seagull-safe-zone {
+        background-color: rgba(255, 253, 245, 0.96) !important;
+        border: 2.5px solid #E59F1E !important;
+        box-shadow: 14px 28px 56px -4px rgba(80, 50, 20, 0.35), 0 6px 16px rgba(0, 0, 0, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.9) !important;
+        transform: perspective(1000px) rotateX(1deg);
+        color: #1C1C1C !important;
+    }
+
+    :host-context(html.papercraft-mode) .origami-seagull-container,
+    html.papercraft-mode .origami-seagull-container {
+        filter: drop-shadow(8px 16px 24px rgba(80, 45, 15, 0.45)) !important;
+    }
+    :host-context(html.papercraft-mode) .origami-heart-container,
+    html.papercraft-mode .origami-heart-container {
+        filter: drop-shadow(4px 12px 16px rgba(220, 60, 40, 0.4)) !important;
     }
 
     /* SVG noise texture */
@@ -1061,6 +1181,28 @@ export class SecureSplashComponent implements OnInit {
   public readonly petAuditory = inject(PetAuditoryService);
   private platformId = inject(PLATFORM_ID);
   readonly appVersion = environment.appVersion;
+
+  getTextureUrl(themeName: string): string {
+    switch (themeName) {
+      case 'hemp': return '/images/hemp_paper_texture.png';
+      case 'construction': return '/images/construction_paper_texture.png';
+      case 'papercraft': return '/images/paper_cardstock_texture.png';
+      case 'rice':
+      default: return '/images/rice_paper_texture.png';
+    }
+  }
+
+  isAudioPlaying = signal<boolean>(false);
+
+  toggleAvianAudio() {
+    if (this.isAudioPlaying()) {
+      this.petAuditory.stop();
+      this.isAudioPlaying.set(false);
+    } else {
+      this.petAuditory.playAvianTherapy();
+      this.isAudioPlaying.set(true);
+    }
+  }
   
   // Inputs
   apiKeyError = input<string | null>(null);

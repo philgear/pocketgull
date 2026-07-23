@@ -8,6 +8,27 @@ export const p_phil_gear: IPatient = {
   lastVisit: "2026.05.20",
   preexistingConditions: ["Hypertension", "Mild Sleep Apnea", "Google Health Integration"],
   patientGoals: "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
+  tcmIntake: {
+    tongueColor: "pink",
+    tongueCoating: "thin-white",
+    pulseQuality: "normal",
+    thermalPreference: "neutral",
+    sweatPattern: "normal",
+    tasteInMouth: "normal",
+    tcmPattern: "Zang-Fu Balance with Mild Liver Qi Constriction (Executive Stress)"
+  },
+  ayurvedicIntake: {
+    prakritiVata: 3,
+    prakritiPitta: 5,
+    prakritiKapha: 3,
+    vikritiVata: 4,
+    vikritiPitta: 6,
+    vikritiKapha: 3,
+    agniType: "samagni",
+    amaScore: 1.8,
+    nadiPulseType: "frog-pitta",
+    ayurvedicImbalance: "Samagni Metabolic Balance with Mild Pitta Exertion"
+  },
   vitals: {
     bp: "122/82",
     hr: "68",

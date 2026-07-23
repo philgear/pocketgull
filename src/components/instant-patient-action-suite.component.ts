@@ -10,95 +10,117 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
   standalone: true,
   imports: [CommonModule, MoodConsciousnessMatrixComponent, PatientHealthTrajectoryStorybookComponent],
   template: `
-    <div class="w-full max-w-4xl mx-auto my-6 p-6 rounded-lg border-2 border-indigo-500/40 dark:border-indigo-500/50 bg-gradient-to-br from-indigo-50/90 via-white to-purple-50/90 dark:from-zinc-900 dark:via-zinc-900 dark:to-indigo-950/60 shadow-lg text-slate-900 dark:text-zinc-100 no-print">
+    <div class="relative w-full rounded-2xl border-2 p-5 sm:p-7 transition-all duration-500 bg-[#F9F3D9] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 border-[#F6B12B] dark:border-[#F6B12B]/80 shadow-[4px_6px_0px_0px_rgba(28,28,28,0.85)] dark:shadow-[4px_6px_0px_0px_rgba(0,0,0,0.9)] font-sans overflow-hidden pocket-gull-card my-6 no-print">
       
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-indigo-200/60 dark:border-indigo-800/60 pb-4 mb-6">
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-2xl animate-pulse">⚡</span>
-            <span class="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded bg-indigo-600 text-white shadow-sm">
-              Instant Patient Action Suite
-            </span>
-            <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              Live Interactive
-            </span>
+      <!-- Background Texture & Papercraft Overlay -->
+      <div class="absolute inset-0 opacity-15 pointer-events-none mix-blend-multiply bg-[radial-gradient(#1c1c1c_1px,transparent_1px)] [background-size:12px_12px]"></div>
+
+      <!-- Header: Avian Squadron Banner & Narrative Stepper Style -->
+      <div class="relative z-10 flex flex-wrap items-center justify-between gap-4 pb-5 mb-6 border-b-2 border-dashed border-[#1C1C1C]/20 dark:border-zinc-800 font-mono">
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-xl bg-[#F6B12B] text-zinc-950 border-2 border-[#1C1C1C] flex items-center justify-center text-2xl shadow-[2px_2px_0px_0px_rgba(28,28,28,0.9)] animate-bounce shrink-0">
+            ⚡
           </div>
-          <h2 class="text-base font-black text-slate-900 dark:text-zinc-100 uppercase tracking-wider mt-1.5">
-            Instant Somatic Relief & Companion Co-Regulation
-          </h2>
-          <p class="text-xs text-slate-600 dark:text-zinc-400 mt-0.5 font-medium">
-            Select an instant protocol below to regulate your nervous system, read your health storybook, co-regulate with a service animal, or simulate cellular recovery.
-          </p>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-mono font-extrabold uppercase tracking-widest text-[#EF6658] dark:text-orange-400">Avian Dispatch Somatic Suite</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-md bg-[#2AA4A0] text-white font-bold tracking-wider uppercase border border-[#1C1C1C]">
+                Swoop ⚡ Dispatch
+              </span>
+              <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                <span class="w-2.5 h-2.5 rounded-full status-dot bg-emerald-500 animate-ping"></span>
+                Live Co-Regulation
+              </span>
+            </div>
+            <h2 class="text-lg sm:text-xl font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight mt-1">
+              Instant Somatic Relief & Companion Co-Regulation
+            </h2>
+            <p class="text-xs sm:text-sm text-[#1C1C1C]/70 dark:text-zinc-400 font-sans mt-0.5">
+              Select an instant protocol below to regulate your nervous system, co-regulate with service companions, or project vitality.
+            </p>
+          </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 shrink-0">
-          <button type="button" (click)="toggleTab('relief')"
-            [class.bg-indigo-600]="activeTab() === 'relief'"
-            [class.text-white]="activeTab() === 'relief'"
-            [class.bg-white]="activeTab() !== 'relief'"
-            [class.dark:bg-zinc-800]="activeTab() !== 'relief'"
-            class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
-            🧘 Relief
-          </button>
-          <button type="button" (click)="toggleTab('storybook')"
-            [class.bg-amber-600]="activeTab() === 'storybook'"
-            [class.text-white]="activeTab() === 'storybook'"
-            [class.bg-white]="activeTab() !== 'storybook'"
-            [class.dark:bg-zinc-800]="activeTab() !== 'storybook'"
-            class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-amber-400 dark:border-amber-600 transition cursor-pointer">
-            📖 Storybook
-          </button>
-          <button type="button" (click)="toggleTab('matrix')"
-            [class.bg-indigo-600]="activeTab() === 'matrix'"
-            [class.text-white]="activeTab() === 'matrix'"
-            [class.bg-white]="activeTab() !== 'matrix'"
-            [class.dark:bg-zinc-800]="activeTab() !== 'matrix'"
-            class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
-            🔮 Mind Matrix
-          </button>
-          <button type="button" (click)="toggleTab('pet')"
-            [class.bg-indigo-600]="activeTab() === 'pet'"
-            [class.text-white]="activeTab() === 'pet'"
-            [class.bg-white]="activeTab() !== 'pet'"
-            [class.dark:bg-zinc-800]="activeTab() !== 'pet'"
-            class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
-            🐕 Service Pet
-          </button>
-          <button type="button" (click)="toggleTab('simulator')"
-            [class.bg-indigo-600]="activeTab() === 'simulator'"
-            [class.text-white]="activeTab() === 'simulator'"
-            [class.bg-white]="activeTab() !== 'simulator'"
-            [class.dark:bg-zinc-800]="activeTab() !== 'simulator'"
-            class="px-3.5 py-2 min-h-[44px] text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-300 dark:border-indigo-700 transition cursor-pointer">
-            🎮 Simulator
-          </button>
+        <!-- Right Controls: Tactile Persona Navigation Pills -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-wrap items-center gap-1.5 bg-[#FFFFFF] dark:bg-zinc-900 p-1.5 rounded-xl border-2 border-[#1C1C1C] dark:border-zinc-700 shadow-[2px_2px_0px_0px_rgba(28,28,28,0.8)] font-mono">
+            <button type="button" (click)="toggleTab('relief')"
+              [class.bg-[#F6B12B]]="activeTab() === 'relief'"
+              [class.text-[#1C1C1C]]="activeTab() === 'relief'"
+              [class.bg-transparent]="activeTab() !== 'relief'"
+              [class.text-[#1C1C1C]/70]="activeTab() !== 'relief'"
+              [class.dark:text-zinc-300]="activeTab() !== 'relief'"
+              class="px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🧘</span> Relief
+            </button>
+
+            <button type="button" (click)="toggleTab('storybook')"
+              [class.bg-[#F6B12B]]="activeTab() === 'storybook'"
+              [class.text-[#1C1C1C]]="activeTab() === 'storybook'"
+              [class.bg-transparent]="activeTab() !== 'storybook'"
+              [class.text-[#1C1C1C]/70]="activeTab() !== 'storybook'"
+              [class.dark:text-zinc-300]="activeTab() !== 'storybook'"
+              class="px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>📖</span> Storybook
+            </button>
+
+            <button type="button" (click)="toggleTab('matrix')"
+              [class.bg-[#F6B12B]]="activeTab() === 'matrix'"
+              [class.text-[#1C1C1C]]="activeTab() === 'matrix'"
+              [class.bg-transparent]="activeTab() !== 'matrix'"
+              [class.text-[#1C1C1C]/70]="activeTab() !== 'matrix'"
+              [class.dark:text-zinc-300]="activeTab() !== 'matrix'"
+              class="px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🔮</span> Mind Matrix
+            </button>
+
+            <button type="button" (click)="toggleTab('pet')"
+              [class.bg-[#F6B12B]]="activeTab() === 'pet'"
+              [class.text-[#1C1C1C]]="activeTab() === 'pet'"
+              [class.bg-transparent]="activeTab() !== 'pet'"
+              [class.text-[#1C1C1C]/70]="activeTab() !== 'pet'"
+              [class.dark:text-zinc-300]="activeTab() !== 'pet'"
+              class="px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🐕</span> Service Pet
+            </button>
+
+            <button type="button" (click)="toggleTab('simulator')"
+              [class.bg-[#F6B12B]]="activeTab() === 'simulator'"
+              [class.text-[#1C1C1C]]="activeTab() === 'simulator'"
+              [class.bg-transparent]="activeTab() !== 'simulator'"
+              [class.text-[#1C1C1C]/70]="activeTab() !== 'simulator'"
+              [class.dark:text-zinc-300]="activeTab() !== 'simulator'"
+              class="px-3 py-1.5 rounded-lg text-xs font-extrabold uppercase transition-all cursor-pointer flex items-center gap-1 min-h-[36px]">
+              <span>🎮</span> Simulator
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Tab 1: Instant Somatic Relief -->
       @if (activeTab() === 'relief') {
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in duration-300">
+        <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-5 animate-in fade-in duration-300">
           
           <!-- 4-7-8 Breathing Trainer -->
-          <div class="p-4 rounded-md border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 flex flex-col justify-between">
+          <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between sub-panel">
             <div>
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">🫁 4-7-8 Bio-Breathing</span>
-                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5 font-mono">
+                  <span>🫁</span> 4-7-8 Bio-Breathing
+                </span>
+                <span class="text-xs font-mono font-extrabold px-2.5 py-1 rounded-full bg-[#F6B12B] text-zinc-950 border border-[#1C1C1C]">
                   {{ breathingPhase() }}
                 </span>
               </div>
-              <p class="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed mb-3">
+              <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 leading-relaxed mb-4">
                 Inhale 4s, Hold 7s, Exhale 8s to stimulate parasympathetic vagal nerve tone.
               </p>
 
               <!-- Interactive Breathing Circle -->
-              <div class="flex items-center justify-center my-3">
-                <div class="relative w-20 h-20 rounded-full border-4 border-indigo-500 flex items-center justify-center transition-all duration-1000"
+              <div class="flex items-center justify-center my-4">
+                <div class="relative w-24 h-24 rounded-full border-4 border-[#1C1C1C] dark:border-zinc-600 bg-indigo-500/10 flex items-center justify-center transition-all duration-1000 shadow-inner"
                   [style.transform]="breathingCircleScale()">
-                  <span class="text-xs font-extrabold font-mono text-indigo-700 dark:text-indigo-300">
+                  <span class="text-sm font-black font-mono text-indigo-700 dark:text-indigo-300">
                     {{ isBreathingActive() ? breathingTimer() + 's' : 'START' }}
                   </span>
                 </div>
@@ -106,52 +128,56 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </div>
 
             <button type="button" (click)="toggleBreathing()"
-              [class.bg-emerald-600]="isBreathingActive()"
-              [class.bg-indigo-600]="!isBreathingActive()"
-              class="w-full min-h-[44px] py-2 px-4 rounded text-white text-xs font-extrabold uppercase tracking-wider transition hover:opacity-90 cursor-pointer">
+              [class.bg-[#10B981]]="isBreathingActive()"
+              [class.bg-[#F6B12B]]="!isBreathingActive()"
+              class="w-full py-3 px-4 rounded-xl border-2 border-[#1C1C1C] text-zinc-950 text-xs font-black uppercase tracking-wider transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)] font-mono">
               {{ isBreathingActive() ? '⏸ Pause Pacer' : '▶ Start 4-7-8 Pacer' }}
             </button>
           </div>
 
           <!-- Acute Pain Vagus Cooling -->
-          <div class="p-4 rounded-md border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 flex flex-col justify-between">
+          <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between sub-panel">
             <div>
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-black uppercase tracking-wider text-sky-600 dark:text-sky-400">🧊 Vagus Nerve Cooling</span>
-                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs font-black uppercase tracking-wider text-sky-700 dark:text-sky-400 flex items-center gap-1.5 font-mono">
+                  <span>🧊</span> Vagus Nerve Cooling
+                </span>
+                <span class="text-xs font-mono font-extrabold px-2.5 py-1 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border border-[#1C1C1C]">
                   {{ coolingTimer() > 0 ? coolingTimer() + 's' : 'READY' }}
                 </span>
               </div>
-              <p class="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed mb-3">
+              <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 leading-relaxed mb-4">
                 Apply cold compress or ice water to carotid / vagal sinus area for 60 seconds to reset pain signaling.
               </p>
               
               <!-- Progress Meter -->
-              <div class="w-full bg-slate-200 dark:bg-zinc-800 rounded-full h-3 mb-3 overflow-hidden">
+              <div class="w-full bg-zinc-200 dark:bg-zinc-800 rounded-full h-3.5 mb-4 overflow-hidden border border-[#1C1C1C]">
                 <div class="bg-sky-500 h-full transition-all duration-300" [style.width.%]="coolingProgress()"></div>
               </div>
             </div>
 
             <button type="button" (click)="startCooling()"
               [disabled]="isCoolingActive()"
-              class="w-full min-h-[44px] py-2 px-4 rounded bg-sky-600 disabled:bg-slate-400 text-white text-xs font-extrabold uppercase tracking-wider transition hover:opacity-90 cursor-pointer">
+              class="w-full py-3 px-4 rounded-xl border-2 border-[#1C1C1C] bg-sky-500 text-white disabled:bg-zinc-400 text-xs font-black uppercase tracking-wider transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)] font-mono">
               {{ isCoolingActive() ? '🧊 Cooling Active (' + coolingTimer() + 's)' : '🧊 Start 60s Vagal Cooling' }}
             </button>
           </div>
 
           <!-- Anti-Inflammatory Recipe Generator -->
-          <div class="p-4 rounded-md border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 flex flex-col justify-between">
+          <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between sub-panel">
             <div>
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">☕ Golden Electrolyte Elixir</span>
-                <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400">
-                  Instant Recipe
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 flex items-center gap-1.5 font-mono">
+                  <span>☕</span> Golden Elixir
+                </span>
+                <span class="text-xs font-mono font-extrabold px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border border-[#1C1C1C]">
+                  Recipe
                 </span>
               </div>
-              <p class="text-[11px] text-slate-500 dark:text-zinc-400 leading-relaxed mb-2">
+              <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 leading-relaxed mb-3">
                 Turmeric (Curcumin) + Piperine + Magnesium + Coconut Water to quench oxidative stress.
               </p>
-              <div class="text-[11px] font-mono bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded border border-amber-200 dark:border-amber-900 text-amber-900 dark:text-amber-200 leading-relaxed mb-3">
+              <div class="text-xs font-mono bg-amber-50 dark:bg-amber-950/40 p-3 rounded-xl border border-[#1C1C1C] text-amber-950 dark:text-amber-200 leading-relaxed mb-4">
                 • 250ml Warm Coconut Water<br>
                 • 1/2 tsp Organic Turmeric<br>
                 • 1 pinch Black Pepper (Piperine)<br>
@@ -160,8 +186,8 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
             </div>
 
             <button type="button" (click)="copyRecipe()"
-              class="w-full min-h-[44px] py-2 px-4 rounded bg-amber-600 text-white text-xs font-extrabold uppercase tracking-wider transition hover:opacity-90 cursor-pointer">
-              {{ isRecipeCopied() ? '✓ Recipe Copied to Clipboard!' : '📋 Copy Elixir Recipe' }}
+              class="w-full py-3 px-4 rounded-xl border-2 border-[#1C1C1C] bg-amber-500 text-zinc-950 text-xs font-black uppercase tracking-wider transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)] font-mono">
+              {{ isRecipeCopied() ? '✓ Recipe Copied!' : '📋 Copy Elixir Recipe' }}
             </button>
           </div>
 
@@ -170,41 +196,41 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
 
       <!-- Tab 2: Service Animal Co-Regulation -->
       @if (activeTab() === 'pet') {
-        <div class="p-4 rounded-md border border-amber-300 dark:border-amber-900 bg-amber-50/40 dark:bg-amber-950/20 text-center animate-in fade-in duration-300">
-          <h3 class="text-xs font-black uppercase tracking-wider text-amber-900 dark:text-amber-300 mb-1">
+        <div class="relative z-10 p-6 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-center animate-in fade-in duration-300 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] sub-panel">
+          <h3 class="text-sm font-black uppercase tracking-wider text-amber-900 dark:text-amber-300 mb-1 font-mono">
             🐕 Service Animal & Companion Co-Regulation Audio Suite
           </h3>
-          <p class="text-xs text-slate-600 dark:text-zinc-400 mb-4 max-w-lg mx-auto font-medium">
+          <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 mb-5 max-w-lg mx-auto font-sans leading-relaxed">
             Select an acoustic entrainment mode below. Is a service dog or comforting pet in the room helping you heal?
           </p>
 
           <div class="flex flex-wrap justify-center gap-3">
             <button (click)="petAuditory.playCanineHeartbeat()" 
-              [class.bg-amber-600]="petAuditory.currentMode === 'canine'"
-              [class.text-white]="petAuditory.currentMode === 'canine'"
-              class="min-h-[48px] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider rounded border border-amber-500 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 cursor-pointer hover:border-amber-600">
+              [class.bg-[#F6B12B]]="petAuditory.currentMode === 'canine'"
+              [class.text-[#1C1C1C]]="petAuditory.currentMode === 'canine'"
+              class="px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1C1C1C] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer hover:scale-105 transition-all shadow-[2px_2px_0px_0px_rgba(28,28,28,0.85)] font-mono">
               🐕 Canine Service (60 bpm)
             </button>
             <button (click)="petAuditory.playFelinePurr()" 
-              [class.bg-emerald-600]="petAuditory.currentMode === 'feline'"
+              [class.bg-[#10B981]]="petAuditory.currentMode === 'feline'"
               [class.text-white]="petAuditory.currentMode === 'feline'"
-              class="min-h-[48px] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider rounded border border-emerald-500 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 cursor-pointer hover:border-emerald-600">
+              class="px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1C1C1C] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer hover:scale-105 transition-all shadow-[2px_2px_0px_0px_rgba(28,28,28,0.85)] font-mono">
               🐈 Feline Purr (25-50 Hz)
             </button>
             <button (click)="petAuditory.playCetaceanTherapy()" 
-              [class.bg-sky-600]="petAuditory.currentMode === 'cetacean'"
+              [class.bg-sky-500]="petAuditory.currentMode === 'cetacean'"
               [class.text-white]="petAuditory.currentMode === 'cetacean'"
-              class="min-h-[48px] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider rounded border border-sky-500 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 cursor-pointer hover:border-sky-600">
+              class="px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1C1C1C] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer hover:scale-105 transition-all shadow-[2px_2px_0px_0px_rgba(28,28,28,0.85)] font-mono">
               🐬 Cetacean Bio-Waves
             </button>
             <button (click)="petAuditory.playAvianTherapy()" 
-              [class.bg-indigo-600]="petAuditory.currentMode === 'avian'"
+              [class.bg-purple-600]="petAuditory.currentMode === 'avian'"
               [class.text-white]="petAuditory.currentMode === 'avian'"
-              class="min-h-[48px] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider rounded border border-indigo-500 bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 cursor-pointer hover:border-indigo-600">
+              class="px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1C1C1C] bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 cursor-pointer hover:scale-105 transition-all shadow-[2px_2px_0px_0px_rgba(28,28,28,0.85)] font-mono">
               🦜 Avian Dawn Chorus
             </button>
             @if(petAuditory.isCurrentlyPlaying) {
-              <button (click)="petAuditory.stop()" class="min-h-[48px] px-5 py-2.5 text-xs font-extrabold uppercase tracking-wider rounded border border-red-500 bg-red-500/10 text-red-600 dark:text-red-400 cursor-pointer">
+              <button (click)="petAuditory.stop()" class="px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl border-2 border-[#1C1C1C] bg-rose-600 text-white cursor-pointer hover:scale-105 transition-all shadow-[2px_2px_0px_0px_rgba(28,28,28,0.85)] font-mono">
                 ⏹ Stop Audio
               </button>
             }
@@ -214,53 +240,53 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
 
       <!-- Tab 3: Interactive Health Simulator -->
       @if (activeTab() === 'simulator') {
-        <div class="p-4 rounded-md border border-slate-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 animate-in fade-in duration-300">
-          <div class="flex justify-between items-center mb-4">
+        <div class="relative z-10 p-6 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 animate-in fade-in duration-300 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] sub-panel">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5 border-b border-zinc-200 dark:border-zinc-800 pb-4">
             <div>
-              <h3 class="text-xs font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <h3 class="text-sm font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-400 font-mono">
                 🎮 Live Bio-Feedback Health Simulator ("My Health Dial")
               </h3>
-              <p class="text-xs text-slate-500 dark:text-zinc-400">
+              <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans mt-0.5">
                 Adjust sliders to simulate how lifestyle habits immediately shift your vital score & cellular recovery.
               </p>
             </div>
 
             <!-- Dynamic Vitality Score Badge -->
-            <div class="text-right">
-              <span class="text-2xl font-black font-mono text-indigo-600 dark:text-indigo-400">{{ calculatedVitalityScore() }}%</span>
-              <span class="block text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Predicted Vitality</span>
+            <div class="text-right shrink-0">
+              <span class="text-3xl font-black font-mono text-indigo-700 dark:text-indigo-400">{{ calculatedVitalityScore() }}%</span>
+              <span class="block text-xs font-mono font-extrabold uppercase tracking-widest text-[#1C1C1C]/70 dark:text-zinc-400">Predicted Vitality</span>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
             <!-- Sleep Hours Slider -->
-            <div class="p-3 rounded bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700">
-              <div class="flex justify-between items-center mb-1">
-                <label for="sim-sleep-input" class="font-extrabold text-slate-700 dark:text-zinc-200">😴 Sleep Duration</label>
-                <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">{{ simSleep() }} hrs</span>
+            <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-2 border-[#1C1C1C] dark:border-zinc-700">
+              <div class="flex justify-between items-center mb-2">
+                <label for="sim-sleep-input" class="font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-wider font-mono">😴 Sleep Duration</label>
+                <span class="font-mono font-extrabold text-indigo-700 dark:text-indigo-300 text-sm">{{ simSleep() }} hrs</span>
               </div>
               <input id="sim-sleep-input" name="simSleep" aria-label="Simulated Sleep Duration Hours" type="range" min="4" max="10" step="0.5" [value]="simSleep()" (input)="updateSleep($event)"
-                class="w-full h-2 bg-slate-200 dark:bg-zinc-700 rounded appearance-none cursor-pointer accent-indigo-600" />
+                class="w-full h-2.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#1C1C1C]" />
             </div>
 
             <!-- Hydration Slider -->
-            <div class="p-3 rounded bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700">
-              <div class="flex justify-between items-center mb-1">
-                <label for="sim-hydration-input" class="font-extrabold text-slate-700 dark:text-zinc-200">💧 Daily Hydration</label>
-                <span class="font-mono font-bold text-sky-600 dark:text-sky-400">{{ simHydration() }} L</span>
+            <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-2 border-[#1C1C1C] dark:border-zinc-700">
+              <div class="flex justify-between items-center mb-2">
+                <label for="sim-hydration-input" class="font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-wider font-mono">💧 Daily Hydration</label>
+                <span class="font-mono font-extrabold text-sky-700 dark:text-sky-300 text-sm">{{ simHydration() }} L</span>
               </div>
               <input id="sim-hydration-input" name="simHydration" aria-label="Simulated Daily Hydration Liters" type="range" min="1.0" max="4.5" step="0.25" [value]="simHydration()" (input)="updateHydration($event)"
-                class="w-full h-2 bg-slate-200 dark:bg-zinc-700 rounded appearance-none cursor-pointer accent-sky-600" />
+                class="w-full h-2.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#1C1C1C]" />
             </div>
 
             <!-- Stress Level Slider -->
-            <div class="p-3 rounded bg-slate-50 dark:bg-zinc-800/60 border border-slate-200 dark:border-zinc-700">
-              <div class="flex justify-between items-center mb-1">
-                <label for="sim-stress-input" class="font-extrabold text-slate-700 dark:text-zinc-200">🧘 Stress Load</label>
-                <span class="font-mono font-bold text-rose-600 dark:text-rose-400">{{ simStress() }} / 10</span>
+            <div class="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-2 border-[#1C1C1C] dark:border-zinc-700">
+              <div class="flex justify-between items-center mb-2">
+                <label for="sim-stress-input" class="font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-wider font-mono">🧘 Stress Load</label>
+                <span class="font-mono font-extrabold text-rose-700 dark:text-rose-300 text-sm">{{ simStress() }} / 10</span>
               </div>
               <input id="sim-stress-input" name="simStress" aria-label="Simulated Stress Load Level Out of 10" type="range" min="1" max="10" step="1" [value]="simStress()" (input)="updateStress($event)"
-                class="w-full h-2 bg-slate-200 dark:bg-zinc-700 rounded appearance-none cursor-pointer accent-rose-600" />
+                class="w-full h-2.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-[#1C1C1C]" />
             </div>
           </div>
         </div>
@@ -268,14 +294,14 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
 
       <!-- Tab 4: Neuro-Consciousness & Mood Optimization Matrix -->
       @if (activeTab() === 'matrix') {
-        <div class="animate-in fade-in duration-300">
+        <div class="relative z-10 animate-in fade-in duration-300">
           <app-mood-consciousness-matrix></app-mood-consciousness-matrix>
         </div>
       }
 
       <!-- Tab 5: Patient Health Trajectory Storybook -->
       @if (activeTab() === 'storybook') {
-        <div class="animate-in fade-in duration-300">
+        <div class="relative z-10 animate-in fade-in duration-300">
           <app-patient-health-trajectory-storybook></app-patient-health-trajectory-storybook>
         </div>
       }

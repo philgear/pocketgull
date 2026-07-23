@@ -466,10 +466,13 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 
       <!-- ─── Main Node Content ──────────────── -->
       @if (type() === 'paragraph') {
-        <p class="flex items-start gap-2"
+        <p class="flex items-start gap-2 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-zinc-900/50 rounded-xl p-2 transition-all duration-200"
            [class.bracket-removed]="node().bracketState === 'removed'"
            [class.bracket-added]="node().bracketState === 'added'"
-           (dblclick)="toggleBracket()">
+           (dblclick)="toggleBracket()"
+           (click)="detectAndHighlightBodyPart(node(), false)"
+           (mouseenter)="detectAndHighlightBodyPart(node(), true)"
+           (mouseleave)="clearHoverState()">
           @if (node().bracketState === 'added') {
             <span class="inline-flex items-center text-green-600 dark:text-green-400 mt-0.5" [innerHTML]="ClinicalIcons.Verified | safeHtml" title="Approved / Bracketed Claim"></span>
           } @else if (node().bracketState === 'removed') {
@@ -478,10 +481,13 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
           <span [innerHTML]="rawHtml() | safeHtml" class="flex-1"></span>
         </p>
       } @else if (type() === 'list-item') {
-        <div class="flex items-start gap-2"
+        <div class="flex items-start gap-2 cursor-pointer hover:bg-slate-100/50 dark:hover:bg-zinc-900/50 rounded-xl p-2 transition-all duration-200"
              [class.bracket-removed]="node().bracketState === 'removed'"
              [class.bracket-added]="node().bracketState === 'added'"
-             (dblclick)="toggleBracket()">
+             (dblclick)="toggleBracket()"
+             (click)="detectAndHighlightBodyPart(node(), false)"
+             (mouseenter)="detectAndHighlightBodyPart(node(), true)"
+             (mouseleave)="clearHoverState()">
           @if (node().bracketState === 'added') {
             <span class="inline-flex items-center text-green-600 dark:text-green-400 mt-0.5" [innerHTML]="ClinicalIcons.Verified | safeHtml" title="Approved / Bracketed Claim"></span>
           } @else if (node().bracketState === 'removed') {
@@ -1414,6 +1420,116 @@ Only include a rich-media block when the user explicitly requests visual or rese
       this.proposalAccepted.set(true);
       this.update.emit({ key: this.node().key, acceptedProposal: this.node().proposedText });
     }
+  }
+
+  detectAndHighlightBodyPart(node: ISummaryNode | ISummaryNodeItem, isHover = false): void {
+    const text = (
+      ((node as any).title || '') + ' ' +
+      ((node as any).text || '') + ' ' +
+      ((node as any).rawHtml || '') + ' ' +
+      ((node as any).html || '')
+    ).toLowerCase();
+
+    let partId: string | null = null;
+    let viewMode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'eastern' | 'ayurvedic' | null = null;
+
+    // Chakras
+    if (text.includes('sahasrara') || text.includes('crown chakra')) {
+      partId = 'chakra_sahasrara';
+      viewMode = 'ayurvedic';
+    } else if (text.includes('ajna') || text.includes('third eye')) {
+      partId = 'chakra_ajna';
+      viewMode = 'ayurvedic';
+    } else if (text.includes('vishuddha') || text.includes('throat chakra')) {
+      partId = 'chakra_vishuddha';
+      viewMode = 'ayurvedic';
+    } else if (text.includes('anahata') || text.includes('heart chakra') || text.includes('heart center')) {
+      partId = 'chakra_anahata';
+      viewMode = 'ayurvedic';
+    } else if (text.includes('manipura') || text.includes('solar plexus')) {
+      partId = 'chakra_manipura';
+      viewMode = 'ayurvedic';
+    } else if (text.includes('svadhisthana') || text.includes('sacral chakra')) {
+      partId = 'chakra_svadhisthana';
+      viewMode = 'ayurvedic';
+    } else if (text.includes('muladhara') || text.includes('root chakra')) {
+      partId = 'chakra_muladhara';
+      viewMode = 'ayurvedic';
+    }
+    // Acupoints
+    else if (text.includes('gv-20') || text.includes('gv20') || text.includes('baihui')) {
+      partId = 'acupoint_gv20';
+      viewMode = 'eastern';
+    } else if (text.includes('cv-17') || text.includes('cv17') || text.includes('danzhong')) {
+      partId = 'acupoint_cv17';
+      viewMode = 'eastern';
+    } else if (text.includes('cv-12') || text.includes('cv12') || text.includes('zhongwan')) {
+      partId = 'acupoint_cv12';
+      viewMode = 'eastern';
+    } else if (text.includes('st-36') || text.includes('st36') || text.includes('zusanli')) {
+      partId = 'acupoint_st36_r';
+      viewMode = 'eastern';
+    } else if (text.includes('li-4') || text.includes('li4') || text.includes('hegu')) {
+      partId = 'acupoint_li4_r';
+      viewMode = 'eastern';
+    } else if (text.includes('sp-6') || text.includes('sp6') || text.includes('sanyinjiao')) {
+      partId = 'acupoint_sp6_r';
+      viewMode = 'eastern';
+    }
+    // Organs / Body Parts
+    else if (text.includes('brain') || text.includes('neuro') || text.includes('nervous system') || text.includes('cognitive')) {
+      partId = 'brain';
+      viewMode = 'organs';
+    } else if (text.includes('heart') || text.includes('cardio') || text.includes('myocard') || text.includes('vagal') || text.includes('vagus') || text.includes('circulation')) {
+      partId = 'heart';
+      viewMode = 'organs';
+    } else if (text.includes('lung') || text.includes('respirat') || text.includes('breath') || text.includes('bronch')) {
+      partId = 'lungs';
+      viewMode = 'organs';
+    } else if (text.includes('liver') || text.includes('hepat') || text.includes('detox')) {
+      partId = 'liver';
+      viewMode = 'organs';
+    } else if (text.includes('stomach') || text.includes('gastric') || text.includes('digestion') || text.includes('gut') || text.includes('celiac')) {
+      partId = 'stomach';
+      viewMode = 'organs';
+    } else if (text.includes('kidney') || text.includes('renal') || text.includes('adrenal')) {
+      partId = 'kidneys';
+      viewMode = 'organs';
+    } else if (text.includes('thyroid') || text.includes('endocrine') || text.includes('goiter')) {
+      partId = 'thyroid';
+      viewMode = 'organs';
+    } else if (text.includes('abdomen') || text.includes('digestive') || text.includes('bowel') || text.includes('intestine')) {
+      partId = 'abdomen';
+      viewMode = 'organs';
+    } else if (text.includes('spine') || text.includes('vertebra') || text.includes('cervical') || text.includes('lumbar')) {
+      partId = 'spine_thoracic';
+      viewMode = 'skeleton';
+    } else if (text.includes('pelvis') || text.includes('hip')) {
+      partId = 'pelvis';
+      viewMode = 'skeleton';
+    } else if (text.includes('head') || text.includes('skull') || text.includes('migraine') || text.includes('headache')) {
+      partId = 'head';
+      viewMode = 'skin';
+    }
+
+    if (partId) {
+      if (isHover) {
+        this.patientState.hoveredPartIdForOverlay.set(partId);
+        this.patientState.hoveredViewModeForOverlay.set(viewMode);
+      } else {
+        this.patientState.selectedPartId.set(partId);
+        if (viewMode) {
+          this.patientState.anatomyViewMode.set(viewMode);
+        }
+      }
+    } else if (isHover) {
+      this.clearHoverState();
+    }
+  }
+
+  clearHoverState(): void {
+    this.patientState.hoveredPartIdForOverlay.set(null);
+    this.patientState.hoveredViewModeForOverlay.set(null);
   }
 
   protected readonly ClinicalIcons = ClinicalIcons;

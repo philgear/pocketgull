@@ -4,6 +4,10 @@ import * as DOMPurify from 'dompurify';
 
 import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
+import { LaafFhirHapticScheduleService, ILaafHapticItem } from './laaf-fhir-haptic-schedule.service';
+import { ClinicalAssessmentsService } from './clinical-assessments/clinical-assessments.service';
+import { YbocsService } from './ybocs/ybocs.service';
+import { AcronymExpanderService } from './acronym-expander.service';
 
 /** Shape of the native JSON export file. */
 export interface INativePatientExport {
@@ -33,6 +37,37 @@ interface IFhirBundle {
   providedIn: 'root'
 })
 export class ExportService {
+  private laafFhir = (() => {
+    try {
+      return inject(LaafFhirHapticScheduleService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
+
+  private clinicalAssessments = (() => {
+    try {
+      return inject(ClinicalAssessmentsService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
+
+  private ybocsService = (() => {
+    try {
+      return inject(YbocsService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
+
+  private acronymService = (() => {
+    try {
+      return inject(AcronymExpanderService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
 
   public sanitizeForExport(inputStr: string): string {
     if (!inputStr) return '';
@@ -49,20 +84,82 @@ export class ExportService {
 
   public buildFhirR4Bundle(patientData: any): any {
     const sanitizedP = this.sanitizeObject(patientData);
+    const nowIso = new Date().toISOString();
+    const patientRef = `Patient/${sanitizedP.id || 'p001'}`;
+
+    const entries: any[] = [
+      {
+        resource: {
+          resourceType: 'Patient',
+          id: sanitizedP.id || 'p001',
+          name: [{ text: sanitizedP.name || 'Patient' }]
+        }
+      }
+    ];
+
+    if (this.clinicalAssessments) {
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `gad7-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '69725-0', display: 'Generalized Anxiety Disorder 7-item (GAD-7) total score' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.clinicalAssessments.gad7Score(), unit: '{score}' },
+          interpretation: [{ text: this.clinicalAssessments.gad7Tier().label }]
+        }
+      });
+
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `phq9-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '44261-6', display: 'Patient Health Questionnaire 9-item (PHQ-9) total score' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.clinicalAssessments.phq9Score(), unit: '{score}' },
+          interpretation: [{ text: this.clinicalAssessments.phq9Tier().label }]
+        }
+      });
+    }
+
+    if (this.ybocsService) {
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `ybocs-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '82290-8', display: 'Yale-Brown Obsessive Compulsive Scale (Y-BOCS) total score' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.ybocsService.totalScore(), unit: '{score}' },
+          interpretation: [{ text: this.ybocsService.severityDetails().name }]
+        }
+      });
+    }
+
+    if (this.acronymService) {
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `kss-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '71556-5', display: 'Karolinska Sleepiness Scale (KSS) Clinician & Patient Readiness' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.acronymService.currentKssScore(), unit: '{scale_1_9}' }
+        }
+      });
+    }
+
     return {
       resourceType: 'Bundle',
       id: `bundle-${sanitizedP.id || 'p001'}`,
       type: 'document',
-      timestamp: new Date().toISOString(),
-      entry: [
-        {
-          resource: {
-            resourceType: 'Patient',
-            id: sanitizedP.id || 'p001',
-            name: [{ text: sanitizedP.name || 'Patient' }]
-          }
-        }
-      ]
+      timestamp: nowIso,
+      entry: entries
     };
   }
 
@@ -1750,6 +1847,76 @@ export class ExportService {
   exportToEHR(patient: IPatient, system: 'Epic' | 'Cerner'): void {
     console.log(`[ExportService] Initiating Smart on FHIR export to ${system}...`);
     this.downloadAsFhirBundle(patient, system);
+  }
+
+  /**
+   * Exports compiled LAAF Haptic Schedule as a FHIR R4 Bundle (CarePlan + DeviceRequest).
+   */
+  downloadLaafHapticScheduleBundle(patient?: IPatient | null, customItems?: ILaafHapticItem[]): void {
+    const patientId = patient?.id || 'P001';
+    const patientName = patient?.name || 'Clinical Patient';
+
+    const defaultItems: ILaafHapticItem[] = customItems && customItems.length > 0 ? customItems : [
+      {
+        id: 'vagal-01',
+        title: '0.1 Hz Baroreflex Vagal Resonance Pacer',
+        modality: 'vagal_resonance',
+        frequencyHz: 0.1,
+        amplitudePercent: 65,
+        anatomicalSite: 'sternum_midline',
+        durationMinutes: 15,
+        repeatFrequency: 3,
+        repeatPeriod: 1,
+        repeatPeriodUnit: 'd',
+        timeOfDay: ['08:00', '14:00', '21:00'],
+        status: 'active',
+        clinicalRationale: '0.1 Hz sternal haptic vibration targeting baroreceptor resonance for HRV parasympathetic elevation.'
+      },
+      {
+        id: 'gamma-02',
+        title: '40 Hz Cognitive Gamma Entrainment',
+        modality: 'gamma_40hz',
+        frequencyHz: 40.0,
+        amplitudePercent: 40,
+        anatomicalSite: 'mastoid_process',
+        durationMinutes: 20,
+        repeatFrequency: 1,
+        repeatPeriod: 1,
+        repeatPeriodUnit: 'd',
+        timeOfDay: ['09:00'],
+        status: 'active',
+        clinicalRationale: '40 Hz dual mastoid bone conduction vibration for microglial clearance & cognitive sharpness.'
+      },
+      {
+        id: 'thermo-03',
+        title: 'Somatic Thermoregulation Pacer',
+        modality: 'somatic_thermoregulation',
+        frequencyHz: 1.2,
+        amplitudePercent: 50,
+        anatomicalSite: 'wrist_bilateral',
+        durationMinutes: 10,
+        repeatFrequency: 2,
+        repeatPeriod: 1,
+        repeatPeriodUnit: 'd',
+        timeOfDay: ['12:00', '18:00'],
+        status: 'active',
+        clinicalRationale: 'Thermal-haptic wrist wave to balance autonomic vascular tone during acute stress.'
+      }
+    ];
+
+    if (!this.laafFhir) return;
+
+    const fhirBundle = this.laafFhir.toFhirBundle({
+      patientId,
+      patientName,
+      scheduleTitle: `LAAF Haptic Schedule — ${patientName}`,
+      createdDate: new Date().toISOString(),
+      items: defaultItems
+    });
+
+    const filename = `LAAF_FHIR_Haptic_Schedule_${patientName.replace(/\s+/g, '_')}.json`;
+    console.log('[ExportService] Triggering LAAF Haptic FHIR Bundle download:', filename);
+    this._downloadJson(fhirBundle, filename);
   }
 
   /**

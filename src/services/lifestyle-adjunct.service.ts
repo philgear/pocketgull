@@ -41,6 +41,9 @@ export class LifestyleAdjunctService {
     cbd:        ['cbd', 'cannabidiol', 'hemp oil', 'hemp extract'],
     diabetic:   ['diabetes', 'diabetic', 'type 1', 'type 2', 't1dm', 't2dm', 'insulin', 'metformin', 'glipizide', 'semaglutide', 'ozempic', 'jardiance'],
     preDiabetic:['pre-diabet', 'prediabet', 'impaired fasting', 'igf', 'borderline diabet'],
+    neuro:      ['multiple sclerosis', ' ms ', 'ms,', 'demyelin', 'neuropathy', 'neurological', 'neuro-demyelinating', 'axon', 'optic neuritis', 'uhthoff', 'moga', 'santos'],
+    visual:     ['blind', 'vision loss', 'optic neuritis', 'macular', 'glaucoma', 'cataract', 'retinopathy', 'low vision'],
+    cognitive:  ['dyslexia', 'adhd', 'autism', 'sensory overload', 'mci', 'dementia', 'concussion', 'tbi', 'cognitive decline'],
   } as const;
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -81,16 +84,22 @@ export class LifestyleAdjunctService {
       usesCbd:               any(this.KW.cbd),
       isDiabetic:            any(this.KW.diabetic),
       isPreDiabetic:         any(this.KW.preDiabetic),
+      hasNeuroCondition:     any(this.KW.neuro),
+      hasVisualImpairment:   any(this.KW.visual),
+      hasCognitiveSensitivity: any(this.KW.cognitive),
       notes,
     };
 
-    if (ctx.hasCaffeine)    notes.push('Caffeine use noted');
-    if (ctx.hasAlcohol)     notes.push(ctx.inAlcoholRecovery ? 'Alcohol — in recovery' : 'Active alcohol use noted');
-    if (ctx.isSmoker)       notes.push('Tobacco/nicotine use noted');
-    if (ctx.isCannabisUser) notes.push('Cannabis (THC) use noted');
-    if (ctx.usesCbd)        notes.push('CBD use noted');
-    if (ctx.isDiabetic)     notes.push('Diabetic — glycemic timing matters');
-    if (ctx.isPreDiabetic)  notes.push('Pre-diabetic — blood sugar monitoring recommended');
+    if (ctx.hasCaffeine)             notes.push('Caffeine use noted');
+    if (ctx.hasAlcohol)              notes.push(ctx.inAlcoholRecovery ? 'Alcohol — in recovery' : 'Active alcohol use noted');
+    if (ctx.isSmoker)                notes.push('Tobacco/nicotine use noted');
+    if (ctx.isCannabisUser)          notes.push('Cannabis (THC) use noted');
+    if (ctx.usesCbd)                 notes.push('CBD use noted');
+    if (ctx.isDiabetic)              notes.push('Diabetic — glycemic timing matters');
+    if (ctx.isPreDiabetic)           notes.push('Pre-diabetic — blood sugar monitoring recommended');
+    if (ctx.hasNeuroCondition)       notes.push('Multiple Sclerosis / Neuro-Demyelination — Uhthoff thermoregulation & axonal support indicated');
+    if (ctx.hasVisualImpairment)     notes.push('Visual Impairment / Optic Neuritis — Audio-primary spatial acoustic protocol active');
+    if (ctx.hasCognitiveSensitivity)  notes.push('Cognitive Sensitivity / Neuro-divergence — High-legibility literacy & 40 Hz Gamma entrainment indicated');
 
     return ctx;
   }
@@ -281,6 +290,74 @@ export class LifestyleAdjunctService {
       });
     }
 
+    // ── MULTIPLE SCLEROSIS & NEURO-DEMYELINATION ───────────────────────────
+    if (ctx.hasNeuroCondition) {
+      recs.push({
+        category: 'caution',
+        emoji: '❄️',
+        title: 'Uhthoff Phenomenon — Thermoregulation & Chilled Hydration',
+        detail: 'Core temperature rises as small as 0.5°C slow demyelinated axonal conduction, triggering transient nerve fatigue. '
+          + 'Serve chilled electrolyte or iced mint tea; keep clinic ambient room temperature under 68°F (20°C). Avoid hot beverages before/during active therapy.',
+      });
+      recs.push({
+        category: 'avs-adjustment',
+        emoji: '🧠',
+        title: 'Gentle Vagal Resonant Pacing (5.5 BPM)',
+        detail: 'Demyelinating conditions benefit from gentle parasympathetic tone enhancement without autonomic over-exertion. '
+          + 'Set breathing rate to 5.5 BPM with extended 4-1-6 ratio to avoid hyperventilation fatigue.',
+        avsAdjust: { param: 'breathing_bpm', value: 5.5 },
+      });
+      recs.push({
+        category: 'beverage',
+        emoji: '🧬',
+        title: 'Oligodendrocyte & Axonal Membrane Support',
+        detail: '• High-Dose Vitamin D3 + K2 (5,000 IU) — crucial for immune tolerance and T-cell regulation\n'
+          + '• Alpha-Lipoic Acid (600 mg) — mitochondrial antioxidant shown to reduce brain atrophy rates in progressive MS\n'
+          + '• CoQ10 / Ubiquinol (200 mg) — supports electron transport chain resilience in demyelinated axons\n'
+          + '• Omega-3 DHA/EPA (2,000 mg) — provides essential lipid precursors for myelin sheath maintenance.',
+      });
+    }
+
+    // ── VISUAL IMPAIRMENT / BLINDNESS / OPTIC NEURITIS ──────────────────────
+    if (ctx.hasVisualImpairment) {
+      recs.push({
+        category: 'avs-adjustment',
+        emoji: '🎧',
+        title: 'Audio-Primary Spatial Acoustic Protocol',
+        detail: 'For patients with visual impairment or optic nerve damage, bypass photic light stimulation and rely on spatialized binaural audio entrainment. '
+          + 'Activate voice dictation and high-clarity spoken feedback.',
+        avsAdjust: { param: 'wave', value: 'alpha' },
+      });
+      recs.push({
+        category: 'beverage',
+        emoji: '🫐',
+        title: 'Retinal & Optic Nerve Botanical Support',
+        detail: '• Bilberry Extract (160 mg Anthocyanins) — enhances microvascular retinal circulation\n'
+          + '• Lutein (20 mg) & Zeaxanthin (4 mg) — macula carotenoid protective shield\n'
+          + '• Saffron Extract (30 mg) — clinically validated for neuroprotection of retinal ganglion cells.',
+      });
+    }
+
+    // ── COGNITIVE LOAD & NEURO-DIVERGENCE (DYSLEXIA, ADHD, AUTISM, MCI, CONCUSSION) ──
+    if (ctx.hasCognitiveSensitivity) {
+      recs.push({
+        category: 'avs-adjustment',
+        emoji: '🧠',
+        title: '40 Hz Gamma Cognitive Synchronization & Sensory Shield',
+        detail: 'For MCI, concussion, or cognitive load sensitivities, use 40 Hz Gamma sensory stimulation (MIT protocol for amyloid clearance & microglial activation). '
+          + 'Enforce Dyslexia-friendly high-legibility plain-language mode and low-stimulation acoustic brown noise.',
+        avsAdjust: { param: 'wave', value: 'gamma' },
+      });
+      recs.push({
+        category: 'beverage',
+        emoji: '🍵',
+        title: 'Nootropic Adaptogen & Synaptic Resilience Stack',
+        detail: '• Bacopa Monnieri (300 mg) — enhances synaptic transmission and speed of recall\n'
+          + '• Phosphatidylserine (200 mg) — membrane lipid that supports cognitive processing speed\n'
+          + '• L-Theanine (200 mg) + Gotu Kola — promotes relaxed focus and mitigates sensory overload.',
+      });
+    }
+
     // ── UNIVERSAL WIND-DOWN ─────────────────────────────────────────────────
     // Only add if there are no other recommendations (avoids clutter for complex cases)
     if (recs.length === 0) {
@@ -319,6 +396,9 @@ export class LifestyleAdjunctService {
     if (ctx.usesCbd)                  factors.push('CBD use (synergistic with alpha)');
     if (ctx.isDiabetic)               factors.push('diabetic (verify glycemic timing, neuropathy considered)');
     if (ctx.isPreDiabetic)            factors.push('pre-diabetic (glucose-supportive beverage suggestions provided)');
+    if (ctx.hasNeuroCondition)        factors.push('Multiple Sclerosis / Neuro-demyelination (Uhthoff thermoregulation & oligodendrocyte support active)');
+    if (ctx.hasVisualImpairment)     factors.push('Visual impairment / Low vision (Audio-primary spatial acoustic entrainment active)');
+    if (ctx.hasCognitiveSensitivity)  factors.push('Cognitive sensitivity / Neuro-divergence (40 Hz Gamma entrainment & high-legibility literacy active)');
 
     if (factors.length === 0) return 'No substance or metabolic interactions detected. Standard protocol applies.';
     return `Lifestyle factors affecting this AVS session: ${factors.join('; ')}.`;

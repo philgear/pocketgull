@@ -21,20 +21,175 @@ import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
 import { ThemeService } from './theme.service';
 import { dataConnect } from '../lib/firebase';
-import { createCarePlan, createConsultationSession } from '../lib/dataconnect';
+import { createCarePlan, createConsultationSession } from '../lib/dataconnect/esm/index.esm.js';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientStateService {
-  // --- UI State ---
+  // --- UI State & Clinical Tool Prescription State Machine ---
   readonly isPlainLanguageMode = signal<boolean>(false);
+  readonly toolStates = signal<Record<string, 'unassigned' | 'prescribed' | 'hidden'>>({});
+
+  readonly prescribedToolsList = computed(() => {
+    const states = this.toolStates();
+    const prescribedKeys = Object.keys(states).filter(k => states[k] === 'prescribed');
+    const vitals = this.vitals();
+    const hrVal = vitals?.hr ? parseInt(String(vitals.hr), 10) || 72 : 72;
+    const bpVal = vitals?.bp || '118/76';
+    
+    const toolNamesMap: Record<string, { 
+      name: string; 
+      icon: string; 
+      category: string;
+      personalizedInstruction: string;
+      suggestedUsage: string;
+      patientCareTip: string;
+    }> = {
+      qaly: { 
+        name: 'QALY Epigenetic Longevity Calculator', 
+        icon: '⏳', 
+        category: 'Epigenetic Healthspan',
+        personalizedInstruction: `Target +12.0 QALY gain by reducing systemic CRP and stabilizing resting blood pressure around ${bpVal}.`,
+        suggestedUsage: 'Re-assess every 30 days during progress reviews.',
+        patientCareTip: 'Track how your daily sleep habits improve your long-term vitality score.'
+      },
+      solfeggio: { 
+        name: 'Polyphonic Solfeggio & AVS Soundscape Deck', 
+        icon: '🎵', 
+        category: 'Acoustic Co-Regulation',
+        personalizedInstruction: `Listen to 528 Hz (DNA/Cellular Repair) paired with 432 Hz to calm sympathetic tone from ${hrVal} bpm.`,
+        suggestedUsage: '15-20 minutes in evening prior to bedtime entrainment.',
+        patientCareTip: 'Use stereo headphones in a quiet, dark room for optimal brainwave sync.'
+      },
+      vagal: { 
+        name: 'Vagal Resonance & Biofeedback Quick-Dock', 
+        icon: '🫁', 
+        category: 'Autonomic HRV Biofeedback',
+        personalizedInstruction: `Practice 6 breaths/min (0.1 Hz resonance) to maximize baroreflex gain and increase HRV power.`,
+        suggestedUsage: '10 minutes twice daily (08:00 AM & 20:00 PM).',
+        patientCareTip: 'Breathe in for 4 seconds, exhale slowly for 6 seconds with relaxed shoulders.'
+      },
+      storm: { 
+        name: 'Physiological & Environmental Storm Shield', 
+        icon: '⛈️', 
+        category: 'Acute Telemetry',
+        personalizedInstruction: `Shield against barometric pressure drops and environmental humidity spikes that trigger symptom flares.`,
+        suggestedUsage: 'Check alert panel daily at 07:30 AM before outdoor activity.',
+        patientCareTip: 'Stay hydrated and increase electrolyte intake when barometric pressure drops.'
+      },
+      foraging: { 
+        name: 'Androscoggin Phytoncide & Foraging Protocol', 
+        icon: '🫐', 
+        category: 'Botanical & Ecological',
+        personalizedInstruction: `Incorporate high-polyphenol wild blueberries and pine needle phytoncide decoctions to clear Ama toxicity.`,
+        suggestedUsage: 'Consume 1/2 cup wild berries daily with morning meal.',
+        patientCareTip: 'Natural wild berries support healthy gut bacteria and digestive warmth.'
+      },
+      investment: { 
+        name: 'Procedural Care Investment Matrix', 
+        icon: '📈', 
+        category: 'Actuarial Healthcare',
+        personalizedInstruction: `Prioritize early lifestyle interventions over high-cost procedures for maximum actuarial ROI.`,
+        suggestedUsage: 'Review quarterly with primary care team.',
+        patientCareTip: 'Small daily healthy choices prevent expensive medical procedures later.'
+      },
+      perils: { 
+        name: 'Life Perils & Stressor Paradigm Matrix', 
+        icon: '⏳', 
+        category: 'Biopsychosocial Risk',
+        personalizedInstruction: `Identify external stressors (sleep disruption, workplace strain) and apply targeted vagal grounding.`,
+        suggestedUsage: 'Assess weekly during self-reflection journaling.',
+        patientCareTip: 'Take 3 deep breaths whenever you feel sudden daily stress building.'
+      },
+      karaoke: { 
+        name: 'Avian Sea Shanty Karaoke & Duet Co-Singer Deck', 
+        icon: '🎙️', 
+        category: 'Multimodal Vocal Co-Regulation',
+        personalizedInstruction: `Singalong to 60 BPM rhythm sea shanties with Avian co-singers for diaphragmatic vagal stimulation.`,
+        suggestedUsage: '5-10 minutes during afternoon fatigue or anxiety onset.',
+        patientCareTip: 'Sing out loud with Swoop or Gulliver to stretch your lungs and lift your mood!'
+      }
+    };
+
+    return prescribedKeys.map(k => ({
+      id: k,
+      ...(toolNamesMap[k] || { 
+        name: k, 
+        icon: '🛠️', 
+        category: 'Clinical Tool',
+        personalizedInstruction: 'Follow clinical protocol guidelines.',
+        suggestedUsage: 'Use as directed by care team.',
+        patientCareTip: 'Consult care provider for questions.'
+      })
+    }));
+  });
+
+  // --- Enterprise Agent HIPAA Audit Telemetry ---
+  readonly enterpriseAuditLog = signal<Array<{
+    timestamp: string;
+    action: 'AI_SYNTHESIS' | 'FHIR_EXPORT' | 'PRESCRIBE_TOOL' | 'WAKE_WORD' | 'SBAR_HANDOFF';
+    actor: string;
+    hash: string;
+    details: string;
+  }>>([
+    {
+      timestamp: new Date().toISOString(),
+      action: 'AI_SYNTHESIS',
+      actor: 'Gemini 2.5 Flash',
+      hash: '0x8f3a9e21b71c4f52',
+      details: 'Multi-Lens evidence-grounded clinical report synthesized'
+    }
+  ]);
+
+  logEnterpriseAudit(action: 'AI_SYNTHESIS' | 'FHIR_EXPORT' | 'PRESCRIBE_TOOL' | 'WAKE_WORD' | 'SBAR_HANDOFF', details: string) {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      action,
+      actor: 'PocketGull Enterprise Agent',
+      hash: `0x${Math.random().toString(16).substring(2, 10)}${Math.random().toString(16).substring(2, 10)}`,
+      details
+    };
+    this.enterpriseAuditLog.update(logs => [entry, ...logs.slice(0, 49)]);
+  }
   
+  getToolState(toolId: string): 'unassigned' | 'prescribed' | 'hidden' {
+    return this.toolStates()[toolId] || 'unassigned';
+  }
+
+  cycleToolState(toolId: string): 'unassigned' | 'prescribed' | 'hidden' {
+    const current = this.getToolState(toolId);
+    let next: 'unassigned' | 'prescribed' | 'hidden' = 'unassigned';
+    if (current === 'unassigned') next = 'prescribed';
+    else if (current === 'prescribed') next = 'hidden';
+    else next = 'unassigned';
+
+    this.toolStates.update(map => ({
+      ...map,
+      [toolId]: next
+    }));
+    return next;
+  }
+
+  restoreHiddenTools() {
+    this.toolStates.update(map => {
+      const updated = { ...map };
+      for (const key of Object.keys(updated)) {
+        if (updated[key] === 'hidden') {
+          updated[key] = 'unassigned';
+        }
+      }
+      return updated;
+    });
+  }
+
   togglePlainLanguageMode() {
     this.isPlainLanguageMode.update(val => !val);
   }
   readonly selectedPartId = signal<string | null>(null);
+  readonly hoveredPartIdForOverlay = signal<string | null>(null);
+  readonly hoveredViewModeForOverlay = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'eastern' | 'ayurvedic' | null>(null);
   readonly loadedPatientId = signal<string | null>(null);
   readonly selectedNoteId = signal<string | null>(null);
   readonly isLiveAgentActive = signal<boolean>(false);
@@ -47,7 +202,7 @@ export class PatientStateService {
   readonly requestedSearchEngine = signal<'google' | 'pubmed' | 'ayurveda' | 'tcm' | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
-  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular'>('skin');
+  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic'>('skin');
   readonly customModelUrl = signal<string | null>(null);
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<IDraftSummaryItem[]>([]);
@@ -58,7 +213,30 @@ export class PatientStateService {
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
+  readonly isAudioPrimaryMode = signal<boolean>(false);
+  readonly isGammaSyncActive = signal<boolean>(false);
   readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
+  readonly tcmIntake = signal<import('./patient.types').ITcmIntake>({
+    tongueColor: 'pink',
+    tongueCoating: 'thin-white',
+    pulseQuality: 'normal',
+    thermalPreference: 'neutral',
+    sweatPattern: 'normal',
+    tasteInMouth: 'normal',
+    tcmPattern: 'Balanced Qi & Blood Flow'
+  });
+  readonly ayurvedicIntake = signal<import('./patient.types').IAyurvedicIntake>({
+    prakritiVata: 4,
+    prakritiPitta: 3,
+    prakritiKapha: 3,
+    vikritiVata: 5,
+    vikritiPitta: 4,
+    vikritiKapha: 2,
+    agniType: 'samagni',
+    amaScore: 2,
+    nadiPulseType: 'swan-kapha',
+    ashtavidhaStatus: 'Balanced Tridosha State'
+  });
   readonly selectedCognitiveLevel = signal<'standard' | 'simplified' | 'dyslexia' | 'child'>('standard');
   readonly selectedLanguage = signal<string>('English');
   readonly selectedReadingLevel = signal<string>('standard');
@@ -382,6 +560,16 @@ export class PatientStateService {
     this.requestAnalysisUpdate();
   }
 
+  updateTcmIntake(partial: Partial<import('./patient.types').ITcmIntake>) {
+    this.tcmIntake.update(curr => ({ ...curr, ...partial }));
+    this.requestAnalysisUpdate();
+  }
+
+  updateAyurvedicIntake(partial: Partial<import('./patient.types').IAyurvedicIntake>) {
+    this.ayurvedicIntake.update(curr => ({ ...curr, ...partial }));
+    this.requestAnalysisUpdate();
+  }
+
   toggleLiveAgent(active: boolean) {
     this.isLiveAgentActive.set(active);
   }
@@ -399,6 +587,19 @@ export class PatientStateService {
         this.game.completeQuest('explore_evidence');
       }
     }
+  }
+
+  openResearchUrl(url: string) {
+    if (!url) return;
+    this.requestedResearchUrl.set(url);
+    this.toggleResearchFrame(true);
+  }
+
+  openResearchQuery(query: string, engine?: 'google' | 'pubmed' | 'ayurveda' | 'tcm') {
+    if (!query) return;
+    if (engine) this.requestedSearchEngine.set(engine);
+    this.requestedResearchQuery.set(query);
+    this.toggleResearchFrame(true);
   }
 
   toggleSynthesisDashboard(visible?: boolean) {
@@ -726,6 +927,8 @@ export class PatientStateService {
     this.viewingPastVisit.set(null); // Ensure we're not in review mode when loading a patient.
     if (state.activePhilosophy) this.activePhilosophy.set(state.activePhilosophy);
     if (state.ayurvedicStatus) this.ayurvedicStatus.set(state.ayurvedicStatus);
+    if (state.tcmIntake) this.tcmIntake.set(state.tcmIntake);
+    if (state.ayurvedicIntake) this.ayurvedicIntake.set(state.ayurvedicIntake);
     if ((state as any).biometricHistory) {
       this.biometricHistory.set((state as any).biometricHistory);
     } else {
@@ -740,6 +943,9 @@ export class PatientStateService {
             patientGoals: this.patientGoals(),
             dietaryProtocol: this.dietaryProtocol(),
             vitals: this.vitals(),
+            activePhilosophy: this.activePhilosophy(),
+            tcmIntake: this.tcmIntake(),
+            ayurvedicIntake: this.ayurvedicIntake(),
             dynamicNutrients: this.dynamicNutrients(),
             oxidativeStressMarkers: this.oxidativeStressMarkers(),
             antioxidantSources: this.antioxidantSources(),
@@ -747,7 +953,6 @@ export class PatientStateService {
             clinicalNotes: this.clinicalNotes(),
             checklist: this.checklist(),
             shoppingList: this.shoppingList(),
-            activePhilosophy: this.activePhilosophy(),
             ayurvedicStatus: this.ayurvedicStatus(),
             biometricHistory: this.biometricHistory(),
         } as any;

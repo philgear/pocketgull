@@ -20,20 +20,20 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in">
       
       <!-- Dieter Rams Braun Audio Console Shell -->
-      <div class="w-full max-w-6xl max-h-[94vh] bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-800 overflow-hidden flex flex-col font-['Inter']">
+      <div class="w-full max-w-6xl max-h-[94vh] bg-white dark:bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden flex flex-col font-['Inter'] pocket-gull-card">
         
         <!-- Header -->
-        <div class="p-5 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
+        <div class="p-5 bg-zinc-100 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-xl bg-zinc-950 border border-zinc-800 text-orange-400 flex items-center justify-center text-xl shadow-inner font-bold">
+            <div class="w-11 h-11 rounded-xl bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-orange-600 dark:text-orange-400 flex items-center justify-center text-xl shadow-inner font-bold">
               📻
             </div>
             <div>
               <div class="flex items-center gap-2.5 font-mono">
-                <h2 class="text-lg font-black tracking-wider uppercase text-zinc-100">Actuarial Glee Vinyl Lounge & DJ Deck</h2>
+                <h2 class="text-lg font-black tracking-wider uppercase text-zinc-900 dark:text-zinc-100">Actuarial Glee Vinyl Lounge & DJ Deck</h2>
                 <pocket-gull-badge label="ANALOG 33/45 RPM DECK" severity="warning"></pocket-gull-badge>
               </div>
-              <p class="text-xs text-zinc-400 font-sans mt-0.5">Technics / Braun Functional Audio Station & Interactive Notation</p>
+              <p class="text-xs text-zinc-600 dark:text-zinc-400 font-sans mt-0.5">Technics / Braun Functional Audio Station & Interactive Notation</p>
             </div>
           </div>
 
@@ -42,46 +42,46 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
             <!-- Master Mute Audio Toggle -->
             <button (click)="audioService.toggleMute()" 
               [class]="audioService.isMuted()
-                ? 'px-3.5 py-1.5 rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/40 text-xs font-bold transition cursor-pointer hover:bg-orange-500/30'
-                : 'px-3.5 py-1.5 rounded-lg bg-zinc-950 text-zinc-300 border border-zinc-800 text-xs font-bold transition cursor-pointer hover:bg-zinc-850'"
+                ? 'px-3.5 py-1.5 rounded-lg bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/40 text-xs font-bold transition cursor-pointer hover:bg-orange-500/30'
+                : 'px-3.5 py-1.5 rounded-lg bg-zinc-100 dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 text-xs font-bold transition cursor-pointer hover:bg-zinc-200 dark:hover:bg-zinc-850'"
               [attr.aria-label]="audioService.isMuted() ? 'Unmute Audio' : 'Mute Audio'">
               <span>{{ audioService.isMuted() ? '🔇 Audio Muted' : '🔊 Sound On' }}</span>
             </button>
 
             <!-- Mode Switcher: Crate Digging vs DJ Booth -->
-            <div class="flex rounded-lg bg-zinc-950 p-1 border border-zinc-800">
+            <div class="flex rounded-lg bg-zinc-200 dark:bg-zinc-950 p-1 border border-zinc-300 dark:border-zinc-800">
               <button (click)="activeTab.set('crate')" 
                 [class.bg-orange-500]="activeTab() === 'crate'"
                 [class.text-zinc-950]="activeTab() === 'crate'"
-                class="px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer text-zinc-400 hover:text-white">
+                class="px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer text-zinc-700 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
                 📦 Record Crate
               </button>
               <button (click)="activeTab.set('turntable')" 
                 [class.bg-orange-500]="activeTab() === 'turntable'"
                 [class.text-zinc-950]="activeTab() === 'turntable'"
-                class="px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer text-zinc-400 hover:text-white">
+                class="px-3 py-1 text-xs font-bold rounded-md transition cursor-pointer text-zinc-700 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
                 🎧 DJ Turntable
               </button>
             </div>
 
-            <button (click)="closeLounge()" class="text-zinc-400 hover:text-white text-2xl font-semibold p-1 cursor-pointer">
+            <button (click)="closeLounge()" class="text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white text-2xl font-semibold p-1 cursor-pointer">
               &times;
             </button>
           </div>
         </div>
 
         <!-- Main Body -->
-        <div class="flex-1 p-6 overflow-y-auto bg-zinc-950 text-zinc-100 flex flex-col space-y-6">
+        <div class="flex-1 p-6 overflow-y-auto bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col space-y-6">
           
           <!-- TAB 1: Record Store Crate Digging View -->
           <div *ngIf="activeTab() === 'crate'" class="flex-1 flex flex-col space-y-6 font-mono">
             
-            <div class="flex items-center justify-between border-b border-zinc-800/80 pb-4">
+            <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800/80 pb-4">
               <div>
-                <h3 class="text-xs font-extrabold uppercase tracking-widest text-orange-400">Vinyl Record Store Bin</h3>
-                <p class="text-xs text-zinc-400 font-sans mt-0.5">Click any vinyl album sleeve to cue it onto the turntable deck</p>
+                <h3 class="text-xs font-extrabold uppercase tracking-widest text-orange-600 dark:text-orange-400">Vinyl Record Store Bin</h3>
+                <p class="text-xs text-zinc-600 dark:text-zinc-400 font-sans mt-0.5">Click any vinyl album sleeve to cue it onto the turntable deck</p>
               </div>
-              <span class="text-xs text-zinc-400">12 Progressive Regeneration Masters</span>
+              <span class="text-xs text-zinc-600 dark:text-zinc-400">12 Progressive Regeneration Masters</span>
             </div>
 
             <!-- Crate Grid of Vinyl Albums -->
@@ -89,10 +89,10 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
               
               @for (track of orderedTracks(); track track.trackNumber; let i = $index) {
                 <div (click)="cueTrackOnTurntable(i)"
-                  class="group relative rounded-2xl bg-zinc-900 border border-zinc-800 p-3 hover:border-orange-500 transition-all duration-300 cursor-pointer shadow-md hover:-translate-y-1">
+                  class="group relative rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 hover:border-orange-500 transition-all duration-300 cursor-pointer shadow-md hover:-translate-y-1 sub-panel">
                   
                   <!-- Vinyl Sleeve Cover -->
-                  <div class="aspect-square rounded-xl overflow-hidden relative shadow-md bg-zinc-950 flex items-center justify-center border border-zinc-800">
+                  <div class="aspect-square rounded-xl overflow-hidden relative shadow-md bg-white dark:bg-zinc-950 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
                     <img src="/assets/images/actuarial_glee_vinyl_cover.png" alt="Vinyl Cover" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                     
                     <!-- Vinyl Edge Ring peek -->
@@ -105,11 +105,11 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
                   </div>
 
                   <div class="mt-3 space-y-0.5 font-sans">
-                    <div class="text-xs font-bold text-zinc-200 truncate group-hover:text-orange-400">{{ track.icon }} {{ track.title }}</div>
-                    <div class="text-[10px] text-zinc-400 truncate">{{ track.subtitle }}</div>
+                    <div class="text-xs font-bold text-zinc-900 dark:text-zinc-200 truncate group-hover:text-orange-600 dark:group-hover:text-orange-400">{{ track.icon }} {{ track.title }}</div>
+                    <div class="text-[10px] text-zinc-600 dark:text-zinc-400 truncate">{{ track.subtitle }}</div>
                   </div>
 
-                  <div class="mt-2 flex items-center justify-between text-[9px] font-mono text-zinc-400">
+                  <div class="mt-2 flex items-center justify-between text-[9px] font-mono text-zinc-600 dark:text-zinc-400">
                     <span>+{{ track.qalyBonus }}y QALY</span>
                     <span>{{ track.bpm }} BPM</span>
                   </div>
@@ -126,7 +126,7 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               <!-- Left 7 Cols: 3D Turntable Deck -->
-              <div class="lg:col-span-7 bg-zinc-900 rounded-2xl border border-zinc-800 p-6 flex flex-col items-center justify-between shadow-xl relative">
+              <div class="lg:col-span-7 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 flex flex-col items-center justify-between shadow-xl relative sub-panel">
                 
                 <!-- Deck Top Controls -->
                 <div class="w-full flex items-center justify-between border-b border-zinc-800 pb-4 mb-4 font-mono">

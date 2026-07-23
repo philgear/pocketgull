@@ -1,6 +1,6 @@
 {
   "name": "pocket-gull",
-  "version": "1.0.0-rc10",
+  "version": "1.3.0",
   "workspaces": [
     "docs/study",
     "companion-apps/avs-therapy",
@@ -76,9 +76,9 @@
   "scripts": {
     "postinstall": "patch-package",
     "dev": "ng serve",
-    "build": "npm install --prefix docs/study && npm run build --prefix docs/study && ng build",
+    "build": "npm --prefix docs/study install && npm --prefix docs/study run build && ng build",
     "deploy": "gcloud run deploy pocket-gull --source . --project gen-lang-client-0540208645 --region=us-central1 --min-instances=0 --update-env-vars=OTEL_SDK_DISABLED=true --timeout=25m --quiet",
-    "lint": "node node_modules/typescript/lib/tsc.js --noEmit",
+    "lint": "node node_modules/typescript/lib/tsc.js -p tsconfig.json --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
     "serve:ssr:app": "node dist/server/server.mjs",

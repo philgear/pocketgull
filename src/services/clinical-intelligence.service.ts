@@ -1,4 +1,4 @@
-import DOMPurify from 'dompurify';
+import * as DOMPurify from 'dompurify';
 import { Injectable, signal, inject } from '@angular/core';
 import { IIntelligenceProvider } from './ai/intelligence.provider';
 import { AiCacheService } from './ai-cache.service';
@@ -935,7 +935,8 @@ Feel free to reference their research areas and publications if it supports the 
      */
     filterNegativeValenceHype(text: string): string {
         if (!text) return text;
-        const cleanText = DOMPurify.sanitize(text);
+        const purify = (DOMPurify as any).default || DOMPurify;
+        const cleanText = purify.sanitize(text);
         return cleanText
             .replace(/\b(disastrous|catastrophic|terrifying|dire warning|fatal breakdown)\b/gi, 'clinical observation')
             .replace(/\b(hopeless|uncontrollable crisis)\b/gi, 'manageable clinical priority');

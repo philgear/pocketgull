@@ -24,96 +24,72 @@ export class WalkthroughTourService {
     const isSpark = this.theme.currentTheme() === 'spark';
     const list: ITourStep[] = [
       {
-        targetId: 'tour-body-chart',
-        title: 'Interactive 3D Anatomical & Dermatome Raycaster',
-        body: 'Tap any region on this 3D mannequin model (Skin, Muscle, Bone, Organs, Spine & Dermatomes) or use the Search Bar to focus the camera. Selecting an organ isolates relevant telemetry and metabolic CMP lab panels without covering the mannequin.',
-        position: 'right',
-      },
-      {
         targetId: 'tour-patient-dropdown',
-        title: 'Patient Story & Sentinel Epidemiological Triage',
-        body: 'The patient\'s story lives here (history, vitals, prior visits). Patients flagged for epidemiological or outbreak threats (Sentinels) feature high-priority amber outlines and dedicated tags to activate containment workflows.',
+        title: 'Step 1: Patient Chart & Sentinel Triage Selection',
+        body: 'Begin the clinical loop by selecting a patient profile. Patients flagged for outbreak or epidemiological threats (Sentinels) feature high-priority amber tags and containment protocols.',
         position: 'bottom',
       },
       {
-        targetId: 'tour-intake-form',
-        title: 'Viewport-Contextual Organ Telemetry & CMP Labs',
-        body: 'Review organ-specific metabolic lab panels (Troponin, ALT/AST, eGFR/Creatinine, Fasting Glucose) and tap one-click clinical symptom shortcuts. Our intelligence engine analyzes every detail to generate context-aware care plans.',
+        targetId: 'tour-body-chart',
+        title: 'Step 2: 3D Anatomical & Dermatome Symptom Isolation',
+        body: 'Investigate the 3D anatomical model (Skin, Muscle, Bone, Visceral Organs, Dermatomes). Tapping an organ focuses the camera and filters metabolic CMP lab panels (Troponin, ALT/AST, eGFR, Fasting Glucose).',
         position: 'right',
-      }
-    ];
-
-    if (isSpark) {
-      list.push({
-        targetId: 'tour-avs-therapy',
-        title: 'AVS Biometric Neuro-Therapy',
-        body: 'In Spark mode, access real-time audio-visual entrainment. Generate a clinical co-regulation protocol or adjust brainwave frequencies and respiratory pacing to guide your patient\'s autonomic state.',
-        position: 'right',
-      });
-    }
-
-    list.push(
+      },
       {
         targetId: 'tour-generate-btn',
-        title: 'One Tap. Multi-Lens Synthesis.',
-        body: 'When ready, press this button. Gemini synthesizes the full patient chart into structured clinical lenses — protocols, nutrition, monitoring, education, and digital telemetry. Watch it stream in live.',
+        title: 'Step 3: One-Tap Gemini Multi-Lens Synthesis',
+        body: 'Click "Generate Clinical Strategy". Google Gemini 2.5 Flash streams real-time evidence-grounded directives across Western Allopathic, TCM Zang-Fu, and Ayurvedic Vedic paradigms.',
         position: 'bottom',
       },
       {
         targetId: 'tour-lens-tabs',
-        title: 'Lens 1: Summary Overview',
-        body: 'Synthesizes documented conditions, diagnostic priorities, and immediate therapeutic targets into a clear executive summary for the attending clinician.',
-        position: 'bottom',
-      },
-      {
-        targetId: 'tour-lens-tabs',
-        title: 'Lens 2: Functional Protocols',
-        body: 'Integrates biochemical pathway targets, bio-energetic balances (TCM Zang-Fu / Ayurvedic Doshas), and high-evidence medical interventions.',
-        position: 'bottom',
-      },
-      {
-        targetId: 'tour-lens-tabs',
-        title: 'Lens 3: Therapeutic Nutrition',
-        body: 'Custom anti-inflammatory, DASH, or elimination diets tailored to metabolic CMP lab markers, liver enzymes, and renal clearance limits.',
-        position: 'bottom',
-      },
-      {
-        targetId: 'tour-lens-tabs',
-        title: 'Lens 4: Precision Nutrients & Botanicals',
-        body: 'Targeted bioavailable micronutrients (Methylcobalamin, L-5-MTHF), adaptogens, and active botanical compounds translated into clinical dosages.',
-        position: 'bottom',
-      },
-      {
-        targetId: 'tour-lens-tabs',
-        title: 'Lens 5: Biometric Monitoring & Follow-Up',
-        body: 'Defines continuous BLE wearable parameters, lab re-check windows, and red-flag clinical escalation rules.',
-        position: 'bottom',
-      },
-      {
-        targetId: 'tour-lens-tabs',
-        title: 'Lens 6: Patient Education Guide',
-        body: 'Translates complex clinical strategies into plain-language 6th-grade patient guides with everyday analogies.',
+        title: 'Step 4: Explore 11 Specialized Clinical Lenses',
+        body: 'Navigate through Overview, Treatment Matrix, Functional Protocols, Nutrition, Precision Nutrients, Follow-up, Patient Education, Assessments, Maternal, and Longevity lenses.',
         position: 'bottom',
       },
       {
         targetId: 'tour-report-node',
-        title: 'Interactive Evidence Focus & Verification',
-        body: 'Every recommendation is interactive. Hover to open Evidence Focus for inline PubMed research/verification. Double-click any task to cycle its verification state (Approved checkmark vs Excluded cross).',
+        title: 'Step 5: Double-Click Prescriptions & Dual Perspective Toggle',
+        body: 'Single-click tools to view guidelines; double-click to cycle state (Unassigned ➔ 💊 Prescribed ➔ 🙈 Hidden). Toggle 🌱 Plain Language / 🔬 Deep Rationale for clinician vs patient literacy.',
         position: 'left',
       },
       {
-        targetId: 'tour-voice-assistant',
-        title: 'Voice & Multimodal WebRTC Consult Assistant',
-        body: 'Engage in real-time, bi-directional clinical audio streaming (`AdkLiveService`). Ask questions, log feedback, or trigger hands-free voice dictation with client-side speech barge-in.',
-        position: 'left',
+        targetId: 'tour-voice-agent-trigger',
+        title: 'Step 6: Live Avian Agent Consult Indicator',
+        body: 'Click this microphone button to open the Avian Voice Consult panel. You can interact with personas like Gulliver (🔭) or Swoop (⚡) using full-duplex WebSocket audio streams.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-research-frame-trigger',
+        title: 'Step 7: Literature Research Panel',
+        body: 'Toggle this Research button to open the on-the-fly medical literature panel, indexing PubMed, Europe PMC, and bioRxiv to cross-validate clinical hypotheses.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-docs-trigger',
+        title: 'Step 8: Interactive Medical Studies & Docs',
+        body: 'Click "Docs" to view the comprehensive, integrated clinical protocol guidelines and study pages.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-theme-trigger',
+        title: 'Step 9: High-Contrast Texture & Theme Suite',
+        body: 'Configure the interface aesthetics with options like Organic Hemp, Rice Paper, Cardstock, and Dark Mode.',
+        position: 'bottom',
+      },
+      {
+        targetId: 'tour-footer-lens-navigation',
+        title: 'Step 10: Footer Lens Stepper Navigation',
+        body: 'Quickly switch and navigate sequentially through the 11 specialized clinical lenses using the bottom bar stepper.',
+        position: 'top',
       },
       {
         targetId: 'tour-finalize-btn',
-        title: 'Global Research Export & Companion App Sync',
-        body: 'Archive the finalized plan to the patient chart and FHIR R4 Bundle. Export care plans into global research languages or sync directly to the mobile app (`pocketgull_flutter`).',
+        title: 'Step 11: Patient QR Handoff & FHIR R4 Bundle Archival',
+        body: 'Archive the care plan, generate HL7 FHIR R4 Bundle exports, and scan the QR code to hand off the plan to the patient\'s mobile device. Loop complete!',
         position: 'bottom',
       }
-    );
+    ];
 
     return list;
   });
@@ -143,7 +119,7 @@ export class WalkthroughTourService {
     const nextIdx = step + 1;
     const nextStep = nextIdx < this.steps().length ? this.steps()[nextIdx] : null;
     
-    if (nextStep && nextStep.targetId === 'tour-voice-assistant') {
+    if (nextStep && nextStep.targetId === 'tour-voice-agent-trigger') {
       this.state.toggleLiveAgent(true);
     } else {
       this.state.toggleLiveAgent(false);
@@ -162,7 +138,7 @@ export class WalkthroughTourService {
       const prevIdx = step - 1;
       const prevStep = this.steps()[prevIdx];
       
-      if (prevStep.targetId === 'tour-voice-assistant') {
+      if (prevStep.targetId === 'tour-voice-agent-trigger') {
         this.state.toggleLiveAgent(true);
       } else {
         this.state.toggleLiveAgent(false);

@@ -14,6 +14,27 @@ export const p_mara_santos: IPatient = {
     "Vitamin D Deficiency"
   ],
   "patientGoals": "Extend relapse-free interval, manage fatigue without additional sedating medications, preserve cognitive function, and explore integrative approaches alongside DMT.",
+  "tcmIntake": {
+    "tongueColor": "pale",
+    "tongueCoating": "peeled",
+    "pulseQuality": "deep-thready",
+    "thermalPreference": "aversion-cold",
+    "sweatPattern": "night-sweats",
+    "tasteInMouth": "normal",
+    "tcmPattern": "Liver & Kidney Yin Deficiency with Internal Wind & Jing Depletion"
+  },
+  "ayurvedicIntake": {
+    "prakritiVata": 7,
+    "prakritiPitta": 5,
+    "prakritiKapha": 2,
+    "vikritiVata": 9,
+    "vikritiPitta": 6,
+    "vikritiKapha": 2,
+    "agniType": "vishamagni",
+    "amaScore": 6.8,
+    "nadiPulseType": "snake-vata",
+    "ayurvedicImbalance": "Severe Vata Resurgence in Majja Dhatu (Nerve Sheath)"
+  },
   "vitals": {
     "bp": "108/68",
     "hr": "76",

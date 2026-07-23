@@ -70,7 +70,7 @@ export const SPECIALTY_PROFILES: ISpecialtyProfile[] = [
     title: 'Neuro-Psychiatry & Behavioral Specialist',
     doctorType: 'Board Certified Neuro-Psychiatrist (MD/DO)',
     icon: '🧠',
-    targetLens: 'Y-BOCs Screener',
+    targetLens: 'ASSESSMENTS',
     accentClass: 'border-rose-500 bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300',
     description: 'Specialized evaluation of obsessive-compulsive inventory trajectories, cognitive load thresholds, and neuro-behavioral protocols.',
     focusTags: ['Y-BOCs Trajectory', 'Neuro-Behavioral Inventory', 'Cognitive Load Shield', 'Autonomic Regulation']

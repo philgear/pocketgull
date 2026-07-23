@@ -201,12 +201,16 @@ export interface IChatEntry {
                                          [class.border-green-500]="entry.role === 'user'">
                                         
                                         <!-- Header line -->
-                                        <div class="text-[12px] md:text-sm uppercase font-bold tracking-widest mb-1.5 flex justify-between items-center opacity-60">
+                                        <div class="text-[12px] md:text-sm uppercase font-bold tracking-widest mb-1.5 flex justify-between items-center opacity-80">
                                             <span>{{entry.role === 'model' ? 'SYS.INTELLIGENCE' : 'USR.MIC'}}_</span>
                                             
-                                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex flex-wrap gap-2 text-[10px] font-mono">
                                                  <button (click)="actionCopy(entry.text)" class="hover:text-black dark:hover:text-white" title="Copy">[COPY]</button>
                                                  @if (entry.role === 'model') {
+                                                    <button (click)="speakPersona(entry.text, 'gulliver')" class="hover:text-[#F6B12B] font-bold" title="Speak with Gulliver voice">[🔭 GULLIVER]</button>
+                                                    <button (click)="speakPersona(entry.text, 'swoop')" class="hover:text-amber-500 font-bold" title="Speak with Swoop voice">[⚡ SWOOP]</button>
+                                                    <button (click)="speakPersona(entry.text, 'sentinel')" class="hover:text-sky-500 font-bold" title="Speak with Sentinel voice">[🔦 SENTINEL]</button>
+                                                    <button (click)="speakPersona(entry.text, 'scribes')" class="hover:text-emerald-500 font-bold" title="Speak with Scribes voice">[📖 SCRIBES]</button>
                                                     <button (click)="actionInsert(entry.text)" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
                                                     <button (click)="actionAnchor(entry.text)" class="hover:text-black dark:hover:text-white" title="Anchor to Memory Palace">[ANCHOR]</button>
                                                  }
@@ -404,6 +408,10 @@ export class VoiceAssistantComponent implements OnDestroy {
     anchorLocus = signal('');
 
     protected readonly ClinicalIcons = ClinicalIcons;
+
+    speakPersona(text: string, persona: 'gulliver' | 'swoop' | 'sentinel' | 'scribes') {
+      this.dictation.speakAvianPersonaText(text, persona);
+    }
     public live = inject(AdkLiveService);
 
     // Derived signal for UI rendering

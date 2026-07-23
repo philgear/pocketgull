@@ -22,18 +22,21 @@ export interface ILifeStagePeril {
   imports: [CommonModule, PocketGullBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="w-full p-5 rounded-2xl bg-slate-900/60 dark:bg-zinc-950/80 border border-slate-700/60 dark:border-zinc-800 backdrop-blur-xl shadow-xl font-sans text-slate-100">
+    <div class="w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 shadow-2xl font-sans relative overflow-hidden pocket-gull-card mb-8">
       
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
-        <div class="flex items-center gap-2.5">
-          <span class="text-2xl p-2 rounded-xl bg-amber-500/20 text-amber-300">⏳</span>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-zinc-200 dark:border-zinc-800">
+        <div class="flex items-center gap-3.5">
+          <span class="text-3xl p-2.5 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">⏳</span>
           <div>
-            <div class="flex items-center gap-2">
-              <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-400">Actuarial Longevity & Risk Engine</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs sm:text-sm font-mono font-extrabold uppercase tracking-widest text-amber-600 dark:text-amber-400">Actuarial Longevity & Risk Engine</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#3B82F6] text-white font-mono font-extrabold uppercase border border-[#1C1C1C] shadow-[1px_1px_0px_0px_rgba(28,28,28,0.9)]">
+                Sentinel 🔦 Risk Mitigation
+              </span>
               <pocket-gull-badge label="Multi-Paradigm Life Perils" severity="warning"></pocket-gull-badge>
             </div>
-            <h3 class="text-base font-extrabold text-white tracking-tight mt-0.5">Life-Stage Perils & Vulnerability Matrix</h3>
+            <h3 class="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight mt-1 uppercase">Life-Stage Perils & Vulnerability Matrix</h3>
           </div>
         </div>
 

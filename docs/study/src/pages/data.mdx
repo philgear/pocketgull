@@ -150,6 +150,13 @@ Generated insights can be physically printed via CSS-optimized layouts featuring
 | **Remote storage**    | None (GCP Healthcare FHIR Store optional)                      |
 | **PHI in transit**    | Stripped before any external request                           |
 | **AI data retention** | Transient inference only (Vertex AI Enterprise)                |
-| **Export formats**    | FHIR R4 Bundle (JSON), PDF, BigQuery Analytics                 |
 | **Import formats**    | FHIR R4, Epic/Lucy, Google Cloud Healthcare FHIR Store, Healthcare NLP |
+
+---
+
+## 📜 Data & FHIR Evolution Timeline
+
+- **v1.2.0 (2026-07-22)**: Added PRAPARE SDOH Z-code FHIR exporter (`Z59.8` Housing, `Z59.41` Food Insecurity, `Z59.82` Transportation, `Z59.6` Financial Strain, `Z60.2` Isolation). Expanded `IPatientState` serialization to auto-save and restore `tcmIntake` and `ayurvedicIntake` profiles across IndexedDB and REST endpoints.
+- **v1.1.0 (2026-07-21)**: Introduced Multilingual WHO ICD-11 Cross-Border Emergency Health Passport (`cross-border-health-wallet.service.ts`) exporting de-identified emergency directives in English, Spanish, French, and Mandarin.
+- **v1.0.0-rc12 (2026-07-21)**: Standardized full vitals schema (`bp`, `hr`, `temp`, `spO2`, `weight`, `height`, `vitD3`, `magnesium`, `b12`, `zinc`), oxidative stress markers, antioxidant sources, and PhysioNet challenge scenarios across all 13 mock patient dataset files.
 

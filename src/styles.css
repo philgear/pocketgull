@@ -1,6 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body, html {
+  font-family: 'Inter', sans-serif;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ==========================================================================
+   PAPERCRAFT THEME SYSTEM (Rice Paper, Hemp, Construction, Cardstock)
+   ========================================================================== */
+
+html.papercraft-mode {
+  background-color: #FAF8F5;
+  background-image: url('/images/rice_paper_texture.png');
+  background-repeat: repeat;
+  background-attachment: fixed;
+  color: #1c1917;
+}
+
+html.papercraft-rice body,
+html.papercraft-rice app-root {
+  background-color: transparent;
+  background-image: url('/images/rice_paper_texture.png');
+  background-repeat: repeat;
+  background-attachment: fixed;
+}
+
+html.papercraft-hemp body,
+html.papercraft-hemp app-root {
+  background-color: #f4eee0;
+  background-image: url('/images/hemp_paper_texture.png');
+  background-repeat: repeat;
+  background-attachment: fixed;
+}
+
+html.papercraft-construction body,
+html.papercraft-construction app-root {
+  background-color: #0f172a;
+  background-image: url('/images/construction_paper_texture.png');
+  background-repeat: repeat;
+  background-attachment: fixed;
+}
+
+/* Tactile Papercraft Components */
+html.papercraft-mode .paper-card {
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(214, 211, 209, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08);
+}
+
+/* Zero Cumulative Layout Shift (CLS) Stability Rules */
+app-root {
+  display: block;
+  min-height: 100vh;
+}
+
+app-body-3d-viewer,
+.body-viewer-container {
+  min-height: 480px;
+  contain: layout;
+}
 
 @keyframes wobble {
 
@@ -438,7 +506,7 @@
 /* Dieter Rams Rectilinear Task Brackets (Replacing Rounded Pills) */
 .rams-task-bracket {
     display: inline-flex;
-    items-center: center;
+    align-items: center;
     gap: 0.5rem;
     padding: 0.35rem 0.75rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -1813,3 +1881,1224 @@ html.dark textarea.dyslexia-textarea {
 .layout-contain {
   contain: layout style;
 }
+
+/* ─── Papercraft Design System & 3D Origami Animations ─── */
+:root {
+  --paper-cream: #F9F3D9;
+  --paper-peach: #F5B98E;
+  --paper-mustard: #F6B12B;
+  --paper-teal: #2AA4A0;
+  --paper-coral: #EF6658;
+  --paper-white: #FFFFFF;
+  --paper-ink: #1C1C1C;
+  --paper-shadow: 6px 12px 24px -4px rgba(80, 50, 20, 0.18), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --paper-shadow-lifted: 12px 24px 36px -6px rgba(80, 50, 20, 0.25), 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.paper-card {
+  position: relative;
+  background-color: #FFFFFF;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(220, 200, 170, 0.4);
+  box-shadow: var(--paper-shadow);
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 300ms ease;
+}
+
+.paper-card:hover {
+  transform: translateY(-3px) rotate(-0.3deg);
+  box-shadow: var(--paper-shadow-lifted);
+}
+
+/* ─── Comprehensive Papercraft Theme Mode Overrides ─── */
+/* ─── Comprehensive Subtle Papercraft & Paper Textures Suite ─── */
+html.papercraft-mode {
+  --paper-cream: #FAF7EE;
+  --paper-peach: #F6E2CF;
+  --paper-mustard: #F6B12B;
+  --paper-teal: #2AA4A0;
+  --paper-coral: #EF6658;
+  --paper-white: #FFFDF8;
+  --paper-ink: #1F1B16;
+  --paper-shadow: 6px 14px 28px -4px rgba(70, 45, 18, 0.16), 0 2px 4px rgba(0, 0, 0, 0.08);
+  --paper-shadow-lifted: 12px 24px 38px -6px rgba(70, 45, 18, 0.22), 0 4px 8px rgba(0, 0, 0, 0.12);
+
+  background-color: #FAF7EE !important;
+  color: #1F1B16 !important;
+}
+
+/* Base Canvas (Body, Main, Containers, Splash) - Light & Transparent Papercraft (10% Opacity Overlay) */
+html.papercraft-mode body,
+html.papercraft-mode main,
+html.papercraft-mode .secure-splash-main,
+html.papercraft-mode .bg-zinc-950,
+html.papercraft-mode .bg-gray-50,
+html.papercraft-mode .bg-zinc-900,
+html.papercraft-mode .bg-zinc-800 {
+  background: linear-gradient(135deg, #FFFEFA 0%, #FAF6EB 60%, #F5EEDD 100%) !important;
+  color: #1F1B16 !important;
+  position: relative;
+}
+
+/* 🌿 Hemp Paper Variant */
+html.papercraft-hemp body,
+html.papercraft-hemp main,
+html.papercraft-hemp .secure-splash-main,
+html.papercraft-hemp .bg-zinc-950,
+html.papercraft-hemp .bg-gray-50 {
+  background: linear-gradient(135deg, #FCF8F3 0%, #F7EFE6 60%, #EFE3D5 100%) !important;
+}
+
+/* 📜 Rice Paper / Washi Variant */
+html.papercraft-rice body,
+html.papercraft-rice main,
+html.papercraft-rice .secure-splash-main,
+html.papercraft-rice .bg-zinc-950,
+html.papercraft-rice .bg-gray-50 {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAF8F5 60%, #F3EFE7 100%) !important;
+}
+
+/* 🎨 Construction Paper Variant */
+html.papercraft-construction body,
+html.papercraft-construction main,
+html.papercraft-construction .secure-splash-main,
+html.papercraft-construction .bg-zinc-950,
+html.papercraft-construction .bg-gray-50 {
+  background: linear-gradient(135deg, #FDFBF5 0%, #F8F3E6 60%, #EFE7D5 100%) !important;
+}
+
+/* Global 10% Opacity Texture Overlay */
+html.papercraft-mode body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.10 !important; /* Strictly 10% texture opacity */
+  background-repeat: repeat;
+  background-image: url('/images/paper_cardstock_texture.png');
+}
+
+html.papercraft-hemp body::before {
+  background-image: url('/images/hemp_paper_texture.png');
+}
+
+html.papercraft-rice body::before {
+  background-image: url('/images/rice_paper_texture.png');
+}
+
+html.papercraft-construction body::before {
+  background-image: url('/images/construction_paper_texture.png');
+}
+
+/* Tactile Translucent Light Paper Cards & Containers (10% Texture Opacity) */
+html.papercraft-mode .bg-white:not(.overflow-y-auto):not(.overflow-auto),
+html.papercraft-mode .pocket-gull-card,
+html.papercraft-mode .paper-card,
+html.papercraft-mode .sub-panel,
+html.papercraft-mode .card,
+html.papercraft-mode [class*="bg-zinc-900"]:not(.overflow-y-auto):not(.overflow-auto),
+html.papercraft-mode [class*="bg-zinc-950"]:not(.overflow-y-auto):not(.overflow-auto),
+html.papercraft-mode [class*="bg-slate-900"]:not(.overflow-y-auto):not(.overflow-auto),
+html.papercraft-mode .bg-gray-50:not(.overflow-y-auto):not(.overflow-auto),
+html.papercraft-mode .bg-gray-100:not(.overflow-y-auto):not(.overflow-auto) {
+  position: relative;
+  background-color: rgba(255, 254, 250, 0.96) !important;
+  color: #1F1B16 !important;
+  border: 1px solid rgba(220, 205, 180, 0.4) !important;
+  box-shadow: 0 4px 16px -2px rgba(70, 45, 18, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+  border-radius: 1.25rem !important;
+}
+
+/* Explicitly preserve scroll container behavior across all papercraft themes */
+html.papercraft-mode .overflow-y-auto,
+html.papercraft-mode .overflow-auto,
+html.papercraft-mode [class*="overflow-y-auto"],
+html.papercraft-mode [class*="overflow-auto"] {
+  overflow-y: auto !important;
+}
+
+html.papercraft-mode .pocket-gull-card::before,
+html.papercraft-mode .paper-card::before,
+html.papercraft-mode .sub-panel::before,
+html.papercraft-mode .card::before,
+html.papercraft-mode .bg-white::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.10 !important; /* Strictly 10% texture opacity */
+  mix-blend-mode: soft-light !important;
+  background-repeat: repeat;
+  background-image: url('/images/paper_cardstock_texture.png');
+}
+
+html.papercraft-hemp .pocket-gull-card::before,
+html.papercraft-hemp .paper-card::before,
+html.papercraft-hemp .sub-panel::before,
+html.papercraft-hemp .card::before,
+html.papercraft-hemp .bg-white::before {
+  background-image: url('/images/hemp_paper_texture.png');
+  border-color: rgba(214, 194, 172, 0.4) !important;
+}
+
+html.papercraft-rice .pocket-gull-card::before,
+html.papercraft-rice .paper-card::before,
+html.papercraft-rice .sub-panel::before,
+html.papercraft-rice .card::before,
+html.papercraft-rice .bg-white::before {
+  background-image: url('/images/rice_paper_texture.png');
+  border-color: rgba(226, 215, 197, 0.4) !important;
+}
+
+html.papercraft-construction .pocket-gull-card::before,
+html.papercraft-construction .paper-card::before,
+html.papercraft-construction .sub-panel::before,
+html.papercraft-construction .card::before,
+html.papercraft-construction .bg-white::before {
+  background-image: url('/images/construction_paper_texture.png');
+  border-color: rgba(218, 205, 182, 0.4) !important;
+}
+
+/* Crisp Paper Cut-out Sub-Panels & White Cards */
+html.papercraft-mode .paper-cutout,
+html.papercraft-mode .sub-panel {
+  background-color: #FFFFFF !important;
+  border: 1px solid rgba(220, 190, 150, 0.6) !important;
+  color: #1F1B16 !important;
+  box-shadow: 0 4px 12px rgba(70, 45, 18, 0.1) !important;
+  border-radius: 1rem !important;
+}
+
+/* Translucent Paper & Pocket-Like UI Utilities */
+.paper-pocket-container {
+  background-image: linear-gradient(135deg, rgba(255, 253, 248, 0.78) 0%, rgba(249, 243, 230, 0.65) 100%);
+  border: 1.5px solid rgba(230, 215, 190, 0.6);
+  box-shadow: 0 20px 50px -10px rgba(60, 40, 15, 0.12), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+html.dark .paper-pocket-container {
+  background-image: linear-gradient(135deg, rgba(24, 24, 27, 0.75) 0%, rgba(9, 9, 11, 0.85) 100%);
+  border: 1.5px solid rgba(63, 63, 70, 0.6);
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+}
+
+.paper-hemp-panel {
+  position: relative;
+  background: rgba(245, 238, 224, 0.72);
+  border: 1px solid rgba(214, 194, 172, 0.5);
+  box-shadow: inset 0 2px 6px rgba(70, 45, 18, 0.06);
+}
+
+html.dark .paper-hemp-panel {
+  background: rgba(24, 24, 27, 0.65);
+  border: 1px solid rgba(63, 63, 70, 0.5);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.paper-hemp-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: soft-light;
+  background-image: url('/images/hemp_paper_texture.png');
+}
+
+.paper-rice-panel {
+  position: relative;
+  background: rgba(253, 251, 247, 0.82);
+  border: 1px solid rgba(226, 215, 197, 0.6);
+  box-shadow: 0 4px 14px rgba(70, 45, 18, 0.05);
+}
+
+html.dark .paper-rice-panel {
+  background: rgba(24, 24, 27, 0.75);
+  border: 1px solid rgba(63, 63, 70, 0.6);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.paper-rice-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: soft-light;
+  background-image: url('/images/rice_paper_texture.png');
+}
+
+.pocket-stitched-border {
+  border-style: dashed !important;
+}
+
+/* Origami Teal & Coral Action Buttons */
+html.papercraft-mode .btn-primary {
+  background-color: #2AA4A0 !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #1F8582 !important;
+  box-shadow: 0 4px 10px rgba(42, 164, 160, 0.25) !important;
+  border-radius: 0.85rem !important;
+  font-weight: 700 !important;
+}
+
+html.papercraft-mode .btn-accent {
+  background-color: #EF6658 !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid #DF5648 !important;
+  box-shadow: 0 4px 10px rgba(239, 102, 88, 0.25) !important;
+  border-radius: 0.5rem !important;
+  font-weight: 700 !important;
+}
+
+/* 📐 Global Dieter Rams Zero-Pill Standard (No oval pills in any components, suites, or tools) */
+.rounded-full:not(.status-dot),
+[class*="rounded-full"]:not(.status-dot),
+button.rounded-full,
+span.rounded-full,
+div.rounded-full {
+  border-radius: 0.375rem !important; /* Crisp 6px rectangular chamfer */
+}
+
+/* Headings & Text Color Overrides for Papercraft Mode */
+html.papercraft-mode h1:not([class*="text-"]),
+html.papercraft-mode h2:not([class*="text-"]),
+html.papercraft-mode h3:not([class*="text-"]),
+html.papercraft-mode h4:not([class*="text-"]),
+html.papercraft-mode h5:not([class*="text-"]) {
+  color: #1F1B16 !important;
+  font-weight: 700;
+}
+
+html.papercraft-mode p:not([class*="text-white"]):not([class*="text-zinc-950"]):not([class*="text-[#"]),
+html.papercraft-mode span:not([class*="text-white"]):not([class*="text-[#"]):not([class*="text-sky"]):not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-amber"]):not([class*="text-purple"]):not([class*="text-indigo"]):not([class*="text-[#1C1C1C]"]):not(button *):not(.badge *) {
+  color: #332C25;
+}
+
+/* Explicit preservation of button and badge text colors in papercraft mode */
+html.papercraft-mode button [class*="text-white"],
+html.papercraft-mode button.text-white,
+html.papercraft-mode .text-white,
+html.papercraft-mode [class*="!text-white"],
+html.papercraft-mode [class*="bg-indigo-600"],
+html.papercraft-mode [class*="bg-indigo-600"] *,
+html.papercraft-mode [class*="bg-purple-600"],
+html.papercraft-mode [class*="bg-purple-600"] *,
+html.papercraft-mode [class*="bg-red-600"],
+html.papercraft-mode [class*="bg-sky-600"],
+html.papercraft-mode [class*="bg-emerald-600"] {
+  color: #FFFFFF !important;
+}
+
+/* Papercraft Wave & Hill Colors */
+html.papercraft-mode .paper-hill-back { color: #F6B12B !important; }
+html.papercraft-mode .paper-hill-mid { color: #2AA4A0 !important; }
+html.papercraft-mode .paper-hill-front { color: #EF6658 !important; }
+
+/* Navbar & Header Overrides (10% Soft-Light Paper Texture) */
+html.papercraft-mode header,
+html.papercraft-mode nav {
+  position: relative;
+  background-color: rgba(250, 247, 238, 0.96) !important;
+  border-bottom: 1.5px solid rgba(229, 213, 181, 0.5) !important;
+}
+
+html.papercraft-mode header::before,
+html.papercraft-mode nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.10 !important; /* Strictly 10% texture opacity */
+  mix-blend-mode: soft-light !important;
+  background-repeat: repeat;
+  background-image: url('/images/paper_cardstock_texture.png');
+}
+
+html.papercraft-hemp header::before,
+html.papercraft-hemp nav::before {
+  background-image: url('/images/hemp_paper_texture.png');
+}
+
+html.papercraft-rice header::before,
+html.papercraft-rice nav::before {
+  background-image: url('/images/rice_paper_texture.png');
+}
+
+html.papercraft-construction header::before,
+html.papercraft-construction nav::before {
+  background-image: url('/images/construction_paper_texture.png');
+}
+
+.paper-cutout {
+  border-radius: 9999px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  filter: drop-shadow(2px 4px 6px rgba(60, 40, 20, 0.15));
+}
+
+/* 3D Origami Fold & Unfold Animations */
+.origami-perspective {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.origami-unfold {
+  transform-origin: top center;
+  animation: origamiUnfold 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  backface-visibility: hidden;
+}
+
+@keyframes origamiUnfold {
+  0% {
+    opacity: 0.2;
+    transform: rotateX(-75deg) scaleY(0.4);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+  }
+  60% {
+    transform: rotateX(8deg) scaleY(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: rotateX(0deg) scaleY(1);
+    box-shadow: var(--paper-shadow);
+  }
+}
+
+/* ─── Avian Persona SVG Keyframe Animations ─── */
+.anim-telescope-scan {
+  animation: telescopeScan 3s ease-in-out infinite alternate;
+}
+@keyframes telescopeScan {
+  0% { transform: rotate(-8deg) scale(0.95); opacity: 0.8; }
+  50% { transform: rotate(8deg) scale(1.05); opacity: 1; }
+  100% { transform: rotate(-8deg) scale(0.95); opacity: 0.8; }
+}
+
+.anim-satchel-bounce {
+  animation: satchelBounce 2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+@keyframes satchelBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px) scale(1.05); }
+}
+
+.anim-lantern-sweep {
+  animation: lanternSweep 4s ease-in-out infinite;
+  transform-origin: center center;
+}
+@keyframes lanternSweep {
+  0% { transform: rotate(0deg); opacity: 0.7; }
+  50% { transform: rotate(180deg); opacity: 1; filter: drop-shadow(0 0 10px #F59E0B); }
+  100% { transform: rotate(360deg); opacity: 0.7; }
+}
+
+.anim-quill-write {
+  animation: quillWrite 2.5s ease-in-out infinite;
+}
+@keyframes quillWrite {
+  0% { transform: rotate(0deg) translate(0, 0); }
+  25% { transform: rotate(-10deg) translate(-2px, -3px); }
+  75% { transform: rotate(10deg) translate(2px, 3px); }
+  100% { transform: rotate(0deg) translate(0, 0); }
+}
+
+.anim-speed-dash {
+  animation: speedDash 1.2s linear infinite;
+}
+@keyframes speedDash {
+  0% { transform: translateX(-4px) skewX(-10deg); opacity: 0.6; }
+  50% { transform: translateX(4px) skewX(10deg); opacity: 1; }
+  100% { transform: translateX(-4px) skewX(-10deg); opacity: 0.6; }
+}
+
+.anim-cpr-pulse {
+  animation: cprPulse 545ms ease-in-out infinite alternate; /* 110 BPM */
+}
+@keyframes cprPulse {
+  0% { transform: scale(0.96); filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.4)); }
+  100% { transform: scale(1.08); filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9)); }
+}
+
+/* ─── Neo-Brutalist Tactile Papercraft Utilities ─── */
+.neo-tactile-card {
+  border: 2px solid #1C1C1C !important;
+  box-shadow: 4px 6px 0px 0px rgba(28, 28, 28, 0.85) !important;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease !important;
+}
+
+.dark .neo-tactile-card {
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 4px 6px 0px 0px rgba(0, 0, 0, 0.9) !important;
+}
+
+.neo-tactile-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 6px 10px 0px 0px rgba(28, 28, 28, 0.9) !important;
+}
+
+.neo-tactile-btn {
+  border: 2px solid #1C1C1C !important;
+  box-shadow: 2px 3px 0px 0px rgba(28, 28, 28, 0.85) !important;
+  font-weight: 800 !important;
+  transition: all 0.15s ease !important;
+}
+
+.dark .neo-tactile-btn {
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 2px 3px 0px 0px rgba(0, 0, 0, 0.9) !important;
+}
+
+.neo-tactile-btn:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+  box-shadow: 4px 5px 0px 0px rgba(28, 28, 28, 0.9) !important;
+}
+
+.neo-tactile-btn:active {
+  transform: translateY(1px) scale(0.98) !important;
+  box-shadow: 1px 1px 0px 0px rgba(28, 28, 28, 0.9) !important;
+}
+
+.neo-persona-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  border: 1.5px solid #1C1C1C;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 2px 2px 0px 0px rgba(28, 28, 28, 0.85);
+}
+
+.dark .neo-persona-badge {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.8);
+}
+
+
+/* ==========================================================================
+   WHITE MARBLE THEME (Light Theme with Gold & Grey Veins)
+   ========================================================================== */
+html.theme-white-marble {
+  --marble-gold: #d4af37;
+  --marble-gold-dark: #aa771c;
+  --marble-gold-light: #f6e4a6;
+  --marble-bg: #f9f9fb;
+  --marble-slab: rgba(255, 255, 255, 0.9);
+}
+
+html.theme-white-marble body,
+html.theme-white-marble app-root {
+  background-color: var(--marble-bg);
+  background-image: 
+    url('/images/white_marble_texture.png'),
+    radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(212, 175, 55, 0.02) 0%, transparent 45%);
+  background-repeat: repeat;
+  background-attachment: fixed;
+  color: #1f2937;
+}
+
+html.theme-white-marble .bg-white,
+html.theme-white-marble .bg-zinc-900,
+html.theme-white-marble .bg-zinc-950,
+html.theme-white-marble .pocket-gull-card,
+html.theme-white-marble .paper-card,
+html.theme-white-marble .sub-panel,
+html.theme-white-marble .card {
+  background-color: var(--marble-slab) !important;
+  border-color: rgba(212, 175, 55, 0.35) !important;
+  box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08), 0 0 10px rgba(212, 175, 55, 0.02) !important;
+  color: #1f2937 !important;
+}
+
+html.theme-white-marble .border,
+html.theme-white-marble .border-gray-100,
+html.theme-white-marble .border-gray-200,
+html.theme-white-marble .border-gray-300,
+html.theme-white-marble .border-zinc-700,
+html.theme-white-marble .border-zinc-800,
+html.theme-white-marble .border-zinc-850 {
+  border-color: rgba(212, 175, 55, 0.22) !important;
+}
+
+html.theme-white-marble h1,
+html.theme-white-marble h2,
+html.theme-white-marble h3,
+html.theme-white-marble h4,
+html.theme-white-marble h5 {
+  color: #aa771c !important;
+}
+
+html.theme-white-marble .text-gray-550,
+html.theme-white-marble .text-gray-500,
+html.theme-white-marble .text-zinc-400,
+html.theme-white-marble .text-zinc-500 {
+  color: #4b5563 !important;
+}
+
+html.theme-white-marble .text-gray-900,
+html.theme-white-marble .text-gray-800,
+html.theme-white-marble .text-zinc-100,
+html.theme-white-marble .text-zinc-200 {
+  color: #111827 !important;
+}
+
+/* Primary/Accent buttons get gold gradient */
+html.theme-white-marble .bg-teal-600,
+html.theme-white-marble .bg-teal-500,
+html.theme-white-marble .bg-indigo-600,
+html.theme-white-marble .bg-\[\#1C1C1C\],
+html.theme-white-marble .bg-slate-900 {
+  background: linear-gradient(135deg, #aa771c 0%, #d4af37 50%, #f6e4a6 100%) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  border: 1px solid #f6e4a6 !important;
+}
+
+html.theme-white-marble .bg-teal-600:hover,
+html.theme-white-marble .bg-teal-500:hover,
+html.theme-white-marble .bg-indigo-600:hover,
+html.theme-white-marble .bg-\[\#1C1C1C\]:hover,
+html.theme-white-marble .bg-slate-900:hover {
+  background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #fff8dc 100%) !important;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4) !important;
+  color: #000000 !important;
+}
+
+
+/* ==========================================================================
+   BLACK MARBLE THEME (Dark Theme with Gold Veins)
+   ========================================================================== */
+html.theme-black-marble {
+  --marble-gold: #d4af37;
+  --marble-gold-light: #f6e4a6;
+  --marble-black: #0d0d11;
+  --marble-slab: rgba(20, 20, 26, 0.9);
+}
+
+html.theme-black-marble body,
+html.theme-black-marble app-root {
+  background-color: var(--marble-black);
+  background-image: 
+    url('/images/black_marble_texture.png'),
+    radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(212, 175, 55, 0.03) 0%, transparent 45%);
+  background-repeat: repeat;
+  background-attachment: fixed;
+  color: #f3f4f6;
+}
+
+html.theme-black-marble .bg-white,
+html.theme-black-marble .bg-zinc-900,
+html.theme-black-marble .bg-zinc-950,
+html.theme-black-marble .pocket-gull-card,
+html.theme-black-marble .paper-card,
+html.theme-black-marble .sub-panel,
+html.theme-black-marble .card {
+  background-color: var(--marble-slab) !important;
+  border-color: rgba(212, 175, 55, 0.3) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.03) !important;
+  color: #f3f4f6 !important;
+}
+
+html.theme-black-marble .border,
+html.theme-black-marble .border-gray-100,
+html.theme-black-marble .border-gray-200,
+html.theme-black-marble .border-gray-300,
+html.theme-black-marble .border-zinc-700,
+html.theme-black-marble .border-zinc-800,
+html.theme-black-marble .border-zinc-850 {
+  border-color: rgba(212, 175, 55, 0.22) !important;
+}
+
+html.theme-black-marble h1,
+html.theme-black-marble h2,
+html.theme-black-marble h3,
+html.theme-black-marble h4,
+html.theme-black-marble h5,
+html.theme-black-marble .text-teal-400,
+html.theme-black-marble .text-teal-300,
+html.theme-black-marble .text-\[\#00B0B9\] {
+  color: var(--marble-gold-light) !important;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.1);
+}
+
+html.theme-black-marble .text-gray-500,
+html.theme-black-marble .text-zinc-400,
+html.theme-black-marble .text-zinc-500 {
+  color: #9ca3af !important;
+}
+
+html.theme-black-marble .text-gray-900,
+html.theme-black-marble .text-gray-800,
+html.theme-black-marble .text-zinc-100,
+html.theme-black-marble .text-zinc-200 {
+  color: #f3f4f6 !important;
+}
+
+/* Primary/Accent buttons in Marble Theme get a beautiful gold gradient */
+html.theme-black-marble .bg-teal-600,
+html.theme-black-marble .bg-teal-500,
+html.theme-black-marble .bg-indigo-600,
+html.theme-black-marble .bg-\[\#1C1C1C\],
+html.theme-black-marble .bg-slate-900 {
+  background: linear-gradient(135deg, #aa771c 0%, #d4af37 50%, #f6e4a6 100%) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  border: 1px solid #f6e4a6 !important;
+}
+
+html.theme-black-marble .bg-teal-600:hover,
+html.theme-black-marble .bg-teal-500:hover,
+html.theme-black-marble .bg-indigo-600:hover,
+html.theme-black-marble .bg-\[\#1C1C1C\]:hover,
+html.theme-black-marble .bg-slate-900:hover {
+  background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #fff8dc 100%) !important;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4) !important;
+  color: #000000 !important;
+}
+
+
+/* ==========================================================================
+   PAPYRUS CAVE THEME (Ancient Egyptian Aesthetic with Torchlight Flicker)
+   ========================================================================== */
+html.theme-papyrus {
+  --egyptian-gold: #d4af37;
+  --egyptian-blue: #1e3a8a; /* Royal Lapis Lazuli */
+  --egyptian-turquoise: #06b6d4; /* Turquoise */
+  --egyptian-terracotta: #b91c1c; /* Ochre/Red clay */
+  --papyrus-dark: #171410;
+  --papyrus-slab: rgba(30, 25, 20, 0.85);
+  --papyrus-text: #e2d1b0;
+}
+
+html.theme-papyrus body,
+html.theme-papyrus app-root {
+  background-color: var(--papyrus-dark);
+  background-image: 
+    url('/images/papyrus_texture.png'),
+    radial-gradient(circle at 30% 20%, rgba(217, 119, 6, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(185, 28, 28, 0.08) 0%, transparent 45%);
+  background-repeat: repeat;
+  background-blend-mode: color-burn;
+  background-attachment: fixed;
+  color: var(--papyrus-text);
+}
+
+/* Torchlight Cave Flicker Overlay */
+html.theme-papyrus body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  mix-blend-mode: color-dodge;
+  background-image: 
+    radial-gradient(circle at 25% 35%, rgba(251, 146, 60, 0.16) 0%, rgba(217, 119, 6, 0.08) 35%, transparent 70%),
+    radial-gradient(circle at 75% 65%, rgba(251, 113, 133, 0.12) 0%, rgba(185, 28, 28, 0.06) 40%, transparent 75%);
+  animation: torch-flicker 4.5s infinite ease-in-out alternate;
+}
+
+@keyframes torch-flicker {
+  0% {
+    opacity: 0.8;
+    transform: scale(1.0) translate(0px, 0px) rotate(0deg);
+  }
+  25% {
+    opacity: 0.95;
+    transform: scale(1.04) translate(-12px, 8px) rotate(0.5deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.97) translate(10px, -15px) rotate(-0.5deg);
+  }
+  75% {
+    opacity: 0.88;
+    transform: scale(1.02) translate(-5px, -5px) rotate(0.2deg);
+  }
+  100% {
+    opacity: 0.82;
+    transform: scale(0.99) translate(8px, 12px) rotate(-0.2deg);
+  }
+}
+
+/* Component slabs styled as clay/dark papyrus tablets */
+html.theme-papyrus .bg-white,
+html.theme-papyrus .bg-zinc-900,
+html.theme-papyrus .bg-zinc-950,
+html.theme-papyrus .pocket-gull-card,
+html.theme-papyrus .paper-card,
+html.theme-papyrus .sub-panel,
+html.theme-papyrus .card {
+  background-color: rgba(23, 20, 16, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(212, 175, 55, 0.25) !important;
+  box-shadow: 
+    0 10px 30px -10px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(217, 119, 6, 0.04) !important;
+  color: var(--papyrus-text) !important;
+  border-radius: 4px !important; /* ancient tablet corners */
+}
+
+/* Egyptian Borders */
+html.theme-papyrus .border,
+html.theme-papyrus .border-gray-100,
+html.theme-papyrus .border-gray-200,
+html.theme-papyrus .border-gray-300,
+html.theme-papyrus .border-zinc-700,
+html.theme-papyrus .border-zinc-800,
+html.theme-papyrus .border-zinc-850 {
+  border-color: rgba(212, 175, 55, 0.18) !important;
+}
+
+/* Egyptian colors for headings: Terracotta Ochre & Gold */
+html.theme-papyrus h1,
+html.theme-papyrus h2,
+html.theme-papyrus h3,
+html.theme-papyrus h4,
+html.theme-papyrus h5 {
+  color: var(--egyptian-gold) !important;
+  font-family: serif, 'Times New Roman', Georgia;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 10px rgba(217, 119, 6, 0.12);
+}
+
+/* Turquoise and Lapis for secondary highlighted alerts & icons */
+html.theme-papyrus .text-teal-400,
+html.theme-papyrus .text-teal-300,
+html.theme-papyrus .text-\[\#00B0B9\] {
+  color: var(--egyptian-turquoise) !important;
+}
+
+html.theme-papyrus .text-gray-500,
+html.theme-papyrus .text-zinc-400,
+html.theme-papyrus .text-zinc-500 {
+  color: #a78bfa !important; /* Soft violet/amethyst details */
+  color: rgba(226, 209, 176, 0.6) !important;
+}
+
+html.theme-papyrus .text-gray-900,
+html.theme-papyrus .text-gray-800,
+html.theme-papyrus .text-zinc-100,
+html.theme-papyrus .text-zinc-200 {
+  color: var(--papyrus-text) !important;
+}
+
+/* Interactive primary buttons styled in Lapis Lazuli & Gold */
+html.theme-papyrus .bg-teal-600,
+html.theme-papyrus .bg-teal-500,
+html.theme-papyrus .bg-indigo-600,
+html.theme-papyrus .bg-\[\#1C1C1C\],
+html.theme-papyrus .bg-slate-900 {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border: 1px solid rgba(212, 175, 55, 0.5) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.theme-papyrus .bg-teal-600:hover,
+html.theme-papyrus .bg-teal-500:hover,
+html.theme-papyrus .bg-indigo-600:hover,
+html.theme-papyrus .bg-\[\#1C1C1C\]:hover,
+html.theme-papyrus .bg-slate-900:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%) !important;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4) !important;
+  color: #ffffff !important;
+}
+
+
+/* ==========================================================================
+   POOL RIPPLES THEME (Light/Dark Dynamic Day & Night, Inflatable Vinyl UI)
+   ========================================================================== */
+html.theme-pool {
+  --pool-noodle-pink: #fb7185;
+  --pool-noodle-cyan: #22d3ee;
+  --pool-noodle-yellow: #facc15;
+  --pool-noodle-green: #4ade80;
+}
+
+/* Day Pool Water Background */
+html.theme-pool-light body,
+html.theme-pool-light app-root {
+  background-color: #7dd3fc;
+  background-image: 
+    url('/images/pool_water_light.png'),
+    linear-gradient(180deg, #38bdf8 0%, #bae6fd 100%);
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
+  animation: pool-water-flow 12s infinite linear alternate;
+  color: #0369a1;
+}
+
+/* Night Pool Water Background */
+html.theme-pool-dark body,
+html.theme-pool-dark app-root {
+  background-color: #0f172a;
+  background-image: 
+    url('/images/pool_water_dark.png'),
+    linear-gradient(180deg, #020617 0%, #1e1b4b 100%);
+  background-repeat: repeat;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
+  animation: pool-water-flow 16s infinite linear alternate;
+  color: #bae6fd;
+}
+
+@keyframes pool-water-flow {
+  0% { background-position: 0px 0px, 0% 0%; }
+  100% { background-position: 60px 40px, 0% 0%; }
+}
+
+/* Gentle floating animation for Blow-up UI Panels */
+html.theme-pool .bg-white,
+html.theme-pool .bg-zinc-900,
+html.theme-pool .bg-zinc-950,
+html.theme-pool .pocket-gull-card,
+html.theme-pool .paper-card,
+html.theme-pool .sub-panel,
+html.theme-pool .card {
+  animation: floating-lounger 6s ease-in-out infinite alternate;
+}
+
+@keyframes floating-lounger {
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-5px) rotate(0.4deg); }
+}
+
+/* Glossy Blow-up Floating Vinyl Panel Design */
+html.theme-pool .bg-white,
+html.theme-pool .bg-zinc-900,
+html.theme-pool .bg-zinc-950,
+html.theme-pool .pocket-gull-card,
+html.theme-pool .paper-card,
+html.theme-pool .sub-panel,
+html.theme-pool .card {
+  border-radius: 28px !important;
+  backdrop-filter: blur(16px) !important;
+  contain: paint;
+  box-shadow: 
+    0 15px 30px -10px rgba(3, 105, 161, 0.25),
+    inset 0 6px 12px rgba(255, 255, 255, 0.7),
+    inset 0 -6px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Light Mode Vinyl Panels */
+html.theme-pool-light .bg-white,
+html.theme-pool-light .bg-zinc-900,
+html.theme-pool-light .bg-zinc-950,
+html.theme-pool-light .pocket-gull-card,
+html.theme-pool-light .paper-card,
+html.theme-pool-light .sub-panel,
+html.theme-pool-light .card {
+  background-color: rgba(255, 255, 255, 0.75) !important;
+  color: #0369a1 !important;
+}
+
+/* Dark Mode Vinyl Panels */
+html.theme-pool-dark .bg-white,
+html.theme-pool-dark .bg-zinc-900,
+html.theme-pool-dark .bg-zinc-950,
+html.theme-pool-dark .pocket-gull-card,
+html.theme-pool-dark .paper-card,
+html.theme-pool-dark .sub-panel,
+html.theme-pool-dark .card {
+  background-color: rgba(15, 23, 42, 0.75) !important;
+  color: #bae6fd !important;
+  box-shadow: 
+    0 15px 35px -10px rgba(0, 0, 0, 0.5),
+    inset 0 4px 10px rgba(255, 255, 255, 0.15),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Pool Noodle Piping: Thick, Rounded, Glossy tube borders */
+html.theme-pool .pocket-gull-card,
+html.theme-pool .card {
+  border: 10px solid var(--pool-noodle-pink) !important;
+}
+html.theme-pool .bg-white,
+html.theme-pool .paper-card {
+  border: 10px solid var(--pool-noodle-cyan) !important;
+}
+html.theme-pool .sub-panel {
+  border: 10px solid var(--pool-noodle-yellow) !important;
+}
+
+/* Specific elements nested get noodle-style accents */
+html.theme-pool .border,
+html.theme-pool .border-gray-100,
+html.theme-pool .border-gray-200,
+html.theme-pool .border-gray-300,
+html.theme-pool .border-zinc-700,
+html.theme-pool .border-zinc-800,
+html.theme-pool .border-zinc-850 {
+  border-color: rgba(14, 165, 233, 0.25) !important;
+}
+
+/* Glossy, Rounded, Inflated Pool Toy Button Style */
+html.theme-pool .bg-teal-600,
+html.theme-pool .bg-teal-500,
+html.theme-pool .bg-indigo-600,
+html.theme-pool .bg-\[\#1C1C1C\],
+html.theme-pool .bg-slate-900 {
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%) !important; /* Inflatable red ring */
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border-radius: 9999px !important;
+  border: 3px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    0 6px 12px -2px rgba(239, 68, 68, 0.3),
+    inset 0 4px 6px rgba(255, 255, 255, 0.5) !important;
+}
+
+html.theme-pool .bg-teal-600:hover,
+html.theme-pool .bg-teal-500:hover,
+html.theme-pool .bg-indigo-600:hover,
+html.theme-pool .bg-\[\#1C1C1C\]:hover,
+html.theme-pool .bg-slate-900:hover {
+  background: linear-gradient(180deg, #fca5a5 0%, #f87171 100%) !important;
+  box-shadow: 
+    0 10px 18px -2px rgba(239, 68, 68, 0.5),
+    inset 0 6px 10px rgba(255, 255, 255, 0.6) !important;
+  color: #ffffff !important;
+}
+
+/* Texts coordination */
+html.theme-pool-light h1,
+html.theme-pool-light h2,
+html.theme-pool-light h3,
+html.theme-pool-light h4,
+html.theme-pool-light h5 {
+  color: #0369a1 !important;
+}
+
+html.theme-pool-dark h1,
+html.theme-pool-dark h2,
+html.theme-pool-dark h3,
+html.theme-pool-dark h4,
+html.theme-pool-dark h5 {
+  color: #38bdf8 !important;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+html.theme-pool-light .text-gray-500,
+html.theme-pool-light .text-zinc-400,
+html.theme-pool-light .text-zinc-500 {
+  color: #0284c7 !important;
+  opacity: 0.8;
+}
+
+html.theme-pool-dark .text-gray-500,
+html.theme-pool-dark .text-zinc-400,
+html.theme-pool-dark .text-zinc-500 {
+  color: #7dd3fc !important;
+  opacity: 0.8;
+}
+
+html.theme-pool-light .text-gray-900,
+html.theme-pool-light .text-gray-800,
+html.theme-pool-light .text-zinc-100,
+html.theme-pool-light .text-zinc-200 {
+  color: #0369a1 !important;
+}
+
+html.theme-pool-dark .text-gray-900,
+html.theme-pool-dark .text-gray-800,
+html.theme-pool-dark .text-zinc-100,
+html.theme-pool-dark .text-zinc-200 {
+  color: #bae6fd !important;
+}
+
+
+/* ==========================================================================
+   MANDALA THEME (Cosmic Indigo & Violet Meditative Visualizer Theme)
+   ========================================================================== */
+html.theme-mandala {
+  --mandala-indigo: #0b071e;
+  --mandala-purple: #4c1d95;
+  --mandala-gold: #f59e0b;
+  --mandala-cyan: #06b6d4;
+  --mandala-text: #e9e3ff;
+  --mandala-rotation-duration: 140s;
+  --mandala-opacity: 0.15;
+}
+
+/* Seagullian Persona Influences */
+html.theme-mandala[data-seagull-persona="calm-gull"] {
+  --mandala-rotation-duration: 180s;
+  --mandala-opacity: 0.08;
+  --mandala-indigo: #08111e;
+  --mandala-purple: #134e4a;
+  --mandala-gold: #34d399; /* Seafoam emerald */
+  --mandala-cyan: #2dd4bf;
+}
+html.theme-mandala[data-seagull-persona="active-skimmer"] {
+  --mandala-rotation-duration: 60s;
+  --mandala-opacity: 0.26;
+  --mandala-indigo: #0c1b2b;
+  --mandala-purple: #0369a1;
+  --mandala-gold: #f59e0b;
+  --mandala-cyan: #38bdf8;
+}
+html.theme-mandala[data-seagull-persona="deep-navigator"] {
+  --mandala-rotation-duration: 95s;
+  --mandala-opacity: 0.18;
+  --mandala-indigo: #0b071e;
+  --mandala-purple: #4c1d95;
+  --mandala-gold: #f59e0b;
+  --mandala-cyan: #06b6d4;
+}
+html.theme-mandala[data-seagull-persona="storm-rider"] {
+  --mandala-rotation-duration: 32s;
+  --mandala-opacity: 0.42;
+  --mandala-indigo: #1e1111;
+  --mandala-purple: #991b1b;
+  --mandala-gold: #f97316; /* Fire orange */
+  --mandala-cyan: #ef4444;
+}
+
+html.theme-mandala body,
+html.theme-mandala app-root {
+  background-color: var(--mandala-indigo) !important;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.18) 0%, transparent 60%),
+    radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 45%) !important;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--mandala-text);
+  overflow-x: hidden;
+  transition: background-color 0.8s ease;
+}
+
+/* Slow-Rotating Floating Mandala Backdrop */
+html.theme-mandala body::before {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70vw;
+  height: 70vw;
+  min-width: 600px;
+  min-height: 600px;
+  background-image: url('/images/mandala_bg.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: var(--mandala-opacity);
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: screen;
+  animation: mandala-backdrop-rotate var(--mandala-rotation-duration) linear infinite;
+  transition: opacity 0.5s ease;
+}
+
+@keyframes mandala-backdrop-rotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Translucent Glowing Cosmic Panels */
+html.theme-mandala .bg-white,
+html.theme-mandala .bg-zinc-900,
+html.theme-mandala .bg-zinc-950,
+html.theme-mandala .pocket-gull-card,
+html.theme-mandala .paper-card,
+html.theme-mandala .sub-panel,
+html.theme-mandala .card {
+  background-color: rgba(18, 12, 45, 0.72) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+  box-shadow: 
+    0 15px 35px -10px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(139, 92, 246, 0.08) !important;
+  color: var(--mandala-text) !important;
+  border-radius: 20px !important; /* Smooth circular energy corners */
+}
+
+/* Glowing Mandala Borders */
+html.theme-mandala .border,
+html.theme-mandala .border-gray-100,
+html.theme-mandala .border-gray-200,
+html.theme-mandala .border-gray-300,
+html.theme-mandala .border-zinc-700,
+html.theme-mandala .border-zinc-800,
+html.theme-mandala .border-zinc-850 {
+  border-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+/* Headers: Shimmering Gold */
+html.theme-mandala h1,
+html.theme-mandala h2,
+html.theme-mandala h3,
+html.theme-mandala h4,
+html.theme-mandala h5 {
+  color: var(--mandala-gold) !important;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+  font-family: serif, 'Times New Roman', Georgia;
+  letter-spacing: 0.08em;
+}
+
+/* Glowing Neon Details */
+html.theme-mandala .text-teal-400,
+html.theme-mandala .text-teal-300,
+html.theme-mandala .text-\[\#00B0B9\] {
+  color: var(--mandala-cyan) !important;
+  text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+}
+
+html.theme-mandala .text-gray-500,
+html.theme-mandala .text-zinc-400,
+html.theme-mandala .text-zinc-500 {
+  color: #a78bfa !important; /* Soft Amethyst Violet details */
+  opacity: 0.85;
+}
+
+html.theme-mandala .text-gray-900,
+html.theme-mandala .text-gray-800,
+html.theme-mandala .text-zinc-100,
+html.theme-mandala .text-zinc-200 {
+  color: var(--mandala-text) !important;
+}
+
+/* Gold Glowing Action Buttons */
+html.theme-mandala .bg-teal-600,
+html.theme-mandala .bg-teal-500,
+html.theme-mandala .bg-indigo-600,
+html.theme-mandala .bg-\[\#1C1C1C\],
+html.theme-mandala .bg-slate-900 {
+  background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #8b5cf6 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  border: 1px solid var(--mandala-gold) !important;
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.4) !important;
+}
+
+html.theme-mandala .bg-teal-600:hover,
+html.theme-mandala .bg-teal-500:hover,
+html.theme-mandala .bg-indigo-600:hover,
+html.theme-mandala .bg-\[\#1C1C1C\]:hover,
+html.theme-mandala .bg-slate-900:hover {
+  background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%) !important;
+  box-shadow: 
+    0 0 15px rgba(245, 158, 11, 0.5),
+    0 4px 20px rgba(139, 92, 246, 0.6) !important;
+  color: #ffffff !important;
+}
+
+/* ─── Accessibility & Readability Text Scaling ─── */
+html.text-scale-large {
+  font-size: 112% !important;
+}
+html.text-scale-extra-large {
+  font-size: 125% !important;
+}
+

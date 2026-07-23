@@ -142,6 +142,10 @@ export class YbocsService {
     };
   }
 
+  saveCurrentAssessment() {
+    this.autoSaveToPatientHistory();
+  }
+
   private autoSaveToPatientHistory() {
     const patientId = this.patientMgmt.selectedPatientId();
     if (!patientId) return;
@@ -164,3 +168,5 @@ export class YbocsService {
     this.storage.savePatient(patient);
   }
 }
+
+export { YbocsService as YbocsStateService };

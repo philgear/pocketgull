@@ -10,23 +10,26 @@ import { ProceduralHealthInvestmentService } from '../services/procedural-health
   imports: [CommonModule, CurrencyPipe, PocketGullBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="w-full p-6 rounded-3xl bg-slate-900/85 dark:bg-zinc-950/90 border border-emerald-500/30 backdrop-blur-2xl shadow-2xl font-sans text-slate-100 mb-8">
+    <div class="w-full p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-800 shadow-2xl font-sans relative overflow-hidden pocket-gull-card mb-8">
       
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-slate-800">
-        <div class="flex items-center gap-3">
-          <span class="text-3xl p-2.5 rounded-2xl bg-emerald-500/20 text-emerald-300">📈</span>
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6 border-b border-zinc-200 dark:border-zinc-800">
+        <div class="flex items-center gap-3.5">
+          <span class="text-3xl p-2.5 rounded-2xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30">📈</span>
           <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-mono font-bold uppercase tracking-widest text-emerald-400">Actuarial Financial & Healthspan ROI</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs sm:text-sm font-mono font-extrabold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Actuarial Financial & Healthspan ROI</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#10B981] text-white font-mono font-extrabold uppercase border border-[#1C1C1C] shadow-[1px_1px_0px_0px_rgba(28,28,28,0.9)]">
+                Scribes 📖 Financial Strategy
+              </span>
               <pocket-gull-badge label="Procedural Innovation & Investment" severity="success"></pocket-gull-badge>
             </div>
-            <h3 class="text-lg font-extrabold text-white tracking-tight mt-0.5">Procedural Innovations & Capital Return Matrix</h3>
+            <h3 class="text-xl sm:text-2xl font-black text-zinc-900 dark:text-white tracking-tight mt-1 uppercase">Procedural Innovations & Capital Return Matrix</h3>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <span class="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-xs font-mono font-bold text-emerald-300 uppercase tracking-wider">
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="px-3 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-xs sm:text-sm font-mono font-extrabold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
             Total 5-Yr Cost Avoidance: {{ totalSavings() | currency:'USD':'symbol':'1.0-0' }}
           </span>
         </div>

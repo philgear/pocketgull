@@ -162,18 +162,21 @@ interface ISentinelContainmentOption {
                   <label class="block text-gray-500 dark:text-zinc-400 mb-1 font-semibold">💵 Cost: {{ (paretoWeights().costWeight * 100).toFixed(0) }}%</label>
                   <input type="range" min="0" max="100" [value]="paretoWeights().costWeight * 100"
                     (input)="updateParetoWeight('costWeight', $event)"
+                    aria-label="Cost Weight"
                     class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
                 </div>
                 <div>
                   <label class="block text-gray-500 dark:text-zinc-400 mb-1 font-semibold">⏱️ Speed: {{ (paretoWeights().speedWeight * 100).toFixed(0) }}%</label>
                   <input type="range" min="0" max="100" [value]="paretoWeights().speedWeight * 100"
                     (input)="updateParetoWeight('speedWeight', $event)"
+                    aria-label="Speed Weight"
                     class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-sky-500" />
                 </div>
                 <div>
                   <label class="block text-gray-500 dark:text-zinc-400 mb-1 font-semibold">🏋️ Adherence: {{ (paretoWeights().adherenceWeight * 100).toFixed(0) }}%</label>
                   <input type="range" min="0" max="100" [value]="paretoWeights().adherenceWeight * 100"
                     (input)="updateParetoWeight('adherenceWeight', $event)"
+                    aria-label="Adherence Weight"
                     class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-purple-500" />
                 </div>
               </div>
@@ -186,6 +189,7 @@ interface ISentinelContainmentOption {
                 <span class="text-[10px] text-gray-400">Contextual Bandit Feedback</span>
               </div>
               <select [value]="clinicianRole()" (change)="setClinicianRole($event)"
+                aria-label="Clinician Specialty"
                 class="bg-white dark:bg-zinc-900 text-xs font-bold text-gray-800 dark:text-zinc-200 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="General">General Practice</option>
                 <option value="Cardiology">Cardiology Lens</option>

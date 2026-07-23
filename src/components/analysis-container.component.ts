@@ -25,12 +25,15 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-analysis-container',
   standalone: true,
-  imports: [CommonModule, AnalysisReportComponent, PocketGullButtonComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent],
+  host: {
+    'class': 'flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden'
+  },
+  imports: [CommonModule, AnalysisReportComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent],
   template: `
-    <div class="flex h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
+    <div class="flex flex-col flex-1 h-full w-full overflow-hidden bg-[#F3F4F6] dark:bg-zinc-950">
       
       <!-- Main Content Container -->
-      <div class="flex-1 flex flex-col min-w-0">
+      <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden">
         
         <!-- Top Toolbar / Header -->
         @if (!state.isEmergencyMode()) {
@@ -84,69 +87,83 @@ import { GreenRoomLoungeComponent } from './green-room-lounge.component';
               }
               
               @if (!intelligence.isLoading()) {
-                <!-- PDF Care Plan Export Button -->
-                <button type="button" (click)="exportPdf()" title="Export Printable PDF Care Plan"
-                  class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-300 hover:bg-zinc-800 hover:text-white transition cursor-pointer shadow-sm">
-                  <span>📄</span> PDF
-                </button>
-
-                <!-- FHIR R4 Export Button -->
-                <button type="button" (click)="exportFhir()" title="Export FHIR R4 JSON Bundle"
-                  class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold uppercase rounded-xl border border-zinc-800 bg-zinc-900 text-orange-400 hover:bg-zinc-800 transition cursor-pointer shadow-sm">
-                  <span>🔥</span> FHIR R4
-                </button>
 
                 <!-- Clinical Tools & Engagement Suites Drawer Toggle Button -->
                 <button type="button" (click)="showToolsMenu.set(!showToolsMenu())" title="Open Clinical Tools & Engagement Suites Drawer"
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer shadow-sm">
                   <span>🎛️</span> Clinical Suites ▾
                 </button>
-
-                <pocket-gull-button (click)="intelligence.clearCache()"
-                  variant="ghost"
-                  size="sm"
-                  title="Clear AI completion cache and force model re-inference"
-                  className="!text-xs !py-1.5 !px-2.5 hover:!bg-red-500/20 hover:!text-red-400 border border-transparent hover:border-red-500/40">
-                  <span>🗑️ Clear</span>
-                </pocket-gull-button>
-              }
-
-              @if (hasReport()) {
-                <pocket-gull-button (click)="triggerAnalysisGenerate()"
-                  variant="primary"
-                  size="sm"
-                  [disabled]="intelligence.isLoading()"
-                  className="!text-xs !py-1.5 !px-3 font-bold">
-                  <span class="inline sm:hidden">{{ hasReport() ? 'Refresh' : 'Generate' }}</span>
-                  <span class="hidden sm:inline">{{ hasReport() ? 'Refresh Analysis' : 'Generate Patient Summary' }}</span>
-                </pocket-gull-button>
               }
             </div>
           </div>
         }
 
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-          <div class="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden transition-all duration-300">
-            <div class="flex-1 flex flex-col min-h-0 min-w-0 overflow-hidden relative" [class.slide-in-panel]="isSlidingIn()">
-                <app-analysis-report (openGleeModal)="showGleeModal.set(true)"></app-analysis-report>
+        <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden relative">
+          <div class="flex-1 min-h-0 min-w-0 h-full flex flex-col overflow-hidden transition-all duration-300">
+            <div class="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden relative" [class.slide-in-panel]="isSlidingIn()">
+                <app-analysis-report class="flex-1 flex flex-col min-h-0 h-full w-full overflow-hidden" #reportRef (openGleeModal)="showGleeModal.set(true)"></app-analysis-report>
             </div>
           </div>
           
-          <!-- Minimalist Metadata Footer -->
+          <!-- Interactive Report Footer: Lens Navigation + Refresh & Clear + Metadata -->
           @if (hasReport() && !state.isEmergencyMode()) {
-            <div class="shrink-0 mt-2 pt-6 border-t border-black/10 dark:border-zinc-800 grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] no-print opacity-80 hover:opacity-100 transition-opacity">
-              <div class="space-y-1">
-                <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">System Identification</div>
-                <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Pocket Gull Analysis Engine v 0.1</div>
+            <div class="shrink-0 mt-4 pt-4 border-t border-slate-200 dark:border-zinc-800 flex flex-col gap-4 font-mono no-print">
+              
+              <!-- Lens Navigation & Action Controls Toolbar -->
+              <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-100/90 dark:bg-zinc-900/90 border border-slate-200 dark:border-zinc-800 shadow-sm">
+                
+                <!-- Sequential Lens Stepper Buttons -->
+                <div class="flex items-center gap-2" id="tour-footer-lens-navigation">
+                  <button type="button" (click)="reportRef.navigateToPreviousLens()"
+                    [disabled]="!reportRef.hasPreviousLens()"
+                    class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700">
+                    <span>← Previous Lens</span>
+                  </button>
+
+                  <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/50">
+                    {{ reportRef.activeLens() }}
+                  </span>
+
+                  <button type="button" (click)="reportRef.navigateToNextLens()"
+                    [disabled]="!reportRef.hasNextLens()"
+                    class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500 shadow-sm">
+                    <span>Next Lens →</span>
+                  </button>
+                </div>
+
+                <!-- Footer Cache Clear & Refresh Analysis Actions -->
+                <div class="flex items-center gap-2">
+                  <button type="button" (click)="intelligence.clearCache()"
+                    title="Clear AI completion cache and force model re-inference"
+                    class="px-3 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 hover:bg-red-500/20">
+                    <span>🗑️ Clear Cache</span>
+                  </button>
+
+                  <button type="button" (click)="triggerAnalysisGenerate()"
+                    [disabled]="intelligence.isLoading()"
+                    class="px-3.5 py-1.5 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500 disabled:opacity-50 shadow-sm">
+                    <span>🔄 Refresh Analysis</span>
+                  </button>
+                </div>
+
               </div>
-              <div class="space-y-1">
-                <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Analysis Metadata</div>
-                <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Generated: {{ intelligence.lastRefreshTime() | date:'yyyy.MM.dd HH:mm:ss' }}</div>
+
+              <!-- Metadata Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] opacity-80 hover:opacity-100 transition-opacity">
+                <div class="space-y-1">
+                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">System Identification</div>
+                  <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Pocket Gull Analysis Engine v 0.1</div>
+                </div>
+                <div class="space-y-1">
+                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Analysis Metadata</div>
+                  <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Generated: {{ intelligence.lastRefreshTime() | date:'yyyy.MM.dd HH:mm:ss' }}</div>
+                </div>
+                <div class="space-y-1 md:text-right">
+                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Regulatory Status</div>
+                  <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
+                </div>
               </div>
-              <div class="space-y-1 md:text-right">
-                <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Regulatory Status</div>
-                <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
-              </div>
+
             </div>
           }
         </div>

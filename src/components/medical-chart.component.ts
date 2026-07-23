@@ -24,8 +24,7 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
     PocketGullCardComponent, 
     MedicalChartSummaryComponent, 
     DicomViewerComponent, 
-    BiometricHistoryChartComponent,
-    SentinelTriageComponent
+    BiometricHistoryChartComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -54,10 +53,43 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
       }
       
 
-      <!-- Sentinel Triage View -->
-      @if (isSentinel()) {
-        <app-sentinel-triage class="block w-full animate-in fade-in slide-in-from-top-4 duration-300"></app-sentinel-triage>
-      }
+      <!-- Accessibility & Neuro-Divergence UX Toolbar -->
+      <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs font-mono text-[11px] no-print">
+        <div class="flex items-center gap-1.5 font-bold uppercase text-zinc-600 dark:text-zinc-400">
+          <span class="text-indigo-500">♿ Sensory & Accessibility Controls:</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <!-- Audio-Primary Mode Toggle (Visual Impairments / Blindness) -->
+          <button type="button" 
+            (click)="state.isAudioPrimaryMode.set(!state.isAudioPrimaryMode())"
+            [class]="state.isAudioPrimaryMode() ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700'"
+            class="px-2.5 py-1 rounded-lg border font-bold uppercase transition flex items-center gap-1 cursor-pointer"
+            title="Toggle Audio-Primary Spatial Entrainment & Voice Assistant for Visual Impairments">
+            <span>🎧 Audio-Primary</span>
+            @if (state.isAudioPrimaryMode()) { <span>✓</span> }
+          </button>
+
+          <!-- Dyslexia Font Toggle -->
+          <button type="button" 
+            (click)="state.selectedCognitiveLevel.set(state.selectedCognitiveLevel() === 'dyslexia' ? 'standard' : 'dyslexia')"
+            [class]="state.selectedCognitiveLevel() === 'dyslexia' ? 'bg-amber-500 text-zinc-950 font-black border-amber-500' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700'"
+            class="px-2.5 py-1 rounded-lg border font-bold uppercase transition flex items-center gap-1 cursor-pointer"
+            title="Toggle Dyslexia-Friendly High-Legibility Literacy Mode">
+            <span>📖 Dyslexia Font</span>
+            @if (state.selectedCognitiveLevel() === 'dyslexia') { <span>✓</span> }
+          </button>
+
+          <!-- 40 Hz Gamma Cognitive Sync (MCI / Concussion / ADHD) -->
+          <button type="button" 
+            (click)="state.isGammaSyncActive.set(!state.isGammaSyncActive())"
+            [class]="state.isGammaSyncActive() ? 'bg-purple-600 text-white border-purple-600 animate-pulse' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700'"
+            class="px-2.5 py-1 rounded-lg border font-bold uppercase transition flex items-center gap-1 cursor-pointer"
+            title="Toggle 40 Hz Gamma Cognitive Synchronization for MCI / Concussion / ADHD">
+            <span>🧠 40Hz Gamma</span>
+            @if (state.isGammaSyncActive()) { <span>✓</span> }
+          </button>
+        </div>
+      </div>
 
       <!-- 3D Body Viewer Card -->
       <pocket-gull-card 

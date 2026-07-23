@@ -231,8 +231,36 @@ export interface IPatientState {
     avsProtocol?: IAvsProtocol;
     /** Selected medical paradigm / philosophy mode. */
     activePhilosophy?: 'western' | 'eastern' | 'ayurvedic';
+    /** Eastern TCM Diagnostic Intake findings. */
+    tcmIntake?: ITcmIntake;
+    /** Ayurvedic Tridosha & Ashtavidha Intake findings. */
+    ayurvedicIntake?: IAyurvedicIntake;
     /** Custom expansive key-value biomarker and note fields. */
     customFields?: { key: string; value: string }[];
+}
+
+export interface ITcmIntake {
+    tongueColor?: 'pale' | 'pink' | 'red' | 'scarlet' | 'purple';
+    tongueCoating?: 'thin-white' | 'thick-white' | 'yellow-dry' | 'yellow-greasy' | 'peeled';
+    pulseQuality?: 'normal' | 'wiry' | 'slippery' | 'deep-thready' | 'floating-rapid' | 'choppy';
+    thermalPreference?: 'neutral' | 'aversion-cold' | 'aversion-heat' | 'afternoon-tidal-heat';
+    sweatPattern?: 'normal' | 'spontaneous-day' | 'night-sweats' | 'none';
+    tasteInMouth?: 'normal' | 'bitter' | 'sweet' | 'metallic' | 'bland';
+    tcmPattern?: string;
+}
+
+export interface IAyurvedicIntake {
+    prakritiVata?: number;
+    prakritiPitta?: number;
+    prakritiKapha?: number;
+    vikritiVata?: number;
+    vikritiPitta?: number;
+    vikritiKapha?: number;
+    agniType?: 'samagni' | 'vishamagni' | 'tikshnagni' | 'mandagni';
+    amaScore?: number;
+    nadiPulseType?: 'snake-vata' | 'frog-pitta' | 'swan-kapha';
+    ashtavidhaStatus?: string;
+    ayurvedicImbalance?: string;
 }
 
 /**
@@ -371,6 +399,9 @@ export interface ILifestyleContext {
     usesCbd:           boolean;   // CBD without significant THC
     isDiabetic:        boolean;   // T1, T2, or gestational
     isPreDiabetic:     boolean;
+    hasNeuroCondition?: boolean;  // Pre-existing neuro conditions (MS, demyelination, neuropathy)
+    hasVisualImpairment?: boolean; // Blindness, optic neuritis, low vision
+    hasCognitiveSensitivity?: boolean; // Dyslexia, ADHD, Autism, MCI, Concussion/TBI
     hasCaffeineWithinSession: boolean; // "had coffee before appointment"
     notes: string[];              // Free-text extraction from chart
 }

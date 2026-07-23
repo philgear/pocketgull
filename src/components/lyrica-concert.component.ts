@@ -543,11 +543,78 @@ export class LyricaConcertComponent implements OnDestroy {
       const primaryColor = act.actNumber === 1 ? '#6366f1' : (act.actNumber === 2 ? '#34d399' : (act.actNumber === 3 ? '#fbbf24' : '#c084fc'));
       const secondaryColor = act.actNumber === 1 ? '#a855f7' : (act.actNumber === 2 ? '#10b981' : (act.actNumber === 3 ? '#f59e0b' : '#ec4899'));
 
-      // Render 12-fold Generative Mandala Cover Art Petals
-      const petalRings = [180, 130, 80, 45];
+      // 1. Render Act-Specific Video Track Effects in the Background
+      if (act.visualStyleName === 'Oceanic Hydrodynamics') {
+        // Draw 3 layers of soft flowing waves representing ocean currents
+        for (let j = 0; j < 3; j++) {
+          ctx.beginPath();
+          ctx.strokeStyle = j === 0 ? 'rgba(99, 102, 241, 0.15)' : (j === 1 ? 'rgba(34, 211, 238, 0.12)' : 'rgba(6, 182, 212, 0.08)');
+          ctx.lineWidth = 4 + j * 2;
+          for (let x = 0; x < width; x += 15) {
+            const y = cy + 40 * Math.sin(x * 0.004 + angle * 1.5 + j) + 20 * Math.cos(x * 0.008 - angle * 0.8);
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      } else if (act.visualStyleName === 'Bioluminescent DNA Helix') {
+        // Draw rotating double helix DNA strand
+        const helixWidth = 320;
+        for (let x = -helixWidth; x < helixWidth; x += 18) {
+          const hScale = Math.sin(x * 0.015 + angle * 2.5);
+          const y1 = cy + hScale * 45;
+          const y2 = cy - hScale * 45;
+          const plotX = cx + x;
+          
+          ctx.beginPath();
+          ctx.moveTo(plotX, y1);
+          ctx.lineTo(plotX, y2);
+          ctx.strokeStyle = 'rgba(52, 211, 153, 0.12)';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(plotX, y1, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#34d399';
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(plotX, y2, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#10b981';
+          ctx.fill();
+        }
+      } else if (act.visualStyleName === 'Aurora Borealis Prism') {
+        // Draw vertical flowing auroral lights
+        for (let j = 0; j < 4; j++) {
+          ctx.beginPath();
+          ctx.strokeStyle = j % 2 === 0 ? 'rgba(168, 85, 247, 0.1)' : 'rgba(245, 158, 11, 0.08)';
+          ctx.lineWidth = 30 + j * 15;
+          for (let x = 0; x < width; x += 40) {
+            const y = cy - 80 + 60 * Math.sin(x * 0.003 + angle * 1.2 + j) + 30 * Math.sin(x * 0.007 - angle);
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      } else if (act.visualStyleName === 'Golden Supernova Mandala') {
+        // Draw expanding supernova solar flares
+        for (let r = 0; r < 24; r++) {
+          const rayAngle = (r * 2 * Math.PI) / 24 + angle * 0.4;
+          const rayLen = 140 + 60 * Math.sin(angle * 3.5 + r);
+          const rx = cx + Math.cos(rayAngle) * rayLen;
+          const ry = cy + Math.sin(rayAngle) * rayLen;
+          
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(rx, ry);
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.15)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      // 2. Render Act-Specific Tuned Mandala Sacred Geometry
+      const petalRings = act.actNumber === 1 ? [140, 80] : (act.actNumber === 2 ? [160, 110, 60] : (act.actNumber === 3 ? [180, 130, 90, 50] : [200, 150, 110, 75, 40]));
       petalRings.forEach((radius, ringIdx) => {
-        const petalCount = 12 + ringIdx * 4;
-        const ringRotation = angle * (ringIdx % 2 === 0 ? 1 : -1);
+        const petalCount = (act.actNumber * 6) + ringIdx * 4;
+        const ringRotation = angle * (ringIdx % 2 === 0 ? 1 : -1) * (1 + 0.2 * act.actNumber);
 
         for (let i = 0; i < petalCount; i++) {
           const theta = (i * 2 * Math.PI) / petalCount + ringRotation;
@@ -557,42 +624,43 @@ export class LyricaConcertComponent implements OnDestroy {
 
           ctx.beginPath();
           ctx.moveTo(0, 0);
-          ctx.quadraticCurveTo(radius / 2, radius / 2, 0, radius);
-          ctx.quadraticCurveTo(-radius / 2, radius / 2, 0, 0);
+          ctx.quadraticCurveTo(radius / 2.2, radius / 2.2, 0, radius);
+          ctx.quadraticCurveTo(-radius / 2.2, radius / 2.2, 0, 0);
 
           ctx.fillStyle = ringIdx % 2 === 0 ? primaryColor : secondaryColor;
-          ctx.globalAlpha = 0.2 + 0.15 * Math.sin(angle * 4 + ringIdx);
+          ctx.globalAlpha = 0.12 + 0.12 * Math.sin(angle * 5 + ringIdx);
           ctx.fill();
 
           ctx.strokeStyle = ringIdx % 2 === 0 ? secondaryColor : primaryColor;
-          ctx.lineWidth = 2;
-          ctx.globalAlpha = 0.7;
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = 0.6;
           ctx.stroke();
 
           ctx.restore();
         }
       });
 
-      // Central Pulsing Solfeggio Core
-      const corePulse = 25 + 8 * Math.sin(angle * 6);
-      const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, corePulse * 2.5);
+      // 3. Central Pulsing Solfeggio Tone Core
+      const corePulse = (18 + act.actNumber * 4) + 6 * Math.sin(angle * (4 + act.actNumber));
+      const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, corePulse * 2.8);
       coreGlow.addColorStop(0, '#ffffff');
-      coreGlow.addColorStop(0.4, primaryColor);
+      coreGlow.addColorStop(0.3, primaryColor);
+      coreGlow.addColorStop(0.8, secondaryColor);
       coreGlow.addColorStop(1, 'transparent');
 
       ctx.beginPath();
       ctx.arc(cx, cy, corePulse, 0, 2 * Math.PI);
       ctx.fillStyle = coreGlow;
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = 0.95;
       ctx.fill();
 
-      // Outer Pulsing Wave Ring
+      // Outer Pulsing Ring
       ctx.beginPath();
-      ctx.arc(cx, cy, 220 + 15 * Math.sin(angle * 2), 0, 2 * Math.PI);
+      ctx.arc(cx, cy, (200 + act.actNumber * 10) + 12 * Math.sin(angle * 1.8), 0, 2 * Math.PI);
       ctx.strokeStyle = secondaryColor;
-      ctx.lineWidth = 1.5;
-      ctx.globalAlpha = 0.4;
-      ctx.setLineDash([6, 8]);
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = 0.35;
+      ctx.setLineDash([5, 8]);
       ctx.stroke();
       ctx.setLineDash([]);
 

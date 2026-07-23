@@ -29,7 +29,7 @@ import {
 import * as CryptoJS from 'crypto-js';
 import { MOCK_PATIENTS } from "../mock-patients";
 import { dataConnect } from '../lib/firebase';
-import { listPatients, getPatientWithCarePlan, createPatient } from '../lib/dataconnect';
+import { listPatients, getPatientWithCarePlan, createPatient } from '../lib/dataconnect/esm/index.esm.js';
 
 const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 
@@ -180,7 +180,7 @@ export class PatientManagementService implements OnDestroy {
         try {
           const res = await listPatients(dataConnect);
           if (res.data && res.data.patients && res.data.patients.length > 0) {
-            const dbPatients = res.data.patients.map(p => ({
+            const dbPatients = res.data.patients.map((p: any) => ({
               id: p.id,
               name: `${p.firstName} ${p.lastName}`,
               age: 0,

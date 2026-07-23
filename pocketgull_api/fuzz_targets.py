@@ -22,7 +22,7 @@ _CI_ITERATIONS = 10_000
 
 def _run_target(target_fn, name: str) -> None:
     """Run a single fuzz target with Atheris."""
-    import atheris
+    import atheris  # type: ignore[import-not-found,import-untyped]
 
     print(f"[FUZZ] Running target: {name}")
 
@@ -119,11 +119,12 @@ def fuzz_column_normalization(data: bytes) -> None:
             val = fdp.ConsumeUnicodeNoSurrogates(fdp.ConsumeIntInRange(0, 256))
             record[key] = val
 
-        # Simulate the normalization loop
-        normalized_key = key.strip().lower().replace(" ", "").replace("_", "")
-        for canonical, aliases in _COLUMN_ALIASES.items():
-            if normalized_key in aliases:
-                break
+        # Simulate the normalization loop for all generated keys
+        for key in record:
+            normalized_key = key.strip().lower().replace(" ", "").replace("_", "")
+            for canonical, aliases in _COLUMN_ALIASES.items():
+                if normalized_key in aliases:
+                    break
     except Exception:
         pass
 
@@ -171,7 +172,7 @@ _TARGETS = [
 
 def main() -> None:
     """Run all fuzz targets sequentially in CI mode."""
-    import atheris  # noqa: F811 — re-import to make it available in target scope
+    import atheris  # type: ignore[import-not-found,import-untyped]  # noqa: F811 — re-import to make it available in target scope
 
     # Inject atheris into the module namespace so targets can use FuzzedDataProvider
     globals()["atheris"] = atheris

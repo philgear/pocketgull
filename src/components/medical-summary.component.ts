@@ -11,6 +11,9 @@ import { DictationService } from '../services/dictation.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { OrcidService } from '../services/orcid.service';
 import { PythonBridgeService } from '../services/python-bridge.service';
+import { ClinicalAssessmentsService } from '../services/clinical-assessments/clinical-assessments.service';
+import { YbocsService } from '../services/ybocs/ybocs.service';
+import { AcronymExpanderService } from '../services/acronym-expander.service';
 import { marked } from 'marked';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
@@ -239,7 +242,163 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </section>
                 }
 
-                <!-- IVitals Grid -->
+                <!-- Clinical Assessments & Screener Trajectory Card -->
+                <section class="mb-8 p-5 bg-white dark:bg-zinc-900/80 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xs transition-all hover:shadow-md">
+                  <!-- Card Header -->
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-zinc-800 pb-4 mb-4">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-7 h-7 rounded-lg bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm">
+                        📊
+                      </div>
+                      <div>
+                        <h2 class="text-xs font-bold text-gray-800 dark:text-zinc-200 uppercase tracking-[0.15em]">
+                          Clinical Assessments & Screener Trajectory
+                        </h2>
+                        <p class="text-[11px] text-gray-500 dark:text-zinc-400">
+                          Standardized clinical metrics: GAD-7, PHQ-9, Y-BOCS OCD, and KSS Clinician Readiness
+                        </p>
+                      </div>
+                    </div>
+
+                    <!-- Quick Status Pill -->
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        4 Active Screeners
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Screener Cards Grid -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                    <!-- 1. GAD-7 (Anxiety) -->
+                    <div class="p-4 rounded-xl bg-gray-50/70 dark:bg-zinc-950/60 border border-gray-200/80 dark:border-zinc-800 flex flex-col justify-between transition hover:border-emerald-300 dark:hover:border-emerald-700">
+                      <div>
+                        <div class="flex justify-between items-center mb-2">
+                          <span class="text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 flex items-center gap-1.5">
+                            <span>🌿</span> GAD-7 (Anxiety)
+                          </span>
+                          <span class="text-[10px] font-mono font-bold text-gray-400 dark:text-zinc-500">Max 21</span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mb-2">
+                          <span class="text-2xl font-black text-gray-900 dark:text-zinc-100 font-mono">
+                            {{ clinicalAssessments.gad7Score() }}
+                          </span>
+                          <span class="text-xs font-medium text-gray-400 dark:text-zinc-500">/ 21</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span class="inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold border w-full justify-center text-center"
+                          [class]="clinicalAssessments.gad7Tier().colorClass">
+                          {{ clinicalAssessments.gad7Tier().label }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- 2. PHQ-9 (Depression) -->
+                    <div class="p-4 rounded-xl bg-gray-50/70 dark:bg-zinc-950/60 border border-gray-200/80 dark:border-zinc-800 flex flex-col justify-between transition hover:border-sky-300 dark:hover:border-sky-700">
+                      <div>
+                        <div class="flex justify-between items-center mb-2">
+                          <span class="text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 flex items-center gap-1.5">
+                            <span>🧠</span> PHQ-9 (Depression)
+                          </span>
+                          <span class="text-[10px] font-mono font-bold text-gray-400 dark:text-zinc-500">Max 27</span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mb-2">
+                          <span class="text-2xl font-black text-gray-900 dark:text-zinc-100 font-mono">
+                            {{ clinicalAssessments.phq9Score() }}
+                          </span>
+                          <span class="text-xs font-medium text-gray-400 dark:text-zinc-500">/ 27</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span class="inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold border w-full justify-center text-center"
+                          [class]="clinicalAssessments.phq9Tier().colorClass">
+                          {{ clinicalAssessments.phq9Tier().label }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- 3. Y-BOCS (OCD Severity) -->
+                    <div class="p-4 rounded-xl bg-gray-50/70 dark:bg-zinc-950/60 border border-gray-200/80 dark:border-zinc-800 flex flex-col justify-between transition hover:border-indigo-300 dark:hover:border-indigo-700">
+                      <div>
+                        <div class="flex justify-between items-center mb-2">
+                          <span class="text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 flex items-center gap-1.5">
+                            <span>🌀</span> Y-BOCS (OCD)
+                          </span>
+                          <span class="text-[10px] font-mono font-bold text-gray-400 dark:text-zinc-500">Max 40</span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mb-1">
+                          <span class="text-2xl font-black text-gray-900 dark:text-zinc-100 font-mono">
+                            {{ ybocsService.totalScore() }}
+                          </span>
+                          <span class="text-xs font-medium text-gray-400 dark:text-zinc-500">/ 40</span>
+                        </div>
+                        <div class="text-[10px] font-mono text-gray-500 dark:text-zinc-400 mb-2 flex justify-between">
+                          <span>Obs: {{ ybocsService.obsessionSubtotal() }}/20</span>
+                          <span>Comp: {{ ybocsService.compulsiveSubtotal() }}/20</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span class="inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold border w-full justify-center text-center"
+                          [class]="ybocsService.severityDetails().color">
+                          {{ ybocsService.severityDetails().name }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- 4. KSS Readiness (Clinician & Patient Sleepiness) -->
+                    <div class="p-4 rounded-xl bg-gray-50/70 dark:bg-zinc-950/60 border border-gray-200/80 dark:border-zinc-800 flex flex-col justify-between transition hover:border-amber-300 dark:hover:border-amber-700">
+                      <div>
+                        <div class="flex justify-between items-center mb-2">
+                          <span class="text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-zinc-400 flex items-center gap-1.5">
+                            <span>😴</span> KSS Readiness
+                          </span>
+                          <span class="text-[10px] font-mono font-bold text-gray-400 dark:text-zinc-500">1 – 9</span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mb-2">
+                          <span class="text-2xl font-black font-mono"
+                            [class.text-emerald-600]="acronymService.currentKssScore() <= 4"
+                            [class.text-amber-600]="acronymService.currentKssScore() >= 5 && acronymService.currentKssScore() <= 6"
+                            [class.text-red-600]="acronymService.currentKssScore() >= 7">
+                            {{ acronymService.currentKssScore() }}
+                          </span>
+                          <span class="text-xs font-medium text-gray-400 dark:text-zinc-500">/ 9</span>
+                        </div>
+                      </div>
+                      <div>
+                        <span class="inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold border w-full justify-center text-center font-mono"
+                          [class.bg-emerald-50]="acronymService.currentKssScore() <= 4"
+                          [class.text-emerald-700]="acronymService.currentKssScore() <= 4"
+                          [class.border-emerald-200]="acronymService.currentKssScore() <= 4"
+                          [class.dark:bg-emerald-950/40]="acronymService.currentKssScore() <= 4"
+                          [class.dark:text-emerald-300]="acronymService.currentKssScore() <= 4"
+                          [class.bg-amber-50]="acronymService.currentKssScore() >= 5 && acronymService.currentKssScore() <= 6"
+                          [class.text-amber-700]="acronymService.currentKssScore() >= 5 && acronymService.currentKssScore() <= 6"
+                          [class.border-amber-200]="acronymService.currentKssScore() >= 5 && acronymService.currentKssScore() <= 6"
+                          [class.dark:bg-amber-950/40]="acronymService.currentKssScore() >= 5 && acronymService.currentKssScore() <= 6"
+                          [class.dark:text-amber-300]="acronymService.currentKssScore() >= 5 && acronymService.currentKssScore() <= 6"
+                          [class.bg-red-50]="acronymService.currentKssScore() >= 7"
+                          [class.text-red-700]="acronymService.currentKssScore() >= 7"
+                          [class.border-red-200]="acronymService.currentKssScore() >= 7"
+                          [class.dark:bg-red-950/40]="acronymService.currentKssScore() >= 7"
+                          [class.dark:text-red-300]="acronymService.currentKssScore() >= 7">
+                          {{ acronymService.currentKssScore() <= 4 ? 'Alert Mode' : acronymService.currentKssScore() <= 6 ? 'Moderate Fatigue' : 'High Fatigue (Safety Shield)' }}
+                        </span>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Auxiliary Screener Trajectory Summary Line -->
+                  <div class="mt-4 pt-3 border-t border-gray-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-gray-500 dark:text-zinc-400">
+                    <div class="flex flex-wrap items-center gap-4">
+                      <span>🌙 ISI Insomnia: <strong class="text-gray-800 dark:text-zinc-200">{{ clinicalAssessments.isiScore() }}/28</strong> ({{ clinicalAssessments.isiTier().label }})</span>
+                      <span>🚨 C-SSRS Safety: <strong class="text-gray-800 dark:text-zinc-200">{{ clinicalAssessments.cssrsScore() }}/6</strong> ({{ clinicalAssessments.cssrsTier().label }})</span>
+                      <span>🌱 Grow-Thyself: <strong class="text-gray-800 dark:text-zinc-200">{{ clinicalAssessments.growThyselfScore() }}/100</strong></span>
+                    </div>
+                  </div>
+                </section>
                 <!-- IVitals & Biometrics -->
                 <section>
                     <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-6">Biometric Telemetry</h2>
@@ -677,97 +836,127 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                   </ng-template>
                 </section>
 
-                <!-- Patient Trends Chart -->
+                <!-- Patient Trends Chart: Unified Visualization Hub -->
                 @defer (on viewport) {
-                  <section>
-                      <div class="flex flex-col gap-3 mb-4 md:mb-6">
-                        <h2 class="text-[10px] md:text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-0">Retrospective Data Visualization</h2>
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 text-[10px] md:text-xs font-medium text-gray-600 dark:text-zinc-400 bg-white dark:bg-zinc-900 px-2.5 py-2 md:px-3 md:py-1.5 rounded-lg border border-gray-200 dark:border-zinc-800">
-                          <label class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
-                                 [class.bg-blue-50]="showCDCBaseline()"
-                                 [class.dark:bg-blue-950/40]="showCDCBaseline()"
-                                 [class.ring-1]="showCDCBaseline()"
-                                 [class.ring-blue-300]="showCDCBaseline()"
-                                 [class.dark:ring-blue-700]="showCDCBaseline()"
-                                 [class.text-blue-700]="showCDCBaseline()"
-                                 [class.dark:text-blue-300]="showCDCBaseline()"
-                                 [class.font-bold]="showCDCBaseline()">
-                            <input id="cdc-baseline-checkbox" name="showCDCBaseline" aria-label="Toggle CDC Baselines Overlay" type="checkbox" [checked]="showCDCBaseline()" (change)="showCDCBaseline.set(!showCDCBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#4285F4] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
-                            <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap"><div class="w-1.5 md:w-2 h-0.5 bg-[#4285F4] rounded-full"></div> CDC Baselines</span>
+                  <section class="space-y-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-gray-200 dark:border-zinc-800 shadow-sm">
+                      <div>
+                        <h2 class="text-xs font-bold text-gray-700 dark:text-zinc-200 uppercase tracking-[0.15em] flex items-center gap-2">
+                          <span>📊 Retrospective Data Visualization Hub</span>
+                          <span class="text-[10px] bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-extrabold px-2 py-0.5 rounded-full border border-indigo-300 dark:border-indigo-800">Unified Footprint</span>
+                        </h2>
+                        <p class="text-[11px] text-gray-500 dark:text-zinc-400 mt-0.5 font-medium">Demographic & condition-calibrated target bands with multi-metric overlays</p>
+                      </div>
+
+                      <!-- Visualization Controls: Type Switcher & Baselines -->
+                      <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+                        <!-- Chart Type Toggle -->
+                        <div class="flex items-center gap-1 bg-gray-100 dark:bg-zinc-800 p-1 rounded-xl border border-gray-200 dark:border-zinc-700">
+                          <button type="button" (click)="chartType.set('line')"
+                            [class]="chartType() === 'line' ? 'bg-white dark:bg-zinc-950 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'"
+                            class="px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px]">
+                            📈 Line Trend
+                          </button>
+                          <button type="button" (click)="chartType.set('bar')"
+                            [class]="chartType() === 'bar' ? 'bg-white dark:bg-zinc-950 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'"
+                            class="px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px]">
+                            📊 Histogram
+                          </button>
+                          <button type="button" (click)="chartType.set('radar')"
+                            [class]="chartType() === 'radar' ? 'bg-white dark:bg-zinc-950 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm' : 'text-gray-500 dark:text-zinc-400 hover:text-gray-900'"
+                            class="px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px]">
+                            🎯 Radar Map
+                          </button>
+                        </div>
+
+                        <!-- Baseline Overlays -->
+                        <div class="flex items-center gap-1 bg-gray-50 dark:bg-zinc-950 p-1 rounded-xl border border-gray-200 dark:border-zinc-800 text-[10px]">
+                          <label class="flex items-center gap-1 cursor-pointer px-2 py-0.5 rounded-lg transition"
+                                 [class.bg-blue-100]="showCDCBaseline()" [class.dark:bg-blue-950]="showCDCBaseline()" [class.text-blue-700]="showCDCBaseline()" [class.dark:text-blue-300]="showCDCBaseline()">
+                            <input type="checkbox" [checked]="showCDCBaseline()" (change)="showCDCBaseline.set(!showCDCBaseline())" class="w-3 h-3 accent-[#4285F4]">
+                            CDC
                           </label>
-                          <label for="who-baseline-checkbox" class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
-                                 [class.bg-green-50]="showWHOBaseline()"
-                                 [class.dark:bg-green-950/40]="showWHOBaseline()"
-                                 [class.ring-1]="showWHOBaseline()"
-                                 [class.ring-green-300]="showWHOBaseline()"
-                                 [class.dark:ring-green-700]="showWHOBaseline()"
-                                 [class.text-green-700]="showWHOBaseline()"
-                                 [class.dark:text-green-300]="showWHOBaseline()"
-                                 [class.font-bold]="showWHOBaseline()">
-                            <input id="who-baseline-checkbox" name="showWHOBaseline" aria-label="Toggle WHO Baselines Overlay" type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#689F38] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
-                            <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap"><div class="w-1.5 md:w-2 h-0.5 bg-[#689F38] rounded-full"></div> WHO Baselines</span>
+                          <label class="flex items-center gap-1 cursor-pointer px-2 py-0.5 rounded-lg transition"
+                                 [class.bg-green-100]="showWHOBaseline()" [class.dark:bg-green-950]="showWHOBaseline()" [class.text-green-700]="showWHOBaseline()" [class.dark:text-green-300]="showWHOBaseline()">
+                            <input type="checkbox" [checked]="showWHOBaseline()" (change)="showWHOBaseline.set(!showWHOBaseline())" class="w-3 h-3 accent-[#689F38]">
+                            WHO
                           </label>
-                          <label for="bq-baseline-checkbox" class="flex items-center gap-1.5 md:gap-2 cursor-pointer transition-all rounded-full px-2 py-0.5 md:px-2.5 md:py-1"
-                                 [class.bg-red-50]="showBQBaseline()"
-                                 [class.dark:bg-red-950/40]="showBQBaseline()"
-                                 [class.ring-1]="showBQBaseline()"
-                                 [class.ring-red-300]="showBQBaseline()"
-                                 [class.dark:ring-red-700]="showBQBaseline()"
-                                 [class.text-red-700]="showBQBaseline()"
-                                 [class.dark:text-red-300]="showBQBaseline()"
-                                 [class.font-bold]="showBQBaseline()">
-                            <input id="bq-baseline-checkbox" name="showBQBaseline" aria-label="Toggle BigQuery OMOP Baselines Overlay" type="checkbox" [checked]="showBQBaseline()" (change)="showBQBaseline.set(!showBQBaseline())" class="w-3 h-3 md:w-3.5 md:h-3.5 accent-[#EA4335] rounded border-gray-300 dark:border-zinc-700 bg-transparent flex-shrink-0 cursor-pointer">
-                            <span class="flex items-center gap-1 md:gap-1.5 whitespace-nowrap">
-                              <div class="w-1.5 md:w-2 h-0.5 bg-[#EA4335] rounded-full"></div> 
-                              BigQuery OMOP 
-                              <span class="text-[9px] md:text-[10px] uppercase font-semibold text-emerald-500" *ngIf="baselines()?.bigqueryActive">(Live)</span>
-                              <span class="text-[9px] md:text-[10px] uppercase font-semibold text-amber-500" *ngIf="!baselines()?.bigqueryActive">(Mock)</span>
-                            </span>
+                          <label class="flex items-center gap-1 cursor-pointer px-2 py-0.5 rounded-lg transition"
+                                 [class.bg-red-100]="showBQBaseline()" [class.dark:bg-red-950]="showBQBaseline()" [class.text-red-700]="showBQBaseline()" [class.dark:text-red-300]="showBQBaseline()">
+                            <input type="checkbox" [checked]="showBQBaseline()" (change)="showBQBaseline.set(!showBQBaseline())" class="w-3 h-3 accent-[#EA4335]">
+                            BigQuery OMOP
                           </label>
                         </div>
                       </div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Pain Path / 0–10</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #painChart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Blood Pressure / Composite</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #bpChart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Pulse Rate / BPM</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #hrChart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Oxygen Saturation / %</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #spo2Chart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col md:col-span-2">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Core Temperature / Trend</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #tempChart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Vitamin C</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #vitCChart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Vitamin D3</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #vitD3Chart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Magnesium</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #magnesiumChart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Zinc</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #zincChart></canvas></div>
-                          </div>
-                          <div class="w-full h-64 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 rounded p-4 sm:p-6 flex flex-col md:col-span-2">
-                              <h3 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.2em] mb-4">Vitamin B12</h3>
-                              <div class="relative flex-1 min-h-0"><canvas #b12Chart></canvas></div>
-                          </div>
+                    </div>
+
+                    <!-- Datapoint Perspective Filter Pills -->
+                    <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar py-1 text-xs font-mono">
+                      <span class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest mr-1 flex-shrink-0">Datapoint Perspective:</span>
+                      
+                      <button (click)="activeMetric.set('all')"
+                        [class]="activeMetric() === 'all' ? 'bg-indigo-600 text-white font-extrabold shadow-sm' : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800'"
+                        class="px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap">
+                        🌐 Combined Overlay
+                      </button>
+                      <button (click)="activeMetric.set('pain')"
+                        [class]="activeMetric() === 'pain' ? 'bg-red-500 text-white font-extrabold shadow-sm' : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800'"
+                        class="px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap">
+                        ⚡ Pain Path (0-10)
+                      </button>
+                      <button (click)="activeMetric.set('bp')"
+                        [class]="activeMetric() === 'bp' ? 'bg-purple-600 text-white font-extrabold shadow-sm' : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800'"
+                        class="px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap">
+                        ❤️ Blood Pressure
+                      </button>
+                      <button (click)="activeMetric.set('hr')"
+                        [class]="activeMetric() === 'hr' ? 'bg-emerald-600 text-white font-extrabold shadow-sm' : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800'"
+                        class="px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap">
+                        💓 Pulse Rate
+                      </button>
+                      <button (click)="activeMetric.set('spo2')"
+                        [class]="activeMetric() === 'spo2' ? 'bg-cyan-600 text-white font-extrabold shadow-sm' : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800'"
+                        class="px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap">
+                        🫁 Oxygen Sat (SpO2)
+                      </button>
+                      <button (click)="activeMetric.set('temp')"
+                        [class]="activeMetric() === 'temp' ? 'bg-amber-600 text-white font-extrabold shadow-sm' : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800'"
+                        class="px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap">
+                        🌡️ Temperature
+                      </button>
+                      <button (click)="activeMetric.set('nutrients')"
+                        [class]="activeMetric() === 'nutrients' ? 'bg-teal-600 text-white font-extrabold shadow-sm' : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-zinc-400 border border-gray-200 dark:border-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-800'"
+                        class="px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap flex items-center gap-1">
+                        🧪 Micronutrients ▾
+                      </button>
+                    </div>
+
+                    @if (activeMetric() === 'nutrients') {
+                      <div class="flex items-center gap-1.5 p-2 rounded-xl bg-teal-50/50 dark:bg-teal-950/20 border border-teal-200/50 dark:border-teal-800/40 text-xs font-mono">
+                        <span class="text-[10px] font-bold uppercase text-teal-700 dark:text-teal-400 mr-1">Nutrient Focus:</span>
+                        <button type="button" (click)="activeNutrient.set('vitD3')" [class.bg-teal-600]="activeNutrient() === 'vitD3'" [class.text-white]="activeNutrient() === 'vitD3'" class="px-2.5 py-1 rounded-lg border border-teal-500/30 text-zinc-700 dark:text-zinc-300 transition cursor-pointer">Vit D3</button>
+                        <button type="button" (click)="activeNutrient.set('vitC')" [class.bg-teal-600]="activeNutrient() === 'vitC'" [class.text-white]="activeNutrient() === 'vitC'" class="px-2.5 py-1 rounded-lg border border-teal-500/30 text-zinc-700 dark:text-zinc-300 transition cursor-pointer">Vit C</button>
+                        <button type="button" (click)="activeNutrient.set('magnesium')" [class.bg-teal-600]="activeNutrient() === 'magnesium'" [class.text-white]="activeNutrient() === 'magnesium'" class="px-2.5 py-1 rounded-lg border border-teal-500/30 text-zinc-700 dark:text-zinc-300 transition cursor-pointer">Magnesium</button>
+                        <button type="button" (click)="activeNutrient.set('zinc')" [class.bg-teal-600]="activeNutrient() === 'zinc'" [class.text-white]="activeNutrient() === 'zinc'" class="px-2.5 py-1 rounded-lg border border-teal-500/30 text-zinc-700 dark:text-zinc-300 transition cursor-pointer">Zinc</button>
+                        <button type="button" (click)="activeNutrient.set('b12')" [class.bg-teal-600]="activeNutrient() === 'b12'" [class.text-white]="activeNutrient() === 'b12'" class="px-2.5 py-1 rounded-lg border border-teal-500/30 text-zinc-700 dark:text-zinc-300 transition cursor-pointer">Vit B12</button>
                       </div>
+                    }
+
+                    <!-- Demographic & Condition Healthy Targets Summary Banner -->
+                    <div class="flex items-center justify-between px-3 py-2 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-xl border border-emerald-200/60 dark:border-emerald-800/40 text-[11px]">
+                      <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-semibold">
+                        <span>🎯 Demographic Target:</span>
+                        <span class="font-mono text-emerald-700 dark:text-emerald-400">{{ getDemographicTargetDescription() }}</span>
+                      </div>
+                      <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 rounded-md">Healthy Zone Active</span>
+                    </div>
+
+                    <!-- Single Canvas Container with Constant Dimensions (h-72 sm:h-80) -->
+                    <div class="w-full h-72 sm:h-80 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl p-3 sm:p-4 flex flex-col shadow-sm relative overflow-hidden">
+                      <div class="relative flex-1 min-h-0 w-full h-full">
+                        <canvas #unifiedChart></canvas>
+                      </div>
+                    </div>
                   </section>
                 } @placeholder {
                   <section>
@@ -777,6 +966,65 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </div>
                   </section>
                 }
+
+                <!-- Paradigm Diagnostic Exploration Card -->
+                <section class="p-5 bg-gradient-to-br from-indigo-50/60 via-purple-50/40 to-slate-50 dark:from-zinc-900 dark:via-zinc-900/90 dark:to-zinc-950 border border-indigo-100 dark:border-zinc-800 rounded-xl shadow-xs space-y-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-indigo-600 text-white shadow-2xs">
+                        {{ state.activePhilosophy() | uppercase }} DIAGNOSTIC EXPLORATION MATRIX
+                      </span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[11px] font-semibold text-gray-500 dark:text-zinc-400">Si Zhen / Ashtavidha Channel Active</span>
+                    </div>
+                  </div>
+
+                  @if (state.activePhilosophy() === 'eastern') {
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                      <div class="p-3 bg-white/80 dark:bg-zinc-800/80 backdrop-blur rounded-lg border border-emerald-200/60 dark:border-emerald-900/40">
+                        <div class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Tongue Inspection (Wang)</div>
+                        <div class="text-xs font-bold text-slate-900 dark:text-zinc-100 mt-1 capitalize">{{ state.tcmIntake().tongueColor }} Body</div>
+                        <div class="text-[11px] font-medium text-slate-600 dark:text-zinc-400 mt-0.5 capitalize">{{ state.tcmIntake().tongueCoating }} Coating</div>
+                      </div>
+                      <div class="p-3 bg-white/80 dark:bg-zinc-800/80 backdrop-blur rounded-lg border border-sky-200/60 dark:border-sky-900/40">
+                        <div class="text-[10px] font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider">Radial Pulse Quality (Qie)</div>
+                        <div class="text-xs font-bold text-slate-900 dark:text-zinc-100 mt-1 capitalize">{{ state.tcmIntake().pulseQuality }} Waveform</div>
+                        <div class="text-[11px] font-medium text-slate-600 dark:text-zinc-400 mt-0.5">Cun / Guan / Chi Position Sync</div>
+                      </div>
+                      <div class="p-3 bg-white/80 dark:bg-zinc-800/80 backdrop-blur rounded-lg border border-purple-200/60 dark:border-purple-900/40">
+                        <div class="text-[10px] font-bold text-purple-700 dark:text-purple-400 uppercase tracking-wider">Thermal & Organ Preference</div>
+                        <div class="text-xs font-bold text-slate-900 dark:text-zinc-100 mt-1 capitalize">{{ state.tcmIntake().thermalPreference }}</div>
+                        <div class="text-[11px] font-medium text-slate-600 dark:text-zinc-400 mt-0.5">Shi Wen 10-Questions Vector</div>
+                      </div>
+                    </div>
+                  } @else if (state.activePhilosophy() === 'ayurvedic') {
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                      <div class="p-3 bg-white/80 dark:bg-zinc-800/80 backdrop-blur rounded-lg border border-cyan-200/60 dark:border-cyan-900/40">
+                        <div class="text-[10px] font-bold text-cyan-700 dark:text-cyan-400 uppercase tracking-wider">Tridosha Vikriti Imbalance</div>
+                        <div class="text-xs font-bold text-slate-900 dark:text-zinc-100 mt-1">
+                          V: {{ state.ayurvedicIntake().vikritiVata }} | P: {{ state.ayurvedicIntake().vikritiPitta }} | K: {{ state.ayurvedicIntake().vikritiKapha }}
+                        </div>
+                        <div class="text-[11px] font-medium text-slate-600 dark:text-zinc-400 mt-0.5">Active Doshic Aggravation</div>
+                      </div>
+                      <div class="p-3 bg-white/80 dark:bg-zinc-800/80 backdrop-blur rounded-lg border border-amber-200/60 dark:border-amber-900/40">
+                        <div class="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Agni Metabolic Fire</div>
+                        <div class="text-xs font-bold text-slate-900 dark:text-zinc-100 mt-1 capitalize">{{ state.ayurvedicIntake().agniType }}</div>
+                        <div class="text-[11px] font-medium text-slate-600 dark:text-zinc-400 mt-0.5">Digestive Fire Status</div>
+                      </div>
+                      <div class="p-3 bg-white/80 dark:bg-zinc-800/80 backdrop-blur rounded-lg border border-rose-200/60 dark:border-rose-900/40">
+                        <div class="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">Ama Toxicity Score</div>
+                        <div class="text-xs font-bold text-slate-900 dark:text-zinc-100 mt-1">{{ state.ayurvedicIntake().amaScore }}/10 Toxicity</div>
+                        <div class="text-[11px] font-medium text-slate-600 dark:text-zinc-400 mt-0.5">Undigested Toxin Load</div>
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="p-3 bg-white/80 dark:bg-zinc-800/80 backdrop-blur rounded-lg border border-slate-200/60 dark:border-zinc-700/60 flex items-center justify-between">
+                      <div class="text-xs font-semibold text-slate-700 dark:text-zinc-300">Western ICD-10 & Pathophysiology Protocol Active</div>
+                      <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Allopathic Mode</span>
+                    </div>
+                  }
+                </section>
 
                 <!-- Active Anatomical Hotspots -->
                 @if (activeIssues().length > 0) {
@@ -880,6 +1128,9 @@ export class MedicalChartSummaryComponent {
   clinicalAI = inject(ClinicalIntelligenceService);
   orcidService = inject(OrcidService);
   pythonBridge = inject(PythonBridgeService);
+  clinicalAssessments = inject(ClinicalAssessmentsService);
+  ybocsService = inject(YbocsService);
+  acronymService = inject(AcronymExpanderService);
   http = inject(HttpClient);
   
   today = new Date();
@@ -962,29 +1213,34 @@ export class MedicalChartSummaryComponent {
 
 
 
-  painChartRef = viewChild<ElementRef<HTMLCanvasElement>>('painChart');
-  bpChartRef = viewChild<ElementRef<HTMLCanvasElement>>('bpChart');
-  hrChartRef = viewChild<ElementRef<HTMLCanvasElement>>('hrChart');
-  spo2ChartRef = viewChild<ElementRef<HTMLCanvasElement>>('spo2Chart');
-  tempChartRef = viewChild<ElementRef<HTMLCanvasElement>>('tempChart');
-  vitCChartRef = viewChild<ElementRef<HTMLCanvasElement>>('vitCChart');
-  vitD3ChartRef = viewChild<ElementRef<HTMLCanvasElement>>('vitD3Chart');
-  magnesiumChartRef = viewChild<ElementRef<HTMLCanvasElement>>('magnesiumChart');
-  zincChartRef = viewChild<ElementRef<HTMLCanvasElement>>('zincChart');
-  b12ChartRef = viewChild<ElementRef<HTMLCanvasElement>>('b12Chart');
+  activeMetric = signal<'all' | 'pain' | 'bp' | 'hr' | 'spo2' | 'temp' | 'nutrients'>('all');
+  activeNutrient = signal<'vitD3' | 'vitC' | 'magnesium' | 'zinc' | 'b12'>('vitD3');
+  chartType = signal<'line' | 'bar' | 'radar'>('line');
+  unifiedChartRef = viewChild<ElementRef<HTMLCanvasElement>>('unifiedChart');
+  private unifiedChartInstance: any = null;
 
-  private charts: { [key: string]: any | null } = {
-    pain: null,
-    bp: null,
-    hr: null,
-    spo2: null,
-    temp: null,
-    vitC: null,
-    vitD3: null,
-    magnesium: null,
-    zinc: null,
-    b12: null
-  };
+  getDemographicTargetDescription(): string {
+    const p = this.patient();
+    const metric = this.activeMetric();
+    const nut = this.activeNutrient();
+    const isGeriatric = p?.age && p.age >= 65;
+    const isInfant = p?.age && p.age <= 2;
+    const precond = p?.preexistingConditions?.join(', ') || 'General Health';
+
+    if (metric === 'pain') return 'Target Pain Index: 0–2 / 10 (Controlled / Mild)';
+    if (metric === 'bp') return isGeriatric ? 'Target BP: <130/80 mmHg (ACC/AHA Senior Baseline)' : 'Target BP: <120/80 mmHg (Adult Clinical Standard)';
+    if (metric === 'hr') return isInfant ? 'Target Pulse: 100–160 BPM (Pediatric Range)' : (isGeriatric ? 'Target Pulse: 55–85 BPM' : 'Target Pulse: 60–90 BPM');
+    if (metric === 'spo2') return 'Target SpO2: 95% – 100% Normal Ambient Air';
+    if (metric === 'temp') return 'Target Core Temp: 97.8°F – 99.1°F Afebril';
+    if (metric === 'nutrients') {
+      if (nut === 'vitD3') return 'Target Vit D3: 40–70 ng/mL (Bone & Immune Optimization)';
+      if (nut === 'vitC') return 'Target Vit C: 0.8–2.0 mg/dL (Antioxidant Reserve)';
+      if (nut === 'magnesium') return 'Target Magnesium: 1.8–2.6 mg/dL (Neuromuscular Tone)';
+      if (nut === 'zinc') return 'Target Zinc: 70–120 mcg/dL (Enzyme Cofactor)';
+      return 'Target Vit B12: 400–900 pg/mL (Neuro-Metabolic Support)';
+    }
+    return `Multi-System Composite Target Range (Calibrated for Age ${p?.age || 35} & ${precond})`;
+  }
 
   patient = computed(() => {
     const id = this.patientManager.selectedPatientId();
@@ -1006,7 +1262,6 @@ export class MedicalChartSummaryComponent {
     const [systolic, diastolic] = bpString.split('/').map(s => parseInt(s.trim(), 10));
     const valid = !isNaN(systolic) && !isNaN(diastolic);
 
-    // Max value on graph for scaling
     const maxSystolic = 200;
     const maxDiastolic = 150;
 
@@ -1043,8 +1298,6 @@ export class MedicalChartSummaryComponent {
     }
 
     effect(() => {
-      // Re-render chart when patient, vitals, or issues change
-      // or when the viewChild charts become available on screen via @defer
       const p = this.patient();
       this.state.vitals();
       this.state.issues();
@@ -1052,23 +1305,17 @@ export class MedicalChartSummaryComponent {
       this.showWHOBaseline();
       this.showBQBaseline();
       this.baselines();
-      const pc = this.painChartRef();
-      const bp = this.bpChartRef();
-      const hr = this.hrChartRef();
-      const spo2 = this.spo2ChartRef();
-      const temp = this.tempChartRef();
-      const vitC = this.vitCChartRef();
-      const vitD3 = this.vitD3ChartRef();
-      const mag = this.magnesiumChartRef();
-      const zinc = this.zincChartRef();
-      const b12 = this.b12ChartRef();
+      this.activeMetric();
+      this.activeNutrient();
+      this.chartType();
+      const ref = this.unifiedChartRef();
 
-      if (p && pc && bp && hr && spo2 && temp && vitC && vitD3 && mag && zinc && b12) {
+      if (p && ref) {
         untracked(() => {
           if (this.chartRenderTimeout) {
             clearTimeout(this.chartRenderTimeout);
           }
-          this.chartRenderTimeout = setTimeout(() => this.renderChart(), 600);
+          this.chartRenderTimeout = setTimeout(() => this.renderChart(), 200);
         });
       }
     });
@@ -1076,15 +1323,24 @@ export class MedicalChartSummaryComponent {
 
   private async renderChart() {
     const p = this.patient();
-    if (!p) return;
+    const ref = this.unifiedChartRef();
+    if (!p || !ref || !ref.nativeElement) return;
 
-    // Dynamically import Chart.js only when needed to optimize bundle size
     const { Chart, registerables } = await import('chart.js');
     Chart.register(...registerables);
 
-    Object.values(this.charts).forEach(chart => {
-      if (chart) chart.destroy();
-    });
+    if (this.unifiedChartInstance) {
+      this.unifiedChartInstance.destroy();
+      this.unifiedChartInstance = null;
+    }
+
+    const existingChart = Chart.getChart(ref.nativeElement);
+    if (existingChart) {
+      existingChart.destroy();
+    }
+
+    const ctx = ref.nativeElement.getContext('2d');
+    if (!ctx) return;
 
     const dates: string[] = [];
     const painLevels: number[] = [];
@@ -1118,9 +1374,7 @@ export class MedicalChartSummaryComponent {
         let maxPain = 0;
         if (entry.state && entry.state.issues) {
           Object.values(entry.state.issues).flat().forEach(issue => {
-            if (issue.painLevel > maxPain) {
-              maxPain = issue.painLevel;
-            }
+            if (issue.painLevel > maxPain) maxPain = issue.painLevel;
           });
         }
         dates.push(entry.date);
@@ -1156,9 +1410,7 @@ export class MedicalChartSummaryComponent {
     let currentMaxPain = 0;
     const currentIssues = this.state.issues();
     Object.values(currentIssues).flat().forEach(issue => {
-      if (issue.painLevel > currentMaxPain) {
-        currentMaxPain = issue.painLevel;
-      }
+      if (issue.painLevel > currentMaxPain) currentMaxPain = issue.painLevel;
     });
 
     dates.push('Current');
@@ -1176,182 +1428,154 @@ export class MedicalChartSummaryComponent {
     zincLevels.push(parseNum(this.state.vitals().zinc));
     b12Levels.push(parseNum(this.state.vitals().b12));
 
-    const createChart = (ref: ElementRef<HTMLCanvasElement> | undefined, label: string, data: (number | null)[], color: string, dataset2?: any, yOpts?: any, baselineKey?: string) => {
-      if (!ref || !ref.nativeElement) return null;
+    const selectedType = this.chartType();
+    const metric = this.activeMetric();
+    const nutrient = this.activeNutrient();
 
-      // Destroy existing chart if present to prevent "Canvas is already in use" error
-      const existingChart = Chart.getChart(ref.nativeElement);
-      if (existingChart) {
-        existingChart.destroy();
-      }
+    // 1. Radar Chart Mode
+    if (selectedType === 'radar') {
+      const radarLabels = ['Pain Path (x10)', 'Systolic BP', 'Pulse (BPM)', 'SpO2 (%)', 'Vit D3 (ng/mL)', 'Vit C (mg/dL)', 'Magnesium (mg/dL)'];
+      const lastIdx = dates.length - 1;
 
-      const ctx = ref.nativeElement.getContext('2d');
-      if (!ctx) return null;
+      const currentValues = [
+        (painLevels[lastIdx] || 0) * 10,
+        systolicLevels[lastIdx] || 120,
+        hrLevels[lastIdx] || 72,
+        spo2Levels[lastIdx] || 98,
+        (vitD3Levels[lastIdx] || 45),
+        (vitCLevels[lastIdx] || 1.2) * 40,
+        (magnesiumLevels[lastIdx] || 2.1) * 35
+      ];
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-      gradient.addColorStop(0, color + '40');
-      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+      const baselineTargetValues = [20, 120, 70, 99, 50, 50, 75]; // Demographic target values
 
-      const datasets: any[] = [{
-        label,
-        data,
-        borderColor: color,
-        backgroundColor: gradient,
-        borderWidth: 3,
-        pointBackgroundColor: '#fff',
-        pointBorderColor: color,
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        fill: true,
-        tension: 0.4,
-        spanGaps: true
-      }];
-
-      if (dataset2) {
-        let grad2: string | CanvasGradient = 'transparent';
-        if (dataset2.borderColor) {
-          grad2 = ctx.createLinearGradient(0, 0, 0, 300);
-          grad2.addColorStop(0, dataset2.borderColor + '40');
-          grad2.addColorStop(1, 'rgba(255,255,255,0)');
-        }
-        datasets.push({
-          ...dataset2,
-          backgroundColor: grad2,
-          borderWidth: 3,
-          pointBackgroundColor: '#fff',
-          pointBorderColor: dataset2.borderColor || color,
-          pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          fill: true,
-          tension: 0.4,
-          spanGaps: true
-        });
-      }
-
-      if (baselineKey && this.baselines()) {
-          const info = this.baselines()[baselineKey];
-          if (info) {
-              const pushOverlay = (src: string, themeColor: string) => {
-                  const b = info.find((x: any) => x.source === src);
-                  if (!b) return;
-                  if (typeof b.value === 'string' && b.value.includes('/')) {
-                      const parts = b.value.split('/');
-                      datasets.push({
-                          label: `${src} Sys. Avg`,
-                          data: Array(dates.length).fill(parseInt(parts[0], 10)),
-                          borderColor: themeColor, borderDash: [4, 4], borderWidth: 2, pointRadius: 0, fill: false
-                      });
-                      datasets.push({
-                          label: `${src} Dia. Avg`,
-                          data: Array(dates.length).fill(parseInt(parts[1], 10)),
-                          borderColor: themeColor, borderDash: [2, 2], borderWidth: 2, pointRadius: 0, fill: false
-                      });
-                  } else {
-                      datasets.push({
-                          label: `${src} Avg Baseline`,
-                          data: Array(dates.length).fill(parseFloat(b.value)),
-                          borderColor: themeColor, borderDash: [4, 4], borderWidth: 2, pointRadius: 0, fill: false
-                      });
-                  }
-              };
-              if (this.showCDCBaseline()) pushOverlay('CDC', '#4285F4');
-              if (this.showWHOBaseline()) pushOverlay('WHO', '#689F38');
-              if (this.showBQBaseline()) pushOverlay('BigQuery', '#EA4335');
-          }
-      }
-
-      return new Chart(ctx, {
-        type: 'line',
-        data: { labels: dates, datasets },
+      this.unifiedChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: radarLabels,
+          datasets: [
+            {
+              label: 'Patient Current Biometrics',
+              data: currentValues,
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139, 92, 246, 0.25)',
+              borderWidth: 3,
+              pointBackgroundColor: '#8b5cf6'
+            },
+            {
+              label: 'Demographic Target Zone',
+              data: baselineTargetValues,
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              borderWidth: 2,
+              borderDash: [4, 4],
+              pointRadius: 0
+            }
+          ]
+        },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           scales: {
-            y: {
-              beginAtZero: false,
-              grid: {
-                display: false
-              },
-              ticks: {
-                font: {
-                  family: 'Inter',
-                  size: 9,
-                  weight: 'bold'
-                },
-                color: '#9CA3AF'
-              },
-              border: {
-                display: false
-              },
-              ...yOpts
-            },
-            x: {
-              grid: {
-                display: false
-              },
-              ticks: {
-                font: {
-                  family: 'Inter',
-                  size: 9,
-                  weight: 'bold'
-                },
-                color: '#9CA3AF',
-                autoSkip: true,
-                maxRotation: 0
-              },
-              border: {
-                display: false
-              }
+            r: {
+              angleLines: { color: 'rgba(156, 163, 175, 0.2)' },
+              grid: { color: 'rgba(156, 163, 175, 0.2)' },
+              pointLabels: { font: { family: 'Inter', size: 10, weight: 'bold' }, color: '#9CA3AF' },
+              ticks: { display: false }
             }
           },
           plugins: {
-            legend: {
-              display: !!dataset2,
-              labels: {
-                font: {
-                  family: 'Inter',
-                  size: 9,
-                  weight: 'bold'
-                },
-                usePointStyle: true,
-                boxWidth: 6,
-                padding: 20
-              }
-            },
-            tooltip: {
-              backgroundColor: '#1C1C1C',
-              titleFont: { family: 'Inter', size: 10, weight: 'bold' },
-              bodyFont: { family: 'Inter', size: 12 },
-              padding: 12,
-              cornerRadius: 4,
-              displayColors: false,
-              callbacks: {
-                label: (context) => `${context.dataset.label}: ${context.parsed.y}`
-              }
-            }
+            legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 }, usePointStyle: true } }
           }
         }
       });
+      return;
+    }
+
+    // 2. Line or Bar Chart Mode
+    const datasets: any[] = [];
+    const isBar = selectedType === 'bar';
+
+    const buildGradient = (hex: string) => {
+      const g = ctx.createLinearGradient(0, 0, 0, 300);
+      g.addColorStop(0, hex + '50');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      return g;
     };
 
-    setTimeout(() => {
-      this.charts['pain'] = createChart(this.painChartRef(), 'PAIN LEVEL', painLevels, '#689F38', undefined, { max: 10, beginAtZero: true, ticks: { stepSize: 2 } });
-      this.charts['bp'] = createChart(this.bpChartRef(), 'SYSTOLIC', systolicLevels, '#D0021B', {
-        label: 'DIASTOLIC',
-        data: diastolicLevels,
-        borderColor: '#64748B'
-      }, undefined, 'bloodPressure');
-      this.charts['hr'] = createChart(this.hrChartRef(), 'HEART RATE', hrLevels, '#94A3B8', undefined, undefined, 'heartRate');
-      this.charts['spo2'] = createChart(this.spo2ChartRef(), 'OXYGEN SATURATION', spo2Levels, '#94A3B8');
-      this.charts['temp'] = createChart(this.tempChartRef(), 'CORE TEMPERATURE', tempLevels, '#94A3B8', undefined, undefined, 'temperature');
-      this.charts['vitC'] = createChart(this.vitCChartRef(), 'VITAMIN C', vitCLevels, '#F59E0B');
-      this.charts['vitD3'] = createChart(this.vitD3ChartRef(), 'VITAMIN D3', vitD3Levels, '#F59E0B');
-      this.charts['magnesium'] = createChart(this.magnesiumChartRef(), 'MAGNESIUM', magnesiumLevels, '#F59E0B');
-      this.charts['zinc'] = createChart(this.zincChartRef(), 'ZINC', zincLevels, '#F59E0B');
-      this.charts['b12'] = createChart(this.b12ChartRef(), 'VITAMIN B12', b12Levels, '#F59E0B');
-    }, 0);
+    if (metric === 'all') {
+      datasets.push(
+        { label: 'Pain (0-10)', data: painLevels, borderColor: '#ef4444', backgroundColor: buildGradient('#ef4444'), borderWidth: 2, tension: 0.3, type: selectedType },
+        { label: 'Systolic BP', data: systolicLevels, borderColor: '#6366f1', backgroundColor: buildGradient('#6366f1'), borderWidth: 2, tension: 0.3, type: selectedType },
+        { label: 'Diastolic BP', data: diastolicLevels, borderColor: '#a855f7', backgroundColor: buildGradient('#a855f7'), borderWidth: 2, tension: 0.3, type: selectedType },
+        { label: 'Pulse BPM', data: hrLevels, borderColor: '#10b981', backgroundColor: buildGradient('#10b981'), borderWidth: 2, tension: 0.3, type: selectedType },
+        { label: 'SpO2 %', data: spo2Levels, borderColor: '#06b6d4', backgroundColor: buildGradient('#06b6d4'), borderWidth: 2, tension: 0.3, type: selectedType },
+        { label: 'Temp °F', data: tempLevels, borderColor: '#f59e0b', backgroundColor: buildGradient('#f59e0b'), borderWidth: 2, tension: 0.3, type: selectedType }
+      );
+    } else if (metric === 'pain') {
+      datasets.push({ label: 'Pain Level (0-10)', data: painLevels, borderColor: '#ef4444', backgroundColor: buildGradient('#ef4444'), borderWidth: 3, tension: 0.3, fill: !isBar, type: selectedType });
+    } else if (metric === 'bp') {
+      datasets.push(
+        { label: 'Systolic BP (mmHg)', data: systolicLevels, borderColor: '#6366f1', backgroundColor: buildGradient('#6366f1'), borderWidth: 3, tension: 0.3, fill: !isBar, type: selectedType },
+        { label: 'Diastolic BP (mmHg)', data: diastolicLevels, borderColor: '#a855f7', backgroundColor: buildGradient('#a855f7'), borderWidth: 3, tension: 0.3, fill: !isBar, type: selectedType }
+      );
+    } else if (metric === 'hr') {
+      datasets.push({ label: 'Pulse Rate (BPM)', data: hrLevels, borderColor: '#10b981', backgroundColor: buildGradient('#10b981'), borderWidth: 3, tension: 0.3, fill: !isBar, type: selectedType });
+    } else if (metric === 'spo2') {
+      datasets.push({ label: 'Oxygen Saturation (%)', data: spo2Levels, borderColor: '#06b6d4', backgroundColor: buildGradient('#06b6d4'), borderWidth: 3, tension: 0.3, fill: !isBar, type: selectedType });
+    } else if (metric === 'temp') {
+      datasets.push({ label: 'Core Temperature (°F)', data: tempLevels, borderColor: '#f59e0b', backgroundColor: buildGradient('#f59e0b'), borderWidth: 3, tension: 0.3, fill: !isBar, type: selectedType });
+    } else if (metric === 'nutrients') {
+      const map: Record<string, { label: string; data: (number | null)[]; color: string }> = {
+        vitD3: { label: 'Vitamin D3 (ng/mL)', data: vitD3Levels, color: '#0d9488' },
+        vitC: { label: 'Vitamin C (mg/dL)', data: vitCLevels, color: '#14b8a6' },
+        magnesium: { label: 'Magnesium (mg/dL)', data: magnesiumLevels, color: '#2dd4bf' },
+        zinc: { label: 'Zinc (mcg/dL)', data: zincLevels, color: '#5eead4' },
+        b12: { label: 'Vitamin B12 (pg/mL)', data: b12Levels, color: '#0f766e' }
+      };
+      const sel = map[nutrient] || map['vitD3'];
+      datasets.push({ label: sel.label, data: sel.data, borderColor: sel.color, backgroundColor: buildGradient(sel.color), borderWidth: 3, tension: 0.3, fill: !isBar, type: selectedType });
+    }
+
+    // Append Baseline Overlays
+    const pushBaseline = (src: string, color: string, value: number) => {
+      datasets.push({
+        label: `${src} Baseline (${value})`,
+        data: Array(dates.length).fill(value),
+        borderColor: color,
+        borderDash: [5, 5],
+        borderWidth: 2,
+        pointRadius: 0,
+        fill: false
+      });
+    };
+
+    if (this.showCDCBaseline()) pushBaseline('CDC Target', '#4285F4', metric === 'bp' ? 120 : (metric === 'hr' ? 72 : (metric === 'spo2' ? 98 : 80)));
+    if (this.showWHOBaseline()) pushBaseline('WHO Norm', '#689F38', metric === 'bp' ? 118 : (metric === 'hr' ? 70 : (metric === 'spo2' ? 97 : 75)));
+    if (this.showBQBaseline()) pushBaseline('BigQuery OMOP', '#EA4335', metric === 'bp' ? 122 : (metric === 'hr' ? 74 : (metric === 'spo2' ? 98.5 : 82)));
+
+    this.unifiedChartInstance = new Chart(ctx, {
+      type: selectedType as any,
+      data: { labels: dates, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            grid: { color: 'rgba(156, 163, 175, 0.1)' },
+            ticks: { font: { family: 'Inter', size: 10, weight: 'bold' }, color: '#9CA3AF' }
+          },
+          x: {
+            grid: { display: false },
+            ticks: { font: { family: 'Inter', size: 10, weight: 'bold' }, color: '#9CA3AF' }
+          }
+        },
+        plugins: {
+          legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 }, usePointStyle: true } }
+        }
+      }
+    });
   }
 
 

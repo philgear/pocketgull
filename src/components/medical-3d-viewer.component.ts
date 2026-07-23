@@ -12,7 +12,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-        <div #canvasContainer class="w-full h-full relative" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+        <div #canvasContainer class="w-full h-full relative overflow-hidden rounded-2xl border border-amber-500/20 shadow-inner bg-[#F9F3D9]/20 dark:bg-zinc-900/60" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
             @if (!webglSupported()) {
                 <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-zinc-100 dark:bg-zinc-800/50 rounded-lg">
                     <svg class="w-10 h-10 text-zinc-400 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,6 +39,16 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
     severity = input<'green' | 'yellow' | 'red' | undefined>();
     afflictionHighlight = input<string | undefined>();
     particles = input<boolean | undefined>();
+    layerMode = input<'surface' | 'acetate' | 'core' | 'all' | undefined>();
+
+    activeLayerMode = signal<'surface' | 'acetate' | 'core' | 'all'>('acetate');
+
+    setLayerMode(mode: 'surface' | 'acetate' | 'core' | 'all') {
+      this.activeLayerMode.set(mode);
+      if (this.scene && this.threejsId()) {
+        this.loadModel(this.threejsId());
+      }
+    }
 
     private renderer!: THREE.WebGLRenderer;
     private scene!: THREE.Scene;
@@ -262,34 +272,57 @@ export class Medical3DViewerComponent implements AfterViewInit, OnDestroy {
 
     private createBaseMaterial(isHighlight = false) {
         const sev = this.severity();
-        let color = this.PALETTE.primary;
+        const mode = this.activeLayerMode();
+        let color = mode === 'acetate' ? 0x2AA4A0 : (mode === 'surface' ? 0xF9F3D9 : this.PALETTE.primary);
+        
         if (sev) {
             color = this.PALETTE.severity[sev];
         } else if (isHighlight) {
-            color = this.PALETTE.severity.red; // default highlight color
+            color = 0xEF6658;
+        }
+
+        if (mode === 'surface') {
+            return new THREE.MeshLambertMaterial({
+                color: 0xF9F3D9,
+                flatShading: true,
+                transparent: false,
+            });
+        }
+
+        if (mode === 'acetate') {
+            return new THREE.MeshPhysicalMaterial({
+                color: color,
+                roughness: 0.1,
+                metalness: 0.1,
+                transmission: 0.8,
+                thickness: 0.5,
+                transparent: true,
+                opacity: 0.45,
+            });
         }
 
         return new THREE.MeshPhysicalMaterial({
             color: color,
             metalness: 0.8,
             roughness: 0.2,
-            wireframe: true,
+            wireframe: mode === 'core',
             transparent: true,
-            opacity: 0.8,
+            opacity: 0.85,
             emissive: color,
-            emissiveIntensity: 0.5 // Boosted for bloom
+            emissiveIntensity: 0.3
         });
     }
     
-    // Solid, dark, glass-like inner core for holographic depth
+    // Charcoal Ink Core material
     private createCoreMaterial() {
+        const mode = this.activeLayerMode();
         return new THREE.MeshPhysicalMaterial({
-            color: 0x050505,
-            metalness: 0.9,
-            roughness: 0.1,
+            color: mode === 'surface' ? 0xF5B98E : 0x1C1C1C,
+            metalness: 0.2,
+            roughness: 0.8,
+            wireframe: true,
             transparent: true,
-            opacity: 0.85,
-            envMapIntensity: 1.0
+            opacity: mode === 'acetate' ? 0.3 : 0.9,
         });
     }
 

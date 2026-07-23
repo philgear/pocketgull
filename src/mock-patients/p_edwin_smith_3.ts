@@ -13,6 +13,27 @@ export const p_edwin_smith_3: IPatient = {
     "PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge"
   ],
   patientGoals: "Stabilize acute head injury, wound care, and address neck stiffness.",
+  tcmIntake: {
+    tongueColor: "purple",
+    tongueCoating: "thick-white",
+    pulseQuality: "wiry",
+    thermalPreference: "neutral",
+    sweatPattern: "spontaneous-day",
+    tasteInMouth: "metallic",
+    tcmPattern: "Acute Traumatic Qi & Blood Stagnation in Du Mai Channel"
+  },
+  ayurvedicIntake: {
+    prakritiVata: 5,
+    prakritiPitta: 6,
+    prakritiKapha: 3,
+    vikritiVata: 9,
+    vikritiPitta: 7,
+    vikritiKapha: 3,
+    agniType: "vishamagni",
+    amaScore: 7.9,
+    nadiPulseType: "snake-vata",
+    ayurvedicImbalance: "Severe Vata Wind Collapse in Pranavaha & Majjavaha Srotas"
+  },
   vitals: {
     bp: "110/70",
     hr: "64",
