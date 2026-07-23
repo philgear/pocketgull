@@ -8,6 +8,7 @@ import { MarkdownService } from '../services/markdown.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { ParadigmLyricsService } from '../services/paradigm-lyrics.service';
 import { DictationService } from '../services/dictation.service';
+import { CompassionateAnalogyService } from '../services/compassionate-analogy.service';
 import { generate } from 'lean-qr';
 
 declare var webkitSpeechRecognition: any;
@@ -64,6 +65,8 @@ import { ShantyKaraokeDeckComponent } from './shanty-karaoke-deck.component';
 
 import { ChronoClockDecisionRailComponent } from './chrono-clock-decision-rail.component';
 import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.component';
+import { ClinicalTrajectoryBiographyComponent } from './clinical-trajectory-biography.component';
+import { DualPaneConsultationComponent } from './dual-pane-consultation.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -114,7 +117,9 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
     FhirPassportModalComponent,
     ShantyKaraokeDeckComponent,
     ChronoClockDecisionRailComponent,
-    ChronoWeeklyMealPlannerComponent
+    ChronoWeeklyMealPlannerComponent,
+    ClinicalTrajectoryBiographyComponent,
+    DualPaneConsultationComponent
   ],
 
 
@@ -123,7 +128,7 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    'class': 'flex flex-col flex-1 min-h-0 w-full overflow-hidden'
+    'class': 'flex flex-col flex-1 min-h-0 w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-150px)]'
   },
   styles: [`
     /* Typography is now handled globally in styles.css */
@@ -264,7 +269,7 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
     }
 
     <!--Content Area-->
-    <div #contentArea (click)="handleContentAreaClick($event)" class="flex-1 mx-4 sm:mx-8 mb-6 mt-2 overflow-y-auto overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 min-h-0 relative">
+    <div #contentArea (click)="handleContentAreaClick($event)" class="flex-1 mx-2 sm:mx-8 mb-6 mt-2 overflow-y-auto max-md:overflow-y-auto max-md:h-full max-md:min-h-[450px] overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 min-h-0 relative">
       <!-- Dieter Rams Industrial Precision Ventilation Grill -->
       <div class="h-1 flex gap-[1.5px] opacity-25 px-4 pt-1.5 no-print">
         <div class="flex-1 bg-slate-400 dark:bg-zinc-600 rounded-full h-0.5"></div>
@@ -1562,7 +1567,50 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
                         {{ state.isAvsSessionActive() ? 'SESSION ACTIVE (AUDIO-VISUAL FLICKER)' : 'STANDBY' }}
                       </span>
                     </div>
-                    <span class="text-[10px] text-gray-400 block mt-1">Integrated in Functional Protocols Lens</span>
+                    <span class="text-[10px] text-gray-400 block mt-1">Auto-Cutoff Enabled (Safety Cap)</span>
+                  </div>
+                </div>
+
+                <!-- 🎭 4-Stage Therapeutic Narrative Arc Exploration -->
+                <div class="mt-4 p-4 rounded-2xl bg-zinc-950/80 border border-purple-800/50 font-mono text-xs">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-purple-900/40 pb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">🎭</span>
+                      <h4 class="font-black text-purple-300 uppercase tracking-wider text-xs">Therapeutic Narrative Arc Exploration</h4>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-950 text-purple-200 border border-purple-700/50 font-bold uppercase">
+                      Medically Calibrated Stages
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                    <button type="button" (click)="setAvsBrainwave('alpha', 12.0)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 1 (0-3m)</div>
+                      <div class="text-xs font-black text-white">🌱 Induction</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">12 Hz Alpha • 174 Hz Tone</div>
+                    </button>
+
+                    <button type="button" (click)="setAvsBrainwave('theta', 7.83)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 2 (3-12m)</div>
+                      <div class="text-xs font-black text-white">🌊 Deep Vagal</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">7.83 Hz Theta • 432 Hz Tone</div>
+                    </button>
+
+                    <button type="button" (click)="setAvsBrainwave('alpha', 10.0)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 3 (12-16m)</div>
+                      <div class="text-xs font-black text-white">✨ Integration</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">528 Hz Solfeggio Tone</div>
+                    </button>
+
+                    <button type="button" (click)="setAvsBrainwave('gamma', 40.0)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 4 (16-20m)</div>
+                      <div class="text-xs font-black text-white">🌅 Awakening</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">40 Hz Gamma Focus</div>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1579,10 +1627,14 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
                  [class.text-sky-950]="!themeService.isPlainLanguageMode()"
                  [class.dark:text-sky-200]="!themeService.isPlainLanguageMode()">
               <div class="flex items-center gap-3">
-                <span class="text-xl">{{ themeService.isPlainLanguageMode() ? '📖' : '🔬' }}</span>
+                <span class="text-xl">
+                  {{ themeService.analogyLensMode() === 'arborist' ? '🌳' : (themeService.analogyLensMode() === 'mechanic' ? '🚗' : (themeService.isPlainLanguageMode() ? '📖' : '🔬')) }}
+                </span>
                 <div>
                   <h4 class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
-                    <span>{{ themeService.isPlainLanguageMode() ? 'Plain Language Health Literacy Active' : 'Deep Clinical Rationale Active' }}</span>
+                    <span>
+                      {{ themeService.analogyLensMode() === 'arborist' ? 'Plain Language Arborist Analogy Active' : (themeService.analogyLensMode() === 'mechanic' ? 'Plain Language Mechanic Analogy Active' : (themeService.isPlainLanguageMode() ? 'Plain Language Health Literacy Active' : 'Deep Clinical Rationale Active')) }}
+                    </span>
                     <span class="text-[9px] px-2 py-0.5 rounded-md font-mono uppercase font-bold"
                           [class.bg-emerald-500/20]="themeService.isPlainLanguageMode()"
                           [class.text-emerald-700]="themeService.isPlainLanguageMode()"
@@ -1590,16 +1642,56 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
                           [class.bg-sky-500/20]="!themeService.isPlainLanguageMode()"
                           [class.text-sky-700]="!themeService.isPlainLanguageMode()"
                           [class.dark:text-sky-300]="!themeService.isPlainLanguageMode()">
-                      {{ themeService.isPlainLanguageMode() ? 'Patient-Friendly Reading Level' : 'Physician & Specialist Level' }}
+                      {{ themeService.isPlainLanguageMode() ? (themeService.analogyLensMode() === 'arborist' ? 'Botanical Tree Analogy' : (themeService.analogyLensMode() === 'mechanic' ? 'Automotive Chassis Analogy' : 'Patient Literacy')) : 'Physician & Specialist Level' }}
                     </span>
                   </h4>
                   <p class="text-[11px] opacity-90 font-medium mt-0.5">
-                    {{ themeService.isPlainLanguageMode() ? 'All clinical notes, recommendations, and diagnostic rationales are simplified for easy understanding.' : 'All clinical notes detail deep pathophysiological mechanisms, ICD-10 codes, and clinical evidence.' }}
+                    {{ themeService.analogyLensMode() === 'arborist' ? 'Clinical symptoms are translated into sap pressure, root hydration, and canopy foliage health for intuitive patient understanding.' : (themeService.analogyLensMode() === 'mechanic' ? 'Clinical symptoms are translated into engine RPM, hydraulic fluid pressure, and trailer hitch mechanical load.' : (themeService.isPlainLanguageMode() ? 'All clinical notes, recommendations, and diagnostic rationales are simplified for easy understanding.' : 'All clinical notes detail deep pathophysiological mechanisms, ICD-10 codes, and clinical evidence.')) }}
                   </p>
                 </div>
               </div>
 
               <div class="flex flex-wrap items-center gap-3 shrink-0">
+                <!-- Analogy Lens Sub-Mode Pill Group -->
+                <div class="flex items-center gap-1 bg-white/30 dark:bg-black/30 p-1 rounded-xl border border-slate-350/50 dark:border-zinc-800/50 font-mono text-[9px] font-bold">
+                  <button type="button" (click)="themeService.setAnalogyLensMode('clinical')"
+                    [class.bg-white]="!themeService.isPlainLanguageMode()"
+                    [class.dark:bg-zinc-800]="!themeService.isPlainLanguageMode()"
+                    [class.text-sky-650]="!themeService.isPlainLanguageMode()"
+                    [class.dark:text-sky-300]="!themeService.isPlainLanguageMode()"
+                    [class.text-zinc-500]="themeService.isPlainLanguageMode()"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🔬 Clinical
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('arborist')"
+                    [class.bg-emerald-600]="themeService.analogyLensMode() === 'arborist'"
+                    [class.text-white]="themeService.analogyLensMode() === 'arborist'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'arborist'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🌳 Arborist
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('mechanic')"
+                    [class.bg-cyan-600]="themeService.analogyLensMode() === 'mechanic'"
+                    [class.text-white]="themeService.analogyLensMode() === 'mechanic'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'mechanic'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🚗 Mechanic
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('gentleman')"
+                    [class.bg-amber-600]="themeService.analogyLensMode() === 'gentleman'"
+                    [class.text-white]="themeService.analogyLensMode() === 'gentleman'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'gentleman'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🎩 Gentleman
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('muse')"
+                    [class.bg-purple-600]="themeService.analogyLensMode() === 'muse'"
+                    [class.text-white]="themeService.analogyLensMode() === 'muse'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'muse'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    ✨ Muse
+                  </button>
+                </div>
                 <!-- Accessibility Text Size Scale Button Group -->
                 <div class="flex items-center gap-1 bg-white/30 dark:bg-black/30 p-1 rounded-xl border border-slate-350/50 dark:border-zinc-800/50 font-mono text-[9px] font-black">
                   <span class="px-2 text-zinc-500 dark:text-zinc-400">TEXT SIZE:</span>
@@ -1647,6 +1739,82 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
                 </button>
               </div>
             </div>
+
+            <!-- Global Sentinel Intelligence Scope Selector (Micro Patient vs Macro Fleet) -->
+            <div class="mb-6 p-4 bg-slate-100/90 dark:bg-zinc-900/90 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md font-mono text-xs">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-cyan-500 animate-ping"></span>
+                  <span class="font-black uppercase tracking-wider text-gray-900 dark:text-zinc-100 text-sm">
+                    🌐 Sentinel Intelligence Scope
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5 bg-gray-200 dark:bg-zinc-950 p-1 rounded-md border border-gray-300 dark:border-zinc-800">
+                  <button type="button" (click)="state.sentinelScope.set('micro-patient')"
+                          [class.bg-sky-600]="state.sentinelScope() === 'micro-patient'"
+                          [class.text-white]="state.sentinelScope() === 'micro-patient'"
+                          [class.text-gray-700]="state.sentinelScope() !== 'micro-patient'"
+                          [class.dark:text-zinc-400]="state.sentinelScope() !== 'micro-patient'"
+                          class="min-h-[44px] px-3.5 py-2 text-xs font-bold rounded-md transition cursor-pointer border-0 flex items-center gap-1.5">
+                    👤 Micro Patient Scope
+                  </button>
+                  <button type="button" (click)="state.sentinelScope.set('macro-fleet')"
+                          [class.bg-emerald-600]="state.sentinelScope() === 'macro-fleet'"
+                          [class.text-white]="state.sentinelScope() === 'macro-fleet'"
+                          [class.text-gray-700]="state.sentinelScope() !== 'macro-fleet'"
+                          [class.dark:text-zinc-400]="state.sentinelScope() !== 'macro-fleet'"
+                          class="min-h-[44px] px-3.5 py-2 text-xs font-bold rounded-md transition cursor-pointer border-0 flex items-center gap-1.5">
+                    🌐 Macro Fleet Sentinel Scope
+                  </button>
+                </div>
+              </div>
+
+              <!-- Macro Fleet Telemetry Banner -->
+              @if (state.sentinelScope() === 'macro-fleet') {
+                <div class="mt-3 p-3 bg-white/90 dark:bg-zinc-950/90 rounded-md border border-emerald-500/30 text-gray-800 dark:text-zinc-200 animate-fadeIn">
+                  <div class="flex items-center justify-between font-bold text-emerald-800 dark:text-emerald-300 mb-1">
+                    @if (themeService.analogyLensMode() === 'arborist') {
+                      <span>🌲 Sylvan Redwood Forest Sentinel (5,400 Grove Hectares Active)</span>
+                      <span>Hydration: 94.2% | Mycorrhizal Mesh: Synchronized</span>
+                    } @else if (themeService.analogyLensMode() === 'mechanic') {
+                      <span>🏎️ Commercial Fleet Motor Pool Sentinel (128 Vehicles Monitored)</span>
+                      <span>Obd-II Fleet DTC: 0 Critical | Fuel Eff: 98.4%</span>
+                    } @else if (themeService.analogyLensMode() === 'gentleman') {
+                      <span>🎩 Royal Naval Armada & Observatory Sentinel (42 Frigates)</span>
+                      <span>Atmospheric Depression: -2.4 hPa | Gales: Minimal</span>
+                    } @else {
+                      <span>🔬 Global WHO Population Health Registry Sentinel</span>
+                      <span>Herd Immunity: 96.1% | Regional AQI: Optimal</span>
+                    }
+                  </div>
+                  <p class="text-[11px] font-sans text-gray-600 dark:text-zinc-400 leading-snug">
+                    @if (themeService.analogyLensMode() === 'arborist') {
+                      "Forest canopy transpiration and subterranean root signals aggregated. Patient vitals synchronized with regional Sylvan grove resilience metrics."
+                    } @else if (themeService.analogyLensMode() === 'mechanic') {
+                      "Motor pool ECU telemetry and chassis load logs synthesized across 128 fleet units. Preventative maintenance schedule active."
+                    } @else if (themeService.analogyLensMode() === 'gentleman') {
+                      "Imperial naval chronometer governors and oceanic barometric depressions logged across all stations."
+                    } @else {
+                      "FHIR R4 population health registries and epidemiological surveillance networks connected to active patient strategy."
+                    }
+                  </p>
+                </div>
+              }
+            </div>
+
+            <!-- Longitudinal Clinical Trajectory Biography Component -->
+            @if (themeService.analogyLensMode() !== 'clinical') {
+              <div class="mb-6">
+                <app-clinical-trajectory-biography></app-clinical-trajectory-biography>
+              </div>
+            }
+
+            <!-- Synchronized Dual-Pane Consultation View -->
+            @if (themeService.analogyLensMode() !== 'clinical') {
+              <div class="mb-6">
+                <app-dual-pane-consultation></app-dual-pane-consultation>
+              </div>
+            }
 
             <!-- AI Comprehensive Report Sections -->
             @for (section of sections; track section.title; let i = $index) {
@@ -1957,6 +2125,7 @@ export class AnalysisReportComponent implements OnDestroy {
   private readonly medicalDecoder = inject(MedicalDecoderService);
   protected readonly lyricsService = inject(ParadigmLyricsService);
   protected readonly themeService = inject(ThemeService);
+  protected readonly compassionateAnalogy = inject(CompassionateAnalogyService);
 
   flowToastMessage = signal<string | null>(null);
   showHandoffModal = signal<boolean>(false);
@@ -2118,7 +2287,9 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
   activeActTitle = computed(() => {
-    return this.actMapper.getActTitleForLens(this.activeLens(), this.state.activePhilosophy());
+    const raw = this.state.activePhilosophy();
+    const phil = (raw === 'arborist' || raw === 'mechanic') ? 'western' : raw;
+    return this.actMapper.getActTitleForLens(this.activeLens(), phil);
   });
 
   activeActProposal = computed(() => {

@@ -12,7 +12,8 @@ import {
   IBookmark,
   BODY_PART_NAMES,
   BODY_PART_MAPPING,
-  IAyurvedicStatus
+  IAyurvedicStatus,
+  IPatientAnatomicProfile
 } from './patient.types';
 
 export type { IPatientState };
@@ -31,6 +32,13 @@ export class PatientStateService {
   // --- UI State & Clinical Tool Prescription State Machine ---
   readonly isPlainLanguageMode = signal<boolean>(false);
   readonly toolStates = signal<Record<string, 'unassigned' | 'prescribed' | 'hidden'>>({});
+
+  // --- Patient 3D Spatial Anatomic Profile & LiDAR Custom Mesh ---
+  readonly anatomicProfile = signal<IPatientAnatomicProfile>({
+    amputations: [],
+    phantomLimbPain: [],
+    customLiDARScanUrl: null
+  });
 
   readonly prescribedToolsList = computed(() => {
     const states = this.toolStates();
@@ -202,7 +210,7 @@ export class PatientStateService {
   readonly requestedSearchEngine = signal<'google' | 'pubmed' | 'ayurveda' | 'tcm' | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
-  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic'>('skin');
+  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive'>('skin');
   readonly customModelUrl = signal<string | null>(null);
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<IDraftSummaryItem[]>([]);
@@ -215,7 +223,8 @@ export class PatientStateService {
   readonly isDemoMode = signal<boolean>(false);
   readonly isAudioPrimaryMode = signal<boolean>(false);
   readonly isGammaSyncActive = signal<boolean>(false);
-  readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic'>('western');
+  readonly sentinelScope = signal<'micro-patient' | 'macro-fleet'>('micro-patient');
+  readonly activePhilosophy = signal<'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic'>('western');
   readonly tcmIntake = signal<import('./patient.types').ITcmIntake>({
     tongueColor: 'pink',
     tongueCoating: 'thin-white',
@@ -555,7 +564,7 @@ export class PatientStateService {
     this.selectedNoteId.set(noteId);
   }
 
-  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
+  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic') {
     this.activePhilosophy.set(philosophy);
     this.requestAnalysisUpdate();
   }
@@ -595,10 +604,9 @@ export class PatientStateService {
     this.toggleResearchFrame(true);
   }
 
-  openResearchQuery(query: string, engine?: 'google' | 'pubmed' | 'ayurveda' | 'tcm') {
-    if (!query) return;
+  openResearchQuery(query?: string, engine?: 'google' | 'pubmed' | 'ayurveda' | 'tcm') {
     if (engine) this.requestedSearchEngine.set(engine);
-    this.requestedResearchQuery.set(query);
+    if (query) this.requestedResearchQuery.set(query);
     this.toggleResearchFrame(true);
   }
 

@@ -10,6 +10,7 @@ import { USDZLoader } from 'three/examples/jsm/loaders/USDZLoader.js';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ThemeService } from '../services/theme.service';
+import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
 import { IBodyPartIssue } from '../services/patient.types';
 
 const PART_NAMES: Record<string, string> = {
@@ -68,45 +69,124 @@ const PART_NAMES: Record<string, string> = {
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-    <div #canvasContainer class="w-full h-full relative bg-white" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
-      <!-- Clean Pure White Ambient Backdrop Filter -->
-      <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-10 bg-white"></div>
-      <canvas *ngIf="!webglSupported()" class="absolute opacity-0 pointer-events-none w-[1px] h-[1px]" aria-label="3D Anatomical Mannequin Placeholder Canvas"></canvas>
-      <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-white rounded-lg border border-slate-200">
-        <svg class="w-10 h-10 text-zinc-400 mb-2 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div #canvasContainer class="w-full h-full relative bg-[#FAF8F0] dark:bg-zinc-950 overflow-hidden" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+      <!-- Dynamic Radial Grid Backdrop (Warm Papyrus Glow vs Dark Obsidian Void) -->
+      <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-100/40 via-[#FAF8F0]/90 to-[#F5F2E6] dark:from-cyan-950/30 dark:via-zinc-950/90 dark:to-black"></div>
+      
+      <canvas *ngIf="!webglSupported()" class="absolute opacity-0 pointer-events-none w-[1px] h-[1px]" aria-label="3D Anatomical Mannequin Canvas"></canvas>
+      <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[#FAF8F0] dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 rounded-lg border border-amber-200 dark:border-zinc-800">
+        <svg class="w-10 h-10 text-teal-600 dark:text-cyan-400 mb-2 opacity-60 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        <span class="text-xs font-medium text-zinc-500">3D view unavailable on this device</span>
-        <span *ngIf="webglError()" class="text-[12px] text-red-500 mt-2 max-w-xs break-words">{{ webglError() }}</span>
+        <span class="text-xs font-bold text-gray-800 dark:text-zinc-300">3D Holographic Engine Initializing...</span>
+        <span *ngIf="webglError()" class="text-[11px] text-rose-500 dark:text-rose-400 mt-2 max-w-xs break-words font-mono">{{ webglError() }}</span>
       </div>
 
-      <!-- Hover Tooltip -->
+      <!-- Top-Left Ergonomic Camera Angle Presets Bar (Sleek rounded-lg) -->
+      <div *ngIf="webglSupported()" class="absolute top-3 left-3 z-30 flex items-center gap-1 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1 rounded-lg border border-slate-300 dark:border-zinc-800/80 shadow-md font-mono text-[11px]">
+        <button (click)="setCameraPreset('cranial')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-sky-100 dark:bg-zinc-900 dark:hover:bg-cyan-950 text-sky-900 dark:text-cyan-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Head & Brain">
+          <span>🧠</span><span class="hidden sm:inline">Cranial</span>
+        </button>
+        <button (click)="setCameraPreset('visceral')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-teal-100 dark:bg-zinc-900 dark:hover:bg-teal-950 text-teal-900 dark:text-teal-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Thorax & Organs">
+          <span>🫀</span><span class="hidden sm:inline">Visceral</span>
+        </button>
+        <button (click)="setCameraPreset('spinal')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-indigo-100 dark:bg-zinc-900 dark:hover:bg-indigo-950 text-indigo-900 dark:text-indigo-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Spine & Posterior">
+          <span>🦴</span><span class="hidden sm:inline">Spine</span>
+        </button>
+        <button (click)="setCameraPreset('peripheral')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-900 dark:text-amber-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Legs & Feet">
+          <span>🦵</span><span class="hidden sm:inline">Extremities</span>
+        </button>
+      </div>
+
+      <!-- Floating 3D Hologram HUD Controls (Sleek rounded-lg) -->
+      <div *ngIf="webglSupported()" class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1.5 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md font-mono text-xs">
+        <button (click)="toggleAutoSpin()" 
+          [class.bg-sky-600]="isAutoSpinning()"
+          [class.text-white]="isAutoSpinning()"
+          [class.bg-slate-100]="!isAutoSpinning()"
+          [class.dark:bg-zinc-900]="!isAutoSpinning()"
+          [class.text-gray-800]="!isAutoSpinning()"
+          [class.dark:text-cyan-300]="!isAutoSpinning()"
+          class="px-2.5 py-1.5 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800 min-h-[36px]"
+          title="Toggle 360° Auto-Spin">
+          <span [class.animate-spin]="isAutoSpinning()">🔄</span>
+          <span class="text-[10px] uppercase font-bold">{{ isAutoSpinning() ? 'Spin ON' : '360°' }}</span>
+        </button>
+
+        <button (click)="resetCameraView()" 
+          class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-gray-800 dark:text-zinc-300 font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800 min-h-[36px]"
+          title="Reset Camera View">
+          <span>🎯</span>
+          <span class="text-[10px] uppercase font-bold">Reset</span>
+        </button>
+      </div>
+
+      <!-- Sleek Dynamic Hover Tooltip -->
       <div *ngIf="showHoverTooltip()" 
-           class="absolute pointer-events-none z-50 bg-white/95 border border-slate-200 backdrop-blur-md rounded-xl p-2.5 shadow-xl text-xs max-w-xs transition-all duration-75 text-zinc-900"
+           class="absolute pointer-events-none z-50 bg-white/95 dark:bg-zinc-950/95 border border-teal-500/40 backdrop-blur-md rounded-lg p-3 shadow-xl text-xs max-w-xs transition-all duration-75 text-gray-900 dark:text-zinc-100 font-mono"
            [style.left.px]="tooltipX()"
            [style.top.px]="tooltipY()"
            [style.transform]="'translate(12px, 12px)'">
-        <div class="flex items-center gap-1.5 font-bold text-zinc-900 mb-1">
-          <span>{{ getPartIcon(hoveredPartId()) }}</span>
-          <span>{{ hoveredPartName() }}</span>
+        <div class="flex items-center gap-2 font-bold text-gray-900 dark:text-white mb-1">
+          <span class="text-base">{{ getPartIcon(hoveredPartId()) }}</span>
+          <span class="text-teal-700 dark:text-cyan-200 font-bold text-xs">{{ hoveredPartName() }}</span>
         </div>
-        <div class="text-[10px] uppercase font-semibold tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-teal-700 w-fit mb-1.5 border border-slate-200">
+        <div class="text-[9.5px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-teal-100 dark:bg-cyan-950 text-teal-900 dark:text-cyan-300 w-fit mb-1.5 border border-teal-300 dark:border-cyan-800/60">
           {{ hoveredPartSystem() }}
         </div>
-        <div *ngIf="hoveredPartPain() > 0" class="flex items-center gap-1 text-[11px] font-bold text-rose-600 mb-1">
+        <div *ngIf="hoveredPartPain() > 0" class="flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 mb-1">
           <span>⚠️ Pain Level: {{ hoveredPartPain() }}/10</span>
         </div>
-        <div *ngIf="hoveredPartNotes()" class="text-[11px] text-zinc-600 italic mb-1 max-w-[200px] truncate">
+        <div *ngIf="hoveredPartNotes()" class="text-[11px] text-gray-600 dark:text-zinc-300 italic mb-1 max-w-[200px] truncate font-sans">
           "{{ hoveredPartNotes() }}"
         </div>
-        <div class="text-[9px] text-zinc-400 font-mono tracking-tight mt-1 border-t border-slate-100 pt-1">
-          Click 3D node to select region
+        <div class="text-[9px] text-gray-500 dark:text-zinc-500 font-mono tracking-tight mt-1.5 border-t border-gray-200 dark:border-zinc-800 pt-1 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-cyan-400 animate-ping"></span>
+          <span>Click 3D node to select region</span>
         </div>
       </div>
 
-      <div *ngIf="webglSupported()" class="absolute bottom-2 left-2 flex flex-col gap-0.5 pointer-events-none font-mono z-20">
-        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Left Click: Select 3D Region</span>
-        <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Right Click: Orbit 360°</span>
+      <!-- Floating Mouse Navigation Instructions -->
+      <div *ngIf="webglSupported()" class="absolute bottom-2 left-3 flex flex-col gap-0.5 pointer-events-none font-mono z-20">
+        <span class="text-[9.5px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-cyan-400"></span>
+          Left Click: Select 3D Node
+        </span>
+        <span class="text-[9.5px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
+          Right Click / Drag: Orbit 360°
+        </span>
+      </div>
+
+      <!-- Environmental & Barometric Telemetry HUD Bar (Unclipped Bottom Positioning) -->
+      <div *ngIf="webglSupported()" class="absolute bottom-2 right-3 z-30 flex flex-col items-end gap-1 font-mono text-[10px] pointer-events-auto">
+        <div class="flex items-center gap-2 bg-white/95 dark:bg-zinc-950/90 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md text-gray-800 dark:text-zinc-200">
+          <span class="flex items-center gap-1 font-bold" [class.text-rose-600]="envTelemetry.isStormShieldActive()" [class.dark:text-rose-400]="envTelemetry.isStormShieldActive()" [class.text-emerald-700]="!envTelemetry.isStormShieldActive()" [class.dark:text-emerald-400]="!envTelemetry.isStormShieldActive()">
+            <span [class.animate-pulse]="envTelemetry.isStormShieldActive()">🌩️</span>
+            <span>{{ envTelemetry.telemetry().barometricPressure }} hPa</span>
+            <span class="text-[9px]">({{ envTelemetry.telemetry().pressureDelta3h > 0 ? '+' : '' }}{{ envTelemetry.telemetry().pressureDelta3h }}hPa/3h)</span>
+          </span>
+          <span class="text-gray-300 dark:text-zinc-600">|</span>
+          <span class="text-sky-700 dark:text-cyan-300 font-bold">AQI {{ envTelemetry.telemetry().aqi }}</span>
+          <span class="text-gray-300 dark:text-zinc-600">|</span>
+          <span class="text-amber-700 dark:text-amber-300 font-bold">UV {{ envTelemetry.telemetry().uvIndex }}</span>
+        </div>
+
+        <!-- Environmental Preset Switcher Pill (Clean rounded-md) -->
+        <div class="flex items-center gap-1 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1 rounded-md border border-slate-300 dark:border-zinc-800/80 shadow-xs">
+          <button (click)="envTelemetry.setPreset('coastal_storm')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold transition text-[9px] cursor-pointer">
+            🌧️ Storm
+          </button>
+          <button (click)="envTelemetry.setPreset('high_altitude')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-100 dark:bg-zinc-900 dark:hover:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold transition text-[9px] cursor-pointer">
+            🏔️ Altitude
+          </button>
+          <button (click)="envTelemetry.setPreset('desert_dry')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold transition text-[9px] cursor-pointer">
+            🏜️ Arid
+          </button>
+          <button (click)="envTelemetry.setPreset('optimal')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-100 dark:bg-zinc-900 dark:hover:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold transition text-[9px] cursor-pointer">
+            ☀️ Baseline
+          </button>
+        </div>
       </div>
     </div>
   `,
@@ -119,6 +199,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     protected readonly state = inject(PatientStateService);
     private readonly patientManagement = inject(PatientManagementService);
     protected readonly themeService = inject(ThemeService);
+    protected readonly envTelemetry = inject(EnvironmentalTelemetryService);
     private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
@@ -131,7 +212,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     // Inputs for external control
     rotation = input<number>(0);
     zoom = input<number>(1);
-    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic'>('skin');
+    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive'>('skin');
     customModelUrl = input<string | null>(null);
 
     readonly webglSupported = signal<boolean>(true);
@@ -169,6 +250,14 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
       this.isSlidingPatient = true;
       this.mannequinGroup.position.x = -3.5;
       if (this.customModelGroup) this.customModelGroup.position.x = -3.5;
+    }
+
+    resetCameraView() {
+      if (this.camera && this.controls) {
+        this.camera.position.set(0, 1.2, 3.2);
+        this.controls.target.set(0, 1.0, 0);
+        this.controls.update();
+      }
     }
 
     readonly sentinelTriageLevel = computed(() => {
@@ -439,6 +528,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private controls!: OrbitControls;
     private mannequinGroup!: THREE.Group;
     private customModelGroup: THREE.Group | null = null;
+    private arborealTreeGroup: THREE.Group | null = null;
+    private automotiveChassisGroup: THREE.Group | null = null;
     private parts: Map<string, THREE.Group | THREE.Mesh> = new Map();
     private raycaster = new THREE.Raycaster();
     private mouse = new THREE.Vector2();
@@ -446,6 +537,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private composer!: EffectComposer;
     private bloomPass!: UnrealBloomPass;
     private timer = new THREE.Timer();
+    private resizeObserver: ResizeObserver | null = null;
 
     private handleResize = () => {
         const container = this.canvasContainer()?.nativeElement;
@@ -491,7 +583,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             const mode = this.anatomyViewMode();
             this.updateTransparency(mode);
             if (this.bloomPass) {
-                this.bloomPass.strength = (mode === 'organs' || mode === 'molecular') ? 0.3 : 0.15;
+                this.bloomPass.strength = (mode === 'organs' || mode === 'molecular' || mode === 'arboreal' || mode === 'automotive') ? 0.3 : 0.15;
+            }
+        });
+
+        // React to Plain Language / Deep Rationale analogy lens modes (Arborist & Mechanic)
+        effect(() => {
+            const analogy = this.themeService.analogyLensMode();
+            if (analogy === 'arborist') {
+                this.state.anatomyViewMode.set('arboreal');
+            } else if (analogy === 'mechanic') {
+                this.state.anatomyViewMode.set('automotive');
             }
         });
 
@@ -537,12 +639,25 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private updateThemeLightingAndMaterials() {
         if (!this.scene || !this.renderer) return;
 
-        // Clean pure white background canvas & studio lighting
-        this.renderer.setClearColor(0xffffff, 1.0);
-        if (this.ambientLight) { this.ambientLight.color.setHex(0xffffff); this.ambientLight.intensity = 1.3; }
-        if (this.directionalLight) { this.directionalLight.color.setHex(0xffffff); this.directionalLight.intensity = 1.1; }
-        if (this.backLight) { this.backLight.color.setHex(0xc7d2fe); this.backLight.intensity = 0.5; }
-        if (this.bloomPass) this.bloomPass.strength = 0.08;
+        const theme = this.themeService.currentTheme();
+        const active = this.themeService.activeTheme();
+        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'black-marble';
+
+        if (isDarkTheme) {
+            // Sleek dark obsidian spatial canvas
+            this.renderer.setClearColor(0x09090b, 1.0);
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xffffff); this.ambientLight.intensity = 1.8; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0x38bdf8); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0x818cf8); this.backLight.intensity = 1.2; }
+            if (this.bloomPass) this.bloomPass.strength = 0.15;
+        } else {
+            // Pristine, bright papyrus parchment studio lighting for Papyrus, Light, Parchment, Marble, Hemp, Rice, Construction
+            this.renderer.setClearColor(0xfbf9f2, 1.0);
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xfff8ee); this.ambientLight.intensity = 2.4; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xfff5e6); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.8; }
+            if (this.bloomPass) this.bloomPass.strength = 0.05;
+        }
     }
 
     ngAfterViewInit() {
@@ -552,19 +667,21 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         }
 
         try {
-            const ua = window.navigator.userAgent.toLowerCase();
-            const isAutomated = window.navigator.webdriver || ua.includes('headless') || ua.includes('playwright');
-            console.log("3D Viewer init. UserAgent:", ua, "Webdriver:", window.navigator.webdriver);
-            if (isAutomated) {
-                throw new Error("WebGL disabled in automated test environments to prevent GPU hangs.");
-            }
             this.initScene();
             this.createMannequin();
+            this.createArborealTreeModel();
+            this.createAutomotiveChassisModel();
             this.startAnimation();
             this.setupInteractions();
 
-            // Bind window resize listener and run delayed resize to ensure correct centering
+            // Bind window and container ResizeObserver to handle tab changes and dynamic layout resizes
+            const container = this.canvasContainer()?.nativeElement;
+            if (typeof ResizeObserver !== 'undefined' && container) {
+                this.resizeObserver = new ResizeObserver(() => this.handleResize());
+                this.resizeObserver.observe(container);
+            }
             window.addEventListener('resize', this.handleResize);
+
             setTimeout(() => {
                 this.handleResize();
                 if (this.controls) {
@@ -581,6 +698,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     ngOnDestroy() {
         if (isPlatformBrowser(this.platformId)) {
             window.removeEventListener('resize', this.handleResize);
+            if (this.resizeObserver) {
+                this.resizeObserver.disconnect();
+                this.resizeObserver = null;
+            }
         }
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
@@ -593,6 +714,12 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         }
         if (this.customModelGroup) {
             this.disposeHierarchy(this.customModelGroup);
+        }
+        if (this.arborealTreeGroup) {
+            this.disposeHierarchy(this.arborealTreeGroup);
+        }
+        if (this.automotiveChassisGroup) {
+            this.disposeHierarchy(this.automotiveChassisGroup);
         }
         if (this.renderer) {
             this.renderer.dispose();
@@ -824,7 +951,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         // Base Layer Materials
         const skinMaterial = new THREE.MeshStandardMaterial({
-            color: 0xf3e5dc, roughness: 0.35, metalness: 0.05, transparent: true, opacity: 0.95, depthWrite: true
+            color: 0x38bdf8, roughness: 0.3, metalness: 0.2, emissive: 0x0369a1, emissiveIntensity: 0.15, transparent: true, opacity: 0.92, depthWrite: true
         });
         const muscleMaterial = new THREE.MeshStandardMaterial({
             color: 0xbe123c, roughness: 0.65, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
@@ -1358,6 +1485,184 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         });
     }
 
+    private createArborealTreeModel() {
+        this.arborealTreeGroup = new THREE.Group();
+        this.scene.add(this.arborealTreeGroup);
+        this.arborealTreeGroup.visible = false;
+
+        const rootMat = new THREE.MeshStandardMaterial({
+            color: 0x78350f, roughness: 0.85, metalness: 0.1
+        });
+        const rootSapMat = new THREE.MeshStandardMaterial({
+            color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.6, roughness: 0.2
+        });
+
+        for (let i = 0; i < 6; i++) {
+            const angle = (i / 6) * Math.PI * 2;
+            const rootGeo = new THREE.CylinderGeometry(0.04, 0.08, 0.9, 12);
+            const rootMesh = new THREE.Mesh(rootGeo, rootMat);
+            rootMesh.position.set(Math.cos(angle) * 0.4, -0.3, Math.sin(angle) * 0.4);
+            rootMesh.rotation.z = Math.cos(angle) * 0.5;
+            rootMesh.rotation.x = Math.sin(angle) * 0.5;
+            rootMesh.userData['id'] = 'pelvis';
+            rootMesh.userData['layer'] = 'organ';
+            this.arborealTreeGroup.add(rootMesh);
+
+            const nodeGeo = new THREE.SphereGeometry(0.06, 12, 12);
+            const nodeMesh = new THREE.Mesh(nodeGeo, rootSapMat);
+            nodeMesh.position.set(Math.cos(angle) * 0.65, -0.6, Math.sin(angle) * 0.65);
+            this.arborealTreeGroup.add(nodeMesh);
+        }
+
+        const trunkGeo = new THREE.CylinderGeometry(0.28, 0.42, 1.6, 24);
+        const trunkMat = new THREE.MeshStandardMaterial({
+            color: 0x5b21b6, roughness: 0.8, metalness: 0.1, emissive: 0x3b0764, emissiveIntensity: 0.2
+        });
+        const trunkMesh = new THREE.Mesh(trunkGeo, trunkMat);
+        trunkMesh.position.set(0, 0.8, 0);
+        trunkMesh.userData['id'] = 'chest';
+        trunkMesh.userData['layer'] = 'organ';
+        this.arborealTreeGroup.add(trunkMesh);
+
+        const sapCoreGeo = new THREE.CylinderGeometry(0.12, 0.15, 1.65, 16);
+        const sapCoreMat = new THREE.MeshStandardMaterial({
+            color: 0x10b981, emissive: 0x10b981, emissiveIntensity: 0.8, transparent: true, opacity: 0.85
+        });
+        const sapCoreMesh = new THREE.Mesh(sapCoreGeo, sapCoreMat);
+        sapCoreMesh.position.set(0, 0.8, 0);
+        sapCoreMesh.userData['isSapCore'] = true;
+        this.arborealTreeGroup.add(sapCoreMesh);
+
+        const boughCoords = [
+            { pos: [-0.45, 1.4, 0], rotZ: -0.6, id: 'l_shoulder' },
+            { pos: [0.45, 1.4, 0], rotZ: 0.6, id: 'r_shoulder' },
+            { pos: [-0.75, 1.2, 0.2], rotZ: -0.9, id: 'l_arm' },
+            { pos: [0.75, 1.2, 0.2], rotZ: 0.9, id: 'r_arm' },
+            { pos: [0, 1.7, 0], rotZ: 0, id: 'head' }
+        ];
+
+        boughCoords.forEach(b => {
+            const boughGeo = new THREE.CylinderGeometry(0.08, 0.16, 0.7, 16);
+            const boughMesh = new THREE.Mesh(boughGeo, trunkMat);
+            boughMesh.position.set(b.pos[0], b.pos[1], b.pos[2]);
+            boughMesh.rotation.z = b.rotZ;
+            boughMesh.userData['id'] = b.id;
+            boughMesh.userData['layer'] = 'organ';
+            this.arborealTreeGroup!.add(boughMesh);
+        });
+
+        const foliageCount = 120;
+        const leafGeo = new THREE.DodecahedronGeometry(0.08, 1);
+        const leafMat = new THREE.MeshStandardMaterial({
+            color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.5, roughness: 0.3
+        });
+
+        for (let i = 0; i < foliageCount; i++) {
+            const leafMesh = new THREE.Mesh(leafGeo, leafMat);
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos((Math.random() * 2) - 1);
+            const r = 0.4 + Math.random() * 0.7;
+
+            leafMesh.position.set(
+                r * Math.sin(phi) * Math.cos(theta),
+                1.9 + r * Math.cos(phi) * 0.6,
+                r * Math.sin(phi) * Math.sin(theta)
+            );
+            leafMesh.userData['isLeafNode'] = true;
+            this.arborealTreeGroup.add(leafMesh);
+        }
+    }
+
+    private createAutomotiveChassisModel() {
+        this.automotiveChassisGroup = new THREE.Group();
+        this.scene.add(this.automotiveChassisGroup);
+        this.automotiveChassisGroup.visible = false;
+
+        const steelMat = new THREE.MeshStandardMaterial({
+            color: 0x64748b, roughness: 0.25, metalness: 0.85
+        });
+        const chromeMat = new THREE.MeshStandardMaterial({
+            color: 0xe2e8f0, roughness: 0.1, metalness: 0.95
+        });
+        const engineMat = new THREE.MeshStandardMaterial({
+            color: 0x0284c7, emissive: 0x0369a1, emissiveIntensity: 0.4, roughness: 0.3, metalness: 0.7
+        });
+        const redStressMat = new THREE.MeshStandardMaterial({
+            color: 0xef4444, emissive: 0xdc2626, emissiveIntensity: 0.7, roughness: 0.2
+        });
+
+        [-0.22, 0.22].forEach(x => {
+            const railGeo = new THREE.BoxGeometry(0.08, 2.2, 0.08);
+            const railMesh = new THREE.Mesh(railGeo, steelMat);
+            railMesh.position.set(x, 0.6, 0);
+            railMesh.userData['id'] = 'chest';
+            railMesh.userData['layer'] = 'bone';
+            this.automotiveChassisGroup!.add(railMesh);
+        });
+
+        const engineBlockGeo = new THREE.BoxGeometry(0.55, 0.5, 0.45);
+        const engineBlockMesh = new THREE.Mesh(engineBlockGeo, engineMat);
+        engineBlockMesh.position.set(0, 1.3, 0);
+        engineBlockMesh.userData['id'] = 'heart';
+        engineBlockMesh.userData['layer'] = 'organ';
+        engineBlockMesh.userData['isEngineBlock'] = true;
+        this.automotiveChassisGroup.add(engineBlockMesh);
+
+        [-0.2, 0.2].forEach(x => {
+            const valveGeo = new THREE.BoxGeometry(0.18, 0.1, 0.42);
+            const valveMesh = new THREE.Mesh(valveGeo, chromeMat);
+            valveMesh.position.set(x, 1.58, 0);
+            valveMesh.rotation.z = x > 0 ? -0.2 : 0.2;
+            this.automotiveChassisGroup!.add(valveMesh);
+        });
+
+        const exhaustGeo = new THREE.TorusGeometry(0.2, 0.04, 12, 24, Math.PI);
+        const exhaustMeshR = new THREE.Mesh(exhaustGeo, chromeMat);
+        exhaustMeshR.position.set(0.28, 1.25, 0);
+        exhaustMeshR.rotation.y = Math.PI / 2;
+        this.automotiveChassisGroup.add(exhaustMeshR);
+
+        const exhaustMeshL = new THREE.Mesh(exhaustGeo, chromeMat);
+        exhaustMeshL.position.set(-0.28, 1.25, 0);
+        exhaustMeshL.rotation.y = -Math.PI / 2;
+        this.automotiveChassisGroup.add(exhaustMeshL);
+
+        const receiverGeo = new THREE.BoxGeometry(0.22, 0.22, 0.35);
+        const receiverMesh = new THREE.Mesh(receiverGeo, steelMat);
+        receiverMesh.position.set(0, 0.45, -0.15);
+        receiverMesh.userData['id'] = 'spine_lumbar';
+        receiverMesh.userData['layer'] = 'bone';
+        this.automotiveChassisGroup.add(receiverMesh);
+
+        const ballGeo = new THREE.SphereGeometry(0.09, 16, 16);
+        const ballMesh = new THREE.Mesh(ballGeo, chromeMat);
+        ballMesh.position.set(0, 0.52, -0.32);
+        this.automotiveChassisGroup.add(ballMesh);
+
+        const tongueLoadGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.6, 12);
+        const tongueLoadMesh = new THREE.Mesh(tongueLoadGeo, redStressMat);
+        tongueLoadMesh.position.set(0, 0.35, -0.55);
+        tongueLoadMesh.rotation.x = Math.PI / 3;
+        this.automotiveChassisGroup.add(tongueLoadMesh);
+
+        const strutPositions = [
+            { x: -0.22, y: -0.1, z: 0, id: 'r_shin' },
+            { x: 0.22, y: -0.1, z: 0, id: 'l_shin' },
+            { x: -0.45, y: 1.45, z: 0, id: 'r_shoulder' },
+            { x: 0.45, y: 1.45, z: 0, id: 'l_shoulder' }
+        ];
+
+        strutPositions.forEach(s => {
+            const coilGeo = new THREE.TorusGeometry(0.1, 0.03, 12, 24);
+            const coilMesh = new THREE.Mesh(coilGeo, chromeMat);
+            coilMesh.position.set(s.x, s.y, s.z);
+            coilMesh.rotation.x = Math.PI / 2;
+            coilMesh.userData['id'] = s.id;
+            coilMesh.userData['layer'] = 'bone';
+            this.automotiveChassisGroup!.add(coilMesh);
+        });
+    }
+
     private applyPos(mesh: THREE.Mesh, pos: any) {
         mesh.position.set(pos.x || 0, pos.y || 0, pos.z || 0);
         if (pos.rx) mesh.rotation.x = pos.rx;
@@ -1393,7 +1698,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                         (material as any).uniforms['uPainLevel'].value = intensity;
                     }
                 } else {
-                    if (layer === 'skin') (material as THREE.MeshStandardMaterial).color.setHex(0xf3e5dc);
+                    if (layer === 'skin') (material as THREE.MeshStandardMaterial).color.setHex(0x38bdf8);
                     if (layer === 'muscle') (material as THREE.MeshStandardMaterial).color.setHex(0xbe123c);
                     if (layer === 'bone') {
                         (material as THREE.MeshStandardMaterial).color.setHex(0xf5f5f4);
@@ -1447,7 +1752,21 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.controls.update();
     }
 
-    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic') {
+    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive') {
+        if (mode === 'arboreal') {
+            if (this.mannequinGroup) this.mannequinGroup.visible = false;
+            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
+            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = true;
+        } else if (mode === 'automotive') {
+            if (this.mannequinGroup) this.mannequinGroup.visible = false;
+            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
+            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = true;
+        } else {
+            if (this.mannequinGroup) this.mannequinGroup.visible = true;
+            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
+            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
+        }
+
         this.parts.forEach((group) => {
             const isSelected = this.state.selectedPartId() === group.userData['id'];
             group.children.forEach(child => {
@@ -1475,6 +1794,18 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     else if (layer === 'organ') { material.opacity = 0.95; material.depthWrite = true; }
                     else if (layer === 'bone') { material.opacity = 0.20; material.depthWrite = false; }
                     else { material.opacity = 0; material.depthWrite = false; }
+                }
+                else if (mode === 'arboreal') {
+                    if (layer === 'skin') { material.opacity = 0.30; material.depthWrite = false; }
+                    else if (layer === 'organ') { material.opacity = 0.90; material.depthWrite = true; }
+                    else if (layer === 'bone') { material.opacity = 0.60; material.depthWrite = true; }
+                    else { material.opacity = 0.20; material.depthWrite = false; }
+                }
+                else if (mode === 'automotive') {
+                    if (layer === 'skin') { material.opacity = 0.20; material.depthWrite = false; }
+                    else if (layer === 'bone') { material.opacity = 0.95; material.depthWrite = true; }
+                    else if (layer === 'organ') { material.opacity = 0.85; material.depthWrite = true; }
+                    else { material.opacity = 0.15; material.depthWrite = false; }
                 }
                 else if (mode === 'molecular') {
                     if (layer === 'skin') { material.opacity = 0.30; material.depthWrite = false; }
@@ -1662,15 +1993,43 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
                 if (this.ayurvedicAuraGroup && this.ayurvedicAuraGroup.visible) {
                     this.ayurvedicAuraGroup.rotation.y += 0.005;
-                    const auraPulse = 0.6 + Math.sin(time * 3) * 0.2;
                     this.ayurvedicAuraGroup.children.forEach(child => {
-                        if (child instanceof THREE.Points && child.material instanceof THREE.PointsMaterial) {
+                        if (child instanceof THREE.Points) {
+                            child.rotation.y -= 0.003;
+                        }
+                        if (child instanceof THREE.Mesh && child.userData['layer'] === 'chakra') {
+                            const timeShift = Number(child.userData['id']?.charCodeAt(7) || 0);
+                            const auraPulse = 0.5 + Math.sin(time * 3 + timeShift) * 0.4;
                             child.material.opacity = auraPulse;
                         }
                     });
                 }
 
-                // 7. Ambient Aura / Bloom entrainment
+                // 7. Arboreal Tree & Automotive Chassis Model Animation Cycles
+                if (this.arborealTreeGroup && this.arborealTreeGroup.visible) {
+                    this.arborealTreeGroup.position.y = Math.sin(time * 1.5) * 0.02;
+                    this.arborealTreeGroup.children.forEach(child => {
+                        if (child.userData['isSapCore'] && child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+                            child.material.emissiveIntensity = 0.5 + Math.sin(time * 6) * 0.4;
+                        }
+                        if (child.userData['isLeafNode'] && child instanceof THREE.Mesh) {
+                            child.rotation.y += 0.01;
+                        }
+                    });
+                }
+
+                if (this.automotiveChassisGroup && this.automotiveChassisGroup.visible) {
+                    this.automotiveChassisGroup.position.y = Math.sin(time * 1.5) * 0.02;
+                    this.automotiveChassisGroup.children.forEach(child => {
+                        if (child.userData['isEngineBlock'] && child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial) {
+                            const engineRpmPulse = 1 + Math.sin(time * 12) * 0.04;
+                            child.scale.set(engineRpmPulse, engineRpmPulse, engineRpmPulse);
+                            child.material.emissiveIntensity = 0.3 + Math.sin(time * 12) * 0.2;
+                        }
+                    });
+                }
+
+                // 8. Ambient Aura / Bloom entrainment
                 if (this.bloomPass) {
                     if (avsActive) {
                         const pacingFrequency = (this.state.avsBreathingRate() / 60) * 2 * Math.PI;

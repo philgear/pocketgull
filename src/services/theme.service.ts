@@ -9,11 +9,22 @@ export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercr
 export class ThemeService {
   public currentTheme = signal<AppTheme>('light');
   public activeTheme = signal<'light' | 'dark'>('light');
+  public activeParadigm = signal<'western' | 'tcm' | 'ayurveda' | 'unified'>('unified');
   public reduceMotion = signal<boolean>(false);
   public isPlainLanguageMode = signal<boolean>(false);
+  public analogyLensMode = signal<'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse'>('clinical');
   public activeSeagullPersona = signal<'calm-gull' | 'active-skimmer' | 'deep-navigator' | 'storm-rider'>('deep-navigator');
   public textSizeScale = signal<'standard' | 'large' | 'extra-large'>('standard');
   private platformId = inject(PLATFORM_ID);
+
+  public setAnalogyLensMode(mode: 'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse') {
+    this.analogyLensMode.set(mode);
+    if (mode !== 'clinical') {
+      this.isPlainLanguageMode.set(true);
+    } else {
+      this.isPlainLanguageMode.set(false);
+    }
+  }
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -35,6 +46,12 @@ export class ThemeService {
       effect(() => {
         const resolvedTheme = this.activeTheme();
         this.applyThemeToDom(resolvedTheme);
+      });
+
+      // Setup effect to apply paradigm reactive CSS variables & data attributes
+      effect(() => {
+        const paradigm = this.activeParadigm();
+        this.applyParadigmToDom(paradigm);
       });
 
       // Setup effect to apply the seagull persona attribute
@@ -104,6 +121,11 @@ export class ThemeService {
       } else {
         this.currentTheme.set('rice');
       }
+    }
+
+    const urlLens = urlParams.get('lens') as any;
+    if (urlLens && ['clinical', 'arborist', 'mechanic', 'gentleman', 'muse'].includes(urlLens)) {
+      this.setAnalogyLensMode(urlLens);
     }
 
     const savedReduceMotion = localStorage.getItem('pocket_gull_reduce_motion');
@@ -232,8 +254,33 @@ export class ThemeService {
     }
   }
 
+  private applyParadigmToDom(paradigm: 'western' | 'tcm' | 'ayurveda' | 'unified') {
+    if (typeof document === 'undefined') return;
+
+    const root = document.documentElement;
+    root.setAttribute('data-clinical-paradigm', paradigm);
+
+    if (paradigm === 'western') {
+      root.style.setProperty('--paradigm-accent', '#06b6d4'); // Cyan
+      root.style.setProperty('--paradigm-accent-glow', 'rgba(6, 182, 212, 0.4)');
+    } else if (paradigm === 'tcm') {
+      root.style.setProperty('--paradigm-accent', '#10b981'); // Emerald
+      root.style.setProperty('--paradigm-accent-glow', 'rgba(16, 185, 129, 0.4)');
+    } else if (paradigm === 'ayurveda') {
+      root.style.setProperty('--paradigm-accent', '#f59e0b'); // Saffron
+      root.style.setProperty('--paradigm-accent-glow', 'rgba(245, 158, 11, 0.4)');
+    } else {
+      root.style.setProperty('--paradigm-accent', '#a855f7'); // Rosetta Purple
+      root.style.setProperty('--paradigm-accent-glow', 'rgba(168, 85, 247, 0.4)');
+    }
+  }
+
   public setTheme(theme: AppTheme) {
     this.currentTheme.set(theme);
+  }
+
+  public setParadigm(paradigm: 'western' | 'tcm' | 'ayurveda' | 'unified') {
+    this.activeParadigm.set(paradigm);
   }
 
   public setReduceMotion(reduce: boolean) {

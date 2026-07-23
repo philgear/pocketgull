@@ -4,19 +4,21 @@ import { PatientStateService } from '../services/patient-state.service';
 import { IBodyPartIssue } from '../services/patient.types';
 import { PatientManagementService } from '../services/patient-management.service';
 import { Body3DViewerComponent } from './body-3d-viewer.component';
+import { Arborist3DViewerComponent } from './arborist-3d-viewer.component';
+import { Mechanical3DViewerComponent } from './mechanical-3d-viewer.component';
 import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-body-viewer',
   standalone: true,
-  imports: [CommonModule, Body3DViewerComponent],
+  imports: [CommonModule, Body3DViewerComponent, Arborist3DViewerComponent, Mechanical3DViewerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `    
-    <div class="flex flex-col h-full w-full bg-slate-900/90 dark:bg-zinc-950/95 text-white rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl font-sans">
+    <div class="flex flex-col h-full w-full bg-white/70 dark:bg-zinc-900 backdrop-blur-[12px] text-gray-900 dark:text-zinc-100 rounded-2xl overflow-hidden border border-gray-200 dark:border-zinc-800 shadow-xl font-sans relative">
       
       <!-- Tooltip -->
       @if (tooltipVisible()) {
-        <div class="absolute bg-[#1C1C1C] text-white text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-sm pointer-events-none shadow-lg z-50"
+        <div class="absolute bg-[#1C1C1C] text-white text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-xl pointer-events-none shadow-lg z-50 border border-white/20"
              [style.left.px]="tooltipX()"
              [style.top.px]="tooltipY()"
              [style.transform]="'translate(-50%, 0)'">
@@ -24,77 +26,94 @@ import { ThemeService } from '../services/theme.service';
         </div>
       }
 
-      <!-- 1. Top Dedicated Header Bar (OUTSIDE 3D Canvas Window) -->
-      <div class="p-3 bg-zinc-900/90 border-b border-zinc-800/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shrink-0 no-print z-20">
-        <!-- Search Bar -->
-        <div class="relative flex items-center bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 w-full sm:w-72 shadow-inner">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-zinc-500 mr-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input 
-            type="text" 
-            [value]="searchQuery()" 
-            (input)="onSearchInput($event)" 
-            placeholder="Search part, organ, acupoint, chakra..." 
-            class="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 outline-none font-medium" />
-          @if (searchQuery()) {
-            <button (click)="clearSearch()" class="p-1 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          }
+      <!-- 1. Top Dedicated Header Bar (Standardized with Patient Summary Cards) -->
+      <div class="px-4 py-3 sm:px-6 sm:py-4 bg-gray-50/80 dark:bg-zinc-900/90 border-b border-gray-200 dark:border-zinc-800/80 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 shrink-0 no-print z-20">
+        
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold">
+            🔬
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-gray-900 dark:text-zinc-100">
+              3D Spatial Diagnostic Scanner
+            </h3>
+            <p class="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-zinc-400">
+              Interactive 3D anatomical twin & cross-projection lenses
+            </p>
+          </div>
         </div>
 
-        <!-- Paradigm Lens Selector Bar -->
-        <div class="flex items-center gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800">
-          <button (click)="state.selectPhilosophy('western')" [class.bg-sky-600]="state.activePhilosophy() === 'western'" [class.text-white]="state.activePhilosophy() === 'western'" [class.text-zinc-400]="state.activePhilosophy() !== 'western'" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer">
-            🩺 Western
-          </button>
-          <button (click)="state.selectPhilosophy('eastern')" [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'" [class.text-white]="state.activePhilosophy() === 'eastern'" [class.text-zinc-400]="state.activePhilosophy() !== 'eastern'" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer">
-            🌿 Eastern TCM
-          </button>
-          <button (click)="state.selectPhilosophy('ayurvedic')" [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'" [class.text-white]="state.activePhilosophy() === 'ayurvedic'" [class.text-zinc-400]="state.activePhilosophy() !== 'ayurvedic'" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors cursor-pointer">
-            🧘 Ayurvedic
-          </button>
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Search Bar -->
+          <div class="relative flex items-center bg-white dark:bg-zinc-950 border border-gray-300 dark:border-zinc-800 rounded-xl px-3 py-1.5 w-full sm:w-64 shadow-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 dark:text-zinc-500 mr-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input 
+              type="text" 
+              [value]="searchQuery()" 
+              (input)="onSearchInput($event)" 
+              placeholder="Search organ, acupoint..." 
+              class="w-full bg-transparent text-xs text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 outline-none font-medium" />
+            @if (searchQuery()) {
+              <button (click)="clearSearch()" class="p-1 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg text-gray-400 hover:text-gray-600 dark:text-zinc-400 dark:hover:text-zinc-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            }
+          </div>
+
+          <!-- Paradigm Lens Selector Bar (Tap-Target Friendly & Dual Light/Dark Theme) -->
+          <div class="flex items-center gap-1.5 bg-gray-200/80 dark:bg-zinc-950 p-1.5 rounded-lg border border-gray-300/80 dark:border-zinc-800 text-xs font-mono">
+            <button (click)="state.selectPhilosophy('western')" [class.bg-sky-600]="state.activePhilosophy() === 'western'" [class.text-white]="state.activePhilosophy() === 'western'" [class.text-gray-700]="state.activePhilosophy() !== 'western'" [class.dark:text-zinc-300]="state.activePhilosophy() !== 'western'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
+              🩺 Western
+            </button>
+            <button (click)="state.selectPhilosophy('eastern')" [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'" [class.text-white]="state.activePhilosophy() === 'eastern'" [class.text-gray-700]="state.activePhilosophy() !== 'eastern'" [class.dark:text-zinc-300]="state.activePhilosophy() !== 'eastern'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
+              🌿 TCM
+            </button>
+            <button (click)="state.selectPhilosophy('ayurvedic')" [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'" [class.text-white]="state.activePhilosophy() === 'ayurvedic'" [class.text-gray-700]="state.activePhilosophy() !== 'ayurvedic'" [class.dark:text-zinc-300]="state.activePhilosophy() !== 'ayurvedic'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
+              🧘 Ayurveda
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Dynamic Paradigm Quick Selection Target Bar -->
-      <div class="py-2 px-3 bg-zinc-950/80 border-b border-zinc-800 flex items-center gap-2 overflow-x-auto text-xs z-20">
+      <!-- Dynamic Paradigm Quick Selection Target Bar (Tap Target & Dual Theme Friendly) -->
+      <div class="py-2.5 px-4 bg-slate-100/90 dark:bg-zinc-950/90 border-b border-gray-200 dark:border-zinc-800/80 flex items-center gap-2 overflow-x-auto text-xs z-20 hide-scrollbar">
         @if (state.activePhilosophy() === 'western') {
-          <span class="text-xs font-bold uppercase tracking-wider text-sky-400 shrink-0">🩺 Western Organs:</span>
-          <button (click)="select('head', 'Head & Brain')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🧠 Head & Brain</button>
-          <button (click)="select('heart', 'Cardiac / Heart')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🫀 Heart</button>
-          <button (click)="select('lungs', 'Pulmonary / Lungs')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🫁 Lungs</button>
-          <button (click)="select('abdomen', 'Abdomen & GI')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🟡 Abdomen</button>
-          <button (click)="select('lower_back', 'Lumbar Spine')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🦴 Spine</button>
+          <span class="text-xs font-black uppercase tracking-wider text-sky-700 dark:text-sky-400 shrink-0 mr-1">🩺 Western:</span>
+          <button (click)="select('head', 'Head & Brain')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/80 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🧠 Head & Brain</button>
+          <button (click)="select('heart', 'Cardiac / Heart')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/80 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🫀 Heart</button>
+          <button (click)="select('lungs', 'Pulmonary / Lungs')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/80 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🫁 Lungs</button>
+          <button (click)="select('abdomen', 'Abdomen & GI')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/80 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟡 Abdomen</button>
+          <button (click)="select('lower_back', 'Lumbar Spine')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/80 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🦴 Spine</button>
         } @else if (state.activePhilosophy() === 'eastern') {
-          <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 shrink-0">☯️ TCM Acupoints:</span>
-          <button (click)="select('acupoint_gv20', 'GV-20 Baihui')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">☯️ Baihui (GV-20)</button>
-          <button (click)="select('acupoint_cv17', 'CV-17 Danzhong')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🫁 Danzhong (CV-17)</button>
-          <button (click)="select('acupoint_cv12', 'CV-12 Zhongwan')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🟡 Zhongwan (CV-12)</button>
-          <button (click)="select('acupoint_st36', 'ST-36 Zusanli')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🦵 Zusanli (ST-36)</button>
-          <button (click)="select('acupoint_li4', 'LI-4 Hegu')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">✋ Hegu (LI-4)</button>
+          <span class="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 shrink-0 mr-1">☯️ TCM:</span>
+          <button (click)="select('acupoint_gv20', 'GV-20 Baihui')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">☯️ Baihui (GV-20)</button>
+          <button (click)="select('acupoint_cv17', 'CV-17 Danzhong')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🫁 Danzhong (CV-17)</button>
+          <button (click)="select('acupoint_cv12', 'CV-12 Zhongwan')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟡 Zhongwan (CV-12)</button>
+          <button (click)="select('acupoint_st36', 'ST-36 Zusanli')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🦵 Zusanli (ST-36)</button>
+          <button (click)="select('acupoint_li4', 'LI-4 Hegu')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">✋ Hegu (LI-4)</button>
         } @else if (state.activePhilosophy() === 'ayurvedic') {
-          <span class="text-xs font-bold uppercase tracking-wider text-amber-400 shrink-0">🧘 Sushumna Chakras:</span>
-          <button (click)="select('chakra_crown', 'Sahasrara (Crown)')" class="px-2.5 py-1 rounded-lg bg-purple-950/80 text-purple-200 border border-purple-800/60 hover:bg-purple-900 transition text-xs font-bold shrink-0 cursor-pointer">🟣 Crown</button>
-          <button (click)="select('chakra_third_eye', 'Ajna (Third Eye)')" class="px-2.5 py-1 rounded-lg bg-indigo-950/80 text-indigo-200 border border-indigo-800/60 hover:bg-indigo-900 transition text-xs font-bold shrink-0 cursor-pointer">🔵 Third Eye</button>
-          <button (click)="select('chakra_throat', 'Vishuddha (Throat)')" class="px-2.5 py-1 rounded-lg bg-sky-950/80 text-sky-200 border border-sky-800/60 hover:bg-sky-900 transition text-xs font-bold shrink-0 cursor-pointer">🟦 Throat</button>
-          <button (click)="select('chakra_heart', 'Anahata (Heart)')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 text-emerald-200 border border-emerald-800/60 hover:bg-emerald-900 transition text-xs font-bold shrink-0 cursor-pointer">🟢 Heart</button>
-          <button (click)="select('chakra_solar', 'Manipura (Solar Plexus)')" class="px-2.5 py-1 rounded-lg bg-amber-950/80 text-amber-200 border border-amber-800/60 hover:bg-amber-900 transition text-xs font-bold shrink-0 cursor-pointer">🟡 Solar</button>
-          <button (click)="select('chakra_sacral', 'Svadhisthana (Sacral)')" class="px-2.5 py-1 rounded-lg bg-orange-950/80 text-orange-200 border border-orange-800/60 hover:bg-orange-900 transition text-xs font-bold shrink-0 cursor-pointer">🟠 Sacral</button>
-          <button (click)="select('chakra_root', 'Muladhara (Root)')" class="px-2.5 py-1 rounded-lg bg-rose-950/80 text-rose-200 border border-rose-800/60 hover:bg-rose-900 transition text-xs font-bold shrink-0 cursor-pointer">🔴 Root</button>
+          <span class="text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 shrink-0 mr-1">🧘 Ayurveda:</span>
+          <button (click)="select('chakra_crown', 'Sahasrara (Crown)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/80 text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟣 Crown</button>
+          <button (click)="select('chakra_third_eye', 'Ajna (Third Eye)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-950/80 text-indigo-900 dark:text-indigo-200 border border-indigo-300 dark:border-indigo-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🔵 Third Eye</button>
+          <button (click)="select('chakra_throat', 'Vishuddha (Throat)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-sky-100 hover:bg-sky-200 dark:bg-sky-950/80 text-sky-900 dark:text-sky-200 border border-sky-300 dark:border-sky-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟦 Throat</button>
+          <button (click)="select('chakra_heart', 'Anahata (Heart)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟢 Heart</button>
+          <button (click)="select('chakra_solar', 'Manipura (Solar Plexus)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/80 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟡 Solar</button>
+          <button (click)="select('chakra_sacral', 'Svadhisthana (Sacral)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-orange-100 hover:bg-orange-200 dark:bg-orange-950/80 text-orange-900 dark:text-orange-200 border border-orange-300 dark:border-orange-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟠 Sacral</button>
+          <button (click)="select('chakra_root', 'Muladhara (Root)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/80 text-rose-900 dark:text-rose-200 border border-rose-300 dark:border-rose-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🔴 Root</button>
         }
       </div>
 
-      <!-- Live Search Dropdown -->
+      <!-- Live Search Dropdown (Dual Light/Dark Theme) -->
       @if (isSearchOpen() || filteredParts().length > 0 && searchQuery().trim()) {
-        <div class="bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800 p-2 max-h-[180px] overflow-y-auto divide-y divide-zinc-800 z-30">
+        <div class="bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-gray-200 dark:border-zinc-800 p-2 max-h-[220px] overflow-y-auto divide-y divide-gray-100 dark:divide-zinc-800 z-30 shadow-lg">
           @for (part of filteredParts(); track part.id) {
             <button (click)="onPartSearchResultClick(part)" 
-                    class="w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-teal-500/20 transition-colors group">
-              <div class="flex items-center gap-2">
-                <span class="text-base">{{ part.icon }}</span>
+                    class="w-full text-left px-4 py-3 min-h-[44px] text-xs flex items-center justify-between hover:bg-emerald-500/10 transition-colors group rounded-lg">
+              <div class="flex items-center gap-3">
+                <span class="text-lg">{{ part.icon }}</span>
                 <div>
-                  <div class="font-semibold text-zinc-200 group-hover:text-teal-400">{{ part.name }}</div>
-                  <div class="text-[10px] text-zinc-500 uppercase tracking-wider">{{ part.system }}</div>
+                  <div class="font-bold text-gray-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">{{ part.name }}</div>
+                  <div class="text-[10px] text-gray-500 dark:text-zinc-400 font-mono uppercase tracking-wider">{{ part.system }}</div>
                 </div>
               </div>
             </button>
@@ -102,16 +121,28 @@ import { ThemeService } from '../services/theme.service';
         </div>
       }
 
-      <!-- 2. Center Pure Unencumbered 3D Viewport Window (ZERO Overlapping Elements) -->
-      <div class="flex-1 w-full relative min-h-[380px] overflow-hidden bg-white border border-slate-200 rounded-xl shadow-xs">
+      <!-- 2. Center 3D Viewport Window (Holographic Diagnostic Twin - Luminous Papyrus/Light Canvas) -->
+      <div class="flex-1 w-full relative min-h-[420px] overflow-hidden bg-[#FAF8F0] dark:bg-zinc-950 border border-gray-300 dark:border-zinc-800 rounded-lg shadow-xl">
         @if (state.bodyViewerMode() === '3d') {
           @defer {
-            <app-body-3d-viewer 
-              class="w-full h-full block"
-              [anatomyViewMode]="state.anatomyViewMode()"
-              [customModelUrl]="null"
-              (partSelected)="onPartSelected($event)">
-            </app-body-3d-viewer>
+            @if (state.anatomyViewMode() === 'arboreal') {
+              <app-arborist-3d-viewer
+                class="w-full h-full block"
+                (nodeSelected)="onPartSelected($event)">
+              </app-arborist-3d-viewer>
+            } @else if (state.anatomyViewMode() === 'automotive') {
+              <app-mechanical-3d-viewer
+                class="w-full h-full block"
+                (nodeSelected)="onPartSelected($event)">
+              </app-mechanical-3d-viewer>
+            } @else {
+              <app-body-3d-viewer 
+                class="w-full h-full block"
+                [anatomyViewMode]="state.anatomyViewMode()"
+                [customModelUrl]="null"
+                (partSelected)="onPartSelected($event)">
+              </app-body-3d-viewer>
+            }
           } @placeholder {
             <div class="w-full h-full flex flex-col items-center justify-center text-zinc-500 gap-4">
               <div class="w-8 h-8 rounded-sm border-2 border-zinc-700 border-t-teal-500 animate-spin"></div>
@@ -160,6 +191,10 @@ import { ThemeService } from '../services/theme.service';
             <button (click)="state.anatomyViewMode.set('muscle')" [class.bg-teal-600]="state.anatomyViewMode() === 'muscle'" [class.text-white]="state.anatomyViewMode() === 'muscle'" [class.bg-zinc-800]="state.anatomyViewMode() !== 'muscle'" [class.text-zinc-300]="state.anatomyViewMode() !== 'muscle'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-zinc-700 transition min-h-[36px] cursor-pointer">🦾 Muscle</button>
             <button (click)="state.anatomyViewMode.set('skeleton')" [class.bg-rose-600]="state.anatomyViewMode() === 'skeleton'" [class.text-white]="state.anatomyViewMode() === 'skeleton'" [class.bg-zinc-800]="state.anatomyViewMode() !== 'skeleton'" [class.text-zinc-300]="state.anatomyViewMode() !== 'skeleton'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-zinc-700 transition min-h-[36px] cursor-pointer">🦴 Skeleton</button>
             <button (click)="state.anatomyViewMode.set('organs')" [class.bg-purple-600]="state.anatomyViewMode() === 'organs'" [class.text-white]="state.anatomyViewMode() === 'organs'" [class.bg-zinc-800]="state.anatomyViewMode() !== 'organs'" [class.text-zinc-300]="state.anatomyViewMode() !== 'organs'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-lg border border-zinc-700 transition min-h-[36px] cursor-pointer">🫀 Organ</button>
+            <button (click)="state.anatomyViewMode.set('arboreal')" [class.bg-emerald-600]="state.anatomyViewMode() === 'arboreal'" [class.text-white]="state.anatomyViewMode() === 'arboreal'" [class.bg-slate-100]="state.anatomyViewMode() !== 'arboreal'" [class.dark:bg-zinc-800]="state.anatomyViewMode() !== 'arboreal'" [class.text-gray-700]="state.anatomyViewMode() !== 'arboreal'" [class.dark:text-zinc-300]="state.anatomyViewMode() !== 'arboreal'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-md border border-slate-300 dark:border-zinc-700 transition min-h-[36px] cursor-pointer">🌳 Arboreal</button>
+            <button (click)="state.anatomyViewMode.set('automotive')" [class.bg-cyan-600]="state.anatomyViewMode() === 'automotive'" [class.text-white]="state.anatomyViewMode() === 'automotive'" [class.bg-slate-100]="state.anatomyViewMode() !== 'automotive'" [class.dark:bg-zinc-800]="state.anatomyViewMode() !== 'automotive'" [class.text-gray-700]="state.anatomyViewMode() !== 'automotive'" [class.dark:text-zinc-300]="state.anatomyViewMode() !== 'automotive'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-md border border-slate-300 dark:border-zinc-700 transition min-h-[36px] cursor-pointer">🚗 Chassis</button>
+            <button (click)="state.anatomyViewMode.set('eastern')" [class.bg-amber-600]="state.anatomyViewMode() === 'eastern'" [class.text-white]="state.anatomyViewMode() === 'eastern'" [class.bg-slate-100]="state.anatomyViewMode() !== 'eastern'" [class.dark:bg-zinc-800]="state.anatomyViewMode() !== 'eastern'" [class.text-gray-700]="state.anatomyViewMode() !== 'eastern'" [class.dark:text-zinc-300]="state.anatomyViewMode() !== 'eastern'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-md border border-slate-300 dark:border-zinc-700 transition min-h-[36px] cursor-pointer">🎩 Clockwork</button>
+            <button (click)="state.anatomyViewMode.set('ayurvedic')" [class.bg-purple-600]="state.anatomyViewMode() === 'ayurvedic'" [class.text-white]="state.anatomyViewMode() === 'ayurvedic'" [class.bg-slate-100]="state.anatomyViewMode() !== 'ayurvedic'" [class.dark:bg-zinc-800]="state.anatomyViewMode() !== 'ayurvedic'" [class.text-gray-700]="state.anatomyViewMode() !== 'ayurvedic'" [class.dark:text-zinc-300]="state.anatomyViewMode() !== 'ayurvedic'" class="px-2.5 py-1.5 text-[11px] font-bold rounded-md border border-slate-300 dark:border-zinc-700 transition min-h-[36px] cursor-pointer">✨ Solfeggio</button>
           </div>
         </div>
       </div>
