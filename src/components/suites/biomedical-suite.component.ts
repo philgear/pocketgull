@@ -43,7 +43,7 @@ import { PatientVitalsChartComponent } from '../patient-vitals-chart.component';
 
         <div class="space-y-4">
           <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-500 font-mono">Vitals Telemetry & Trend Analysis</h4>
-          <app-patient-vitals-chart />
+          <app-patient-vitals-chart [history]="history()" />
         </div>
       </div>
     </div>
@@ -52,4 +52,5 @@ import { PatientVitalsChartComponent } from '../patient-vitals-chart.component';
 export class BiomedicalSuiteComponent {
   private patientState = inject(PatientStateService);
   vitals = this.patientState.vitals;
+  history = this.patientState.patientHistory;
 }

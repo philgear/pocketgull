@@ -384,9 +384,9 @@ import { environment } from '../environments/environment';
                         🕊️ Avian
                       </button>
                       <button type="button"
-                              (click)="petAuditory.currentMode === ('dreamteam' as any) ? petAuditory.stop() : petAuditory.playDreamTeamArena()"
-                              [class.bg-red-600]="petAuditory.currentMode === ('dreamteam' as any)"
-                              [class.text-white]="petAuditory.currentMode === ('dreamteam' as any)"
+                              (click)="petAuditory.currentMode === 'dreamteam' ? petAuditory.stop() : petAuditory.playDreamTeamArena()"
+                              [class.bg-red-600]="petAuditory.currentMode === 'dreamteam'"
+                              [class.text-white]="petAuditory.currentMode === 'dreamteam'"
                               class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-red-100 dark:hover:bg-zinc-700">
                         🏀 Dream Team '96
                       </button>

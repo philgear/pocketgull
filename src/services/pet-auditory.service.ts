@@ -7,7 +7,7 @@ export class PetAuditoryService {
   private audioCtx: AudioContext | null = null;
   private nodes: any[] = [];
   private isPlaying = false;
-  private activeMode: 'feline' | 'canine' | 'cetacean' | 'avian' | null = null;
+  private activeMode: 'feline' | 'canine' | 'cetacean' | 'avian' | 'dreamteam' | null = null;
   private recognition: any = null;
   private isListening = false;
 
@@ -131,7 +131,7 @@ export class PetAuditoryService {
     return this.isPlaying;
   }
 
-  public get currentMode(): 'feline' | 'canine' | 'cetacean' | 'avian' | null {
+  public get currentMode(): 'feline' | 'canine' | 'cetacean' | 'avian' | 'dreamteam' | null {
     return this.activeMode;
   }
 
