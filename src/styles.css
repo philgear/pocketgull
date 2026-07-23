@@ -3307,10 +3307,40 @@ html.theme-dream-team {
   --text-secondary: #FFC72C;
   --border-color: #E11B22;
   --brand-accent: #E11B22;
+
+  /* 🏀 1996 Dream Team Official Game Ball Pebble Leather Grain Texture */
+  background-color: #0C2340 !important;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(225, 27, 34, 0.15) 0%, transparent 85%),
+    radial-gradient(#FFC72C 0.85px, transparent 0.85px), 
+    radial-gradient(rgba(0, 0, 0, 0.45) 0.85px, #0C2340 0.85px) !important;
+  background-size: 100% 100%, 12px 12px, 12px 12px !important;
+  background-position: 0 0, 0 0, 6px 6px !important;
+}
+
+html.theme-dream-team body {
+  background-color: transparent !important;
+}
+
+/* Basketball Pebble Leather Texture on Cards & Panels */
+html.theme-dream-team .bg-white,
+html.theme-dream-team .dark\:bg-zinc-900,
+html.theme-dream-team .bg-gray-50,
+html.theme-dream-team .pocket-gull-card {
+  background-color: #142B49 !important;
+  background-image: 
+    radial-gradient(rgba(255, 199, 44, 0.08) 1px, transparent 1px),
+    radial-gradient(rgba(0, 0, 0, 0.35) 1px, #142B49 1px) !important;
+  background-size: 10px 10px, 10px 10px !important;
+  background-position: 0 0, 5px 5px !important;
+  border-color: rgba(225, 27, 34, 0.4) !important;
+  color: #FFFFFF !important;
 }
 
 html.theme-dream-team .theme-nav-bar {
-  background-color: #0C2340 !important;
+  background-color: #0A1C33 !important;
+  background-image: radial-gradient(rgba(255, 199, 44, 0.1) 1px, transparent 1px) !important;
+  background-size: 8px 8px !important;
   border-bottom: 2px solid #E11B22 !important;
   color: #FFFFFF !important;
 }
