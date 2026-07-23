@@ -3300,6 +3300,21 @@ html.theme-mandala .theme-nav-bar {
   color: #F5F3FF !important;
 }
 
+html.theme-dream-team {
+  --bg-primary: #0C2340;
+  --bg-card: #142B49;
+  --text-primary: #FFFFFF;
+  --text-secondary: #FFC72C;
+  --border-color: #E11B22;
+  --brand-accent: #E11B22;
+}
+
+html.theme-dream-team .theme-nav-bar {
+  background-color: #0C2340 !important;
+  border-bottom: 2px solid #E11B22 !important;
+  color: #FFFFFF !important;
+}
+
 /* 2. Dieter Rams Tactile Controls & Typography Tokens */
 .btn-rams {
   display: inline-flex;

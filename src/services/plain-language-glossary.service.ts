@@ -101,6 +101,24 @@ export class PlainLanguageGlossaryService {
         plainDefinition: 'In Ayurvedic medicine, the earth and water energy that gives your body physical strength and joint lubrication.',
         simpleAnalogy: 'Like solid foundation soil keeping your body grounded and strong.'
       }
+    ],
+    [
+      'vitals',
+      {
+        term: 'Starting 5 Box Score',
+        category: 'Western Physiology',
+        plainDefinition: 'Your baseline cardiac and metabolic stats displayed like a 1996 Dream Team starting lineup box score.',
+        simpleAnalogy: 'Like checking the halftime score, rebounds, and field goal percentage of your core organ systems.'
+      }
+    ],
+    [
+      'care plan',
+      {
+        term: 'Championship Playbook',
+        category: 'Western Physiology',
+        plainDefinition: 'Your customized clinical intervention protocol designed like a 1996 Dream Team halftime tactical playbook.',
+        simpleAnalogy: 'Like running a flawless 90s fast break: crisp passes, precision execution, and zero turnovers.'
+      }
     ]
   ]);
 

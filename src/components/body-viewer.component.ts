@@ -68,8 +68,8 @@ import { ThemeService } from '../services/theme.service';
             <button (click)="state.selectPhilosophy('eastern')" [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'" [class.text-white]="state.activePhilosophy() === 'eastern'" [class.text-gray-700]="state.activePhilosophy() !== 'eastern'" [class.dark:text-zinc-300]="state.activePhilosophy() !== 'eastern'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
               🌿 TCM
             </button>
-            <button (click)="state.selectPhilosophy('ayurvedic')" [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'" [class.text-white]="state.activePhilosophy() === 'ayurvedic'" [class.text-gray-700]="state.activePhilosophy() !== 'ayurvedic'" [class.dark:text-zinc-300]="state.activePhilosophy() !== 'ayurvedic'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
-              🧘 Ayurveda
+            <button (click)="themeService.setAnalogyLensMode('coach')" [class.bg-red-600]="themeService.analogyLensMode() === 'coach'" [class.text-white]="themeService.analogyLensMode() === 'coach'" [class.text-gray-700]="themeService.analogyLensMode() !== 'coach'" [class.dark:text-zinc-300]="themeService.analogyLensMode() !== 'coach'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
+              🏀 Coach '96
             </button>
           </div>
         </div>
@@ -100,6 +100,11 @@ import { ThemeService } from '../services/theme.service';
           <button (click)="select('chakra_solar', 'Manipura (Solar Plexus)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/80 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟡 Solar</button>
           <button (click)="select('chakra_sacral', 'Svadhisthana (Sacral)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-orange-100 hover:bg-orange-200 dark:bg-orange-950/80 text-orange-900 dark:text-orange-200 border border-orange-300 dark:border-orange-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🟠 Sacral</button>
           <button (click)="select('chakra_root', 'Muladhara (Root)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/80 text-rose-900 dark:text-rose-200 border border-rose-300 dark:border-rose-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🔴 Root</button>
+        } @else if (themeService.analogyLensMode() === 'coach') {
+          <span class="text-xs font-black uppercase tracking-wider text-red-600 dark:text-red-400 shrink-0 mr-1">🏀 1996 Box Score:</span>
+          <button (click)="select('head', 'Point Guard (Neural Drive)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-red-100 hover:bg-red-200 dark:bg-red-950/80 text-red-900 dark:text-red-200 border border-red-300 dark:border-red-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🏀 PG (Neural Drive)</button>
+          <button (click)="select('chest', 'Shooting Guard (Cardiac Pace)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/80 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🏆 SG (Cardiac Pace)</button>
+          <button (click)="select('lowerLegs', 'Center (Rim Protection)')" class="min-h-[44px] px-3.5 py-2 rounded-lg bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/80 text-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-800/60 transition-all text-xs font-bold shrink-0 cursor-pointer flex items-center gap-1.5 shadow-xs">🛡️ C (Rim Protection)</button>
         }
       </div>
 

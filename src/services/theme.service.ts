@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'dream-team';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +12,12 @@ export class ThemeService {
   public activeParadigm = signal<'western' | 'tcm' | 'ayurveda' | 'unified'>('unified');
   public reduceMotion = signal<boolean>(false);
   public isPlainLanguageMode = signal<boolean>(false);
-  public analogyLensMode = signal<'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse'>('clinical');
+  public analogyLensMode = signal<'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse' | 'coach'>('clinical');
   public activeSeagullPersona = signal<'calm-gull' | 'active-skimmer' | 'deep-navigator' | 'storm-rider'>('deep-navigator');
   public textSizeScale = signal<'standard' | 'large' | 'extra-large'>('standard');
   private platformId = inject(PLATFORM_ID);
 
-  public setAnalogyLensMode(mode: 'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse') {
+  public setAnalogyLensMode(mode: 'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse' | 'coach') {
     this.analogyLensMode.set(mode);
     if (mode !== 'clinical') {
       this.isPlainLanguageMode.set(true);

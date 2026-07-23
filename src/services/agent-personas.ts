@@ -104,6 +104,18 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         svgAnimation: 'cpr-pulse-metronome',
         adkMapping: 'offline_emergency_bypass',
     },
+    coach: {
+        name: 'Head Coach Red',
+        role: '1996 Dream Team Championship Strategy & Tactical Box Score',
+        emoji: '🏀',
+        tagline: 'Run the 96 Dream Team offense: execution, pace, and relentless defense!',
+        accentColor: '#E11B22',
+        accentTailwind: 'red-600',
+        avatarPath: 'assets/images/agents/coach.png',
+        props: ['Whistle & Lanyard', 'Chalkboard Playbook', '1996 Gold Championship Ring'],
+        svgAnimation: 'playbook-whistle',
+        adkMapping: 'head_coach_96_agent',
+    },
 };
 
 /**
