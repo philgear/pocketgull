@@ -21,6 +21,9 @@ source.tgz
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/launch.json
+.vscode/chrome-debug-profile/
+chrome-debug-profile/
 .idea
 .DS_Store
 *.suo

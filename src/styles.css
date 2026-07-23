@@ -2390,32 +2390,62 @@ html.theme-white-marble {
   --marble-gold-dark: #aa771c;
   --marble-gold-light: #f6e4a6;
   --marble-bg: #f9f9fb;
-  --marble-slab: rgba(255, 255, 255, 0.9);
+  --marble-slab: rgba(255, 255, 255, 0.88);
 }
 
 html.theme-white-marble body,
+html.theme-white-marble main,
+html.theme-white-marble .secure-splash-main,
+html.theme-white-marble .bg-zinc-950,
+html.theme-white-marble .bg-gray-50,
 html.theme-white-marble app-root {
-  background-color: var(--marble-bg);
-  background-image: 
-    url('/images/white_marble_texture.png'),
-    radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(212, 175, 55, 0.02) 0%, transparent 45%);
-  background-repeat: repeat;
-  background-attachment: fixed;
-  color: #1f2937;
+  background: linear-gradient(135deg, #FAFBFD 0%, #F4F5F8 60%, #EBECEF 100%) !important;
+  color: #1f2937 !important;
+  position: relative;
 }
 
-html.theme-white-marble .bg-white,
-html.theme-white-marble .bg-zinc-900,
-html.theme-white-marble .bg-zinc-950,
+/* Fixed Global White Marble Texture Overlay (Modeled on Papercraft) */
+html.theme-white-marble body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.35 !important;
+  background-repeat: repeat;
+  background-image: url('/images/white_marble_texture.png');
+}
+
+html.theme-white-marble .bg-white:not(.overflow-y-auto):not(.overflow-auto),
+html.theme-white-marble .bg-zinc-900:not(.overflow-y-auto):not(.overflow-auto),
+html.theme-white-marble .bg-zinc-950:not(.overflow-y-auto):not(.overflow-auto),
 html.theme-white-marble .pocket-gull-card,
 html.theme-white-marble .paper-card,
 html.theme-white-marble .sub-panel,
 html.theme-white-marble .card {
+  position: relative;
   background-color: var(--marble-slab) !important;
   border-color: rgba(212, 175, 55, 0.35) !important;
   box-shadow: 0 4px 20px -2px rgba(28, 25, 23, 0.08), 0 0 10px rgba(212, 175, 55, 0.02) !important;
   color: #1f2937 !important;
+  border-radius: 1.25rem !important;
+}
+
+/* Card Texture Blend Overlay for White Marble */
+html.theme-white-marble .pocket-gull-card::before,
+html.theme-white-marble .paper-card::before,
+html.theme-white-marble .sub-panel::before,
+html.theme-white-marble .card::before,
+html.theme-white-marble .bg-white::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.25 !important;
+  mix-blend-mode: multiply !important;
+  background-repeat: repeat;
+  background-image: url('/images/white_marble_texture.png');
 }
 
 html.theme-white-marble .border,
@@ -2480,32 +2510,63 @@ html.theme-black-marble {
   --marble-gold: #d4af37;
   --marble-gold-light: #f6e4a6;
   --marble-black: #0d0d11;
-  --marble-slab: rgba(20, 20, 26, 0.9);
+  --marble-slab: rgba(20, 20, 26, 0.86);
 }
 
 html.theme-black-marble body,
+html.theme-black-marble main,
+html.theme-black-marble .secure-splash-main,
+html.theme-black-marble .bg-zinc-950,
+html.theme-black-marble .bg-gray-50,
 html.theme-black-marble app-root {
-  background-color: var(--marble-black);
-  background-image: 
-    url('/images/black_marble_texture.png'),
-    radial-gradient(circle at 0% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 100% 100%, rgba(212, 175, 55, 0.03) 0%, transparent 45%);
-  background-repeat: repeat;
-  background-attachment: fixed;
-  color: #f3f4f6;
+  background: linear-gradient(135deg, #0F0F14 0%, #0A0A0E 60%, #050508 100%) !important;
+  color: #f3f4f6 !important;
+  position: relative;
 }
 
-html.theme-black-marble .bg-white,
-html.theme-black-marble .bg-zinc-900,
-html.theme-black-marble .bg-zinc-950,
+/* Fixed Global Black Marble Texture Overlay (Modeled on Papercraft) */
+html.theme-black-marble body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.45 !important;
+  background-repeat: repeat;
+  background-image: url('/images/black_marble_texture.png');
+}
+
+html.theme-black-marble .bg-white:not(.overflow-y-auto):not(.overflow-auto),
+html.theme-black-marble .bg-zinc-900:not(.overflow-y-auto):not(.overflow-auto),
+html.theme-black-marble .bg-zinc-950:not(.overflow-y-auto):not(.overflow-auto),
 html.theme-black-marble .pocket-gull-card,
 html.theme-black-marble .paper-card,
 html.theme-black-marble .sub-panel,
 html.theme-black-marble .card {
+  position: relative;
   background-color: var(--marble-slab) !important;
   border-color: rgba(212, 175, 55, 0.3) !important;
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6), 0 0 15px rgba(212, 175, 55, 0.03) !important;
   color: #f3f4f6 !important;
+  border-radius: 1.25rem !important;
+}
+
+/* Card Texture Blend Overlay for Black Marble */
+html.theme-black-marble .pocket-gull-card::before,
+html.theme-black-marble .paper-card::before,
+html.theme-black-marble .sub-panel::before,
+html.theme-black-marble .card::before,
+html.theme-black-marble .bg-zinc-900::before,
+html.theme-black-marble .bg-zinc-950::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.35 !important;
+  mix-blend-mode: screen !important;
+  background-repeat: repeat;
+  background-image: url('/images/black_marble_texture.png');
 }
 
 html.theme-black-marble .border,
@@ -2727,35 +2788,57 @@ html.theme-pool {
 
 /* Day Pool Water Background */
 html.theme-pool-light body,
+html.theme-pool-light main,
+html.theme-pool-light .secure-splash-main,
+html.theme-pool-light .bg-zinc-950,
+html.theme-pool-light .bg-gray-50,
 html.theme-pool-light app-root {
-  background-color: #7dd3fc;
-  background-image: 
-    url('/images/pool_water_light.png'),
-    linear-gradient(180deg, #38bdf8 0%, #bae6fd 100%);
+  background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 50%, #bae6fd 100%) !important;
+  color: #0369a1 !important;
+  position: relative;
+}
+
+/* Fixed Global Pool Light Texture Overlay (Modeled on Papercraft) */
+html.theme-pool-light body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.35 !important;
   background-repeat: repeat;
-  background-attachment: fixed;
-  background-blend-mode: overlay;
+  background-image: url('/images/pool_water_light.png');
   animation: pool-water-flow 12s infinite linear alternate;
-  color: #0369a1;
 }
 
 /* Night Pool Water Background */
 html.theme-pool-dark body,
+html.theme-pool-dark main,
+html.theme-pool-dark .secure-splash-main,
+html.theme-pool-dark .bg-zinc-950,
+html.theme-pool-dark .bg-gray-50,
 html.theme-pool-dark app-root {
-  background-color: #0f172a;
-  background-image: 
-    url('/images/pool_water_dark.png'),
-    linear-gradient(180deg, #020617 0%, #1e1b4b 100%);
+  background: linear-gradient(180deg, #020617 0%, #0f172a 60%, #1e1b4b 100%) !important;
+  color: #bae6fd !important;
+  position: relative;
+}
+
+/* Fixed Global Pool Dark Texture Overlay (Modeled on Papercraft) */
+html.theme-pool-dark body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.40 !important;
   background-repeat: repeat;
-  background-attachment: fixed;
-  background-blend-mode: overlay;
+  background-image: url('/images/pool_water_dark.png');
   animation: pool-water-flow 16s infinite linear alternate;
-  color: #bae6fd;
 }
 
 @keyframes pool-water-flow {
-  0% { background-position: 0px 0px, 0% 0%; }
-  100% { background-position: 60px 40px, 0% 0%; }
+  0% { background-position: 0px 0px; }
+  100% { background-position: 60px 40px; }
 }
 
 /* Gentle floating animation for Blow-up UI Panels */
@@ -2774,7 +2857,7 @@ html.theme-pool .card {
   100% { transform: translateY(-5px) rotate(0.4deg); }
 }
 
-/* Glossy Blow-up Floating Vinyl Panel Design */
+/* Glossy Solid Floating Vinyl Lounger & Pool Furniture Panels */
 html.theme-pool .bg-white,
 html.theme-pool .bg-zinc-900,
 html.theme-pool .bg-zinc-950,
@@ -2782,16 +2865,17 @@ html.theme-pool .pocket-gull-card,
 html.theme-pool .paper-card,
 html.theme-pool .sub-panel,
 html.theme-pool .card {
-  border-radius: 28px !important;
-  backdrop-filter: blur(16px) !important;
+  border-radius: 20px !important;
+  backdrop-filter: blur(12px) !important;
   contain: paint;
   box-shadow: 
-    0 15px 30px -10px rgba(3, 105, 161, 0.25),
-    inset 0 6px 12px rgba(255, 255, 255, 0.7),
-    inset 0 -6px 12px rgba(0, 0, 0, 0.05) !important;
+    0 22px 45px -12px rgba(2, 132, 199, 0.45),
+    0 10px 20px -5px rgba(0, 0, 0, 0.25),
+    inset 0 3px 6px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Light Mode Vinyl Panels */
+/* Light Mode Solid Floating Pool Furniture */
 html.theme-pool-light .bg-white,
 html.theme-pool-light .bg-zinc-900,
 html.theme-pool-light .bg-zinc-950,
@@ -2799,11 +2883,21 @@ html.theme-pool-light .pocket-gull-card,
 html.theme-pool-light .paper-card,
 html.theme-pool-light .sub-panel,
 html.theme-pool-light .card {
-  background-color: rgba(255, 255, 255, 0.75) !important;
-  color: #0369a1 !important;
+  position: relative;
+  background-color: #FFFFFF !important; /* 100% Solid White Porcelain Floating Lounger */
+  color: #0F172A !important; /* Deep Navy High Contrast Text */
+  border: 3px solid #0284C7 !important; /* Crisp Aqua Vinyl Seam */
 }
 
-/* Dark Mode Vinyl Panels */
+html.theme-pool-light .pocket-gull-card::before,
+html.theme-pool-light .paper-card::before,
+html.theme-pool-light .sub-panel::before,
+html.theme-pool-light .card::before,
+html.theme-pool-light .bg-white::before {
+  display: none !important; /* Remove background texture bleed inside card for crystal clarity */
+}
+
+/* Dark Mode Solid Floating Pool Furniture */
 html.theme-pool-dark .bg-white,
 html.theme-pool-dark .bg-zinc-900,
 html.theme-pool-dark .bg-zinc-950,
@@ -2811,25 +2905,37 @@ html.theme-pool-dark .pocket-gull-card,
 html.theme-pool-dark .paper-card,
 html.theme-pool-dark .sub-panel,
 html.theme-pool-dark .card {
-  background-color: rgba(15, 23, 42, 0.75) !important;
-  color: #bae6fd !important;
+  position: relative;
+  background-color: #0F172A !important; /* 100% Solid Midnight Slate Floating Raft */
+  color: #F0F9FF !important; /* Ice White High Contrast Text */
+  border: 3px solid #38BDF8 !important; /* Glowing Turquoise Vinyl Seam */
   box-shadow: 
-    0 15px 35px -10px rgba(0, 0, 0, 0.5),
-    inset 0 4px 10px rgba(255, 255, 255, 0.15),
-    inset 0 -4px 10px rgba(0, 0, 0, 0.4) !important;
+    0 22px 50px -10px rgba(0, 0, 0, 0.75),
+    0 10px 20px -5px rgba(14, 165, 233, 0.3),
+    inset 0 3px 6px rgba(255, 255, 255, 0.2),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Pool Noodle Piping: Thick, Rounded, Glossy tube borders */
+html.theme-pool-dark .pocket-gull-card::before,
+html.theme-pool-dark .paper-card::before,
+html.theme-pool-dark .sub-panel::before,
+html.theme-pool-dark .card::before,
+html.theme-pool-dark .bg-zinc-900::before,
+html.theme-pool-dark .bg-zinc-950::before {
+  display: none !important; /* Remove background texture bleed inside card for crystal clarity */
+}
+
+/* Inflatable Vinyl Seam Accents for Cards */
 html.theme-pool .pocket-gull-card,
 html.theme-pool .card {
-  border: 10px solid var(--pool-noodle-pink) !important;
+  border-color: #0284C7 !important;
 }
 html.theme-pool .bg-white,
 html.theme-pool .paper-card {
-  border: 10px solid var(--pool-noodle-cyan) !important;
+  border-color: #0284C7 !important;
 }
 html.theme-pool .sub-panel {
-  border: 10px solid var(--pool-noodle-yellow) !important;
+  border-color: #EAB308 !important; /* Yellow poolside accent seam */
 }
 
 /* Specific elements nested get noodle-style accents */
@@ -2871,13 +2977,14 @@ html.theme-pool .bg-slate-900:hover {
   color: #ffffff !important;
 }
 
-/* Texts coordination */
+/* Texts coordination for Floating Pool Loungers & Furniture */
 html.theme-pool-light h1,
 html.theme-pool-light h2,
 html.theme-pool-light h3,
 html.theme-pool-light h4,
 html.theme-pool-light h5 {
-  color: #0369a1 !important;
+  color: #0369A1 !important; /* Deep Cyan Heading (WCAG AAA Compliant 5.7:1) */
+  font-weight: 800 !important;
 }
 
 html.theme-pool-dark h1,
@@ -2885,33 +2992,45 @@ html.theme-pool-dark h2,
 html.theme-pool-dark h3,
 html.theme-pool-dark h4,
 html.theme-pool-dark h5 {
-  color: #38bdf8 !important;
-  text-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  color: #38BDF8 !important; /* Glowing Turquoise Heading */
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+html.theme-pool-light p,
+html.theme-pool-light span,
+html.theme-pool-light div,
+html.theme-pool-light .text-gray-900,
+html.theme-pool-light .text-gray-800,
+html.theme-pool-light .text-gray-700,
+html.theme-pool-light .text-zinc-100,
+html.theme-pool-light .text-zinc-200,
+html.theme-pool-light .text-zinc-300 {
+  color: #0F172A !important; /* Solid High Contrast Deep Slate Body Text */
+}
+
+html.theme-pool-dark p,
+html.theme-pool-dark span,
+html.theme-pool-dark div,
+html.theme-pool-dark .text-gray-900,
+html.theme-pool-dark .text-gray-800,
+html.theme-pool-dark .text-zinc-100,
+html.theme-pool-dark .text-zinc-200,
+html.theme-pool-dark .text-zinc-300 {
+  color: #F8FAFC !important; /* Solid High Contrast Ice White Body Text */
 }
 
 html.theme-pool-light .text-gray-500,
 html.theme-pool-light .text-zinc-400,
 html.theme-pool-light .text-zinc-500 {
-  color: #0284c7 !important;
-  opacity: 0.8;
+  color: #334155 !important; /* High Contrast Slate Secondary Text */
 }
 
 html.theme-pool-dark .text-gray-500,
 html.theme-pool-dark .text-zinc-400,
 html.theme-pool-dark .text-zinc-500 {
-  color: #7dd3fc !important;
-  opacity: 0.8;
+  color: #94A3B8 !important; /* High Contrast Slate Muted Text */
 }
-
-html.theme-pool-light .text-gray-900,
-html.theme-pool-light .text-gray-800,
-html.theme-pool-light .text-zinc-100,
-html.theme-pool-light .text-zinc-200 {
-  color: #0369a1 !important;
-}
-
-html.theme-pool-dark .text-gray-900,
-html.theme-pool-dark .text-gray-800,
 html.theme-pool-dark .text-zinc-100,
 html.theme-pool-dark .text-zinc-200 {
   color: #bae6fd !important;
@@ -3100,5 +3219,124 @@ html.text-scale-large {
 }
 html.text-scale-extra-large {
   font-size: 125% !important;
+}
+
+/* ==========================================================================
+   DIETER RAMS "LESS, BUT BETTER" DESIGN SYSTEM & THEME NAVBAR BRIDGE
+   ========================================================================== */
+
+/* 1. Theme Navigation Bar Bridge */
+.theme-nav-bar {
+  background-color: var(--bg-card, #FFFFFF);
+  color: var(--text-primary, #0F172A);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+html.dark .theme-nav-bar {
+  background-color: #111111 !important;
+  border-bottom-color: #27272a !important;
+  color: #f4f4f5 !important;
+}
+
+html.papercraft-mode .theme-nav-bar,
+html.papercraft-rice .theme-nav-bar {
+  background-color: #FAF8F0 !important;
+  border-bottom-color: #E5DFC8 !important;
+  color: #18181B !important;
+}
+
+html.papercraft-hemp .theme-nav-bar {
+  background-color: #F5EFE0 !important;
+  border-bottom-color: #DCCFA8 !important;
+  color: #1F1912 !important;
+}
+
+html.papercraft-construction .theme-nav-bar {
+  background-color: #ECEAE2 !important;
+  border-bottom-color: #C8C4B4 !important;
+  color: #0F172A !important;
+}
+
+html.theme-papyrus .theme-nav-bar {
+  background-color: #1C1813 !important;
+  border-bottom-color: #382C1E !important;
+  color: #F3EAD6 !important;
+}
+
+html.theme-pool-light .theme-nav-bar {
+  background-color: #FFFFFF !important;
+  border-bottom-color: #0284C7 !important;
+  color: #0F172A !important;
+}
+
+html.theme-pool-dark .theme-nav-bar {
+  background-color: #0F172A !important;
+  border-bottom-color: #38BDF8 !important;
+  color: #F8FAFC !important;
+}
+
+html.theme-white-marble .theme-nav-bar {
+  background-color: #FFFFFF !important;
+  border-bottom-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+html.theme-black-marble .theme-nav-bar {
+  background-color: #13151D !important;
+  border-bottom-color: #2D3748 !important;
+  color: #F8FAFC !important;
+}
+
+html.theme-spark .theme-nav-bar {
+  background-color: #170B07 !important;
+  border-bottom-color: #441A0E !important;
+  color: #FFF7ED !important;
+}
+
+html.theme-mandala .theme-nav-bar {
+  background-color: #211A42 !important;
+  border-bottom-color: #3B2E70 !important;
+  color: #F5F3FF !important;
+}
+
+/* 2. Dieter Rams Tactile Controls & Typography Tokens */
+.btn-rams {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 0.375rem; /* 6px Dieter Rams precise radius */
+  border: 1px solid currentColor;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-rams:active {
+  transform: scale(0.98);
+}
+
+/* Rams Header & Panel Typography */
+.rams-header-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-family: var(--font-mono, monospace);
+}
+
+.rams-badge {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-mono, monospace);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
 }
 

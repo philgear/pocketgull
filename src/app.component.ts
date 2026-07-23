@@ -47,6 +47,7 @@ import { ConsentModalComponent } from './components/consent-modal.component';
 import { ResearchTabComponent } from './components/research-tab.component';
 import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
 import { CompanionSyncModalComponent } from './components/companion-sync-modal.component';
+import { GlossaryModalComponent } from './components/glossary-modal.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -70,7 +71,8 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
     PocketGullInputComponent,
     ConsentModalComponent,
     ZamecznikCanvasComponent,
-    CompanionSyncModalComponent
+    CompanionSyncModalComponent,
+    GlossaryModalComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -79,6 +81,10 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
     <!-- ACM §1.6: First-run informed consent -->
     @if (!showSplash() && !consentService.hasConsented()) {
       <app-consent-modal></app-consent-modal>
+    }
+
+    @if (showGlossaryModal()) {
+      <app-glossary-modal (close)="showGlossaryModal.set(false)"></app-glossary-modal>
     }
 
     @if (showFhirCallback()) {
@@ -321,8 +327,8 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
             </div>
           </div>
         }
-        <!-- Navbar: Pure utility, no decoration -->
-        <nav class="h-14 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center justify-between px-3 sm:px-6 shrink-0 bg-white dark:bg-[#111111] z-50 no-print">
+        <!-- Navbar: Pure utility & theme harmony -->
+        <nav class="theme-nav-bar h-14 flex items-center justify-between px-3 sm:px-6 shrink-0 z-50 no-print">
           <div class="flex items-center gap-4">
               <div class="flex items-center gap-3">
                   <svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
@@ -341,7 +347,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                       <!-- Beak (Golden-Amber Orange) -->
                       <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
                   </svg>
-                  <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
+                  <span class="font-bold uppercase tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
                   <!-- System Status Indicator (Hidden on smallest watches) -->
             <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-pointer group relative no-print" 
                  (click)="network.toggleForceOffline()"
@@ -537,21 +543,40 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
               }
             </button>
 
-            <!-- Global Plain Language Health Literacy vs Deep Clinical Rationale Toggle Button -->
-            <button (click)="theme.togglePlainLanguageMode()"
-                    aria-label="Toggle Plain Language / Deep Rationale"
-                    [title]="theme.isPlainLanguageMode() ? 'Switch to Deep Clinical Rationale Mode' : 'Switch to Plain Language Health Literacy Mode'"
-                    [class.bg-emerald-500/10]="theme.isPlainLanguageMode()"
-                    [class.border-emerald-500/30]="theme.isPlainLanguageMode()"
-                    [class.text-emerald-600]="theme.isPlainLanguageMode()"
-                    [class.dark:text-emerald-400]="theme.isPlainLanguageMode()"
-                    [class.bg-sky-500/10]="!theme.isPlainLanguageMode()"
-                    [class.border-sky-500/30]="!theme.isPlainLanguageMode()"
-                    [class.text-sky-600]="!theme.isPlainLanguageMode()"
-                    [class.dark:text-sky-400]="!theme.isPlainLanguageMode()"
-                    class="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 border rounded-md transition-all text-xs font-bold font-mono cursor-pointer hover:scale-105 active:scale-95 shadow-xs">
-              <span>{{ theme.isPlainLanguageMode() ? '📖 Plain Language' : '🔬 Deep Rationale' }}</span>
-            </button>
+            <!-- Global Plain Language Health Literacy vs Deep Clinical Rationale Toggle Button & Analogy Sub-Modes -->
+            <div class="shrink-0 flex items-center bg-zinc-900/90 p-0.5 rounded-lg border border-zinc-800 shadow-sm font-mono text-xs">
+              <button (click)="theme.setAnalogyLensMode('clinical')"
+                      aria-label="Deep Rationale Mode"
+                      title="Switch to Deep Clinical Medical Rationale Mode"
+                      [class.bg-sky-600]="!theme.isPlainLanguageMode()"
+                      [class.text-white]="!theme.isPlainLanguageMode()"
+                      [class.text-zinc-400]="theme.isPlainLanguageMode()"
+                      class="px-2.5 py-1 rounded-md transition font-bold cursor-pointer">
+                🔬 Deep Rationale
+              </button>
+
+              <button (click)="theme.setAnalogyLensMode('arborist')"
+                      aria-label="Arborist Botanical Analogy Mode"
+                      title="Switch to Plain Language Arborist Botanical Analogy Mode"
+                      [class.bg-emerald-600]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist'"
+                      [class.text-white]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist'"
+                      [class.text-zinc-400]="!(theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist')"
+                      class="px-2 py-1 rounded-md transition font-bold cursor-pointer flex items-center gap-1">
+                <span>🌳</span>
+                <span class="hidden md:inline">Arborist</span>
+              </button>
+
+              <button (click)="theme.setAnalogyLensMode('mechanic')"
+                      aria-label="Mechanic Automotive Analogy Mode"
+                      title="Switch to Plain Language Mechanic Automotive Analogy Mode"
+                      [class.bg-cyan-600]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic'"
+                      [class.text-white]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic'"
+                      [class.text-zinc-400]="!(theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic')"
+                      class="px-2 py-1 rounded-md transition font-bold cursor-pointer flex items-center gap-1">
+                <span>🚗</span>
+                <span class="hidden md:inline">Mechanic</span>
+              </button>
+            </div>
  
             <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400 pl-4 border-l border-gray-100 dark:border-zinc-800">
               <!-- Gamified Points & Level HUD capsule -->
@@ -727,8 +752,40 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
         <!-- Main Grid Layout -->
         <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
 
+            <!-- Mobile Header: Back Button & View Tabs -->
+            @if (!state.isLiveAgentActive() && !state.isSparkModeActive()) {
+              <div class="w-full gap-2 shrink-0 z-20 hidden max-md:flex max-md:flex-col mb-3 no-print">
+                @if (state.selectedPartId()) {
+                  <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-1.5 -ml-2 transition-colors min-h-[44px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    <span>Back to Full Chart</span>
+                  </button>
+                }
+                <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full border border-gray-300 dark:border-zinc-700/60 shadow-sm">
+                  <button (click)="mobileActiveTab.set('chart')" 
+                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                          [class.bg-white]="mobileActiveTab() === 'chart'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'chart'" [class.text-black]="mobileActiveTab() === 'chart'" [class.dark:text-white]="mobileActiveTab() === 'chart'"
+                          [class.text-gray-500]="mobileActiveTab() !== 'chart'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'chart'">
+                    🩺 Chart
+                  </button>
+                  <button (click)="mobileActiveTab.set('analysis')"
+                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [class.dark:text-white]="mobileActiveTab() === 'analysis'"
+                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'">
+                    📊 Analysis
+                  </button>
+                  @if (state.selectedPartId()) {
+                    <button (click)="mobileActiveTab.set('tasks')"
+                            class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                            [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
+                            [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'">
+                      📋 Tasks
+                    </button>
+                  }
+                </div>
+              </div>
+            }
 
-          
           <!-- Column 1: IPatient Medical Chart -->
            <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                 id="tour-body-chart"
@@ -798,40 +855,6 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                 </div>
             </div>
 
-            <!-- Mobile Header: Back Button & View Tabs -->
-            @if (!state.isLiveAgentActive() && !state.isSparkModeActive()) {
-              <div class="w-full gap-2 shrink-0 z-20 hidden max-md:flex max-md:flex-col mb-3 no-print">
-                @if (state.selectedPartId()) {
-                  <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-1.5 -ml-2 transition-colors min-h-[44px]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                    <span>Back to Full Chart</span>
-                  </button>
-                }
-                <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full border border-gray-300 dark:border-zinc-700/60 shadow-sm">
-                  <button (click)="mobileActiveTab.set('chart')" 
-                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
-                          [class.bg-white]="mobileActiveTab() === 'chart'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'chart'" [class.text-black]="mobileActiveTab() === 'chart'" [class.dark:text-white]="mobileActiveTab() === 'chart'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'chart'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'chart'">
-                    🩺 Chart
-                  </button>
-                  <button (click)="mobileActiveTab.set('analysis')"
-                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
-                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [class.dark:text-white]="mobileActiveTab() === 'analysis'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'">
-                    📊 Analysis
-                  </button>
-                  @if (state.selectedPartId()) {
-                    <button (click)="mobileActiveTab.set('tasks')"
-                            class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
-                            [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
-                            [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'">
-                      📋 Tasks
-                    </button>
-                  }
-                </div>
-              </div>
-            }
-
             <!-- Column 2 (Middle): Task Flow & Intake Bracket -->
             @if (state.selectedPartId() && !state.isLiveAgentActive() && !state.isSparkModeActive()) {
                <div class="shrink-0 w-full md:w-[400px] flex flex-col gap-3 md:gap-6 h-full z-20 transition-all duration-300"
@@ -854,13 +877,13 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                </div>
             }
 
-            <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col min-h-0 w-full"
+            <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col min-h-0 w-full max-md:min-h-[calc(100dvh-130px)]"
                  [class.hidden]="isAnalysisCollapsed()"
                  [class.max-md:hidden]="mobileActiveTab() !== 'analysis'"
                  [class.tab-fade-enter]="mobileActiveTab() === 'analysis'">
              
                  <!-- Section 1: Analysis Intake Container -->
-                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]"
+                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh] max-md:min-h-[calc(100dvh-140px)] max-md:h-full"
                       [class.rounded-none]="isChartCollapsed()"
                       [class.border-y-0]="isChartCollapsed()"
                       [class.border-r-0]="isChartCollapsed()"
@@ -868,7 +891,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                       [class.bg-[#F9FAFB]]="isChartCollapsed()"
                       [class.dark:bg-[#09090b]]="isChartCollapsed()">
                      @defer {
-                       <app-analysis-container class="flex flex-col flex-1 min-h-0 min-w-0 h-full w-full overflow-hidden" appReveal [revealDelay]="100"></app-analysis-container>
+                       <app-analysis-container class="flex flex-col flex-1 min-h-0 min-w-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]" appReveal [revealDelay]="100"></app-analysis-container>
                      } @placeholder {
                        <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Core AI Synthesis...</div>
                      }
@@ -912,7 +935,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
               </style>
 
               <!-- The Pocket Container -->
-              <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100%-2rem)] sm:w-[420px] h-[650px] max-h-[calc(100dvh-4rem)] z-[100] flex flex-col transition-all duration-500 animate-in slide-in-from-bottom-10 fade-in pointer-events-none">
+              <div id="tour-voice-agent-window" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100%-2rem)] sm:w-[420px] h-[650px] max-h-[calc(100dvh-4rem)] z-[100] flex flex-col transition-all duration-500 animate-in slide-in-from-bottom-10 fade-in pointer-events-none">
                  
                  <!-- Perched Origami Seagull -->
                  <div class="relative w-full h-24 pointer-events-auto flex justify-center items-end pb-0 translate-y-[4px] z-[101]" style="perspective: 1000px;">
@@ -1307,6 +1330,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
   `]
 })
 export class AppComponent implements OnDestroy {
+  readonly showGlossaryModal = signal<boolean>(false);
   private _translateTimer: any = null;
 
   private debouncedTranslate(text: string, level: any) {
