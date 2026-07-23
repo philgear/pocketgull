@@ -10,10 +10,11 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-# Local temporary test results
+# Local temporary test results & deployment tarball
 tmp/
 test-results/
 playwright-report/
+source.tgz
 *.local
 *.local.*
 

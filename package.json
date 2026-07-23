@@ -77,7 +77,7 @@
     "postinstall": "patch-package",
     "dev": "ng serve",
     "build": "npm --prefix docs/study install && npm --prefix docs/study run build && ng build",
-    "deploy": "gcloud run deploy pocket-gull --source . --project gen-lang-client-0540208645 --region=us-central1 --min-instances=0 --update-env-vars=OTEL_SDK_DISABLED=true --timeout=25m --quiet",
+    "deploy": "tar -czf source.tgz --exclude='.git' --exclude='node_modules' --exclude='.angular' --exclude='dist' --exclude='tmp' --exclude='.venv' --exclude='venv' --exclude='test-results' --exclude='playwright-report' . && gcloud run deploy pocket-gull --source source.tgz --project gen-lang-client-0540208645 --region=us-central1 --min-instances=0 --update-env-vars=OTEL_SDK_DISABLED=true --timeout=25m --quiet",
     "lint": "node node_modules/typescript/lib/tsc.js -p tsconfig.json --noEmit",
     "preview": "npm run build && node dist/server/server.mjs",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
