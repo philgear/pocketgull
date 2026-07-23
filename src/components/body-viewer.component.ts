@@ -68,6 +68,9 @@ import { ThemeService } from '../services/theme.service';
             <button (click)="state.selectPhilosophy('eastern')" [class.bg-emerald-600]="state.activePhilosophy() === 'eastern'" [class.text-white]="state.activePhilosophy() === 'eastern'" [class.text-gray-700]="state.activePhilosophy() !== 'eastern'" [class.dark:text-zinc-300]="state.activePhilosophy() !== 'eastern'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
               🌿 TCM
             </button>
+            <button (click)="state.selectPhilosophy('ayurvedic')" [class.bg-amber-600]="state.activePhilosophy() === 'ayurvedic'" [class.text-white]="state.activePhilosophy() === 'ayurvedic'" [class.text-gray-700]="state.activePhilosophy() !== 'ayurvedic'" [class.dark:text-zinc-300]="state.activePhilosophy() !== 'ayurvedic'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
+              🪷 Ayurvedic
+            </button>
             <button (click)="themeService.setAnalogyLensMode('coach')" [class.bg-red-600]="themeService.analogyLensMode() === 'coach'" [class.text-white]="themeService.analogyLensMode() === 'coach'" [class.text-gray-700]="themeService.analogyLensMode() !== 'coach'" [class.dark:text-zinc-300]="themeService.analogyLensMode() !== 'coach'" class="min-h-[44px] px-3.5 py-2 text-xs font-black uppercase tracking-wider rounded-md transition-all cursor-pointer border-0 shadow-xs flex items-center justify-center">
               🏀 Coach '96
             </button>

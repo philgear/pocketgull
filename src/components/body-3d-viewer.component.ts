@@ -542,8 +542,13 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private handleResize = () => {
         const container = this.canvasContainer()?.nativeElement;
         if (!container) return;
-        const w = container.clientWidth;
-        const h = container.clientHeight;
+        let w = container.clientWidth;
+        let h = container.clientHeight;
+        if (w === 0 || h === 0) {
+            const parentRect = container.parentElement?.getBoundingClientRect();
+            w = parentRect?.width || container.offsetWidth || 350;
+            h = parentRect?.height || container.offsetHeight || 480;
+        }
         if (w === 0 || h === 0) return;
         if (this.camera) {
             this.camera.aspect = w / (h || 1);
@@ -683,12 +688,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             }
             window.addEventListener('resize', this.handleResize);
 
+            requestAnimationFrame(() => this.handleResize());
             setTimeout(() => {
                 this.handleResize();
                 if (this.controls) {
                     this.controls.update();
                 }
-            }, 100);
+            }, 50);
+            setTimeout(() => this.handleResize(), 300);
+            setTimeout(() => this.handleResize(), 800);
         } catch (e: any) {
             console.warn("3D Viewer disabled: WebGL not supported on this device.", e);
             this.webglSupported.set(false);
