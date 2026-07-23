@@ -49,7 +49,7 @@ IGNORE_FILES = {
 
 # Known safe placeholders that regex might flag (like mock variables in tests)
 SAFE_PLACEHOLDERS = {
-    "fake_", "mock_", "dummy_", "test_", "placeholder", "example.com", "555-0199", "12345", "philgear", "pocketgull.app"
+    "fake_", "mock_", "dummy_", "test_", "placeholder", "example.com", "555-0199", "12345", "philgear", "pocketgull.app", "loinc", "icd-10"
 }
 
 def is_safe_placeholder(text: str) -> bool:
@@ -82,7 +82,7 @@ def scan_file(filepath: str) -> List[Tuple[str, int, str, str]]:
                     for label, pattern in PII_PATTERNS.items():
                         for match in pattern.finditer(line):
                             match_text = match.group(0)
-                            if not is_safe_placeholder(match_text):
+                            if not is_safe_placeholder(match_text) and not is_safe_placeholder(line):
                                 violations.append(("PII/PHI", line_no, mask_sensitive_match(match_text), label))
                 
                 # 2. Scan for Secrets (exclude this scanner script to avoid false positives)

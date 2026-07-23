@@ -34,7 +34,93 @@
 
 ---
 
-![Pocket Gull Social Preview](./social-preview.png)
+<!-- 📄 CLINICAL STATIONERY HEADER & PATIENT CARE PLAN DOSSIER -->
+<div align="center">
+  <table width="100%" border="0" style="border: 3px double #1e3a5f; background: #faf8f5; color: #1e293b; padding: 20px; font-family: 'Inter', monospace, sans-serif; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);">
+    <tr>
+      <td>
+        <div style="border-bottom: 2px solid #1e3a5f; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 style="margin: 0; color: #1e3a5f; letter-spacing: 2px;">🏥 POCKET GULL MEDICAL INTELLIGENCE</h2>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b; font-weight: bold; text-transform: uppercase;">Official Clinical Care Plan Strategy & Live AI Consult Engine</p>
+          </div>
+          <div style="text-align: right; font-size: 11px; color: #475569;">
+            <span><strong>DOSSIER NO:</strong> PG-2026-EX-9901</span><br/>
+            <span><strong>FHIR R4 BUNDLE:</strong> VERIFIED ✓</span><br/>
+            <span><strong>STATIONERY THEME:</strong> CONSTRUCTIVE PAPERCRAFT</span>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## 📄 SECTION 1: CLINICAL STATIONERY & PATIENT TRAJECTORY
+
+### 📑 CLINICAL DATA CARD 1.0 — PATIENT DEMOGRAPHICS & BASELINE VITALS
+
+| Field | Parameter | Baseline Metric | Status & Clinical Interpretation |
+| :--- | :--- | :--- | :--- |
+| 👤 **Patient Identity** | Phil Gear, Ph.G | Age 42 (Male) | ID: `p_phil_gear` \| Executive Care Profile |
+| 💓 **Hemodynamics** | Blood Pressure / Heart Rate | `122/82 mmHg` \| `68 bpm` | Optimal resting autonomic tone (LF/HF `1.25`) |
+| 🫁 **Pulmonary & Temp** | SpO2 / Body Temperature | `98%` \| `98.6°F` | Eupneic baseline, normal thermoregulation |
+| ⚖️ **Anthropometrics** | Height / Weight | `5'10"` \| `178 lbs` | BMI `25.5` \| Samagni Metabolic Balance |
+| 🧪 **Biomarker Matrix** | Mg / Vit D3 / B12 / Zn | `2.1 mg/dL` \| `32 ng/mL` \| `580 pg/mL` \| `92 mcg/dL` | Sub-optimal Mg & D3; optimal methylation & Zn |
+| 🎯 **Care Objective** | Patient Strategy Goal | *"Optimize metabolic health, synchronize biometrics from Health Connect, and reduce sleep latency."* | Active Care Plan |
+
+---
+
+### 📑 CLINICAL DATA CARD 2.0 — ASSESSMENT & SCREENER TRAJECTORY GRID
+
+| Assessment Instrument | Standard Code (LOINC / System) | Measured Score | Severity Classification | Recommended Interventions |
+| :--- | :--- | :---: | :---: | :--- |
+| 🌿 **GAD-7 (Anxiety)** | LOINC `69725-0` | `4 / 21` | **Mild / Subclinical** | 0.1 Hz Vagal Resonant Breathing & Sleep Hygiene |
+| 🧠 **PHQ-9 (Depression)** | LOINC `44261-6` | `3 / 27` | **Minimal Baseline** | Circadian Sunlight Entrainment & Habit Tracking |
+| 🌀 **Y-BOCS (OCD)** | LOINC `82290-8` | `4 / 40` | **Subclinical** | Daily Routine Structuring & Mindfulness Anchoring |
+| 😴 **KSS Readiness** | LOINC `71556-5` | `3 / 9` | **Alert (Level 3)** | Full Multimodal Telemetry Enabled |
+| 🌙 **ISI (Insomnia)** | LOINC `86095-7` | `5 / 28` | **None** | Evening Blue-Light Blocking & Mag Glycinate |
+| 🚨 **C-SSRS (Safety)** | LOINC `84411-8` | `0` | **Minimal Risk** | Standard Safeguards & Emergency Mode Readiness |
+| 🌱 **Grow-Thyself Index** | Custom Epigenetic | `8.8 / 10` | **Sovereignty** | High Resilience & Lifestyle Alignment |
+
+---
+
+### 📑 CLINICAL DATA CARD 3.0 — MULTI-PARADIGM MEDICINE MATRIX
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                       🏥 POCKET GULL MULTI-LENS CLINICAL PARADIGM MATRIX                     │
+├───────────────────────────────┬───────────────────────────────┬─────────────────────────────┤
+│ 🩺 WESTERN ALLOPATHIC LENS     │ 🌿 TRADITIONAL CHINESE (TCM)  │ 🧘 AYURVEDIC MEDICINE LENS  │
+│ • Diagnosis: Mild Tension     │ • Pattern: Zang-Fu Qi         │ • Prakriti: V3 / P5 / K3    │
+│   Headache & Sleep Latency    │   Constriction (Liver Qi)     │ • Vikriti: V4 / P6 / K3     │
+│ • ICD-10: G44.209, G47.00     │ • Tongue: Pink, Thin White    │ • Agni: Samagni Balance     │
+│ • FHIR R4 Bundle Exported     │ • Pulse: Normal / Moderate    │ • Nadi: Frog-Pitta Flow     │
+├───────────────────────────────┼───────────────────────────────┼─────────────────────────────┤
+│ 🧪 ORTHOMOLECULAR & NUTRIENT  │ 📊 PHYSIONET 2026 TELEMETRY   │ ⏳ ACTUARIAL LONGEVITY LENS │
+│ • Magnesium: Sub-optimal      │ • QRS Interval: 88 ms         │ • Projected QALY Gain:      │
+│ • Vit D3: Sub-optimal (32)    │ • QTc (Fridericia): 412 ms    │   +4.2 Quality-Adjusted Yrs │
+│ • B12 & Zinc: Optimal Status  │ • LF/HF Ratio: 1.25           │ • 10-Yr Mortality Risk:     │
+│ • Precision Dosing 400mg PM   │ • RMSSD: 48 ms (Good Vagal)   │   -18.5% Relative Reduc.    │
+└───────────────────────────────┴───────────────────────────────┴─────────────────────────────┘
+```
+
+---
+
+## 📄 SECTION 2: ARCHITECTURAL BLUEPRINT & SYSTEM VISUALS
+
+<!-- 📐 CONSTRUCTION BLUEPRINT IMAGE FRAME 1.0 -->
+<div align="center" style="background: #0f172a; border: 2px dashed #f59e0b; padding: 20px; border-radius: 12px; margin: 24px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-bottom: 16px;">
+    <span style="color: #f59e0b; font-family: monospace; font-size: 13px; font-weight: bold;">📐 FIG 1.0 — ANATOMICAL 3D BLUEPRINT & LIVE AI CONSULT DASHBOARD</span>
+    <span style="color: #64748b; font-family: monospace; font-size: 11px;">SCALE: 1:1 | RENDER: THREE.JS WEBGL + GEMINI 2.5 FLASH</span>
+  </div>
+  <img src="./docs/images/pocket-gall_dashboard.png" alt="Pocket Gull Clinical Blueprint" style="border-radius: 8px; border: 1px solid #334155; width: 100%; max-width: 1100px;" />
+  <p style="color: #94a3b8; font-size: 11px; font-family: monospace; margin: 12px 0 0 0;">
+    [BLUEPRINT SPEC] Three.js Procedural Skeletal & Surface Mesh • Real-Time Web Speech Multimodal Audio Streaming • Evidence-Grounded PubMed Search
+  </p>
+</div>
 
 ---
 
@@ -46,7 +132,18 @@ Like its namesake, the agent is **agile**, **interruptible**, and **highly obser
 
 > **Industrial Grace:** We believe medical tools should be as beautiful as they are functional. Our design language combines the clinical precision of a laboratory with the "Less, but better" philosophy of Dieter Rams.
 
-![Pocket Gull Dashboard](./docs/images/pocket-gall_dashboard.png)
+<!-- 📐 CONSTRUCTION BLUEPRINT IMAGE FRAME 2.0 -->
+<div align="center" style="background: #0f172a; border: 2px dashed #38bdf8; padding: 20px; border-radius: 12px; margin: 24px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-bottom: 16px;">
+    <span style="color: #38bdf8; font-family: monospace; font-size: 13px; font-weight: bold;">📄 FIG 2.0 — CLINICAL CARE PLAN & MULTI-LENS ANALYSIS LENSES</span>
+    <span style="color: #64748b; font-family: monospace; font-size: 11px;">THEME: PAPERCRAFT CONSTRUCTIVE STATIONERY</span>
+  </div>
+  <img src="./screenshot.png" alt="Pocket Gull Social Preview" style="border-radius: 8px; border: 1px solid #334155; width: 100%; max-width: 1100px;" />
+</div>
+
+---
+
+## 📄 SECTION 3: SYSTEM ARCHITECTURE & COMPLIANCE SPECIFICATIONS
 
 ---
 
