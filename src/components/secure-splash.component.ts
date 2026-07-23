@@ -312,6 +312,7 @@ import { environment } from '../environments/environment';
                           <option value="mandala">🧘 Sacred Mandala</option>
                           <option value="spark">✨ Spark Mode</option>
                           <option value="calm">🧘 Serene Calm</option>
+                          <option value="dream-team">🏀 1996 Dream Team</option>
                         </select>
 
                         <!-- Health Literacy Persona Selector -->
@@ -327,6 +328,7 @@ import { environment } from '../environments/environment';
                           <option value="mechanic">🏎️ Car Talk Garage Mechanic</option>
                           <option value="gentleman">🎩 Victorian Gentleman</option>
                           <option value="muse">✨ 528 Hz Artistic Muse</option>
+                          <option value="coach">🏀 Head Coach Red (1996 Box Score)</option>
                         </select>
                       </div>
 
