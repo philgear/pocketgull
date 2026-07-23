@@ -595,4 +595,41 @@ export class PetAuditoryService {
     osc.start(startTime);
     osc.stop(startTime + 0.11);
   }
+
+  /**
+   * Triggers a crisp 90s basketball UI audio feedback sound effect on button clicks.
+   */
+  public playUiBasketballClick(type: 'dribble' | 'squeak' | 'swish' = 'dribble') {
+    this.initContext();
+    if (!this.audioCtx) return;
+    const now = this.audioCtx.currentTime;
+
+    if (type === 'squeak') {
+      this.createSneakerSqueak(now);
+    } else if (type === 'swish') {
+      this.createSwishNet(now);
+    } else {
+      this.createBasketballDribble(now);
+    }
+  }
+
+  private createSwishNet(startTime: number) {
+    if (!this.audioCtx) return;
+    const ctx = this.audioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(1400, startTime);
+    osc.frequency.exponentialRampToValueAtTime(800, startTime + 0.12);
+
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(0.06, startTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.14);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + 0.15);
+  }
 }
