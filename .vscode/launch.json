@@ -74,7 +74,7 @@
       "request": "launch",
       "url": "http://localhost:4200",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Web: Attach to Existing Chrome (Port 9222)",
@@ -90,7 +90,7 @@
       "request": "launch",
       "url": "http://localhost:4321",
       "webRoot": "${workspaceFolder}/docs/study",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Theme Debug: 🌊 Ocean Pool Float (?theme=pool)",
@@ -98,7 +98,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?theme=pool",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Theme Debug: 📜 Papyrus Illuminated (?theme=papyrus)",
@@ -106,7 +106,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?theme=papyrus",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Theme Debug: 🌾 Rice Papercraft (?theme=rice)",
@@ -114,7 +114,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?theme=rice",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Theme Debug: 🏛️ White Marble (?theme=white-marble)",
@@ -122,7 +122,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?theme=white-marble",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Theme Debug: 🖤 Black Marble (?theme=black-marble)",
@@ -130,7 +130,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?theme=black-marble",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Theme Debug: 🔥 Spark Ember (?theme=spark)",
@@ -138,7 +138,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?theme=spark",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Theme Debug: 🧘 Solfeggio Mandala (?theme=mandala)",
@@ -146,7 +146,15 @@
       "request": "launch",
       "url": "http://localhost:4200/?theme=mandala",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
+    },
+    {
+      "name": "Theme Debug: 🏀 1996 Dream Team (?theme=dream-team)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?theme=dream-team",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": true
     },
     {
       "name": "Persona Debug: 🌳 Sylvan Arborist (?lens=arborist)",
@@ -154,7 +162,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?lens=arborist",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Persona Debug: 🏎️ Garage Mechanic (?lens=mechanic)",
@@ -162,7 +170,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?lens=mechanic",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Persona Debug: 🎩 Victorian Gentleman (?lens=gentleman)",
@@ -170,7 +178,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?lens=gentleman",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     },
     {
       "name": "Persona Debug: ✨ Solfeggio Muse (?lens=muse)",
@@ -178,7 +186,15 @@
       "request": "launch",
       "url": "http://localhost:4200/?lens=muse",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
+    },
+    {
+      "name": "Persona Debug: 🏀 Head Coach Red (?lens=coach)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:4200/?lens=coach",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": true
     },
     {
       "name": "Persona Debug: 🔬 Clinical Specialist (?lens=clinical)",
@@ -186,7 +202,7 @@
       "request": "launch",
       "url": "http://localhost:4200/?lens=clinical",
       "webRoot": "${workspaceFolder}",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile"
+      "userDataDir": true
     }
   ],
   "compounds": [
