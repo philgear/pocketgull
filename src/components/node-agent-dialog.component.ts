@@ -35,12 +35,15 @@ interface IChatEntry {
     template: `
     <!-- Overlay backdrop -->
     <div class="fixed inset-0 z-50 flex items-end justify-end p-6 pointer-events-none">
-        <!-- Dialog Panel -->
-        <div class="node-agent-dialog pointer-events-auto flex flex-col"
-             [class.node-agent-dialog--open]="isOpen()">
+        <!-- Dialog Panel (Draggable Window) -->
+        <div class="node-agent-dialog pointer-events-auto flex flex-col transition-shadow duration-200"
+             [class.node-agent-dialog--open]="isOpen()"
+             [style.position]="position() ? 'fixed' : null"
+             [style.left.px]="position() ? position()!.x : null"
+             [style.top.px]="position() ? position()!.y : null">
  
-            <!-- Header -->
-            <div class="node-agent-header">
+            <!-- Header (Drag Handle) -->
+            <div class="node-agent-header cursor-move select-none" (mousedown)="startDrag($event)">
                 <div class="flex items-center gap-2 flex-1 min-w-0">
                     <!-- Pulse indicator -->
                     <span class="flex-shrink-0 flex h-2 w-2 relative">
@@ -586,6 +589,42 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDes
     private _liveModelText = '';
 
     suggestedQuestions = signal<string[]>([]);
+
+    // Draggable Window State
+    position = signal<{ x: number; y: number } | null>(null);
+    isDragging = signal(false);
+    private dragOffset = { x: 0, y: 0 };
+
+    startDrag(event: MouseEvent) {
+      if (event.button !== 0) return;
+      const target = event.target as HTMLElement;
+      if (target.closest('button') || target.closest('input')) return;
+      
+      const dialogEl = target.closest('.node-agent-dialog') as HTMLElement;
+      if (!dialogEl) return;
+      const rect = dialogEl.getBoundingClientRect();
+      this.dragOffset = {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+      this.isDragging.set(true);
+
+      const onMouseMove = (moveEvent: MouseEvent) => {
+        if (!this.isDragging()) return;
+        const newX = Math.max(10, Math.min(window.innerWidth - 380, moveEvent.clientX - this.dragOffset.x));
+        const newY = Math.max(10, Math.min(window.innerHeight - 300, moveEvent.clientY - this.dragOffset.y));
+        this.position.set({ x: newX, y: newY });
+      };
+
+      const onMouseUp = () => {
+        this.isDragging.set(false);
+        window.removeEventListener('mousemove', onMouseMove);
+        window.removeEventListener('mouseup', onMouseUp);
+      };
+
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    }
 
     agentName = computed(() => {
         const section = this.data().sectionTitle;
