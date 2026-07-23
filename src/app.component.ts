@@ -739,7 +739,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                [style.--panel-width.px]="isChartCollapsed() ? 0 : (isAnalysisCollapsed() ? null : inputPanelWidth())"
                [class.md:w-[var(--panel-width)]]="!isAnalysisCollapsed() && inputPanelWidth() !== undefined && !state.isSparkModeActive()"
                [class.hidden]="isChartCollapsed()"
-               [class.max-md:hidden]="!!state.selectedPartId() && !state.isSparkModeActive()">
+               [class.max-md:hidden]="mobileActiveTab() !== 'chart' && !state.isSparkModeActive()">
                <div class="md:h-full w-full md:overflow-hidden flex-1 flex flex-col min-h-0">
                  @defer {
                    <app-medical-chart class="no-print md:h-full block md:overflow-y-auto w-full max-md:overflow-visible"></app-medical-chart>
@@ -798,26 +798,36 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                 </div>
             </div>
 
-            <!-- Mobile Header: Back Button & Tabs -->
-            @if (state.selectedPartId() && !state.isLiveAgentActive() && !state.isSparkModeActive()) {
-              <div class="w-full flex-col gap-3 shrink-0 z-20 hidden max-md:flex mb-3">
-                <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-3 -ml-2 transition-colors min-h-[44px]">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                  <span>Back to Chart</span>
-                </button>
-                <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full">
-                  <button (click)="mobileActiveTab.set('tasks')" 
-                          class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
-                          [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'" [class.hover:text-gray-700]="mobileActiveTab() !== 'tasks'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'tasks'">
-                    Tasks
+            <!-- Mobile Header: Back Button & View Tabs -->
+            @if (!state.isLiveAgentActive() && !state.isSparkModeActive()) {
+              <div class="w-full gap-2 shrink-0 z-20 hidden max-md:flex max-md:flex-col mb-3 no-print">
+                @if (state.selectedPartId()) {
+                  <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-1.5 -ml-2 transition-colors min-h-[44px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    <span>Back to Full Chart</span>
+                  </button>
+                }
+                <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full border border-gray-300 dark:border-zinc-700/60 shadow-sm">
+                  <button (click)="mobileActiveTab.set('chart')" 
+                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                          [class.bg-white]="mobileActiveTab() === 'chart'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'chart'" [class.text-black]="mobileActiveTab() === 'chart'" [class.dark:text-white]="mobileActiveTab() === 'chart'"
+                          [class.text-gray-500]="mobileActiveTab() !== 'chart'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'chart'">
+                    🩺 Chart
                   </button>
                   <button (click)="mobileActiveTab.set('analysis')"
-                          class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
+                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
                           [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [class.dark:text-white]="mobileActiveTab() === 'analysis'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'" [class.hover:text-gray-700]="mobileActiveTab() !== 'analysis'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'analysis'">
-                    Analysis
+                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'">
+                    📊 Analysis
                   </button>
+                  @if (state.selectedPartId()) {
+                    <button (click)="mobileActiveTab.set('tasks')"
+                            class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                            [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
+                            [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'">
+                      📋 Tasks
+                    </button>
+                  }
                 </div>
               </div>
             }
@@ -844,10 +854,10 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                </div>
             }
 
-            <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col"
+            <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col min-h-0 w-full"
                  [class.hidden]="isAnalysisCollapsed()"
-                 [class.max-md:hidden]="!!state.selectedPartId() && mobileActiveTab() !== 'analysis'"
-                 [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
+                 [class.max-md:hidden]="mobileActiveTab() !== 'analysis'"
+                 [class.tab-fade-enter]="mobileActiveTab() === 'analysis'">
              
                  <!-- Section 1: Analysis Intake Container -->
                  <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]"
@@ -1996,10 +2006,11 @@ export class AppComponent implements OnDestroy {
   private resizeDebounceTimer: any = null;
 
   isMobile = signal<boolean>(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
-  mobileActiveTab = signal<'tasks' | 'analysis'>('tasks');
+  mobileActiveTab = signal<'chart' | 'tasks' | 'analysis'>('chart');
 
   goBackToChart(): void {
     this.state.selectPart(null);
+    this.mobileActiveTab.set('chart');
   }
 
   isViewingVisitDetails = computed(() => {
