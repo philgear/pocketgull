@@ -59,7 +59,7 @@ security-report.md
 # Sandbox & Challenge workspace environments
 sandbox/
 python_example_2026/
-/contests/
+contests/
 
 # Agent Rules
 rules.yaml

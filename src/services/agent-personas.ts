@@ -128,6 +128,18 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         svgAnimation: 'candle-pulse',
         adkMapping: 'lenten_monk_agent',
     },
+    curie: {
+        name: 'Madame Marie Curie',
+        role: 'Pioneer Radiologist & PET Isotope Decay Specialist',
+        emoji: '🔬',
+        tagline: 'Nothing in life is to be feared, it is only to be understood.',
+        accentColor: '#00FF88',
+        accentTailwind: 'emerald-500',
+        avatarPath: 'assets/images/agents/curie.png',
+        props: ['Electrometer', 'Radium Test Tube', '1903 Nobel Medal'],
+        svgAnimation: 'radium-glow',
+        adkMapping: 'madame_curie_agent',
+    },
 };
 
 /**

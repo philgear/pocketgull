@@ -152,12 +152,7 @@ import {
           </button>
         }
 
-        @if (svc.activeTab() === 'isi' && svc.isiScore() >= 8) {
-          <button (click)="triggerSolfeggioSleepDeck()"
-            class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold uppercase tracking-wider text-xs transition shadow hover:shadow-md active:scale-95 cursor-pointer">
-            <span>🎶 Activate Solfeggio 432Hz Sleep Deck</span>
-          </button>
-        }
+        
 
         <button (click)="svc.resetAssessment(svc.activeTab())"
           class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider text-xs transition active:scale-95 cursor-pointer">

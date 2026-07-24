@@ -470,9 +470,6 @@ Recommends voluntary pre-conception carrier screening for autosomal recessive tr
 
         if (!isEmergency && this.patientState.isDemoMode()) {
             this.isLoading.set(true);
-            if (this.themeService?.currentTheme() === 'dream-team' || this.themeService?.analogyLensMode() === 'coach') {
-                this.petAuditory?.playCrowdCheer();
-            }
             this.error.set(null);
             this.analysisResults.set({});
             this.analysisMetrics.set(null);

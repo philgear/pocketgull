@@ -313,11 +313,6 @@ export class PocketGullButtonComponent implements AfterContentChecked {
 
   onClick(event: MouseEvent) {
     if (!this.disabled() && !this.loading()) {
-      if (this.themeService?.currentTheme() === 'dream-team' || this.themeService?.analogyLensMode() === 'coach') {
-        const variant = this.variant();
-        const soundType = variant === 'primary' ? 'swish' : variant === 'secondary' ? 'dribble' : 'squeak';
-        this.petAuditory?.playUiBasketballClick(soundType);
-      }
       this.clicked.emit(event);
     }
   }

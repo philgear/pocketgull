@@ -113,7 +113,7 @@ def audit_patient_data_structures(filepath: str) -> List[str]:
         "Robert Davis", "Sarah Jenkins", "William Henderson", 
         "Global Sentinel", "Maternal Sentinel", "Pediatric Sentinel", "Geriatric Sentinel",
         "Systemic Health", "Oxidative Stress", "Antioxidant Status", "Phil Gear", "Mara Santos",
-        "Frida Kahlo", "Charles Darwin"
+        "Frida Kahlo", "Charles Darwin", "Srinivasa Ramanujan"
     }
         
     try:

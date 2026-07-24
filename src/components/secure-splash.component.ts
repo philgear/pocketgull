@@ -312,25 +312,10 @@ import { environment } from '../environments/environment';
                           <option value="mandala">🧘 Sacred Mandala</option>
                           <option value="spark">✨ Spark Mode</option>
                           <option value="calm">🧘 Serene Calm</option>
-                          <option value="dream-team">🏀 1996 Dream Team</option>
                           <option value="lent">✝️ Lent / Ascetic Reset</option>
+                          <option value="curie">🔬 Madame Curie (Radium Lab)</option>
                         </select>
 
-                        <!-- Health Literacy Persona Selector -->
-                        <label for="splash-persona-select-lock" class="text-xs font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-400 ml-1">
-                          🧠 Persona:
-                        </label>
-                        <select id="splash-persona-select-lock"
-                                [ngModel]="theme.analogyLensMode()"
-                                (ngModelChange)="theme.setAnalogyLensMode($event)"
-                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                          <option value="clinical">🔬 Clinical Allopathic</option>
-                          <option value="arborist">🌳 Sylvan Redwood Arborist</option>
-                          <option value="mechanic">🏎️ Car Talk Garage Mechanic</option>
-                          <option value="gentleman">🎩 Victorian Gentleman</option>
-                          <option value="muse">✨ 528 Hz Artistic Muse</option>
-                          <option value="coach">🏀 Head Coach Red (1996 Box Score)</option>
-                        </select>
                       </div>
 
                       <!-- Reduced Motion Toggle -->
@@ -383,13 +368,6 @@ import { environment } from '../environments/environment';
                               [class.text-zinc-950]="petAuditory.currentMode === 'avian'"
                               class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
                         🕊️ Avian
-                      </button>
-                      <button type="button"
-                              (click)="petAuditory.currentMode === 'dreamteam' ? petAuditory.stop() : petAuditory.playDreamTeamArena()"
-                              [class.bg-red-600]="petAuditory.currentMode === 'dreamteam'"
-                              [class.text-white]="petAuditory.currentMode === 'dreamteam'"
-                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-red-100 dark:hover:bg-zinc-700">
-                        🏀 Dream Team '96
                       </button>
                       @if (petAuditory.isCurrentlyPlaying) {
                         <button type="button"
