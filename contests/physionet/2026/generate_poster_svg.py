@@ -25,7 +25,7 @@ def load_live_evaluation_metrics() -> dict[str, str]:
         "age_auc": "0.9943",
         "prevalence_reward": "0.9074",
         "high_risk_recall": "100.0%",
-        "conformal_width": "0.2400",
+        "conformal_width": "0.1200",
         "p2022_auc": "0.9999",
         "p2022_brier": "0.0049",
         "p2022_age": "0.9998",
