@@ -69,123 +69,132 @@ const PART_NAMES: Record<string, string> = {
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-    <div #canvasContainer class="w-full h-full relative bg-[#FAF8F0] dark:bg-zinc-950 overflow-hidden" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
-      <!-- Dynamic Radial Grid Backdrop (Warm Papyrus Glow vs Dark Obsidian Void) -->
-      <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-100/40 via-[#FAF8F0]/90 to-[#F5F2E6] dark:from-cyan-950/30 dark:via-zinc-950/90 dark:to-black"></div>
-      
-      <canvas *ngIf="!webglSupported()" class="absolute opacity-0 pointer-events-none w-[1px] h-[1px]" aria-label="3D Anatomical Mannequin Canvas"></canvas>
-      <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[#FAF8F0] dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 rounded-lg border border-amber-200 dark:border-zinc-800">
-        <svg class="w-10 h-10 text-teal-600 dark:text-cyan-400 mb-2 opacity-60 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <span class="text-xs font-bold text-gray-800 dark:text-zinc-300">3D Holographic Engine Initializing...</span>
-        <span *ngIf="webglError()" class="text-[11px] text-rose-500 dark:text-rose-400 mt-2 max-w-xs break-words font-mono">{{ webglError() }}</span>
-      </div>
-
-      <!-- Top-Left Ergonomic Camera Angle Presets Bar (Sleek rounded-lg) -->
-      <div *ngIf="webglSupported()" class="absolute top-3 left-3 z-30 flex items-center gap-1 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1 rounded-lg border border-slate-300 dark:border-zinc-800/80 shadow-md font-mono text-[11px]">
-        <button (click)="setCameraPreset('cranial')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-sky-100 dark:bg-zinc-900 dark:hover:bg-cyan-950 text-sky-900 dark:text-cyan-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Head & Brain">
-          <span>🧠</span><span class="hidden sm:inline">Cranial</span>
-        </button>
-        <button (click)="setCameraPreset('visceral')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-teal-100 dark:bg-zinc-900 dark:hover:bg-teal-950 text-teal-900 dark:text-teal-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Thorax & Organs">
-          <span>🫀</span><span class="hidden sm:inline">Visceral</span>
-        </button>
-        <button (click)="setCameraPreset('spinal')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-indigo-100 dark:bg-zinc-900 dark:hover:bg-indigo-950 text-indigo-900 dark:text-indigo-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Spine & Posterior">
-          <span>🦴</span><span class="hidden sm:inline">Spine</span>
-        </button>
-        <button (click)="setCameraPreset('peripheral')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-900 dark:text-amber-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Legs & Feet">
-          <span>🦵</span><span class="hidden sm:inline">Extremities</span>
-        </button>
-      </div>
-
-      <!-- Floating 3D Hologram HUD Controls (Sleek rounded-lg) -->
-      <div *ngIf="webglSupported()" class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1.5 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md font-mono text-xs">
-        <button (click)="toggleAutoSpin()" 
-          [class.bg-sky-600]="isAutoSpinning()"
-          [class.text-white]="isAutoSpinning()"
-          [class.bg-slate-100]="!isAutoSpinning()"
-          [class.dark:bg-zinc-900]="!isAutoSpinning()"
-          [class.text-gray-800]="!isAutoSpinning()"
-          [class.dark:text-cyan-300]="!isAutoSpinning()"
-          class="px-2.5 py-1.5 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800 min-h-[36px]"
-          title="Toggle 360° Auto-Spin">
-          <span [class.animate-spin]="isAutoSpinning()">🔄</span>
-          <span class="text-[10px] uppercase font-bold">{{ isAutoSpinning() ? 'Spin ON' : '360°' }}</span>
-        </button>
-
-        <button (click)="resetCameraView()" 
-          class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-gray-800 dark:text-zinc-300 font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800 min-h-[36px]"
-          title="Reset Camera View">
-          <span>🎯</span>
-          <span class="text-[10px] uppercase font-bold">Reset</span>
-        </button>
-      </div>
-
-      <!-- Sleek Dynamic Hover Tooltip -->
-      <div *ngIf="showHoverTooltip()" 
-           class="absolute pointer-events-none z-50 bg-white/95 dark:bg-zinc-950/95 border border-teal-500/40 backdrop-blur-md rounded-lg p-3 shadow-xl text-xs max-w-xs transition-all duration-75 text-gray-900 dark:text-zinc-100 font-mono"
-           [style.left.px]="tooltipX()"
-           [style.top.px]="tooltipY()"
-           [style.transform]="'translate(12px, 12px)'">
-        <div class="flex items-center gap-2 font-bold text-gray-900 dark:text-white mb-1">
-          <span class="text-base">{{ getPartIcon(hoveredPartId()) }}</span>
-          <span class="text-teal-700 dark:text-cyan-200 font-bold text-xs">{{ hoveredPartName() }}</span>
+    <div class="flex flex-col h-full w-full bg-[#FAF8F0] dark:bg-zinc-950 overflow-hidden font-sans">
+      <!-- 1. Dedicated Top Unobstructed HUD Ribbon -->
+      <div *ngIf="webglSupported()" class="px-3 py-2 bg-slate-100/90 dark:bg-zinc-950/90 border-b border-slate-300 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 font-mono text-xs">
+        <!-- Camera Angle Presets -->
+        <div class="flex items-center gap-1">
+          <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mr-1 hidden sm:inline">Camera:</span>
+          <button (click)="setCameraPreset('cranial')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-sky-100 dark:bg-zinc-900 dark:hover:bg-cyan-950 text-sky-900 dark:text-cyan-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Head & Brain">
+            <span>🧠</span><span class="text-[10px] uppercase font-bold">Cranial</span>
+          </button>
+          <button (click)="setCameraPreset('visceral')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-teal-100 dark:bg-zinc-900 dark:hover:bg-teal-950 text-teal-900 dark:text-teal-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Thorax & Organs">
+            <span>🫀</span><span class="text-[10px] uppercase font-bold">Visceral</span>
+          </button>
+          <button (click)="setCameraPreset('spinal')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-indigo-100 dark:bg-zinc-900 dark:hover:bg-indigo-950 text-indigo-900 dark:text-indigo-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Spine & Posterior">
+            <span>🦴</span><span class="text-[10px] uppercase font-bold">Spine</span>
+          </button>
+          <button (click)="setCameraPreset('peripheral')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-900 dark:text-amber-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Legs & Feet">
+            <span>🦵</span><span class="text-[10px] uppercase font-bold">Extremities</span>
+          </button>
         </div>
-        <div class="text-[9.5px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-teal-100 dark:bg-cyan-950 text-teal-900 dark:text-cyan-300 w-fit mb-1.5 border border-teal-300 dark:border-cyan-800/60">
-          {{ hoveredPartSystem() }}
-        </div>
-        <div *ngIf="hoveredPartPain() > 0" class="flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 mb-1">
-          <span>⚠️ Pain Level: {{ hoveredPartPain() }}/10</span>
-        </div>
-        <div *ngIf="hoveredPartNotes()" class="text-[11px] text-gray-600 dark:text-zinc-300 italic mb-1 max-w-[200px] truncate font-sans">
-          "{{ hoveredPartNotes() }}"
-        </div>
-        <div class="text-[9px] text-gray-500 dark:text-zinc-500 font-mono tracking-tight mt-1.5 border-t border-gray-200 dark:border-zinc-800 pt-1 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-cyan-400 animate-ping"></span>
-          <span>Click 3D node to select region</span>
+
+        <!-- Viewport Spin & Reset Controls -->
+        <div class="flex items-center gap-1.5">
+          <button (click)="toggleAutoSpin()" 
+            [class.bg-sky-600]="isAutoSpinning()"
+            [class.text-white]="isAutoSpinning()"
+            [class.bg-white]="!isAutoSpinning()"
+            [class.dark:bg-zinc-900]="!isAutoSpinning()"
+            [class.text-gray-800]="!isAutoSpinning()"
+            [class.dark:text-cyan-300]="!isAutoSpinning()"
+            class="min-h-[36px] px-2.5 py-1 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Toggle 360° Auto-Spin">
+            <span [class.animate-spin]="isAutoSpinning()">🔄</span>
+            <span class="text-[10px] uppercase font-bold">{{ isAutoSpinning() ? 'Spin ON' : '360°' }}</span>
+          </button>
+
+          <button (click)="resetCameraView()" 
+            class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-gray-800 dark:text-zinc-300 font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Reset Camera View">
+            <span>🎯</span>
+            <span class="text-[10px] uppercase font-bold">Reset</span>
+          </button>
         </div>
       </div>
 
-      <!-- Floating Mouse Navigation Instructions -->
-      <div *ngIf="webglSupported()" class="absolute bottom-2 left-3 flex flex-col gap-0.5 pointer-events-none font-mono z-20">
-        <span class="text-[9.5px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-cyan-400"></span>
-          Left Click: Select 3D Node
-        </span>
-        <span class="text-[9.5px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
-          Right Click / Drag: Orbit 360°
-        </span>
+      <!-- 2. Central Unobstructed 3D Viewport Canvas -->
+      <div #canvasContainer class="w-full flex-1 relative bg-[#FAF8F0] dark:bg-zinc-950 overflow-hidden" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+        <!-- Dynamic Radial Grid Backdrop (Warm Papyrus Glow vs Dark Obsidian Void) -->
+        <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-100/40 via-[#FAF8F0]/90 to-[#F5F2E6] dark:from-cyan-950/30 dark:via-zinc-950/90 dark:to-black"></div>
+        
+        <canvas *ngIf="!webglSupported()" class="absolute opacity-0 pointer-events-none w-[1px] h-[1px]" aria-label="3D Anatomical Mannequin Canvas"></canvas>
+        <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[#FAF8F0] dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 rounded-lg border border-amber-200 dark:border-zinc-800">
+          <svg class="w-10 h-10 text-teal-600 dark:text-cyan-400 mb-2 opacity-60 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span class="text-xs font-bold text-gray-800 dark:text-zinc-300">3D Holographic Engine Initializing...</span>
+          <span *ngIf="webglError()" class="text-[11px] text-rose-500 dark:text-rose-400 mt-2 max-w-xs break-words font-mono">{{ webglError() }}</span>
+        </div>
+
+        <!-- Sleek Dynamic Hover Tooltip -->
+        <div *ngIf="showHoverTooltip()" 
+             class="absolute pointer-events-none z-50 bg-white/95 dark:bg-zinc-950/95 border border-teal-500/40 backdrop-blur-md rounded-lg p-3 shadow-xl text-xs max-w-xs transition-all duration-75 text-gray-900 dark:text-zinc-100 font-mono"
+             [style.left.px]="tooltipX()"
+             [style.top.px]="tooltipY()"
+             [style.transform]="'translate(12px, 12px)'">
+          <div class="flex items-center gap-2 font-bold text-gray-900 dark:text-white mb-1">
+            <span class="text-base">{{ getPartIcon(hoveredPartId()) }}</span>
+            <span class="text-teal-700 dark:text-cyan-200 font-bold text-xs">{{ hoveredPartName() }}</span>
+          </div>
+          <div class="text-[9.5px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-teal-100 dark:bg-cyan-950 text-teal-900 dark:text-cyan-300 w-fit mb-1.5 border border-teal-300 dark:border-cyan-800/60">
+            {{ hoveredPartSystem() }}
+          </div>
+          <div *ngIf="hoveredPartPain() > 0" class="flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 mb-1">
+            <span>⚠️ Pain Level: {{ hoveredPartPain() }}/10</span>
+          </div>
+          <div *ngIf="hoveredPartNotes()" class="text-[11px] text-gray-600 dark:text-zinc-300 italic mb-1 max-w-[200px] truncate font-sans">
+            "{{ hoveredPartNotes() }}"
+          </div>
+          <div class="text-[9px] text-gray-500 dark:text-zinc-500 font-mono tracking-tight mt-1.5 border-t border-gray-200 dark:border-zinc-800 pt-1 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-cyan-400 animate-ping"></span>
+            <span>Click 3D node to select region</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Environmental & Barometric Telemetry HUD Bar (Unclipped Bottom Positioning) -->
-      <div *ngIf="webglSupported()" class="absolute bottom-2 right-3 z-30 flex flex-col items-end gap-1 font-mono text-[10px] pointer-events-auto">
-        <div class="flex items-center gap-2 bg-white/95 dark:bg-zinc-950/90 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md text-gray-800 dark:text-zinc-200">
-          <span class="flex items-center gap-1 font-bold" [class.text-rose-600]="envTelemetry.isStormShieldActive()" [class.dark:text-rose-400]="envTelemetry.isStormShieldActive()" [class.text-emerald-700]="!envTelemetry.isStormShieldActive()" [class.dark:text-emerald-400]="!envTelemetry.isStormShieldActive()">
-            <span [class.animate-pulse]="envTelemetry.isStormShieldActive()">🌩️</span>
-            <span>{{ envTelemetry.telemetry().barometricPressure }} hPa</span>
-            <span class="text-[9px]">({{ envTelemetry.telemetry().pressureDelta3h > 0 ? '+' : '' }}{{ envTelemetry.telemetry().pressureDelta3h }}hPa/3h)</span>
+      <!-- 3. Bottom Unclipped Environmental & Navigation Telemetry Dock -->
+      <div *ngIf="webglSupported()" class="px-3 py-2 bg-slate-100/90 dark:bg-zinc-950/90 border-t border-slate-300 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 font-mono text-[10px]">
+        <!-- Mouse Navigation Instructions -->
+        <div class="flex items-center gap-3 text-gray-600 dark:text-zinc-400">
+          <span class="font-bold uppercase tracking-wider flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-cyan-400"></span>
+            Left Click: Select Node
           </span>
-          <span class="text-gray-300 dark:text-zinc-600">|</span>
-          <span class="text-sky-700 dark:text-cyan-300 font-bold">AQI {{ envTelemetry.telemetry().aqi }}</span>
-          <span class="text-gray-300 dark:text-zinc-600">|</span>
-          <span class="text-amber-700 dark:text-amber-300 font-bold">UV {{ envTelemetry.telemetry().uvIndex }}</span>
+          <span class="font-bold uppercase tracking-wider flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
+            Drag: Orbit 360°
+          </span>
         </div>
 
-        <!-- Environmental Preset Switcher Pill (Clean rounded-md) -->
-        <div class="flex items-center gap-1 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1 rounded-md border border-slate-300 dark:border-zinc-800/80 shadow-xs">
-          <button (click)="envTelemetry.setPreset('coastal_storm')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold transition text-[9px] cursor-pointer">
-            🌧️ Storm
-          </button>
-          <button (click)="envTelemetry.setPreset('high_altitude')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-100 dark:bg-zinc-900 dark:hover:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold transition text-[9px] cursor-pointer">
-            🏔️ Altitude
-          </button>
-          <button (click)="envTelemetry.setPreset('desert_dry')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold transition text-[9px] cursor-pointer">
-            🏜️ Arid
-          </button>
-          <button (click)="envTelemetry.setPreset('optimal')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-100 dark:bg-zinc-900 dark:hover:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold transition text-[9px] cursor-pointer">
-            ☀️ Baseline
-          </button>
+        <!-- Environmental & Barometric Telemetry HUD Bar -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-slate-300 dark:border-zinc-800 text-gray-800 dark:text-zinc-200 font-bold">
+            <span [class.text-rose-600]="envTelemetry.isStormShieldActive()" [class.dark:text-rose-400]="envTelemetry.isStormShieldActive()" [class.text-emerald-700]="!envTelemetry.isStormShieldActive()" [class.dark:text-emerald-400]="!envTelemetry.isStormShieldActive()">
+              <span [class.animate-pulse]="envTelemetry.isStormShieldActive()">🌩️</span>
+              <span>{{ envTelemetry.telemetry().barometricPressure }} hPa</span>
+            </span>
+            <span class="text-gray-300 dark:text-zinc-600">|</span>
+            <span class="text-sky-700 dark:text-cyan-300">AQI {{ envTelemetry.telemetry().aqi }}</span>
+            <span class="text-gray-300 dark:text-zinc-600">|</span>
+            <span class="text-amber-700 dark:text-amber-300">UV {{ envTelemetry.telemetry().uvIndex }}</span>
+          </div>
+
+          <!-- Environmental Preset Switcher Pills -->
+          <div class="flex items-center gap-1 bg-white dark:bg-zinc-900 p-0.5 rounded-md border border-slate-300 dark:border-zinc-800">
+            <button (click)="envTelemetry.setPreset('coastal_storm')" class="px-2 py-0.5 rounded hover:bg-rose-100 dark:hover:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold transition cursor-pointer">
+              🌧️ Storm
+            </button>
+            <button (click)="envTelemetry.setPreset('high_altitude')" class="px-2 py-0.5 rounded hover:bg-purple-100 dark:hover:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold transition cursor-pointer">
+              🏔️ Altitude
+            </button>
+            <button (click)="envTelemetry.setPreset('desert_dry')" class="px-2 py-0.5 rounded hover:bg-amber-100 dark:hover:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold transition cursor-pointer">
+              🏜️ Arid
+            </button>
+            <button (click)="envTelemetry.setPreset('optimal')" class="px-2 py-0.5 rounded hover:bg-emerald-100 dark:hover:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold transition cursor-pointer">
+              ☀️ Baseline
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -1297,9 +1306,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         mindMesh.userData['isMindCore'] = true;
         this.mannequinGroup.add(mindMesh);
 
-        // Instantiate procedural 3D TCM Meridians & Ayurvedic Aura Fields
+        // Instantiate procedural 3D TCM Meridians, Ayurvedic Aura Fields, and Curie Radium Isotope Nodes
         this.createTcmMeridians();
         this.createAyurvedicAura();
+        this.createCurieIsotopeNodes();
 
         this.updatePartColors();
         this.updateTransparency(this.anatomyViewMode());
@@ -1492,6 +1502,86 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.ayurvedicAuraGroup!.add(mesh);
             this.parts.set(c.id, new THREE.Group().add(mesh));
         });
+    }
+
+    private curieIsotopeGroup: THREE.Group | null = null;
+
+    private createCurieIsotopeNodes() {
+        this.curieIsotopeGroup = new THREE.Group();
+        this.mannequinGroup.add(this.curieIsotopeGroup);
+
+        // ⚛️ 1950s Gilbert U-238 Radium-226 Isotope Alpha Emission Nodes
+        const isotopes = [
+            { id: 'chest', pos: [0, 1.30, 0.18], color: 0x00ff66, label: 'Radium-226 Hematopoietic Bone Marrow Stem Node' },
+            { id: 'r_hand', pos: [-0.52, 0.80, 0.05], color: 0xfbbf24, label: 'Radium Palmar Desquamation Lesion Node' },
+            { id: 'l_hand', pos: [0.52, 0.80, 0.05], color: 0xfbbf24, label: 'Polonium-210 Dermal Erythema Node' }
+        ];
+
+        isotopes.forEach(iso => {
+            const haloGeo = new THREE.RingGeometry(0.04, 0.065, 24);
+            const haloMat = new THREE.MeshBasicMaterial({
+                color: iso.color,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.85
+            });
+            const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+            haloMesh.position.set(iso.pos[0], iso.pos[1], iso.pos[2]);
+            haloMesh.userData['id'] = iso.id;
+            haloMesh.userData['isCurieNode'] = true;
+            this.curieIsotopeGroup!.add(haloMesh);
+
+            const innerGeo = new THREE.SphereGeometry(0.025, 16, 16);
+            const innerMat = new THREE.MeshStandardMaterial({
+                color: iso.color,
+                emissive: iso.color,
+                emissiveIntensity: 1.0,
+                roughness: 0.1
+            });
+            const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+            innerMesh.position.set(iso.pos[0], iso.pos[1], iso.pos[2]);
+            innerMesh.userData['id'] = iso.id;
+            innerMesh.userData['isCurieNode'] = true;
+            this.curieIsotopeGroup!.add(innerMesh);
+        });
+
+        // Alpha / Beta Decay Particle Emission Cloud
+        const pCount = 120;
+        const pPos = new Float32Array(pCount * 3);
+        const pColors = new Float32Array(pCount * 3);
+        const cGreen = new THREE.Color(0x00ff66);
+        const cAmber = new THREE.Color(0xfbbf24);
+
+        for (let i = 0; i < pCount; i++) {
+            const rad = 0.3 + Math.random() * 0.5;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+
+            pPos[i * 3] = rad * Math.sin(phi) * Math.cos(theta);
+            pPos[i * 3 + 1] = 1.3 + rad * Math.cos(phi) * 0.6;
+            pPos[i * 3 + 2] = rad * Math.sin(phi) * Math.sin(theta);
+
+            const col = i % 2 === 0 ? cGreen : cAmber;
+            pColors[i * 3] = col.r;
+            pColors[i * 3 + 1] = col.g;
+            pColors[i * 3 + 2] = col.b;
+        }
+
+        const pGeo = new THREE.BufferGeometry();
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        pGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+
+        const pMat = new THREE.PointsMaterial({
+            size: 0.035,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particleCloud = new THREE.Points(pGeo, pMat);
+        particleCloud.userData['isCurieCloud'] = true;
+        this.curieIsotopeGroup.add(particleCloud);
     }
 
     private createArborealTreeModel() {
