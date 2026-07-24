@@ -33,7 +33,7 @@ SECRET_PATTERNS = {
 }
 
 # Directories to ignore
-IGNORE_DIRS = {"node_modules", ".git", "dist", "dist-ssr", ".angular", "tmp", "test-results", "playwright-report"}
+IGNORE_DIRS = {"node_modules", ".git", "dist", "dist-ssr", ".angular", "tmp", "test-results", "playwright-report", ".vscode", ".venv"}
 
 # Extensions to skip (binary/large assets)
 SKIP_EXTENSIONS = {
@@ -113,7 +113,7 @@ def audit_patient_data_structures(filepath: str) -> List[str]:
         "Robert Davis", "Sarah Jenkins", "William Henderson", 
         "Global Sentinel", "Maternal Sentinel", "Pediatric Sentinel", "Geriatric Sentinel",
         "Systemic Health", "Oxidative Stress", "Antioxidant Status", "Phil Gear", "Mara Santos",
-        "Frida Kahlo", "Charles Darwin"
+        "Frida Kahlo", "Charles Darwin", "Srinivasa Ramanujan"
     }
         
     try:
@@ -155,7 +155,7 @@ def is_third_party_or_build(relative_path: str) -> bool:
     vendor_dirs = {
         "node_modules", ".git", ".angular", "dist", "playwright-report",
         "test-results", "tmp", ".husky", "build", ".dart_tool", "ios", "android",
-        "windows", "linux", "macos", "web", "sandbox", "flutter", "venv", ".venv"
+        "windows", "linux", "macos", "web", "sandbox", "flutter", "venv", ".venv", ".vscode"
     }
     if any(part in vendor_dirs for part in parts):
         return True

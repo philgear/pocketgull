@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ElementRef, effect, signal, viewChild, untracked } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { PatientStateService, IPatientState } from '../services/patient-state.service';
 import { PatientManagementService, HistoryEntry, IPatient } from '../services/patient-management.service';
 import { IDraftSummaryItem } from '../services/patient.types';
@@ -139,9 +140,11 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </div>
                   </button>
 
-                  <div *ngIf="showHealthsheet()" class="mt-4 pt-4 border-t border-zinc-800">
-                    <app-clinical-data-card></app-clinical-data-card>
-                  </div>
+                  @if (showHealthsheet()) {
+                    <div class="mt-4 pt-4 border-t border-zinc-800">
+                      <app-clinical-data-card></app-clinical-data-card>
+                    </div>
+                  }
                 </section>
 
                 <!-- Live Biometric Telemetry Dashboard (Collapsible Caret Accordion) -->
@@ -155,9 +158,11 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                           {{ isBiometricsExpanded() ? 'EXPANDED' : 'COLLAPSED' }}
                         </span>
                       </div>
-                      <span *ngIf="!isBiometricsExpanded()" class="text-xs font-mono text-slate-600 dark:text-zinc-400 truncate">
-                        BP {{ state.vitals().bp || '120/80' }} • HR {{ state.vitals().hr || '72' }} bpm • SpO2 {{ state.vitals().spO2 || '98%' }}
-                      </span>
+                      @if (!isBiometricsExpanded()) {
+                        <span class="text-xs font-mono text-slate-600 dark:text-zinc-400 truncate">
+                          BP {{ state.vitals().bp || '120/80' }} • HR {{ state.vitals().hr || '72' }} bpm • SpO2 {{ state.vitals().spO2 || '98%' }}
+                        </span>
+                      }
                     </div>
 
                     <div class="flex items-center gap-1 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-zinc-200 text-xs font-bold transition">
@@ -166,7 +171,8 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                     </div>
                   </button>
 
-                  <div *ngIf="isBiometricsExpanded()" class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 grid grid-cols-2 md:grid-cols-4 gap-4 animate-in">
+                  @if (isBiometricsExpanded()) {
+                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800 grid grid-cols-2 md:grid-cols-4 gap-4 animate-in">
                     <app-metric-card
                       title="Blood Pressure"
                       [value]="state.vitals().bp || '--'"
@@ -200,72 +206,120 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                       trendDirection="stable"
                     ></app-metric-card>
                   </div>
-                </section>
+                }
+              </section>
 
-                <!-- Real-time Clinical Triage Risk Score Card -->
+                <!-- Real-time Clinical Triage Risk Score Card with 3D Double-Click Flip State Machine -->
                 @if (pythonBridge.riskScore(); as risk) {
-                  <section class="mb-8 p-5 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-900/50 dark:to-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div>
-                        <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em] mb-1">Clinical Triage Risk</h2>
-                        <div class="flex items-center gap-2">
-                          <span class="text-3xl font-light tracking-tight text-gray-900 dark:text-zinc-100">
-                            {{ (risk.risk_score * 100) | number:'1.0-1' }}%
-                          </span>
-                          <span class="text-xs text-gray-400 dark:text-zinc-500 font-medium">score</span>
+                  <div class="relative perspective-1000 group cursor-pointer mb-8"
+                       (dblclick)="isTriageFlipped.set(!isTriageFlipped())"
+                       title="Double-click to flip over for Plain-Language Patient Summary & Action Steps">
+                    
+                    <div [class.rotate-y-180]="isTriageFlipped()"
+                         class="relative w-full transition-transform duration-500 transform-style-3d">
+
+                      <!-- FRONT FACE: Clinical Triage Risk Telemetry -->
+                      <section class="p-5 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-900/50 dark:to-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm transition-all hover:shadow-md backface-hidden">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                          <div>
+                            <div class="flex items-center gap-2 mb-1">
+                              <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Clinical Triage Risk</h2>
+                              <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                                dblclick 🔄 flip
+                              </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <span class="text-3xl font-light tracking-tight text-gray-900 dark:text-zinc-100">
+                                {{ (risk.risk_score * 100) | number:'1.0-1' }}%
+                              </span>
+                              <span class="text-xs text-gray-400 dark:text-zinc-500 font-medium">score</span>
+                            </div>
+                          </div>
+
+                          <div class="flex flex-col items-end gap-1.5">
+                            @if (risk.risk_level === 'low') {
+                              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                Low Risk
+                              </span>
+                            } @else if (risk.risk_level === 'moderate') {
+                              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+                                Moderate Risk
+                              </span>
+                            } @else if (risk.risk_level === 'high') {
+                              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30">
+                                <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>
+                                High Risk
+                              </span>
+                            } @else if (risk.risk_level === 'critical') {
+                              <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-100 dark:border-red-900/30 animate-pulse">
+                                <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-ping"></span>
+                                Critical Risk
+                              </span>
+                            }
+                            
+                            <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest">
+                              Confidence: {{ (risk.confidence * 100) | number:'1.0-0' }}%
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      <div class="flex flex-col items-end gap-1.5">
-                        <!-- Dynamic Risk Level Badge -->
-                        @if (risk.risk_level === 'low') {
-                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-                            Low Risk
-                          </span>
-                        } @else if (risk.risk_level === 'moderate') {
-                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border border-amber-100 dark:border-amber-900/30">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
-                            Moderate Risk
-                          </span>
-                        } @else if (risk.risk_level === 'high') {
-                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400 border border-orange-100 dark:border-orange-900/30">
-                            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5"></span>
-                            High Risk
-                          </span>
-                        } @else if (risk.risk_level === 'critical') {
-                          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400 border border-red-100 dark:border-red-900/30 animate-pulse">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-ping"></span>
-                            Critical Risk
-                          </span>
+                        @if (risk.contributing_factors && risk.contributing_factors.length > 0) {
+                          <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800/80">
+                            <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Contributing Factors</h3>
+                            <ul class="space-y-1">
+                              @for (factor of risk.contributing_factors; track factor) {
+                                <li class="flex items-start gap-2 text-xs font-light text-gray-600 dark:text-zinc-300">
+                                  <span class="text-gray-400 dark:text-zinc-600 mt-0.5">•</span>
+                                  <span>{{ factor }}</span>
+                                </li>
+                              }
+                            </ul>
+                          </div>
                         }
-                        
-                        <span class="text-[10px] text-gray-400 dark:text-zinc-500 font-bold uppercase tracking-widest">
-                          Confidence: {{ (risk.confidence * 100) | number:'1.0-0' }}%
-                        </span>
-                      </div>
-                    </div>
 
-                    <!-- Contributing Factors list -->
-                    @if (risk.contributing_factors && risk.contributing_factors.length > 0) {
-                      <div class="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800/80">
-                        <h3 class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Contributing Factors</h3>
-                        <ul class="space-y-1">
-                          @for (factor of risk.contributing_factors; track factor) {
-                            <li class="flex items-start gap-2 text-xs font-light text-gray-600 dark:text-zinc-300">
-                              <span class="text-gray-400 dark:text-zinc-600 mt-0.5">•</span>
-                              <span>{{ factor }}</span>
-                            </li>
-                          }
-                        </ul>
-                      </div>
-                    }
+                        <div class="mt-3 text-[9px] font-bold uppercase tracking-widest text-gray-400/80 dark:text-zinc-600 flex justify-between items-center">
+                          <span>Source: {{ risk.note || 'Clinical Intelligence Classifier' }}</span>
+                        </div>
+                      </section>
 
-                    <!-- Attribution note -->
-                    <div class="mt-3 text-[9px] font-bold uppercase tracking-widest text-gray-400/80 dark:text-zinc-600 flex justify-between items-center">
-                      <span>Source: {{ risk.note || 'Clinical Intelligence Classifier' }}</span>
+                      <!-- BACK FACE: Plain-Language Patient Summary & Action Steps -->
+                      <section class="p-5 bg-emerald-950 text-white border border-emerald-500/40 rounded-xl shadow-2xl absolute inset-0 rotate-y-180 backface-hidden backdrop-blur-xl font-sans text-xs flex flex-col justify-between">
+                        <div>
+                          <div class="flex items-center justify-between border-b border-emerald-800 pb-2 mb-3 font-mono text-xs">
+                            <div class="flex items-center gap-2 text-emerald-300 font-bold uppercase tracking-wider">
+                              <span>💡</span>
+                              <span>Plain-Language Health Summary</span>
+                            </div>
+                            <span class="text-[10px] text-emerald-400 font-mono">dblclick flip back</span>
+                          </div>
+
+                          <div class="space-y-3">
+                            <div>
+                              <span class="font-bold text-emerald-300 font-mono text-[10px] uppercase block mb-1">What Your Score Means:</span>
+                              <p class="text-emerald-100 leading-relaxed">
+                                Your overall stability is monitored by AI. Your risk rating is <strong>{{ (risk.risk_score * 100) | number:'1.0-1' }}%</strong> ({{ risk.risk_level | uppercase }}), which means your vitals and symptoms are tracking predictably.
+                              </p>
+                            </div>
+
+                            <div>
+                              <span class="font-bold text-amber-300 font-mono text-[10px] uppercase block mb-1">1 Recommended Daily Focus:</span>
+                              <p class="text-emerald-100 leading-relaxed italic">
+                                Prioritize 7-8 hours of restful sleep and 15 minutes of outdoor sunlight exposure to support vagal tone.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-emerald-900 font-mono text-[10px] text-emerald-400 flex justify-between items-center">
+                          <span>Patient Literacy Shield Active</span>
+                          <span>Double-click to return to clinical risk metrics</span>
+                        </div>
+                      </section>
+
                     </div>
-                  </section>
+                  </div>
                 }
 
                 <!-- Clinical Assessments & Screener Trajectory Card -->
@@ -1168,6 +1222,7 @@ export class MedicalChartSummaryComponent {
   // Mobile Biometric Accordion Signal & Healthsheet Signal
   isBiometricsExpanded = signal<boolean>(false);
   showHealthsheet = signal<boolean>(false);
+  readonly isTriageFlipped = signal<boolean>(false);
 
   toggleBiometrics() {
     this.isBiometricsExpanded.update(v => !v);
@@ -1209,12 +1264,13 @@ export class MedicalChartSummaryComponent {
     return isNaN(num) ? 0 : num;
   }
 
-  ngOnInit() {
-    // Fetch aggregated baselines from server
-    this.http.get('/api/health/baselines').subscribe({
-        next: (data) => this.baselines.set(data),
-        error: (err) => console.error('Failed to load world health baselines', err)
-    });
+  async ngOnInit() {
+    try {
+      const data = await firstValueFrom(this.http.get('/api/health/baselines'));
+      this.baselines.set(data);
+    } catch {
+      // Ignore baseline fetch errors
+    }
   }
 
   async connectOrcid(id: string) {

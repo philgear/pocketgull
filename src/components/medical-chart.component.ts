@@ -58,8 +58,8 @@ import { SentinelTelemetryPlotterComponent } from './sentinel-telemetry-plotter.
 
       <!-- Accessibility & Neuro-Divergence UX Toolbar (Dieter Rams Touch Targets) -->
       <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs font-mono text-[11px] no-print">
-        <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-          <span class="text-indigo-500">♿ Sensory & Accessibility Controls:</span>
+        <div class="flex items-center gap-1.5 font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+          <span class="text-indigo-700 dark:text-indigo-300">♿ Sensory & Accessibility Controls:</span>
         </div>
 
         <div class="flex flex-wrap items-center gap-1.5">

@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'dream-team' | 'lent' | 'curie';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'lent' | 'curie';
 
 @Injectable({
   providedIn: 'root'
@@ -291,6 +291,13 @@ export class ThemeService {
 
   public setReduceMotion(reduce: boolean) {
     this.reduceMotion.set(reduce);
+  }
+
+  public cycleTextSizeScale() {
+    const curr = this.textSizeScale();
+    if (curr === 'standard') this.textSizeScale.set('large');
+    else if (curr === 'large') this.textSizeScale.set('extra-large');
+    else this.textSizeScale.set('standard');
   }
 
   public togglePlainLanguageMode() {

@@ -37,8 +37,8 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
-          # Disable public REST publish if OIDC token is missing, keeping SARIF local upload robust
-          publish_results: false
+          # Enable public REST publish to populate OpenSSF Scorecard badge & viewer
+          publish_results: true
 
       - name: Upload Scorecard Results to Security Tab
         uses: github/codeql-action/upload-sarif@df409f7d9260372bd5f19e5b04e83cb3c43714ae # v3.27.9

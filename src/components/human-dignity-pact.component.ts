@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, inject, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExportService } from '../services/export.service';
 import { PatientStateService } from '../services/patient-state.service';
@@ -105,7 +105,7 @@ import { PatientStateService } from '../services/patient-state.service';
   `
 })
 export class HumanDignityPactComponent {
-  @Output() closeModal = new EventEmitter<void>();
+  closeModal = output<void>();
   exportService = inject(ExportService);
   state = inject(PatientStateService);
   

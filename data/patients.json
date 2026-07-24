@@ -2205,6 +2205,265 @@
     ]
   },
   {
+    "id": "p_marie_curie",
+    "name": "Madame Marie Curie",
+    "age": 66,
+    "gender": "Female",
+    "lastVisit": "1934.07.04",
+    "preexistingConditions": [
+      "Radiologic Aplastic Anemia",
+      "Radiologic Dermatitis",
+      "Bone Marrow Hematopoietic Suppression",
+      "Mitochondrial Oxidative Stress"
+    ],
+    "patientGoals": "Regenerate bone marrow hematopoietic stem cells, upregulate Phase II antioxidant Nrf2, and repair radiologic cutaneous burns.",
+    "vitals": {
+      "bp": "108/68",
+      "hr": "64",
+      "spO2": "97%",
+      "temp": "97.8°F",
+      "weight": "123 lbs",
+      "height": "5'3\""
+    },
+    "customFields": [
+      {
+        "key": "Atomic Lab Aesthetic",
+        "value": "⚛️ 1950s Gilbert U-238 Atomic Energy Lab (Brushed Lead & Steel Plate)"
+      },
+      {
+        "key": "Isotope Activity",
+        "value": "☢️ Radium-226 (2.5 μCi / 1,600 yr Half-Life)"
+      },
+      {
+        "key": "Geiger Counter Telemetry",
+        "value": "🎛️ 420 CPM (Alpha / Beta Particle Flux)"
+      },
+      {
+        "key": "Lead Shielding Enclosure",
+        "value": "🛡️ 4.5 cm Solid Lead Crucible (Purity 99.8%)"
+      },
+      {
+        "key": "Grow Thyself Radioprotection",
+        "value": "🌿 Ashwagandha, Ginkgo biloba, Centella asiatica"
+      }
+    ],
+    "tcmIntake": {
+      "tongueColor": "pale",
+      "tongueCoating": "thin-white",
+      "pulseQuality": "deep-thready",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "spontaneous-day",
+      "tasteInMouth": "bland",
+      "tcmPattern": "Bone Marrow Jing Depletion & Blood Qi Deficiency"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 7,
+      "prakritiPitta": 5,
+      "prakritiKapha": 3,
+      "vikritiVata": 9,
+      "vikritiPitta": 7,
+      "vikritiKapha": 2,
+      "agniType": "mandagni",
+      "amaScore": 6.2,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata Aggravation in Majja Dhatu (Bone Marrow) & Ojas Depletion"
+    },
+    "medications": [
+      {
+        "id": "1",
+        "name": "N-Acetylcysteine (NAC)",
+        "value": "1,200mg BID (Glutathione Precursor)"
+      },
+      {
+        "id": "2",
+        "name": "Sulforaphane Extract",
+        "value": "50mg daily (Nrf2 Activation)"
+      },
+      {
+        "id": "3",
+        "name": "CoQ10 (Ubiquinol)",
+        "value": "300mg daily (Mitochondrial Protection)"
+      },
+      {
+        "id": "4",
+        "name": "Specialized Pro-Resolving Mediators (SPMs)",
+        "value": "1,000mg BID"
+      }
+    ],
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "8-hydroxy-2'-deoxyguanosine (8-OHdG)",
+        "value": "18.4 ng/mg Cr (DNA Oxidative Damage)"
+      },
+      {
+        "id": "2",
+        "name": "Radium-226 Serum Isotope Activity",
+        "value": "Elevated Internal Alpha Emitter"
+      }
+    ],
+    "issues": {
+      "chest": [
+        {
+          "id": "chest",
+          "noteId": "note_curie_marrow_1",
+          "name": "Bone Marrow Hematopoietic Suppression",
+          "painLevel": 6,
+          "description": "Severe radiologic aplastic anemia from chronic unshielded radium-226 and polonium-210 exposure.",
+          "symptoms": [
+            {
+              "name": "Hematopoietic stem cell fatigue",
+              "type": "Systemic",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ],
+      "skin": [
+        {
+          "id": "skin",
+          "noteId": "note_curie_dermatitis_1",
+          "name": "Radiologic Cutaneous Dermatitis",
+          "painLevel": 5,
+          "description": "Bilateral palmar and forearm radiologic erythema, desquamation, and superficial tissue ulceration.",
+          "symptoms": [
+            {
+              "name": "Palmar desquamation",
+              "type": "Dermatologic",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ]
+    },
+    "history": [
+      {
+        "type": "AnalysisRun",
+        "date": "1934.07.04",
+        "summary": "Nobel Radiologic & Gilbert U-238 Atomic Energy Lab Regeneration Analysis",
+        "report": {
+          "Summary Overview": "### ⚛️ Gilbert U-238 Atomic Energy Lab Clinical Summary\nMadame Marie Curie presents with severe radiologic aplastic anemia and chronic radium dermatitis resulting from decades of unshielded laboratory research with radium and polonium isotopes. Primary clinical imperatives: stimulate bone marrow hematopoietic stem cell niche regeneration, upregulate Nrf2 phase II cellular detoxification pathways, and arrest double-strand DNA oxidative breakdown inside our lead-shielded Gilbert U-238 Atomic Chamber.",
+          "Functional Protocols": "### Radioprotection & Hematopoietic Regeneration\n- **Nrf2 Phase II Gene Activation**: High-dose Sulforaphane (50mg) + N-Acetylcysteine (1,200mg BID) to restore cellular Glutathione pools.\n- **Autophagy Clearing**: Fasting autophagic clearance of damaged radiologic subcellular debris (Ohsumi Autophagy Protocol).\n- **$\\\\Psi$-Modified mRNA Repair**: Pseudouridine-substituted cellular repair transcripts to bypass endosomal TLR7/8 immune activation.",
+          "Nutrition": "### Radioprotective & DNA-Repair Nutrition\n- **Glutathione-Rich Crucifers**: Steamed broccoli sprouts, bok choy, and watercress.\n- **Anthocyanin Berries**: Wild blueberries, dark pomegranates, and aronia berries for vascular endothelial repair.\n- **Avoid**: Pro-inflammatory omega-6 industrial oils and refined simple sugars that accelerate DNA methyltransferase breakdown.",
+          "Precision Nutrients": "### Orthomolecular & Botanical Grow Thyself Protocols\n- **Ashwagandha (Withania somnifera)**: 500mg BID (Bone marrow radioprotection & adaptogenic GABAergic support).\n- **Ginkgo biloba Extract**: 120mg BID (Microvascular cutaneous and cerebral perfusion).\n- **Centella asiatica (Gotu Kola)**: 400mg daily (Collagen type I/III synthesis for radiologic skin remodeling)."
+        }
+      }
+    ],
+    "bookmarks": []
+  },
+  {
+    "id": "p_srinivasa_ramanujan",
+    "name": "Srinivasa Ramanujan",
+    "age": 32,
+    "gender": "Male",
+    "lastVisit": "1920.04.26",
+    "preexistingConditions": [
+      "Hepatic Amoebiasis",
+      "Gastric Malabsorption & Dyspepsia",
+      "Vishamagni (Irregular Metabolic Fire)",
+      "Vata-Pitta Irregularity"
+    ],
+    "patientGoals": "Restore gastric Agni metabolic fire, pacify Vata motility irregularity, heal intestinal mucosal barrier, and restore physical energy for mathematical research.",
+    "vitals": {
+      "bp": "112/72",
+      "hr": "76",
+      "spO2": "98%",
+      "temp": "98.2°F",
+      "weight": "115 lbs",
+      "height": "5'6\""
+    },
+    "tcmIntake": {
+      "tongueColor": "pale",
+      "tongueCoating": "yellow-greasy",
+      "pulseQuality": "wiry",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "spontaneous-day",
+      "tasteInMouth": "bitter",
+      "tcmPattern": "Spleen Qi Deficiency with Damp-Heat in Liver & Gallbladder"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 7,
+      "prakritiPitta": 6,
+      "prakritiKapha": 2,
+      "vikritiVata": 9,
+      "vikritiPitta": 8,
+      "vikritiKapha": 2,
+      "agniType": "vishamagni",
+      "amaScore": 7.8,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata-Pitta Spasm in Annavaha Srotas & Vishamagni"
+    },
+    "medications": [
+      {
+        "id": "1",
+        "name": "Deglycyrrhizinated Licorice (DGL)",
+        "value": "400mg chewed 20 min before meals"
+      },
+      {
+        "id": "2",
+        "name": "L-Glutamine Powder",
+        "value": "5g morning on empty stomach"
+      },
+      {
+        "id": "3",
+        "name": "Zinc Carnosine (PepZin GI)",
+        "value": "75mg BID"
+      },
+      {
+        "id": "4",
+        "name": "Tinospora cordifolia (Guduchi)",
+        "value": "500mg BID"
+      }
+    ],
+    "oxidativeStressMarkers": [
+      {
+        "id": "1",
+        "name": "Fecal Calprotectin",
+        "value": "185 mcg/g (Gut Mucosal Inflammation)"
+      },
+      {
+        "id": "2",
+        "name": "Intestinal Permeability (Zonulin)",
+        "value": "64 ng/mL (Elevated Leaky Gut)"
+      }
+    ],
+    "issues": {
+      "abdomen": [
+        {
+          "id": "abdomen",
+          "noteId": "note_ramanujan_hepatic_1",
+          "name": "Hepatic Amoebic Inflammation & Agni Debility",
+          "painLevel": 7,
+          "description": "Right upper quadrant hepatic tender distress, chronic dysentery history (Cambridge 1917–1919), and severe gastric malabsorption.",
+          "symptoms": [
+            {
+              "name": "Gastric spasm & malabsorption",
+              "type": "Gastrointestinal",
+              "verified": true,
+              "timeline": "Chronic"
+            }
+          ]
+        }
+      ]
+    },
+    "history": [
+      {
+        "type": "AnalysisRun",
+        "date": "1920.04.26",
+        "summary": "Ayurvedic & TCM Gastric Agni Restoration Analysis",
+        "report": {
+          "Summary Overview": "### Mathematical Prodigy Clinical Summary\nSrinivasa Ramanujan presents with severe hepatic amoebiasis, intestinal malabsorption, and acute Vishamagni (irregular digestive fire). Primary clinical imperatives: pacify severe Vata motility spasms, heal the intestinal epithelial barrier with mucosal emollients, and kindle Agni using warm, easily digestible Kitchari and carminative herbs.",
+          "Functional Protocols": "### Warm Agni Kindling & Intestinal Barrier Repair\n- **Agni Activation**: Warm ginger decoction + Ajwain seed infusion 15 minutes prior to meals.\n- **Mucosal Layer Defense**: Deglycyrrhizinated Licorice (DGL) + Zinc Carnosine to soothe gastric mucosal lining.\n- **Enterocyte Regeneration**: L-Glutamine 5g morning on empty stomach to tight-junction enterocytes.",
+          "Nutrition": "### Vata-Pacifying Restorative Kitchari Protocol\n- **Split Yellow Mung Bean & Basmati Rice Kitchari**: Prepared with Ghee, Cumin, Turmeric, Coriander, and Asafoetida (Hing).\n- **Avoid**: Raw cold salads, ice water, coarse raw bran, and high-histamine fermented foods during active flare.",
+          "Precision Nutrients": "### Botanical Grow Thyself Protocols\n- **Tulsi (Ocimum sanctum / Holy Basil)**: 400mg BID (Vata-Kapha balancing adaptogen & antimicrobial defense).\n- **Zingiber officinale (Ginger)**: 500mg BID (Kindles Agni metabolic fire & disperses TCM Dampness).\n- **Phyllanthus emblica (Amalaki)**: 500mg daily (Pitta-soothing Rasayana for mucosal tissue regeneration)."
+        }
+      }
+    ],
+    "bookmarks": []
+  },
+  {
     "id": "p_phil_gear",
     "name": "Phil Gear",
     "age": 42,
@@ -2249,6 +2508,28 @@
       "b12": "580 pg/mL",
       "zinc": "92 mcg/dL"
     },
+    "customFields": [
+      {
+        "key": "Master Paradigm Coherence",
+        "value": "94% Cross-Paradigm Coherence"
+      },
+      {
+        "key": "Ohsumi Autophagy Flux",
+        "value": "88% Autophagic Clearing Rate"
+      },
+      {
+        "key": "Turing Cellular Automata State",
+        "value": "Rule B3/S23 Morphogenesis Stable (0 Deadlocks)"
+      },
+      {
+        "key": "Navier-Stokes Glymphatic Velocity",
+        "value": "1.8 mm/s Perivascular CSF Flow"
+      },
+      {
+        "key": "Grow Thyself Selections",
+        "value": "Lion's Mane (Hericium erinaceus), Rhodiola rosea, Bacopa monnieri"
+      }
+    ],
     "oxidativeStressMarkers": [
       {
         "id": "1",
@@ -2330,11 +2611,11 @@
       {
         "type": "AnalysisRun",
         "date": "2026.05.20",
-        "summary": "Comprehensive Clinical Analysis",
+        "summary": "Comprehensive Clinical & 10-Dimensional Suite Analysis",
         "report": {
-          "Summary Overview": "### Clinical Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Focus is on optimization of metabolic pathways, screen time hygiene, and real-time biometric telemetry tracking.\n\n### Priority List\n- **Sleep Latency & BMAL1 Rhythm**: Circadian realignment to achieve rapid sleep onset (< 20 mins).\n- **Autonomic Vagal Regulation**: 0.1 Hz resonant breathing for sympathetic dampening.\n- **Biometric Integration**: Google Health Connect and continuous telemetry monitoring.\n\n### Goals\n- **Short-term**: Reduce sleep latency to < 20 minutes.\n- **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
-          "Functional Protocols": "### Diagnostic Workup & Lifestyle\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.\n- 0.1 Hz vagal resonant breathing session for 10 minutes before sleep.",
-          "Nutrition": "### Nutritional Interventions\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.\n- Incorporate 7-day Chrono-Nutrition fast-break porridge and afternoon dark cacao nibs.",
+          "Summary Overview": "### Clinical & 10-Dimensional Suite Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Integrated cross-paradigm evaluation shows 94% Master Coherence across Allopathic, Turing Logic, Nobel Evidence Engine, AAAS Science, Lasker mRNA/PIEZO, Eastern TCM, and Ayurvedic Tridosha models.\n\n### Priority List\n- **Sleep Latency & BMAL1 Rhythm**: Circadian realignment to achieve rapid sleep onset (< 20 mins).\n- **Autonomic Vagal Regulation**: 0.1 Hz resonant breathing for sympathetic dampening.\n- **Biometric Integration**: Google Health Connect and continuous telemetry monitoring.\n\n### Goals\n- **Short-term**: Reduce sleep latency to < 20 minutes.\n- **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
+          "Functional Protocols": "### Diagnostic Workup & 10-Suite Integration\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.\n- 0.1 Hz vagal resonant breathing session for 10 minutes before sleep.\n- Track Turing Formal Logic cellular automata morphogenesis and Navier-Stokes perivascular CSF clearance.",
+          "Nutrition": "### Nutritional Interventions & Grow Thyself Selections\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.\n- Incorporate 7-day Chrono-Nutrition fast-break porridge and afternoon dark cacao nibs.\n- Grow Thyself Botanical Protocol: Lion's Mane (BDNF neurogenesis), Rhodiola rosea (cortisol modulation), Bacopa monnieri (synaptic plastic resilience).",
           "Monitoring & Follow-up": "### Immediate (24-72 hours) & Clinical Tracking\n- Monitor daily resting heart rate and sleep cycles using Fitbit/Google Health Connect.\n- Follow up in 4 weeks for HRV spectral power density review.",
           "Patient Education": "### Understanding Your Health Path\nWe are focusing on tuning your body's daily rhythms, syncing Fitbit metrics, and optimizing cellular nutrients to resolve evening tension.",
           "Precision Nutrients": "### Biomarker Matrix\n\n- **Magnesium**: Sub-optimal (ATP Synthesis / NMDA)\n- **Vitamin D3**: Sub-optimal (Immune / Bone)\n- **Vitamin B12**: Optimal (Methylation)\n- **Zinc**: Optimal (Immune / Hormones)",
@@ -2361,6 +2642,14 @@
         "date": "2026.04.15",
         "description": "Mild sleep latency elevation; zero central sleep apnea. AHI 4.2/hr (Mild), Sleep Efficiency 88%.",
         "status": "Reviewed"
+      },
+      {
+        "id": "scan_phil_2",
+        "title": "Whole Body 3D Spatial LiDAR Telemetry",
+        "type": "Ultrasound",
+        "date": "2026.05.18",
+        "description": "LiDAR spatial surface mesh and skeletal alignment telemetry confirming zero pelvic tilt or spinal subluxation.",
+        "status": "Normal"
       }
     ],
     "dietaryProtocol": "",
@@ -2370,81 +2659,5 @@
     "checklist": [],
     "shoppingList": [],
     "ayurvedicStatus": {}
-  },
-  {
-    "id": "emergency_casualty",
-    "name": "Emergency Patient",
-    "age": 30,
-    "gender": "Other",
-    "lastVisit": "2026-07-23T22:32:04.023Z",
-    "preexistingConditions": [],
-    "history": [
-      {
-        "type": "FinalizedPatientSummary",
-        "date": "2026.07.23",
-        "summary": "Patient Summary updated (auto-saved).",
-        "report": {
-          "Summary Overview": "### Clinical Assessment\nEmergency Patient is a 30-year-old other presenting for management of active clinical concerns and functional optimization. \n\n### Current Presentation & Vitals\n- **Vitals**: BP: 120/80, HR: 72 bpm, Temp: 98.6°F, SpO2: 98%\n- **Active Concerns**:\n- **General Wellness**: No acute physical issues reported.\n\n### Clinical Priorities\n- **Symptom Management**: Focus on non-pharmacological and targeted interventions for general wellness.\n- **Lifestyle Modification**: Circadian alignment, metabolic optimization, and targeted movement.\n- **Patient Goals**: Immediate trauma and emergency life support bypass mode.\n\n### Plan of Care\n- **Short-term**: Optimize daily movement and address acute stressors/pain.\n- **Long-term**: Functional rehabilitation and systemic health optimization.",
-          "Functional Protocols": "### Diagnostic Workup & Lifestyle\n- **Exercise**: Structured moderate-intensity cardiovascular exercise 3x/week.\n- **Posture & Ergonomics**: Regular movement breaks and ergonomic assessment.\n- **Sleep**: Maintain consistent sleep/wake cycle.",
-          "Nutrition": "### Nutritional Interventions\n- **Anti-inflammatory Diet**: Emphasize whole foods, lean proteins, omega-3 fats, and high-fiber vegetables.\n- **Hydration**: Target 2-3 liters of filtered water daily.\n\n### Local & Wild Sourcing\n- **Standard Supermarkets**: Source wild-caught salmon and mackerel in the seafood aisle. Frozen wild blueberries are highly abundant and cost-effective.\n- **Wild Foraging**: Forage for wild dandelions or stinging nettles in organic, pesticide-free meadows (blanch nettles thoroughly to deactivate stingers; they are rich in iron and vitamin C).",
-          "Precision Nutrients": "### Biomarker Matrix & Suggested Supplements\n- **Magnesium Glycinate**: 300-400mg before bed.\n- **Vitamin D3**: Optimize levels to support immune and bone health.\n- **Omega-3 Fatty Acids**: Anti-inflammatory support.",
-          "Monitoring & Follow-up": "### Immediate (24-72 hours) & Clinical Tracking\n- Monitor vitals and symptom logs.\n- Re-assess functional capacity in 4 weeks.",
-          "Patient Education": "### Understanding Your Health Path\nBy focusing on nutrition, movement, sleep, and targeted supplementation, we can address the root functional causes of your symptoms and build a foundation for long-term health.",
-          "Maternal & Postpartum": "### Perinatal Health Assessment\nEmergency Patient is a 30-year-old other evaluated for perinatal functional optimization and maternal autonomic balance. Maternal blood pressure is 120/80 with stable SpO2 at 98%.\n\n### Perinatal Safety Thresholds\n| Metric | Target Range | Frequency | Action Threshold |\n| :--- | :--- | :--- | :--- |\n| Blood Pressure | < 130/80 mmHg | Daily | > 140/90 mmHg (Preeclampsia Rule-out) |\n| Fetal Movement | ≥ 10 kicks / 2 hrs | Daily | < 10 kicks in 2 hours |\n| Postpartum Mood | EPDS Score < 9 | Bi-weekly | EPDS ≥ 10 |\n\n### Integrated Care Protocol\n- **Western Support**: Pre-eclampsia monitoring, prenatal iron/folate supplementation.\n- **Eastern TCM**: Ren Mai (Conception Vessel) warming & Shen calming.\n- **Ayurvedic Garbhini**: Sattvic diet, warm sesame Abhyanga, Nadi Shodhana breathing.",
-          "Grow-Thyself Education": "### Ecological Cellular & Garden Metaphors\nYour cellular energy system operates like a living garden ecosystem. Nutrients and hydration are your fertile soil; circadian sleep and morning sunlight provide vital solar energy.\n\n### Ancestral Dietary Heritage & Cultural Swaps\n| Cultural Heritage | Traditional Swap | Bio-Individual Benefit | Local Sourcing Tip |\n| :--- | :--- | :--- | :--- |\n| African Heritage | Collard greens & okra broth | High folate, prebiotic fiber | Local farmers market |\n| Latino/Hispanic | Black beans & avocado oil | Stable glycemic index, oleic acid | Standard grocery produce |\n| East/South Asian | Miso & ginger jujube tea | Probiotic enzymes, digestion | Asian specialty market |\n\n### Daily Micro-Habits (Grow-Thyself Quests)\n- **🌅 Morning Circadian Sun Reset**: 15 min morning light.\n- **🫁 Vagal Tone Breathing**: 6.0 bpm resonant breathing.\n- **🍵 Ancestral Mineralization**: Warm herbal mineral infusion.",
-          "Epigenetic Longevity": "### Actuarial Risk & Biological Age Synthesis\nQuantitative Gompertz-Makeham hazard modeling indicates a biological age delta of **-4.5 years** relative to chronological age (30), projecting **+7.2 Quality-Adjusted Life Years (QALY)** gain.\n\n### CDC 4-Driver Hazard Reduction Matrix\n| Mortality Vector | Baseline Risk | Multi-Paradigm Strategy | Projected Hazard Ratio (HR) |\n| :--- | :--- | :--- | :--- |\n| Cardiovascular | Moderate | HRV 6.0 bpm Vagal Tone + CoQ10 | **0.62** (38% Risk Reduction) |\n| Metabolic | Low-Moderate | Sirtuin Activators + Low Glycemic | **0.55** (45% Risk Reduction) |\n| Neurodegenerative | Low | TCM Shen Harmonization + Neti/Nasya | **0.68** (32% Risk Reduction) |\n| Oncological | Low | Autophagic Rasayana & Anti-inflammatory | **0.74** (26% Risk Reduction) |\n\n### Multi-Paradigm Cell Longevity Protocol\n- **Western Epigenetic Support**: Sirtuin activation (NAD+/NMN), AMPK activation, HRV vagal tone.\n- **Eastern TCM Essence**: Zang-Fu meridian balancing, sleep architecture, Jing preservation.\n- **Ayurvedic Rasayana**: Ama detoxification, Agni metabolic fire, adaptogenic rejuvenation.",
-          "Pre-Conception & Family Health": "### Pre-Conception Parental Epigenetic Matrix\n| Optimization Vector | Targeted Biomarker | Parental Protocol | Fetal Healthspan Impact |\n| :--- | :--- | :--- | :--- |\n| Folate Methylation | MTHFR C677T / Homocysteine | L-5-MTHF (800 mcg) + B12 | Neural tube & DNA fidelity |\n| Maternal Mitochondria | CoQ10 Ubiquinol / Fasting Insulin | Ubiquinol (300 mg) + Alpha-Lipoic | High oocyte cleavage ATP |\n| Paternal Spermatogenesis | Sperm DNA DFI / Zinc | Zinc (30 mg) + Selenium + Carnitine | Lower germline mutational load |\n| Environmental Detox | Heavy metals & Endocrine Disruptors | Filtered water & organic whole foods | Reduced epigenetic transgenerational risk |\n\n### Senior & Geriatric Caretaking Strategy\n- **Autonomic Vagal Tone**: HRV SDNN 6.0 bpm resonant breathing sessions to reduce agitation and improve sleep.\n- **TCM Kidney Jing & Shen**: Warm bone broths, Rehmannia, and Gingko Biloba to nourish brain marrow (*Sui Hai*).\n- **Ayurvedic Vata Pacification**: Warm sesame Abhyanga massage & Bacopa Monnieri (Brahmi) for joint/cognitive support.\n\n### Voluntary ACOG/ACMG Carrier Screening Guidance\nRecommends voluntary pre-conception carrier screening for autosomal recessive traits. Pre-conception optimization ensures offspring inherit optimal epigenetic programming while preserving human dignity."
-        },
-        "annotations": {}
-      }
-    ],
-    "bookmarks": [],
-    "issues": {},
-    "patientGoals": "Immediate trauma and emergency life support bypass mode.",
-    "dietaryProtocol": "",
-    "vitals": {
-      "bp": "",
-      "hr": "",
-      "temp": "",
-      "spO2": "",
-      "weight": "",
-      "height": "",
-      "vitC": "",
-      "vitD3": "",
-      "magnesium": "",
-      "zinc": "",
-      "b12": ""
-    },
-    "dynamicNutrients": [],
-    "oxidativeStressMarkers": [],
-    "antioxidantSources": [],
-    "medications": [],
-    "clinicalNotes": [],
-    "checklist": [],
-    "shoppingList": [],
-    "activePhilosophy": "western",
-    "tcmIntake": {
-      "tongueColor": "pink",
-      "tongueCoating": "thin-white",
-      "pulseQuality": "normal",
-      "thermalPreference": "neutral",
-      "sweatPattern": "normal",
-      "tasteInMouth": "normal",
-      "tcmPattern": "Zang-Fu Balance with Mild Liver Qi Constriction (Executive Stress)"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 3,
-      "prakritiPitta": 5,
-      "prakritiKapha": 3,
-      "vikritiVata": 4,
-      "vikritiPitta": 6,
-      "vikritiKapha": 3,
-      "agniType": "samagni",
-      "amaScore": 1.8,
-      "nadiPulseType": "frog-pitta",
-      "ayurvedicImbalance": "Samagni Metabolic Balance with Mild Pitta Exertion"
-    },
-    "ayurvedicStatus": {},
-    "biometricHistory": []
   }
 ]

@@ -57,24 +57,26 @@ import { ClinicalStorytellingService, IPatientStory, IStoryAct } from '../servic
           </div>
 
           <!-- Active Act Content Card -->
-          <div *ngIf="currentStory.acts[activeActIndex()] as activeAct" class="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-sm space-y-4 font-mono">
-            <div>
-              <span class="text-[10px] font-bold uppercase text-orange-400">Chapter {{ activeAct.actNumber }}</span>
-              <h4 class="text-base font-bold text-zinc-100 font-sans mt-0.5">{{ activeAct.title }}</h4>
-              <p class="text-xs text-zinc-400 font-sans mt-0.5">{{ activeAct.subtitle }}</p>
-            </div>
+          @if (currentStory.acts[activeActIndex()]; as activeAct) {
+            <div class="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-sm space-y-4 font-mono">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-orange-400">Chapter {{ activeAct.actNumber }}</span>
+                <h4 class="text-base font-bold text-zinc-100 font-sans mt-0.5">{{ activeAct.title }}</h4>
+                <p class="text-xs text-zinc-400 font-sans mt-0.5">{{ activeAct.subtitle }}</p>
+              </div>
 
-            <p class="text-sm text-zinc-300 leading-relaxed font-sans border-t border-zinc-800/80 pt-4">
-              {{ activeAct.narrative }}
-            </p>
-
-            <div class="p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-xs">
-              <span class="text-[10px] font-bold uppercase text-orange-400 block mb-1">💡 Key Insight</span>
-              <p class="font-bold text-zinc-200 font-sans italic">
-                "{{ activeAct.keyInsight }}"
+              <p class="text-sm text-zinc-300 leading-relaxed font-sans border-t border-zinc-800/80 pt-4">
+                {{ activeAct.narrative }}
               </p>
+
+              <div class="p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-xs">
+                <span class="text-[10px] font-bold uppercase text-orange-400 block mb-1">💡 Key Insight</span>
+                <p class="font-bold text-zinc-200 font-sans italic">
+                  "{{ activeAct.keyInsight }}"
+                </p>
+              </div>
             </div>
-          </div>
+          }
 
         </div>
 
@@ -87,9 +89,11 @@ import { ClinicalStorytellingService, IPatientStory, IStoryAct } from '../servic
                 : 'px-4 py-2 text-xs font-bold uppercase rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 transition cursor-pointer border border-orange-400/50'">
               {{ isSpeaking() ? '⏸ Pause Audio Story' : '▶ Play Audio Story (TED Voice)' }}
             </button>
-            <span *ngIf="isSpeaking()" class="text-xs text-orange-400 font-bold animate-pulse">
-              🎙️ Narrating...
-            </span>
+            @if (isSpeaking()) {
+              <span class="text-xs text-orange-400 font-bold animate-pulse">
+                🎙 Speaking Chapter {{ story().acts[activeActIndex()].actNumber }}...
+              </span>
+            }
           </div>
 
           <pocket-gull-button (click)="closeModal.emit()" variant="secondary" size="sm">

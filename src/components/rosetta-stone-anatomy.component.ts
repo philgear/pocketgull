@@ -48,7 +48,7 @@ export interface IAnatomicalTarget {
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="w-full mb-8 p-6 sm:p-8 bg-zinc-950 text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl relative overflow-hidden font-sans pocket-gull-card">
+    <div class="w-full mb-8 p-6 sm:p-8 bg-zinc-950/75 dark:bg-zinc-950/75 backdrop-blur-xl text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl relative overflow-hidden font-sans pocket-gull-card thematic-3d-container">
       
       <!-- Component Header -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5 mb-6 font-mono">
@@ -94,18 +94,6 @@ export interface IAnatomicalTarget {
               : 'px-3 py-1.5 rounded-xl text-zinc-400 text-xs font-bold hover:text-amber-300 hover:bg-zinc-800 transition'">
             🟡 Ayurveda
           </button>
-          <button (click)="setLens('arborist')"
-            [class]="activeLens() === 'arborist'
-              ? 'px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs shadow-md transition'
-              : 'px-3 py-1.5 rounded-xl text-zinc-400 text-xs font-bold hover:text-emerald-300 hover:bg-zinc-800 transition'">
-            🌳 Arborist
-          </button>
-          <button (click)="setLens('mechanic')"
-            [class]="activeLens() === 'mechanic'
-              ? 'px-3 py-1.5 rounded-xl bg-cyan-600 text-white font-extrabold text-xs shadow-md transition'
-              : 'px-3 py-1.5 rounded-xl text-zinc-400 text-xs font-bold hover:text-cyan-300 hover:bg-zinc-800 transition'">
-            🚗 Mechanic
-          </button>
         </div>
       </div>
 
@@ -113,7 +101,7 @@ export interface IAnatomicalTarget {
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <!-- Left Column: Canvas Spatial Visualization -->
-        <div class="lg:col-span-7 relative bg-zinc-900/80 rounded-2xl border border-zinc-800 p-4 min-h-[380px] flex flex-col justify-between overflow-hidden">
+        <div class="lg:col-span-7 relative bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-zinc-800 p-4 min-h-[380px] flex flex-col justify-between overflow-hidden">
           
           <!-- Background Grid & Shader Glow -->
           <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-cyan-900/20 via-zinc-950/80 to-zinc-950 pointer-events-none"></div>
