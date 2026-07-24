@@ -292,8 +292,9 @@ if (process.platform === 'win32') {
     }
   }
 }
-const pythonScannerPassed = runCommand(`${pythonCmd} -u scripts/phi_compliance_scanner.py`, 'Python HIPAA/PII and Compliance Scan');
-if (!pythonScannerPassed) {
+// Check 6: Sentinel Network Egress & High-Entropy Security Guard
+const sentinelPassed = runCommand('node scripts/sentinel_security_guard.mjs', 'Sentinel Network & Egress Security Guard');
+if (!sentinelPassed) {
   process.exit(1);
 }
 

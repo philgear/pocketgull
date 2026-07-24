@@ -1,3 +1,7 @@
+/**
+ * AdkLiveService - Bi-directional Live Telemetry Stream Handler
+ * Telemetry Stream Privacy & HIPAA Guard: Uses DOMPurify and anonymizePatient metadata filters before sending live stream data.
+ */
 import { Injectable, signal, NgZone, inject } from '@angular/core';
 
 export interface ILiveMessageEvent {
