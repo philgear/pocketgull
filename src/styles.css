@@ -3382,6 +3382,66 @@ html.theme-lent .theme-nav-bar {
   color: #F7F5F0 !important;
 }
 
+/* ☢️ Madame Curie Radium Lab & 1950s Gilbert U-238 Atomic Energy Lab Theme */
+html.theme-curie {
+  --bg-primary: #0f1416;
+  --bg-card: #162025;
+  --text-primary: #e2f8ee;
+  --text-secondary: #00ff66;
+  --border-color: #00cc66;
+  --brand-accent: #00ff66;
+
+  /* ⚛️ Brushed Lead/Steel Plate Metallic Grid & Radioactive Radium Particle Cloud */
+  background-color: #0f1416 !important;
+  background-image: 
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 24px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 24px),
+    radial-gradient(circle at 50% 30%, rgba(0, 255, 102, 0.20) 0%, transparent 75%),
+    linear-gradient(135deg, #0e1315 0%, #1a252b 50%, #0c1012 100%) !important;
+  background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100% !important;
+}
+
+html.theme-curie body {
+  background-color: transparent !important;
+}
+
+/* ☢️ Gilbert U-238 Metallic Lead-Shielded Cards & Geiger Pulse Borders */
+html.theme-curie .bg-white,
+html.theme-curie .dark\:bg-zinc-900,
+html.theme-curie .bg-gray-50,
+html.theme-curie .pocket-gull-card {
+  background-color: #162025 !important;
+  background-image: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(0, 0, 0, 0.2) 100%),
+    radial-gradient(circle at 10% 10%, rgba(0, 255, 102, 0.08) 0%, transparent 60%) !important;
+  border-color: rgba(0, 255, 102, 0.4) !important;
+  border-width: 1.5px !important;
+  color: #e2f8ee !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 15px rgba(0, 255, 102, 0.15) !important;
+}
+
+html.theme-curie .theme-nav-bar {
+  background-color: #0b0f11 !important;
+  border-bottom: 2.5px solid #00ff66 !important;
+  box-shadow: 0 4px 15px rgba(0, 255, 102, 0.2) !important;
+  color: #e2f8ee !important;
+}
+
+/* ⚛️ Gilbert U-238 Radium Accent Headings & Isotope Badges */
+html.theme-curie h1,
+html.theme-curie h2,
+html.theme-curie h3,
+html.theme-curie h4 {
+  color: #00ff66 !important;
+  text-shadow: 0 0 8px rgba(0, 255, 102, 0.4) !important;
+}
+
+html.theme-curie .text-zinc-400,
+html.theme-curie .text-zinc-500,
+html.theme-curie .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
 /* 2. Dieter Rams Tactile Controls & Typography Tokens */
 .btn-rams {
   display: inline-flex;

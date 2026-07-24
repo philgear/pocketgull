@@ -21,6 +21,13 @@ export const p_marie_curie: IPatient = {
     weight: '123 lbs',
     height: '5\'3"'
   },
+  customFields: [
+    { key: 'Atomic Lab Aesthetic', value: '⚛️ 1950s Gilbert U-238 Atomic Energy Lab (Brushed Lead & Steel Plate)' },
+    { key: 'Isotope Activity', value: '☢️ Radium-226 (2.5 μCi / 1,600 yr Half-Life)' },
+    { key: 'Geiger Counter Telemetry', value: '🎛️ 420 CPM (Alpha / Beta Particle Flux)' },
+    { key: 'Lead Shielding Enclosure', value: '🛡️ 4.5 cm Solid Lead Crucible (Purity 99.8%)' },
+    { key: 'Grow Thyself Radioprotection', value: '🌿 Ashwagandha, Ginkgo biloba, Centella asiatica' }
+  ],
   tcmIntake: {
     tongueColor: 'pale',
     tongueCoating: 'thin-white',
@@ -82,9 +89,9 @@ export const p_marie_curie: IPatient = {
     {
       type: 'AnalysisRun',
       date: '1934.07.04',
-      summary: 'Nobel Radiologic & Hematopoietic Regeneration Analysis',
+      summary: 'Nobel Radiologic & Gilbert U-238 Atomic Energy Lab Regeneration Analysis',
       report: {
-        'Summary Overview': '### Radiologic Pioneer Clinical Summary\nMadame Marie Curie presents with severe radiologic aplastic anemia and chronic radium dermatitis resulting from decades of unshielded laboratory research with radium and polonium isotopes. Primary clinical imperatives: stimulate bone marrow hematopoietic stem cell niche regeneration, upregulate Nrf2 phase II cellular detoxification pathways, and arrest double-strand DNA oxidative breakdown.',
+        'Summary Overview': '### ⚛️ Gilbert U-238 Atomic Energy Lab Clinical Summary\nMadame Marie Curie presents with severe radiologic aplastic anemia and chronic radium dermatitis resulting from decades of unshielded laboratory research with radium and polonium isotopes. Primary clinical imperatives: stimulate bone marrow hematopoietic stem cell niche regeneration, upregulate Nrf2 phase II cellular detoxification pathways, and arrest double-strand DNA oxidative breakdown inside our lead-shielded Gilbert U-238 Atomic Chamber.',
         'Functional Protocols': '### Radioprotection & Hematopoietic Regeneration\n- **Nrf2 Phase II Gene Activation**: High-dose Sulforaphane (50mg) + N-Acetylcysteine (1,200mg BID) to restore cellular Glutathione pools.\n- **Autophagy Clearing**: Fasting autophagic clearance of damaged radiologic subcellular debris (Ohsumi Autophagy Protocol).\n- **$\\\\Psi$-Modified mRNA Repair**: Pseudouridine-substituted cellular repair transcripts to bypass endosomal TLR7/8 immune activation.',
         'Nutrition': '### Radioprotective & DNA-Repair Nutrition\n- **Glutathione-Rich Crucifers**: Steamed broccoli sprouts, bok choy, and watercress.\n- **Anthocyanin Berries**: Wild blueberries, dark pomegranates, and aronia berries for vascular endothelial repair.\n- **Avoid**: Pro-inflammatory omega-6 industrial oils and refined simple sugars that accelerate DNA methyltransferase breakdown.',
         'Precision Nutrients': '### Orthomolecular & Botanical Grow Thyself Protocols\n- **Ashwagandha (Withania somnifera)**: 500mg BID (Bone marrow radioprotection & adaptogenic GABAergic support).\n- **Ginkgo biloba Extract**: 120mg BID (Microvascular cutaneous and cerebral perfusion).\n- **Centella asiatica (Gotu Kola)**: 400mg daily (Collagen type I/III synthesis for radiologic skin remodeling).'

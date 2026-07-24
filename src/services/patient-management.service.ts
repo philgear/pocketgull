@@ -36,6 +36,8 @@ const ENCRYPTION_KEY = 'pocket-gull-clinical-vault-key-poc';
 // Re-export for use in other components
 export type { IBodyPartIssue, HistoryEntry, IPatient };
 
+import { ThemeService } from './theme.service';
+
 @Injectable({
   providedIn: "root",
 })
@@ -45,6 +47,7 @@ export class PatientManagementService implements OnDestroy {
   private network = inject(NetworkStateService);
   private http = inject(HttpClient);
   public storage = inject(StorageService);
+  private themeService = inject(ThemeService);
   private autoSave$ = new Subject<void>();
   private autoSaveSub?: Subscription;
 
@@ -391,6 +394,10 @@ export class PatientManagementService implements OnDestroy {
     if (this.selectedPatientId() === id) return;
     this.saveCurrentPatientState();
     this.selectedPatientId.set(id);
+
+    if (id === 'p_marie_curie') {
+      this.themeService.setTheme('curie');
+    }
   }
 
   /** Reloads the current patient's most up-to-date state. Used to exit "review mode". */
