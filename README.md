@@ -10,7 +10,7 @@
 ![Sentinel Guard](https://img.shields.io/badge/Sentinel_Guard-Passed-emerald?logo=shield)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/philgear/pocketgull/badge)](https://securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull)
 [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
-[![DOI](https://zenodo.org/badge/1161259215.svg)](https://doi.org/10.5281/zenodo.20647513)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20647514.svg)](https://zenodo.org/records/20647514)
 
 ---
 
@@ -276,4 +276,27 @@ Full documentation is available in the [`docs/study/`](file:///c:/Users/philg/Po
 
 ---
 
-*© 2026 Pocket Gull. Licensed under the [MIT License](file:///c:/Users/philg/Pocketgull/pocketgull/LICENSE).*
+## 🔬 ACADEMIC CITATION & ZENODO ARCHIVE
+
+If you reference or use Pocket Gull in clinical research, medical informatics studies, or AI health publications, please cite our official Zenodo archive record:
+
+- **Zenodo Release Record (v0.10.0)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20647514.svg)](https://doi.org/10.5281/zenodo.20647514) — [`10.5281/zenodo.20647514`](https://zenodo.org/records/20647514)
+- **Zenodo Concept DOI (All Versions)**: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20647513.svg)](https://doi.org/10.5281/zenodo.20647513) — [`10.5281/zenodo.20647513`](https://doi.org/10.5281/zenodo.20647513)
+- **ORCID iD**: [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
+
+```bibtex
+@software{gear_phil_2026_20647514,
+  author       = {Gear, Phil},
+  title        = {Pocket-Gull: Living Medical Intelligence Engine},
+  month        = jul,
+  year         = 2026,
+  publisher    = {Zenodo},
+  version      = {v0.10.0},
+  doi          = {10.5281/zenodo.20647514},
+  url          = {https://doi.org/10.5281/zenodo.20647514}
+}
+```
+
+---
+
+*© 2026 Pocket Gull. Licensed under the [MIT License](file:///c:/Users/philg/Pocketgull/pocketgull/LICENSE).*
