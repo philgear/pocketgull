@@ -8,11 +8,13 @@ import { TuringSuiteComponent } from '../turing/turing-suite.component';
 import { NobelLaureatesSuiteComponent } from '../nobel/nobel-laureates-suite.component';
 import { AaasBreakthroughsSuiteComponent } from '../aaas/aaas-breakthroughs-suite.component';
 import { LaskerBreakthroughSuiteComponent } from '../lasker/lasker-breakthrough-suite.component';
+import { EasternTcmSuiteComponent } from '../eastern/eastern-tcm-suite.component';
+import { AyurvedicSystemsSuiteComponent } from '../ayurvedic/ayurvedic-systems-suite.component';
 import { PatientStateService } from '../../services/patient-state.service';
 import { CircadianSleepinessService } from '../../services/circadian-sleepiness.service';
 import { ThemeService } from '../../services/theme.service';
 
-export type DomainSuiteId = 'biomedical' | 'therapeutics' | 'nutrition' | 'recovery' | 'turing' | 'nobel' | 'aaas' | 'lasker';
+export type DomainSuiteId = 'biomedical' | 'therapeutics' | 'nutrition' | 'recovery' | 'turing' | 'nobel' | 'aaas' | 'lasker' | 'eastern_tcm' | 'ayurvedic_systems';
 
 export interface IDomainSuite {
   id: DomainSuiteId;
@@ -34,7 +36,9 @@ export interface IDomainSuite {
     TuringSuiteComponent,
     NobelLaureatesSuiteComponent,
     AaasBreakthroughsSuiteComponent,
-    LaskerBreakthroughSuiteComponent
+    LaskerBreakthroughSuiteComponent,
+    EasternTcmSuiteComponent,
+    AyurvedicSystemsSuiteComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -126,6 +130,8 @@ export interface IDomainSuite {
           @case ('nobel') { <app-nobel-laureates-suite /> }
           @case ('aaas') { <app-aaas-breakthroughs-suite /> }
           @case ('lasker') { <app-lasker-breakthrough-suite /> }
+          @case ('eastern_tcm') { <app-eastern-tcm-suite /> }
+          @case ('ayurvedic_systems') { <app-ayurvedic-systems-suite /> }
         }
       </div>
     </div>
@@ -154,7 +160,9 @@ export class DomainSuitesNavigatorComponent {
     { id: 'turing', name: 'Turing Formal Logic', subtitle: 'Cellular Automata & Petri Net Deadlock Models', icon: '🧮', badge: 'Turing' },
     { id: 'nobel', name: 'Nobel Evidence Engine', subtitle: 'Ohsumi, Hall & Pääbo Breakthrough Models', icon: '🏆', badge: 'Nobel' },
     { id: 'aaas', name: 'AAAS Science Breakthroughs', subtitle: 'GLP-1 Incretin & SCFA Gut-Brain Vagal Models', icon: '🔬', badge: 'AAAS' },
-    { id: 'lasker', name: 'Lasker & Breakthrough', subtitle: 'mRNA LNP & PIEZO1/2 Mechanosensory Models', icon: '🏛️', badge: 'Lasker' }
+    { id: 'lasker', name: 'Lasker & Breakthrough', subtitle: 'mRNA LNP & PIEZO1/2 Mechanosensory Models', icon: '🏛️', badge: 'Lasker' },
+    { id: 'eastern_tcm', name: 'Eastern TCM Jing-Luo', subtitle: '12 Meridians & Pulse/Tongue Diagnostics', icon: '☯️', badge: 'TCM' },
+    { id: 'ayurvedic_systems', name: 'Ayurvedic Tridosha', subtitle: 'Vata/Pitta/Kapha Ratios & Agni Fire', icon: '🪷', badge: 'Ayurveda' }
   ];
 
   toggleParadigmDiff() {
