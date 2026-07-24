@@ -12,7 +12,7 @@
 | **physionet_2023** | `physionet_2023_model.joblib` | **0.9966** | **0.0164** | 0.8745 | 0.9215 | age_conditioned_auroc=0.9966, prevalence_based_reward=0.839 |
 | **physionet_2024** | `physionet_2024_model.joblib` | **0.9971** | **0.0203** | 0.9405 | 0.9693 | age_conditioned_auroc=0.9973, prevalence_based_reward=0.9378 |
 | **physionet_2025** | `physionet_2025_model.joblib` | **0.9961** | **0.0229** | 0.9395 | 0.9604 | age_conditioned_auroc=0.9959, prevalence_based_reward=0.9159 |
-| **physionet_2026** | `clinical_risk_v2.joblib` | **0.7196** | **0.2078** | 0.4758 | 0.6502 | age_conditioned_auroc=0.71, prevalence_based_reward=0.3544 |
+| **physionet_2026** | `physionet_2026_model.joblib` | **0.7689** | **0.1526** | 0.1722 | 0.6917 | age_conditioned_auroc=0.7473, prevalence_based_reward=0.1041 |
 | **clinical_risk_v2** | `clinical_risk_v2.joblib` | **0.7196** | **0.2078** | 0.4758 | 0.6502 | age_conditioned_auroc=0.71, prevalence_based_reward=0.3544 |
 
 ---

@@ -156,6 +156,10 @@ def get_contest_eval_data(contest: str) -> Tuple[pd.DataFrame, pd.Series, str]:
         from train_historical_contests import generate_physionet_2025_data
         X, y = generate_physionet_2025_data(n_samples=2000, seed=92025)
         return X, y, "physionet_2025_model.joblib"
+    elif contest == "physionet_2026":
+        from train_historical_contests import generate_physionet_2026_data
+        X, y = generate_physionet_2026_data(n_samples=2000, seed=92026)
+        return X, y, "physionet_2026_model.joblib"
     else:
         raw_val_data = generate_evaluation_data(n_samples=1500)
         val_data = add_derived_features(raw_val_data)
