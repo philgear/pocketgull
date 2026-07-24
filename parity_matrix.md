@@ -86,7 +86,7 @@ This document maps feature capabilities across the Angular/TypeScript Web App, F
 | **eastern tcm suite** | `src\components\eastern\eastern-tcm-suite.component.ts` | - | - | 🌐 Web Core Feature |
 | **edf parser** | - | - | `pocketgull_api\src\data_pipeline\edf_parser.py` | 🐍 Python ML Service |
 | **emergency nutritional bypass** | `src\components\emergency-nutritional-bypass.component.ts` | - | - | 🌐 Web Core Feature |
-| **emergency supply finder** | `src\components\emergency-supply-finder.component.ts` | - | - | 🌐 Web Core Feature |
+| **emergency supply finder** | `src\components\emergency-supply-finder.component.ts` | `pocketgull_flutter\lib\widgets\emergency_supply_finder_widget.dart` | - | ✅ Web & Mobile Parity |
 | **environmental telemetry** | `src\services\environmental-telemetry.service.ts` | - | - | 🌐 Web Core Feature |
 | **eval agent** | - | - | `pocketgull_api\eval_agent.py` | 🐍 Python ML Service |
 | **evaluate** | - | - | `pocketgull_api\evaluate_model.py` | 🐍 Python ML Service |
@@ -113,7 +113,7 @@ This document maps feature capabilities across the Angular/TypeScript Web App, F
 | **gull squadron showcase** | `src\components\gull-squadron-showcase.component.ts` | - | - | 🌐 Web Core Feature |
 | **hall chronotherapy matrix** | `src\components\nobel\hall-chronotherapy-matrix.component.ts` | - | - | 🌐 Web Core Feature |
 | **handoff modal** | `src\components\handoff-modal.component.ts` | - | - | 🌐 Web Core Feature |
-| **hardware telemetry** | `src\services\hardware-telemetry.service.ts` | - | - | 🌐 Web Core Feature |
+| **hardware telemetry** | `src\services\hardware-telemetry.service.ts` | `pocketgull_flutter\lib\services\hardware_telemetry_service.dart` | - | ✅ Web & Mobile Parity |
 | **healthcare intelligence** | `src\services\healthcare-intelligence.service.ts` | - | - | 🌐 Web Core Feature |
 | **healthy hobbies lifestyle** | `src\components\healthy-hobbies-lifestyle.component.ts` | - | - | 🌐 Web Core Feature |
 | **history timeline** | - | `pocketgull_flutter\lib\widgets\history_timeline_widget.dart` | - | 📱 Flutter Companion Feature |
@@ -285,5 +285,5 @@ This document maps feature capabilities across the Angular/TypeScript Web App, F
 
 ## Architecture Summary
 - **Total Tracked System Capabilities**: 267
-- **Unified Cross-Platform Matched Features**: 78
-- **Specialized Subsystem Services**: 189
+- **Unified Cross-Platform Matched Features**: 80
+- **Specialized Subsystem Services**: 187
