@@ -7,6 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Submodules & Local Challenge Repos
+python_example_2026/
+
 node_modules
 dist
 dist-ssr
