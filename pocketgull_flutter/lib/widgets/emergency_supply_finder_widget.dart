@@ -21,7 +21,7 @@ class EmergencySupplyItem {
 }
 
 class EmergencySupplyFinderWidget extends StatefulWidget {
-  const EmergencySupplyFinderWidget({Key? key}) : super(key: key);
+  const EmergencySupplyFinderWidget({super.key});
 
   @override
   State<EmergencySupplyFinderWidget> createState() => _EmergencySupplyFinderWidgetState();
@@ -77,10 +77,10 @@ class _EmergencySupplyFinderWidgetState extends State<EmergencySupplyFinderWidge
       decoration: BoxDecoration(
         color: const Color(0xFF18181B), // Dark zinc background
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.redAccent.withOpacity(0.5), width: 1.5),
+        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.redAccent.withOpacity(0.1),
+            color: Colors.redAccent.withValues(alpha: 0.1),
             blurRadius: 10,
             spreadRadius: 2,
           )
@@ -91,7 +91,7 @@ class _EmergencySupplyFinderWidgetState extends State<EmergencySupplyFinderWidge
         children: [
           // Header Row
           Row(
-            mainAxisAlignment: MainAxisAlignment.between,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: const [
@@ -101,7 +101,7 @@ class _EmergencySupplyFinderWidgetState extends State<EmergencySupplyFinderWidge
                     'EMERGENCY RADAR & SUPPLIES',
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.black,
+                      fontWeight: FontWeight.w900,
                       color: Colors.white,
                       letterSpacing: 0.8,
                     ),
@@ -111,13 +111,13 @@ class _EmergencySupplyFinderWidgetState extends State<EmergencySupplyFinderWidge
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.emerald.withOpacity(0.2),
+                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.emerald.withOpacity(0.4)),
+                  border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
                 ),
                 child: const Text(
                   'GPS ACTIVE',
-                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.emeraldAccent),
+                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF34D399)),
                 ),
               ),
             ],
@@ -138,7 +138,7 @@ class _EmergencySupplyFinderWidgetState extends State<EmergencySupplyFinderWidge
                 decoration: BoxDecoration(
                   color: const Color(0xFF27272A),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.zinc.withOpacity(0.3)),
+                  border: Border.all(color: const Color(0xFF3F3F46).withValues(alpha: 0.5)),
                 ),
                 child: Row(
                   children: [
