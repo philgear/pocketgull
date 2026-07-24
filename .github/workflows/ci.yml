@@ -46,8 +46,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
-          cd pocketgull_api
-          pip install -r requirements.txt
+          pip install -r pocketgull_api/requirements.txt
 
       - name: Run Python Tests
         run: python3 pocketgull_api/run_tests.py
