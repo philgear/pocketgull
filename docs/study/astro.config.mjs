@@ -10,11 +10,6 @@ export default defineConfig({
   outDir: './dist',
   vite: {
     // @ts-ignore
-    configFile: false,
-    build: {
-      rollupOptions: {
-        input: undefined
-      }
-    }
+    configFile: false
   }
 });
