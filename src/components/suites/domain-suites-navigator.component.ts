@@ -10,6 +10,7 @@ import { AaasBreakthroughsSuiteComponent } from '../aaas/aaas-breakthroughs-suit
 import { LaskerBreakthroughSuiteComponent } from '../lasker/lasker-breakthrough-suite.component';
 import { EasternTcmSuiteComponent } from '../eastern/eastern-tcm-suite.component';
 import { AyurvedicSystemsSuiteComponent } from '../ayurvedic/ayurvedic-systems-suite.component';
+import { MasterParadigmSynthesizerComponent } from './master-paradigm-synthesizer.component';
 import { PatientStateService } from '../../services/patient-state.service';
 import { CircadianSleepinessService } from '../../services/circadian-sleepiness.service';
 import { ThemeService } from '../../services/theme.service';
@@ -38,7 +39,8 @@ export interface IDomainSuite {
     AaasBreakthroughsSuiteComponent,
     LaskerBreakthroughSuiteComponent,
     EasternTcmSuiteComponent,
-    AyurvedicSystemsSuiteComponent
+    AyurvedicSystemsSuiteComponent,
+    MasterParadigmSynthesizerComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -73,6 +75,9 @@ export interface IDomainSuite {
           </span>
         </div>
       </div>
+
+      <!-- 10-Dimensional Master Synthesizer Overview -->
+      <app-master-paradigm-synthesizer />
 
       <!-- Domain Suite Selector & Paradigm Diff Bar -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
