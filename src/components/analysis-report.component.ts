@@ -66,12 +66,14 @@ import { ChronoClockDecisionRailComponent } from './chrono-clock-decision-rail.c
 import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.component';
 import { ClinicalTrajectoryBiographyComponent } from './clinical-trajectory-biography.component';
 import { DualPaneConsultationComponent } from './dual-pane-consultation.component';
+import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashboard.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
   imports: [
     CommonModule,
+    ClinicalSleepTwinDashboardComponent,
     DecimalPipe,
     TitleCasePipe,
     SummaryNodeComponent,
@@ -447,9 +449,10 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
                 <app-chrono-weekly-meal-planner></app-chrono-weekly-meal-planner>
               }
 
-              <!-- Functional Medicine Biomarker Matrix (Protocols, Nutrients, Monitoring) -->
+              <!-- Functional Medicine Biomarker Matrix & Clinical Sleep Twin Simulator -->
               @if (activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
                 <app-biomarker-matrix></app-biomarker-matrix>
+                <app-clinical-sleep-twin-dashboard></app-clinical-sleep-twin-dashboard>
               }
             </div>
           }

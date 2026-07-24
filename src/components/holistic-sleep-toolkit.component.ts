@@ -11,7 +11,7 @@ export interface ISleepToolkitMilestone {
 
 export interface ISleepMicroAction {
   title: string;
-  category: 'Circadian' | 'Digital Detox' | 'Mind-Body' | 'Nutrition' | 'Ambient';
+  category: 'Clinical PSG' | 'Circadian' | 'Digital Detox' | 'Mind-Body' | 'Nutrition' | 'Ambient';
   description: string;
   impact: string;
 }
@@ -116,12 +116,15 @@ export interface ISleepMicroAction {
       <!-- Telemetry Dashboard: PSG, Wearables & Contactless Ambient -->
       <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
         <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
-          <span class="text-xs font-medium text-zinc-400">Holistic Risk</span>
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-zinc-400">Two-Headed Hydra Risk</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">s_C Ranker</span>
+          </div>
           <div class="mt-1.5 flex items-baseline gap-1.5">
             <span class="text-2xl font-extrabold text-indigo-400">{{ (riskScore() * 100).toFixed(1) }}%</span>
             <span class="text-[10px] text-emerald-400">↓ 4.2%</span>
           </div>
-          <p class="text-[10px] text-zinc-500">Cross-Domain Fused</p>
+          <p class="text-[10px] text-zinc-500">Pairwise Rank Probability</p>
         </div>
 
         <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
@@ -130,7 +133,7 @@ export interface ISleepMicroAction {
             <span class="text-2xl font-extrabold text-purple-300">{{ n3Percentage() }}%</span>
             <span class="text-[10px] text-emerald-400">Optimal</span>
           </div>
-          <p class="text-[10px] text-zinc-500">Slow-Wave SWS</p>
+          <p class="text-[10px] text-zinc-500">P(N3→N3): {{ (n3Continuity() * 100).toFixed(1) }}%</p>
         </div>
 
         <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
@@ -143,21 +146,21 @@ export interface ISleepMicroAction {
         </div>
 
         <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
-          <span class="text-xs font-medium text-zinc-400">Ambient Light</span>
+          <span class="text-xs font-medium text-zinc-400">Markov Dynamics</span>
           <div class="mt-1.5 flex items-baseline gap-1.5">
-            <span class="text-2xl font-extrabold text-amber-300">{{ ambientLightLux() }} lux</span>
-            <span class="text-[10px] text-emerald-400">Dim Sanctuary</span>
+            <span class="text-2xl font-extrabold text-amber-300">{{ (n2ToN1Rate() * 100).toFixed(1) }}%</span>
+            <span class="text-[10px] text-emerald-400">Low Arousal</span>
           </div>
-          <p class="text-[10px] text-zinc-500">Contactless Sensing</p>
+          <p class="text-[10px] text-zinc-500">P(N2→N1) Fragmentation</p>
         </div>
 
         <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
-          <span class="text-xs font-medium text-zinc-400">Room Temp / CO2</span>
+          <span class="text-xs font-medium text-zinc-400">Covariate Armor</span>
           <div class="mt-1.5 flex items-baseline gap-1.5">
-            <span class="text-2xl font-extrabold text-teal-300">{{ roomTempCelsius() }}°C</span>
-            <span class="text-[10px] text-zinc-400">650 ppm</span>
+            <span class="text-xl font-extrabold text-teal-300">Active</span>
+            <span class="text-[10px] text-emerald-400">Normalized</span>
           </div>
-          <p class="text-[10px] text-zinc-500">Environmental Cues</p>
+          <p class="text-[10px] text-zinc-500">Hardware Scaling Proof</p>
         </div>
       </div>
 
@@ -231,12 +234,39 @@ export class HolisticSleepToolkitComponent {
   conformalWidth = computed(() => (this.conformalUpper() - this.conformalLower()).toFixed(3));
   sleepFluidityIndex = signal(88.4);
   n3Percentage = signal(21.5);
+  n3Continuity = signal(0.915);
+  n2ToN1Rate = signal(0.042);
+  remInstability = signal(0.012);
   hrvRmssd = signal(44);
   ahi = signal(3.8);
   ambientLightLux = signal(2.5);
   roomTempCelsius = signal(18.5);
 
   microActions = signal<ISleepMicroAction[]>([
+    {
+      title: 'Clinical CPAP & Hypoxia Resolution',
+      category: 'Clinical PSG',
+      description: 'Treat AHI & SpO2 desaturation spikes to prevent nocturnal micro-arousals from interrupting SWS.',
+      impact: 'Restores uninterrupted Slow-Wave Sleep and slows cognitive decline in mild impairment.'
+    },
+    {
+      title: 'Lateral Glymphatic Positioning',
+      category: 'Clinical PSG',
+      description: 'Transition from supine (back) sleeping to lateral (side) position during sleep cycles.',
+      impact: 'Mechanically optimizes cerebrospinal fluid (CSF) flow to flush amyloid-beta & tau proteins.'
+    },
+    {
+      title: 'SWS Thermoregulation (18.5°C)',
+      category: 'Ambient',
+      description: 'Maintain bedroom ambient temp at 18.5°C (65°F) with regular daytime physical activity.',
+      impact: 'Facilitates core body temp drop required to expand perivascular spaces for glymphatic clearance.'
+    },
+    {
+      title: 'Photic & Acoustic Shielding (90m Window)',
+      category: 'Digital Detox',
+      description: 'Kill blue light 90m before bed, use blackout curtains, and mask ambient noise with white noise.',
+      impact: 'Eliminates autonomic micro-arousals (N2→N1 transitions) and preserves sleep continuity.'
+    },
     {
       title: 'Consistent Circadian Anchors',
       category: 'Circadian',
@@ -250,16 +280,16 @@ export class HolisticSleepToolkitComponent {
       impact: 'Reduces sleep latency by 45% and calms cortical hyper-arousal.'
     },
     {
-      title: 'Contactless Ambient Optimization',
-      category: 'Ambient',
-      description: 'Maintain bedroom ambient temp at 18.5°C and ambient light below 5 lux before bedtime.',
-      impact: 'Triggers thermoregulatory sleep onset and minimizes nocturnal awakenings.'
-    },
-    {
       title: 'Nutrient-Optimized Wind Down',
       category: 'Nutrition',
-      description: 'Combine magnesium-rich evening snacks with warm Solfeggio 528 Hz audio.',
-      impact: 'Enhances SWS N3 slow-wave sleep depth and glymphatic clearance.'
+      description: 'Combine magnesium glycinate evening snacks with warm Solfeggio 528 Hz audio.',
+      impact: 'Enhances SWS N3 slow-wave sleep depth and vagal tone resilience.'
+    },
+    {
+      title: 'Vagal Tone Biofeedback & CBT-I',
+      category: 'Mind-Body',
+      description: 'Practice diaphragmatic 4-7-8 breathing entrainment to lower sympathetic hyper-arousal.',
+      impact: 'Elevates RMSSD vagal tone and stabilizes heart rate variability.'
     }
   ]);
 
