@@ -101,7 +101,10 @@ def add_derived_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def generate_evaluation_data(n_samples: int = 1500, seed: int = 101) -> pd.DataFrame:
-    """Generates synthetic validation data for general clinical risk."""
+    """
+    Generates synthetic validation data for general clinical risk.
+    Includes stochastic physiological confounding noise to reflect real-world clinical variance and prevent target leakage.
+    """
     rng = np.random.default_rng(seed)
     hr = rng.normal(76, 14, n_samples).clip(40, 180)
     bp_systolic = rng.normal(122, 16, n_samples).clip(70, 200)
@@ -109,6 +112,9 @@ def generate_evaluation_data(n_samples: int = 1500, seed: int = 101) -> pd.DataF
     spo2 = rng.beta(14, 0.6, n_samples) * 100
     spo2 = np.clip(spo2, 70, 100)
     age = rng.integers(18, 90, n_samples)
+    
+    # Stochastic unobserved physiological noise (unmeasured comorbidity & vital jitter)
+    unobserved_noise = rng.normal(0, 1.2, n_samples)
     
     df = pd.DataFrame({
         "hr": hr,
@@ -119,11 +125,12 @@ def generate_evaluation_data(n_samples: int = 1500, seed: int = 101) -> pd.DataF
     })
     
     logit = (
-        0.02 * (df["hr"] - 75)**2 / 100 +
-        0.015 * (df["bp_systolic"] - 120)**2 / 100 +
-        -0.25 * (df["spo2"] - 98) +
-        0.03 * (df["age"] - 40) -
-        2.5
+        0.015 * (df["hr"] - 75)**2 / 100 +
+        0.012 * (df["bp_systolic"] - 120)**2 / 100 +
+        -0.18 * (df["spo2"] - 98) +
+        0.02 * (df["age"] - 40) +
+        unobserved_noise -
+        2.2
     )
     prob = 1 / (1 + np.exp(-logit))
     df["outcome"] = (prob >= 0.35).astype(int)
