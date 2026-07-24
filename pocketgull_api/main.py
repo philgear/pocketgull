@@ -32,6 +32,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
+from services.holistic_risk_service import MultiModalPatientStateInput, compute_holistic_patient_risk
+
 # ══════════════════════════════════════════════════════════════════════════════
 # ML: CLINICAL RISK SCORING (joblib / scikit-learn) STATE & LOADING
 # ══════════════════════════════════════════════════════════════════════════════
@@ -227,6 +229,12 @@ async def calculate_somatic_coherence(payload: SomaticCoherenceRequest) -> Somat
         recommended_binaural_pulse_hz=rec_pulse,
         clinical_recommendation=rec_text
     )
+
+
+@app.post("/ml/holistic-risk", summary="Calculate Multi-Modal Sleep Twin & Cross-Domain Holistic Patient Risk")
+async def get_holistic_patient_risk(payload: MultiModalPatientStateInput) -> dict[str, Any]:
+    """Calculates unified holistic patient risk score fusing PSG sleep architecture, vitals, and passive wearable telemetry."""
+    return compute_holistic_patient_risk(payload)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
