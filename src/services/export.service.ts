@@ -75,7 +75,7 @@ export class ExportService {
     if (purify && typeof purify.sanitize === 'function') {
       return purify.sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe', 'object', 'embed'], FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'] });
     }
-    return inputStr.replace(/<[^>]*>/g, '');
+    return inputStr.replace(/[<>]/g, '');
   }
 
   public buildFhirR4Bundle(patientData: any): any {

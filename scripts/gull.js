@@ -537,10 +537,10 @@ function openPatientChartDirect(id) {
   const sanitizedId = String(id).replace(/[^a-zA-Z0-9_-]/g, '');
   const protocolUrl = `pocketgull://patient/${sanitizedId}`;
   console.log(`Deep-linking shell to launch: ${protocolUrl}`);
-  execFile('cmd.exe', ['/c', 'start', protocolUrl], (err) => {
+  execFile('explorer.exe', [protocolUrl], (err) => {
     if (err) {
       const fallbackUrl = `http://localhost:4200/patient/${sanitizedId}`;
-      execFile('cmd.exe', ['/c', 'start', fallbackUrl]);
+      execFile('explorer.exe', [fallbackUrl]);
     }
   });
 }
