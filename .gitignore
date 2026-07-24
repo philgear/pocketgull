@@ -56,8 +56,9 @@ dist_*.json
 .lighthouseci/
 security-report.md
 
-# Sandbox environment
+# Sandbox & Challenge workspace environments
 sandbox/
+python_example_2026/
 
 # Agent Rules
 rules.yaml
