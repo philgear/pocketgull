@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'atomic';
 
 @Injectable({
   providedIn: 'root'
@@ -110,7 +110,7 @@ export class ThemeService {
     // Check URL query parameters first for testing, audits, or direct links
     const urlParams = new URLSearchParams(window.location.search);
     const urlTheme = urlParams.get('theme') as AppTheme;
-    if (urlTheme && ['light', 'dark', 'system', 'spark', 'calm', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala'].includes(urlTheme)) {
+    if (urlTheme && ['light', 'dark', 'system', 'spark', 'calm', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'atomic'].includes(urlTheme)) {
       this.currentTheme.set(urlTheme);
       this.resolveTheme(urlTheme);
     } else {
@@ -156,7 +156,7 @@ export class ThemeService {
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
         : false;
       this.activeTheme.set(isSystemDark ? 'dark' : 'light');
-    } else if (theme === 'spark' || theme === 'black-marble' || theme === 'papyrus' || theme === 'mandala') {
+    } else if (theme === 'spark' || theme === 'black-marble' || theme === 'papyrus' || theme === 'mandala' || theme === 'atomic') {
       this.activeTheme.set('dark');
     } else if (theme === 'pool') {
       const hour = new Date().getHours();
@@ -174,7 +174,7 @@ export class ThemeService {
     
     // Always remove existing classes first to clean up state
     document.documentElement.classList.remove(
-      'dark', 'theme-spark', 'theme-calm',
+      'dark', 'theme-spark', 'theme-calm', 'theme-atomic',
       'papercraft-mode', 'papercraft-hemp', 'papercraft-rice', 'papercraft-construction',
       'theme-white-marble', 'theme-black-marble', 'theme-papyrus',
       'theme-pool', 'theme-pool-light', 'theme-pool-dark',
@@ -239,6 +239,12 @@ export class ThemeService {
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
         metaThemeColor.setAttribute('content', '#16112d');
+      }
+    } else if (theme === 'atomic') {
+      document.documentElement.classList.add('dark', 'theme-atomic');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#020617');
       }
     } else if (resolvedTheme === 'dark') {
       document.documentElement.classList.add('dark');
