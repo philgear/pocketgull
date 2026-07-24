@@ -403,12 +403,14 @@ app.get('/health', (req, res) => {
 const dataDir = join(process.cwd(), 'data');
 const patientsDbPath = join(dataDir, 'patients.json');
 
-// Ensure data directory and empty DB exists
-if (!fs.existsSync(dataDir)) {
+// Ensure data directory and empty DB exists atomically
+try {
   fs.mkdirSync(dataDir, { recursive: true });
-}
-if (!fs.existsSync(patientsDbPath)) {
-  fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2));
+} catch {}
+try {
+  fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2), { flag: 'wx' });
+} catch (err) {
+  if (err.code !== 'EEXIST') throw err;
 }
 
 // Patients API Endpoints
@@ -536,11 +538,24 @@ app.put('/api/patients/:id', (req, res) => {
     const patients = JSON.parse(data);
     const index = patients.findIndex(p => p.id === id);
 
+    const allowedPatientFields = ['id', 'name', 'age', 'gender', 'vitals', 'symptoms', 'history', 'conditions', 'carePlan', 'metrics', 'demographics', 'assessment'];
+    const sanitizePatientObj = (raw) => {
+      if (!raw || typeof raw !== 'object') return {};
+      const clean = {};
+      for (const k of Object.keys(raw)) {
+        if (allowedPatientFields.includes(k) || typeof raw[k] === 'object') {
+          clean[k] = raw[k];
+        }
+      }
+      return clean;
+    };
+
+    const cleanPayload = sanitizePatientObj(req.body);
     if (index !== -1) {
-      patients[index] = { ...patients[index], ...req.body, id }; // Ensure ID stays same
+      patients[index] = { ...patients[index], ...cleanPayload, id }; // Ensure ID stays same
     } else {
       // If it doesn't exist, we can create it
-      patients.push({ ...req.body, id });
+      patients.push({ ...cleanPayload, id });
     }
 
     fs.writeFileSync(patientsDbPath, JSON.stringify(patients, null, 2));

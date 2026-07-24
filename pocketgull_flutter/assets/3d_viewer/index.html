@@ -237,6 +237,9 @@
         }
 
         function onMessageReceived(event) {
+            if (event.origin && event.origin !== window.location.origin && event.origin !== 'null' && !event.origin.startsWith('file://')) {
+                return;
+            }
             try {
                 // Ensure it's a valid JSON string (since flutter sends strings, or we might receive objects directly if injected via runJavaScript)
                 const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;

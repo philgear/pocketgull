@@ -28,6 +28,7 @@ PII_PATTERNS = {
 # Regex Patterns for Secrets and API Keys
 SECRET_PATTERNS = {
     "Google API Key": re.compile(r"AIzaSy[A-Za-z0-9_-]{33}"),
+    "GitHub Token": re.compile(r"gh[pousr]_[A-Za-z0-9\.\-_]{36,}"),
     "Generic Private Key": re.compile(r"-----BEGIN [A-Z0-9_-]+ PRIVATE KEY-----"),
     "Generic Password/Secret Assignment": re.compile(r"(api[-_]?key|secret[-_]?key|password|db[-_]?pass)\s*[:=]\s*['\"`][a-zA-Z0-9_\-*!@#%^&()]{16,}['\"`]", re.IGNORECASE)
 }
@@ -37,7 +38,7 @@ IGNORE_DIRS = {"node_modules", ".git", "dist", "dist-ssr", ".angular", "tmp", "t
 
 # Extensions to skip (binary/large assets)
 SKIP_EXTENSIONS = {
-    ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip", ".sqlite",
+    ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip", ".tgz", ".tar", ".gz", ".map", ".sqlite",
     ".db", ".keystore", ".jks", ".lock", ".ico", ".dill"
 }
 
@@ -151,11 +152,12 @@ def audit_patient_data_structures(filepath: str) -> List[str]:
     return issues
 
 def is_third_party_or_build(relative_path: str) -> bool:
-    parts = relative_path.split(os.sep)
+    parts = re.split(r"[/\\]", relative_path)
     vendor_dirs = {
         "node_modules", ".git", ".angular", "dist", "playwright-report",
         "test-results", "tmp", ".husky", "build", ".dart_tool", "ios", "android",
-        "windows", "linux", "macos", "web", "sandbox", "flutter", "venv", ".venv"
+        "windows", "linux", "macos", "web", "sandbox", "flutter", "venv", ".venv", ".vscode",
+        "__pycache__", ".pytest_cache", "site-packages", ".genkit", ".continue"
     }
     if any(part in vendor_dirs for part in parts):
         return True
@@ -173,8 +175,8 @@ def main():
     json_issues_count = 0
     
     for root, dirs, files in os.walk(workspace_dir):
-        # Prune build/third party directories to speed up os.walk
-        dirs[:] = [d for d in dirs if not is_third_party_or_build(os.path.relpath(os.path.join(root, d), workspace_dir))]
+        # Prune build/third party directories directly by name to speed up os.walk
+        dirs[:] = [d for d in dirs if not is_third_party_or_build(d) and not is_third_party_or_build(os.path.relpath(os.path.join(root, d), workspace_dir))]
         
         for file in files:
             # Skip environment files and lock files
