@@ -111,35 +111,6 @@ import { PatientStateService } from '../services/patient-state.service';
 
         </div>
 
-        <!-- Right 5 Cols: Live Calculated Telemetry Readout -->
-        <div class="lg:col-span-5 p-6 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] space-y-6 flex flex-col justify-between sub-panel">
-          
-          <div class="space-y-4 text-center">
-            <span class="text-xs font-mono font-black uppercase tracking-widest text-[#1C1C1C]/70 dark:text-zinc-400 block">Actuarial Longevity Projection</span>
-            
-            <!-- Epigenetic Age Delta -->
-            <div class="p-4 rounded-xl bg-amber-50 dark:bg-zinc-800 border-2 border-[#1C1C1C]">
-              <span class="text-xs font-bold uppercase text-orange-700 dark:text-orange-400 block mb-1 font-mono">Projected Biological Age Delta</span>
-              <span class="text-3xl font-black text-[#1C1C1C] dark:text-zinc-100 font-mono tracking-tight">{{ bioAgeDelta().toFixed(1) }} Yrs</span>
-              <span class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 block mt-1 font-mono">Horvath DNAm Epigenetic Clock Speed</span>
-            </div>
-
-            <!-- Projected QALY Gain -->
-            <div class="p-4 rounded-xl bg-emerald-50 dark:bg-zinc-800 border-2 border-[#1C1C1C]">
-              <span class="text-xs font-bold uppercase text-emerald-700 dark:text-emerald-400 block mb-1 font-mono">Projected QALY Longevity Gain</span>
-              <span class="text-3xl font-black text-emerald-700 dark:text-emerald-400 font-mono tracking-tight">+{{ projectedQaly().toFixed(1) }} Years</span>
-              <span class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 block mt-1 font-mono">Quality-Adjusted Life-Year Expansion</span>
-            </div>
-          </div>
-
-          <!-- Reset Button -->
-          <button (click)="resetCalculator()"
-            class="w-full py-3 rounded-xl border-2 border-[#1C1C1C] bg-[#F6B12B] text-[#1C1C1C] font-mono text-xs font-black uppercase transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)]">
-            🔄 Reset to Defaults
-          </button>
-
-        </div>
-
       </div>
 
     </div>
@@ -147,6 +118,8 @@ import { PatientStateService } from '../services/patient-state.service';
 })
 export class ActuarialQalyCalculatorComponent {
   patientState = inject(PatientStateService);
+
+  readonly isQalyFlipped = signal<boolean>(false);
 
   vagalBreathingMins = signal<number>(15);
   chronoAdherence = signal<number>(80);
@@ -159,14 +132,26 @@ export class ActuarialQalyCalculatorComponent {
     const z = this.zone2Hours();
     const p = this.precisionDosing();
 
-    // Baseline age delta computation algorithm
     const delta = -( (v * 0.12) + (c * 0.035) + (z * 0.45) + (p * 0.025) );
     return Math.max(-8.5, Math.min(-0.5, delta));
   });
 
-  projectedQaly = computed(() => {
+  biologicalAge = computed(() => {
+    return +(42.5 + this.bioAgeDelta()).toFixed(1);
+  });
+
+  qalyGained = computed(() => {
     const absDelta = Math.abs(this.bioAgeDelta());
     return +(absDelta * 1.65).toFixed(1);
+  });
+
+  dnamAgeSpeed = computed(() => {
+    const delta = Math.abs(this.bioAgeDelta());
+    return (1.0 - (delta / 42.5)).toFixed(2);
+  });
+
+  projectedQaly = computed(() => {
+    return this.qalyGained();
   });
 
   asNumber(event: Event): number {

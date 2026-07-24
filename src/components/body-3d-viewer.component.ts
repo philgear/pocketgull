@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, output, input, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -151,6 +151,76 @@ const PART_NAMES: Record<string, string> = {
             <span>Click 3D node to select region</span>
           </div>
         </div>
+
+        <!-- Selected Anatomical Node Overlay Card with 3D Double-Click Flip State Machine -->
+        @if (state.selectedPartId(); as partId) {
+          @let isFlipped = isSelectedPartFlipped();
+          <div (dblclick)="isSelectedPartFlipped.set(!isSelectedPartFlipped()); $event.stopPropagation()"
+               class="absolute bottom-4 right-4 z-40 max-w-xs sm:max-w-sm w-full perspective-1000 group cursor-pointer h-52 font-mono select-none"
+               title="Double-click to flip over for Somatic Innervation & Vagus Nerve Rationale">
+            
+            <div [class.rotate-y-180]="isFlipped"
+                 class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+              <!-- FRONT FACE: Anatomical Telemetry -->
+              <div class="p-4 rounded-2xl bg-zinc-950/90 text-white border border-teal-500/40 shadow-2xl backdrop-blur-xl flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden">
+                <div>
+                  <div class="flex items-center justify-between border-b border-teal-800/80 pb-1.5 mb-2 font-mono text-xs">
+                    <span class="text-teal-300 font-bold uppercase flex items-center gap-1.5 truncate">
+                      <span>{{ getPartIcon(partId) }}</span>
+                      <span class="truncate">{{ state.selectedPartName() || partId }}</span>
+                    </span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30 uppercase shrink-0">
+                      dblclick 🔄
+                    </span>
+                  </div>
+
+                  <div class="space-y-1.5 text-xs text-zinc-300">
+                    <div class="flex justify-between items-center text-[11px]">
+                      <span>Spatial Lens:</span>
+                      <span class="font-bold text-teal-400 uppercase">{{ anatomyViewMode() }} Paradigm</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px]">
+                      <span>Acute Pain Rating:</span>
+                      <span class="font-bold text-rose-400 font-mono">{{ getPartPainLevel(partId) }}/10</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px]">
+                      <span>Reported Issues:</span>
+                      <span class="font-bold text-amber-300">{{ (state.issues()[partId] || []).length }} Note(s)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-1.5 border-t border-zinc-800 flex items-center justify-between font-mono text-[9px] text-zinc-400">
+                  <span>3D Node: {{ partId }}</span>
+                  <span class="text-teal-400 font-bold">Double-click flip</span>
+                </div>
+              </div>
+
+              <!-- BACK FACE: Somatic Innervation & Vagal Shield -->
+              <div class="p-4 rounded-2xl bg-teal-950 text-white border border-teal-400/50 shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+                <div>
+                  <div class="flex items-center justify-between border-b border-teal-800 pb-1.5 mb-2 font-mono text-xs">
+                    <span class="text-teal-200 font-bold uppercase flex items-center gap-1">
+                      <span>🧠</span> Somatic & Nerve Innervation
+                    </span>
+                    <span class="text-teal-400 font-mono text-[9px]">dblclick flip</span>
+                  </div>
+                  <div class="space-y-1.5 text-teal-100 font-mono text-[11px]">
+                    <p><strong>Nerve Root:</strong> {{ getPartNerveInnervation(partId) }}</p>
+                    <p><strong>Vagal Co-Regulation:</strong> {{ getPartVagalTip(partId) }}</p>
+                  </div>
+                </div>
+
+                <div class="pt-1.5 border-t border-teal-900 font-mono text-[9px] text-teal-300 flex justify-between">
+                  <span>Somatic Innervation Shield</span>
+                  <span>Double-click to return</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
       </div>
     </div>
   `,
@@ -171,7 +241,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private directionalLight?: THREE.DirectionalLight;
     private backLight?: THREE.DirectionalLight;
 
-    @Output() partSelected = new EventEmitter<{ id: string, name: string }>();
+    partSelected = output<{ id: string, name: string }>();
 
     // Inputs for external control
     rotation = input<number>(0);
@@ -206,6 +276,51 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly showHoverTooltip = signal<boolean>(false);
     readonly quickPainLevel = signal<number>(3);
     readonly quickSymptomText = signal<string>('');
+
+    readonly isSelectedPartFlipped = signal<boolean>(false);
+
+    getPartIcon(partId: string | null): string {
+      if (!partId) return '📍';
+      const id = partId.toLowerCase();
+      if (id.includes('head') || id.includes('brain') || id.includes('cranial')) return '🧠';
+      if (id.includes('heart') || id.includes('cardio')) return '🫀';
+      if (id.includes('lung') || id.includes('resp')) return '🫁';
+      if (id.includes('stomach') || id.includes('digest') || id.includes('abdo') || id.includes('liver')) return '🫄';
+      if (id.includes('spine') || id.includes('cervical') || id.includes('lumbar') || id.includes('dermatome')) return '🦴';
+      if (id.includes('arm') || id.includes('hand') || id.includes('shoulder')) return '🦾';
+      if (id.includes('leg') || id.includes('thigh') || id.includes('foot') || id.includes('shin')) return '🦵';
+      if (id.includes('acupoint')) return '☯️';
+      if (id.includes('chakra')) return '🧘';
+      return '📍';
+    }
+
+    getPartPainLevel(partId: string): number {
+      const issues = this.state.issues()[partId] || [];
+      if (issues.length === 0) return 0;
+      return Math.max(...issues.map(i => i.painLevel || 0));
+    }
+
+    getPartNerveInnervation(partId: string): string {
+      const id = partId.toLowerCase();
+      if (id.includes('head') || id.includes('brain')) return 'Cranial Nerves I-XII & Vagus (CN X)';
+      if (id.includes('heart') || id.includes('chest')) return 'T1-T5 Sympathetic Cardiac Accelerators & Vagus';
+      if (id.includes('lung')) return 'T2-T6 Intercostal Nerves & Phrenic (C3-C5)';
+      if (id.includes('abdo') || id.includes('stomach') || id.includes('liver')) return 'T5-T12 Splanchnic Nerves & Enteric Nervous System (ENS)';
+      if (id.includes('spine_cervical')) return 'C1-C8 Cervical Plexus & Suboccipital Nerve';
+      if (id.includes('spine_lumbar') || id.includes('dermatome_l4')) return 'L1-L5 Lumbar Plexus & Sciatic Nerve Root';
+      if (id.includes('arm') || id.includes('hand') || id.includes('shoulder')) return 'C5-T1 Brachial Plexus & Median/Radial/Ulnar Nerves';
+      if (id.includes('leg') || id.includes('thigh') || id.includes('foot')) return 'L4-S3 Sacral Plexus & Femoral/Tibial Nerves';
+      return 'Autonomic Nervous System & Somosensory Dermatome';
+    }
+
+    getPartVagalTip(partId: string): string {
+      const id = partId.toLowerCase();
+      if (id.includes('heart') || id.includes('chest')) return 'Practice 0.1 Hz RSA diaphragmatic breathing (4s in, 6s out) to increase vagal baroreflex power.';
+      if (id.includes('head') || id.includes('brain')) return 'Apply gentle pressure to suboccipital release points and practice vocal humming (Om/Shen) to stimulate auricular vagus branch.';
+      if (id.includes('abdo') || id.includes('stomach')) return 'Warm castor oil pack over epigastrium to ease splanchnic vasoconstriction and activate parasympathetic digestion.';
+      if (id.includes('spine') || id.includes('dermatome')) return 'Postural decompression and gentle spinal cat-cow rotations to relieve intervertebral nerve root compression.';
+      return 'Perform 5 minutes of physiological sighing (double inhale through nose, long exhale through mouth) for autonomic reset.';
+    }
 
     private isSlidingPatient = false;
 
@@ -397,17 +512,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         const id = this.state.selectedPartId();
         if (!id) return '';
         return PART_NAMES[id] || id;
-    }
-
-    getPartIcon(id: string | null): string {
-        if (!id) return '🎯';
-        if (id.startsWith('acupoint_')) return '☯️';
-        if (id.startsWith('chakra_')) return '🧘';
-        if (id === 'head' || id === 'brain') return '🧠';
-        if (id === 'heart') return '🫀';
-        if (id === 'lungs') return '🫁';
-        if (id.includes('spine')) return '🦴';
-        return '🟡';
     }
 
     deselectPart(): void {

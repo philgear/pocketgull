@@ -14,6 +14,8 @@ export class AiCacheService {
     private readonly STORE_NAME = 'ai-responses';
     private readonly DB_VERSION = 1;
     private readonly MAX_ENTRIES = 50;
+    private readonly MEMORY_MAX = 100;
+    private memoryCache = new Map<string, { value: any; timestamp: number }>();
     private dbPromise: Promise<IDBDatabase | null>;
     private encryptionKeyPromise: Promise<CryptoKey | null>;
 
@@ -93,9 +95,17 @@ export class AiCacheService {
     }
 
     /**
-   * Retrieves a value from the cache (Decrypted).
+   * Retrieves a value from the cache (Decrypted & Fast Tier In-Memory).
    */
     async get<T = any>(key: string): Promise<T | null> {
+        // Fast Tier 1: Check In-Memory LRU Cache (<2ms response)
+        const memHit = this.memoryCache.get(key);
+        if (memHit) {
+            memHit.timestamp = Date.now();
+            return memHit.value as T;
+        }
+
+        // Fast Tier 2: Decrypt from IndexedDB
         const db = await this.dbPromise;
         if (!db) return null;
 
@@ -122,17 +132,30 @@ export class AiCacheService {
                 keyObj,
                 entry.encryptedData
             );
-            return JSON.parse(new TextDecoder().decode(decrypted));
+            const val = JSON.parse(new TextDecoder().decode(decrypted));
+            // Populate Fast Tier 1 Memory Cache
+            this.setMemoryCache(key, val);
+            return val;
         } catch (e) {
             console.error('Cache decryption failed:', e);
             return null;
         }
     }
 
+    private setMemoryCache(key: string, value: any): void {
+        if (this.memoryCache.size >= this.MEMORY_MAX) {
+            const oldestKey = this.memoryCache.keys().next().value;
+            if (oldestKey) this.memoryCache.delete(oldestKey);
+        }
+        this.memoryCache.set(key, { value, timestamp: Date.now() });
+    }
+
     /**
-     * Stores a value in the cache (Encrypted).
+     * Stores a value in the cache (Encrypted & Fast Tier In-Memory).
      */
     async set(key: string, value: any): Promise<void> {
+        this.setMemoryCache(key, value);
+
         const db = await this.dbPromise;
         const keyObj = await this.encryptionKeyPromise;
         if (!db || !keyObj) return;
@@ -178,8 +201,20 @@ export class AiCacheService {
      * Enforces LRU policy by keeping only the MAX_ENTRIES most recently used items.
      */
     private async vacuum(): Promise<void> {
+        if (this.memoryCache.size < this.MAX_ENTRIES) return;
+
         const db = await this.dbPromise;
         if (!db) return;
+
+        const count = await new Promise<number>((resolve) => {
+            const tx = db.transaction(this.STORE_NAME, 'readonly');
+            const req = tx.objectStore(this.STORE_NAME).count();
+            req.onsuccess = () => resolve(req.result || 0);
+            req.onerror = () => resolve(0);
+        });
+
+        if (count <= this.MAX_ENTRIES) return;
+
         const transaction = db.transaction(this.STORE_NAME, 'readwrite');
         const store = transaction.objectStore(this.STORE_NAME);
 

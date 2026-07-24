@@ -67,6 +67,8 @@ import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.c
 import { ClinicalTrajectoryBiographyComponent } from './clinical-trajectory-biography.component';
 import { DualPaneConsultationComponent } from './dual-pane-consultation.component';
 import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashboard.component';
+import { ChronobiologyMatrixComponent } from './chronobiology-matrix.component';
+import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -74,6 +76,8 @@ import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashb
   imports: [
     CommonModule,
     ClinicalSleepTwinDashboardComponent,
+    ChronobiologyMatrixComponent,
+    FunctionalMedicineMatrixComponent,
     DecimalPipe,
     TitleCasePipe,
     SummaryNodeComponent,
@@ -243,6 +247,18 @@ import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashb
                 [class]="activeLens() === 'Epigenetic Longevity' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>⏳</span> Epigenetic Longevity
+              </button>
+
+              <button (click)="changeLens('Chronobiology Matrix')"
+                [class]="activeLens() === 'Chronobiology Matrix' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>⏰</span> Chronobiology
+              </button>
+
+              <button (click)="changeLens('Functional Medicine Matrix')"
+                [class]="activeLens() === 'Functional Medicine Matrix' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>🧬</span> Functional Matrix
               </button>
             </div>
 
@@ -437,10 +453,11 @@ import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashb
           </div>
 
           <!-- Circadian Chronobiology & Functional Medicine Biomarker Telemetry -->
-          @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+          @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up' || activeLens() === 'Chronobiology Matrix' || activeLens() === 'Functional Medicine Matrix') {
             <div class="my-6 space-y-6 font-mono no-print">
-              <!-- Circadian Chronobiology Clock Decision Rail (Nutrition & Functional Protocols) -->
-              @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols') {
+              <!-- Chronobiology Rhythm Matrix & Clock Decision Rail -->
+              @if (activeLens() === 'Chronobiology Matrix' || activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols') {
+                <app-chronobiology-matrix></app-chronobiology-matrix>
                 <app-chrono-clock-decision-rail></app-chrono-clock-decision-rail>
               }
 
@@ -450,7 +467,8 @@ import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashb
               }
 
               <!-- Functional Medicine Biomarker Matrix & Clinical Sleep Twin Simulator -->
-              @if (activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+              @if (activeLens() === 'Functional Medicine Matrix' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+                <app-functional-medicine-matrix></app-functional-medicine-matrix>
                 <app-biomarker-matrix></app-biomarker-matrix>
                 <app-clinical-sleep-twin-dashboard></app-clinical-sleep-twin-dashboard>
               }
@@ -801,11 +819,15 @@ import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashb
                   </div>
                 } @else if (activeAuxTool() === 'karaoke') {
                   <div class="animate-in fade-in duration-200">
-                    <app-shanty-karaoke-deck></app-shanty-karaoke-deck>
+                    @defer (on idle) {
+                      <app-shanty-karaoke-deck></app-shanty-karaoke-deck>
+                    }
                   </div>
                 } @else if (activeAuxTool() === 'assessments') {
                   <div class="animate-in fade-in duration-200">
-                    <app-clinical-assessments-suite></app-clinical-assessments-suite>
+                    @defer (on idle) {
+                      <app-clinical-assessments-suite></app-clinical-assessments-suite>
+                    }
                   </div>
                 }
               </div>
@@ -2105,6 +2127,8 @@ export class AnalysisReportComponent implements OnDestroy {
     'Precision Nutrients',
     'Monitoring & Follow-up',
     'Patient Education',
+    'Chronobiology Matrix',
+    'Functional Medicine Matrix',
     'PhysioNet Telemetry',
     'ASSESSMENTS',
     'Maternal & Postpartum',
@@ -2524,6 +2548,20 @@ export class AnalysisReportComponent implements OnDestroy {
             subtitle: 'Glycemic Regulation & Anti-Inflammatory Nutrient Density',
             badges: ['Macronutrient Ratios', 'Allergen Shielding', 'Micronutrient Targets'],
             description: 'Optimizing glycemic index, essential fatty acids, and micro-nutrient sufficiency to reduce systemic inflammatory biomarkers.'
+          };
+        case 'Chronobiology Matrix':
+          return {
+            title: 'Chronobiology & Circadian Rhythm Entrainment',
+            subtitle: 'Suprachiasmatic Nucleus (SCN) & Cortisol Diurnal Architecture',
+            badges: ['PER2 / BMAL1 Clocks', 'Cortisol Diurnal Slope', 'REM Sleep Telemetry'],
+            description: 'Aligning circadian zeitgebers, suprachiasmatic nucleus pacemaking, and melatonin clearance with sleep-wake architecture.'
+          };
+        case 'Functional Medicine Matrix':
+          return {
+            title: 'Functional Medicine 7-Node Matrix',
+            subtitle: 'Mitochondrial Bio-Energetics, Cytokine Cascades & Mucosal Integrity',
+            badges: ['IFM 7-Node Web', 'Inflammatory Burden', 'Gut-Brain Axis Barrier'],
+            description: 'Assessing root cause bio-energetics across hepatic biotransformation, mitochondrial ATP coupling, and gut mucosal permeability.'
           };
         default:
           return {

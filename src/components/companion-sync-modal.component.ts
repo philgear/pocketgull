@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
@@ -111,7 +111,7 @@ import { PatientManagementService } from '../services/patient-management.service
   `
 })
 export class CompanionSyncModalComponent {
-  @Output() closeModal = new EventEmitter<void>();
+  closeModal = output<void>();
 
   private patientState = inject(PatientStateService);
   private patientMgmt = inject(PatientManagementService);

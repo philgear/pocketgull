@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, signal, computed, Output, EventEmitter, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface IGlossaryEntry {
@@ -127,7 +127,7 @@ export interface IGlossaryEntry {
   `
 })
 export class GlossaryModalComponent {
-  @Output() close = new EventEmitter<void>();
+  close = output<void>();
 
   readonly searchQuery = signal<string>('');
   readonly activeCategory = signal<string>('all');

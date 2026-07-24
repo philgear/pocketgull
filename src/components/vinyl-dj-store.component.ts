@@ -74,7 +74,8 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
         <div class="flex-1 p-6 overflow-y-auto bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col space-y-6">
           
           <!-- TAB 1: Record Store Crate Digging View -->
-          <div *ngIf="activeTab() === 'crate'" class="flex-1 flex flex-col space-y-6 font-mono">
+          @if (activeTab() === 'crate') {
+            <div class="flex-1 flex flex-col space-y-6 font-mono">
             
             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800/80 pb-4">
               <div>
@@ -118,10 +119,12 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
 
             </div>
 
-          </div>
+            </div>
+          }
 
           <!-- TAB 2: DJ Turntable & Music Video Station -->
-          <div *ngIf="activeTab() === 'turntable'" class="flex-1 flex flex-col space-y-6">
+          @if (activeTab() === 'turntable') {
+            <div class="flex-1 flex flex-col space-y-6">
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
@@ -262,6 +265,7 @@ import { SheetMusicNotationComponent } from './sheet-music-notation.component';
             </div>
 
           </div>
+        }
 
         </div>
 

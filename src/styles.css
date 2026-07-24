@@ -3499,4 +3499,68 @@ html.theme-curie .thematic-3d-container {
   border-color: rgba(0, 255, 102, 0.5) !important;
 }
 
+/* ==========================================================================
+   3D CARD FLIP & COGNITIVE LOAD SHIELDING UTILITIES
+   ========================================================================== */
+.perspective-1000 {
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg) !important;
+  -webkit-transform: rotateY(180deg) !important;
+}
+
+.rotate-y-0 {
+  transform: rotateY(0deg) !important;
+  -webkit-transform: rotateY(0deg) !important;
+}
+
+/* ==========================================================================
+   ACCESSIBILITY: PREFERS-REDUCED-MOTION (WCAG 2.1 Success Criterion 2.3.3)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .transform-style-3d,
+  .perspective-1000,
+  .rotate-y-180,
+  .backface-hidden {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Instant zero-motion face swap for vestibular sensitivity */
+  .rotate-y-180 {
+    transform: none !important;
+    -webkit-transform: none !important;
+  }
+
+  /* Hide front face instantly when container has .rotate-y-180 class under reduced motion */
+  .transform-style-3d.rotate-y-180 > .backface-hidden:not(.rotate-y-180) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Show back face instantly when container has .rotate-y-180 class under reduced motion */
+  .transform-style-3d.rotate-y-180 > .rotate-y-180 {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+  }
+}
+
+
+
 

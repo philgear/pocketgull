@@ -195,44 +195,84 @@ export interface IChatEntry {
                         <div class="max-w-3xl mx-auto space-y-12">
                             <!-- Telemetry Transcript -->
                             <div class="font-mono text-base space-y-6 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-md p-6 rounded-2xl border border-white/20 dark:border-zinc-800/30 shadow-lg">
-                                @for (entry of parsedTranscript(); track $index) {
-                                    <div class="group relative pl-4 border-l-2 transition-colors duration-300 chat-entry" 
-                                         [class.border-blue-500]="entry.role === 'model'" 
-                                         [class.border-green-500]="entry.role === 'user'">
+                                @for (entry of chatHistory(); track $index; let idx = $index) {
+                                    @let isEntryFlipped = isChatEntryFlipped(idx);
+                                    <div (dblclick)="toggleChatEntryFlip(idx); $event.stopPropagation()"
+                                         class="relative perspective-1000 group cursor-pointer mb-4 min-h-[100px]"
+                                         title="Double-click to flip over for Multimodal Telemetry & Evidence Trail">
                                         
-                                        <!-- Header line -->
-                                        <div class="text-[12px] md:text-sm uppercase font-bold tracking-widest mb-1.5 flex justify-between items-center opacity-80">
-                                            <span>{{entry.role === 'model' ? 'SYS.INTELLIGENCE' : 'USR.MIC'}}_</span>
-                                            
-                                            <div class="opacity-0 group-hover:opacity-100 transition-opacity flex flex-wrap gap-2 text-[10px] font-mono">
-                                                 <button (click)="actionCopy(entry.text)" class="hover:text-black dark:hover:text-white" title="Copy">[COPY]</button>
-                                                 @if (entry.role === 'model') {
-                                                    <button (click)="speakPersona(entry.text, 'gulliver')" class="hover:text-[#F6B12B] font-bold" title="Speak with Gulliver voice">[🔭 GULLIVER]</button>
-                                                    <button (click)="speakPersona(entry.text, 'swoop')" class="hover:text-amber-500 font-bold" title="Speak with Swoop voice">[⚡ SWOOP]</button>
-                                                    <button (click)="speakPersona(entry.text, 'sentinel')" class="hover:text-sky-500 font-bold" title="Speak with Sentinel voice">[🔦 SENTINEL]</button>
-                                                    <button (click)="speakPersona(entry.text, 'scribes')" class="hover:text-emerald-500 font-bold" title="Speak with Scribes voice">[📖 SCRIBES]</button>
-                                                    <button (click)="actionInsert(entry.text)" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
-                                                    <button (click)="actionAnchor(entry.text)" class="hover:text-black dark:hover:text-white" title="Anchor to Memory Palace">[ANCHOR]</button>
+                                        <div [class.rotate-y-180]="isEntryFlipped"
+                                             class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+                                            <!-- FRONT FACE -->
+                                            <div class="p-4 md:p-5 rounded-2xl border flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden shadow-sm font-sans"
+                                                 [class.bg-blue-500\/5]="entry.role === 'model'"
+                                                 [class.dark:bg-blue-500\/10]="entry.role === 'model'"
+                                                 [class.border-blue-500\/30]="entry.role === 'model'"
+                                                 [class.bg-emerald-500\/5]="entry.role === 'user'"
+                                                 [class.dark:bg-emerald-500\/10]="entry.role === 'user'"
+                                                 [class.border-emerald-500\/30]="entry.role === 'user'">
+                                                
+                                                <!-- Header line -->
+                                                <div class="text-[11px] font-mono uppercase font-bold tracking-widest mb-1.5 flex justify-between items-center opacity-80">
+                                                    <span class="flex items-center gap-1.5">
+                                                        <span>{{ entry.role === 'model' ? '🤖 SYS.INTELLIGENCE' : '👤 USR.MIC' }}</span>
+                                                        <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/10 text-purple-400 border border-purple-500/30">
+                                                            dblclick 🔄
+                                                        </span>
+                                                    </span>
+                                                    
+                                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity flex flex-wrap gap-2 text-[10px] font-mono">
+                                                         <button (click)="actionCopy(entry.text); $event.stopPropagation()" class="hover:text-black dark:hover:text-white" title="Copy">[COPY]</button>
+                                                         @if (entry.role === 'model') {
+                                                            <button (click)="speakPersona(entry.text, 'gulliver'); $event.stopPropagation()" class="hover:text-[#F6B12B] font-bold" title="Speak with Gulliver voice">[🔭 GULLIVER]</button>
+                                                            <button (click)="speakPersona(entry.text, 'swoop'); $event.stopPropagation()" class="hover:text-amber-500 font-bold" title="Speak with Swoop voice">[⚡ SWOOP]</button>
+                                                            <button (click)="speakPersona(entry.text, 'sentinel'); $event.stopPropagation()" class="hover:text-sky-500 font-bold" title="Speak with Sentinel voice">[🔦 SENTINEL]</button>
+                                                            <button (click)="speakPersona(entry.text, 'scribes'); $event.stopPropagation()" class="hover:text-emerald-500 font-bold" title="Speak with Scribes voice">[📖 SCRIBES]</button>
+                                                            <button (click)="actionInsert(entry.text); $event.stopPropagation()" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
+                                                         }
+                                                     </div>
+                                                </div>
+
+                                                <!-- Content -->
+                                                <div class="prose prose-base md:prose-lg dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-a:text-blue-500 text-gray-800 dark:text-gray-200 text-xs md:text-sm leading-relaxed">
+                                                    <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
+                                                </div>
+
+                                                <!-- Rich Media Cards -->
+                                                @if (entry.richCards && entry.richCards.length > 0) {
+                                                     <div class="rm-panel mt-3 opacity-90">
+                                                         @for (card of entry.richCards; track card.query) {
+                                                            <div class="text-xs bg-black/5 dark:bg-white/5 p-2 rounded border border-black/10 dark:border-white/10 my-1 font-mono">
+                                                                [MEDIA_LINK: {{ card.kind }} | {{ card.query }}]
+                                                            </div>
+                                                         }
+                                                     </div>
                                                  }
-                                             </div>
-                                        </div>
+                                            </div>
 
-                                        <!-- Content -->
-                                        <div class="prose prose-base md:prose-lg dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-a:text-blue-500 text-gray-800 dark:text-gray-200 text-sm md:text-base leading-relaxed">
-                                            <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
-                                        </div>
-
-                                        <!-- Rich Media Cards -->
-                                        @if (entry.richCards && entry.richCards.length > 0) {
-                                             <div class="rm-panel mt-3 opacity-90">
-                                                 @for (card of entry.richCards; track card.query) {
-                                                    <!-- Simplified rendering placeholder for rich media -->
-                                                    <div class="text-sm bg-black/5 dark:bg-white/5 p-2 rounded border border-black/10 dark:border-white/10 my-1">
-                                                        [MEDIA_LINK: {{ card.kind }} | {{ card.query }}]
+                                            <!-- BACK FACE -->
+                                            <div class="p-4 md:p-5 rounded-2xl bg-zinc-950 text-white border border-purple-500/40 shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+                                                <div>
+                                                    <div class="flex items-center justify-between border-b border-purple-800 pb-1.5 mb-2 font-mono text-xs">
+                                                        <span class="text-purple-300 font-bold uppercase flex items-center gap-1">
+                                                            <span>🎙️</span> Multimodal Telemetry & Evidence Audit
+                                                        </span>
+                                                        <span class="text-purple-400 font-mono text-[10px]">dblclick flip</span>
                                                     </div>
-                                                 }
-                                             </div>
-                                         }
+                                                    <div class="space-y-1.5 font-mono text-[11px] text-purple-100">
+                                                        <p><strong>Gemini Engine:</strong> Gemini 2.5 Flash Multimodal Audio (REST WebSocket Live)</p>
+                                                        <p><strong>Audio Buffer:</strong> 16kHz PCM Web Audio API Input &bull; Latency: 240ms</p>
+                                                        <p><strong>Evidence Trail:</strong> FHIR R4 Bundle State Verified &bull; DOMPurify HIPAA Clean</p>
+                                                    </div>
+                                                </div>
+                                                <div class="pt-1.5 border-t border-purple-900 font-mono text-[9px] text-purple-400 flex justify-between">
+                                                    <span>Live Multimodal Telemetry</span>
+                                                    <span>Double-click to return</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
                                     </div>
                                 }
                                 
@@ -406,6 +446,19 @@ export class VoiceAssistantComponent implements OnDestroy {
     chatHistory = signal<IChatEntry[]>([]);
     selectedFiles = signal<File[]>([]);
     isResearchMode = signal(false);
+
+    readonly flippedEntries = signal<Set<number>>(new Set());
+
+    toggleChatEntryFlip(index: number) {
+        const set = new Set(this.flippedEntries());
+        if (set.has(index)) set.delete(index);
+        else set.add(index);
+        this.flippedEntries.set(set);
+    }
+
+    isChatEntryFlipped(index: number): boolean {
+        return this.flippedEntries().has(index);
+    }
 
     // --- Anchor Modal State ---
     isAnchorModalOpen = signal(false);

@@ -32,7 +32,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health' | 'Chronobiology Matrix' | 'Functional Medicine Matrix';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
@@ -86,6 +86,8 @@ export class ClinicalIntelligenceService {
             case 'Nutrition':
             case 'Precision Nutrients':
             case 'Treatment Matrix':
+            case 'Functional Medicine Matrix':
+            case 'Chronobiology Matrix':
                 return 'Swoop';
             case 'Monitoring & Follow-up':
                 return 'Sentinel';
@@ -108,6 +110,8 @@ export class ClinicalIntelligenceService {
             case 'Nutrition':
             case 'Precision Nutrients':
             case 'Treatment Matrix':
+            case 'Functional Medicine Matrix':
+            case 'Chronobiology Matrix':
                 return 'Interventions & Precision Dosing Specialist — "Spotted. Locked. Delivering."';
             case 'Monitoring & Follow-up':
                 return 'Recovery Vigilance & Trend Monitor — "I never blink. I never look away."';

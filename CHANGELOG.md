@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-07-24
+
+**Enterprise Multi-Tenant Scale Bottleneck Audit Resolution (Bottlenecks 4–11)**
+
+### Fixed & Optimized
+- **[Scale / Memory & CPU] Orphaned `setInterval` Lifecycle Cleanup (Bottleneck 4)**:
+  - Ensured strict `ngOnDestroy()` lifecycle timer/animation frame cleanup across all affected components (`secure-splash`, `mood-consciousness-matrix`, `biometric-history-chart`, `sentinel-triage`, `shanty-karaoke-deck`, `doctor-shift-simulator`, `zamecznik-canvas`, `instant-patient-action-suite`, `analysis-report`). Cleaned up duplicate lifecycle method declarations to eliminate background CPU/memory leaks over 12-hour shifts.
+- **[Scale / Resilience] Gemini API Retry with Exponential Backoff & Jitter (Bottleneck 5)**:
+  - Implemented `fetchWithRetry()` helper in `GeminiProvider` with 3 retries, exponential backoff (`1s → 2s → 4s`), and randomized jitter (`0-250ms`) for transient 429 (rate limits) and 5xx errors across all AI endpoints.
+- **[Scale / Performance] Angular `@defer (on idle)` Lazy Loading (Bottleneck 6)**:
+  - Deferred loading of auxiliary tools (`ShantyKaraokeDeck`, `ClinicalAssessmentsSuite`) using Angular `@defer (on idle)` boundaries in `analysis-report.component.ts`, reducing initial JavaScript parsing overhead.
+- **[Scale / Voice Resilience] WebSocket Auto-Reconnect Strategy (Bottleneck 7)**:
+  - Added client-side 3-attempt exponential backoff reconnect sequence (`1s → 3s → 9s`) in `AdkLiveService.onclose` with automatic attempt counter resets on connection recovery.
+- **[Scale / Database I/O] IndexedDB Vacuum Throttling (Bottleneck 8)**:
+  - Added fast-path memory cache size guard (`if (memoryCache.size < MAX_ENTRIES) return;`) and IndexedDB `store.count()` check before opening cursor scans in `AiCacheService.vacuum()`.
+- **[Scale / Security] Socket.IO Environment CORS Enforced (Bottleneck 9)**:
+  - Verified environment-aware origin validation in `src/server.ts` restricting Socket.IO connections in production.
+- **[Scale / Server] Proxy Rate Limiting Configured (Bottleneck 10)**:
+  - Verified Express rate limiting across proxy routes (`healthcare.ts`, `dicom.ts`).
+- **[Scale / Memory] Unmanaged RxJS Subscription Converted (Bottleneck 11)**:
+  - Converted unmanaged `.subscribe()` in `medical-summary.component.ts` `ngOnInit()` to clean `firstValueFrom()` async/await execution.
+
 ## [1.4.0] - 2026-07-24
 
 **PhysioNet 2026 Challenge Two-Headed Hydra Engine, Covariate Armor, Script Replacement Safeguards, Docker Compliance & Interactive Clinical Sleep Twin Simulator**

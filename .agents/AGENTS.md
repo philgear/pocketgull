@@ -60,3 +60,13 @@
 - **Strict Requirement**: Always use the explicit project Node module paths for typechecking and builds to prevent PATH resolution mismatches:
   - **TypeScript Typecheck**: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\typescript\lib\tsc.js -p c:\Users\philg\Pocketgull\pocketgull\tsconfig.json --noEmit`
   - **Angular Build**: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\@angular\cli\bin\ng.js build`
+
+## UI/UX Standards — Cognitive Load Shielding & 3D Double-Click Flip State Machines
+- **Single-Click Isolation**: Single-click (`(click)`) MUST remain dedicated exclusively to primary component interactions (row selection, expand/collapse, modal trigger, input focus). Single-click MUST NOT trigger 3D card flips.
+- **Double-Click State Machine (`(dblclick)`)**: Double-clicking (or double-tapping) triggers a 180° Y-Axis 3D perspective flip (`perspective: 1000px; transform-style: preserve-3d; transition: transform 500ms;`) between Clinician Mode (Face A) and Plain-Language Shield Mode (Face B).
+- **Header Indicator Badge**: Every flippable component MUST render an interactive indicator cue in its header bar (e.g., `dblclick 🔄 flip` or `dblclick 🔄 audit`).
+- **Face Anatomy Standard**:
+  - **Face A (Front)**: High-density clinical telemetry, lab reference ranges, ML risk scores, ICD-10/SNOMED CT tags, and SBAR specialist notes.
+  - **Face B (Back)**: Plain-language translation (8th-grade reading level), Explainable AI "Why" rationale, 1 stress-free micro-habit / OARS prompt, and a status footer (`Cognitive Load Shield Active • Double-click to return`).
+- **Zero Layout Shift**: Face A and Face B MUST share identical CSS container bounds (`absolute inset-0 backface-hidden`) so card grid layouts never collapse or jump during rotation.
+
