@@ -6,11 +6,12 @@ import { NutritionSuiteComponent } from './nutrition-suite.component';
 import { RecoverySuiteComponent } from './recovery-suite.component';
 import { TuringSuiteComponent } from '../turing/turing-suite.component';
 import { NobelLaureatesSuiteComponent } from '../nobel/nobel-laureates-suite.component';
+import { AaasBreakthroughsSuiteComponent } from '../aaas/aaas-breakthroughs-suite.component';
 import { PatientStateService } from '../../services/patient-state.service';
 import { CircadianSleepinessService } from '../../services/circadian-sleepiness.service';
 import { ThemeService } from '../../services/theme.service';
 
-export type DomainSuiteId = 'biomedical' | 'therapeutics' | 'nutrition' | 'recovery' | 'turing' | 'nobel';
+export type DomainSuiteId = 'biomedical' | 'therapeutics' | 'nutrition' | 'recovery' | 'turing' | 'nobel' | 'aaas';
 
 export interface IDomainSuite {
   id: DomainSuiteId;
@@ -30,7 +31,8 @@ export interface IDomainSuite {
     NutritionSuiteComponent,
     RecoverySuiteComponent,
     TuringSuiteComponent,
-    NobelLaureatesSuiteComponent
+    NobelLaureatesSuiteComponent,
+    AaasBreakthroughsSuiteComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -120,6 +122,7 @@ export interface IDomainSuite {
           @case ('recovery') { <app-recovery-suite /> }
           @case ('turing') { <app-turing-suite /> }
           @case ('nobel') { <app-nobel-laureates-suite /> }
+          @case ('aaas') { <app-aaas-breakthroughs-suite /> }
         }
       </div>
     </div>
@@ -146,7 +149,8 @@ export class DomainSuitesNavigatorComponent {
     { id: 'nutrition', name: 'Nutritional & Metabolic', subtitle: 'Circadian Meal Planning', icon: '🥗', badge: 'Thermal Matrix' },
     { id: 'recovery', name: 'Kinetic & Recovery', subtitle: '120 BPM Entrainment', icon: '⚡', badge: 'Vagal & Playbook' },
     { id: 'turing', name: 'Turing Formal Logic', subtitle: 'Cellular Automata & Petri Net Deadlock Models', icon: '🧮', badge: 'Turing' },
-    { id: 'nobel', name: 'Nobel Evidence Engine', subtitle: 'Ohsumi, Hall & Pääbo Breakthrough Models', icon: '🏆', badge: 'Nobel' }
+    { id: 'nobel', name: 'Nobel Evidence Engine', subtitle: 'Ohsumi, Hall & Pääbo Breakthrough Models', icon: '🏆', badge: 'Nobel' },
+    { id: 'aaas', name: 'AAAS Science Breakthroughs', subtitle: 'GLP-1 Incretin & SCFA Gut-Brain Vagal Models', icon: '🔬', badge: 'AAAS' }
   ];
 
   toggleParadigmDiff() {
