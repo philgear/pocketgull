@@ -1,21 +1,21 @@
 ---
 layout: ../layouts/DocsLayout.astro
-title: Git Roadmap & Clinical Telemetry Matrix
-description: "Interactive Git release history, Gantt charts, TypeScript architecture drill-down, and clinical telemetry measurement standards."
+title: Git Roadmap & Software Development Lifecycle
+description: "Interactive Git release history, Gantt charts, TypeScript architecture drill-down, SDLC security standards, and future product roadmap."
 ---
 import DocNode from '../components/DocNode.astro';
 
-# Git Roadmap & Clinical Telemetry Matrix
+# Git Roadmap & Software Development Lifecycle (SDLC)
 
-This interactive reference maps Pocket Gull's complete Git release history, component architecture hierarchy, and clinical measurement benchmarks.
+This interactive reference maps Pocket Gull's complete Git release history, DevSecOps SDLC framework, component architecture hierarchy, and future product evolution roadmap.
 
 ---
 
-## Git Release Milestone History (SEMVER Roadmap)
+## Git Release Milestone Evolution (SEMVER Roadmap)
 
 ```mermaid
 gantt
-    title Pocket Gull Release Milestone Evolution (v1.0.0-rc1 -> v1.2.0)
+    title Pocket Gull Release Milestone & Future Roadmap Evolution
     dateFormat  YYYY-MM-DD
     axisFormat  %b %d
 
@@ -37,9 +37,50 @@ gantt
     v1.0.0-rc10 (PhysioNet Lens & Origami Unfolding):done, rc10, 2026-07-21, 2026-07-21
     v1.1.0 (AIGA Models, Storm Shield & Passport)   :done, v11, 2026-07-21, 2026-07-22
 
-    section Multimodal Instruments & Paradigms
-    v1.2.0 (10 Instruments, 3D Sync & Rice Paper)   :active, v12, 2026-07-22, 2d
+    section Multimodal & DevSecOps
+    v1.2.0 (10 Instruments, 3D Sync & Rice Paper)   :done, v12, 2026-07-22, 2026-07-23
+    v1.3.0 (Sentinel Security Guard & Node 24)      :done, v13, 2026-07-24, 2026-07-24
+
+    section Future Horizon
+    v1.4.0 (FHIR R5 Wearable Stream Ingestion)      :active, v14, 2026-08-01, 30d
+    v1.5.0 (On-Device WebGPU & Gemini Nano Local)   :v15, 2026-09-01, 30d
+    v2.0.0 (Federated WebMCP Multi-Agent Consensus) :v20, 2026-10-01, 45d
 ```
+
+---
+
+## 🔮 Future Product Roadmap & Architectural Horizons
+
+### 📡 1. v1.4.0 — Real-Time Wearable Ingestion & FHIR R5 Subscriptions
+- **Web Bluetooth & Health Connect Sync**: Direct real-time ingestion of optical pulse wave (PPG), heart rate variability (HRV), and continuous SpO₂ streams into `PatientStateService`.
+- **FHIR R5 `SubscriptionTopic` Streaming**: Server-sent event (SSE) and WebSocket pub/sub model broadcasting real-time patient status changes to connected clinical monitoring stations.
+
+### 🧠 2. v1.5.0 — On-Device WebGPU & Gemini Nano Local Inference
+- **Zero-Latency Offline LLM Fallback**: Full local execution via Chrome `window.ai` (Gemini Nano) and WebLLM for disaster recovery, rural clinics, and extreme privacy-isolated consults.
+- **WebGPU Acceleration**: Offloading 3D spatial particle systems and local tensor computations directly to client GPUs (NVIDIA, AMD, Apple Silicon).
+
+### 🌐 3. v2.0.0 — Federated WebMCP Multi-Agent Panel Consensus
+- **Model Context Protocol (MCP) Tool Mesh**: Inter-agent multi-specialty panels where specialized agents (Cardiologist, Pharmacologist, TCM Master, Ayurvedic Vaidya) deliberate concurrently.
+- **Post-Quantum Cryptography (PQC)**: Kyber/Dilithium AEAD envelopment for end-to-end self-sovereign patient records.
+
+---
+
+## 🔄 Software Development Lifecycle (SDLC) & DevSecOps
+
+Pocket Gull enforces a **Shift-Left DevSecOps SDLC**:
+
+1. **Shift-Left Pre-Commit Validation (`pre-commit-check.cjs`)**:
+   - TypeScript strict type checking (`tsc --noEmit`).
+   - Vitest automated unit & safety red-teaming execution (`tests/safety.spec.ts`).
+   - Markdown image reference validation.
+   - Shannon Entropy secret scanner.
+   - **Sentinel Security Guard** network egress domain whitelist auditing (`generativelanguage.googleapis.com`, `fhir.org`, `cloudrun.app`).
+
+2. **Automated CI/CD Security Pipeline (`.github/workflows/deploy.yml`)**:
+   - Step-Security `harden-runner v2.16.0` with `disable-sudo: true`.
+   - CodeQL static analysis for Javascript/Typescript and Python.
+   - OpenSSF Scorecard automated security posture scoring.
+   - Automated deployment to Google Cloud Run with Google Cloud Secret Manager integration.
 
 ---
 
@@ -87,7 +128,7 @@ graph TD
 | **📡 PhysioNet Telemetry** | `qtcFridericia` | Fridericia Corrected QT | `380 – 440` | `ms` |
 | **📡 PhysioNet Telemetry** | `stSegmentDev` | ST Elevation / Depression | `-0.05 – +0.05` | `mV` |
 | **📡 PhysioNet Telemetry** | `hrvLfHfRatio` | Sympathovagal Balance | `0.8 – 1.5` | `ratio` |
-| **🧪 CMP Lab Panel** | `troponinI` | High-Sensitivity Cardiac Troponin | `&lt; 0.04` | `ng/mL` |
+| **🧪 CMP Lab Panel** | `troponinI` | High-Sensitivity Cardiac Troponin | `< 0.04` | `ng/mL` |
 | **🧪 CMP Lab Panel** | `eGfr` | Glomerular Filtration Rate | `> 90` | `mL/min/1.73m²` |
 | **🧪 CMP Lab Panel** | `altAstRatio` | Hepatic Transaminases | `0.8 – 1.2` | `ratio` |
 | **🫁 Somatic Box Breathing** | `boxCycleDuration` | Square Breathing (4-4-4-4) | `16.0` | `seconds` |
