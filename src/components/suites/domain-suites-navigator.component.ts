@@ -4,11 +4,12 @@ import { BiomedicalSuiteComponent } from './biomedical-suite.component';
 import { TherapeuticsSuiteComponent } from './therapeutics-suite.component';
 import { NutritionSuiteComponent } from './nutrition-suite.component';
 import { RecoverySuiteComponent } from './recovery-suite.component';
+import { TuringSuiteComponent } from '../turing/turing-suite.component';
 import { PatientStateService } from '../../services/patient-state.service';
 import { CircadianSleepinessService } from '../../services/circadian-sleepiness.service';
 import { ThemeService } from '../../services/theme.service';
 
-export type DomainSuiteId = 'biomedical' | 'therapeutics' | 'nutrition' | 'recovery';
+export type DomainSuiteId = 'biomedical' | 'therapeutics' | 'nutrition' | 'recovery' | 'turing';
 
 export interface IDomainSuite {
   id: DomainSuiteId;
@@ -26,7 +27,8 @@ export interface IDomainSuite {
     BiomedicalSuiteComponent,
     TherapeuticsSuiteComponent,
     NutritionSuiteComponent,
-    RecoverySuiteComponent
+    RecoverySuiteComponent,
+    TuringSuiteComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -114,6 +116,7 @@ export interface IDomainSuite {
           @case ('therapeutics') { <app-therapeutics-suite /> }
           @case ('nutrition') { <app-nutrition-suite /> }
           @case ('recovery') { <app-recovery-suite /> }
+          @case ('turing') { <app-turing-suite /> }
         }
       </div>
     </div>
@@ -138,7 +141,8 @@ export class DomainSuitesNavigatorComponent {
     { id: 'biomedical', name: 'Biomedical & Diagnostic', subtitle: 'Ground Truth Telemetry', icon: '🧬', badge: 'Lab & Vitals' },
     { id: 'therapeutics', name: 'Therapeutics & Botanical', subtitle: 'Precision Formulas', icon: '🌿', badge: 'Nutrients & Herbs' },
     { id: 'nutrition', name: 'Nutritional & Metabolic', subtitle: 'Circadian Meal Planning', icon: '🥗', badge: 'Thermal Matrix' },
-    { id: 'recovery', name: 'Kinetic & Recovery', subtitle: '120 BPM Entrainment', icon: '⚡', badge: 'Vagal & Playbook' }
+    { id: 'recovery', name: 'Kinetic & Recovery', subtitle: '120 BPM Entrainment', icon: '⚡', badge: 'Vagal & Playbook' },
+    { id: 'turing', name: 'Turing Formal Logic', subtitle: 'Cellular Automata & Petri Net Deadlock Models', icon: '🧮', badge: 'Turing' }
   ];
 
   toggleParadigmDiff() {
