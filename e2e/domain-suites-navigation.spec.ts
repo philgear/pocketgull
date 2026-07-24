@@ -1,21 +1,30 @@
 import { test, expect } from '@playwright/test';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 test.describe('10-Dimensional Master Domain Suites E2E Verification', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to local dev app
-    await page.goto('http://localhost:4200/', { waitUntil: 'domcontentloaded' });
+    test.setTimeout(90000);
+    await page.addInitScript(() => {
+      window.localStorage.setItem('pg_tour_seen', '1');
+      window.localStorage.setItem('pg_data_consent_v1', 'true');
+      window.localStorage.setItem('pocketgull_pin_unlocked', 'true');
+      window.localStorage.setItem('pg_splash_dismissed', 'true');
+    });
+    await setupE2ePage(page);
   });
 
   test('should display 10-Dimensional Master Paradigm Synthesizer & navigate all 10 domain suites', async ({ page }) => {
-    // Wait for main container or bypass splash screen if visible
-    const bypassBtn = page.locator('button:has-text("Enter Application"), button:has-text("Bypass"), button:has-text("Skip")').first();
-    if (await bypassBtn.isVisible().catch(() => false)) {
-      await bypassBtn.click();
-    }
+    // Perform full login and enter demo mode
+    await enterDemoMode(page);
+
+    // Toggle viewMode to 'suites' in AnalysisContainerComponent
+    const domainSuitesToggle = page.locator('button').filter({ hasText: /Domain Suites/i }).first();
+    await expect(domainSuitesToggle).toBeVisible({ timeout: 45000 });
+    await domainSuitesToggle.click();
 
     // Verify Master Paradigm Synthesizer Card is rendered
     const synthesizerHeader = page.locator('h3:has-text("10-Dimensional Master Paradigm Health Vector")');
-    await expect(synthesizerHeader).toBeVisible({ timeout: 15000 });
+    await expect(synthesizerHeader).toBeVisible({ timeout: 20000 });
 
     // Define all 10 Domain Suite tab names to test
     const suites = [
