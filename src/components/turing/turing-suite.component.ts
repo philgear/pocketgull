@@ -2,11 +2,17 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CellularAutomataViewerComponent } from './cellular-automata-viewer.component';
 import { PetriNetViewerComponent } from './petri-net-viewer.component';
+import { NavierStokesViewerComponent } from './navier-stokes-viewer.component';
 
 @Component({
   selector: 'app-turing-suite',
   standalone: true,
-  imports: [CommonModule, CellularAutomataViewerComponent, PetriNetViewerComponent],
+  imports: [
+    CommonModule,
+    CellularAutomataViewerComponent,
+    PetriNetViewerComponent,
+    NavierStokesViewerComponent
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="space-y-6 font-sans">
@@ -36,6 +42,11 @@ import { PetriNetViewerComponent } from './petri-net-viewer.component';
         <div class="h-[440px]">
           <app-petri-net-viewer />
         </div>
+      </div>
+
+      <!-- Fluid Dynamics Section -->
+      <div class="h-[420px]">
+        <app-navier-stokes-viewer />
       </div>
     </div>
   `
