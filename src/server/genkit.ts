@@ -1,5 +1,5 @@
 import { genkit, z } from 'genkit';
-import { vertexAI } from '@genkit-ai/vertexai';
+import { googleAI } from '@genkit-ai/googleai';
 
 // Polyfill fetch to append our referer and bypass strict API key restrictions
 const originalFetch = globalThis.fetch;
@@ -31,15 +31,14 @@ globalThis.fetch = async (url: any, options: any = {}) => {
   return originalFetch(url, options);
 };
 
-// Initialize Genkit
+// Initialize Genkit with @genkit-ai/googleai
 export const ai = genkit({
   plugins: [
-    vertexAI({
-      projectId: process.env['GOOGLE_CLOUD_PROJECT'] || process.env['GCLOUD_PROJECT'] || 'gen-lang-client-0540208645',
-      location: process.env['GOOGLE_CLOUD_REGION'] || process.env['GCLOUD_REGION'] || 'us-west1',
+    googleAI({
+      apiKey: process.env['GEMINI_API_KEY'] || process.env['GOOGLE_GENAI_API_KEY']
     })
   ],
-  model: 'vertexai/gemini-2.5-flash',
+  model: 'googleai/gemini-2.5-flash',
 });
 
 // 1. Generate Metrics Flow
@@ -291,7 +290,7 @@ Please provide:
 Note: This is an AI preliminary analysis for decision-support, not an official diagnostic read. Respond with clear, structured Markdown.`;
 
       const response = await ai.generate({
-        model: 'vertexai/gemini-2.5-pro', // Using pro for better multimodal reading
+        model: 'googleai/gemini-2.5-pro', // Using pro for better multimodal reading
         messages: [
           {
             role: 'user',
@@ -436,7 +435,7 @@ Strictly map any extracted clinical issues or symptoms to one of the following e
 Return all results structured into the response schema.`;
 
     const response = await ai.generate({
-      model: 'vertexai/gemini-2.5-flash',
+      model: 'googleai/gemini-2.5-flash',
       messages: [
         {
           role: 'user',

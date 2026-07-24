@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     test: {
+          root: '.',
           environment: 'jsdom',
           include: [
                   'src/**/*.spec.ts',

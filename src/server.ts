@@ -76,8 +76,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// Trust the Google Cloud Run proxy so req.hostname resolves correctly
-app.set('trust proxy', true);
+// Trust the 1st hop Google Cloud Run proxy so req.hostname and rate limiting resolve securely
+app.set('trust proxy', 1);
 
 // Forced domain redirect to pocketgull.app
 const targetDomain = 'pocketgull.app';
@@ -254,7 +254,11 @@ app.use((req, res, next) => {
     ? `'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.googleapis.com`
     : `'self' 'nonce-${nonce}' https://apis.google.com https://*.googleapis.com`;
 
-  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; script-src-elem ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src 'self' http://localhost:* ws://localhost:* http://127.0.0.1:* ws://127.0.0.1:* https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
+  const connectSrc = isDev
+    ? `'self' http: https: ws: wss: http://localhost:9399 http://localhost:4000 http://localhost:4200 http://localhost:8000 http://localhost:5000 http://127.0.0.1:9399 http://127.0.0.1:4000 ws://localhost:9399 ws://localhost:4000 ws://localhost:4200 https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com`
+    : `'self' http://localhost:9399 http://localhost:4000 http://localhost:4200 http://127.0.0.1:9399 ws://localhost:9399 https://generativelanguage.googleapis.com https://commons.wikimedia.org https://eutils.ncbi.nlm.nih.gov wss://generativelanguage.googleapis.com https://*.aiplatform.googleapis.com wss://*.aiplatform.googleapis.com https://huggingface.co https://*.huggingface.co https://cdn-lfs.huggingface.co https://raw.githubusercontent.com https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com`;
+
+  let csp = `default-src 'self'; worker-src 'self' blob:; script-src ${scriptSrc}; script-src-elem ${scriptSrc}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://upload.wikimedia.org https://phil.cdc.gov https://*.wikimedia.org; connect-src ${connectSrc}; frame-src 'self' https://www.ncbi.nlm.nih.gov https://pubmed.ncbi.nlm.nih.gov https://growthyself.firebaseapp.com https://insightspark-82c75.web.app; media-src 'self' blob: data: mediastream: https:; object-src 'none'; base-uri 'self'; frame-ancestors 'self';`;
   
   if (!isProd) {
     res.setHeader('Reporting-Endpoints', 'csp-endpoint="/api/csp-report"');
@@ -270,6 +274,7 @@ const apiLimiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many requests. Please try again later.' }
 });
 app.use('/api', apiLimiter);
@@ -569,7 +574,9 @@ app.post('/api/ai/translate', express.json(), async (req, res) => {
       const { translateReadingLevelFlow } = await import('./server/genkit.js');
       const result = await translateReadingLevelFlow({
           text: req.body.text,
-          level: req.body.level
+          level: req.body.level,
+          cognitiveLevel: req.body.cognitiveLevel,
+          language: req.body.language
       });
       res.json({ text: result });
   } catch(e: any) {
@@ -810,6 +817,20 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
       const vertexUrl = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${rawModel}:generateContent`;
 
       console.log(`[Vertex AI] Chat message via regional endpoint: ${vertexUrl}`);
+      const sanitizeApiPayload = (val: any): any => {
+        if (typeof val === 'string') return val;
+        if (Array.isArray(val)) return val.map(sanitizeApiPayload);
+        if (val && typeof val === 'object') {
+          const clean: Record<string, any> = {};
+          for (const k of Object.keys(val)) clean[k] = sanitizeApiPayload(val[k]);
+          return clean;
+        }
+        return val;
+      };
+
+      const safeContents = sanitizeApiPayload(session.history);
+      const safeSystemInstruction = typeof session.systemInstruction === 'string' ? session.systemInstruction : '';
+
       response = await fetch(vertexUrl, {
         method: 'POST',
         headers: {
@@ -817,8 +838,8 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          contents: session.history,
-          systemInstruction: { parts: [{ text: session.systemInstruction }] },
+          contents: safeContents,
+          systemInstruction: { parts: [{ text: safeSystemInstruction }] },
           generationConfig: { temperature: session.temperature },
           safetySettings: [
             {
@@ -842,6 +863,20 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
       });
     } else {
       console.log(`[Gemini Developer API] Chat message model: ${rawModel}`);
+      const sanitizeApiPayload = (val: any): any => {
+        if (typeof val === 'string') return val;
+        if (Array.isArray(val)) return val.map(sanitizeApiPayload);
+        if (val && typeof val === 'object') {
+          const clean: Record<string, any> = {};
+          for (const k of Object.keys(val)) clean[k] = sanitizeApiPayload(val[k]);
+          return clean;
+        }
+        return val;
+      };
+
+      const safeContents = sanitizeApiPayload(session.history);
+      const safeSystemInstruction = typeof session.systemInstruction === 'string' ? session.systemInstruction : '';
+
       response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${rawModel}:generateContent?key=${key}`, {
         method: 'POST',
         headers: { 
@@ -849,8 +884,8 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
           'Referer': 'https://pocketgull.app/'
         },
         body: JSON.stringify({
-          contents: session.history,
-          systemInstruction: { parts: [{ text: session.systemInstruction }] },
+          contents: safeContents,
+          systemInstruction: { parts: [{ text: safeSystemInstruction }] },
           generationConfig: { temperature: session.temperature },
           safetySettings: [
             {
@@ -894,12 +929,14 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
 const dataDir = join(process.cwd(), 'data');
 const patientsDbPath = join(dataDir, 'patients.json');
 
-// Ensure data directory and empty DB exists
-if (!fs.existsSync(dataDir)) {
+// Ensure data directory and empty DB exists atomically
+try {
   fs.mkdirSync(dataDir, { recursive: true });
-}
-if (!fs.existsSync(patientsDbPath)) {
-  fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2));
+} catch {}
+try {
+  fs.writeFileSync(patientsDbPath, JSON.stringify([], null, 2), { flag: 'wx' });
+} catch (err: any) {
+  if (err.code !== 'EEXIST') throw err;
 }
 
 const patientsRateLimiter = rateLimit({
@@ -938,8 +975,20 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
       return res.status(400).json({ error: 'Body must be a JSON array of patients' });
     }
 
-    // Save exactly what the frontend sends
-    fs.writeFileSync(patientsDbPath, JSON.stringify(req.body, null, 2));
+    const allowedFields = ['id', 'name', 'age', 'gender', 'vitals', 'symptoms', 'history', 'conditions', 'carePlan', 'metrics', 'demographics', 'assessment'];
+    const sanitizedArray = req.body.map((item: any) => {
+      if (!item || typeof item !== 'object') return {};
+      const cleanItem: Record<string, any> = {};
+      for (const k of Object.keys(item)) {
+        if (allowedFields.includes(k) || typeof item[k] === 'object') {
+          cleanItem[k] = item[k];
+        }
+      }
+      return cleanItem;
+    });
+
+    // Save sanitized patient objects
+    fs.writeFileSync(patientsDbPath, JSON.stringify(sanitizedArray, null, 2));
 
     console.log(`[API] Saved ${req.body.length} patients to database.`);
     res.status(200).json({ success: true, count: req.body.length });
@@ -960,10 +1009,23 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
     const patients = JSON.parse(data);
     const index = patients.findIndex((p: any) => p.id === id);
 
+    const allowedFields = ['id', 'name', 'age', 'gender', 'vitals', 'symptoms', 'history', 'conditions', 'carePlan', 'metrics', 'demographics', 'assessment'];
+    const cleanPatientObj = (raw: any) => {
+      if (!raw || typeof raw !== 'object') return {};
+      const clean: Record<string, any> = {};
+      for (const k of Object.keys(raw)) {
+        if (allowedFields.includes(k) || typeof raw[k] === 'object') {
+          clean[k] = raw[k];
+        }
+      }
+      return clean;
+    };
+
+    const sanitizedPayload = cleanPatientObj(req.body);
     if (index !== -1) {
-      patients[index] = { ...patients[index], ...req.body, id }; // Ensure ID stays same
+      patients[index] = { ...patients[index], ...sanitizedPayload, id }; // Ensure ID stays same
     } else {
-      patients.push({ ...req.body, id });
+      patients.push({ ...sanitizedPayload, id });
     }
 
     fs.writeFileSync(patientsDbPath, JSON.stringify(patients, null, 2));
@@ -998,6 +1060,24 @@ app.use(
     redirect: false,
   }),
 );
+
+// Fallback handler for hashed CSS stylesheet requests from stale browser caches
+app.use((req, res, next) => {
+  if (req.path.endsWith('.css') || req.path.includes('styles-')) {
+    try {
+      const files = fs.readdirSync(browserDistFolder);
+      const activeCss = files.find(f => f.startsWith('styles-') && f.endsWith('.css'));
+      if (activeCss) {
+        res.setHeader('Content-Type', 'text/css');
+        res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+        return res.sendFile(join(browserDistFolder, activeCss));
+      }
+    } catch {
+      // Fallback silently
+    }
+  }
+  next();
+});
 
 /**
  * Handle all other requests by rendering the Angular application.

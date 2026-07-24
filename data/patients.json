@@ -13,6 +13,27 @@
       "Metabolic Syndrome"
     ],
     "patientGoals": "Discuss CPAP compliance issues and weight management strategies.",
+    "tcmIntake": {
+      "tongueColor": "pale",
+      "tongueCoating": "thick-white",
+      "pulseQuality": "slippery",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "spontaneous-day",
+      "tasteInMouth": "bland",
+      "tcmPattern": "Spleen Qi Deficiency with Phlegm-Damp Accumulation"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 3,
+      "prakritiPitta": 4,
+      "prakritiKapha": 8,
+      "vikritiVata": 4,
+      "vikritiPitta": 5,
+      "vikritiKapha": 9,
+      "agniType": "mandagni",
+      "amaScore": 7.2,
+      "nadiPulseType": "swan-kapha",
+      "ayurvedicImbalance": "Kapha Agni Suppression & Medas Dhatu Stagnation"
+    },
     "vitals": {
       "bp": "152/95",
       "hr": "88",
@@ -1388,6 +1409,27 @@
       "Vitamin D Deficiency"
     ],
     "patientGoals": "Extend relapse-free interval, manage fatigue without additional sedating medications, preserve cognitive function, and explore integrative approaches alongside DMT.",
+    "tcmIntake": {
+      "tongueColor": "pale",
+      "tongueCoating": "peeled",
+      "pulseQuality": "deep-thready",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "night-sweats",
+      "tasteInMouth": "normal",
+      "tcmPattern": "Liver & Kidney Yin Deficiency with Internal Wind & Jing Depletion"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 7,
+      "prakritiPitta": 5,
+      "prakritiKapha": 2,
+      "vikritiVata": 9,
+      "vikritiPitta": 6,
+      "vikritiKapha": 2,
+      "agniType": "vishamagni",
+      "amaScore": 6.8,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata Resurgence in Majja Dhatu (Nerve Sheath)"
+    },
     "vitals": {
       "bp": "108/68",
       "hr": "76",
@@ -1665,6 +1707,16 @@
             ]
           }
         }
+      },
+      {
+        "type": "Y-BOCsAssessment",
+        "date": "2026.05.19",
+        "summary": "Y-BOCS Assessment completed: Moderate OCD score 18/40",
+        "assessment": {
+          "totalScore": 18,
+          "severityCategory": "Moderate",
+          "dateCreated": "2026-05-19T14:30:00Z"
+        }
       }
     ],
     "bookmarks": [],
@@ -1685,6 +1737,27 @@
       "PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge"
     ],
     "patientGoals": "Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.",
+    "tcmIntake": {
+      "tongueColor": "purple",
+      "tongueCoating": "peeled",
+      "pulseQuality": "choppy",
+      "thermalPreference": "aversion-cold",
+      "sweatPattern": "night-sweats",
+      "tasteInMouth": "bitter",
+      "tcmPattern": "Traumatic Blood Stasis with Kidney Yin & Jing Depletion"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 6,
+      "prakritiPitta": 7,
+      "prakritiKapha": 2,
+      "vikritiVata": 9,
+      "vikritiPitta": 8,
+      "vikritiKapha": 2,
+      "agniType": "vishamagni",
+      "amaScore": 8.5,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata-Pitta Aggravation in Asthi & Majja Dhatu"
+    },
     "vitals": {
       "bp": "115/75",
       "hr": "82",
@@ -1838,6 +1911,27 @@
       "PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge"
     ],
     "patientGoals": "Stabilize acute head injury, wound care, and address neck stiffness.",
+    "tcmIntake": {
+      "tongueColor": "purple",
+      "tongueCoating": "thick-white",
+      "pulseQuality": "wiry",
+      "thermalPreference": "neutral",
+      "sweatPattern": "spontaneous-day",
+      "tasteInMouth": "metallic",
+      "tcmPattern": "Acute Traumatic Qi & Blood Stagnation in Du Mai Channel"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 5,
+      "prakritiPitta": 6,
+      "prakritiKapha": 3,
+      "vikritiVata": 9,
+      "vikritiPitta": 7,
+      "vikritiKapha": 3,
+      "agniType": "vishamagni",
+      "amaScore": 7.9,
+      "nadiPulseType": "snake-vata",
+      "ayurvedicImbalance": "Severe Vata Wind Collapse in Pranavaha & Majjavaha Srotas"
+    },
     "vitals": {
       "bp": "110/70",
       "hr": "64",
@@ -2122,6 +2216,27 @@
       "Google Health Integration"
     ],
     "patientGoals": "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
+    "tcmIntake": {
+      "tongueColor": "pink",
+      "tongueCoating": "thin-white",
+      "pulseQuality": "normal",
+      "thermalPreference": "neutral",
+      "sweatPattern": "normal",
+      "tasteInMouth": "normal",
+      "tcmPattern": "Zang-Fu Balance with Mild Liver Qi Constriction (Executive Stress)"
+    },
+    "ayurvedicIntake": {
+      "prakritiVata": 3,
+      "prakritiPitta": 5,
+      "prakritiKapha": 3,
+      "vikritiVata": 4,
+      "vikritiPitta": 6,
+      "vikritiKapha": 3,
+      "agniType": "samagni",
+      "amaScore": 1.8,
+      "nadiPulseType": "frog-pitta",
+      "ayurvedicImbalance": "Samagni Metabolic Balance with Mild Pitta Exertion"
+    },
     "vitals": {
       "bp": "122/82",
       "hr": "68",
@@ -2225,6 +2340,16 @@
           "Precision Nutrients": "### Biomarker Matrix\n\n- **Magnesium**: Sub-optimal (ATP Synthesis / NMDA)\n- **Vitamin D3**: Sub-optimal (Immune / Bone)\n- **Vitamin B12**: Optimal (Methylation)\n- **Zinc**: Optimal (Immune / Hormones)",
           "PhysioNet Telemetry": "### PhysioNet 2026 Digital Signal & Electrophysiology Summary\nIntegrated EDF/PhysioNet waveform metrics captured from high-frequency BLE telemetry sensors and continuous multi-lead ECG monitoring.\n\n### Electrocardiographic Waveform Morphology\n- **QRS Interval Duration**: 88 ms (Normal baseline: < 120 ms).\n- **ST-Segment**: Neutral ST morphology across Lead II, V2, V5 (+0.02 mV deviation).\n- **QTc Interval (Fridericia)**: 412 ms (Normal baseline: < 450 ms).\n\n### Heart Rate Variability (HRV) Spectral Power Density\n- **LF/HF Ratio**: 1.25 (Balanced autonomic tone)\n- **RMSSD**: 48 ms (Good parasympathetic rebound)"
         }
+      },
+      {
+        "type": "Y-BOCsAssessment",
+        "date": "2026.05.20",
+        "summary": "Y-BOCS Assessment completed: Subclinical OCD score 4/40",
+        "assessment": {
+          "totalScore": 4,
+          "severityCategory": "Subclinical",
+          "dateCreated": "2026-05-20T10:00:00Z"
+        }
       }
     ],
     "bookmarks": [],
@@ -2239,11 +2364,11 @@
       }
     ],
     "dietaryProtocol": "",
+    "activePhilosophy": "western",
     "dynamicNutrients": [],
     "clinicalNotes": [],
     "checklist": [],
     "shoppingList": [],
-    "activePhilosophy": "western",
     "ayurvedicStatus": {}
   }
 ]

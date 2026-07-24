@@ -1,9 +1,11 @@
-import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, inject, ElementRef, viewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ExportService } from '../services/export.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
+import { ClinicalDataCardComponent } from './clinical-data-card.component';
+import { generate } from 'lean-qr';
 
 export interface IPrintPageThumbnail {
   pageNumber: number;
@@ -17,7 +19,7 @@ export interface IPrintPageThumbnail {
 @Component({
   selector: 'app-care-plan-print-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ClinicalDataCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-zinc-200/80 dark:border-zinc-800 shadow-xl mb-8 font-sans">
@@ -93,6 +95,26 @@ export interface IPrintPageThumbnail {
               class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
               🟡 Ayurvedic Medicine
             </button>
+            <button (click)="selectPhilosophy('arborist')"
+              [class.bg-emerald-700]="activePhilosophy() === 'arborist'"
+              [class.text-white]="activePhilosophy() === 'arborist'"
+              [class.bg-zinc-200]="activePhilosophy() !== 'arborist'"
+              [class.text-zinc-700]="activePhilosophy() !== 'arborist'"
+              [class.dark:bg-zinc-800]="activePhilosophy() !== 'arborist'"
+              [class.dark:text-zinc-300]="activePhilosophy() !== 'arborist'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              🌳 Arborist Order
+            </button>
+            <button (click)="selectPhilosophy('mechanic')"
+              [class.bg-cyan-600]="activePhilosophy() === 'mechanic'"
+              [class.text-white]="activePhilosophy() === 'mechanic'"
+              [class.bg-zinc-200]="activePhilosophy() !== 'mechanic'"
+              [class.text-zinc-700]="activePhilosophy() !== 'mechanic'"
+              [class.dark:bg-zinc-800]="activePhilosophy() !== 'mechanic'"
+              [class.dark:text-zinc-300]="activePhilosophy() !== 'mechanic'"
+              class="px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider transition cursor-pointer border border-transparent">
+              🏎️ Mechanic Inspection
+            </button>
           </div>
 
           <!-- Cognitive Assessment Export Level Selector -->
@@ -147,6 +169,74 @@ export interface IPrintPageThumbnail {
           <span>Active Patient: <strong class="text-zinc-800 dark:text-zinc-200">{{ activePatientName() }}</strong></span>
         </div>
       </div>
+
+      <!-- Prescribed Clinical Apps & Interventions Summary Drawer -->
+      @if (patientState.prescribedToolsList().length > 0) {
+        <div class="mb-6 p-5 rounded-2xl bg-[#FFFDF8] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 border-2 border-[#1C1C1C] dark:border-zinc-700 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] font-mono sub-panel">
+          <div class="flex items-center justify-between border-b-2 border-[#1C1C1C] pb-3 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">💊</span>
+              <h3 class="text-xs font-black uppercase tracking-wider">Active Prescribed Clinical Apps & Interventions ({{ patientState.prescribedToolsList().length }})</h3>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded-md bg-[#10B981] text-white font-bold uppercase">Care Plan Attached</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            @for (tool of patientState.prescribedToolsList(); track tool.id) {
+              <div class="p-4 rounded-xl border-2 border-[#1C1C1C] bg-white dark:bg-zinc-900 shadow-[2px_2px_0px_0px_rgba(28,28,28,0.8)] space-y-2">
+                <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl shrink-0">{{ tool.icon }}</span>
+                    <div class="overflow-hidden font-sans">
+                      <strong class="block text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 truncate">{{ tool.name }}</strong>
+                      <span class="block text-[9.5px] text-emerald-700 dark:text-emerald-400 font-mono uppercase font-black">{{ tool.category }}</span>
+                    </div>
+                  </div>
+                  <span class="text-[9.5px] font-bold font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 uppercase">
+                    Prescribed
+                  </span>
+                </div>
+
+                <!-- Personalized Instructions & Suggested Usage -->
+                <div class="space-y-1.5 font-sans text-xs">
+                  <div class="p-2 rounded-lg bg-sky-50/70 dark:bg-sky-950/30 border border-sky-200/60 dark:border-sky-800/40 text-[11px]">
+                    <strong class="font-mono text-[9.5px] uppercase text-sky-700 dark:text-sky-400 block font-bold">👨‍⚕️ Clinical Directive:</strong>
+                    <span class="text-zinc-800 dark:text-zinc-200 leading-relaxed">{{ tool.personalizedInstruction }}</span>
+                  </div>
+
+                  <div class="flex flex-wrap items-center justify-between gap-2 text-[10.5px] font-mono pt-1 text-zinc-600 dark:text-zinc-400">
+                    <span>⏱️ <strong>Suggested Usage:</strong> {{ tool.suggestedUsage }}</span>
+                  </div>
+
+                  <div class="p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 text-[11px]">
+                    <strong class="font-mono text-[9.5px] uppercase text-emerald-700 dark:text-emerald-400 block font-bold">💡 Patient Self-Care Tip:</strong>
+                    <span class="text-zinc-800 dark:text-zinc-200 leading-relaxed">{{ tool.patientCareTip }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Mobile Patient Access QR Code -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-3 border-t-2 border-dashed border-[#1C1C1C] dark:border-zinc-800 text-xs font-mono">
+            <div>
+              <span class="font-black text-zinc-900 dark:text-zinc-100 block uppercase tracking-wider">📱 Mobile Patient Access QR Code</span>
+              <span class="text-[11px] text-zinc-600 dark:text-zinc-400 font-sans block mt-0.5">
+                Scan with any smartphone camera to open this archived Care Plan & interactive tools directly on mobile.
+              </span>
+            </div>
+            
+            <div class="shrink-0 flex items-center gap-3 p-2 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-300 dark:border-zinc-700 shadow-sm">
+              <div #qrContainer class="w-20 h-20 bg-white p-1 rounded-md flex items-center justify-center"></div>
+              <div class="text-[10px] text-zinc-700 dark:text-zinc-300 space-y-0.5 font-mono">
+                <span class="block font-bold text-emerald-700 dark:text-emerald-400">STATUS: VERIFIED</span>
+                <span class="block text-zinc-500">ID: {{ patientState.patientId() || 'P_001' }}</span>
+                <span class="block text-zinc-500">Tools: {{ patientState.prescribedToolsList().length }} active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
 
       <!-- Compact Edit Box (Replaces Raw Code Dump) -->
       @if (isEditBoxOpen()) {
@@ -319,11 +409,16 @@ export interface IPrintPageThumbnail {
               <p><strong>Resonant Breathing Cadence:</strong> {{ patientState.avsBreathingRate() }} bpm (0.1 Hz Baroreflex Vagal Tone Peak)</p>
               <p><strong>Brainwave Entrainment:</strong> {{ patientState.avsBrainwaveFrequency() | titlecase }} ({{ patientState.avsBrainwaveFrequencyHz() }} Hz)</p>
             </div>
-          } @else {
+          } @else if (currentPage.pageNumber === 4) {
             <div>
               <h2 class="text-sm font-bold border-b pb-1 mb-2">CHRONO-NUTRITION & DIETER RAMS CLINICAL MENU</h2>
               <p><strong>Circadian Pathway:</strong> BMAL1 / CLOCK Peripheral Organ Gene Synchronization</p>
               <p><strong>Prescribed Menu:</strong> 🥑 Avocado Carpaccio, 🍣 Wild Salmon with Turmeric, 🫖 Gingerol Decoction, 🫐 Blueberry Compote</p>
+            </div>
+          } @else {
+            <div class="space-y-3">
+              <h2 class="text-sm font-bold border-b pb-1 mb-2">PAIR DATA CARDS & HEALTHSHEET TRANSPARENCY (arXiv:2202.13028)</h2>
+              <app-clinical-data-card></app-clinical-data-card>
             </div>
           }
         </div>
@@ -359,6 +454,51 @@ export class CarePlanPrintPreviewComponent {
     return patient ? patient.name : 'Charles Darwin';
   });
 
+  qrContainer = viewChild<ElementRef<HTMLDivElement>>('qrContainer');
+
+  constructor() {
+    effect(() => {
+      if (this.qrContainer()) {
+        this.renderQrCode();
+      }
+    });
+  }
+
+  renderQrCode() {
+    const container = this.qrContainer()?.nativeElement;
+    if (!container) return;
+    container.innerHTML = '';
+
+    const prescribedCsv = this.patientState.prescribedToolsList().map(t => t.id).join(',');
+    const payload = `https://pocketgull.app/careplan?id=${this.patientState.patientId() || 'p001'}&tools=${prescribedCsv}&mode=${this.activeCognitiveLevel()}&phil=${this.activePhilosophy()}`;
+    
+    try {
+      const code = generate(payload);
+      const canvas = document.createElement('canvas');
+      canvas.width = 80;
+      canvas.height = 80;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const size = code.size;
+        const scale = canvas.width / size;
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#18181b';
+
+        for (let y = 0; y < size; y++) {
+          for (let x = 0; x < size; x++) {
+            if (code.get(x, y)) {
+              ctx.fillRect(Math.floor(x * scale), Math.floor(y * scale), Math.ceil(scale), Math.ceil(scale));
+            }
+          }
+        }
+      }
+      container.appendChild(canvas);
+    } catch (e) {
+      console.warn('QR Code generation notice:', e);
+    }
+  }
+
   printPages: IPrintPageThumbnail[] = [
     {
       pageNumber: 1,
@@ -391,6 +531,14 @@ export class CarePlanPrintPreviewComponent {
       icon: '🥑',
       previewSummary: '24-Hour Circadian meal timing clock, glycemic index ratings, and prescribed Dieter Rams clinical menu items.',
       category: 'Nutrition'
+    },
+    {
+      pageNumber: 5,
+      title: 'PAIR Data Cards & Healthsheets',
+      subtitle: 'arXiv:2202.13028 Transparency',
+      icon: '🏷️',
+      previewSummary: 'Dataset provenance, subgroup fairness metrics, missingness ratio, and human clinician verification mandate.',
+      category: 'Summary'
     }
   ];
 
@@ -398,7 +546,7 @@ export class CarePlanPrintPreviewComponent {
     this.isEditBoxOpen.update(v => !v);
   }
 
-  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic') {
+  selectPhilosophy(philosophy: 'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic') {
     this.patientState.selectPhilosophy(philosophy);
   }
 

@@ -98,7 +98,13 @@ export class PetAuditoryService {
     }
   }
 
+  private timerId: any = null;
+
   public stop() {
+    if (this.timerId) {
+      clearTimeout(this.timerId);
+      this.timerId = null;
+    }
     if (this.audioCtx) {
       this.nodes.forEach(n => {
         try { n.stop(); } catch(e) {}
@@ -108,6 +114,15 @@ export class PetAuditoryService {
     }
     this.isPlaying = false;
     this.activeMode = null;
+  }
+
+  /** Schedules automatic safety cutoff aligned with species attention span limits. */
+  private scheduleSpeciesAutoCutoff(durationMinutes: number) {
+    if (this.timerId) clearTimeout(this.timerId);
+    this.timerId = setTimeout(() => {
+      console.log(`[Pet Auditory] ${this.activeMode} attention-span limit reached (${durationMinutes} min). Auto-stopping.`);
+      this.stop();
+    }, durationMinutes * 60 * 1000);
   }
 
   public get isCurrentlyPlaying(): boolean {
@@ -164,6 +179,7 @@ export class PetAuditoryService {
     this.nodes.push(carrier, modulator, modulatorGain, filter, masterGain);
     this.isPlaying = true;
     this.activeMode = 'feline';
+    this.scheduleSpeciesAutoCutoff(2.0); // 2-minute feline attention span micro-dose
   }
 
   /**

@@ -23,36 +23,36 @@ import { IClinicalMenuItem } from './clinical-menu.component';
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="w-full bg-gradient-to-b from-sky-950 via-zinc-950 to-black rounded-3xl p-6 border border-zinc-800 shadow-2xl relative overflow-hidden font-mono">
+    <div class="w-full bg-zinc-950 rounded-3xl p-6 border border-zinc-800 shadow-2xl relative overflow-hidden font-mono text-zinc-100">
       <!-- Top Bar / Braun Industrial Design Status -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-4 mb-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4 mb-4">
         <div>
-          <div class="flex items-center gap-3">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse"></span>
-            <h3 class="text-xs font-bold text-zinc-100 uppercase tracking-widest">
-              🌿 Outdoor Dining Table & Silver Mechanical Dish Carousel
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]"></span>
+            <h3 class="text-xs font-black uppercase tracking-widest text-zinc-100">
+              🌿 Outdoor Dining Table & Mechanical Dish Carousel
             </h3>
           </div>
           <p class="text-[11px] text-zinc-400 mt-1 font-mono">
-            Seated view over red-and-white plaid tablecloth • Automatic silver cloche presentation arm
+            Rotary presentation carousel • Automatic silver cloche mechanical arm
           </p>
         </div>
 
         <!-- Controls: Spin Carousel Left / Right -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 font-mono">
           <button (click)="rotateTurntable(-90)"
-            class="px-3.5 py-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 text-xs font-bold uppercase transition active:scale-95 cursor-pointer border border-zinc-700">
-            ◀ Rotate Carousel
+            class="px-3.5 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 text-xs font-bold uppercase transition active:scale-95 cursor-pointer border border-orange-400/50">
+            ◀ Rotate Left
           </button>
           <button (click)="rotateTurntable(90)"
-            class="px-3.5 py-1.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-700 text-zinc-200 text-xs font-bold uppercase transition active:scale-95 cursor-pointer border border-zinc-700">
-            Rotate Carousel ▶
+            class="px-3.5 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 text-xs font-bold uppercase transition active:scale-95 cursor-pointer border border-orange-400/50">
+            Rotate Right ▶
           </button>
         </div>
       </div>
 
       <!-- 3D WebGL Canvas Container -->
-      <div #canvasContainer class="w-full h-96 sm:h-[420px] relative rounded-2xl overflow-hidden bg-gradient-to-b from-sky-900/20 via-zinc-900/40 to-zinc-950 border border-zinc-800 cursor-grab active:cursor-grabbing">
+      <div #canvasContainer class="w-full h-96 sm:h-[420px] relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 cursor-grab active:cursor-grabbing">
         @if (!webglSupported()) {
           <div class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center text-zinc-400">
             <span>3D Outdoor Dining Scene Unavailable</span>
@@ -61,13 +61,13 @@ import { IClinicalMenuItem } from './clinical-menu.component';
 
         <!-- Interactive Overlay Badge -->
         @if (selectedItem(); as item) {
-          <div class="absolute top-4 left-4 z-10 p-3.5 bg-zinc-950/85 backdrop-blur-md rounded-2xl border border-zinc-700/60 shadow-xl text-xs max-w-sm pointer-events-none">
+          <div class="absolute top-4 left-4 z-10 p-4 bg-zinc-950/90 backdrop-blur-md rounded-2xl border border-zinc-800 shadow-xl text-xs max-w-sm pointer-events-none font-mono">
             <div class="flex items-center justify-between gap-3 mb-1">
               <div class="flex items-center gap-2 font-bold text-zinc-100">
                 <span class="text-xl">{{ item.emoji }}</span>
-                <span class="text-sm tracking-tight">{{ item.name }}</span>
+                <span class="text-xs font-bold font-sans tracking-tight">{{ item.name }}</span>
               </div>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-[10px]">
+              <span class="px-2 py-0.5 rounded bg-zinc-900 text-orange-400 border border-zinc-800 font-bold text-[10px]">
                 GI {{ item.glycemicIndex }}
               </span>
             </div>
@@ -76,7 +76,7 @@ import { IClinicalMenuItem } from './clinical-menu.component';
             </p>
             <div class="flex flex-wrap items-center gap-1 text-[10px]">
               @for (c of item.activeCompounds; track c.name) {
-                <span class="px-2 py-0.5 rounded bg-zinc-800 text-indigo-300 border border-zinc-700">
+                <span class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800">
                   {{ c.name }}: {{ c.dose }}
                 </span>
               }
@@ -85,21 +85,19 @@ import { IClinicalMenuItem } from './clinical-menu.component';
         }
 
         <!-- Environment Telemetry Overlay -->
-        <div class="absolute bottom-4 right-4 z-10 px-3 py-1.5 bg-zinc-950/80 backdrop-blur-md rounded-xl border border-zinc-800 text-[10px] font-mono text-zinc-400 flex items-center gap-3">
+        <div class="absolute bottom-4 right-4 z-10 px-3.5 py-2 bg-zinc-950/90 backdrop-blur-md rounded-xl border border-zinc-800 text-[10px] font-mono text-zinc-400 flex items-center gap-3">
           <span>🍃 Gentle Outdoor Breeze: <strong class="text-emerald-400">Active</strong></span>
           <span>Carousel Angle: <strong class="text-orange-400">{{ currentAngle().toFixed(0) }}°</strong></span>
         </div>
       </div>
 
       <!-- Quick Item Selector Bar -->
-      <div class="mt-4 flex flex-wrap items-center justify-center gap-2.5">
+      <div class="mt-4 flex flex-wrap items-center justify-center gap-2.5 font-mono">
         @for (menuOpt of items(); track menuOpt.id; let idx = $index) {
           <button (click)="selectItemByAngle(idx, menuOpt)"
-            [class.bg-emerald-600]="selectedItem()?.id === menuOpt.id"
-            [class.text-white]="selectedItem()?.id === menuOpt.id"
-            [class.bg-zinc-900]="selectedItem()?.id !== menuOpt.id"
-            [class.text-zinc-400]="selectedItem()?.id !== menuOpt.id"
-            class="px-4 py-2 rounded-xl border border-zinc-800 text-xs font-mono font-bold transition-all hover:border-zinc-700 cursor-pointer flex items-center gap-2 shadow-sm">
+            [class]="selectedItem()?.id === menuOpt.id
+              ? 'px-4 py-2 rounded-xl border border-orange-400/50 bg-orange-500 text-zinc-950 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 shadow-md'
+              : 'px-4 py-2 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 text-xs font-mono font-bold transition-all hover:border-zinc-700 hover:text-zinc-200 cursor-pointer flex items-center gap-2'">
             <span class="text-sm">{{ menuOpt.emoji }}</span>
             <span>{{ menuOpt.name.split(' ')[0] }}</span>
           </button>

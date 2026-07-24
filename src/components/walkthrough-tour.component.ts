@@ -242,29 +242,39 @@ interface IRect { top: number; left: number; width: number; height: number; }
     @if (tour.isActive()) {
       <!-- Dark overlay -->
       <div class="tour-backdrop active" (click)="onBackdropClick($event)" role="presentation">
-        <!-- Spotlight ring around target -->
+        <!-- SVG mask: full-screen dark rect with cutout(s) -->
+        <svg class="tour-svg" aria-hidden="true">
+          <defs>
+            <mask id="tour-cutout">
+              <rect width="100%" height="100%" fill="white"></rect>
+              @if (rect()) {
+                <rect [attr.x]="rect()!.left - 8" [attr.y]="rect()!.top - 8"
+                      [attr.width]="rect()!.width + 16" [attr.height]="rect()!.height + 16"
+                      rx="16" ry="16" fill="black">
+                </rect>
+              }
+              @if (secondaryRect()) {
+                <rect [attr.x]="secondaryRect()!.left - 8" [attr.y]="secondaryRect()!.top - 8"
+                      [attr.width]="secondaryRect()!.width + 16" [attr.height]="secondaryRect()!.height + 16"
+                      rx="16" ry="16" fill="black">
+                </rect>
+              }
+            </mask>
+          </defs>
+          <rect width="100%" height="100%" class="tour-mask-bg" mask="url(#tour-cutout)"></rect>
+        </svg>
+
+        <!-- Spotlight ring around main target -->
         @if (rect()) {
           <div class="tour-ring" [style.top.px]="rect()!.top - 6" [style.left.px]="rect()!.left - 6"
                [style.width.px]="rect()!.width + 12" [style.height.px]="rect()!.height + 12">
           </div>
-          <!-- SVG mask: full-screen dark rect with cutout -->
-          <svg class="tour-svg" aria-hidden="true">
-            <defs>
-              <mask id="tour-cutout">
-                <rect width="100%" height="100%" fill="white"></rect>
-                <rect [attr.x]="rect()!.left - 8" [attr.y]="rect()!.top - 8"
-                      [attr.width]="rect()!.width + 16" [attr.height]="rect()!.height + 16"
-                      rx="14" ry="14" fill="black">
-                </rect>
-              </mask>
-            </defs>
-            <rect width="100%" height="100%" class="tour-mask-bg" mask="url(#tour-cutout)"></rect>
-          </svg>
-        } @else {
-          <!-- No target: full dark overlay -->
-          <svg class="tour-svg" aria-hidden="true">
-            <rect width="100%" height="100%" class="tour-mask-bg"></rect>
-          </svg>
+        }
+        <!-- Spotlight ring around secondary target -->
+        @if (secondaryRect()) {
+          <div class="tour-ring" [style.top.px]="secondaryRect()!.top - 6" [style.left.px]="secondaryRect()!.left - 6"
+               [style.width.px]="secondaryRect()!.width + 12" [style.height.px]="secondaryRect()!.height + 12">
+          </div>
         }
       </div>
 
@@ -333,6 +343,7 @@ export class WalkthroughTourComponent implements OnDestroy {
   protected tour = inject(WalkthroughTourService);
 
   rect = signal<IRect | null>(null);
+  secondaryRect = signal<IRect | null>(null);
   stepsArray = computed(() => this.tour.steps());
   cardHeight = signal<number>(220); // Dynamic card height signal with a sensible default fallback
 
@@ -354,6 +365,7 @@ export class WalkthroughTourComponent implements OnDestroy {
         this._updateRect(def.targetId);
       } else {
         this.rect.set(null);
+        this.secondaryRect.set(null);
       }
     });
 
@@ -386,9 +398,33 @@ export class WalkthroughTourComponent implements OnDestroy {
 
   private _updateRectPosition(targetId: string) {
     const el = document.getElementById(targetId);
-    if (!el) { this.rect.set(null); return; }
+    if (!el) {
+      this.rect.set(null);
+      this.secondaryRect.set(null);
+      return;
+    }
     const r = el.getBoundingClientRect();
     this.rect.set({ top: r.top, left: r.left, width: r.width, height: r.height });
+
+    if (targetId === 'tour-voice-agent-window' || targetId === 'tour-voice-agent-trigger') {
+      const secEl = document.getElementById(targetId === 'tour-voice-agent-window' ? 'tour-voice-agent-trigger' : 'tour-voice-agent-window');
+      if (secEl) {
+        const rSec = secEl.getBoundingClientRect();
+        this.secondaryRect.set({ top: rSec.top, left: rSec.left, width: rSec.width, height: rSec.height });
+      } else {
+        this.secondaryRect.set(null);
+      }
+    } else if (targetId === 'tour-research-frame-window' || targetId === 'tour-research-frame-trigger') {
+      const secEl = document.getElementById(targetId === 'tour-research-frame-window' ? 'tour-research-frame-trigger' : 'tour-research-frame-window');
+      if (secEl) {
+        const rSec = secEl.getBoundingClientRect();
+        this.secondaryRect.set({ top: rSec.top, left: rSec.left, width: rSec.width, height: rSec.height });
+      } else {
+        this.secondaryRect.set(null);
+      }
+    } else {
+      this.secondaryRect.set(null);
+    }
   }
 
   private _updateRect(targetId: string) {
@@ -480,10 +516,18 @@ export class WalkthroughTourComponent implements OnDestroy {
       }
     }
 
-    // Desktop positioning
+    // Desktop positioning with automatic viewport collision detection
     let top: number, left: number;
 
-    switch (def.position) {
+    // Check if bottom positioning will exceed bottom of viewport
+    let effectivePosition = def.position;
+    if (effectivePosition === 'bottom' && (r.top + r.height + PAD + CARD_H) > (vh - PAD)) {
+      effectivePosition = 'top';
+    } else if (effectivePosition === 'top' && (r.top - CARD_H - PAD) < PAD) {
+      effectivePosition = 'bottom';
+    }
+
+    switch (effectivePosition) {
       case 'bottom':
         top = r.top + r.height + PAD;
         left = Math.max(PAD, Math.min(r.left + r.width / 2 - CARD_W / 2, vw - CARD_W - PAD));
@@ -503,16 +547,18 @@ export class WalkthroughTourComponent implements OnDestroy {
         break;
     }
 
-    // Clamp to viewport
-    top = Math.max(PAD, Math.min(top, vh - CARD_H - PAD));
-    left = Math.max(PAD, Math.min(left, vw - CARD_W - PAD));
+    // Strict clamp to viewport canvas bounds
+    top = Math.max(PAD, Math.min(top, Math.max(PAD, vh - CARD_H - PAD)));
+    left = Math.max(PAD, Math.min(left, Math.max(PAD, vw - CARD_W - PAD)));
 
     return {
       top: `${top}px`,
       bottom: 'auto',
       left: `${left}px`,
       right: 'auto',
-      width: `${CARD_W}px`
+      transform: 'none',
+      maxHeight: `calc(100vh - ${PAD * 2}px)`,
+      overflowY: 'auto'
     };
   });
 

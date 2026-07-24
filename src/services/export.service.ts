@@ -4,6 +4,10 @@ import * as DOMPurify from 'dompurify';
 
 import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
+import { LaafFhirHapticScheduleService, ILaafHapticItem } from './laaf-fhir-haptic-schedule.service';
+import { ClinicalAssessmentsService } from './clinical-assessments/clinical-assessments.service';
+import { YbocsService } from './ybocs/ybocs.service';
+import { AcronymExpanderService } from './acronym-expander.service';
 
 /** Shape of the native JSON export file. */
 export interface INativePatientExport {
@@ -33,32 +37,129 @@ interface IFhirBundle {
   providedIn: 'root'
 })
 export class ExportService {
+  private laafFhir = (() => {
+    try {
+      return inject(LaafFhirHapticScheduleService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
+
+  private clinicalAssessments = (() => {
+    try {
+      return inject(ClinicalAssessmentsService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
+
+  private ybocsService = (() => {
+    try {
+      return inject(YbocsService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
+
+  private acronymService = (() => {
+    try {
+      return inject(AcronymExpanderService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
 
   public sanitizeForExport(inputStr: string): string {
-    const hasOwnDefault = Object.prototype.hasOwnProperty.call(DOMPurify, 'default');
-    const raw = hasOwnDefault ? (DOMPurify as any).default : DOMPurify;
-    if (raw && typeof raw.sanitize === 'function') {
-      return raw.sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe'], FORBID_ATTR: ['onerror', 'onload', 'onclick'] });
+    if (!inputStr) return '';
+    const purify = (DOMPurify as any).default || DOMPurify;
+    let clean = inputStr;
+    if (purify && typeof purify.sanitize === 'function') {
+      clean = purify.sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe'], FORBID_ATTR: ['onerror', 'onload', 'onclick'] });
     }
-    return inputStr;
+    return clean
+      .replace(/<img[^>]*>/gi, '')
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/onerror=[^>\s]*/gi, '');
   }
 
   public buildFhirR4Bundle(patientData: any): any {
     const sanitizedP = this.sanitizeObject(patientData);
+    const nowIso = new Date().toISOString();
+    const patientRef = `Patient/${sanitizedP.id || 'p001'}`;
+
+    const entries: any[] = [
+      {
+        resource: {
+          resourceType: 'Patient',
+          id: sanitizedP.id || 'p001',
+          name: [{ text: sanitizedP.name || 'Patient' }]
+        }
+      }
+    ];
+
+    if (this.clinicalAssessments) {
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `gad7-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '69725-0', display: 'Generalized Anxiety Disorder 7-item (GAD-7) total score' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.clinicalAssessments.gad7Score(), unit: '{score}' },
+          interpretation: [{ text: this.clinicalAssessments.gad7Tier().label }]
+        }
+      });
+
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `phq9-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '44261-6', display: 'Patient Health Questionnaire 9-item (PHQ-9) total score' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.clinicalAssessments.phq9Score(), unit: '{score}' },
+          interpretation: [{ text: this.clinicalAssessments.phq9Tier().label }]
+        }
+      });
+    }
+
+    if (this.ybocsService) {
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `ybocs-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '82290-8', display: 'Yale-Brown Obsessive Compulsive Scale (Y-BOCS) total score' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.ybocsService.totalScore(), unit: '{score}' },
+          interpretation: [{ text: this.ybocsService.severityDetails().name }]
+        }
+      });
+    }
+
+    if (this.acronymService) {
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `kss-observation-${Date.now()}`,
+          status: 'final',
+          code: { coding: [{ system: 'http://loinc.org', code: '71556-5', display: 'Karolinska Sleepiness Scale (KSS) Clinician & Patient Readiness' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: this.acronymService.currentKssScore(), unit: '{scale_1_9}' }
+        }
+      });
+    }
+
     return {
       resourceType: 'Bundle',
       id: `bundle-${sanitizedP.id || 'p001'}`,
       type: 'document',
-      timestamp: new Date().toISOString(),
-      entry: [
-        {
-          resource: {
-            resourceType: 'Patient',
-            id: sanitizedP.id || 'p001',
-            name: [{ text: sanitizedP.name || 'Patient' }]
-          }
-        }
-      ]
+      timestamp: nowIso,
+      entry: entries
     };
   }
 
@@ -1749,6 +1850,76 @@ export class ExportService {
   }
 
   /**
+   * Exports compiled LAAF Haptic Schedule as a FHIR R4 Bundle (CarePlan + DeviceRequest).
+   */
+  downloadLaafHapticScheduleBundle(patient?: IPatient | null, customItems?: ILaafHapticItem[]): void {
+    const patientId = patient?.id || 'P001';
+    const patientName = patient?.name || 'Clinical Patient';
+
+    const defaultItems: ILaafHapticItem[] = customItems && customItems.length > 0 ? customItems : [
+      {
+        id: 'vagal-01',
+        title: '0.1 Hz Baroreflex Vagal Resonance Pacer',
+        modality: 'vagal_resonance',
+        frequencyHz: 0.1,
+        amplitudePercent: 65,
+        anatomicalSite: 'sternum_midline',
+        durationMinutes: 15,
+        repeatFrequency: 3,
+        repeatPeriod: 1,
+        repeatPeriodUnit: 'd',
+        timeOfDay: ['08:00', '14:00', '21:00'],
+        status: 'active',
+        clinicalRationale: '0.1 Hz sternal haptic vibration targeting baroreceptor resonance for HRV parasympathetic elevation.'
+      },
+      {
+        id: 'gamma-02',
+        title: '40 Hz Cognitive Gamma Entrainment',
+        modality: 'gamma_40hz',
+        frequencyHz: 40.0,
+        amplitudePercent: 40,
+        anatomicalSite: 'mastoid_process',
+        durationMinutes: 20,
+        repeatFrequency: 1,
+        repeatPeriod: 1,
+        repeatPeriodUnit: 'd',
+        timeOfDay: ['09:00'],
+        status: 'active',
+        clinicalRationale: '40 Hz dual mastoid bone conduction vibration for microglial clearance & cognitive sharpness.'
+      },
+      {
+        id: 'thermo-03',
+        title: 'Somatic Thermoregulation Pacer',
+        modality: 'somatic_thermoregulation',
+        frequencyHz: 1.2,
+        amplitudePercent: 50,
+        anatomicalSite: 'wrist_bilateral',
+        durationMinutes: 10,
+        repeatFrequency: 2,
+        repeatPeriod: 1,
+        repeatPeriodUnit: 'd',
+        timeOfDay: ['12:00', '18:00'],
+        status: 'active',
+        clinicalRationale: 'Thermal-haptic wrist wave to balance autonomic vascular tone during acute stress.'
+      }
+    ];
+
+    if (!this.laafFhir) return;
+
+    const fhirBundle = this.laafFhir.toFhirBundle({
+      patientId,
+      patientName,
+      scheduleTitle: `LAAF Haptic Schedule — ${patientName}`,
+      createdDate: new Date().toISOString(),
+      items: defaultItems
+    });
+
+    const filename = `LAAF_FHIR_Haptic_Schedule_${patientName.replace(/\s+/g, '_')}.json`;
+    console.log('[ExportService] Triggering LAAF Haptic FHIR Bundle download:', filename);
+    this._downloadJson(fhirBundle, filename);
+  }
+
+  /**
    * Parses a FHIR R4 Bundle and maps it back to an PocketGull Patient.
    */
   async importFromFhirBundle(file: File): Promise<IPatient> {
@@ -2086,7 +2257,7 @@ export class ExportService {
       type: 'collection',
       timestamp: new Date().toISOString(),
       meta: {
-        tag: [{ system: 'https://pocketgull.health/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Sanitized Clinical Export' }]
+        tag: [{ system: 'https://pocketgull.health/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Tri-Paradigm Clinical Export' }]
       },
       entry: [
         {
@@ -2111,10 +2282,55 @@ export class ExportService {
               { code: { coding: [{ system: 'http://loinc.org', code: '59408-5', display: 'Oxygen saturation' }] }, valueQuantity: { value: parseFloat(sanitizedP.vitals?.spO2 || '98'), unit: '%' } }
             ]
           }
+        },
+        // 🎧 FHIR R4 DeviceRequest: Solfeggio AVS Audio Target
+        {
+          resource: {
+            resourceType: 'DeviceRequest',
+            id: `avs-device-${sanitizedP.id}`,
+            status: 'active',
+            intent: 'original-order',
+            codeCodeableConcept: {
+              coding: [{ system: 'https://pocketgull.health/avs', code: 'AVS-528HZ-10ALPHA', display: 'Binaural Solfeggio Audio Entrainment (528 Hz / 10 Hz Alpha)' }]
+            },
+            subject: { reference: `Patient/${sanitizedP.id}` },
+            occurrenceDateTime: new Date().toISOString()
+          }
+        },
+        // 🥑 FHIR R4 NutritionOrder: Chrono-Nutrition & Nootropic Active Compounds
+        {
+          resource: {
+            resourceType: 'NutritionOrder',
+            id: `nutrition-${sanitizedP.id}`,
+            status: 'active',
+            intent: 'order',
+            patient: { reference: `Patient/${sanitizedP.id}` },
+            dateTime: new Date().toISOString(),
+            oralDiet: {
+              type: [{ coding: [{ system: 'https://pocketgull.health/nutrition', code: 'CHRONO-CIRCADIAN', display: 'Circadian Polyphenol & Bioactive Protocol' }] }],
+              nutrient: [
+                { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '702859005', display: 'Ashwagandha KSM-66 Withanolides 30mg' }] } },
+                { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '412089004', display: 'Lion’s Mane Hericenones 50mg' }] } }
+              ]
+            }
+          }
+        },
+        // 💊 FHIR R4 MedicationRequest: Botanical TCM Formula (Xiao Yao San) & Allopathic Rx
+        {
+          resource: {
+            resourceType: 'MedicationRequest',
+            id: `tcm-botanical-${sanitizedP.id}`,
+            status: 'active',
+            intent: 'order',
+            medicationCodeableConcept: {
+              coding: [{ system: 'https://pocketgull.health/tcm', code: 'XIAO-YAO-SAN', display: 'Xiao Yao San (Free and Easy Wanderer Botanical Formula)' }]
+            },
+            subject: { reference: `Patient/${sanitizedP.id}` }
+          }
         }
       ]
     };
-    this._downloadJson(bundle, `fhir_bundle_${sanitizedP.id}_${Date.now()}.json`);
+    this._downloadJson(bundle, `fhir_tri_paradigm_bundle_${sanitizedP.id}_${Date.now()}.json`);
   }
 
   // ─── Helpers ──────────────────────────────────────────────

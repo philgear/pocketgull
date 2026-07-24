@@ -15,6 +15,27 @@ export const p_frida_kahlo: IPatient = {
     "PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge"
   ],
   patientGoals: "Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.",
+  tcmIntake: {
+    tongueColor: "purple",
+    tongueCoating: "peeled",
+    pulseQuality: "choppy",
+    thermalPreference: "aversion-cold",
+    sweatPattern: "night-sweats",
+    tasteInMouth: "bitter",
+    tcmPattern: "Traumatic Blood Stasis with Kidney Yin & Jing Depletion"
+  },
+  ayurvedicIntake: {
+    prakritiVata: 6,
+    prakritiPitta: 7,
+    prakritiKapha: 2,
+    vikritiVata: 9,
+    vikritiPitta: 8,
+    vikritiKapha: 2,
+    agniType: "vishamagni",
+    amaScore: 8.5,
+    nadiPulseType: "snake-vata",
+    ayurvedicImbalance: "Severe Vata-Pitta Aggravation in Asthi & Majja Dhatu"
+  },
   vitals: {
     bp: "115/75",
     hr: "82",

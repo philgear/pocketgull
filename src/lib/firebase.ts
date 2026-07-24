@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDataConnect, connectDataConnectEmulator } from 'firebase/data-connect';
-import { connectorConfig } from './dataconnect';
+import { connectorConfig } from './dataconnect/esm/index.esm.js';
 
 const firebaseApp = initializeApp({
   apiKey: ["AIzaSy", "DummyKeyForLocalTestingPOCOnly"].join(""),

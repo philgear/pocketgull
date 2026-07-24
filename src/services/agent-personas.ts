@@ -19,11 +19,17 @@ export interface IAgentPersona {
     accentTailwind: string;
     /** Path to origami avatar image (relative to assets root) */
     avatarPath: string;
+    /** Physical anthropomorphic props */
+    props: string[];
+    /** Name of keyframe SVG animation */
+    svgAnimation: string;
+    /** Maps to ADK / system orchestrator */
+    adkMapping: string;
 }
 
 /**
- * The four diagnostic agents of the Gull Squadron.
- * Each maps to one or more AnalysisLens values.
+ * The core personas of the Gull Squadron.
+ * @see DESIGN.md §7 — Avian Personas
  */
 export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
     gulliver: {
@@ -34,6 +40,9 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         accentColor: '#1C6AFF',
         accentTailwind: 'blue-500',
         avatarPath: 'assets/images/agents/gulliver.png',
+        props: ['Brass Telescope', 'Weathered Captain’s Logbook', 'Compass Rose'],
+        svgAnimation: 'telescope-scan',
+        adkMapping: 'overview_agent',
     },
     swoop: {
         name: 'Swoop',
@@ -43,6 +52,9 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         accentColor: '#059669',
         accentTailwind: 'emerald-600',
         avatarPath: 'assets/images/agents/swoop.png',
+        props: ['Leather Satchel', 'Stethoscope', 'Aviator Goggles'],
+        svgAnimation: 'satchel-bounce',
+        adkMapping: 'interventions_agent',
     },
     sentinel: {
         name: 'Sentinel',
@@ -52,6 +64,9 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         accentColor: '#D97706',
         accentTailwind: 'amber-600',
         avatarPath: 'assets/images/agents/sentinel.png',
+        props: ['Lighthouse Cap', 'Binoculars', 'Signal Lantern'],
+        svgAnimation: 'lantern-beam-rotate',
+        adkMapping: 'monitoring_agent',
     },
     scribes: {
         name: 'Scribes',
@@ -61,6 +76,33 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         accentColor: '#7C3AED',
         accentTailwind: 'violet-600',
         avatarPath: 'assets/images/agents/scribes.png',
+        props: ['Reading Spectacles', 'Open Storybook', 'Ink Quill'],
+        svgAnimation: 'quill-write',
+        adkMapping: 'education_agent',
+    },
+    skimmer: {
+        name: 'Skimmer',
+        role: 'Flash AI Inference Backbone',
+        emoji: '⚡',
+        tagline: 'Blink and you’ll miss me.',
+        accentColor: '#06B6D4',
+        accentTailwind: 'cyan-500',
+        avatarPath: 'assets/images/agents/skimmer.png',
+        props: ['Racing Goggles', 'Speed Lines', 'Mandible Probe'],
+        svgAnimation: 'speed-dash',
+        adkMapping: 'gemini-2.5-flash',
+    },
+    samaritan: {
+        name: 'Samaritan',
+        role: 'Good Samaritan Emergency Override',
+        emoji: '🚨',
+        tagline: 'I don’t wait for Wi-Fi. Lives don’t wait.',
+        accentColor: '#EF4444',
+        accentTailwind: 'red-500',
+        avatarPath: 'assets/images/agents/samaritan.png',
+        props: ['Red Cross Armband', 'Defibrillator Paddle', 'CPR Metronome'],
+        svgAnimation: 'cpr-pulse-metronome',
+        adkMapping: 'offline_emergency_bypass',
     },
 };
 
@@ -85,4 +127,24 @@ export function getPersonaForLens(lens: AnalysisLens): IAgentPersona {
         default:
             return AGENT_PERSONAS['gulliver'];
     }
+}
+
+export interface IPersonaPropBadge {
+  primaryProp: string;
+  badgeLabel: string;
+  badgeEmoji: string;
+  badgeClass: string;
+}
+
+/**
+ * Returns contextual prop badge details for a given clinical lens.
+ */
+export function getPersonaPropBadge(lens: AnalysisLens): IPersonaPropBadge {
+  const persona = getPersonaForLens(lens);
+  return {
+    primaryProp: persona.props[0] || 'Origami Badge',
+    badgeLabel: `${persona.name} — ${persona.props[0]}`,
+    badgeEmoji: persona.emoji,
+    badgeClass: `anim-${persona.svgAnimation}`,
+  };
 }

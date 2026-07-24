@@ -13,6 +13,7 @@ dicomRouter.use(rateLimit({
   max: 60,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { trustProxy: false },
   message: { error: 'Too many DICOM requests. Please try again later.' }
 }));
 

@@ -34,7 +34,7 @@ export interface IPubMedEvidenceCitation {
             <h2 class="text-lg font-bold uppercase tracking-tight text-zinc-100">
               PubMed Literature Sourcing & UK RIO Research Integrity
             </h2>
-            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase">
+            <span class="text-[10px] font-bold px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-300 border border-blue-500/30 uppercase">
               UK RIO Compliant Display
             </span>
           </div>

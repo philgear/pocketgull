@@ -8,11 +8,13 @@ import { MarkdownService } from '../services/markdown.service';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { ParadigmLyricsService } from '../services/paradigm-lyrics.service';
 import { DictationService } from '../services/dictation.service';
+import { CompassionateAnalogyService } from '../services/compassionate-analogy.service';
 import { generate } from 'lean-qr';
 
 declare var webkitSpeechRecognition: any;
 import { ISummaryNode, ISummaryNodeItem, IReportSection, IParsedTranscriptEntry, NodeAnnotation, LensAnnotations, IVerificationIssue } from './analysis-report.types';
 import { SummaryNodeComponent } from './summary-node.component';
+import { Body3DViewerComponent } from './body-3d-viewer.component';
 import { PocketGullCardComponent } from './shared/pocket-gull-card.component';
 import { BiomarkerMatrixComponent } from './biomarker-matrix.component';
 import { CostBenefitAnalysisComponent } from './cost-benefit-analysis.component';
@@ -28,6 +30,7 @@ import { MedicalDecoderService } from '../services/medical-decoder.service';
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
 import { YbocsScreenerComponent } from './ybocs-screener.component';
+import { ClinicalAssessmentsSuiteComponent } from './clinical-assessments-suite.component';
 import { ClinicalMenuComponent } from './clinical-menu.component';
 import { KssCognitiveShieldComponent } from './kss-cognitive-shield.component';
 import { CarePlanPrintPreviewComponent } from './care-plan-print-preview.component';
@@ -46,11 +49,24 @@ import { PatientHealthTrajectoryStorybookComponent } from './patient-health-traj
 import { HandoffModalComponent } from './handoff-modal.component';
 import { SdohNavigatorComponent } from './sdoh-navigator.component';
 import { LifePerilsParadigmMatrixComponent } from './life-perils-paradigm-matrix.component';
-import { CyclingErgonomicsDualRevealComponent } from './cycling-ergonomics-dual-reveal.component';
+import { HealthyHobbiesLifestyleComponent } from './healthy-hobbies-lifestyle.component';
 import { StormAnalysisComponent } from './storm-analysis.component';
-import { AigaTelemetryLensComponent } from './aiga-telemetry-lens.component';
 import { AndroscogginForagingPhytoncideComponent } from './androscoggin-foraging-phytoncide.component';
 import { ProceduralInvestmentMatrixComponent } from './procedural-investment-matrix.component';
+import { ActuarialQalyCalculatorComponent } from './actuarial-qaly-calculator.component';
+import { SolfeggioAudioDeckComponent } from './solfeggio-audio-deck.component';
+import { VagalBiofeedbackDockComponent } from './vagal-biofeedback-dock.component';
+import { Sec1557AuditModalComponent } from './sec1557-audit-modal.component';
+import { BystanderActionSuiteComponent } from './bystander-action-suite.component';
+import { FhirPassportModalComponent } from './fhir-passport-modal.component';
+import { getPersonaPropBadge } from '../services/agent-personas';
+import { ThemeService, AppTheme } from '../services/theme.service';
+import { ShantyKaraokeDeckComponent } from './shanty-karaoke-deck.component';
+
+import { ChronoClockDecisionRailComponent } from './chrono-clock-decision-rail.component';
+import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.component';
+import { ClinicalTrajectoryBiographyComponent } from './clinical-trajectory-biography.component';
+import { DualPaneConsultationComponent } from './dual-pane-consultation.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -60,6 +76,7 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
     DecimalPipe,
     TitleCasePipe,
     SummaryNodeComponent,
+    Body3DViewerComponent,
     PocketGullCardComponent,
     BiomarkerMatrixComponent,
     CostBenefitAnalysisComponent,
@@ -71,9 +88,9 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
     RevealDirective,
     NodeAgentDialogComponent,
     YbocsScreenerComponent,
+    ClinicalAssessmentsSuiteComponent,
     ClinicalMenuComponent,
     KssCognitiveShieldComponent,
-    CarePlanPrintPreviewComponent,
     EmergencyNutritionalBypassComponent,
     MoodConsciousnessMatrixComponent,
     UkRioPubmedSourcingComponent,
@@ -88,11 +105,21 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
     HandoffModalComponent,
     SdohNavigatorComponent,
     LifePerilsParadigmMatrixComponent,
-    CyclingErgonomicsDualRevealComponent,
+    HealthyHobbiesLifestyleComponent,
     StormAnalysisComponent,
-    AigaTelemetryLensComponent,
     AndroscogginForagingPhytoncideComponent,
-    ProceduralInvestmentMatrixComponent
+    ProceduralInvestmentMatrixComponent,
+    ActuarialQalyCalculatorComponent,
+    SolfeggioAudioDeckComponent,
+    VagalBiofeedbackDockComponent,
+    Sec1557AuditModalComponent,
+    BystanderActionSuiteComponent,
+    FhirPassportModalComponent,
+    ShantyKaraokeDeckComponent,
+    ChronoClockDecisionRailComponent,
+    ChronoWeeklyMealPlannerComponent,
+    ClinicalTrajectoryBiographyComponent,
+    DualPaneConsultationComponent
   ],
 
 
@@ -101,7 +128,7 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    'class': 'flex flex-col flex-1 min-h-0 w-full overflow-hidden'
+    'class': 'flex flex-col flex-1 min-h-0 w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-150px)]'
   },
   styles: [`
     /* Typography is now handled globally in styles.css */
@@ -109,195 +136,132 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
   template: `
 
 
-    <!-- Analysis & Paradigm Carousel Navigation Bar (Pixel 9 Pro Mobile Optimized) -->
-    @if (hasAnyReport() || state.isEmergencyMode()) {
-      <div class="px-2 sm:px-8 py-2 sm:py-3 no-print w-full bg-slate-100/90 dark:bg-zinc-950/90 border-b border-slate-200 dark:border-zinc-800">
-        <div class="max-w-4xl mx-auto min-w-0 relative flex flex-col gap-2 font-mono">
+    <!-- Emergency Mode Dedicated Header & Lens Bar -->
+    @if (state.isEmergencyMode()) {
+      <div class="px-4 sm:px-8 py-3 no-print w-full bg-red-955/90 border-b border-red-800/80 font-mono text-zinc-100">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           
-          <!-- Paradigm Status & Chevron Navigation Header Bar -->
-          <div class="flex items-center justify-between gap-2 overflow-x-auto pb-1 hide-scrollbar">
-            <div class="flex items-center gap-2 shrink-0">
-              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-zinc-400">
-                Paradigm:
-              </span>
-              
-              <!-- Active Paradigm Badge -->
-              <span class="px-2.5 py-0.5 text-[10.5px] font-extrabold uppercase rounded-md border flex items-center gap-1.5"
-                    [class.bg-sky-500/10]="state.activePhilosophy() === 'western'"
-                    [class.text-sky-700]="state.activePhilosophy() === 'western'"
-                    [class.dark:text-sky-300]="state.activePhilosophy() === 'western'"
-                    [class.border-sky-500/40]="state.activePhilosophy() === 'western'"
-                    [class.bg-emerald-500/10]="state.activePhilosophy() === 'eastern'"
-                    [class.text-emerald-700]="state.activePhilosophy() === 'eastern'"
-                    [class.dark:text-emerald-300]="state.activePhilosophy() === 'eastern'"
-                    [class.border-emerald-500/40]="state.activePhilosophy() === 'eastern'"
-                    [class.bg-amber-500/10]="state.activePhilosophy() === 'ayurvedic'"
-                    [class.text-amber-700]="state.activePhilosophy() === 'ayurvedic'"
-                    [class.dark:text-amber-300]="state.activePhilosophy() === 'ayurvedic'"
-                    [class.border-amber-500/40]="state.activePhilosophy() === 'ayurvedic'">
-                <span>{{ state.activePhilosophy() === 'western' ? '🔵 Western Clinical' : (state.activePhilosophy() === 'eastern' ? '🟢 Eastern TCM' : '🟡 Ayurvedic Vedic') }}</span>
-              </span>
-            </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-              <span title="ACA Section 1557 Non-Discrimination & Algorithmic Fairness Audit Certified (99.4% Parity Score)" class="hidden sm:flex items-center gap-1 px-2.5 py-1 text-[10.5px] font-extrabold uppercase rounded-md border border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-                <span>🛡️</span> Sec 1557 Certified
-              </span>
-
-              <button type="button" (click)="showHandoffModal.set(true)"
-                class="px-2.5 py-1 text-[10.5px] font-extrabold uppercase rounded-md border border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer flex items-center gap-1">
-                <span>🤝</span> Specialist Consult
-              </button>
-
-              <!-- Dieter Rams Touch Carousel Chevrons -->
-              <div class="flex items-center gap-1 shrink-0">
-                <button type="button" (click)="scrollLenses('left')" aria-label="Scroll left"
-                  class="w-7 h-7 rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-zinc-800 transition active:scale-95 cursor-pointer">
-                  ‹
-                </button>
-                <button type="button" (click)="scrollLenses('right')" aria-label="Scroll right"
-                  class="w-7 h-7 rounded-md border border-slate-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 font-bold flex items-center justify-center hover:bg-slate-200 dark:hover:bg-zinc-800 transition active:scale-95 cursor-pointer">
-                  ›
-                </button>
-              </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xl animate-pulse">🚨</span>
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-red-400 block">Offline Emergency First Aid Active</span>
+              <span class="text-[10px] text-zinc-400 font-sans">Bystander 911 protocol & real-time telemetry</span>
             </div>
           </div>
 
-          <!-- Touch Snap Horizontal Carousel Strip -->
-          <div #lensCarousel id="tour-lens-tabs" 
-               class="flex overflow-x-auto hide-scrollbar items-center gap-1.5 w-full relative z-10 snap-x snap-mandatory scroll-smooth py-1">
-            
-            <button (click)="changeLens('Summary Overview')"
-              data-testid="tab-overview"
-              [class]="activeLens() === 'Summary Overview' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>📋</span> Overview
-              @if (getParadigmCoreBadge('Summary Overview'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-bold ml-0.5">{{ badge }}</span>
-              }
+          <div class="flex items-center gap-2">
+            <button type="button" (click)="changeLens('EMT Handoff')"
+                    [class]="activeLens() === 'EMT Handoff' ? 'bg-red-600 text-white font-extrabold shadow-md border-red-400' : 'bg-zinc-900 text-red-300 border border-red-900/60 hover:bg-zinc-800'"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5 border">
+              <span>🚑</span> First Aid & CPR
             </button>
 
-            <button (click)="changeLens('Treatment Matrix')"
-              data-testid="tab-treatment-matrix"
-              [class]="activeLens() === 'Treatment Matrix' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>💊</span> Treatment Matrix
-              @if (getParadigmCoreBadge('Treatment Matrix'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-bold ml-0.5">{{ badge }}</span>
-              }
-            </button>
-
-            <button (click)="changeLens('Functional Protocols')"
-              data-testid="tab-functional-protocols"
-              [class]="activeLens() === 'Functional Protocols' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>🧠</span> Functional Protocols
-              @if (getParadigmCoreBadge('Functional Protocols'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold ml-0.5">{{ badge }}</span>
-              }
-            </button>
-
-            <button (click)="changeLens('Nutrition')"
-              data-testid="tab-nutrition"
-              [class]="activeLens() === 'Nutrition' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>🥗</span> Nutrition
-              @if (getParadigmCoreBadge('Nutrition'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold ml-0.5">{{ badge }}</span>
-              }
-            </button>
-
-            <button (click)="changeLens('Precision Nutrients')"
-              data-testid="tab-precision-nutrients"
-              [class]="activeLens() === 'Precision Nutrients' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>🧬</span> Precision Nutrients
-              @if (getParadigmCoreBadge('Precision Nutrients'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold ml-0.5">{{ badge }}</span>
-              }
-            </button>
-
-            <button (click)="changeLens('Monitoring & Follow-up')"
-              data-testid="tab-monitoring-follow-up"
-              [class]="activeLens() === 'Monitoring & Follow-up' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>📈</span> Monitoring & Follow-up
-            </button>
-
-            <button (click)="changeLens('Patient Education')"
-              data-testid="tab-patient-education"
-              [class]="activeLens() === 'Patient Education' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>📚</span> Patient Education
-              @if (getParadigmCoreBadge('Patient Education'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold ml-0.5">{{ badge }}</span>
-              }
-            </button>
-
-            <button (click)="changeLens('PhysioNet Telemetry')"
-              [class]="activeLens() === 'PhysioNet Telemetry' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
+            <button type="button" (click)="changeLens('PhysioNet Telemetry')"
+                    [class]="activeLens() === 'PhysioNet Telemetry' ? 'bg-sky-600 text-white font-extrabold shadow-md border-sky-400' : 'bg-zinc-900 text-sky-300 border border-sky-900/60 hover:bg-zinc-800'"
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5 border">
               <span>📡</span> PhysioNet Waveforms
-              @if (getParadigmCoreBadge('PhysioNet Telemetry'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-sky-500/20 text-sky-300 font-bold ml-0.5">{{ badge }}</span>
-              }
             </button>
 
-            <button (click)="changeLens('Y-BOCs Screener')"
-              [class]="activeLens() === 'Y-BOCs Screener' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[38px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>🧠</span> Y-BOCs Screener
-              @if (getParadigmCoreBadge('Y-BOCs Screener'); as badge) {
-                <span class="text-[9px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-bold ml-0.5">{{ badge }}</span>
-              }
+            <button type="button" (click)="state.isEmergencyMode.set(false)"
+                    class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs font-bold uppercase tracking-wider transition cursor-pointer ml-2">
+              ✕ Exit Emergency
             </button>
-
-            <button (click)="changeLens('Maternal & Postpartum')"
-              [class]="activeLens() === 'Maternal & Postpartum' ? '!bg-indigo-600 !text-white dark:!bg-indigo-600 dark:!text-white border-indigo-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>🤰</span> Maternal & Postpartum
-            </button>
-
-            <button (click)="changeLens('Grow-Thyself Education')"
-              [class]="activeLens() === 'Grow-Thyself Education' ? '!bg-emerald-600 !text-white dark:!bg-emerald-600 dark:!text-white border-emerald-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-emerald-50 dark:hover:bg-zinc-800 hover:text-emerald-700 dark:hover:text-emerald-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>🌱</span> Grow-Thyself Education
-            </button>
-
-            <button (click)="changeLens('Epigenetic Longevity')"
-              [class]="activeLens() === 'Epigenetic Longevity' ? '!bg-purple-600 !text-white dark:!bg-purple-600 dark:!text-white border-purple-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-purple-50 dark:hover:bg-zinc-800 hover:text-purple-700 dark:hover:text-purple-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>⌛</span> Epigenetic Longevity
-            </button>
-
-            <button (click)="changeLens('Pre-Conception & Family Health')"
-              [class]="activeLens() === 'Pre-Conception & Family Health' ? '!bg-teal-600 !text-white dark:!bg-teal-600 dark:!text-white border-teal-600 shadow-md font-extrabold scale-[1.02]' : 'bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-zinc-200 border-slate-300 dark:border-zinc-800 hover:bg-teal-50 dark:hover:bg-zinc-800 hover:text-teal-700 dark:hover:text-teal-300 font-semibold'"
-              class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-              <span>🧬</span> Family & Pre-Conception
-            </button>
-
-            @if (state.isEmergencyMode()) {
-              <button (click)="changeLens('EMT Handoff')"
-                [class]="activeLens() === 'EMT Handoff' ? '!bg-red-600 !text-white border-red-600 shadow-md font-extrabold scale-[1.02]' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/40 hover:bg-red-600 hover:text-white font-semibold'"
-                class="snap-start py-2 px-3 min-h-[44px] rounded-md tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1.5 shrink-0 cursor-pointer">
-                <span>🚑</span> EMT Handoff
-              </button>
-            }
           </div>
 
-          <!-- Carousel Pagination Dot Indicators -->
-          <div class="flex items-center justify-center gap-1.5 pt-1">
-            @for (lens of availableLenses; track lens; let i = $index) {
-              <button (click)="changeLens(lens)" [attr.aria-label]="'Go to lens ' + lens"
-                [class.w-4]="activeLensIndex() === i"
-                [class.bg-indigo-600]="activeLensIndex() === i"
-                [class.dark:bg-indigo-400]="activeLensIndex() === i"
-                [class.w-1.5]="activeLensIndex() !== i"
-                [class.bg-slate-300]="activeLensIndex() !== i"
-                [class.dark:bg-zinc-700]="activeLensIndex() !== i"
-                class="h-1.5 rounded-full transition-all duration-300 cursor-pointer">
+        </div>
+      </div>
+    }
+
+    @if (hasAnyReport() && !state.isEmergencyMode()) {
+      <div class="px-3 sm:px-8 py-2.5 no-print w-full bg-slate-100/95 dark:bg-zinc-950/95 border-b border-slate-200 dark:border-zinc-800">
+        <div class="max-w-4xl mx-auto flex flex-col gap-2 font-mono">
+          
+          <!-- Primary Lens Navigation Tabs -->
+          <div class="flex items-center justify-between gap-1.5 w-full relative z-10 pt-1 border-t border-slate-200/60 dark:border-zinc-800/80">
+            <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+              <button (click)="changeLens('Summary Overview')"
+                [class]="activeLens() === 'Summary Overview' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>📋</span> Overview
               </button>
-            }
+
+              <button (click)="changeLens('Treatment Matrix')"
+                [class]="activeLens() === 'Treatment Matrix' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>💊</span> Treatment Matrix
+              </button>
+
+              <button (click)="changeLens('Functional Protocols')"
+                [class]="activeLens() === 'Functional Protocols' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>🧠</span> Functional Protocols
+              </button>
+
+              <button (click)="changeLens('Nutrition')"
+                [class]="activeLens() === 'Nutrition' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>🥗</span> Nutrition
+              </button>
+
+              <button (click)="changeLens('Precision Nutrients')"
+                [class]="activeLens() === 'Precision Nutrients' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>🧬</span> Precision Nutrients
+              </button>
+
+              <button (click)="changeLens('Monitoring & Follow-up')"
+                [class]="activeLens() === 'Monitoring & Follow-up' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>📊</span> Monitoring & Follow-up
+              </button>
+
+              <button (click)="changeLens('Patient Education')"
+                [class]="activeLens() === 'Patient Education' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>📖</span> Patient Education
+              </button>
+
+              <button (click)="changeLens('ASSESSMENTS')"
+                [class]="activeLens() === 'ASSESSMENTS' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>⚡</span> ASSESSMENTS
+              </button>
+
+              <button (click)="changeLens('Maternal & Postpartum')"
+                [class]="activeLens() === 'Maternal & Postpartum' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>🤱</span> Maternal & Postpartum
+              </button>
+
+              <button (click)="changeLens('Epigenetic Longevity')"
+                [class]="activeLens() === 'Epigenetic Longevity' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
+                class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
+                <span>⏳</span> Epigenetic Longevity
+              </button>
+            </div>
+
+            <!-- Compact Dropdown for All Secondary Lenses -->
+            <div class="relative shrink-0">
+              <button (click)="showAllLensesMenu.set(!showAllLensesMenu())"
+                class="py-1.5 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-purple-300 border border-purple-500/40 text-[11px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1">
+                <span class="text-purple-300">🔍 All Lenses ({{ availableLenses.length }})</span>
+                <span class="text-purple-300">▾</span>
+              </button>
+
+              @if (showAllLensesMenu()) {
+                <div class="absolute right-0 top-full mt-1.5 w-64 p-2 rounded-2xl bg-zinc-950 border border-purple-500/40 shadow-2xl z-50 flex flex-col gap-1 max-h-80 overflow-y-auto">
+                  @for (lens of availableLenses; track lens) {
+                    <button (click)="changeLens(lens); showAllLensesMenu.set(false)"
+                      [class]="activeLens() === lens ? 'bg-purple-600 text-white font-bold' : 'text-zinc-300 hover:bg-zinc-900'"
+                      class="px-3 py-2 rounded-xl text-left text-xs font-mono transition flex items-center justify-between cursor-pointer">
+                      <span [class.text-white]="activeLens() === lens" [class.text-zinc-300]="activeLens() !== lens">{{ lens }}</span>
+                      @if (activeLens() === lens) { <span class="text-white">✓</span> }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+
           </div>
 
         </div>
@@ -305,7 +269,7 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
     }
 
     <!--Content Area-->
-    <div #contentArea class="flex-1 mx-4 sm:mx-8 mb-6 mt-2 overflow-y-auto overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 min-h-0 relative">
+    <div #contentArea (click)="handleContentAreaClick($event)" class="flex-1 mx-2 sm:mx-8 mb-6 mt-2 overflow-y-auto max-md:overflow-y-auto max-md:h-full max-md:min-h-[450px] overflow-x-hidden bg-white dark:bg-[#09090b] rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 min-h-0 relative">
       <!-- Dieter Rams Industrial Precision Ventilation Grill -->
       <div class="h-1 flex gap-[1.5px] opacity-25 px-4 pt-1.5 no-print">
         <div class="flex-1 bg-slate-400 dark:bg-zinc-600 rounded-full h-0.5"></div>
@@ -317,31 +281,9 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
       <!--Analysis Engine Body-->
       <div class="max-w-4xl mx-auto px-4 sm:px-8 py-6 sm:py-8 pb-24 min-w-0">
         
-        <!-- Mandatory Prescribed Therapeutic Album Banner -->
-        @if (hasAnyReport()) {
-          <div class="mb-6 p-4 rounded-xl bg-gradient-to-r from-purple-900/10 via-indigo-900/10 to-slate-900/10 dark:from-purple-950/40 dark:to-slate-900/40 border border-purple-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl p-2 rounded-xl bg-purple-500/20 text-purple-300">🎵</span>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30">Mandatory Clinical Prescription</span>
-                  <span class="text-xs font-bold text-slate-800 dark:text-purple-200">+12.0 QALYs Recovery</span>
-                </div>
-                <h4 class="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">Actuarial Glee: 12-Track Duet Singalong Album</h4>
-                <p class="text-[11px] text-slate-600 dark:text-zinc-400">Prescribed for daily autonomic co-regulation, vagal tone activation, and multi-generational family healthspan</p>
-              </div>
-            </div>
 
-            <div class="flex items-center gap-2 shrink-0">
-              <pocket-gull-button (click)="openGleeAlbumFromReport()" variant="primary" size="xs">
-                Play Prescribed Album
-              </pocket-gull-button>
-            </div>
-          </div>
-        }
 
-        <!-- Active Medicine Mode Info Banner -->
-        @if (hasAnyReport() && activeLens() !== 'EMT Handoff') {
+        @if (hasAnyReport() && activeLens() !== 'EMT Handoff' && !state.isEmergencyMode()) {
           <div class="mb-6 p-4 rounded-xl border transition-all duration-300"
                [class.bg-sky-50\/40]="state.activePhilosophy() === 'western'"
                [class.border-sky-200\/60]="state.activePhilosophy() === 'western'"
@@ -399,60 +341,224 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
                           [class.bg-emerald-500]="state.activePhilosophy() === 'eastern'"
                           [class.bg-amber-500]="state.activePhilosophy() === 'ayurvedic'"></span>
                     Expert: {{ activeAgentName() }}
+                    <span class="ml-1 text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1" [title]="activePersonaPropBadge().badgeLabel">
+                      <span>{{ activePersonaPropBadge().badgeEmoji }}</span>
+                      <span class="hidden sm:inline font-mono">({{ activePersonaPropBadge().primaryProp }})</span>
+                    </span>
                   </div>
                 </div>
 
-                <!-- Higher-Order Paradigm Typology Badge -->
-                <div class="mt-2.5 flex items-center gap-2">
-                  <app-typology-badge 
-                    [paradigm]="state.activePhilosophy() === 'eastern' ? 'tcm' : (state.activePhilosophy() === 'ayurvedic' ? 'ayurvedic' : 'western')"
-                    [lens]="activeLens()"
-                    [evidenceGrade]="'A'"
-                    [systemTag]="activeLens() === 'Summary Overview' ? 'Pathophysiological' : (activeLens() === 'Treatment Matrix' ? 'Multi-Modal Intervention' : (activeLens() === 'Functional Protocols' ? 'Biochemical & Circadian' : (activeLens() === 'Nutrition' ? 'Metabolic & Oxidative' : (activeLens() === 'Precision Nutrients' ? 'Orthomolecular Dosing' : 'Cognitive Localization'))))">
-                  </app-typology-badge>
+                <!-- Higher-Order Paradigm Typology Badge & Dynamic Paradigm-Lens Overview Card -->
+                @let lensOverview = getParadigmLensOverview();
+                <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-slate-300 dark:border-zinc-800 pb-3 mb-3 font-mono">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <app-typology-badge 
+                      [paradigm]="state.activePhilosophy() === 'eastern' ? 'tcm' : (state.activePhilosophy() === 'ayurvedic' ? 'ayurvedic' : 'western')"
+                      [lens]="activeLens()"
+                      [evidenceGrade]="'A'"
+                      [systemTag]="activeLens() === 'Summary Overview' ? 'Pathophysiological' : (activeLens() === 'Treatment Matrix' ? 'Multi-Modal Intervention' : (activeLens() === 'Functional Protocols' ? 'Biochemical & Circadian' : (activeLens() === 'Nutrition' ? 'Metabolic & Oxidative' : (activeLens() === 'Precision Nutrients' ? 'Orthomolecular Dosing' : 'Cognitive Localization'))))">
+                    </app-typology-badge>
+
+                    <span class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-md bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30 uppercase">
+                      Lens Focus: {{ activeLens() }}
+                    </span>
+                  </div>
+
+                  <!-- Active Perspective Indicator Badge -->
+                  <div class="flex items-center gap-2">
+                    <span [class]="state.isPlainLanguageMode() ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40' : 'bg-sky-500/20 text-sky-700 dark:text-sky-300 border-sky-500/40'"
+                          class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border flex items-center gap-1 shadow-sm">
+                      <span>{{ state.isPlainLanguageMode() ? '🌱 Patient Health Literacy Mode' : '🔬 Clinician (Doctor) Deep Rationale Mode' }}</span>
+                    </span>
+                  </div>
                 </div>
                 
-                <p class="text-xs mt-1 text-gray-600 dark:text-zinc-400 leading-relaxed font-sans">
-                  @if (state.activePhilosophy() === 'western') {
-                    Analyzing case telemetry under FDA and WHO pharmacotherapy reference standards, prioritizing conventional allopathic diagnostics.
-                  } @else if (state.activePhilosophy() === 'eastern') {
-                    Synthesizing patient history, symptoms, and vitals through TCM organ disharmonies, meridian flow, and energetic herbal/dietary dynamics.
-                  } @else if (state.activePhilosophy() === 'ayurvedic') {
-                    Mapping biomarkers and constitutional trends to the Tridosha framework (Vata/Pitta/Kapha), evaluating Agni (digestive fire) and Ama (cellular load).
-                  }
-                </p>
+                <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-zinc-800/80 font-mono">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-zinc-100">
+                      {{ lensOverview.title }}
+                    </h3>
+                    <div class="flex flex-wrap items-center gap-1.5">
+                      @for (badge of lensOverview.badges; track badge) {
+                        <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-slate-200/80 dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border border-slate-300/60 dark:border-zinc-800 uppercase">
+                          {{ badge }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  <span class="text-[11px] font-semibold text-slate-600 dark:text-zinc-400 block font-sans mb-1">
+                    {{ lensOverview.subtitle }}
+                  </span>
+                  <p class="text-xs text-slate-700 dark:text-zinc-300 leading-relaxed font-sans mb-3">
+                    {{ lensOverview.description }}
+                  </p>
+
+                  <!-- Dual Perspective View Recommendation Matrix -->
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-dashed border-slate-300/80 dark:border-zinc-800 font-sans text-xs">
+                    <!-- Clinician (Doctor) Directives -->
+                    <div class="p-3 rounded-xl bg-sky-50/60 dark:bg-sky-950/30 border border-sky-200/60 dark:border-sky-850/50">
+                      <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-400 font-mono mb-1">
+                        <span>👨‍⚕️ Clinician (Doctor) Analysis View:</span>
+                      </div>
+                      <p class="text-[11.5px] text-sky-950 dark:text-sky-200 leading-relaxed">
+                        @if (state.activePhilosophy() === 'western') {
+                          Target quantitative biomarkers, FDA standard-of-care drug-drug interactions, and SBAR specialist handoff briefs.
+                        } @else if (state.activePhilosophy() === 'eastern') {
+                          Delineate Zang-Fu organ pattern disharmonies, root (Ben) vs branch (Biao) principles, and classical herbal formulation ratios.
+                        } @else {
+                          Assess Prakriti vs Vikriti doshic deviations, Agni digestive fire metrics, and Ama toxic metabolite clearance.
+                        }
+                      </p>
+                    </div>
+
+                    <!-- Patient Self-Care Action Plan -->
+                    <div class="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-850/50">
+                      <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-mono mb-1">
+                        <span>🧑‍🤝‍🧑 Patient Health Literacy View:</span>
+                      </div>
+                      <p class="text-[11.5px] text-emerald-950 dark:text-emerald-200 leading-relaxed">
+                        @if (state.activePhilosophy() === 'western') {
+                          Understand your symptoms in plain language, complete daily micro-habits, and track your health progress easily.
+                        } @else if (state.activePhilosophy() === 'eastern') {
+                          Learn how thermal foods (warming/cooling) soothe your body, practice meridian breathing, and restore energy balance.
+                        } @else {
+                          Follow your daily dosha routine (Dinacharya), enjoy warm digestive teas, and practice calming evening self-massage.
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Paradigm Lyric & Observational Wisdom Card -->
-          @if (lyricsService.getRandomLyricForParadigm(state.activePhilosophy()); as lyric) {
-            <div class="mb-6 p-4 rounded-xl border border-dashed flex items-start gap-3 transition-all"
-                 [class]="lyric.color">
-              <span class="text-lg">🎵</span>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between gap-2 mb-1">
-                  <span class="text-[11px] font-mono font-bold uppercase tracking-wider">{{ lyric.context }}</span>
-                  <span class="text-[10px] font-serif italic text-slate-500 dark:text-zinc-400">— {{ lyric.source }}</span>
-                </div>
-                <p class="text-xs font-serif italic leading-snug text-slate-800 dark:text-zinc-200">
-                  "{{ lyric.quote }}"
-                </p>
-                <p class="text-[11px] font-sans mt-2 text-slate-600 dark:text-zinc-400">
-                  <span class="font-bold">Observational Impact:</span> {{ lyric.clinicalImpact }}
-                </p>
-              </div>
+          <!-- Circadian Chronobiology & Functional Medicine Biomarker Telemetry -->
+          @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+            <div class="my-6 space-y-6 font-mono no-print">
+              <!-- Circadian Chronobiology Clock Decision Rail (Nutrition & Functional Protocols) -->
+              @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols') {
+                <app-chrono-clock-decision-rail></app-chrono-clock-decision-rail>
+              }
+
+              <!-- 7-Day Chrono-Nutrition Meal Planner (Nutrition) -->
+              @if (activeLens() === 'Nutrition') {
+                <app-chrono-weekly-meal-planner></app-chrono-weekly-meal-planner>
+              }
+
+              <!-- Functional Medicine Biomarker Matrix (Protocols, Nutrients, Monitoring) -->
+              @if (activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+                <app-biomarker-matrix></app-biomarker-matrix>
+              }
             </div>
           }
         }
 
-        @if (activeLens() === 'Y-BOCs Screener') {
-          <div class="w-full">
-            <app-ybocs-screener></app-ybocs-screener>
+          @if (activeLens() === 'ASSESSMENTS') {
+          <div class="w-full space-y-6">
+            <!-- Screener Sub-Lens Tab Selection -->
+            <div class="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 max-w-2xl">
+              <button (click)="screenerTab.set('ybocs')"
+                [class.bg-white]="screenerTab() === 'ybocs'"
+                [class.dark:bg-zinc-800]="screenerTab() === 'ybocs'"
+                [class.text-indigo-650]="screenerTab() === 'ybocs'"
+                [class.dark:text-indigo-400]="screenerTab() === 'ybocs'"
+                [class.text-zinc-500]="screenerTab() !== 'ybocs'"
+                [class.shadow-xs]="screenerTab() === 'ybocs'"
+                class="flex-1 py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0">
+                ⚡ Y-BOCs OCD Screener
+              </button>
+              <button (click)="screenerTab.set('suite')"
+                [class.bg-white]="screenerTab() === 'suite'"
+                [class.dark:bg-zinc-800]="screenerTab() === 'suite'"
+                [class.text-indigo-650]="screenerTab() === 'suite'"
+                [class.dark:text-indigo-400]="screenerTab() === 'suite'"
+                [class.text-zinc-500]="screenerTab() !== 'suite'"
+                [class.shadow-xs]="screenerTab() === 'suite'"
+                class="flex-1 py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0">
+                📋 General Clinical Suite
+              </button>
+              <button (click)="screenerTab.set('suggestions')"
+                [class.bg-white]="screenerTab() === 'suggestions'"
+                [class.dark:bg-zinc-800]="screenerTab() === 'suggestions'"
+                [class.text-indigo-650]="screenerTab() === 'suggestions'"
+                [class.dark:text-indigo-400]="screenerTab() === 'suggestions'"
+                [class.text-zinc-500]="screenerTab() !== 'suggestions'"
+                [class.shadow-xs]="screenerTab() === 'suggestions'"
+                class="flex-1 py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0">
+                💡 Intake & Interviewing
+              </button>
+            </div>
+
+            @if (screenerTab() === 'ybocs') {
+              <div class="w-full">
+                <app-ybocs-screener></app-ybocs-screener>
+              </div>
+            } @else if (screenerTab() === 'suite') {
+              <div class="w-full">
+                <app-clinical-assessments-suite></app-clinical-assessments-suite>
+              </div>
+            } @else {
+              <!-- Intake & Motivational interviewing Suggestions Panel -->
+              <div class="w-full flex flex-col gap-5">
+                <div class="p-5 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-850 rounded-2xl shadow-xs">
+                  <div class="flex items-center gap-3.5 border-b border-zinc-200/60 dark:border-zinc-800 pb-4 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl shrink-0 font-bold">
+                      💡
+                    </div>
+                    <div>
+                      <h4 class="text-sm font-black uppercase text-zinc-900 dark:text-zinc-150">Patient Assessment Intake Suggestions</h4>
+                      <p class="text-xs text-zinc-500 dark:text-zinc-400">Intelligent alerts on which tools to run or refresh and motivational interviewing cues matching current state.</p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-4">
+                    @for (sug of intakeSuggestions(); track sug.assessment) {
+                      <div class="p-4 rounded-xl border border-zinc-200/70 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/30 flex flex-col gap-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200/30 dark:border-zinc-800/30 pb-2">
+                          <span class="text-xs font-extrabold uppercase text-indigo-650 dark:text-indigo-400 flex items-center gap-1.5">
+                            📌 Recommended: {{ sug.assessment }}
+                          </span>
+                          <span class="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded bg-zinc-200/60 dark:bg-zinc-850 text-zinc-600 dark:text-zinc-450 border border-zinc-300/40 dark:border-zinc-800">
+                            State Triggered
+                          </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                          <!-- Clinical Triggers -->
+                          <div class="flex flex-col gap-1">
+                            <span class="font-bold text-zinc-500 dark:text-zinc-400">Clinical Reason / Trigger:</span>
+                            <span class="text-zinc-800 dark:text-zinc-200 leading-relaxed font-semibold">{{ sug.reason }}</span>
+                          </div>
+                          <!-- Clinical Recommendation -->
+                          <div class="flex flex-col gap-1">
+                            <span class="font-bold text-zinc-500 dark:text-zinc-400">Recommended Action:</span>
+                            <span class="text-zinc-800 dark:text-zinc-200 leading-relaxed font-semibold">{{ sug.action }}</span>
+                          </div>
+                        </div>
+
+                        <!-- Motivational Interviewing Prompts -->
+                        <div class="mt-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/3 flex flex-col gap-2">
+                          <span class="text-[10px] font-bold uppercase text-amber-600 dark:text-amber-400 tracking-wider flex items-center gap-1">
+                            💬 Suggested Motivational Interviewing Prompts (OARS):
+                          </span>
+                          <div class="flex flex-col gap-2 font-serif text-xs text-zinc-700 dark:text-zinc-300 italic leading-relaxed">
+                            @for (prompt of sug.interviewPrompts; track prompt) {
+                              <div class="pl-3 border-l-2 border-amber-500/40">
+                                {{ prompt }}
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
           </div>
         } @else {
           <!-- ACM §1.3: AI-Generated Content Disclosure -->
-          @if (hasAnyReport()) {
+          @if (hasAnyReport() && !state.isEmergencyMode()) {
             <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/50 dark:border-violet-800/30">
             <div class="relative group/ai-badge cursor-help">
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-bold uppercase tracking-widest bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-700/40 select-none">
@@ -472,23 +578,291 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
             </span>
           </div>
         }
+      }
 
-        <!--Clinical Overview Dashboard-->
-        @if (activeLens() !== 'EMT Handoff' && intel.analysisMetrics(); as metrics) {
+        <!-- Enterprise Agent SBAR Clinical Handoff Protocol Card (Scoped strictly to EMT Handoff Lens) -->
+        @if (activeLens() === 'EMT Handoff') {
+          <div class="mb-6 p-4 rounded-2xl bg-[#FFFDF8] dark:bg-zinc-950 border-2 border-[#1C1C1C] dark:border-zinc-800 shadow-[4px_4px_0px_0px_rgba(28,28,28,0.85)] font-mono pocket-gull-card">
+            <div class="flex items-center justify-between border-b-2 border-[#1C1C1C] pb-2.5 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="text-base">🚑</span>
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-zinc-100">
+                  Enterprise SBAR Clinical Handoff Protocol & HIPAA Telemetry
+                </h3>
+              </div>
+              <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-[#F6B12B] text-zinc-950 border border-[#1C1C1C] uppercase shadow-[1px_1px_0px_0px_rgba(28,28,28,0.9)]">
+                Audit Verified: {{ state.enterpriseAuditLog().length }} Traces
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+              <div class="p-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-850">
+                <strong class="block text-[10px] font-bold uppercase text-sky-700 dark:text-sky-400 mb-0.5">S - Situation:</strong>
+                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">Somatic symptom presentation with active HRV autonomic compensatory response.</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-850">
+                <strong class="block text-[10px] font-bold uppercase text-purple-700 dark:text-purple-400 mb-0.5">B - Background:</strong>
+                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">CYP2D6 *4/*4 genomic profile; Grade-A randomized trial literature alignment.</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-850">
+                <strong class="block text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400 mb-0.5">A - Assessment:</strong>
+                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">Stability Index 94%; Multi-Lens Western/TCM/Ayurvedic consensus verified.</span>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-850">
+                <strong class="block text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-400 mb-0.5">R - Recommendation:</strong>
+                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">Execute 6 bpm 0.1 Hz vagal resonance + prescribed digital therapeutics.</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!--Clinical Overview Dashboard & Telemetry Gauges-->
+        @if (activeLens() !== 'EMT Handoff' && !state.isEmergencyMode() && intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
-            <div class="col-span-full mb-2">
-              <h2 class="text-xs font-bold text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-widest border-b border-gray-100 dark:border-zinc-800 pb-2"> Clinical Overview Dashboard </h2>
-            </div>
+            
+            <!-- Multi-Paradigm Switchable Clinical Dashboard (Shown for Functional Protocols or Non-Western Paradigms) -->
+            @if (activeLens() === 'Functional Protocols' || state.activePhilosophy() !== 'western') {
+              <div class="col-span-full mb-4 space-y-4 font-mono">
+                <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
+              </div>
+            }
 
-            <!-- Multi-Paradigm Switchable Clinical Dashboard, Storm Analysis, AIGA Telemetry, Androscoggin Foraging, Procedural Investment & Life-Stage Perils Matrix -->
-            <div class="col-span-full mb-4 space-y-4">
-              <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
-              <app-storm-analysis></app-storm-analysis>
-              <app-aiga-telemetry-lens></app-aiga-telemetry-lens>
-              <app-androscoggin-foraging-phytoncide></app-androscoggin-foraging-phytoncide>
-              <app-procedural-investment-matrix></app-procedural-investment-matrix>
-              <app-life-perils-paradigm-matrix></app-life-perils-paradigm-matrix>
-            </div>
+            <!-- Collapsible Auxiliary Clinical Apps Control Bar (Unobtrusive Footer Tray) -->
+            <div class="col-span-full mb-2 font-mono">
+              <div class="p-3 bg-white dark:bg-zinc-950 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs pocket-gull-card">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-extrabold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+                    <span>🛠️</span> Auxiliary Clinical Apps & Prescriptions
+                  </span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-mono font-bold border border-zinc-200 dark:border-zinc-800">
+                    8 Digital Therapeutics & Biofeedback Apps
+                  </span>
+                </div>
+
+                <button type="button" (click)="isAuxToolsExpanded.set(!isAuxToolsExpanded())"
+                  class="px-3.5 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 text-xs font-bold uppercase transition cursor-pointer flex items-center gap-1.5">
+                  <span>{{ isAuxToolsExpanded() ? '▲ Hide Auxiliary Apps' : '▼ Open Auxiliary Suite' }}</span>
+                </button>
+              </div>
+
+              @if (isAuxToolsExpanded()) {
+                <div class="mt-3 p-4 bg-zinc-900/40 rounded-2xl border border-zinc-800 space-y-4 animate-in fade-in duration-200">
+                  <div class="flex items-center justify-between text-xs text-zinc-400 border-b border-zinc-800 pb-2">
+                    <span class="text-[10px] uppercase font-bold text-zinc-300">Single-click to open view • Double-click state machine: Prescribe 💊 -> Hide 🙈 -> Unassign ⚙️</span>
+                    <button type="button" (click)="state.restoreHiddenTools()" class="text-[10px] font-bold text-amber-400 hover:underline cursor-pointer">
+                      Restore Hidden Tools
+                    </button>
+                  </div>      
+
+                  <div class="flex flex-wrap items-center gap-2">
+                  <!-- QALY Tool -->
+                  @if (state.getToolState('qaly') !== 'hidden') {
+                    <button (click)="toggleAuxTool('qaly')" (dblclick)="state.cycleToolState('qaly')"
+                            [class.bg-[#10B981]]="state.getToolState('qaly') === 'prescribed'"
+                            [class.text-white]="state.getToolState('qaly') === 'prescribed'"
+                            [class.bg-orange-500]="activeAuxTool() === 'qaly' && state.getToolState('qaly') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'qaly' && state.getToolState('qaly') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'qaly' && state.getToolState('qaly') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'qaly' && state.getToolState('qaly') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'qaly' && state.getToolState('qaly') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'qaly' && state.getToolState('qaly') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>⏳ QALY Epigenetic</span>
+                      @if (state.getToolState('qaly') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+                  
+                  <!-- Solfeggio Tool -->
+                  @if (state.getToolState('solfeggio') !== 'hidden') {
+                    <button (click)="toggleAuxTool('solfeggio')" (dblclick)="state.cycleToolState('solfeggio')"
+                            [class.bg-[#10B981]]="state.getToolState('solfeggio') === 'prescribed'"
+                            [class.text-white]="state.getToolState('solfeggio') === 'prescribed'"
+                            [class.bg-orange-500]="activeAuxTool() === 'solfeggio' && state.getToolState('solfeggio') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'solfeggio' && state.getToolState('solfeggio') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>🎵 Solfeggio Synth</span>
+                      @if (state.getToolState('solfeggio') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+                  
+                  <!-- Vagal Tool -->
+                  @if (state.getToolState('vagal') !== 'hidden') {
+                    <button (click)="toggleAuxTool('vagal')" (dblclick)="state.cycleToolState('vagal')"
+                            [class.bg-[#10B981]]="state.getToolState('vagal') === 'prescribed'"
+                            [class.text-white]="state.getToolState('vagal') === 'prescribed'"
+                            [class.bg-orange-500]="activeAuxTool() === 'vagal' && state.getToolState('vagal') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'vagal' && state.getToolState('vagal') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'vagal' && state.getToolState('vagal') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'vagal' && state.getToolState('vagal') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'vagal' && state.getToolState('vagal') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'vagal' && state.getToolState('vagal') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>🫁 Vagal HRV Dock</span>
+                      @if (state.getToolState('vagal') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+
+                  <!-- Storm Tool -->
+                  @if (state.getToolState('storm') !== 'hidden') {
+                    <button (click)="toggleAuxTool('storm')" (dblclick)="state.cycleToolState('storm')"
+                            [class.bg-[#10B981]]="state.getToolState('storm') === 'prescribed'"
+                            [class.text-white]="state.getToolState('storm') === 'prescribed'"
+                            [class.bg-orange-500]="activeAuxTool() === 'storm' && state.getToolState('storm') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'storm' && state.getToolState('storm') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'storm' && state.getToolState('storm') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'storm' && state.getToolState('storm') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'storm' && state.getToolState('storm') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'storm' && state.getToolState('storm') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>⛈️ Storm Shield</span>
+                      @if (state.getToolState('storm') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+
+                  <!-- Foraging Tool -->
+                  @if (state.getToolState('foraging') !== 'hidden') {
+                    <button (click)="toggleAuxTool('foraging')" (dblclick)="state.cycleToolState('foraging')"
+                            [class.bg-[#10B981]]="state.getToolState('foraging') === 'prescribed'"
+                            [class.text-white]="state.getToolState('foraging') === 'prescribed'"
+                            [class.bg-orange-500]="activeAuxTool() === 'foraging' && state.getToolState('foraging') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'foraging' && state.getToolState('foraging') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'foraging' && state.getToolState('foraging') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'foraging' && state.getToolState('foraging') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'foraging' && state.getToolState('foraging') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'foraging' && state.getToolState('foraging') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>🫐 Foraging</span>
+                      @if (state.getToolState('foraging') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+
+                  <!-- Investment Tool -->
+                  @if (state.getToolState('investment') !== 'hidden') {
+                    <button (click)="toggleAuxTool('investment')" (dblclick)="state.cycleToolState('investment')"
+                            [class.bg-[#10B981]]="state.getToolState('investment') === 'prescribed'"
+                            [class.text-white]="state.getToolState('investment') === 'prescribed'"
+                            [class.bg-orange-500]="activeAuxTool() === 'investment' && state.getToolState('investment') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'investment' && state.getToolState('investment') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'investment' && state.getToolState('investment') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'investment' && state.getToolState('investment') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'investment' && state.getToolState('investment') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'investment' && state.getToolState('investment') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>📈 Investments</span>
+                      @if (state.getToolState('investment') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+
+                  <!-- Perils Tool -->
+                  @if (state.getToolState('perils') !== 'hidden') {
+                    <button (click)="toggleAuxTool('perils')" (dblclick)="state.cycleToolState('perils')"
+                            [class.bg-[#10B981]]="state.getToolState('perils') === 'prescribed'"
+                            [class.text-white]="state.getToolState('perils') === 'prescribed'"
+                            [class.bg-orange-500]="activeAuxTool() === 'perils' && state.getToolState('perils') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'perils' && state.getToolState('perils') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'perils' && state.getToolState('perils') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'perils' && state.getToolState('perils') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'perils' && state.getToolState('perils') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'perils' && state.getToolState('perils') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>⏳ Perils Matrix</span>
+                      @if (state.getToolState('perils') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+
+                  <!-- Karaoke Tool -->
+                  @if (state.getToolState('karaoke') !== 'hidden') {
+                    <button (click)="toggleAuxTool('karaoke')" (dblclick)="state.cycleToolState('karaoke')"
+                            [class.bg-[#10B981]]="state.getToolState('karaoke') === 'prescribed'"
+                            [class.text-white]="state.getToolState('karaoke') === 'prescribed'"
+                            [class.bg-[#F6B12B]]="activeAuxTool() === 'karaoke' && state.getToolState('karaoke') !== 'prescribed'"
+                            [class.text-zinc-950]="activeAuxTool() === 'karaoke' && state.getToolState('karaoke') !== 'prescribed'"
+                            [class.bg-zinc-100]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
+                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
+                            [class.text-zinc-800]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
+                            [class.dark:text-zinc-300]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
+                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                            title="Single-click to view. Double-click to prescribe to care plan.">
+                      <span>🎙️ Shanty Karaoke</span>
+                      @if (state.getToolState('karaoke') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
+                    </button>
+                  }
+
+                  <!-- Clinical Assessments Suite Button -->
+                  <button (click)="toggleAuxTool('assessments')"
+                          [class.bg-sky-500]="activeAuxTool() === 'assessments'"
+                          [class.text-zinc-950]="activeAuxTool() === 'assessments'"
+                          [class.bg-zinc-100]="activeAuxTool() !== 'assessments'"
+                          [class.dark:bg-zinc-900]="activeAuxTool() !== 'assessments'"
+                          [class.text-zinc-800]="activeAuxTool() !== 'assessments'"
+                          [class.dark:text-zinc-300]="activeAuxTool() !== 'assessments'"
+                          class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
+                          title="Single-click to open PHQ-9, GAD-7, ISI & C-SSRS assessment suite.">
+                    <span>📊 Clinical Suite (PHQ-9/GAD-7/ISI/C-SSRS)</span>
+                  </button>
+
+                  <!-- Restore Hidden Tools Button -->
+                  <button (click)="state.restoreHiddenTools()"
+                    class="px-2.5 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 text-[10px] font-mono font-bold uppercase transition cursor-pointer flex items-center gap-1">
+                    <span>🙈 Restore Hidden Tools</span>
+                  </button>
+                </div>
+
+                <!-- Active Collapsible Tool View -->
+                @if (activeAuxTool() === 'qaly') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-actuarial-qaly-calculator></app-actuarial-qaly-calculator>
+                  </div>
+                } @else if (activeAuxTool() === 'solfeggio') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-solfeggio-audio-deck></app-solfeggio-audio-deck>
+                  </div>
+                } @else if (activeAuxTool() === 'vagal') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-vagal-biofeedback-dock></app-vagal-biofeedback-dock>
+                  </div>
+                } @else if (activeAuxTool() === 'storm') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-storm-analysis></app-storm-analysis>
+                  </div>
+                } @else if (activeAuxTool() === 'foraging') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-androscoggin-foraging-phytoncide></app-androscoggin-foraging-phytoncide>
+                  </div>
+                } @else if (activeAuxTool() === 'investment') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-procedural-investment-matrix></app-procedural-investment-matrix>
+                  </div>
+                } @else if (activeAuxTool() === 'perils') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-life-perils-paradigm-matrix></app-life-perils-paradigm-matrix>
+                  </div>
+                } @else if (activeAuxTool() === 'karaoke') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-shanty-karaoke-deck></app-shanty-karaoke-deck>
+                  </div>
+                } @else if (activeAuxTool() === 'assessments') {
+                  <div class="animate-in fade-in duration-200">
+                    <app-clinical-assessments-suite></app-clinical-assessments-suite>
+                  </div>
+                }
+              </div>
+            }
+          </div>
 
             <app-clinical-gauge
               label="Complexity"
@@ -551,39 +925,43 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
           </div>
         }
 
-        <!-- Outdoor Cycling & Dual-Insight Synchronized Reveal Engine -->
-        <app-cycling-ergonomics-dual-reveal></app-cycling-ergonomics-dual-reveal>
+        <!-- Active Hobbies & Healthy Lifestyle Suggestions (Functional Protocols Lens Only) -->
+        @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
+          <app-healthy-hobbies-lifestyle></app-healthy-hobbies-lifestyle>
+        }
 
         <!-- Theatrical Clinical Proposal Act Banner -->
-        @if (activeActProposal(); as act) {
-          <div class="mb-6 p-4 rounded-md border-l-4 border-l-indigo-600 dark:border-l-indigo-400 border-t border-b border-r border-t-slate-200 border-b-slate-200 border-r-slate-200 dark:border-t-zinc-800 dark:border-b-zinc-800 dark:border-r-zinc-800 bg-slate-50 dark:bg-zinc-900/80 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">{{ act.icon }}</span>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300/40">
-                    {{ act.actsSequenceStage }}
-                  </span>
+        @if (!state.isEmergencyMode()) {
+          @if (activeActProposal(); as act) {
+            <div class="mb-6 p-4 rounded-md border-l-4 border-l-indigo-600 dark:border-l-indigo-400 border-t border-b border-r border-t-slate-200 border-b-slate-200 border-r-slate-200 dark:border-t-zinc-800 dark:border-b-zinc-800 dark:border-r-zinc-800 bg-slate-50 dark:bg-zinc-900/80 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-sm">
+              <div class="flex items-center gap-3">
+                <span class="text-2xl">{{ act.icon }}</span>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-mono text-[10px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300/40">
+                      {{ act.actsSequenceStage }}
+                    </span>
+                  </div>
+                  <h3 class="text-sm font-extrabold text-slate-900 dark:text-zinc-100 uppercase tracking-wider mt-1">
+                    {{ activeActTitle() }}
+                  </h3>
+                  <p class="text-xs text-slate-600 dark:text-zinc-400 mt-0.5 font-medium">
+                    {{ act.proposalFocus }}
+                  </p>
                 </div>
-                <h3 class="text-sm font-extrabold text-slate-900 dark:text-zinc-100 uppercase tracking-wider mt-1">
-                  {{ activeActTitle() }}
-                </h3>
-                <p class="text-xs text-slate-600 dark:text-zinc-400 mt-0.5 font-medium">
-                  {{ act.proposalFocus }}
-                </p>
+              </div>
+
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
+                  Paradigm: {{ state.activePhilosophy() | uppercase }}
+                </span>
               </div>
             </div>
-
-            <div class="flex items-center gap-2 shrink-0">
-              <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
-                Paradigm: {{ state.activePhilosophy() | uppercase }}
-              </span>
-            </div>
-          </div>
+          }
         }
 
         <!-- Instant Patient Action Suite (Somatic Relief, Service Animal & Health Simulator) -->
-        @if (hasAnyReport()) {
+        @if (hasAnyReport() && !state.isEmergencyMode()) {
           <app-instant-patient-action-suite></app-instant-patient-action-suite>
         }
 
@@ -592,6 +970,8 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
         <!-- EMT Handoff Component/Layout -->
         @if (activeLens() === 'EMT Handoff') {
           <div class="flex flex-col gap-6 animate-in fade-in duration-500">
+            <!-- 🚨 Bystander 911 Action Suite & Role Assignment -->
+            <app-bystander-action-suite></app-bystander-action-suite>
             <!-- Crimson alert banner -->
             <div class="p-4 bg-red-955/40 border border-red-800/60 rounded-xl text-red-200 text-xs flex items-center justify-between shadow-inner">
               <div class="flex items-center gap-2.5">
@@ -760,8 +1140,8 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
                 }
               </pocket-gull-card>
 
-              <!-- Column 3: Casualty Medical ID (ICE) -->
-              <pocket-gull-card title="Casualty Medical ID (ICE)" [icon]="ClinicalIcons.Education">
+              <!-- Column 3: Patient Emergency Medical ID (ICE) -->
+              <pocket-gull-card title="Patient Emergency Medical ID (ICE)" [icon]="ClinicalIcons.Education">
                 <div class="space-y-3 text-[12px]">
                   <div class="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/85 pb-2">
                     <span class="text-gray-450 dark:text-zinc-500 uppercase tracking-wider font-semibold text-[8.5px]">Blood Type</span>
@@ -970,264 +1350,558 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
           </div>
         }
 
-        <!-- Care Plan Print Studio & Document Carousel -->
-        <app-care-plan-print-preview></app-care-plan-print-preview>
-
-
-        <!-- Karolinska Sleepiness Scale (KSS) Adaptive Cognitive Load Shield -->
-        <app-kss-cognitive-shield></app-kss-cognitive-shield>
-
-        <!-- Functional Protocols Lens Only: Neuro-Consciousness & Mood Optimization Matrix -->
-        @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
-          <app-mood-consciousness-matrix></app-mood-consciousness-matrix>
-          <app-geolocational-health-relocation></app-geolocational-health-relocation>
-        }
-
-        <!-- Summary Overview Lens Only: Living Health Fruit Tree -->
-        @if (activeLens() === 'Summary Overview' && hasAnyReport()) {
-          <app-patient-fruit-tree></app-patient-fruit-tree>
-        }
-
-        <!-- Nutrition Lens Only: Dietary Allergy & Synthetic Red Dye #40 Shield -->
-        @if (activeLens() === 'Nutrition' && hasAnyReport()) {
-          <app-dietary-allergy-shield></app-dietary-allergy-shield>
-        }
-
-        <!-- Lens Innovation Shield & Insight Sparks Drill-Down -->
-        @if (hasAnyReport()) {
-          <app-lens-insight-spark-shield [activeLens]="activeLens()"></app-lens-insight-spark-shield>
-        }
-
-        <!-- Patient Education Lens Only: UK RIO PubMed Sourcing & Evidence Hierarchy Panel -->
-        @if (activeLens() === 'Patient Education' && hasAnyReport()) {
-          <app-uk-rio-pubmed-sourcing></app-uk-rio-pubmed-sourcing>
-        }
-
-        <!-- Patient Education & Summary Overview Lens: Interactive Health Trajectory Storybook -->
-        @if ((activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
-          <app-patient-health-trajectory-storybook></app-patient-health-trajectory-storybook>
-          <app-sdoh-navigator></app-sdoh-navigator>
-        }
-
-
-
-        <!-- Dieter Rams Clinical Menu (Nutrition Lens Only) -->
-        @if (activeLens() === 'Nutrition' && hasAnyReport()) {
-          <app-clinical-menu [reportText]="activeReport()"></app-clinical-menu>
-        }
-
-
-
-
-        <!-- Biomarker Matrix (Orthomolecular Only) -->
-        @if (activeLens() === 'Precision Nutrients' && hasAnyReport()) {
-          <app-biomarker-matrix [reportText]="activeReport()"></app-biomarker-matrix>
-        }
-
-
-        <!-- Cost-Benefit Analysis (Summary Overview & Treatment Matrix Lenses) -->
-        @if ((activeLens() === 'Summary Overview' || activeLens() === 'Treatment Matrix') && hasAnyReport()) {
-          <app-cost-benefit-analysis [reportText]="activeReport()"></app-cost-benefit-analysis>
-        }
-
-        <!-- AVS Neuro-Therapy & Autonomic Co-Regulation (Functional Protocols Lens Only) -->
-        @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
-          <div class="mb-6 bg-gradient-to-r from-indigo-900/10 via-purple-900/10 to-emerald-900/10 dark:from-indigo-950/40 dark:via-purple-950/40 dark:to-emerald-950/40 rounded-2xl p-6 border border-indigo-500/20 dark:border-indigo-500/30 shadow-lg relative overflow-hidden">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-indigo-200/40 dark:border-indigo-800/40 pb-4 mb-4">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-md bg-indigo-500 animate-pulse"></span>
-                  <h3 class="text-base font-bold text-gray-900 dark:text-zinc-150 uppercase tracking-widest">
-                    🧠 Autonomic Co-Regulation & AVS Therapy Apps
-                  </h3>
-                  <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30">
-                    Functional Protocol Integration
-                  </span>
-                </div>
-                <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
-                  Audio-Visual Stimulation (AVS) companion session targeting parasympathetic vagal tone restoration & brainwave entrainment.
-                </p>
-              </div>
-
-              <div class="flex flex-wrap items-center gap-2">
-                <button type="button" (click)="launchAvsVoiceCoRegulation()"
-                  class="px-3.5 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                  <span>🎙️</span>
-                  <span>AVS Voice Guide</span>
-                </button>
-                <button type="button" (click)="toggleAvsSession()"
-                  [class]="state.isAvsSessionActive() ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'"
-                  class="px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                  <span>{{ state.isAvsSessionActive() ? '⏸ Pause AVS Therapy' : '▶ Start AVS Co-Regulation' }}</span>
-                </button>
-              </div>
-
-            </div>
-
-            <!-- Parameters Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-              <!-- Breathing Cadence -->
-              <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
-                <div class="flex justify-between items-center mb-2">
-                  <span class="font-bold text-gray-700 dark:text-zinc-300">🫁 Resonant Breathing Rate</span>
-                  <span class="font-mono font-black text-indigo-600 dark:text-indigo-400">{{ state.avsBreathingRate().toFixed(1) }} bpm</span>
-                </div>
-                <input type="range" min="4.0" max="8.0" step="0.5" [value]="state.avsBreathingRate()"
-                  (input)="updateAvsBreathing($event)"
-                  class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
-                <span class="text-[10px] text-gray-400 dark:text-zinc-500 block mt-1">0.1 Hz Baroreflex Peak Resonance</span>
-              </div>
-
-              <!-- Brainwave Entrainment -->
-              <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
-                <div class="flex justify-between items-center mb-2">
-                  <span class="font-bold text-gray-700 dark:text-zinc-300">🧠 Target Entrainment</span>
-                  <span class="font-mono font-black text-purple-600 dark:text-purple-400">{{ state.avsBrainwaveFrequency() | titlecase }} ({{ state.avsBrainwaveFrequencyHz() }} Hz)</span>
-                </div>
-                <div class="flex gap-1">
-                  <button type="button" (click)="setAvsBrainwave('theta', 6.0)"
-                    [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'theta'"
-                    [class.text-white]="state.avsBrainwaveFrequency() === 'theta'"
-                    class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Theta (6Hz)</button>
-                  <button type="button" (click)="setAvsBrainwave('alpha', 10.0)"
-                    [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'alpha'"
-                    [class.text-white]="state.avsBrainwaveFrequency() === 'alpha'"
-                    class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Alpha (10Hz)</button>
-                  <button type="button" (click)="setAvsBrainwave('gamma', 40.0)"
-                    [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'gamma'"
-                    [class.text-white]="state.avsBrainwaveFrequency() === 'gamma'"
-                    class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Gamma (40Hz)</button>
-                </div>
-              </div>
-
-              <!-- Active Status Indicator -->
-              <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col justify-between">
-                <span class="font-bold text-gray-700 dark:text-zinc-300">⚡ Autonomic Status</span>
-                <div class="flex items-center gap-2 mt-1">
-                  <span class="w-2.5 h-2.5 rounded-full" [class.bg-emerald-500]="state.isAvsSessionActive()" [class.animate-ping]="state.isAvsSessionActive()" [class.bg-gray-400]="!state.isAvsSessionActive()"></span>
-                  <span class="font-bold font-mono text-[11px]" [class.text-emerald-600]="state.isAvsSessionActive()" [class.dark:text-emerald-400]="state.isAvsSessionActive()">
-                    {{ state.isAvsSessionActive() ? 'SESSION ACTIVE (AUDIO-VISUAL FLICKER)' : 'STANDBY' }}
-                  </span>
-                </div>
-                <span class="text-[10px] text-gray-400 block mt-1">Integrated in Functional Protocols Lens</span>
-              </div>
-            </div>
-          </div>
-        }
-
-
-        <!--AI Report Section-->
+        <!--AI Primary Lens Report Section & Dedicated Lens Widgets-->
         @if (activeLens() !== 'EMT Handoff' && reportSections(); as sections) {
           <div class="flex flex-col gap-4 sm:gap-6 pb-4 w-full min-w-0">
 
-          <!-- Storybook Narrative Arc Banner & Lens Stage Indicator -->
-          <div class="mb-2 p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-500/30 shadow-xl font-sans relative overflow-hidden">
-            <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none"></div>
-            
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold uppercase tracking-widest bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                    📖 Storybook Chapter: {{ activeLens() }}
-                  </span>
-                  <span class="text-[10px] font-mono text-zinc-400">
-                    Paradigm Framework: <strong class="text-cyan-400 font-bold uppercase">{{ state.activePhilosophy() }}</strong>
-                  </span>
+            <!-- Storybook Narrative Arc Banner & Lens Stage Indicator -->
+            <div class="mb-2 p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-500/30 shadow-xl font-sans relative overflow-hidden">
+              <div class="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-indigo-500/10 blur-2xl pointer-events-none"></div>
+              
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-extrabold uppercase tracking-widest bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                      📖 Storybook Chapter: {{ activeLens() }}
+                    </span>
+                    <span class="text-[10px] font-mono text-zinc-400">
+                      Paradigm Framework: <strong class="text-cyan-400 font-bold uppercase">{{ state.activePhilosophy() }}</strong>
+                    </span>
+                  </div>
+                  <h2 class="text-base font-extrabold uppercase tracking-wide text-zinc-100 mt-1">
+                    {{ activeActTitle() }}
+                  </h2>
                 </div>
-                <h2 class="text-base font-extrabold uppercase tracking-wide text-zinc-100 mt-1">
-                  {{ activeActTitle() }}
-                </h2>
-              </div>
 
-              <!-- 3-Act Narrative Arc Progress Dots -->
-              <div class="flex items-center gap-2 bg-zinc-900/80 px-3.5 py-2 rounded-xl border border-zinc-800 shrink-0 font-mono text-[11px]">
-                <div class="flex items-center gap-1.5 text-indigo-400 font-bold">
-                  <span>Act I: Triage</span>
-                  <span class="text-xs">→</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-cyan-400 font-bold">
-                  <span>Act II: Probing</span>
-                  <span class="text-xs">→</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-emerald-400 font-bold">
-                  <span>Act III: Quest</span>
+                <!-- 3-Act Narrative Arc Progress Dots -->
+                <div class="flex items-center gap-2 bg-zinc-900/80 px-3.5 py-2 rounded-xl border border-zinc-800 shrink-0 font-mono text-[11px]">
+                  <div class="flex items-center gap-1.5 text-indigo-400 font-bold">
+                    <span>Act I: Triage</span>
+                    <span class="text-xs">→</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-cyan-400 font-bold">
+                    <span>Act II: Probing</span>
+                    <span class="text-xs">→</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-emerald-400 font-bold">
+                    <span>Act III: Quest</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-            @for (section of sections; track section.title; let i = $index) {
-              <div [id]="i === 0 ? 'tour-report-node' : null" appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
-                <pocket-gull-card [title]="section.title" [icon]="section.icon" class="flex-1 min-w-0 overflow-hidden">
-                  <div right-action class="flex items-center gap-2">
-                    @if (intel.isLoading() && !verificationStatus(section.title)) {
-                      <div class="flex items-center gap-1.5 mr-2">
-                        <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
-                        <span class="text-[12px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">{{ activeAgentName() }} is streaming...</span>
-                      </div>
-                    }
-                    @if (verificationStatus(section.title); as status) {
-                      <pocket-gull-badge [label]="status" [severity]="statusSeverity(status)">
-                        <div badge-icon [innerHTML]="ClinicalIcons.Verified | safeHtml"></div>
-                      </pocket-gull-badge>
-                    }
+
+            <!-- Mobile Section Jump Bar & Accordion Controls -->
+            @if (sections.length > 0) {
+              <div class="mb-4 p-2.5 rounded-2xl bg-zinc-950/90 dark:bg-zinc-900/90 border border-zinc-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 font-mono text-xs shadow-md no-print">
+                
+                <!-- Left: Horizontal Scrollable Section Filter Tabs -->
+                <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar shrink min-w-0 px-1 py-0.5">
+                  <span class="text-[10px] uppercase font-bold text-zinc-400 shrink-0 mr-1">Section Jump:</span>
+                  <button type="button" (click)="selectedMobileSectionTab.set('all'); expandAllSections()"
+                    [class]="selectedMobileSectionTab() === 'all' ? 'bg-orange-500 text-zinc-950 font-black shadow-sm' : 'bg-zinc-900 dark:bg-zinc-950 text-zinc-300 border border-zinc-800 hover:bg-zinc-800'"
+                    class="px-3 py-1 rounded-xl text-[11px] font-bold uppercase transition cursor-pointer shrink-0">
+                    All ({{ sections.length }})
+                  </button>
+                  @for (sec of sections; track sec.title) {
+                    <button type="button" (click)="selectSectionMobile(sec.title)"
+                      [class]="selectedMobileSectionTab() === sec.title ? 'bg-orange-500 text-zinc-950 font-black shadow-sm' : 'bg-zinc-900 dark:bg-zinc-950 text-zinc-300 border border-zinc-800 hover:bg-zinc-800'"
+                      class="px-3 py-1 rounded-xl text-[11px] font-bold uppercase transition cursor-pointer shrink-0 flex items-center gap-1.5">
+                      <span>{{ sec.title }}</span>
+                      <span class="text-[9px] px-1.5 py-0.2 rounded-md bg-zinc-800 text-zinc-300 font-mono">{{ sec.nodes.length }}</span>
+                    </button>
+                  }
+                </div>
+
+                <!-- Right: Expand / Collapse All Controls -->
+                <div class="flex items-center gap-1.5 shrink-0 justify-end">
+                  <button type="button" (click)="expandAllSections()" title="Expand All Sections"
+                    class="px-2.5 py-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 text-[10px] font-bold uppercase transition cursor-pointer flex items-center gap-1">
+                    <span>📂</span>
+                    <span>Expand All</span>
+                  </button>
+                  <button type="button" (click)="collapseAllSections()" title="Collapse Secondary Sections"
+                    class="px-2.5 py-1 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 text-[10px] font-bold uppercase transition cursor-pointer flex items-center gap-1">
+                    <span>📁</span>
+                    <span>Collapse All</span>
+                  </button>
+                </div>
+
+              </div>
+            }
+
+            <!-- Dedicated Interactive Lens Widgets (Scoped to Active Lens) -->
+            @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
+              <app-kss-cognitive-shield></app-kss-cognitive-shield>
+              <app-mood-consciousness-matrix></app-mood-consciousness-matrix>
+              <app-geolocational-health-relocation></app-geolocational-health-relocation>
+            }
+
+            @if (activeLens() === 'Summary Overview' && hasAnyReport()) {
+              <app-patient-fruit-tree></app-patient-fruit-tree>
+            }
+
+            @if (activeLens() === 'Nutrition' && hasAnyReport()) {
+              <app-dietary-allergy-shield></app-dietary-allergy-shield>
+              <app-clinical-menu [reportText]="activeReport()"></app-clinical-menu>
+            }
+
+            @if (hasAnyReport()) {
+              <app-lens-insight-spark-shield [activeLens]="activeLens()"></app-lens-insight-spark-shield>
+            }
+
+            @if (activeLens() === 'Patient Education' && hasAnyReport()) {
+              <app-uk-rio-pubmed-sourcing></app-uk-rio-pubmed-sourcing>
+            }
+
+            @if ((activeLens() === 'Patient Education' || activeLens() === 'Summary Overview') && hasAnyReport()) {
+              <app-patient-health-trajectory-storybook></app-patient-health-trajectory-storybook>
+              <app-sdoh-navigator></app-sdoh-navigator>
+            }
+
+            @if (activeLens() === 'Precision Nutrients' && hasAnyReport()) {
+              <app-biomarker-matrix [reportText]="activeReport()"></app-biomarker-matrix>
+            }
+
+            @if ((activeLens() === 'Summary Overview' || activeLens() === 'Treatment Matrix') && hasAnyReport()) {
+              <app-cost-benefit-analysis [reportText]="activeReport()"></app-cost-benefit-analysis>
+            }
+
+            @if (activeLens() === 'Functional Protocols' && hasAnyReport()) {
+              <div class="mb-6 bg-gradient-to-r from-indigo-900/10 via-purple-900/10 to-emerald-900/10 dark:from-indigo-950/40 dark:via-purple-950/40 dark:to-emerald-950/40 rounded-2xl p-6 border border-indigo-500/20 dark:border-indigo-500/30 shadow-lg relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-indigo-200/40 dark:border-indigo-800/40 pb-4 mb-4">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="w-3 h-3 rounded-md bg-indigo-500 animate-pulse"></span>
+                      <h3 class="text-base font-bold text-gray-900 dark:text-zinc-150 uppercase tracking-widest">
+                        🧠 Autonomic Co-Regulation & AVS Therapy Apps
+                      </h3>
+                      <span class="text-[10px] font-black px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30">
+                        Functional Protocol Integration
+                      </span>
+                    </div>
+                    <p class="text-xs text-gray-500 dark:text-zinc-400 mt-1">
+                      Audio-Visual Stimulation (AVS) companion session targeting parasympathetic vagal tone restoration & brainwave entrainment.
+                    </p>
                   </div>
 
-                  <div class="rams-typography" (mouseover)="onTooltipOver($event)" (mouseout)="onTooltipOut($event)">
-                    @for (node of section.nodes; track node.id) {
-                      @if (node.type === 'raw') {
-                        <div [innerHTML]="(node.rawHtml || '') | safeHtml" class="mb-4"></div>
-                      } @else if (node.type === 'paragraph') {
-                        <app-summary-node
-                          [node]="node"
-                          type="paragraph"
-                          [sectionTitle]="section.title"
-                          [saveStatus]="nodeSaveStatuses()[node.key]"
-                          [protocolInsights]="protocolInsights"
-                          (update)="handleNodeUpdate(node, $event)"
-                          (dictationToggle)="openNodeDictation(node)"
-                          (askAgent)="openAgentDialog($event)">
-                        </app-summary-node>
-                      } @else if (node.type === 'list') {
-                        @if (node.ordered) {
-                          <ol class="list-decimal pl-4 mb-6">
-                            @for (item of node.items; track item.id) {
-                              <li class="pl-2 mb-1">
-                                <app-summary-node
-                                  [node]="item"
-                                  type="list-item"
-                                  [sectionTitle]="section.title"
-                                  [saveStatus]="nodeSaveStatuses()[item.key]"
-                                  [protocolInsights]="protocolInsights"
-                                  (update)="handleNodeUpdate(item, $event)"
-                                  (dictationToggle)="openNodeDictation(item)"
-                                  (askAgent)="openAgentDialog($event)">
-                                </app-summary-node>
-                              </li>
-                            }
-                          </ol>
-                        } @else {
-                          <ul class="list-disc pl-4 mb-6">
-                            @for (item of node.items; track item.id) {
-                              <li class="pl-2 mb-1">
-                                <app-summary-node
-                                  [node]="item"
-                                  type="list-item"
-                                  [sectionTitle]="section.title"
-                                  [saveStatus]="nodeSaveStatuses()[item.key]"
-                                  [protocolInsights]="protocolInsights"
-                                  (update)="handleNodeUpdate(item, $event)"
-                                  (dictationToggle)="openNodeDictation(item)"
-                                  (askAgent)="openAgentDialog($event)">
-                                </app-summary-node>
-                              </li>
-                            }
-                          </ul>
-                        }
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" (click)="launchAvsVoiceCoRegulation()"
+                      class="px-3.5 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                      <span>🎙️</span>
+                      <span>AVS Voice Guide</span>
+                    </button>
+                    <button type="button" (click)="toggleAvsSession()"
+                      [class]="state.isAvsSessionActive() ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20' : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20'"
+                      class="px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center gap-1.5 cursor-pointer">
+                      <span>{{ state.isAvsSessionActive() ? '⏸ Pause AVS Therapy' : '▶ Start AVS Co-Regulation' }}</span>
+                    </button>
+
+                    <!-- AVS Session Duration & Countdown Selector -->
+                    <div class="flex items-center gap-1.5 bg-zinc-950 p-1.5 rounded-md border border-zinc-800 text-xs text-zinc-300">
+                      <span class="text-zinc-400 font-bold uppercase tracking-wider pl-1">⏱️ Limit:</span>
+                      <select [value]="avsSessionDuration()" (change)="setAvsDuration(+$any($event.target).value)" class="bg-zinc-900 border border-zinc-800 text-zinc-100 rounded px-2 py-1 outline-none cursor-pointer text-xs font-bold font-mono">
+                        <option [value]="5">5 Min</option>
+                        <option [value]="10">10 Min</option>
+                        <option [value]="15">15 Min</option>
+                        <option [value]="20">20 Min</option>
+                        <option [value]="-1">Continuous</option>
+                      </select>
+                      @if (state.isAvsSessionActive() && avsSessionDuration() !== -1) {
+                        <span class="text-indigo-400 font-mono font-black pl-2 tracking-wider animate-pulse">{{ getFormattedAvsTime() }}</span>
                       }
+                    </div>
+
+                    <!-- Seagullian Persona Influence Selector (Visible only in Mandala Theme) -->
+                    @if (themeService.currentTheme() === 'mandala') {
+                      <div class="flex items-center gap-1.5 bg-zinc-950 p-1.5 rounded-md border border-zinc-800 text-xs text-zinc-300">
+                        <span class="text-zinc-400 font-bold uppercase tracking-wider pl-1">🕊️ Persona:</span>
+                        <select [value]="themeService.activeSeagullPersona()" (change)="themeService.activeSeagullPersona.set($any($event.target).value)" class="bg-zinc-900 border border-zinc-800 text-zinc-100 rounded px-2 py-1 outline-none cursor-pointer text-xs font-bold">
+                          <option value="calm-gull">🕊️ Calm Gull (Zen Shore)</option>
+                          <option value="active-skimmer">🪶 Active Skimmer (High Winds)</option>
+                          <option value="deep-navigator">🦅 Deep Navigator (Thermal Lift)</option>
+                          <option value="storm-rider">⚡ Storm Rider (Ocean Gale)</option>
+                        </select>
+                      </div>
                     }
                   </div>
-                </pocket-gull-card>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                  <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="font-bold text-gray-700 dark:text-zinc-300">🫁 Resonant Breathing Rate</span>
+                      <span class="font-mono font-black text-indigo-600 dark:text-indigo-400">{{ state.avsBreathingRate().toFixed(1) }} bpm</span>
+                    </div>
+                    <input type="range" min="4.0" max="8.0" step="0.5" [value]="state.avsBreathingRate()"
+                      (input)="updateAvsBreathing($event)"
+                      class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+                    <span class="text-[10px] text-gray-400 dark:text-zinc-500 block mt-1">0.1 Hz Baroreflex Peak Resonance</span>
+                  </div>
+
+                  <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="font-bold text-gray-700 dark:text-zinc-300">🧠 Target Entrainment</span>
+                      <span class="font-mono font-black text-purple-600 dark:text-purple-400">{{ state.avsBrainwaveFrequency() | titlecase }} ({{ state.avsBrainwaveFrequencyHz() }} Hz)</span>
+                    </div>
+                    <div class="flex gap-1">
+                      <button type="button" (click)="setAvsBrainwave('theta', 6.0)"
+                        [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'theta'"
+                        [class.text-white]="state.avsBrainwaveFrequency() === 'theta'"
+                        class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Theta (6Hz)</button>
+                      <button type="button" (click)="setAvsBrainwave('alpha', 10.0)"
+                        [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'alpha'"
+                        [class.text-white]="state.avsBrainwaveFrequency() === 'alpha'"
+                        class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Alpha (10Hz)</button>
+                      <button type="button" (click)="setAvsBrainwave('gamma', 40.0)"
+                        [class.bg-purple-600]="state.avsBrainwaveFrequency() === 'gamma'"
+                        [class.text-white]="state.avsBrainwaveFrequency() === 'gamma'"
+                        class="flex-1 py-1 rounded bg-gray-100 dark:bg-zinc-800 text-[10px] font-bold transition cursor-pointer">Gamma (40Hz)</button>
+                    </div>
+                  </div>
+
+                  <div class="bg-white/70 dark:bg-zinc-900/70 p-3.5 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60 flex flex-col justify-between">
+                    <span class="font-bold text-gray-700 dark:text-zinc-300">⚡ Autonomic Status</span>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="w-2.5 h-2.5 rounded-full" [class.bg-emerald-500]="state.isAvsSessionActive()" [class.animate-ping]="state.isAvsSessionActive()" [class.bg-gray-400]="!state.isAvsSessionActive()"></span>
+                      <span class="font-bold font-mono text-[11px]" [class.text-emerald-600]="state.isAvsSessionActive()" [class.dark:text-emerald-400]="state.isAvsSessionActive()">
+                        {{ state.isAvsSessionActive() ? 'SESSION ACTIVE (AUDIO-VISUAL FLICKER)' : 'STANDBY' }}
+                      </span>
+                    </div>
+                    <span class="text-[10px] text-gray-400 block mt-1">Auto-Cutoff Enabled (Safety Cap)</span>
+                  </div>
+                </div>
+
+                <!-- 🎭 4-Stage Therapeutic Narrative Arc Exploration -->
+                <div class="mt-4 p-4 rounded-2xl bg-zinc-950/80 border border-purple-800/50 font-mono text-xs">
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-purple-900/40 pb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">🎭</span>
+                      <h4 class="font-black text-purple-300 uppercase tracking-wider text-xs">Therapeutic Narrative Arc Exploration</h4>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-purple-950 text-purple-200 border border-purple-700/50 font-bold uppercase">
+                      Medically Calibrated Stages
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                    <button type="button" (click)="setAvsBrainwave('alpha', 12.0)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 1 (0-3m)</div>
+                      <div class="text-xs font-black text-white">🌱 Induction</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">12 Hz Alpha • 174 Hz Tone</div>
+                    </button>
+
+                    <button type="button" (click)="setAvsBrainwave('theta', 7.83)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 2 (3-12m)</div>
+                      <div class="text-xs font-black text-white">🌊 Deep Vagal</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">7.83 Hz Theta • 432 Hz Tone</div>
+                    </button>
+
+                    <button type="button" (click)="setAvsBrainwave('alpha', 10.0)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 3 (12-16m)</div>
+                      <div class="text-xs font-black text-white">✨ Integration</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">528 Hz Solfeggio Tone</div>
+                    </button>
+
+                    <button type="button" (click)="setAvsBrainwave('gamma', 40.0)"
+                            class="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/50 hover:border-purple-500 transition text-left cursor-pointer">
+                      <div class="text-[10px] font-bold text-purple-400 uppercase">Stage 4 (16-20m)</div>
+                      <div class="text-xs font-black text-white">🌅 Awakening</div>
+                      <div class="text-[10px] text-zinc-400 font-sans mt-0.5">40 Hz Gamma Focus</div>
+                    </button>
+                  </div>
+                </div>
               </div>
+            }
+
+            <!-- Global Health Literacy vs Deep Clinical Rationale Mode Banner -->
+            <div class="mb-4 p-3.5 rounded-2xl transition-all border flex items-center justify-between shadow-xs"
+                 [class.bg-emerald-500/10]="themeService.isPlainLanguageMode()"
+                 [class.border-emerald-500/30]="themeService.isPlainLanguageMode()"
+                 [class.text-emerald-950]="themeService.isPlainLanguageMode()"
+                 [class.dark:text-emerald-200]="themeService.isPlainLanguageMode()"
+                 [class.bg-sky-500/10]="!themeService.isPlainLanguageMode()"
+                 [class.border-sky-500/30]="!themeService.isPlainLanguageMode()"
+                 [class.text-sky-950]="!themeService.isPlainLanguageMode()"
+                 [class.dark:text-sky-200]="!themeService.isPlainLanguageMode()">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">
+                  {{ themeService.analogyLensMode() === 'arborist' ? '🌳' : (themeService.analogyLensMode() === 'mechanic' ? '🚗' : (themeService.isPlainLanguageMode() ? '📖' : '🔬')) }}
+                </span>
+                <div>
+                  <h4 class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
+                    <span>
+                      {{ themeService.analogyLensMode() === 'arborist' ? 'Plain Language Arborist Analogy Active' : (themeService.analogyLensMode() === 'mechanic' ? 'Plain Language Mechanic Analogy Active' : (themeService.isPlainLanguageMode() ? 'Plain Language Health Literacy Active' : 'Deep Clinical Rationale Active')) }}
+                    </span>
+                    <span class="text-[9px] px-2 py-0.5 rounded-md font-mono uppercase font-bold"
+                          [class.bg-emerald-500/20]="themeService.isPlainLanguageMode()"
+                          [class.text-emerald-700]="themeService.isPlainLanguageMode()"
+                          [class.dark:text-emerald-300]="themeService.isPlainLanguageMode()"
+                          [class.bg-sky-500/20]="!themeService.isPlainLanguageMode()"
+                          [class.text-sky-700]="!themeService.isPlainLanguageMode()"
+                          [class.dark:text-sky-300]="!themeService.isPlainLanguageMode()">
+                      {{ themeService.isPlainLanguageMode() ? (themeService.analogyLensMode() === 'arborist' ? 'Botanical Tree Analogy' : (themeService.analogyLensMode() === 'mechanic' ? 'Automotive Chassis Analogy' : 'Patient Literacy')) : 'Physician & Specialist Level' }}
+                    </span>
+                  </h4>
+                  <p class="text-[11px] opacity-90 font-medium mt-0.5">
+                    {{ themeService.analogyLensMode() === 'arborist' ? 'Clinical symptoms are translated into sap pressure, root hydration, and canopy foliage health for intuitive patient understanding.' : (themeService.analogyLensMode() === 'mechanic' ? 'Clinical symptoms are translated into engine RPM, hydraulic fluid pressure, and trailer hitch mechanical load.' : (themeService.isPlainLanguageMode() ? 'All clinical notes, recommendations, and diagnostic rationales are simplified for easy understanding.' : 'All clinical notes detail deep pathophysiological mechanisms, ICD-10 codes, and clinical evidence.')) }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3 shrink-0">
+                <!-- Analogy Lens Sub-Mode Pill Group -->
+                <div class="flex items-center gap-1 bg-white/30 dark:bg-black/30 p-1 rounded-xl border border-slate-350/50 dark:border-zinc-800/50 font-mono text-[9px] font-bold">
+                  <button type="button" (click)="themeService.setAnalogyLensMode('clinical')"
+                    [class.bg-white]="!themeService.isPlainLanguageMode()"
+                    [class.dark:bg-zinc-800]="!themeService.isPlainLanguageMode()"
+                    [class.text-sky-650]="!themeService.isPlainLanguageMode()"
+                    [class.dark:text-sky-300]="!themeService.isPlainLanguageMode()"
+                    [class.text-zinc-500]="themeService.isPlainLanguageMode()"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🔬 Clinical
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('arborist')"
+                    [class.bg-emerald-600]="themeService.analogyLensMode() === 'arborist'"
+                    [class.text-white]="themeService.analogyLensMode() === 'arborist'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'arborist'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🌳 Arborist
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('mechanic')"
+                    [class.bg-cyan-600]="themeService.analogyLensMode() === 'mechanic'"
+                    [class.text-white]="themeService.analogyLensMode() === 'mechanic'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'mechanic'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🚗 Mechanic
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('gentleman')"
+                    [class.bg-amber-600]="themeService.analogyLensMode() === 'gentleman'"
+                    [class.text-white]="themeService.analogyLensMode() === 'gentleman'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'gentleman'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    🎩 Gentleman
+                  </button>
+                  <button type="button" (click)="themeService.setAnalogyLensMode('muse')"
+                    [class.bg-purple-600]="themeService.analogyLensMode() === 'muse'"
+                    [class.text-white]="themeService.analogyLensMode() === 'muse'"
+                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'muse'"
+                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
+                    ✨ Muse
+                  </button>
+                </div>
+                <!-- Accessibility Text Size Scale Button Group -->
+                <div class="flex items-center gap-1 bg-white/30 dark:bg-black/30 p-1 rounded-xl border border-slate-350/50 dark:border-zinc-800/50 font-mono text-[9px] font-black">
+                  <span class="px-2 text-zinc-500 dark:text-zinc-400">TEXT SIZE:</span>
+                  <button type="button" (click)="themeService.textSizeScale.set('standard')"
+                    [class.bg-white]="themeService.textSizeScale() === 'standard'"
+                    [class.dark:bg-zinc-800]="themeService.textSizeScale() === 'standard'"
+                    [class.text-indigo-650]="themeService.textSizeScale() === 'standard'"
+                    [class.dark:text-indigo-400]="themeService.textSizeScale() === 'standard'"
+                    [class.text-zinc-500]="themeService.textSizeScale() !== 'standard'"
+                    [class.shadow-xs]="themeService.textSizeScale() === 'standard'"
+                    class="px-2.5 py-1 rounded-md uppercase transition cursor-pointer border-0">
+                    A (Std)
+                  </button>
+                  <button type="button" (click)="themeService.textSizeScale.set('large')"
+                    [class.bg-white]="themeService.textSizeScale() === 'large'"
+                    [class.dark:bg-zinc-800]="themeService.textSizeScale() === 'large'"
+                    [class.text-indigo-650]="themeService.textSizeScale() === 'large'"
+                    [class.dark:text-indigo-400]="themeService.textSizeScale() === 'large'"
+                    [class.text-zinc-500]="themeService.textSizeScale() !== 'large'"
+                    [class.shadow-xs]="themeService.textSizeScale() === 'large'"
+                    class="px-2.5 py-1 rounded-md uppercase transition cursor-pointer border-0">
+                    A+ (Lg)
+                  </button>
+                  <button type="button" (click)="themeService.textSizeScale.set('extra-large')"
+                    [class.bg-white]="themeService.textSizeScale() === 'extra-large'"
+                    [class.dark:bg-zinc-800]="themeService.textSizeScale() === 'extra-large'"
+                    [class.text-indigo-650]="themeService.textSizeScale() === 'extra-large'"
+                    [class.dark:text-indigo-400]="themeService.textSizeScale() === 'extra-large'"
+                    [class.text-zinc-500]="themeService.textSizeScale() !== 'extra-large'"
+                    [class.shadow-xs]="themeService.textSizeScale() === 'extra-large'"
+                    class="px-2.5 py-1 rounded-md uppercase transition cursor-pointer border-0">
+                    A++ (XL)
+                  </button>
+                </div>
+
+                <button type="button" (click)="themeService.togglePlainLanguageMode()"
+                        class="px-3 py-1.5 rounded-xl border font-mono text-[10px] font-extrabold uppercase tracking-wider transition cursor-pointer hover:scale-105"
+                        [class.bg-emerald-600]="themeService.isPlainLanguageMode()"
+                        [class.text-white]="themeService.isPlainLanguageMode()"
+                        [class.border-emerald-700]="themeService.isPlainLanguageMode()"
+                        [class.bg-sky-600]="!themeService.isPlainLanguageMode()"
+                        [class.text-white]="!themeService.isPlainLanguageMode()"
+                        [class.border-sky-700]="!themeService.isPlainLanguageMode()">
+                  Switch to {{ themeService.isPlainLanguageMode() ? '🔬 Deep Rationale' : '📖 Plain Language' }}
+                </button>
+              </div>
+            </div>
+
+            <!-- Global Sentinel Intelligence Scope Selector (Micro Patient vs Macro Fleet) -->
+            <div class="mb-6 p-4 bg-slate-100/90 dark:bg-zinc-900/90 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md font-mono text-xs">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-cyan-500 animate-ping"></span>
+                  <span class="font-black uppercase tracking-wider text-gray-900 dark:text-zinc-100 text-sm">
+                    🌐 Sentinel Intelligence Scope
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5 bg-gray-200 dark:bg-zinc-950 p-1 rounded-md border border-gray-300 dark:border-zinc-800">
+                  <button type="button" (click)="state.sentinelScope.set('micro-patient')"
+                          [class.bg-sky-600]="state.sentinelScope() === 'micro-patient'"
+                          [class.text-white]="state.sentinelScope() === 'micro-patient'"
+                          [class.text-gray-700]="state.sentinelScope() !== 'micro-patient'"
+                          [class.dark:text-zinc-400]="state.sentinelScope() !== 'micro-patient'"
+                          class="min-h-[44px] px-3.5 py-2 text-xs font-bold rounded-md transition cursor-pointer border-0 flex items-center gap-1.5">
+                    👤 Micro Patient Scope
+                  </button>
+                  <button type="button" (click)="state.sentinelScope.set('macro-fleet')"
+                          [class.bg-emerald-600]="state.sentinelScope() === 'macro-fleet'"
+                          [class.text-white]="state.sentinelScope() === 'macro-fleet'"
+                          [class.text-gray-700]="state.sentinelScope() !== 'macro-fleet'"
+                          [class.dark:text-zinc-400]="state.sentinelScope() !== 'macro-fleet'"
+                          class="min-h-[44px] px-3.5 py-2 text-xs font-bold rounded-md transition cursor-pointer border-0 flex items-center gap-1.5">
+                    🌐 Macro Fleet Sentinel Scope
+                  </button>
+                </div>
+              </div>
+
+              <!-- Macro Fleet Telemetry Banner -->
+              @if (state.sentinelScope() === 'macro-fleet') {
+                <div class="mt-3 p-3 bg-white/90 dark:bg-zinc-950/90 rounded-md border border-emerald-500/30 text-gray-800 dark:text-zinc-200 animate-fadeIn">
+                  <div class="flex items-center justify-between font-bold text-emerald-800 dark:text-emerald-300 mb-1">
+                    @if (themeService.analogyLensMode() === 'arborist') {
+                      <span>🌲 Sylvan Redwood Forest Sentinel (5,400 Grove Hectares Active)</span>
+                      <span>Hydration: 94.2% | Mycorrhizal Mesh: Synchronized</span>
+                    } @else if (themeService.analogyLensMode() === 'mechanic') {
+                      <span>🏎️ Commercial Fleet Motor Pool Sentinel (128 Vehicles Monitored)</span>
+                      <span>Obd-II Fleet DTC: 0 Critical | Fuel Eff: 98.4%</span>
+                    } @else if (themeService.analogyLensMode() === 'gentleman') {
+                      <span>🎩 Royal Naval Armada & Observatory Sentinel (42 Frigates)</span>
+                      <span>Atmospheric Depression: -2.4 hPa | Gales: Minimal</span>
+                    } @else {
+                      <span>🔬 Global WHO Population Health Registry Sentinel</span>
+                      <span>Herd Immunity: 96.1% | Regional AQI: Optimal</span>
+                    }
+                  </div>
+                  <p class="text-[11px] font-sans text-gray-600 dark:text-zinc-400 leading-snug">
+                    @if (themeService.analogyLensMode() === 'arborist') {
+                      "Forest canopy transpiration and subterranean root signals aggregated. Patient vitals synchronized with regional Sylvan grove resilience metrics."
+                    } @else if (themeService.analogyLensMode() === 'mechanic') {
+                      "Motor pool ECU telemetry and chassis load logs synthesized across 128 fleet units. Preventative maintenance schedule active."
+                    } @else if (themeService.analogyLensMode() === 'gentleman') {
+                      "Imperial naval chronometer governors and oceanic barometric depressions logged across all stations."
+                    } @else {
+                      "FHIR R4 population health registries and epidemiological surveillance networks connected to active patient strategy."
+                    }
+                  </p>
+                </div>
+              }
+            </div>
+
+            <!-- Longitudinal Clinical Trajectory Biography Component -->
+            @if (themeService.analogyLensMode() !== 'clinical') {
+              <div class="mb-6">
+                <app-clinical-trajectory-biography></app-clinical-trajectory-biography>
+              </div>
+            }
+
+            <!-- Synchronized Dual-Pane Consultation View -->
+            @if (themeService.analogyLensMode() !== 'clinical') {
+              <div class="mb-6">
+                <app-dual-pane-consultation></app-dual-pane-consultation>
+              </div>
+            }
+
+            <!-- AI Comprehensive Report Sections -->
+            @for (section of sections; track section.title; let i = $index) {
+              @if (selectedMobileSectionTab() === 'all' || selectedMobileSectionTab() === section.title) {
+                <div [id]="i === 0 ? 'tour-report-node' : null" appReveal [revealDelay]="i * 100" class="w-full shrink-0 flex flex-col min-h-max min-w-0 overflow-hidden">
+                  <pocket-gull-card [title]="section.title" [icon]="section.icon" class="flex-1 min-w-0 overflow-hidden">
+                    <div right-action class="flex items-center gap-2">
+                      @if (intel.isLoading() && !verificationStatus(section.title)) {
+                        <div class="flex items-center gap-1.5 mr-2">
+                          <span class="flex h-1.5 w-1.5 rounded-full bg-[#689F38] dark:bg-[#8bc34a] animate-pulse"></span>
+                          <span class="text-[12px] uppercase tracking-tighter text-gray-500 dark:text-zinc-400">{{ activeAgentName() }} is streaming...</span>
+                        </div>
+                      }
+                      @if (verificationStatus(section.title); as status) {
+                        <pocket-gull-badge [label]="status" [severity]="statusSeverity(status)">
+                          <div badge-icon [innerHTML]="ClinicalIcons.Verified | safeHtml"></div>
+                        </pocket-gull-badge>
+                      }
+
+                      <!-- Expand / Collapse Accordion Toggle -->
+                      <button type="button" (click)="toggleSection(section.title)"
+                        [title]="isSectionCollapsed(section.title, i) ? 'Expand Section' : 'Collapse Section'"
+                        class="px-2.5 py-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 text-xs font-mono font-bold transition flex items-center gap-1.5 cursor-pointer">
+                        <span class="text-[10px] text-zinc-400 uppercase font-mono">{{ section.nodes.length }} items</span>
+                        <span>{{ isSectionCollapsed(section.title, i) ? '▼ Expand' : '▲ Collapse' }}</span>
+                      </button>
+                    </div>
+
+                    @if (!isSectionCollapsed(section.title, i)) {
+                      <div class="rams-typography" (mouseover)="onTooltipOver($event)" (mouseout)="onTooltipOut($event)">
+                        @for (node of section.nodes; track node.id) {
+                          @if (node.type === 'raw') {
+                            <div [innerHTML]="(node.rawHtml || '') | safeHtml" class="mb-4"></div>
+                          } @else if (node.type === 'paragraph') {
+                            <app-summary-node
+                              [node]="node"
+                              type="paragraph"
+                              [sectionTitle]="section.title"
+                              [saveStatus]="nodeSaveStatuses()[node.key]"
+                              [protocolInsights]="protocolInsights"
+                              (update)="handleNodeUpdate(node, $event)"
+                              (dictationToggle)="openNodeDictation(node)"
+                              (askAgent)="openAgentDialog($event)">
+                            </app-summary-node>
+                          } @else if (node.type === 'list') {
+                            @if (node.ordered) {
+                              <ol class="list-decimal pl-4 mb-6">
+                                @for (item of node.items; track item.id) {
+                                  <li class="pl-2 mb-1">
+                                    <app-summary-node
+                                      [node]="item"
+                                      type="list-item"
+                                      [sectionTitle]="section.title"
+                                      [saveStatus]="nodeSaveStatuses()[item.key]"
+                                      [protocolInsights]="protocolInsights"
+                                      (update)="handleNodeUpdate(item, $event)"
+                                      (dictationToggle)="openNodeDictation(item)"
+                                      (askAgent)="openAgentDialog($event)">
+                                    </app-summary-node>
+                                  </li>
+                                }
+                              </ol>
+                            } @else {
+                              <ul class="list-disc pl-4 mb-6">
+                                @for (item of node.items; track item.id) {
+                                  <li class="pl-2 mb-1">
+                                    <app-summary-node
+                                      [node]="item"
+                                      type="list-item"
+                                      [sectionTitle]="section.title"
+                                      [saveStatus]="nodeSaveStatuses()[item.key]"
+                                      [protocolInsights]="protocolInsights"
+                                      (update)="handleNodeUpdate(item, $event)"
+                                      (dictationToggle)="openNodeDictation(item)"
+                                      (askAgent)="openAgentDialog($event)">
+                                    </app-summary-node>
+                                  </li>
+                                }
+                              </ul>
+                            }
+                          }
+                        }
+                      </div>
+                    }
+                  </pocket-gull-card>
+                </div>
+              }
             }
 
             <!-- Actionable Lens Flow Dock (Dieter Rams Grid & Continuous Flow) -->
@@ -1278,27 +1952,24 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
                 </div>
               }
             </div>
+
+        <!-- AI Co-Pilot Transparency Watermark -->
+        <div class="mt-4 pb-8 flex items-center justify-center gap-3 opacity-60 no-print select-none">
+          <div class="h-px bg-gray-300 dark:bg-zinc-700 flex-1 max-w-[120px]"></div>
+          <div class="text-[12px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 flex items-center gap-1.5">
+            <span [innerHTML]="ClinicalIcons.Verified | safeHtml" class="w-3.5 h-3.5"></span>
+            Generated by AI Co-Pilot — Verify all clinical findings
           </div>
-          
-          <!-- AI Co-Pilot Transparency Watermark -->
-          <div class="mt-4 pb-8 flex items-center justify-center gap-3 opacity-60 no-print select-none">
-            <div class="h-px bg-gray-300 dark:bg-zinc-700 flex-1 max-w-[120px]"></div>
-            <div class="text-[12px] font-bold uppercase tracking-widest text-gray-500 dark:text-zinc-500 flex items-center gap-1.5">
-               <span [innerHTML]="ClinicalIcons.Verified | safeHtml" class="w-3.5 h-3.5"></span>
-               Generated by AI Co-Pilot — Verify all clinical findings
-            </div>
-            <div class="h-px bg-gray-300 dark:bg-zinc-700 flex-1 max-w-[120px]"></div>
-          </div>
-        }
+          <div class="h-px bg-gray-300 dark:bg-zinc-700 flex-1 max-w-[120px]"></div>
+        </div>
 
         @if (!intel.isLoading() && !hasAnyReport()) {
           <div class="h-64 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg flex items-center justify-center no-print">
             <p class="text-xs text-gray-500 dark:text-zinc-400 font-medium uppercase tracking-widest">Waiting for input data...</p>
           </div>
         }
-      }
       </div>
-    </div>
+    }
 
     <!-- Viewport Portal Tooltip -->
     @if (activeTooltip(); as tooltip) {
@@ -1336,6 +2007,110 @@ import { ProceduralInvestmentMatrixComponent } from './procedural-investment-mat
 
     <!-- Clinician-to-Clinician Handoff Modal -->
     <app-handoff-modal [isOpen]="showHandoffModal()" (close)="showHandoffModal.set(false)"></app-handoff-modal>
+    @if (showSec1557Modal()) {
+      <app-sec1557-audit-modal (close)="showSec1557Modal.set(false)"></app-sec1557-audit-modal>
+    }
+
+    <!-- Clinical Tools & Exports Modal -->
+    @if (showClinicalToolsModal()) {
+      <div class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div class="w-full max-w-lg p-6 rounded-3xl bg-zinc-950/95 border border-purple-500/40 shadow-[0_0_50px_rgba(168,85,247,0.3)] font-mono text-zinc-100 relative">
+          
+          <div class="flex items-center justify-between pb-4 border-b border-zinc-800 mb-4">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl p-2 rounded-xl bg-purple-500/20 text-purple-300">🎛️</span>
+              <div>
+                <h3 class="text-base font-extrabold text-white uppercase tracking-wider">Clinical Tools & Exports</h3>
+                <span class="text-xs text-zinc-400 font-sans">Patient: {{ state.patientName() || 'Active Encounter' }}</span>
+              </div>
+            </div>
+
+            <button (click)="showClinicalToolsModal.set(false)" class="w-8 h-8 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold flex items-center justify-center transition cursor-pointer">
+              ✕
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 my-4 text-xs font-sans">
+            <button (click)="exportFhirPassport(); showClinicalToolsModal.set(false)"
+              class="p-3 rounded-2xl bg-sky-950/40 hover:bg-sky-900/60 border border-sky-500/40 text-sky-200 flex items-center gap-2.5 transition text-left cursor-pointer">
+              <span class="text-xl">📄</span>
+              <div>
+                <strong class="block font-bold text-white uppercase text-[11px] font-mono">FHIR R4 Passport</strong>
+                <span class="text-[10.5px] text-zinc-400">Download HIPAA JSON Bundle</span>
+              </div>
+            </button>
+
+            <button (click)="showSec1557Modal.set(true); showClinicalToolsModal.set(false)"
+              class="p-3 rounded-2xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 flex items-center gap-2.5 transition text-left cursor-pointer">
+              <span class="text-xl">🛡️</span>
+              <div>
+                <strong class="block font-bold text-white uppercase text-[11px] font-mono">Sec 1557 Audit</strong>
+                <span class="text-[10.5px] text-zinc-400">Algorithmic Fairness Telemetry</span>
+              </div>
+            </button>
+
+            <button (click)="showHandoffModal.set(true); showClinicalToolsModal.set(false)"
+              class="p-3 rounded-2xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/40 text-purple-200 flex items-center gap-2.5 transition text-left cursor-pointer">
+              <span class="text-xl">🤝</span>
+              <div>
+                <strong class="block font-bold text-white uppercase text-[11px] font-mono">Specialist Consult</strong>
+                <span class="text-[10.5px] text-zinc-400">SBAR Handoff Brief</span>
+              </div>
+            </button>
+
+            <button (click)="toggleParadigm(); showClinicalToolsModal.set(false)"
+              class="p-3 rounded-2xl bg-amber-950/40 hover:bg-amber-900/60 border border-amber-500/40 text-amber-200 flex items-center gap-2.5 transition text-left cursor-pointer">
+              <span class="text-xl">☯️</span>
+              <div>
+                <strong class="block font-bold text-white uppercase text-[11px] font-mono">Switch Paradigm</strong>
+                <span class="text-[10.5px] text-zinc-400">Western / TCM / Ayurveda</span>
+              </div>
+            </button>
+          </div>
+
+          <div class="pt-3 border-t border-zinc-800 flex justify-end">
+            <button (click)="showClinicalToolsModal.set(false)" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs uppercase tracking-wider transition cursor-pointer">
+              Close
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }
+
+    <!-- FHIR R4 Patient Health Passport Modal -->
+    @if (showFhirPassportModal()) {
+      <app-fhir-passport-modal (closeModal)="showFhirPassportModal.set(false)"></app-fhir-passport-modal>
+    }
+
+    <!-- Floating 3D Anatomy Research Overlay -->
+    @if (showFloating3dOverlay()) {
+      <div 
+        class="fixed bottom-6 right-6 z-50 w-80 h-[380px] bg-zinc-950/95 border border-teal-500/40 backdrop-blur-xl rounded-2xl p-4 shadow-2xl transition-all duration-300 transform scale-100 hover:border-teal-400 font-sans"
+        (mouseenter)="cancelCloseTimer()"
+        (mouseleave)="startCloseTimer()"
+      >
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-3">
+          <div class="flex items-center gap-1.5 text-teal-300 font-bold text-[11px] uppercase tracking-wider">
+            <span>🔬</span>
+            <span>3D Anatomy Overlay</span>
+          </div>
+          <button (click)="closeOverlay()" class="text-zinc-400 hover:text-zinc-200 cursor-pointer p-0.5">✕</button>
+        </div>
+        
+        <div class="h-64 rounded-xl overflow-hidden bg-white border border-slate-200 shadow-xs relative">
+          <app-body-3d-viewer 
+            [anatomyViewMode]="state.anatomyViewMode()"
+            class="w-full h-full">
+          </app-body-3d-viewer>
+        </div>
+        
+        <div class="mt-2.5 text-[10px] text-zinc-500 font-mono text-center flex items-center justify-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span>
+          <span>Targeting: {{ state.selectedPartId() || 'None' }}</span>
+        </div>
+      </div>
+    }
   `
 })
 export class AnalysisReportComponent implements OnDestroy {
@@ -1349,16 +2124,42 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly actMapper = inject(ClinicalActLensMapperService);
   private readonly medicalDecoder = inject(MedicalDecoderService);
   protected readonly lyricsService = inject(ParadigmLyricsService);
+  protected readonly themeService = inject(ThemeService);
+  protected readonly compassionateAnalogy = inject(CompassionateAnalogyService);
 
   flowToastMessage = signal<string | null>(null);
   showHandoffModal = signal<boolean>(false);
+  showSec1557Modal = signal<boolean>(false);
+  showPaperTextureMenu = signal<boolean>(false);
+  activeAuxTool = signal<'none' | 'qaly' | 'solfeggio' | 'vagal' | 'storm' | 'foraging' | 'investment' | 'perils' | 'karaoke' | 'assessments'>('none');
+  isAuxToolsExpanded = signal<boolean>(false);
   lensCarousel = viewChild<ElementRef<HTMLDivElement>>('lensCarousel');
+  contentArea = viewChild<ElementRef<HTMLDivElement>>('contentArea');
+  selectedMobileSectionTab = signal<string>('all');
+
+  setPaperTexture(theme: AppTheme) {
+    this.themeService.currentTheme.set(theme);
+    this.showPaperTextureMenu.set(false);
+  }
+
+  getPaperTextureLabel(theme: AppTheme): string {
+    if (theme === 'papercraft') return '📜 Cardstock';
+    if (theme === 'hemp') return '🌿 Organic Hemp';
+    if (theme === 'rice') return '🌾 Rice Paper';
+    if (theme === 'construction') return '🎨 Construction';
+    if (theme === 'dark') return '🌙 Dark Mode';
+    return '📜 Texture Suite';
+  }
+
+  toggleAuxTool(tool: 'qaly' | 'solfeggio' | 'vagal' | 'storm' | 'foraging' | 'investment' | 'perils' | 'karaoke' | 'assessments') {
+    this.activeAuxTool.update(curr => curr === tool ? 'none' : tool);
+  }
 
   openGleeAlbumFromReport() {
     this.openGleeModal.emit();
   }
 
-  availableLenses: (AnalysisLens | 'Y-BOCs Screener' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health')[] = [
+  availableLenses: (AnalysisLens | 'ASSESSMENTS' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health')[] = [
     'Summary Overview',
     'Treatment Matrix',
     'Functional Protocols',
@@ -1367,7 +2168,7 @@ export class AnalysisReportComponent implements OnDestroy {
     'Monitoring & Follow-up',
     'Patient Education',
     'PhysioNet Telemetry',
-    'Y-BOCs Screener',
+    'ASSESSMENTS',
     'Maternal & Postpartum',
     'Grow-Thyself Education',
     'Epigenetic Longevity',
@@ -1383,7 +2184,7 @@ export class AnalysisReportComponent implements OnDestroy {
   isCoreLensForParadigm(lens: string): boolean {
     const p = this.state.activePhilosophy();
     if (p === 'western') return lens === 'Summary Overview' || lens === 'Treatment Matrix' || lens === 'PhysioNet Telemetry';
-    if (p === 'eastern') return lens === 'Functional Protocols' || lens === 'Nutrition' || lens === 'Y-BOCs Screener';
+    if (p === 'eastern') return lens === 'Functional Protocols' || lens === 'Nutrition' || lens === 'ASSESSMENTS';
     if (p === 'ayurvedic') return lens === 'Precision Nutrients' || lens === 'Nutrition' || lens === 'Patient Education';
     return false;
   }
@@ -1395,6 +2196,17 @@ export class AnalysisReportComponent implements OnDestroy {
     if (p === 'eastern') return '☯️ Core';
     if (p === 'ayurvedic') return '🪷 Core';
     return null;
+  }
+
+  getRecommendedCoreLensForParadigm(): { name: any; icon: string; reason: string } {
+    const p = this.state.activePhilosophy();
+    if (p === 'eastern') {
+      return { name: 'Functional Protocols', icon: '☯️', reason: 'Eastern TCM Zang-Fu & Qi Harmony' };
+    }
+    if (p === 'ayurvedic') {
+      return { name: 'Precision Nutrients', icon: '🪷', reason: 'Ayurvedic Rasayana & Dosha Matrix' };
+    }
+    return { name: 'Summary Overview', icon: '🔬', reason: 'Western Clinical Diagnostic Overview' };
   }
 
   hasNextLens = computed(() => {
@@ -1410,8 +2222,45 @@ export class AnalysisReportComponent implements OnDestroy {
       const nextLens = this.getNextLensName();
       if (nextLens) {
         this.changeLens(nextLens as any);
-        if (typeof window !== 'undefined') {
-          window.scrollTo({ top: 180, behavior: 'smooth' });
+      }
+    }
+  }
+
+  hasPreviousLens = computed(() => {
+    return this.activeLensIndex() > 0;
+  });
+
+  getPreviousLensName = computed((): string => {
+    return this.hasPreviousLens() ? this.availableLenses[this.activeLensIndex() - 1] : '';
+  });
+
+  navigateToPreviousLens(): void {
+    if (this.hasPreviousLens()) {
+      const prevLens = this.getPreviousLensName();
+      if (prevLens) {
+        this.changeLens(prevLens as any);
+      }
+    }
+  }
+
+  handleContentAreaClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const anchor = target?.closest?.('a');
+    if (anchor) {
+      const href = anchor.getAttribute('href');
+      if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) {
+          this.state.openResearchUrl(href);
+        } else {
+          try {
+            const fullUrl = new URL(href, window.location.origin).href;
+            this.state.openResearchUrl(fullUrl);
+          } catch {
+            this.state.openResearchUrl(href);
+          }
         }
       }
     }
@@ -1438,7 +2287,9 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
   activeActTitle = computed(() => {
-    return this.actMapper.getActTitleForLens(this.activeLens(), this.state.activePhilosophy());
+    const raw = this.state.activePhilosophy();
+    const phil = (raw === 'arborist' || raw === 'mechanic') ? 'western' : raw;
+    return this.actMapper.getActTitleForLens(this.activeLens(), phil);
   });
 
   activeActProposal = computed(() => {
@@ -1510,7 +2361,23 @@ export class AnalysisReportComponent implements OnDestroy {
   });
   protected readonly cache = inject(AiCacheService);
   protected readonly markdownService = inject(MarkdownService);
+  protected readonly exportService = inject(ExportService);
+  protected readonly patientManagement = inject(PatientManagementService);
   protected readonly ClinicalIcons = ClinicalIcons;
+
+  showClinicalToolsModal = signal<boolean>(false);
+  showAllLensesMenu = signal<boolean>(false);
+  showFhirPassportModal = signal<boolean>(false);
+
+  exportFhirPassport() {
+    this.showFhirPassportModal.set(true);
+  }
+
+  toggleParadigm() {
+    const current = this.state.activePhilosophy();
+    const next = current === 'western' ? 'eastern' : (current === 'eastern' ? 'ayurvedic' : 'western');
+    this.state.activePhilosophy.set(next);
+  }
 
   historyEntries = signal<any[]>([]);
 
@@ -1538,19 +2405,261 @@ export class AnalysisReportComponent implements OnDestroy {
     this.historyEntries.set(entries.filter(e => e.value?._isSnapshot));
   }
 
-  activeLens = signal<AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener' | 'Maternal & Postpartum'>('Summary Overview');
+  activeLens = signal<AnalysisLens | 'EMT Handoff' | 'ASSESSMENTS' | 'Maternal & Postpartum'>('Summary Overview');
+  screenerTab = signal<'ybocs' | 'suite' | 'suggestions'>('ybocs');
   showRawFhir = signal(false);
+
+  intakeSuggestions = computed(() => {
+    const vitals = this.state.vitals();
+    const tcm = this.state.tcmIntake();
+    const occupation = this.state.occupation() || '';
+    const reason = this.state.reasonForVisit() || '';
+
+    const suggestions: {
+      assessment: string;
+      reason: string;
+      action: string;
+      interviewPrompts: string[];
+    }[] = [];
+
+    // 1. GAD-7 Anxiety Assessment suggestion
+    const hrVal = parseInt(String(vitals?.hr || '0'), 10);
+    const hasAnxietyMatch = reason.toLowerCase().includes('anxiety') || 
+                            reason.toLowerCase().includes('stress') || 
+                            reason.toLowerCase().includes('panic') ||
+                            hrVal > 95;
+    if (hasAnxietyMatch) {
+      suggestions.push({
+        assessment: 'GAD-7 (Generalized Anxiety)',
+        reason: hrVal > 95 
+          ? `Elevated heart rate (${hrVal} bpm) detected in vitals.` 
+          : `Chief complaint mentions anxiety or stress indicators.`,
+        action: 'Refresh GAD-7 assessment to track clinical anxiety trajectory.',
+        interviewPrompts: [
+          `"It sounds like you've been carrying a heavy weight lately. What has been occupying your thoughts the most?"`,
+          `"How does that stress physically manifest in your body during the day?"`
+        ]
+      });
+    }
+
+    // 2. PHQ-9 Depression Assessment suggestion
+    const hasDepressionMatch = reason.toLowerCase().includes('depress') || 
+                               reason.toLowerCase().includes('mood') || 
+                               reason.toLowerCase().includes('sad') || 
+                               reason.toLowerCase().includes('fatigue');
+    if (hasDepressionMatch) {
+      suggestions.push({
+        assessment: 'PHQ-9 (Depression Severity)',
+        reason: `Symptom profile indicates persistent low mood, fatigue, or sadness.`,
+        action: 'Perform PHQ-9 screener to track depressive symptoms.',
+        interviewPrompts: [
+          `"When you feel your energy or mood drop, what does a typical day look like for you?"`,
+          `"What are some small activities that used to bring you joy, and how accessible do they feel right now?"`
+        ]
+      });
+    }
+
+    // 3. ISI (Insomnia Severity Index) suggestion
+    const hasSleepMatch = reason.toLowerCase().includes('sleep') || 
+                          reason.toLowerCase().includes('insomnia') || 
+                          reason.toLowerCase().includes('wake') ||
+                          reason.toLowerCase().includes('nightmare');
+    if (hasSleepMatch) {
+      suggestions.push({
+        assessment: 'Insomnia Severity Index (ISI)',
+        reason: `Patient notes or chief complaint mentions sleep latency or architecture distress.`,
+        action: 'Administer ISI to quantify sleep quality and day-time impairment.',
+        interviewPrompts: [
+          `"Describe your evening wind-down routine. What happens when your head hits the pillow?"`,
+          `"How does your sleep quality affect your focus and energy the next morning?"`
+        ]
+      });
+    }
+
+    // 4. PRAPARE (SDOH) suggestion
+    const isHighStressOccupation = occupation.toLowerCase().includes('worker') ||
+                                   occupation.toLowerCase().includes('shift') ||
+                                   occupation.toLowerCase().includes('labor') ||
+                                   occupation.toLowerCase().includes('unemployed');
+    if (isHighStressOccupation) {
+      suggestions.push({
+        assessment: 'PRAPARE (Social Determinants of Health)',
+        reason: `Occupation category "${occupation}" may correlate with high psychosocial stressors or resource needs.`,
+        action: 'Complete SDOH PRAPARE assessment to check support structures and safety nets.',
+        interviewPrompts: [
+          `"Outside of your health, are there external challenges like transportation, work hours, or costs that make it hard to care for yourself?"`,
+          `"Who in your life can you lean on when things get stressful or overwhelming?"`
+        ]
+      });
+    }
+
+    // 5. Eastern & Holistic suggestions
+    const thermal = tcm?.thermalPreference;
+    if (thermal === 'aversion-cold' || thermal === 'aversion-heat') {
+      suggestions.push({
+        assessment: 'TCM Ba Gang Profile & Ayurvedic Vikriti check',
+        reason: `Thermal preference is skewed towards "${thermal}".`,
+        action: 'Refresh TCM Ba Gang profile and check Ayurvedic Vikriti imbalance.',
+        interviewPrompts: [
+          `"Do you notice your symptoms changing depending on the temperature or the food you eat?"`,
+          `"How does your body react when you introduce warm teas or cooling herbs?"`
+        ]
+      });
+    }
+
+    // Default suggestions if no specific match
+    if (suggestions.length === 0) {
+      suggestions.push({
+        assessment: 'General Clinical Intake & Goal Alignment',
+        reason: 'Standard patient check-in protocol.',
+        action: 'Administer General Clinical Suite to establish patient baseline.',
+        interviewPrompts: [
+          `"What is the single most important goal you want to achieve for your health in our time together?"`,
+          `"What has worked well for you in the past when trying to manage these symptoms?"`,
+          `"On a scale of 1-10, how ready do you feel to make some changes to your daily routine, and what would make it a higher number?"`
+        ]
+      });
+    }
+
+    return suggestions;
+  });
+
+  getParadigmLensOverview(): { title: string; subtitle: string; badges: string[]; description: string } {
+    const phil = this.state.activePhilosophy();
+    const lens = this.activeLens();
+
+    if (phil === 'western') {
+      switch (lens) {
+        case 'Summary Overview':
+          return {
+            title: 'Western Allopathic Clinical Overview',
+            subtitle: 'Pathophysiological Differential & Biomarker Risk Stratification',
+            badges: ['ICD-10 / SNOMED CT', 'Lab Reference Ranges', 'FDA Standard-of-Care'],
+            description: 'Synthesizing objective vitals, diagnostic labs, and clinical findings into evidence-graded allopathic diagnostic impressions.'
+          };
+        case 'Treatment Matrix':
+          return {
+            title: 'Evidence-Based Pharmacotherapy & Interventions',
+            subtitle: 'First-Line Pharmacological & Procedural Pathways',
+            badges: ['FDA / WHO Guidelines', 'Dosing Protocols', 'Contraindication Audit'],
+            description: 'Prioritizing Grade-A randomized trial evidence, guideline-directed medical therapy (GDMT), and specialist consult pathways.'
+          };
+        case 'Functional Protocols':
+          return {
+            title: 'Circadian & Mitochondrial Systems Biology',
+            subtitle: 'Vagal HRV, Neuro-Metabolic & Cellular Bio-mechanics',
+            badges: ['BMAL1 Circadian Clock', 'Vagal Autonomic Tone', 'Mitochondrial Efficiency'],
+            description: 'Leveraging autonomic nervous system biofeedback, sleep entrainment, and mitochondrial substrate optimization.'
+          };
+        case 'Nutrition':
+          return {
+            title: 'Clinical Medical Nutrition Therapy',
+            subtitle: 'Glycemic Regulation & Anti-Inflammatory Nutrient Density',
+            badges: ['Macronutrient Ratios', 'Allergen Shielding', 'Micronutrient Targets'],
+            description: 'Optimizing glycemic index, essential fatty acids, and micro-nutrient sufficiency to reduce systemic inflammatory biomarkers.'
+          };
+        default:
+          return {
+            title: `Western Allopathic Lens: ${lens}`,
+            subtitle: 'Quantitative Biomarkers & Clinical Protocol',
+            badges: ['Biomarker Telemetry', 'Clinical Evidence Grade A'],
+            description: `Evaluated under FDA reference standards for ${lens.toLowerCase()} management.`
+          };
+      }
+    } else if (phil === 'eastern') {
+      switch (lens) {
+        case 'Summary Overview':
+          return {
+            title: 'TCM Zang-Fu Organ Harmony Overview',
+            subtitle: 'Yin-Yang Equilibrium & Meridian Flow Diagnostics',
+            badges: ['Zang-Fu Patterns', 'Qi & Blood Flow', 'Tongue / Pulse Telemetry'],
+            description: 'Evaluating root organ disharmonies (Ben) vs superficial symptom manifestations (Biao) across primary meridian pathways.'
+          };
+        case 'Treatment Matrix':
+          return {
+            title: 'TCM Classical Herbal & Acupuncture Protocols',
+            subtitle: 'Synergistic Herbal Formulations & Point Selection',
+            badges: ['Classic Prescriptions', 'Acupuncture Points', 'Meridian De-Stagnation'],
+            description: 'Formulating classic botanical remedies paired with targeted acupoint stimulation to clear dampness and restore Qi.'
+          };
+        case 'Functional Protocols':
+          return {
+            title: 'Shen Co-Regulation & Qigong Energetic Alignment',
+            subtitle: 'Mind-Spirit Anchoring & Meridian Breathwork',
+            badges: ['Shen Co-Regulation', 'Dan Tian Breathwork', 'Circadian Meridian Clock'],
+            description: 'Harmonizing the mind (Shen) and liver Qi to relieve stagnation, improve sleep quality, and foster autonomic resilience.'
+          };
+        case 'Nutrition':
+          return {
+            title: 'TCM Five-Element Thermal Food Therapy',
+            subtitle: 'Thermal Energetics & Organ Tonification Foods',
+            badges: ['Five Thermal Energies', 'Spleen Qi Support', 'Moistening & Cooling'],
+            description: 'Selecting foods by thermal nature (Warming, Neutral, Cooling) to nourish Yin, support Spleen Qi digestion, and balance Internal Heat.'
+          };
+        default:
+          return {
+            title: `TCM Energetic Lens: ${lens}`,
+            subtitle: 'Meridian Synergy & Qi Balance',
+            badges: ['Qi & Essence', 'Meridian Dynamics'],
+            description: `Analyzing ${lens.toLowerCase()} through Traditional Chinese Medicine organ energetics.`
+          };
+      }
+    } else { // ayurvedic
+      switch (lens) {
+        case 'Summary Overview':
+          return {
+            title: 'Ayurvedic Tridosha & Agni Diagnostic Overview',
+            subtitle: 'Vata / Pitta / Kapha Balance & Ama Toxic Load',
+            badges: ['Tridosha Matrix', 'Agni (Digestive Fire)', 'Ama Toxicity Load'],
+            description: 'Assessing constitutional balance (Prakriti vs Vikriti), digestive fire (Agni), and cellular toxin accumulation (Ama).'
+          };
+        case 'Treatment Matrix':
+          return {
+            title: 'Ayurvedic Rasayana & Rejuvenation Therapy',
+            subtitle: 'Herbal Phytotherapy & Panchakarma Protocols',
+            badges: ['Rasayana Phytotherapy', 'Panchakarma Detox', 'Dhatu Tissue Rejuvenation'],
+            description: 'Deploying adaptogenic botanicals (Ashwagandha, Guduchi, Triphala) and lifestyle cleansing to restore Dhatu vitality.'
+          };
+        case 'Functional Protocols':
+          return {
+            title: 'Dinacharya Rhythms & Vagal Soma Integration',
+            subtitle: 'Daily Rhythms, Pranayama & Abhyanga Self-Care',
+            badges: ['Dinacharya Rhythms', 'Pranayama Pacer', 'Ojas Enhancement'],
+            description: 'Structuring daily circadian routines (Dinacharya), alternate nostril breathing (Nadi Shodhana), and warm oil therapies for nervous system grounding.'
+          };
+        case 'Nutrition':
+          return {
+            title: 'Ayurvedic Six-Taste (Shad Rasa) Nutrition',
+            subtitle: 'Constitutional Dosha-Balancing Meal Calibrations',
+            badges: ['Six Tastes (Shad Rasa)', 'Agni Ignition Foods', 'Dosha Pacification'],
+            description: 'Designing meals around the six tastes (Sweet, Sour, Salty, Pungent, Bitter, Astringent) to pacify active dosha imbalances.'
+          };
+        default:
+          return {
+            title: `Ayurvedic Vedic Lens: ${lens}`,
+            subtitle: 'Tridosha Harmony & Cellular Ojas',
+            badges: ['Tridosha Matrix', 'Ojas Vitality'],
+            description: `Evaluating ${lens.toLowerCase()} under Ayurvedic Tridosha and Dhatu frameworks.`
+          };
+      }
+    }
+  }
 
   activeAgentName = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'EMT Handoff' || lens === 'Y-BOCs Screener') return '';
+    if (lens === 'EMT Handoff' || lens === 'ASSESSMENTS') return '';
     return this.intel.getAgentNameForLens(lens as AnalysisLens);
   });
 
   activeAgentRole = computed(() => {
     const lens = this.activeLens();
-    if (lens === 'EMT Handoff' || lens === 'Y-BOCs Screener') return '';
+    if (lens === 'EMT Handoff' || lens === 'ASSESSMENTS') return '';
     return this.intel.getAgentRoleForLens(lens as AnalysisLens);
+  });
+
+  activePersonaPropBadge = computed(() => {
+    const lens = this.activeLens();
+    return getPersonaPropBadge(lens as AnalysisLens);
   });
 
   activeTabClasses = computed(() => {
@@ -1573,7 +2682,7 @@ export class AnalysisReportComponent implements OnDestroy {
         resource: {
           resourceType: 'Patient',
           id: 'emergency_casualty',
-          name: [{ text: 'Emergency Casualty' }],
+          name: [{ text: 'Emergency Patient' }],
           gender: 'unknown'
         }
       }
@@ -1655,7 +2764,7 @@ export class AnalysisReportComponent implements OnDestroy {
         resource: {
           resourceType: 'Patient',
           id: 'ec',
-          name: [{ text: 'Casualty' }]
+          name: [{ text: 'Emergency Patient' }]
         }
       }
     ];
@@ -1791,7 +2900,6 @@ export class AnalysisReportComponent implements OnDestroy {
     if (lens === 'EMT Handoff') return '';
     return getSafeProperty(this.intel.analysisResults(), lens) || '';
   });
-  contentArea = viewChild<ElementRef<HTMLDivElement>>('contentArea');
 
   isSectionEmpty(section: any): boolean {
     return !section.nodes || section.nodes.length === 0;
@@ -1988,6 +3096,60 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   });
 
+  get sections(): IReportSection[] {
+    return this.reportSections() || [];
+  }
+
+  // Accordion & Mobile Jump Controls to Reduce Endless Scrolling
+  collapsedSections = signal<Record<string, boolean>>({});
+
+  isSectionCollapsed(title: string, index: number): boolean {
+    const override = this.collapsedSections()[title];
+    if (override !== undefined) return override;
+    if (this.selectedMobileSectionTab() !== 'all' && this.selectedMobileSectionTab() !== title) {
+      return true;
+    }
+    return false;
+  }
+
+  toggleSection(title: string) {
+    const current = this.isSectionCollapsed(title, 0);
+    this.collapsedSections.update(map => ({
+      ...map,
+      [title]: !current
+    }));
+  }
+
+  expandAllSections() {
+    const map: Record<string, boolean> = {};
+    for (const sec of this.sections) {
+      map[sec.title] = false;
+    }
+    this.collapsedSections.set(map);
+    this.selectedMobileSectionTab.set('all');
+  }
+
+  collapseAllSections() {
+    const map: Record<string, boolean> = {};
+    for (let i = 0; i < this.sections.length; i++) {
+      map[this.sections[i].title] = i > 0;
+    }
+    this.collapsedSections.set(map);
+  }
+
+  selectSectionMobile(title: string) {
+    this.selectedMobileSectionTab.set(title);
+    const map: Record<string, boolean> = {};
+    for (const sec of this.sections) {
+      map[sec.title] = sec.title !== title;
+    }
+    this.collapsedSections.set(map);
+    const el = this.contentArea()?.nativeElement;
+    if (el) {
+      el.scrollTop = 0;
+    }
+  }
+
   private getIconForSection(title: string): string {
     const lower = title.toLowerCase();
     if (lower.includes('assessment') || lower.includes('overview') || lower.includes('nutrition')) return ClinicalIcons.Assessment;
@@ -2020,7 +3182,34 @@ export class AnalysisReportComponent implements OnDestroy {
   private readonly _saveVersion = signal(0);
   private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
+  showFloating3dOverlay = signal<boolean>(false);
+  private hoverTimerId: any = null;
+  private closeTimerId: any = null;
+
   constructor() {
+    effect(() => {
+      const partId = this.state.hoveredPartIdForOverlay();
+      const viewMode = this.state.hoveredViewModeForOverlay();
+
+      if (this.hoverTimerId) {
+        clearTimeout(this.hoverTimerId);
+        this.hoverTimerId = null;
+      }
+
+      if (partId) {
+        this.cancelCloseTimer();
+        this.hoverTimerId = window.setTimeout(() => {
+          this.state.selectedPartId.set(partId);
+          if (viewMode) {
+            this.state.anatomyViewMode.set(viewMode);
+          }
+          this.showFloating3dOverlay.set(true);
+        }, 5000);
+      } else {
+        this.startCloseTimer();
+      }
+    });
+
     // Auto-scroll effect for transcript
     effect(() => {
       // This effect depends on the parsedTranscript signal.
@@ -2101,8 +3290,28 @@ export class AnalysisReportComponent implements OnDestroy {
     });
   }
 
+  startCloseTimer() {
+    this.cancelCloseTimer();
+    this.closeTimerId = window.setTimeout(() => {
+      this.closeOverlay();
+    }, 2000);
+  }
+
+  cancelCloseTimer() {
+    if (this.closeTimerId) {
+      clearTimeout(this.closeTimerId);
+      this.closeTimerId = null;
+    }
+  }
+
+  closeOverlay() {
+    this.showFloating3dOverlay.set(false);
+  }
+
   ngOnDestroy() {
     if (this._autoSaveTimer) clearTimeout(this._autoSaveTimer);
+    if (this.hoverTimerId) clearTimeout(this.hoverTimerId);
+    if (this.closeTimerId) clearTimeout(this.closeTimerId);
     this.flushAutoSave();
     this.stopCprMetronome();
   }
@@ -2112,8 +3321,71 @@ export class AnalysisReportComponent implements OnDestroy {
     this._saveVersion.update(v => v + 1);
   }
 
+  avsSessionDuration = signal<number>(15);
+  avsSecondsRemaining = signal<number>(900);
+  private avsTimerInterval: any = null;
+
   toggleAvsSession() {
-    this.state.isAvsSessionActive.update(v => !v);
+    const nextState = !this.state.isAvsSessionActive();
+    this.state.isAvsSessionActive.set(nextState);
+
+    if (nextState) {
+      if (this.avsSessionDuration() !== -1) {
+        this.avsSecondsRemaining.set(this.avsSessionDuration() * 60);
+        this.startAvsCountdown();
+      }
+    } else {
+      this.stopAvsCountdown();
+    }
+  }
+
+  private startAvsCountdown() {
+    this.stopAvsCountdown();
+    this.avsTimerInterval = setInterval(() => {
+      const remaining = this.avsSecondsRemaining();
+      if (remaining <= 1) {
+        this.avsSecondsRemaining.set(0);
+        this.state.isAvsSessionActive.set(false);
+        this.stopAvsCountdown();
+        if (typeof AudioContext !== 'undefined' || typeof (window as any).webkitAudioContext !== 'undefined') {
+          try {
+            const ctx = new (AudioContext || (window as any).webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.frequency.setValueAtTime(528, ctx.currentTime); // Solfeggio 528Hz Transformation tone
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.0);
+            osc.stop(ctx.currentTime + 2.1);
+          } catch(e) {}
+        }
+      } else {
+        this.avsSecondsRemaining.set(remaining - 1);
+      }
+    }, 1000);
+  }
+
+  private stopAvsCountdown() {
+    if (this.avsTimerInterval) {
+      clearInterval(this.avsTimerInterval);
+      this.avsTimerInterval = null;
+    }
+  }
+
+  getFormattedAvsTime(): string {
+    const totalSecs = this.avsSecondsRemaining();
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  setAvsDuration(mins: number) {
+    this.avsSessionDuration.set(mins);
+    if (this.state.isAvsSessionActive() && mins !== -1) {
+      this.avsSecondsRemaining.set(mins * 60);
+    }
   }
 
   launchAvsVoiceCoRegulation() {
@@ -2303,10 +3575,17 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   }
 
-  changeLens(lens: AnalysisLens | 'EMT Handoff' | 'Y-BOCs Screener' | 'Maternal & Postpartum') {
+  changeLens(lens: AnalysisLens | 'EMT Handoff' | 'ASSESSMENTS' | 'Maternal & Postpartum') {
     this.audit.logAction('VIEW_LENS', this.patientManager.selectedPatientId(), { lens });
     this.flushAutoSave();
     this.activeLens.set(lens);
+    this.collapsedSections.set({});
+    this.selectedMobileSectionTab.set('all');
+
+    const el = this.contentArea()?.nativeElement;
+    if (el) {
+      el.scrollTop = 0;
+    }
   }
 
   toggleCprMetronome() {

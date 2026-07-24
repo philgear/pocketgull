@@ -94,3 +94,72 @@ def create_risk_score_bundle(score: float, risk_level: str, confidence: float, f
     )
     
     return bundle
+
+
+def create_readmission_risk_bundle(
+    readmission_prob: float,
+    recovery_prob: float,
+    risk_tier: str,
+    top_drivers: List[str],
+    recommended_actions: List[str],
+    qaly_gain: float,
+    note: str = ""
+) -> Bundle:
+    """Helper to convert 30-Day Readmission & 90-Day Recovery ML Predictions into a valid FHIR R4 Bundle."""
+    code = CodeableConcept(
+        coding=[
+            Coding(system="http://loinc.org", code="45439-7", display="30 day readmission risk assessment"),
+            Coding(system="http://snomed.info/sct", code="407563006", display="Clinical risk assessment")
+        ],
+        text="30-Day Readmission & 90-Day Recovery Risk Score"
+    )
+    
+    value = ValueQuantity(value=round(readmission_prob, 3), unit="probability", code="{prob}")
+    interpretation = [CodeableConcept(text=risk_tier.upper())]
+    
+    components = [
+        ObservationComponent(
+            code=CodeableConcept(text="90-Day Functional Recovery Probability"),
+            valueQuantity=ValueQuantity(value=round(recovery_prob, 3), unit="probability", code="{prob}")
+        ),
+        ObservationComponent(
+            code=CodeableConcept(text="QALY Gain Estimate"),
+            valueQuantity=ValueQuantity(value=round(qaly_gain, 2), unit="QALY", code="QALY")
+        )
+    ]
+    
+    for driver in top_drivers:
+        components.append(
+            ObservationComponent(
+                code=CodeableConcept(text="Risk Driver"),
+                valueString=driver
+            )
+        )
+        
+    for action in recommended_actions:
+        components.append(
+            ObservationComponent(
+                code=CodeableConcept(text="Recommended Preventative Action"),
+                valueString=action
+            )
+        )
+        
+    obs_note = [{"text": note}] if note else []
+    
+    observation = Observation(
+        code=code,
+        valueQuantity=value,
+        interpretation=interpretation,
+        component=components,
+        note=obs_note
+    )
+    
+    return Bundle(
+        entry=[
+            BundleEntry(
+                fullUrl=f"urn:uuid:{observation.id}",
+                resource=observation
+            )
+        ]
+    )
+

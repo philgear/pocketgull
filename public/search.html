@@ -124,7 +124,7 @@
 
         // Listen for messages from the parent Angular application
         window.addEventListener('message', (event) => {
-            // Security check (ideally verify origin in prod)
+            if (event.origin && event.origin !== window.location.origin && event.origin !== 'null') return;
             if (event.data && event.data.type === 'EXECUTE_SEARCH') {
                 runSearch(event.data.query);
             }

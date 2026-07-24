@@ -7,15 +7,26 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Submodules & Local Challenge Repos
+python_example_2026/
+
 node_modules
 dist
 dist-ssr
+# Local temporary test results & deployment tarball
+tmp/
+test-results/
+playwright-report/
+source.tgz
 *.local
 *.local.*
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/launch.json
+.vscode/chrome-debug-profile/
+chrome-debug-profile/
 .idea
 .DS_Store
 *.suo

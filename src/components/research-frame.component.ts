@@ -24,7 +24,7 @@ export interface IPubMedSearchResult {
   imports: [CommonModule, PocketGullButtonComponent, PocketGullInputComponent, SafeHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex flex-col bg-white dark:bg-[#09090b] shadow-2xl border border-gray-300 dark:border-zinc-800 rounded-none md:rounded-lg overflow-hidden z-40 transition-all"
+    <div id="tour-research-frame-window" class="flex flex-col bg-white dark:bg-[#09090b] shadow-2xl border border-gray-300 dark:border-zinc-800 rounded-none md:rounded-lg overflow-hidden z-40 transition-all"
          [class.fixed]="isMobile()"
          [class.inset-0]="isMobile()"
          [class.absolute]="!isMobile()"
@@ -38,9 +38,61 @@ export interface IPubMedSearchResult {
       <div (mousedown)="isMobile() ? null : startDrag($event)" 
            [class.cursor-move]="!isMobile()"
            class="h-10 px-4 flex items-center justify-between bg-gray-100 dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shrink-0 select-none">
-        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-zinc-400">Research Frame</h3>
+        <div class="flex items-center gap-2">
+          <span class="text-xs">🔬</span>
+          <h3 class="text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-zinc-400">Draggable Literature Research Frame</h3>
+        </div>
         <pocket-gull-button variant="ghost" size="sm" (click)="close()" icon="M12 10.586 16.95 5.636a1 1 0 1 1 1.414 1.414L13.414 12l4.95 4.95a1 1 0 0 1-1.414 1.414L12 13.414l-4.95 4.95a1 1 0 0 1-1.414-1.414L10.586 12 5.636 7.05a1 1 0 0 1 1.414-1.414L12 10.586z" title="Close Research Window" ariaLabel="Close Research Window">
         </pocket-gull-button>
+      </div>
+
+      <!-- Featured Research Frame Experiences Banner Carousel -->
+      <div class="p-3 bg-gradient-to-r from-indigo-950/80 via-zinc-900 to-purple-950/80 border-b border-zinc-800 text-zinc-100 font-mono text-xs shrink-0 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
+            ✨ Available Research Frame Experiences
+          </span>
+          <span class="text-[10px] text-zinc-400 font-sans">Cross-Paradigm Evidence Engines</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <!-- Experience 1: PubMed Matrix -->
+          <div (click)="setSearchEngine('pubmed')" class="p-2 rounded-xl bg-zinc-900/90 border border-indigo-500/30 hover:border-indigo-400 cursor-pointer transition-all space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-indigo-300">
+              <span>📚 PubMed Index</span>
+              <span>24M+</span>
+            </div>
+            <p class="text-[9.5px] text-zinc-400 font-sans leading-tight">MeSH graph & clinical trials</p>
+          </div>
+
+          <!-- Experience 2: bioRxiv Preprints -->
+          <div (click)="setSearchEngine('google')" class="p-2 rounded-xl bg-zinc-900/90 border border-purple-500/30 hover:border-purple-400 cursor-pointer transition-all space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-purple-300">
+              <span>🧬 bioRxiv Trial</span>
+              <span>Live</span>
+            </div>
+            <p class="text-[9.5px] text-zinc-400 font-sans leading-tight">Pre-publication clinical trials</p>
+          </div>
+
+          <!-- Experience 3: TCM Formulatory -->
+          <div (click)="setSearchEngine('tcm')" class="p-2 rounded-xl bg-zinc-900/90 border border-emerald-500/30 hover:border-emerald-400 cursor-pointer transition-all space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-emerald-300">
+              <span>🌿 TCM Herbology</span>
+              <span>Zang-Fu</span>
+            </div>
+            <p class="text-[9.5px] text-zinc-400 font-sans leading-tight">Herb-drug interaction formulas</p>
+          </div>
+
+          <!-- Experience 4: Vedic Samhita Corpus -->
+          <div (click)="setSearchEngine('ayurveda')" class="p-2 rounded-xl bg-zinc-900/90 border border-amber-500/30 hover:border-amber-400 cursor-pointer transition-all space-y-1">
+            <div class="flex items-center justify-between text-[11px] font-bold text-amber-300">
+              <span>🧘 Vedic Samhita</span>
+              <span>Dosha</span>
+            </div>
+            <p class="text-[9.5px] text-zinc-400 font-sans leading-tight">Classical Charaka & Sushruta sutras</p>
+          </div>
+        </div>
       </div>
 
       <!-- Toolbar -->
@@ -183,7 +235,6 @@ export interface IPubMedSearchResult {
                     class="w-full h-full border-none transition-opacity bg-white dark:bg-zinc-950" 
                     [class.absolute]="searchEngine() === 'google' && googleResults() !== null"
                     [class.opacity-0]="searchEngine() === 'google' && googleResults() !== null"
-                    [class.-z-10]="searchEngine() === 'google' && googleResults() !== null"
                     [class.pointer-events-none]="searchEngine() === 'google' && googleResults() !== null">
             </iframe>
         }
@@ -291,7 +342,7 @@ export class ResearchFrameComponent implements OnDestroy {
   patientState = inject(PatientStateService);
 
   isMobile = signal(false);
-  searchEngine = signal<'google' | 'pubmed' | 'ayurveda' | 'tcm'>('google');
+  searchEngine = signal<'google' | 'pubmed' | 'ayurveda' | 'tcm' | 'datacard'>('google');
   searchText = signal<string>('');
 
   private currentUrl = signal<string | null>(null);
@@ -475,9 +526,9 @@ export class ResearchFrameComponent implements OnDestroy {
   }
 
   // --- Browser Actions ---
-  setSearchEngine(engine: 'google' | 'pubmed' | 'ayurveda' | 'tcm') {
+  setSearchEngine(engine: 'google' | 'pubmed' | 'ayurveda' | 'tcm' | 'datacard') {
     this.searchEngine.set(engine);
-    if (this.searchText().trim()) {
+    if (engine !== 'datacard' && this.searchText().trim()) {
       this.search();
     }
   }

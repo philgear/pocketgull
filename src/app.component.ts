@@ -18,7 +18,7 @@ import { IntelligenceProviderToken } from './services/ai/intelligence.provider.t
 import { GeminiProvider } from './services/ai/gemini.provider';
 import { ClinicalIntelligenceService } from './services/clinical-intelligence.service';
 import { PatientManagementService } from './services/patient-management.service';
-import { ThemeService } from './services/theme.service';
+import { ThemeService, AppTheme } from './services/theme.service';
 import { NetworkStateService } from './services/network-state.service';
 import { HardwareTelemetryService } from './services/hardware-telemetry.service';
 import { ExportService } from './services/export.service';
@@ -47,6 +47,7 @@ import { ConsentModalComponent } from './components/consent-modal.component';
 import { ResearchTabComponent } from './components/research-tab.component';
 import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
 import { CompanionSyncModalComponent } from './components/companion-sync-modal.component';
+import { GlossaryModalComponent } from './components/glossary-modal.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -70,7 +71,8 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
     PocketGullInputComponent,
     ConsentModalComponent,
     ZamecznikCanvasComponent,
-    CompanionSyncModalComponent
+    CompanionSyncModalComponent,
+    GlossaryModalComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -79,6 +81,10 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
     <!-- ACM §1.6: First-run informed consent -->
     @if (!showSplash() && !consentService.hasConsented()) {
       <app-consent-modal></app-consent-modal>
+    }
+
+    @if (showGlossaryModal()) {
+      <app-glossary-modal (close)="showGlossaryModal.set(false)"></app-glossary-modal>
     }
 
     @if (showFhirCallback()) {
@@ -129,7 +135,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                 <span class="text-[12px] font-bold text-red-655 dark:text-red-400 uppercase tracking-widest">First Aid Mode</span>
               </div>
             </div>
-            <app-analysis-container class="block h-full w-full"></app-analysis-container>
+            <app-analysis-container class="flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden"></app-analysis-container>
           </main>
         } @else {
           <main class="flex-1 flex flex-col min-w-0 min-h-0 relative group/main"> <!-- Main Content -->
@@ -321,8 +327,8 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
             </div>
           </div>
         }
-        <!-- Navbar: Pure utility, no decoration -->
-        <nav class="h-14 border-b border-[#EEEEEE] dark:border-zinc-800 flex items-center justify-between px-3 sm:px-6 shrink-0 bg-white dark:bg-[#111111] z-50 no-print">
+        <!-- Navbar: Pure utility & theme harmony -->
+        <nav class="theme-nav-bar h-14 flex items-center justify-between px-3 sm:px-6 shrink-0 z-50 no-print">
           <div class="flex items-center gap-4">
               <div class="flex items-center gap-3">
                   <svg width="42" height="42" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
@@ -341,17 +347,17 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                       <!-- Beak (Golden-Amber Orange) -->
                       <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5" stroke-linejoin="round" />
                   </svg>
-                  <span class="font-medium text-[#1C1C1C] dark:text-zinc-100 tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
+                  <span class="font-bold uppercase tracking-[0.15em] text-sm hidden sm:inline">POCKET GULL</span>
                   <!-- System Status Indicator (Hidden on smallest watches) -->
-            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-full border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-pointer group relative no-print" 
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-zinc-900 rounded-md border border-gray-200 dark:border-zinc-800 hover:border-gray-300 dark:hover:border-zinc-700 transition-all cursor-pointer group relative no-print" 
                  (click)="network.toggleForceOffline()"
                  [title]="network.isOnline() ? 'Click to simulate offline' : 'Click to disable offline override'">
             <div class="relative flex h-2 w-2">
-              <span class="absolute inline-flex h-full w-full rounded-full opacity-75" 
+              <span class="absolute inline-flex h-full w-full rounded-full status-dot opacity-75" 
                     [style.background-color]="network.isOnline() ? 'var(--spectral-stable)' : 'var(--spectral-critical)'"
                     [class.animate-ping]="network.isOnline()"
                     style="will-change: transform, opacity;"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2"
+              <span class="relative inline-flex rounded-full status-dot h-2 w-2"
                     [style.background-color]="network.isOnline() ? 'var(--spectral-stable)' : 'var(--spectral-critical)'"></span>
             </div>
             <span class="text-xs font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-widest">{{ network.isOnline() ? 'System Ready' : 'System Offline' }}</span>
@@ -448,7 +454,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
           
           <div class="flex items-center gap-2">
             <button (click)="state.toggleLiveAgent(!state.isLiveAgentActive())"
-                   
+                    id="tour-voice-agent-trigger"
                     aria-label="Toggle Live Agent"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border transition-colors text-xs font-bold uppercase tracking-widest"
                     [class.bg-gray-800]="state.isLiveAgentActive()"
@@ -475,6 +481,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
             </button>
             
             <button (click)="state.toggleResearchFrame()"
+                    id="tour-research-frame-trigger"
                     aria-label="Research"
                     class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 18c-2.29 0-4.43-.78-6.14-2.1C4.6 16.5 4 14.83 4 12c0-1.5.3-2.91.86-4.22L16.22 19.14A7.92 7.92 0 0 1 12 20m7.14-2.1C20.4 16.5 21 14.83 21 12c0-1.5-.3-2.91-.86-4.22L8.78 19.14C10.09 20.7 11.97 21.5 14 21.5c1.47 0 2.87-.42 4.14-1.14Z"/></svg>
@@ -483,6 +490,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
 
             
             <a href="/docs/study/" target="_blank" rel="noopener"
+               id="tour-docs-trigger"
                aria-label="Docs"
                class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -493,7 +501,6 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
             </a>
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
-                   
                     aria-label="Start Tour Guide"
                     title="Start Tour Guide"
                     class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer">
@@ -504,12 +511,12 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
               </svg>
             </button>
             
-            <!-- Theme Toggle -->
+            <!-- Theme Toggle (Cycles through available themes) -->
             <button (click)="cycleTheme()" 
-                   
+                    id="tour-theme-trigger"
                     aria-label="Toggle Theme"
-                    [title]="'Theme: ' + theme.currentTheme()"
-                    class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer">
+                    [title]="'Cycle Theme (Current: ' + theme.currentTheme() + ')'"
+                    class="group shrink-0 p-2 border border-gray-300 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-md transition-colors text-gray-500 dark:text-zinc-400 cursor-pointer flex items-center gap-1">
               @switch (theme.currentTheme()) {
                  @case ('dark') {
                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>   
@@ -517,21 +524,59 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                  @case ('light') {
                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                  }
-                 @case ('system') {
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                 }
-                 @case ('spark') {
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#FF6F3D] animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                     <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275Z"/>
+                 @case ('papercraft') {
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#F6B12B] transform hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                     <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                     <polyline points="2 17 12 22 22 17" />
+                     <polyline points="2 12 12 17 22 12" />
                    </svg>
                  }
-                 @case ('calm') {
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#8D6E63]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                   </svg>
-                 }
+                 @case ('hemp') { <span class="text-xs">🌿</span> }
+                 @case ('rice') { <span class="text-xs">🌾</span> }
+                 @case ('construction') { <span class="text-xs">🎨</span> }
+                 @case ('white-marble') { <span class="text-xs" title="White Marble Theme">🏛️</span> }
+                 @case ('black-marble') { <span class="text-xs" title="Black Marble Theme">🌌</span> }
+                 @case ('papyrus') { <span class="text-xs" title="Papyrus Cave Theme">🏺</span> }
+                 @case ('pool') { <span class="text-xs" title="Pool Ripples Theme">🏊</span> }
+                 @case ('mandala') { <span class="text-xs" title="Sacred Mandala Theme">☸️</span> }
+                 @default { <span class="text-xs">🎨</span> }
               }
             </button>
+
+            <!-- Global Plain Language Health Literacy vs Deep Clinical Rationale Toggle Button & Analogy Sub-Modes -->
+            <div class="shrink-0 flex items-center bg-zinc-900/90 p-0.5 rounded-lg border border-zinc-800 shadow-sm font-mono text-xs">
+              <button (click)="theme.setAnalogyLensMode('clinical')"
+                      aria-label="Deep Rationale Mode"
+                      title="Switch to Deep Clinical Medical Rationale Mode"
+                      [class.bg-sky-600]="!theme.isPlainLanguageMode()"
+                      [class.text-white]="!theme.isPlainLanguageMode()"
+                      [class.text-zinc-400]="theme.isPlainLanguageMode()"
+                      class="px-2.5 py-1 rounded-md transition font-bold cursor-pointer">
+                🔬 Deep Rationale
+              </button>
+
+              <button (click)="theme.setAnalogyLensMode('arborist')"
+                      aria-label="Arborist Botanical Analogy Mode"
+                      title="Switch to Plain Language Arborist Botanical Analogy Mode"
+                      [class.bg-emerald-600]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist'"
+                      [class.text-white]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist'"
+                      [class.text-zinc-400]="!(theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist')"
+                      class="px-2 py-1 rounded-md transition font-bold cursor-pointer flex items-center gap-1">
+                <span>🌳</span>
+                <span class="hidden md:inline">Arborist</span>
+              </button>
+
+              <button (click)="theme.setAnalogyLensMode('mechanic')"
+                      aria-label="Mechanic Automotive Analogy Mode"
+                      title="Switch to Plain Language Mechanic Automotive Analogy Mode"
+                      [class.bg-cyan-600]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic'"
+                      [class.text-white]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic'"
+                      [class.text-zinc-400]="!(theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic')"
+                      class="px-2 py-1 rounded-md transition font-bold cursor-pointer flex items-center gap-1">
+                <span>🚗</span>
+                <span class="hidden md:inline">Mechanic</span>
+              </button>
+            </div>
  
             <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400 pl-4 border-l border-gray-100 dark:border-zinc-800">
               <!-- Gamified Points & Level HUD capsule -->
@@ -632,6 +677,9 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                      <button (click)="exportFhir(); exportMenuOpen.set(false)" [disabled]="!hasReport()" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> As FHIR
                      </button>
+                     <button (click)="exportLaafHapticFhir(); exportMenuOpen.set(false)" class="w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest text-sky-600 dark:text-sky-400 hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center gap-2 border-t border-gray-100 dark:border-zinc-800">
+                       <span>⚡ LAAF Haptic FHIR</span>
+                     </button>
                    </div>
                  </div>
                }
@@ -704,8 +752,40 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
         <!-- Main Grid Layout -->
         <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
 
+            <!-- Mobile Header: Back Button & View Tabs -->
+            @if (!state.isLiveAgentActive() && !state.isSparkModeActive()) {
+              <div class="w-full gap-2 shrink-0 z-20 hidden max-md:flex max-md:flex-col mb-3 no-print">
+                @if (state.selectedPartId()) {
+                  <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-1.5 -ml-2 transition-colors min-h-[44px]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    <span>Back to Full Chart</span>
+                  </button>
+                }
+                <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full border border-gray-300 dark:border-zinc-700/60 shadow-sm">
+                  <button (click)="mobileActiveTab.set('chart')" 
+                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                          [class.bg-white]="mobileActiveTab() === 'chart'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'chart'" [class.text-black]="mobileActiveTab() === 'chart'" [class.dark:text-white]="mobileActiveTab() === 'chart'"
+                          [class.text-gray-500]="mobileActiveTab() !== 'chart'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'chart'">
+                    🩺 Chart
+                  </button>
+                  <button (click)="mobileActiveTab.set('analysis')"
+                          class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [class.dark:text-white]="mobileActiveTab() === 'analysis'"
+                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'">
+                    📊 Analysis
+                  </button>
+                  @if (state.selectedPartId()) {
+                    <button (click)="mobileActiveTab.set('tasks')"
+                            class="flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px] flex items-center justify-center gap-1.5"
+                            [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
+                            [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'">
+                      📋 Tasks
+                    </button>
+                  }
+                </div>
+              </div>
+            }
 
-          
           <!-- Column 1: IPatient Medical Chart -->
            <div class="relative w-full md:h-full bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 md:overflow-hidden flex flex-col md:block flex-shrink-0"
                 id="tour-body-chart"
@@ -716,7 +796,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                [style.--panel-width.px]="isChartCollapsed() ? 0 : (isAnalysisCollapsed() ? null : inputPanelWidth())"
                [class.md:w-[var(--panel-width)]]="!isAnalysisCollapsed() && inputPanelWidth() !== undefined && !state.isSparkModeActive()"
                [class.hidden]="isChartCollapsed()"
-               [class.max-md:hidden]="!!state.selectedPartId() && !state.isSparkModeActive()">
+               [class.max-md:hidden]="mobileActiveTab() !== 'chart' && !state.isSparkModeActive()">
                <div class="md:h-full w-full md:overflow-hidden flex-1 flex flex-col min-h-0">
                  @defer {
                    <app-medical-chart class="no-print md:h-full block md:overflow-y-auto w-full max-md:overflow-visible"></app-medical-chart>
@@ -775,30 +855,6 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                 </div>
             </div>
 
-            <!-- Mobile Header: Back Button & Tabs -->
-            @if (state.selectedPartId() && !state.isLiveAgentActive() && !state.isSparkModeActive()) {
-              <div class="w-full flex-col gap-3 shrink-0 z-20 hidden max-md:flex mb-3">
-                <button (click)="goBackToChart()" class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-zinc-400 hover:text-black dark:hover:text-white self-start px-2 py-3 -ml-2 transition-colors min-h-[44px]">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                  <span>Back to Chart</span>
-                </button>
-                <div class="flex p-1.5 bg-gray-200 dark:bg-zinc-800 rounded-[10px] w-full">
-                  <button (click)="mobileActiveTab.set('tasks')" 
-                          class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
-                          [class.bg-white]="mobileActiveTab() === 'tasks'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'tasks'" [class.text-black]="mobileActiveTab() === 'tasks'" [class.dark:text-white]="mobileActiveTab() === 'tasks'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'tasks'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'tasks'" [class.hover:text-gray-700]="mobileActiveTab() !== 'tasks'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'tasks'">
-                    Tasks
-                  </button>
-                  <button (click)="mobileActiveTab.set('analysis')"
-                          class="flex-1 py-3 text-xs font-bold uppercase tracking-widest rounded-md transition-all shadow-sm min-h-[44px]"
-                          [class.bg-white]="mobileActiveTab() === 'analysis'" [class.dark:bg-[#09090b]]="mobileActiveTab() === 'analysis'" [class.text-black]="mobileActiveTab() === 'analysis'" [class.dark:text-white]="mobileActiveTab() === 'analysis'"
-                          [class.text-gray-500]="mobileActiveTab() !== 'analysis'" [class.dark:text-zinc-400]="mobileActiveTab() !== 'analysis'" [class.hover:text-gray-700]="mobileActiveTab() !== 'analysis'" [class.dark:hover:text-zinc-300]="mobileActiveTab() !== 'analysis'">
-                    Analysis
-                  </button>
-                </div>
-              </div>
-            }
-
             <!-- Column 2 (Middle): Task Flow & Intake Bracket -->
             @if (state.selectedPartId() && !state.isLiveAgentActive() && !state.isSparkModeActive()) {
                <div class="shrink-0 w-full md:w-[400px] flex flex-col gap-3 md:gap-6 h-full z-20 transition-all duration-300"
@@ -821,13 +877,13 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                </div>
             }
 
-            <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col"
+            <div class="flex-1 md:flex-[1.5] flex md:overflow-hidden relative gap-3 md:gap-6 flex-col min-h-0 w-full max-md:min-h-[calc(100dvh-130px)]"
                  [class.hidden]="isAnalysisCollapsed()"
-                 [class.max-md:hidden]="!!state.selectedPartId() && mobileActiveTab() !== 'analysis'"
-                 [class.tab-fade-enter]="!!state.selectedPartId() && mobileActiveTab() === 'analysis'">
+                 [class.max-md:hidden]="mobileActiveTab() !== 'analysis'"
+                 [class.tab-fade-enter]="mobileActiveTab() === 'analysis'">
              
                  <!-- Section 1: Analysis Intake Container -->
-                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh]"
+                 <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md flex-1 md:min-h-0 min-h-[50dvh] max-md:min-h-[calc(100dvh-140px)] max-md:h-full"
                       [class.rounded-none]="isChartCollapsed()"
                       [class.border-y-0]="isChartCollapsed()"
                       [class.border-r-0]="isChartCollapsed()"
@@ -835,7 +891,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
                       [class.bg-[#F9FAFB]]="isChartCollapsed()"
                       [class.dark:bg-[#09090b]]="isChartCollapsed()">
                      @defer {
-                       <app-analysis-container class="block h-full min-h-0 min-w-0" appReveal [revealDelay]="100"></app-analysis-container>
+                       <app-analysis-container class="flex flex-col flex-1 min-h-0 min-w-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]" appReveal [revealDelay]="100"></app-analysis-container>
                      } @placeholder {
                        <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Core AI Synthesis...</div>
                      }
@@ -879,7 +935,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
               </style>
 
               <!-- The Pocket Container -->
-              <div class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100%-2rem)] sm:w-[420px] h-[650px] max-h-[calc(100dvh-4rem)] z-[100] flex flex-col transition-all duration-500 animate-in slide-in-from-bottom-10 fade-in pointer-events-none">
+              <div id="tour-voice-agent-window" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100%-2rem)] sm:w-[420px] h-[650px] max-h-[calc(100dvh-4rem)] z-[100] flex flex-col transition-all duration-500 animate-in slide-in-from-bottom-10 fade-in pointer-events-none">
                  
                  <!-- Perched Origami Seagull -->
                  <div class="relative w-full h-24 pointer-events-auto flex justify-center items-end pb-0 translate-y-[4px] z-[101]" style="perspective: 1000px;">
@@ -1226,12 +1282,20 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
           
           <!-- Footer -->
           <div class="px-8 py-5 border-t border-gray-300 dark:border-zinc-800 bg-gray-50/50 dark:bg-[#09090b]/50 flex justify-between items-center mt-auto">
-            <button 
-              (click)="printReport()" 
-              class="px-5 py-2.5 border border-[#1C1C1C] dark:border-zinc-600 text-[#1C1C1C] dark:text-zinc-100 bg-transparent text-[12px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-2 rounded-[2px]">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
-              Print Document
-            </button>
+            <div class="flex items-center gap-3">
+              <button 
+                (click)="printReport()" 
+                class="px-5 py-2.5 border border-[#1C1C1C] dark:border-zinc-600 text-[#1C1C1C] dark:text-zinc-100 bg-transparent text-[12px] font-bold uppercase tracking-[0.2em] transition-all hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center gap-2 rounded-[2px]">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+                Print Document
+              </button>
+              <button 
+                (click)="exportLaafHapticFhir()" 
+                title="Export FHIR R4 Bundle containing LAAF Vagal & 40Hz Gamma Haptic Schedules"
+                class="px-4 py-2.5 border border-sky-500/50 text-sky-700 dark:text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 text-[12px] font-extrabold uppercase tracking-[0.15em] transition-all flex items-center gap-1.5 rounded-[2px] cursor-pointer">
+                <span>⚡ Export LAAF Haptic FHIR</span>
+              </button>
+            </div>
             <div class="flex items-center gap-4">
               <button 
                 (click)="closePreview()" 
@@ -1266,6 +1330,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
   `]
 })
 export class AppComponent implements OnDestroy {
+  readonly showGlossaryModal = signal<boolean>(false);
   private _translateTimer: any = null;
 
   private debouncedTranslate(text: string, level: any) {
@@ -1318,6 +1383,7 @@ export class AppComponent implements OnDestroy {
   });
   isDemoMode = this.state.isDemoMode;
   readonly showCompanionSyncModal = signal<boolean>(false);
+  readonly showHeaderThemeMenu = signal<boolean>(false);
   apiKeyInput = signal<string>('');
   showPassword = signal<boolean>(false);
   apiKeyError = signal<string | null>(null);
@@ -1437,6 +1503,12 @@ export class AppComponent implements OnDestroy {
         summary: results['Summary Overview']
       }, 'Clinical User');
     }
+  }
+
+  exportLaafHapticFhir() {
+    const patient = this.patientMgmt.selectedPatient();
+    this.export.downloadLaafHapticScheduleBundle(patient);
+    this.exportMenuOpen.set(false);
   }
 
   exportJson() {
@@ -1692,6 +1764,7 @@ export class AppComponent implements OnDestroy {
 
   selectCognitiveLevel(level: 'standard' | 'simplified' | 'dyslexia' | 'child') {
     this.selectedCognitiveLevel.set(level);
+    this.state.selectedCognitiveLevel.set(level);
     this.updateReadingLevelAndTranslate();
   }
 
@@ -1752,11 +1825,37 @@ export class AppComponent implements OnDestroy {
       this.previewText.set(translated);
       await this.analyzeCurrentTranslation();
     } catch (error) {
-      console.error("Translation failed", error);
-      this.translationError.set("Failed to translate plan. Please retry.");
+      console.warn("API Translation unavailable, generating deterministic cognitive transformation fallback", error);
+      const fallback = this.generateCognitiveFallback(this.originalPreviewText(), cog, lang);
+      this.previewText.set(fallback);
+      this.translationAnalysis.set(`Cognitive Level: [${cog.toUpperCase()}] • Target Language: [${lang.toUpperCase()}] (Deterministic Local Adapter)`);
     } finally {
       this.isTranslating.set(false);
     }
+  }
+
+  private generateCognitiveFallback(text: string, cog: 'standard' | 'simplified' | 'dyslexia' | 'child', lang: string): string {
+    const header = `--- CLINICAL CARE PLAN [COGNITIVE FORMAT: ${cog.toUpperCase()} | LANG: ${lang.toUpperCase()}] ---\n\n`;
+    let body = text;
+
+    if (cog === 'dyslexia') {
+      body = body.split('\n')
+        .filter(line => line.trim().length > 0)
+        .map(line => `• **${line.substring(0, Math.min(line.length, 30))}** ${line.substring(Math.min(line.length, 30))}`)
+        .join('\n\n');
+    } else if (cog === 'child') {
+      body = `🌟 **Your Health Adventure Plan** 🌟\n\n` + 
+        body.replace(/patient/gi, 'hero')
+            .replace(/symptoms/gi, 'body signals')
+            .replace(/medication/gi, 'superpower helper drops')
+            .replace(/vitals/gi, 'heart & energy scores');
+    } else if (cog === 'simplified') {
+      body = body.replace(/radiculopathy/gi, 'nerve pain')
+        .replace(/hypertension/gi, 'high blood pressure')
+        .replace(/inflammation/gi, 'swelling & soreness');
+    }
+
+    return header + body;
   }
 
   async changeReadingLevel(levelOrEvent: string | Event) {
@@ -1890,12 +1989,10 @@ export class AppComponent implements OnDestroy {
   }
 
   cycleTheme() {
+    const themes: AppTheme[] = ['papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'light', 'dark'];
     const current = this.theme.currentTheme();
-    if (current === 'system') this.theme.setTheme('light');
-    else if (current === 'light') this.theme.setTheme('dark');
-    else if (current === 'dark') this.theme.setTheme('calm');
-    else if (current === 'calm') this.theme.setTheme('spark');
-    else this.theme.setTheme('system');
+    const nextIdx = (themes.indexOf(current) + 1) % themes.length;
+    this.theme.setTheme(themes[nextIdx]);
   }
 
   isSyncing = signal<boolean>(false);
@@ -1933,10 +2030,11 @@ export class AppComponent implements OnDestroy {
   private resizeDebounceTimer: any = null;
 
   isMobile = signal<boolean>(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
-  mobileActiveTab = signal<'tasks' | 'analysis'>('tasks');
+  mobileActiveTab = signal<'chart' | 'tasks' | 'analysis'>('chart');
 
   goBackToChart(): void {
     this.state.selectPart(null);
+    this.mobileActiveTab.set('chart');
   }
 
   isViewingVisitDetails = computed(() => {
@@ -2417,7 +2515,7 @@ export class AppComponent implements OnDestroy {
 
     const emergencyPatient: any = {
       id: 'emergency_casualty',
-      name: 'Emergency Casualty',
+      name: 'Emergency Patient',
       age: 30,
       gender: 'Other',
       lastVisit: new Date().toISOString(),

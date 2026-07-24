@@ -34,7 +34,7 @@ export interface IFloatingIsland {
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="relative w-full h-[480px] rounded-3xl overflow-hidden bg-zinc-950 border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.15)] font-mono select-none">
+    <div class="relative w-full h-[480px] rounded-3xl overflow-hidden bg-zinc-950 border border-zinc-800 shadow-2xl font-mono select-none">
       
       <!-- Interactive Water Fluid Canvas -->
       <canvas #waterCanvas (click)="onCanvasClick($event)" (mousemove)="onCanvasMouseMove($event)"
@@ -42,25 +42,23 @@ export interface IFloatingIsland {
 
       <!-- Glassmorphic Water Overlay & Ambient Light -->
       <div class="absolute inset-0 bg-gradient-to-b from-zinc-950/60 via-transparent to-zinc-950/80 pointer-events-none z-10"></div>
-      <div class="absolute -top-32 -left-32 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none z-10"></div>
-      <div class="absolute -bottom-32 -right-32 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none z-10"></div>
 
-      <!-- Section Header Overlay -->
-      <div class="absolute top-5 left-6 right-6 flex items-center justify-between z-20 pointer-events-none">
+      <!-- Section Header Overlay (Dieter Rams Braun Style) -->
+      <div class="absolute top-5 left-6 right-6 flex items-center justify-between z-20 pointer-events-none font-mono">
         <div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)] animate-pulse"></span>
-            <h3 class="text-sm font-bold uppercase tracking-tight text-emerald-200">
-              🌊 Aquatic Consciousness & Floating City Archipelagos
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)]"></span>
+            <h3 class="text-xs font-black uppercase tracking-widest text-zinc-100">
+              🌊 Aquatic Consciousness & Floating Archipelagos
             </h3>
           </div>
           <p class="text-[11px] text-zinc-400 font-sans mt-0.5">
-            Click anywhere on the fluid surface to cast water ripples. Interactive words & bio-islands float in real-time buoyancy.
+            Click anywhere on the fluid surface to cast water ripples. Interactive words float in real-time buoyancy.
           </p>
         </div>
 
         <div class="hidden sm:flex items-center gap-2 font-mono text-[10px]">
-          <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 uppercase">
+          <span class="px-2.5 py-0.5 rounded bg-zinc-900 text-orange-400 border border-zinc-800 uppercase">
             Fluid Hydrodynamics: Active
           </span>
         </div>
@@ -75,14 +73,14 @@ export interface IFloatingIsland {
             
             <!-- Island Ring & Pulsing Ripple -->
             <div class="relative flex flex-col items-center">
-              <div class="w-16 h-16 rounded-full bg-zinc-900/90 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.3)] flex flex-col items-center justify-center backdrop-blur-md transition group-hover:border-emerald-400 group-hover:shadow-[0_0_30px_rgba(52,211,153,0.5)]">
-                <span class="text-2xl group-hover:scale-125 transition-transform duration-300">{{ island.emoji }}</span>
+              <div class="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-md flex flex-col items-center justify-center backdrop-blur-md transition group-hover:border-orange-500 group-hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                <span class="text-xl group-hover:scale-125 transition-transform duration-300">{{ island.emoji }}</span>
               </div>
               
               <!-- Floating Island Title Label -->
-              <div class="mt-1.5 px-2.5 py-1 rounded-full bg-zinc-950/90 border border-zinc-800 text-center shadow-lg backdrop-blur-sm">
+              <div class="mt-1.5 px-2.5 py-1 rounded-xl bg-zinc-950 border border-zinc-800 text-center shadow-lg backdrop-blur-sm">
                 <span class="text-[10px] font-bold text-zinc-200 block uppercase tracking-wider font-mono">{{ island.name }}</span>
-                <span class="text-[8.5px] text-emerald-400 block font-mono">{{ island.freq }}</span>
+                <span class="text-[8.5px] text-orange-400 block font-mono">{{ island.freq }}</span>
               </div>
             </div>
 
@@ -90,7 +88,7 @@ export interface IFloatingIsland {
         }
       </div>
 
-      <!-- Buoyant Floating Interactive Words (Lotus Leaves / Water Lanterns) -->
+      <!-- Buoyant Floating Interactive Words -->
       <div class="absolute inset-0 z-30 pointer-events-none">
         @for (word of floatingWords(); track word.id) {
           <div (click)="onWordClick(word)"
@@ -98,8 +96,7 @@ export interface IFloatingIsland {
             [style.left.%]="word.x" [style.top.%]="word.y"
             [style.transform]="'translate(-50%, -50%) translateY(' + (Math.sin(word.phase) * 6) + 'px)'">
             
-            <!-- Water Lantern / Floating Leaf Pill -->
-            <div class="px-3.5 py-1.5 rounded-2xl bg-zinc-900/80 border border-zinc-700/80 text-zinc-200 text-xs font-sans flex items-center gap-2 shadow-xl backdrop-blur-md group-hover:border-emerald-400 group-hover:bg-emerald-950/60 group-hover:text-emerald-200 group-hover:scale-110 transition-all duration-200">
+            <div class="px-3.5 py-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-200 text-xs font-sans flex items-center gap-2 shadow-xl backdrop-blur-md group-hover:border-orange-500 group-hover:text-orange-400 group-hover:scale-110 transition-all duration-200">
               <span class="text-sm group-hover:rotate-12 transition-transform">{{ word.emoji }}</span>
               <span class="font-semibold text-[11px] font-mono tracking-tight">{{ word.text }}</span>
             </div>
@@ -110,15 +107,15 @@ export interface IFloatingIsland {
 
       <!-- Active Floating Word Details Modal Overlay -->
       @if (selectedWord(); as word) {
-        <div class="absolute bottom-4 left-6 right-6 p-4 rounded-2xl bg-zinc-900/95 border border-emerald-500/40 shadow-2xl backdrop-blur-lg z-40 flex items-center justify-between gap-4 font-sans animate-in fade-in slide-in-from-bottom-3 duration-200">
+        <div class="absolute bottom-4 left-6 right-6 p-4 rounded-2xl bg-zinc-900/95 border border-zinc-800 shadow-2xl backdrop-blur-lg z-40 flex items-center justify-between gap-4 font-sans animate-in fade-in slide-in-from-bottom-3 duration-200">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xl shrink-0">
+            <div class="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 text-orange-400 flex items-center justify-center text-xl shrink-0">
               {{ word.emoji }}
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <h4 class="text-xs font-bold font-mono uppercase text-emerald-300 tracking-wider">{{ word.text }}</h4>
-                <span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono uppercase">{{ word.category }}</span>
+                <h4 class="text-xs font-bold font-mono uppercase text-orange-400 tracking-wider">{{ word.text }}</h4>
+                <span class="text-[9px] px-2 py-0.5 rounded bg-zinc-950 text-zinc-300 font-mono uppercase border border-zinc-800">{{ word.category }}</span>
               </div>
               <p class="text-xs text-zinc-300 mt-0.5 leading-relaxed font-mono">
                 {{ word.details }}
@@ -127,7 +124,7 @@ export interface IFloatingIsland {
           </div>
 
           <button (click)="selectedWord.set(null)"
-            class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-mono text-xs font-bold transition cursor-pointer shrink-0">
+            class="px-3.5 py-1.5 rounded-xl bg-zinc-950 hover:bg-zinc-800 text-zinc-300 font-mono text-xs font-bold transition cursor-pointer shrink-0 border border-zinc-800">
             ✕ Close
           </button>
         </div>
@@ -142,7 +139,6 @@ export class FloatingWaterConsciousnessComponent implements AfterViewInit, OnDes
   patientState = inject(PatientStateService);
   Math = Math;
 
-  // Floating Archipelagos (Cities on Water) with 3D Anatomical Organ Focus Mapping
   islands: IFloatingIsland[] = [
     { id: 'isl-1', name: 'Gamma Sanctuary', stateId: 'focus', emoji: '⚡', x: 20, y: 35, color: 'indigo', freq: '40 Hz Gamma', targetOrganId: 'brain' },
     { id: 'isl-2', name: 'Alpha Lagoon', stateId: 'calm', emoji: '🧘', x: 50, y: 25, color: 'emerald', freq: '10 Hz Alpha', targetOrganId: 'heart' },
@@ -151,8 +147,6 @@ export class FloatingWaterConsciousnessComponent implements AfterViewInit, OnDes
     { id: 'isl-5', name: 'Grounding Isle', stateId: 'grounding', emoji: '🛡️', x: 65, y: 70, color: 'rose', freq: '8 Hz Low Alpha', targetOrganId: 'stomach' }
   ];
 
-
-  // Floating Words / Lotus Lanterns drifting on fluid water
   floatingWords = signal<IFloatingWord[]>([
     { id: 'w-1', text: '528 Hz Solfeggio', category: 'frequency', x: 28, y: 48, vx: 0.03, vy: 0.02, scale: 1, phase: 0, emoji: '🎵', details: 'Transformation frequency promoting vagal tone and cellular DNA harmony.' },
     { id: 'w-2', text: 'GABA-A Receptor', category: 'neurotransmitter', x: 58, y: 42, vx: -0.02, vy: 0.03, scale: 1, phase: 1.5, emoji: '🧬', details: 'Primary inhibitory neurotransmitter driving parasympathetic emotional calmness.' },
@@ -201,10 +195,8 @@ export class FloatingWaterConsciousnessComponent implements AfterViewInit, OnDes
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     
-    // Add dynamic water ripple
     this.ripples.push({ x, y, radius: 5, maxRadius: 140, opacity: 0.8 });
 
-    // Hydrodynamic repulsion on floating words
     const words = this.floatingWords();
     const updated = words.map(w => {
       const wx = (w.x / 100) * rect.width;
@@ -247,87 +239,49 @@ export class FloatingWaterConsciousnessComponent implements AfterViewInit, OnDes
   selectIsland(island: IFloatingIsland) {
     this.patientState.selectedPartId.set(island.targetOrganId);
     this.patientState.anatomyViewMode.set('organs');
-
-    const noteText = `🌊 Selected Floating City Archipelago: ${island.emoji} ${island.name} (${island.freq}) → Focused 3D Organ: ${island.targetOrganId}`;
-    this.patientState.addClinicalNote({
-      id: `island-select-${island.id}-${Date.now()}`,
-      text: noteText,
-      sourceLens: 'Functional Protocols',
-      date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
-    });
-    alert(`🌊 Navigating to Floating City Archipelago: ${island.name}\nTarget Frequency: ${island.freq}\n3D Anatomical Focus: ${island.targetOrganId.toUpperCase()}`);
   }
-
 
   private animate = () => {
     if (!this.ctx || !this.canvasRef) return;
     const canvas = this.canvasRef.nativeElement;
-    const w = canvas.width;
-    const h = canvas.height;
+    const ctx = this.ctx;
 
-    this.ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = 'rgba(9, 9, 11, 0.2)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw Ambient Fluid Water Gradient Background
-    const grad = this.ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, '#09090b');
-    grad.addColorStop(0.5, '#041712');
-    grad.addColorStop(1, '#09090b');
-    this.ctx.fillStyle = grad;
-    this.ctx.fillRect(0, 0, w, h);
-
-    // Render Animated Water Surface Caustics / Waves
-    const time = Date.now() * 0.0012;
-    this.ctx.strokeStyle = 'rgba(16, 185, 129, 0.07)';
-    this.ctx.lineWidth = 1.5;
-
-    for (let i = 0; i < 6; i++) {
-      this.ctx.beginPath();
-      const yOffset = (h / 7) * (i + 1);
-      for (let x = 0; x < w; x += 15) {
-        const waveY = yOffset + Math.sin(x * 0.015 + time + i) * 12 + Math.cos(x * 0.008 - time) * 6;
-        if (x === 0) this.ctx.moveTo(x, waveY);
-        else this.ctx.lineTo(x, waveY);
-      }
-      this.ctx.stroke();
-    }
-
-    // Render Dynamic Water Ripples
     for (let i = this.ripples.length - 1; i >= 0; i--) {
       const r = this.ripples[i];
-      r.radius += 1.8;
-      r.opacity -= 0.012;
+      r.radius += 1.5;
+      r.opacity *= 0.96;
 
-      if (r.opacity <= 0 || r.radius >= r.maxRadius) {
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(249, 115, 22, ${r.opacity})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      if (r.opacity < 0.01 || r.radius >= r.maxRadius) {
         this.ripples.splice(i, 1);
-        continue;
       }
-
-      this.ctx.beginPath();
-      this.ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
-      this.ctx.strokeStyle = `rgba(52, 211, 153, ${r.opacity})`;
-      this.ctx.lineWidth = 1.5;
-      this.ctx.stroke();
     }
 
-    // Update Floating Words position & phase (Buoyancy physics)
     const words = this.floatingWords();
-    const updated = words.map(word => {
-      let newX = word.x + word.vx;
-      let newY = word.y + word.vy;
-      let vx = word.vx * 0.98; // Friction dampening
-      let vy = word.vy * 0.98;
+    const updated = words.map(w => {
+      let x = w.x + w.vx * 0.1;
+      let y = w.y + w.vy * 0.1;
+      let vx = w.vx * 0.99;
+      let vy = w.vy * 0.99;
 
-      // Bounce off boundaries (10% to 90%)
-      if (newX < 10 || newX > 90) vx = -vx;
-      if (newY < 18 || newY > 85) vy = -vy;
+      if (x < 10 || x > 90) vx *= -1;
+      if (y < 15 || y > 85) vy *= -1;
 
       return {
-        ...word,
-        x: Math.max(10, Math.min(90, newX)),
-        y: Math.max(18, Math.min(85, newY)),
+        ...w,
+        x,
+        y,
         vx,
         vy,
-        phase: word.phase + 0.03
+        phase: w.phase + 0.03
       };
     });
     this.floatingWords.set(updated);

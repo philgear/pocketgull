@@ -5,6 +5,49 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-07-23
+
+**Patient Summary Clinical Assessments & Screener Trajectory, Research Frame Link Interceptor, Clean White 3D Viewport & Mobile Splashscreen Optimizations**
+
+### Added
+- **[Clinical / Patient Summary] Assessments & Screener Trajectory Integration (`medical-summary.component.ts`)**: Integrated live clinical screener metrics directly into the Patient Summary / Medical Chart view:
+  - 🌿 **GAD-7 (Anxiety)**: Live score out of 21 with automatic severity tier classification.
+  - 🧠 **PHQ-9 (Depression)**: Live score out of 27 with severity tier classification.
+  - 🌀 **Y-BOCS (OCD)**: Live total score out of 40 with obsession and compulsion subtotal breakdown and severity classification.
+  - 😴 **KSS Readiness**: Karolinska Sleepiness Scale (1–9) score with active cognitive fatigue safety mode indicator.
+  - 📊 **Auxiliary Screener Trajectory**: Summary readouts for Insomnia Severity Index (ISI), C-SSRS Safety Risk, and Grow-Thyself Epigenetic Flourishing Index.
+- **[UI / Research Frame] Research Frame Link Routing (`analysis-report.component.ts` & `patient-state.service.ts`)**: Added click interceptor (`handleContentAreaClick`) to route all internal app links and external research URLs clicked inside the Analysis component directly into the floating `ResearchFrameComponent`.
+
+### Fixed
+- **[UI / Layout] Analysis Lens Scrollability & Papercraft Theme Support (`styles.css` & `analysis-container.component.ts`)**: Fixed broken vertical scrolling across all primary/secondary lenses and papercraft themes (`Cardstock`, `Hemp`, `Rice`, `Construction`) by correcting container flex propagation and overriding global CSS overflow constraints on theme cards.
+- **[3D Body Viewer / UI] Clean White 3D Map Viewport (`body-3d-viewer.component.ts` & `body-viewer.component.ts`)**: Removed inline data entry overlay card from the 3D map canvas and updated the WebGL renderer background clear color to clean pure white (`#ffffff`).
+- **[Splashscreen / UX] Viewport Fit & High-Contrast Buttons (`secure-splash.component.ts`)**: Constrained splashscreen layout to fit within viewport height without scrolling, compacted Animal Comfort Protocols widget, and enhanced button text contrast (`bg-emerald-600 dark:bg-emerald-500 font-black text-white dark:text-zinc-950`).
+
+## [1.2.0] - 2026-07-22
+
+**10 Standardized Clinical & Life Sovereignty Assessment Instruments, Dynamic 3D Paradigm Synchronization & Rice Papercraft Theme**
+
+### Added
+- **[Clinical / Assessments] 10 Standardized Clinical & Life Sovereignty Assessment Instruments (`clinical-assessments.service.ts` & `clinical-assessments-suite.component.ts`)**:
+  1. 🧠 **PHQ-9**: 9-item Patient Health Questionnaire for depression severity (0–27).
+  2. ⚡ **GAD-7**: 7-item Generalized Anxiety Disorder scale with 0.1 Hz vagal resonance biofeedback integration (0–21).
+  3. 🌙 **ISI**: 7-item Insomnia Severity Index with CBT-I sleep restriction directives (0–28).
+  4. 🛡️ **C-SSRS**: 6-question Columbia Suicide Screener with automatic **HIGH RISK Sentinel Safety Alerts** & 988 Lifeline routing (0–16).
+  5. 🩺 **ROS-14**: 14-System Review of Systems intake inventory spanning all major organ systems.
+  6. 🫀 **PHQ-15**: 15-item Somatic Symptom Scale evaluating physical distress & autonomic dysregulation (0–30).
+  7. 🤝 **PRAPARE**: Social Determinants of Health (SDOH) protocol automatically exporting ICD-10 Z-codes (`Z59.8` Housing, `Z59.41` Food Insecurity, `Z59.82` Transportation, `Z59.6` Financial Strain, `Z60.2` Isolation).
+  8. 🧘 **AYURVEDA**: 6-vector Samskrita Tridosha Inventory calculating Vata, Pitta, & Kapha balances and Agni metabolic fire types (*Samagni*, *Vishamagni*, *Mandagni*, *Tikshnagni*).
+  9. 🌿 **TCM**: Traditional Chinese Medicine Shi Wen (Ten Questions) 6-vector inventory calculating Qi, Blood, Yin, Yang, Cold, & Heat Ba Gang patterns.
+  10. 🌱 **GROW_THYSELF**: 5-domain Life Sovereignty & Epigenetic Flourishing inventory assessing Purpose/Ikigai, Somatic Sovereignty, Epigenetic Gut Vitality, Relational Depth, & Cognitive Agency.
+- **[3D Body Viewer / Paradigms] Dynamic Paradigm-Driven 3D Viewport Synchronization (`body-viewer.component.ts` & `body-3d-viewer.component.ts`)**:
+  - Selecting **🩺 Western** switches 3D WebGL viewport to Allopathic Organs.
+  - Selecting **🌿 Eastern TCM** renders 3D Jing-Luo meridians & 12 Acupoints (`GV-20 Baihui`, `CV-17 Danzhong`, `ST-36 Zusanli`).
+  - Selecting **🧘 Ayurvedic** renders 3D Sushumna Lotus Chakras (`Sahasrara`, `Ajna`, `Anahata`, `Manipura`).
+- **[3D UX / Interactivity] Interactive 3D Raycast Tooltips & Quick Data Entry Overlay Card**:
+  - Hovering over 3D nodes renders a floating **Raycast Tooltip** displaying part icon, paradigm badge, and recorded pain scores.
+  - Clicking any 3D node opens a **Quick Data Entry Card** with pain slider (0–10), symptom notes, and direct intake navigation.
+- **[UI / Themes] Default Rice Papercraft Theme**: Applied tactile rice paper background texture (`/images/rice_paper_texture.png`) and soft organic off-white warm aesthetics (`#FAF8F5`).
+
 ## [1.1.0] - 2026-07-21
 
 **Pocket-Gull v1.1.0 — AIGA 2025/2026 Models, Multi-Paradigm Storm Shield, Ambient Co-Regulation & Multilingual Health Passport**
@@ -37,7 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[Mind-State / AVS] Neuro-Consciousness & Mood Optimization Matrix (`mood-consciousness-matrix.component.ts`)**: Multimodal mind-state calibration engine organizing interventions into 5 states of consciousness (`⚡ Hyper-Focus & Flow`, `🧘 Meditative Calm`, `🌙 Deep Rest & Sleep`, `🎨 Creative Reverie`, `🛡️ Anxiolytic Grounding`). Single-click state prescriptions synchronize AVS brainwave frequencies (Gamma, Alpha, Theta, Delta), vagal breathing cadences (4–6 BPM), botanical micro-doses, and Gemini bi-directional voice consultation modes.
 - **[Print / Export] Care Plan Print Studio & Document Carousel (`care-plan-print-preview.component.ts` & `export.service.ts`)**: Replaced raw code/FHIR dumps with a compact inline note editor and an interactive 4-page print thumbnail carousel with live page previews. Supports section toggle switches (`Vitals`, `Side-by-Side Comparison`, `AVS Protocols`, `Chrono-Nutrition`, `GCN Genomics`) and renders a 3-column side-by-side comparative table (`🔵 Western Allopathic` vs `🟢 Eastern TCM` vs `🟡 Ayurvedic Medicine`) in printed PDFs.
 - **[Mobile / QR] Mobile Menu QR Code Engine & Smartphone View (`mobile-menu-qr-modal.component.ts`)**: Encodes patient clinical parameters into a high-contrast QR Code matrix for mobile camera scanning. Features an interactive smartphone mockup with 1-tap meal prescriptions for on-the-fly patient exploration.
-- **[Emergency / Telemetry] Emergency Bypass Rapid Nutritional Triage (`emergency-nutritional-bypass.component.ts`)**: Real-time osmotic hydration and botanical triage recommendations calculated from vitals readouts ($\text{BP} \ge 130/80$, $\text{HR} \ge 85$, $\text{SpO}_2 < 95\%$), active conditions, and live GPS location telemetry (e.g. Oregon Pacific Coast Buoy 46050) with 1-click triage logging.
+- **[Emergency / Telemetry] Emergency Bypass Rapid Nutritional Triage (`emergency-nutritional-bypass.component.ts`)**: Real-time osmotic hydration and botanical triage recommendations calculated from vitals readouts ($\text{BP} \ge 130/80$, $\text{HR} \ge 85$, $\text{SpO}_2 < 95\%$), active conditions, and live GPS location telemetry (e.g. Oregon Pacific Coast Buoy station) with 1-click triage logging.
 - **[UI / Visualization] Living Patient Health Fruit Tree (`patient-fruit-tree.component.ts`)**: Interactive visual clinical metaphor rendering patient health as a living procedural fruit tree on the **Summary Overview** screen. Renders soil roots for preexisting conditions (*Type 2 Diabetes*, *Hypertension*), major clinical domain boughs, procedural fruit nodes (`🍎 Blood Pressure`, `🫐 Glycemic HbA1c`, `🍋 Vagal HRV`, `🍊 CYP2D6 Clearance`), and live ripeness growth ($0\% \to 100\%$) tied to patient note additions.
 - **[Clinical / Research] Lens Innovation Shield & Insight Sparks Engine (`lens-insight-spark-shield.component.ts`)**: Lens-tailored protection engine and translational research hypothesis generator. Dynamically renders active lens shields and provides an interactive drill-down modal proposing cutting-edge clinical research sparks (*0.1 Hz Vagal Breathing & Telomere Epigenetics*, *Chrono-Nutrition & GLUT4 Clearance*, *Anthocyanin Glymphatic Clearance*) with 1-click PubMed launches.
 - **[Docs] Feature & Architecture Documentation Update**: Updated `docs/study/src/pages/features.mdx` and `docs/study/src/pages/clinical-paradigms.mdx` to reflect all 4 new clinical systems and the Multimodal Side-by-Side Philosophy Comparison framework.

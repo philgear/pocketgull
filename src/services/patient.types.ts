@@ -1,5 +1,15 @@
 import { AnalysisLens } from './clinical-intelligence.service';
 
+export interface IPatientAnatomicProfile {
+  amputations: Array<'r_arm' | 'l_arm' | 'r_hand' | 'l_hand' | 'r_thigh' | 'r_shin' | 'r_foot' | 'l_thigh' | 'l_shin' | 'l_foot'>;
+  phantomLimbPain: Array<{
+    limbId: string;
+    intensity: number;
+    phantomAvsFrequencyHz: number;
+  }>;
+  customLiDARScanUrl?: string | null;
+}
+
 export const BODY_PART_NAMES: Record<string, string> = {
     'head': 'Head & Neck',
     'chest': 'Chest & Upper Torso',
@@ -230,9 +240,37 @@ export interface IPatientState {
     /** Current AI-generated AVS co-regulation protocol. */
     avsProtocol?: IAvsProtocol;
     /** Selected medical paradigm / philosophy mode. */
-    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic';
+    activePhilosophy?: 'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic';
+    /** Eastern TCM Diagnostic Intake findings. */
+    tcmIntake?: ITcmIntake;
+    /** Ayurvedic Tridosha & Ashtavidha Intake findings. */
+    ayurvedicIntake?: IAyurvedicIntake;
     /** Custom expansive key-value biomarker and note fields. */
     customFields?: { key: string; value: string }[];
+}
+
+export interface ITcmIntake {
+    tongueColor?: 'pale' | 'pink' | 'red' | 'scarlet' | 'purple';
+    tongueCoating?: 'thin-white' | 'thick-white' | 'yellow-dry' | 'yellow-greasy' | 'peeled';
+    pulseQuality?: 'normal' | 'wiry' | 'slippery' | 'deep-thready' | 'floating-rapid' | 'choppy';
+    thermalPreference?: 'neutral' | 'aversion-cold' | 'aversion-heat' | 'afternoon-tidal-heat';
+    sweatPattern?: 'normal' | 'spontaneous-day' | 'night-sweats' | 'none';
+    tasteInMouth?: 'normal' | 'bitter' | 'sweet' | 'metallic' | 'bland';
+    tcmPattern?: string;
+}
+
+export interface IAyurvedicIntake {
+    prakritiVata?: number;
+    prakritiPitta?: number;
+    prakritiKapha?: number;
+    vikritiVata?: number;
+    vikritiPitta?: number;
+    vikritiKapha?: number;
+    agniType?: 'samagni' | 'vishamagni' | 'tikshnagni' | 'mandagni';
+    amaScore?: number;
+    nadiPulseType?: 'snake-vata' | 'frog-pitta' | 'swan-kapha';
+    ashtavidhaStatus?: string;
+    ayurvedicImbalance?: string;
 }
 
 /**
@@ -253,12 +291,18 @@ export interface ITraumaFlags {
     knownTriggers: string[];
 }
 
-/**
- * Gemini-generated AVS co-regulation protocol, personalized from patient context.
- * Applied by ClinicalContextAvsService → GlobalAvsService.
- */
+export interface IAvsNarrativeStage {
+  stageNumber: number;
+  name: string; // e.g. "Stage 1: Sympathetic Induction", "Stage 2: Deep Vagal Entrainment", "Stage 3: Harmonic Integration", "Stage 4: Cognitive Awakening"
+  durationSeconds: number; // e.g. 180, 540, 240, 240
+  targetWave: 'delta' | 'theta' | 'alpha' | 'beta' | 'gamma';
+  targetHz: number; // e.g. 12, 7.83, 528, 10
+  solfeggioToneHz: number; // e.g. 174, 432, 528, 639
+  narrativeDescription: string;
+}
+
 export interface IAvsProtocol {
-    wave: 'delta' | 'theta' | 'alpha' | 'beta';
+    wave: 'delta' | 'theta' | 'alpha' | 'beta' | 'gamma';
     breathing_bpm: number;
     color_palette: 'emerald' | 'blue' | 'violet' | 'amber' | 'rose-earth';
     noise_type: 'brown' | 'pink' | 'white';
@@ -273,6 +317,12 @@ export interface IAvsProtocol {
     contraindications: string[];
     generated_at: number;
     context_hash: string;
+    /** Prescribed session duration in minutes (5-20 min range, 15 min default). */
+    session_duration_minutes?: number;
+    /** Safety auto-cutoff toggle ensuring session hard-stops when session timer expires. */
+    auto_cutoff_enabled?: boolean;
+    /** 4-Stage Therapeutic Narrative Arc Exploration. */
+    narrative_arc?: IAvsNarrativeStage[];
 }
 
 /**
@@ -371,6 +421,9 @@ export interface ILifestyleContext {
     usesCbd:           boolean;   // CBD without significant THC
     isDiabetic:        boolean;   // T1, T2, or gestational
     isPreDiabetic:     boolean;
+    hasNeuroCondition?: boolean;  // Pre-existing neuro conditions (MS, demyelination, neuropathy)
+    hasVisualImpairment?: boolean; // Blindness, optic neuritis, low vision
+    hasCognitiveSensitivity?: boolean; // Dyslexia, ADHD, Autism, MCI, Concussion/TBI
     hasCaffeineWithinSession: boolean; // "had coffee before appointment"
     notes: string[];              // Free-text extraction from chart
 }

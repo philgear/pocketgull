@@ -12,6 +12,8 @@
 ![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![Version](https://img.shields.io/badge/version-1.0.0--rc12-blue)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/philgear/pocketgull/badge)](https://securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull)
+[![OpenSSF Best Practices](https://img.shields.io/badge/OpenSSF-Best%20Practices-006699?logo=openssf&logoColor=white)](https://bestpractices.coreinfrastructure.org)
 [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
 [![DOI](https://zenodo.org/badge/1161259215.svg)](https://doi.org/10.5281/zenodo.20647513)
 [![ACM Code of Ethics](https://img.shields.io/badge/ACM-Ethics%20%26%20Conduct-006699?logo=associationforcomputingmachinery&logoColor=white)](https://www.acm.org/code-of-ethics)
@@ -33,7 +35,151 @@
 
 ---
 
-![Pocket Gull Social Preview](./social-preview.png)
+<!-- 📄 CLINICAL STATIONERY HEADER & PATIENT CARE PLAN DOSSIER -->
+<div align="center">
+  <table width="100%" border="0" style="border: 3px double #1e3a5f; background: #faf8f5; color: #1e293b; padding: 20px; font-family: 'Inter', monospace, sans-serif; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.08);">
+    <tr>
+      <td>
+        <div style="border-bottom: 2px solid #1e3a5f; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 style="margin: 0; color: #1e3a5f; letter-spacing: 2px;">🏥 POCKET GULL MEDICAL INTELLIGENCE</h2>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b; font-weight: bold; text-transform: uppercase;">Official Clinical Care Plan Strategy & Live AI Consult Engine</p>
+          </div>
+          <div style="text-align: right; font-size: 11px; color: #475569;">
+            <span><strong>DOSSIER NO:</strong> PG-2026-EX-9901</span><br/>
+            <span><strong>FHIR R4 BUNDLE:</strong> VERIFIED ✓</span><br/>
+            <span><strong>STATIONERY THEME:</strong> CONSTRUCTIVE PAPERCRAFT</span>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## 📄 SECTION 1: CLINICAL STATIONERY & PATIENT TRAJECTORY
+
+### 📑 CLINICAL DATA CARD 1.0 — PATIENT DEMOGRAPHICS & BASELINE VITALS
+
+| Field | Parameter | Baseline Metric | Status & Clinical Interpretation |
+| :--- | :--- | :--- | :--- |
+| 👤 **Patient Identity** | Phil Gear, Ph.G | Age 42 (Male) | ID: `p_phil_gear` \| Executive Care Profile |
+| 💓 **Hemodynamics** | Blood Pressure / Heart Rate | `122/82 mmHg` \| `68 bpm` | Optimal resting autonomic tone (LF/HF `1.25`) |
+| 🫁 **Pulmonary & Temp** | SpO2 / Body Temperature | `98%` \| `98.6°F` | Eupneic baseline, normal thermoregulation |
+| ⚖️ **Anthropometrics** | Height / Weight | `5'10"` \| `178 lbs` | BMI `25.5` \| Samagni Metabolic Balance |
+| 🧪 **Biomarker Matrix** | Mg / Vit D3 / B12 / Zn | `2.1 mg/dL` \| `32 ng/mL` \| `580 pg/mL` \| `92 mcg/dL` | Sub-optimal Mg & D3; optimal methylation & Zn |
+| 🎯 **Care Objective** | Patient Strategy Goal | *"Optimize metabolic health, synchronize biometrics from Health Connect, and reduce sleep latency."* | Active Care Plan |
+
+---
+
+### 📑 CLINICAL DATA CARD 2.0 — ASSESSMENT & SCREENER TRAJECTORY GRID
+
+| Assessment Instrument | Standard Code (LOINC / System) | Measured Score | Severity Classification | Recommended Interventions |
+| :--- | :--- | :---: | :---: | :--- |
+| 🌿 **GAD-7 (Anxiety)** | LOINC `69725-0` | `4 / 21` | **Mild / Subclinical** | 0.1 Hz Vagal Resonant Breathing & Sleep Hygiene |
+| 🧠 **PHQ-9 (Depression)** | LOINC `44261-6` | `3 / 27` | **Minimal Baseline** | Circadian Sunlight Entrainment & Habit Tracking |
+| 🌀 **Y-BOCS (OCD)** | LOINC `82290-8` | `4 / 40` | **Subclinical** | Daily Routine Structuring & Mindfulness Anchoring |
+| 😴 **KSS Readiness** | LOINC `71556-5` | `3 / 9` | **Alert (Level 3)** | Full Multimodal Telemetry Enabled |
+| 🌙 **ISI (Insomnia)** | LOINC `86095-7` | `5 / 28` | **None** | Evening Blue-Light Blocking & Mag Glycinate |
+| 🚨 **C-SSRS (Safety)** | LOINC `84411-8` | `0` | **Minimal Risk** | Standard Safeguards & Emergency Mode Readiness |
+| 🌱 **Grow-Thyself Index** | Custom Epigenetic | `8.8 / 10` | **Sovereignty** | High Resilience & Lifestyle Alignment |
+
+---
+
+### 📑 CLINICAL DATA CARD 3.0 — MULTI-PARADIGM MEDICINE MATRIX
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                       🏥 POCKET GULL MULTI-LENS CLINICAL PARADIGM MATRIX                     │
+├───────────────────────────────┬───────────────────────────────┬─────────────────────────────┤
+│ 🩺 WESTERN ALLOPATHIC LENS     │ 🌿 TRADITIONAL CHINESE (TCM)  │ 🧘 AYURVEDIC MEDICINE LENS  │
+│ • Diagnosis: Mild Tension     │ • Pattern: Zang-Fu Qi         │ • Prakriti: V3 / P5 / K3    │
+│   Headache & Sleep Latency    │   Constriction (Liver Qi)     │ • Vikriti: V4 / P6 / K3     │
+│ • ICD-10: G44.209, G47.00     │ • Tongue: Pink, Thin White    │ • Agni: Samagni Balance     │
+│ • FHIR R4 Bundle Exported     │ • Pulse: Normal / Moderate    │ • Nadi: Frog-Pitta Flow     │
+├───────────────────────────────┼───────────────────────────────┼─────────────────────────────┤
+│ 🧪 ORTHOMOLECULAR & NUTRIENT  │ 📊 PHYSIONET 2026 TELEMETRY   │ ⏳ ACTUARIAL LONGEVITY LENS │
+│ • Magnesium: Sub-optimal      │ • QRS Interval: 88 ms         │ • Projected QALY Gain:      │
+│ • Vit D3: Sub-optimal (32)    │ • QTc (Fridericia): 412 ms    │   +4.2 Quality-Adjusted Yrs │
+│ • B12 & Zinc: Optimal Status  │ • LF/HF Ratio: 1.25           │ • 10-Yr Mortality Risk:     │
+│ • Precision Dosing 400mg PM   │ • RMSSD: 48 ms (Good Vagal)   │   -18.5% Relative Reduc.    │
+└───────────────────────────────┴───────────────────────────────┴─────────────────────────────┘
+```
+
+---
+
+## 📄 SECTION 2: ARCHITECTURAL BLUEPRINT & SYSTEM VISUALS
+
+<!-- 📐 CONSTRUCTION BLUEPRINT IMAGE FRAME 1.0 -->
+<div align="center" style="background: #0f172a; border: 2px dashed #f59e0b; padding: 20px; border-radius: 12px; margin: 24px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-bottom: 16px;">
+    <span style="color: #f59e0b; font-family: monospace; font-size: 13px; font-weight: bold;">📐 FIG 1.0 — ANATOMICAL 3D BLUEPRINT & LIVE AI CONSULT DASHBOARD</span>
+    <span style="color: #64748b; font-family: monospace; font-size: 11px;">SCALE: 1:1 | RENDER: THREE.JS WEBGL + GEMINI 2.5 FLASH</span>
+  </div>
+  <img src="./docs/images/pocket-gall_dashboard.png" alt="Pocket Gull Clinical Blueprint" style="border-radius: 8px; border: 1px solid #334155; width: 100%; max-width: 1100px;" />
+  <p style="color: #94a3b8; font-size: 11px; font-family: monospace; margin: 12px 0 0 0;">
+    [BLUEPRINT SPEC] Three.js Procedural Skeletal & Surface Mesh • Real-Time Web Speech Multimodal Audio Streaming • Evidence-Grounded PubMed Search
+  </p>
+</div>
+
+---
+
+## 🎨 AVAILABLE THEMES & COGNITIVE HEALTH LITERACY MODES
+
+Pocket Gull features a comprehensive design system supporting dynamic visual themes, 5 health literacy persona modes, 3 spatial paradigm lenses, and WCAG AA accessibility standards:
+
+### 🌓 1. Visual Themes & Aesthetic Systems
+- **🌞 Light Mode**: Warm parchment & crisp glassmorphism cards (`bg-white/70`, `bg-[#FFFDF5]`), high-contrast dark text (`text-gray-900`), soft borders (`border-gray-200`), and subtle ambient drop shadows.
+- **🌙 Dark Mode**: Deep obsidian & zinc styling (`dark:bg-zinc-900`, `dark:bg-zinc-950`), glowing neon accents (`emerald-500`, `cyan-400`, `amber-400`), crisp bright typography (`dark:text-zinc-100`), and zero-whitespace circadian breathing ambient glow.
+- **📄 Constructive Papercraft Stationery**: Neumorphic paper cards with double borders, tactile shadows (`shadow-[4px_6px_0px_0px_rgba(28,28,28,0.85)]`), and official FHIR R4 clinical dossier stamps.
+
+---
+
+### 🧠 2. Health Literacy Personas & Cognitive Writing Styles
+Users can toggle between 5 distinct cognitive writing styles to suit their preferred mental model and emotional tone:
+
+1. **🔬 Clinical Allopathic Mode**:
+   - Evidence-grounded ICD-10/SNOMED coding, physiological telemetry, FHIR R4 bundles, and PubMed clinical trial citations.
+2. **🌳 The Arborist Botanical Redwood Mode**:
+   - Translates body systems into dendrochronology, tree ring growth, xylem sap velocity (`120/80 hPa`), and canopy foliage vitality (`SpO₂ 98%`).
+3. **🏎️ Car Talk Warm Garage Mechanic Mode**:
+   - Translates body systems into V8 engine chassis logs, fluid line PSI, manifold vacuum pressure, and OBD-II DTC diagnostic trouble codes (`DTC P0128`).
+4. **🎩 The Extraordinary Gentleman Polymath Mode**:
+   - Translates telemetry into a Victorian Steampunk expedition memoir with central brass chronometer governors, barometric pressure dials, and etheric purity gauges.
+5. **✨ The Inspirational Artistic Muse Mode**:
+   - Translates health history into a 3-movement epic symphony with 528 Hz Solfeggio frequencies, watercolor canvas palettes, and harmonic resonance.
+
+---
+
+### 🩺 3. 3D Spatial Paradigm Lenses
+- **🩺 Western Allopathic 3D Surface & Skeletal Model** (Organ target selection & skeletal overlay)
+- **🌿 Eastern TCM 3D Acupoint Meridian Lens** (GV-20 Baihui, CV-17 Danzhong, CV-12 Zhongwan, ST-36 Zusanli, LI-4 Hegu)
+- **🧘 Ayurvedic 3D Sushumna Chakra Lens** (Crown, Third Eye, Throat, Heart, Solar Plexus, Sacral, Root)
+
+---
+
+### ♿ 4. Accessibility, Typography & Ergonomics Framework
+
+#### 🔤 The 3-Tier Font Pairing System
+- **Interface & Body (`Inter / Sans-Serif`)**: Clinical rationales, drug matrix tables, and care plan steps. High x-height, open apertures, clear letterform separation (`1`, `I`, `l`, `0`, `O`).
+- **Data & Telemetry (`JetBrains Mono / Monospace`)**: Vital signs, blood pressure (`120/80 hPa`), ICD-10/SNOMED codes, timestamps. Fixed character widths guarantee that lab columns alignment never shifts during live streaming updates.
+- **Persona Narrative (`Serif / Display`)**: Sylvan Arborist lore, Gentleman memoirs, and Muse poetry. High-contrast strokes create an immersive, rhythmic cadence for narrative health storybooks.
+
+#### 📏 Scale, Leading & Touch Target Boundaries
+- **Hero Card Header**: `text-lg` (`18px – 20px`), `leading-snug` (`1.375`).
+- **Section Title**: `text-base` (`16px`), `leading-normal` (`1.5`).
+- **Body Rationale**: `text-xs/sm` (`12px – 14px`), `leading-relaxed` (`1.625`) capped at 3 lines per paragraph to prevent line-skipping fatigue.
+- **Biomarker Metric**: `text-[11px]` (`11px font-mono`), `leading-none` (`1.0`).
+- **Interactive Touch Targets**: `min-h-[44px]` × `px-3.5 py-2` across all buttons and paradigm selection pills ensuring **44px × 44px minimum touch area** for WCAG AA mobile & touchscreen compliance.
+
+#### 🎨 Color Contrast Ratios (WCAG AAA Compliance)
+- **☀️ Light Mode**: Warm Parchment (`#FFFDF5` / `bg-slate-50`), Deep Charcoal text (`#111827`, **Contrast 16.2:1** vs AAA 7:1), Slate Gray labels (`#475569`, **Contrast 4.8:1** vs AA 4.5:1).
+- **🌙 Dark Mode**: Obsidian Zinc (`#09090b` / `dark:bg-zinc-950`), Pure Ice Zinc text (`#f4f4f5`, **Contrast 17.1:1** vs AAA 7:1), high-glow neon metrics (`#34d399` emerald-400, `#22d3ee` cyan-400, `#fbbf24` amber-400).
+
+#### 🧠 Cognitive Ergonomics for Rapid Scanability
+- **Dynamic Text Resizing Multipliers (`textSizeScale`)**: `A (Std)` 1.0× baseline, `A+ (Lg)` 1.15× magnification, `A++ (XL)` 1.30× magnification for high-visibility environments.
+- **Plain Language Dual Rationale Toggle**: Instantly switch between **🔬 Deep Clinical Rationale** (ICD-10, pathophysiology, FHIR R4) and **📖 Plain Language** (persona metaphors and micro-habits).
 
 ---
 
@@ -45,7 +191,18 @@ Like its namesake, the agent is **agile**, **interruptible**, and **highly obser
 
 > **Industrial Grace:** We believe medical tools should be as beautiful as they are functional. Our design language combines the clinical precision of a laboratory with the "Less, but better" philosophy of Dieter Rams.
 
-![Pocket Gull Dashboard](./docs/images/pocket-gall_dashboard.png)
+<!-- 📐 CONSTRUCTION BLUEPRINT IMAGE FRAME 2.0 -->
+<div align="center" style="background: #0f172a; border: 2px dashed #38bdf8; padding: 20px; border-radius: 12px; margin: 24px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 8px; margin-bottom: 16px;">
+    <span style="color: #38bdf8; font-family: monospace; font-size: 13px; font-weight: bold;">📄 FIG 2.0 — CLINICAL CARE PLAN & MULTI-LENS ANALYSIS LENSES</span>
+    <span style="color: #64748b; font-family: monospace; font-size: 11px;">THEME: PAPERCRAFT CONSTRUCTIVE STATIONERY</span>
+  </div>
+  <img src="./screenshot.png" alt="Pocket Gull Social Preview" style="border-radius: 8px; border: 1px solid #334155; width: 100%; max-width: 1100px;" />
+</div>
+
+---
+
+## 📄 SECTION 3: SYSTEM ARCHITECTURE & COMPLIANCE SPECIFICATIONS
 
 ---
 

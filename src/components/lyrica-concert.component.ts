@@ -18,6 +18,9 @@ export interface IConcertAct {
   bgGradient: string;
   lyricaAffirmation: string;
   visualStyleName: 'Oceanic Hydrodynamics' | 'Bioluminescent DNA Helix' | 'Aurora Borealis Prism' | 'Golden Supernova Mandala';
+  tcmScale: 'Gong (Earth)' | 'Shang (Metal)' | 'Jiao (Wood)' | 'Zhi (Fire)' | 'Yu (Water)';
+  ayurvedicRaga: string;
+  allopathicTarget: string;
 }
 
 @Component({
@@ -123,6 +126,17 @@ export interface IConcertAct {
               </button>
             }
 
+            <button (click)="isMusicVideoOpen.set(true)"
+              class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg flex items-center gap-2 cursor-pointer border border-purple-400/30 active:scale-95">
+              <span>📺 Launch Visualizer</span>
+            </button>
+
+            <button (click)="triggerKinestheticImpact('golf')"
+              class="px-3.5 py-2 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/50 text-cyan-300 font-bold text-xs transition cursor-pointer active:scale-95 flex items-center gap-1.5"
+              title="Trigger Golf Driver Impact Acoustic Anchor">
+              <span>⛳ Golf Impact Anchor</span>
+            </button>
+
             <button (click)="nextAct()"
               class="p-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition cursor-pointer border border-zinc-700 active:scale-95"
               title="Next Act">
@@ -131,8 +145,8 @@ export interface IConcertAct {
           </div>
         </div>
 
-        <!-- 4-Act Setlist Timeline Progress -->
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <!-- 5-Act Setlist Timeline Progress -->
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
           @for (act of setlist; track act.actNumber; let idx = $index) {
             <button (click)="selectAct(idx)"
               [class.border-purple-500]="activeActIndex() === idx"
@@ -174,6 +188,19 @@ export interface IConcertAct {
           <p class="text-sm italic text-purple-200 font-sans leading-relaxed">
             "{{ currentAct.lyricaAffirmation }}"
           </p>
+
+          <!-- Tri-Paradigm Concert Synthesis Bar -->
+          <div class="mt-3 pt-2.5 border-t border-zinc-800/80 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[10px] font-mono">
+            <div class="px-2.5 py-1.5 rounded-lg bg-cyan-950/40 border border-cyan-800/40 text-cyan-300 truncate">
+              ⚡ <strong>Allopathic:</strong> {{ currentAct.allopathicTarget }}
+            </div>
+            <div class="px-2.5 py-1.5 rounded-lg bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 truncate">
+              ☯️ <strong>TCM Scale:</strong> {{ currentAct.tcmScale }}
+            </div>
+            <div class="px-2.5 py-1.5 rounded-lg bg-amber-950/40 border border-amber-800/40 text-amber-300 truncate">
+              🟡 <strong>Ayurveda:</strong> {{ currentAct.ayurvedicRaga }}
+            </div>
+          </div>
         </div>
 
       </div>
@@ -188,14 +215,38 @@ export interface IConcertAct {
               ✕
             </button>
 
-            <!-- Poster Header Artwork -->
-            <div class="text-center border-b border-purple-500/30 pb-6 mb-6 space-y-2">
-              <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-purple-400 block">Pocket-Gull Generative Concert Series</span>
+            <!-- Poster Header Artwork & Generative Cover Art -->
+            <div class="text-center border-b border-purple-500/30 pb-6 mb-6 space-y-3">
+              <span class="text-[10px] font-bold uppercase tracking-[0.4em] text-purple-400 block">Pocket-Gull Generative Concert & Album Series</span>
+              
+              <!-- Generative Album Cover Art Preview Badge -->
+              <div class="w-48 h-48 mx-auto my-3 rounded-2xl bg-gradient-to-br from-purple-900 via-indigo-950 to-zinc-950 border-2 border-purple-400/50 shadow-[0_0_30px_rgba(168,85,247,0.4)] flex flex-col items-center justify-center relative overflow-hidden group">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent animate-pulse"></div>
+                <span class="text-5xl mb-1 animate-spin" style="animation-duration: 20s;">☸️</span>
+                <span class="text-[9px] font-mono font-bold uppercase tracking-widest text-purple-300 relative z-10">Bioluminescent Lotus Cover</span>
+                <span class="text-[8px] font-mono text-zinc-400 relative z-10">528Hz Solfeggio Resonator</span>
+              </div>
+
               <h1 class="text-2xl sm:text-4xl font-black uppercase tracking-tight text-white concert-title-glow font-sans">
                 {{ activePatientName() }}
               </h1>
               <p class="text-sm font-bold text-purple-300 tracking-widest uppercase">THE RECOVERY WORLD TOUR: LIVE IN HEALING CONCERT</p>
               <p class="text-xs text-zinc-400 font-sans">Venue: Pocket-Gull Mind-State Arena &bull; Target Frequencies: 174Hz – 963Hz Solfeggio</p>
+            </div>
+
+            <!-- Official Album Liner Notes -->
+            <div class="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 mb-6 font-sans text-xs">
+              <h4 class="text-[11px] font-mono font-bold uppercase tracking-wider text-purple-300 mb-2 flex items-center gap-2">
+                <span>📖</span> Official Album Liner Notes & Clinical Credits
+              </h4>
+              <p class="text-zinc-300 leading-relaxed mb-2">
+                <strong>Executive Producer:</strong> Google Gemini 2.5 Clinical Intelligence Engine<br>
+                <strong>Lead Vocalist & Beneficiary:</strong> {{ activePatientName() }}<br>
+                <strong>Acoustic Architecture:</strong> 528 Hz transformation carrier waves, 432 Hz prefrontal gamma entrainment, and 639 Hz Shen heart-anchoring sonnets.
+              </p>
+              <p class="text-zinc-400 text-[11px] italic leading-normal border-t border-purple-500/20 pt-2">
+                "Engineered for daily autonomic co-regulation, vagal tone activation, and multi-generational family healthspan."
+              </p>
             </div>
 
             <!-- Setlist Program -->
@@ -228,9 +279,14 @@ export interface IConcertAct {
             </div>
 
             <!-- Action Buttons -->
-            <div class="mt-6 flex justify-end gap-3">
+            <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+              <button (click)="saveAlbumArtToRecord()"
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition cursor-pointer flex items-center gap-1.5 border border-emerald-400/40">
+                <span>📌</span> Save Album Art & Liner Notes to Record
+              </button>
+
               <button (click)="isPosterModalOpen.set(false)"
-                class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition">
+                class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition cursor-pointer">
                 Close Ticket & Poster
               </button>
             </div>
@@ -321,7 +377,10 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'indigo',
       bgGradient: 'from-indigo-950 via-zinc-900 to-black',
       lyricaAffirmation: 'My body releases all stored tension. In this sanctuary, every breath restores safety.',
-      visualStyleName: 'Oceanic Hydrodynamics'
+      visualStyleName: 'Oceanic Hydrodynamics',
+      tcmScale: 'Yu (Water)',
+      ayurvedicRaga: 'Raga Bairagi (Vata Pacifying)',
+      allopathicTarget: 'Vagal Tone Resuscitation (HRV RMSSD +15ms)'
     },
     {
       actNumber: 2,
@@ -334,7 +393,10 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'emerald',
       bgGradient: 'from-emerald-950 via-zinc-900 to-black',
       lyricaAffirmation: 'My cells resonate with vitality. Every organ vibrates in harmonious, vibrant health.',
-      visualStyleName: 'Bioluminescent DNA Helix'
+      visualStyleName: 'Bioluminescent DNA Helix',
+      tcmScale: 'Jiao (Wood)',
+      ayurvedicRaga: 'Raga Bhairav (Pitta Cooling)',
+      allopathicTarget: 'Nitric Oxide Synthesis & DNA Repair'
     },
     {
       actNumber: 3,
@@ -347,7 +409,10 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'amber',
       bgGradient: 'from-amber-950 via-zinc-900 to-black',
       lyricaAffirmation: 'My mind is clear, light, and unburdened. Wisdom and inspiration flow effortlessly through me.',
-      visualStyleName: 'Aurora Borealis Prism'
+      visualStyleName: 'Aurora Borealis Prism',
+      tcmScale: 'Zhi (Fire)',
+      ayurvedicRaga: 'Raga Yaman (Kapha Destagnation)',
+      allopathicTarget: '40Hz Microglial Cleansing & Gamma Flow'
     },
     {
       actNumber: 4,
@@ -360,7 +425,26 @@ export class LyricaConcertComponent implements OnDestroy {
       themeColor: 'purple',
       bgGradient: 'from-purple-950 via-zinc-900 to-black',
       lyricaAffirmation: 'I am whole, radiant, and fully restored. Pure peace fills every cell of my being.',
-      visualStyleName: 'Golden Supernova Mandala'
+      visualStyleName: 'Golden Supernova Mandala',
+      tcmScale: 'Gong (Earth)',
+      ayurvedicRaga: 'Raga Malkauns (Prana Integration)',
+      allopathicTarget: 'Glymphatic Brain Autophagy Entry'
+    },
+    {
+      actNumber: 5,
+      actTitle: 'Sports Medicine Overture: Kinetic Impact & Athletic Flow',
+      subtitle: 'Golf Ball Impact Acoustic Anchor to 40Hz Motor Unit Entrainment',
+      solfeggioFreq: 528,
+      binauralBeatHz: 40,
+      waveType: 'Gamma',
+      durationSeconds: 300,
+      themeColor: 'cyan',
+      bgGradient: 'from-cyan-950 via-zinc-900 to-black',
+      lyricaAffirmation: 'My body strikes with effortless kinetic grace. Precision, strength, and motor flow harmonize in every movement.',
+      visualStyleName: 'Aurora Borealis Prism',
+      tcmScale: 'Jiao (Wood)',
+      ayurvedicRaga: 'Raga Yaman (Athletic Focus)',
+      allopathicTarget: 'Kinesthetic Impact Priming & Kinesiophobia Clearance'
     }
   ];
 
@@ -379,7 +463,7 @@ export class LyricaConcertComponent implements OnDestroy {
     // Start canvas animation loop when music video opens
     effect(() => {
       if (this.isMusicVideoOpen()) {
-        setTimeout(() => this.startCanvasRender(), 100);
+        setTimeout(() => this.startCanvasVisualizer(), 100);
       } else {
         if (this.canvasAnimFrame) cancelAnimationFrame(this.canvasAnimFrame);
       }
@@ -426,6 +510,35 @@ export class LyricaConcertComponent implements OnDestroy {
     }
   }
 
+  triggerKinestheticImpact(impactType: 'golf' | 'tennis' | 'baseball' = 'golf') {
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = this.audioContext || new AudioContextClass();
+
+      const impactOsc = ctx.createOscillator();
+      const impactGain = ctx.createGain();
+
+      const freqMap = { golf: 3800, tennis: 2400, baseball: 1800 };
+      const startFreq = freqMap[impactType] || 3800;
+
+      impactOsc.type = 'triangle';
+      impactOsc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+      impactOsc.frequency.exponentialRampToValueAtTime(528, ctx.currentTime + 0.18);
+
+      impactGain.gain.setValueAtTime(0.4, ctx.currentTime);
+      impactGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+
+      impactOsc.connect(impactGain);
+      impactGain.connect(ctx.destination);
+
+      impactOsc.start(ctx.currentTime);
+      impactOsc.stop(ctx.currentTime + 0.35);
+    } catch (e) {
+      console.warn('Kinesthetic impact audio failed', e);
+    }
+  }
+
   private playActSynth(act: IConcertAct) {
     this.stopSynth();
     try {
@@ -435,6 +548,11 @@ export class LyricaConcertComponent implements OnDestroy {
       this.gainNode = this.audioContext.createGain();
       this.gainNode.gain.setValueAtTime(0.15, this.audioContext.currentTime);
       this.gainNode.connect(this.audioContext.destination);
+
+      // Trigger Kinesthetic Impact Acoustic Anchor for Sports Medicine Act 5
+      if (act.actNumber === 5) {
+        this.triggerKinestheticImpact('golf');
+      }
 
       // Solfeggio Carrier Oscillator
       this.solfeggioOsc = this.audioContext.createOscillator();
@@ -482,16 +600,16 @@ export class LyricaConcertComponent implements OnDestroy {
     }
   }
 
-  private startCanvasRender() {
-    const canvasRef = this.visualizerCanvas();
-    if (!canvasRef) return;
-
-    const canvas = canvasRef.nativeElement;
+  private startCanvasVisualizer() {
+    if (!this.isMusicVideoOpen()) return;
+    const canvasEl = this.visualizerCanvas();
+    if (!canvasEl) return;
+    const canvas = canvasEl.nativeElement;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    canvas.width = canvas.clientWidth || 1280;
-    canvas.height = canvas.clientHeight || 720;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     let angle = 0;
 
@@ -501,46 +619,155 @@ export class LyricaConcertComponent implements OnDestroy {
       const act = this.setlist[this.activeActIndex()];
       const width = canvas.width;
       const height = canvas.height;
+      const cx = width / 2;
+      const cy = height / 2;
 
-      ctx.fillStyle = 'rgba(5, 5, 10, 0.15)';
+      // Dark background trailing wash
+      ctx.fillStyle = 'rgba(5, 5, 10, 0.2)';
       ctx.fillRect(0, 0, width, height);
 
-      angle += 0.02;
+      angle += 0.008;
 
-      // Draw Generative Visualizer Mandala / Waves
-      ctx.save();
-      ctx.translate(width / 2, height / 2);
+      // Primary color themes per act
+      const primaryColor = act.actNumber === 1 ? '#6366f1' : (act.actNumber === 2 ? '#34d399' : (act.actNumber === 3 ? '#fbbf24' : '#c084fc'));
+      const secondaryColor = act.actNumber === 1 ? '#a855f7' : (act.actNumber === 2 ? '#10b981' : (act.actNumber === 3 ? '#f59e0b' : '#ec4899'));
 
-      const numPoints = 8;
-      const radius = 150 + Math.sin(angle * 2) * 30;
+      // 1. Render Act-Specific Video Track Effects in the Background
+      if (act.visualStyleName === 'Oceanic Hydrodynamics') {
+        // Draw 3 layers of soft flowing waves representing ocean currents
+        for (let j = 0; j < 3; j++) {
+          ctx.beginPath();
+          ctx.strokeStyle = j === 0 ? 'rgba(99, 102, 241, 0.15)' : (j === 1 ? 'rgba(34, 211, 238, 0.12)' : 'rgba(6, 182, 212, 0.08)');
+          ctx.lineWidth = 4 + j * 2;
+          for (let x = 0; x < width; x += 15) {
+            const y = cy + 40 * Math.sin(x * 0.004 + angle * 1.5 + j) + 20 * Math.cos(x * 0.008 - angle * 0.8);
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      } else if (act.visualStyleName === 'Bioluminescent DNA Helix') {
+        // Draw rotating double helix DNA strand
+        const helixWidth = 320;
+        for (let x = -helixWidth; x < helixWidth; x += 18) {
+          const hScale = Math.sin(x * 0.015 + angle * 2.5);
+          const y1 = cy + hScale * 45;
+          const y2 = cy - hScale * 45;
+          const plotX = cx + x;
+          
+          ctx.beginPath();
+          ctx.moveTo(plotX, y1);
+          ctx.lineTo(plotX, y2);
+          ctx.strokeStyle = 'rgba(52, 211, 153, 0.12)';
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.arc(plotX, y1, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#34d399';
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(plotX, y2, 5, 0, 2 * Math.PI);
+          ctx.fillStyle = '#10b981';
+          ctx.fill();
+        }
+      } else if (act.visualStyleName === 'Aurora Borealis Prism') {
+        // Draw vertical flowing auroral lights
+        for (let j = 0; j < 4; j++) {
+          ctx.beginPath();
+          ctx.strokeStyle = j % 2 === 0 ? 'rgba(168, 85, 247, 0.1)' : 'rgba(245, 158, 11, 0.08)';
+          ctx.lineWidth = 30 + j * 15;
+          for (let x = 0; x < width; x += 40) {
+            const y = cy - 80 + 60 * Math.sin(x * 0.003 + angle * 1.2 + j) + 30 * Math.sin(x * 0.007 - angle);
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      } else if (act.visualStyleName === 'Golden Supernova Mandala') {
+        // Draw expanding supernova solar flares
+        for (let r = 0; r < 24; r++) {
+          const rayAngle = (r * 2 * Math.PI) / 24 + angle * 0.4;
+          const rayLen = 140 + 60 * Math.sin(angle * 3.5 + r);
+          const rx = cx + Math.cos(rayAngle) * rayLen;
+          const ry = cy + Math.sin(rayAngle) * rayLen;
+          
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(rx, ry);
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.15)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      // 2. Render Act-Specific Tuned Mandala Sacred Geometry
+      const petalRings = act.actNumber === 1 ? [140, 80] : (act.actNumber === 2 ? [160, 110, 60] : (act.actNumber === 3 ? [180, 130, 90, 50] : [200, 150, 110, 75, 40]));
+      petalRings.forEach((radius, ringIdx) => {
+        const petalCount = (act.actNumber * 6) + ringIdx * 4;
+        const ringRotation = angle * (ringIdx % 2 === 0 ? 1 : -1) * (1 + 0.2 * act.actNumber);
+
+        for (let i = 0; i < petalCount; i++) {
+          const theta = (i * 2 * Math.PI) / petalCount + ringRotation;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(theta);
+
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(radius / 2.2, radius / 2.2, 0, radius);
+          ctx.quadraticCurveTo(-radius / 2.2, radius / 2.2, 0, 0);
+
+          ctx.fillStyle = ringIdx % 2 === 0 ? primaryColor : secondaryColor;
+          ctx.globalAlpha = 0.12 + 0.12 * Math.sin(angle * 5 + ringIdx);
+          ctx.fill();
+
+          ctx.strokeStyle = ringIdx % 2 === 0 ? secondaryColor : primaryColor;
+          ctx.lineWidth = 1.5;
+          ctx.globalAlpha = 0.6;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+      });
+
+      // 3. Central Pulsing Solfeggio Tone Core
+      const corePulse = (18 + act.actNumber * 4) + 6 * Math.sin(angle * (4 + act.actNumber));
+      const coreGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, corePulse * 2.8);
+      coreGlow.addColorStop(0, '#ffffff');
+      coreGlow.addColorStop(0.3, primaryColor);
+      coreGlow.addColorStop(0.8, secondaryColor);
+      coreGlow.addColorStop(1, 'transparent');
 
       ctx.beginPath();
-      for (let i = 0; i <= numPoints; i++) {
-        const theta = (i / numPoints) * Math.PI * 2 + angle;
-        const r = radius + Math.sin(theta * 5 + angle * 3) * 40;
-        const x = Math.cos(theta) * r;
-        const y = Math.sin(theta) * r;
+      ctx.arc(cx, cy, corePulse, 0, 2 * Math.PI);
+      ctx.fillStyle = coreGlow;
+      ctx.globalAlpha = 0.95;
+      ctx.fill();
 
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-
-      if (act.actNumber === 1) ctx.strokeStyle = 'rgba(99, 102, 241, 0.8)';
-      else if (act.actNumber === 2) ctx.strokeStyle = 'rgba(16, 185, 129, 0.8)';
-      else if (act.actNumber === 3) ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
-      else ctx.strokeStyle = 'rgba(168, 85, 247, 0.8)';
-
-      ctx.lineWidth = 4;
-      ctx.shadowBlur = 20;
-      ctx.shadowColor = ctx.strokeStyle;
+      // Outer Pulsing Ring
+      ctx.beginPath();
+      ctx.arc(cx, cy, (200 + act.actNumber * 10) + 12 * Math.sin(angle * 1.8), 0, 2 * Math.PI);
+      ctx.strokeStyle = secondaryColor;
+      ctx.lineWidth = 1.2;
+      ctx.globalAlpha = 0.35;
+      ctx.setLineDash([5, 8]);
       ctx.stroke();
-
-      ctx.restore();
+      ctx.setLineDash([]);
 
       this.canvasAnimFrame = requestAnimationFrame(render);
     };
 
     render();
+  }
+
+  saveAlbumArtToRecord() {
+    const patientName = this.activePatientName();
+    const noteText = `🎨 Generative Album Cover Art & Tour Liner Notes Saved: "Actuarial Glee: 12-Track Duet & Solfeggio Symphony" (Lead Artist: ${patientName}). Includes Bioluminescent Lotus Cover Art, 528 Hz transformation acoustics, and VIP Tour Poster Credits.`;
+    this.patientState.addClinicalNote({
+      id: `album-art-${Date.now()}`,
+      text: noteText,
+      sourceLens: 'Functional Protocols',
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+    });
+    alert(`🎨 Saved Generative Album Cover Art & Concert Liner Notes to ${patientName}'s active medical record!`);
   }
 }

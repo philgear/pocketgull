@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy, signal, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, output, Injectable, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
+import { PatientStateService } from '../services/patient-state.service';
 
 export interface IPostItNote {
   id: string;
@@ -8,13 +9,22 @@ export interface IPostItNote {
   category: 'happiness' | 'vagal_calm' | 'elixir' | 'longevity';
   text: string;
   color: 'yellow' | 'mint' | 'rose' | 'lavender';
-  rotation: number; // e.g. -2, 1, 3 degrees
+  rotation: number;
   pinnedArea?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class PostItService {
   notes = signal<IPostItNote[]>([
+    {
+      id: 'n_rx',
+      title: '🎵 Mandatory Clinical Prescription',
+      category: 'longevity',
+      text: 'Prescribed: Actuarial Glee 12-Track Duet Singalong Album (+12.0 QALYs). Sing daily with partner/family for vagal co-regulation.',
+      color: 'yellow',
+      rotation: 0,
+      pinnedArea: 'Universal Mandatory Rx'
+    },
     {
       id: 'n1',
       title: '☀️ Morning Circadian Sun Reset',
@@ -60,97 +70,155 @@ export class PostItService {
   standalone: true,
   imports: [CommonModule, PocketGullButtonComponent],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in">
+    <!-- Screen View Modal Container -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in font-mono print:static print:bg-white print:p-0 print:block">
       
-      <!-- Modal Container -->
-      <div class="w-full max-w-5xl max-h-[92vh] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden flex flex-col font-['Inter']">
+      <!-- Dieter Rams Braun Functional Shell -->
+      <div class="w-full max-w-5xl max-h-[92vh] bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-800 overflow-hidden flex flex-col font-['Inter'] text-zinc-100 print:max-w-none print:max-h-none print:bg-white print:text-black print:border-none print:shadow-none print:rounded-none">
         
-        <!-- Header -->
-        <div class="p-6 bg-slate-50 dark:bg-zinc-850 border-b border-slate-200 dark:border-zinc-800 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold">
+        <!-- Header (Screen Only) -->
+        <div class="p-6 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between font-mono no-print">
+          <div class="flex items-center gap-3.5">
+            <div class="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 text-orange-400 flex items-center justify-center text-xl font-bold shadow-inner">
               📌
             </div>
             <div>
-              <h2 class="text-lg font-bold text-slate-900 dark:text-zinc-100">3D Interactive Prescription Post-It Notes</h2>
-              <p class="text-xs text-slate-500 dark:text-zinc-400">Tactile, printable visual sticky notes to pin to refrigerators or desks for maximum health & happiness</p>
+              <h2 class="text-base font-black uppercase tracking-wide text-zinc-100">Interactive Prescription Post-It Notes</h2>
+              <p class="text-xs text-zinc-400 font-sans mt-0.5">Tactile visual sticky notes to pin to refrigerators, mirrors, or desks for daily health anchors</p>
             </div>
           </div>
-          <button (click)="closeModal.emit()" class="text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 text-2xl font-semibold p-1 cursor-pointer">
+          <button (click)="closeModal.emit()" class="text-zinc-400 hover:text-white text-2xl font-semibold p-1 cursor-pointer">
             &times;
           </button>
         </div>
 
+        <!-- Printable Document Header (Print Only) -->
+        <div class="hidden print:block p-6 border-b-2 border-slate-900 mb-4 font-mono">
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-xl font-black uppercase tracking-wider text-slate-900">📌 Pocket-Gull Prescription Sticky Notes</h1>
+              <p class="text-xs text-slate-600 font-sans mt-1">
+                Patient: <strong class="uppercase text-slate-900 font-mono">{{ state.patientName() || 'Active Encounter' }}</strong> · 
+                Issued: {{ todayDate }} · 
+                Instructions: <em>Cut along dashed lines and pin to refrigerator, mirror, or workspace.</em>
+              </p>
+            </div>
+            <div class="text-right text-[10px] text-slate-500 font-mono">
+              <span class="block font-bold uppercase">HIPAA Compliant Cutout Sheet</span>
+              <span>Pocket-Gull Care Engine</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Main Body: Sticky Notes Board -->
-        <div class="flex-1 p-6 overflow-y-auto bg-amber-500/5 dark:bg-zinc-950 flex flex-col space-y-6">
+        <div class="flex-1 p-6 overflow-y-auto bg-zinc-950 flex flex-col space-y-6 print:bg-white print:p-0 print:overflow-visible">
           
-          <!-- Actions & Template Adders -->
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-zinc-800 pb-4">
+          <!-- Actions & Template Adders (Screen Only) -->
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-4 font-mono no-print">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Quick Templates:</span>
-              <button (click)="addTemplate('sun')" class="px-2.5 py-1 text-xs font-bold rounded bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition cursor-pointer">
+              <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">Quick Templates:</span>
+              <button (click)="addTemplate('sun')" class="px-2.5 py-1 text-xs font-bold rounded bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-orange-400 hover:border-orange-500/40 transition cursor-pointer">
                 + ☀️ Sun Reset
               </button>
-              <button (click)="addTemplate('vagal')" class="px-2.5 py-1 text-xs font-bold rounded bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200 transition cursor-pointer">
+              <button (click)="addTemplate('vagal')" class="px-2.5 py-1 text-xs font-bold rounded bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-emerald-400 hover:border-emerald-500/40 transition cursor-pointer">
                 + 🫁 Vagal Calm
               </button>
-              <button (click)="addTemplate('tea')" class="px-2.5 py-1 text-xs font-bold rounded bg-rose-100 text-rose-800 border border-rose-300 hover:bg-rose-200 transition cursor-pointer">
+              <button (click)="addTemplate('tea')" class="px-2.5 py-1 text-xs font-bold rounded bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-orange-400 hover:border-orange-500/40 transition cursor-pointer">
                 + 🍵 Elixir Tea
               </button>
-              <button (click)="addTemplate('hawking')" class="px-2.5 py-1 text-xs font-bold rounded bg-purple-100 text-purple-800 border border-purple-300 hover:bg-purple-200 transition cursor-pointer">
+              <button (click)="addTemplate('hawking')" class="px-2.5 py-1 text-xs font-bold rounded bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-sky-400 hover:border-sky-500/40 transition cursor-pointer">
                 + 🎵 Hawking / Stars
               </button>
-              <button (click)="addTemplate('water')" class="px-2.5 py-1 text-xs font-bold rounded bg-cyan-100 text-cyan-800 border border-cyan-300 hover:bg-cyan-200 transition cursor-pointer">
+              <button (click)="addTemplate('water')" class="px-2.5 py-1 text-xs font-bold rounded bg-zinc-900 text-zinc-300 border border-zinc-800 hover:text-sky-400 hover:border-sky-500/40 transition cursor-pointer">
                 + 🌊 Lao Tzu Water
               </button>
             </div>
 
             <div class="flex items-center gap-2">
-              <pocket-gull-button (click)="printNotes()" variant="primary" size="sm" icon="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-                Print Fridge Replica Sheet
-              </pocket-gull-button>
+              <button (click)="printNotes()" class="px-4 py-2 text-xs font-bold uppercase rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 transition shadow-md cursor-pointer border border-orange-400/50 flex items-center gap-2">
+                <span>📄</span> Print Replica Sheet
+              </button>
             </div>
           </div>
 
-          <!-- Sticky Notes Grid with 3D Tactile Styling -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-2">
-            
+          <!-- Screen Sticky Notes Grid (Screen Only) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-2 no-print">
             <div *ngFor="let note of notes(); let i = index" 
               [style.transform]="'rotate(' + note.rotation + 'deg)'"
-              [class]="getColorClass(note.color)"
-              class="relative p-5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border flex flex-col justify-between min-h-[220px] group cursor-grab">
+              class="relative p-5 rounded-2xl bg-zinc-900 border border-zinc-800 shadow-xl transition-all duration-200 flex flex-col justify-between min-h-[220px] group cursor-grab hover:border-orange-500/40">
               
               <!-- Tape Pin Top Header -->
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-4 bg-white/40 dark:bg-black/30 backdrop-blur-sm rounded border border-white/60 shadow-sm transform -rotate-1"></div>
+              <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-3.5 bg-orange-500/80 rounded border border-orange-400/60 shadow-sm transform -rotate-1"></div>
 
-              <div class="space-y-3">
+              <div class="space-y-3 font-mono">
                 <div class="flex items-start justify-between">
-                  <h4 class="text-xs font-extrabold text-slate-900 leading-snug">{{ note.title }}</h4>
-                  <button (click)="deleteNote(note.id)" class="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-slate-800 text-xs font-bold transition cursor-pointer">
+                  <h4 class="text-xs font-extrabold text-white leading-snug font-sans">{{ note.title }}</h4>
+                  <button (click)="deleteNote(note.id)" class="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-white text-xs font-bold transition cursor-pointer">
                     &times;
                   </button>
                 </div>
                 
-                <p class="text-xs text-slate-800 font-serif leading-relaxed">
+                <p class="text-xs text-zinc-300 font-sans leading-relaxed">
                   {{ note.text }}
                 </p>
               </div>
 
               <!-- Pin Location Badge -->
-              <div class="pt-3 border-t border-slate-900/10 flex items-center justify-between text-[10px] font-bold text-slate-700">
+              <div class="pt-3 border-t border-zinc-800 flex items-center justify-between text-[10px] font-bold font-mono text-zinc-400">
                 <span>📍 {{ note.pinnedArea || 'Body & Mind' }}</span>
-                <span class="uppercase font-mono">Prescription Note</span>
+                <span class="uppercase text-orange-400">Rx Note</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- High-Contrast Printable Cutout Grid (Print Only) -->
+          <div class="hidden print:grid grid-cols-2 gap-6 p-4">
+            <div *ngFor="let note of notes()"
+              [class.bg-amber-50]="note.color === 'yellow'"
+              [class.border-amber-300]="note.color === 'yellow'"
+              [class.bg-emerald-50]="note.color === 'mint'"
+              [class.border-emerald-300]="note.color === 'mint'"
+              [class.bg-rose-50]="note.color === 'rose'"
+              [class.border-rose-300]="note.color === 'rose'"
+              [class.bg-purple-50]="note.color === 'lavender'"
+              [class.border-purple-300]="note.color === 'lavender'"
+              class="relative p-6 rounded-2xl border-2 border-dashed shadow-sm flex flex-col justify-between min-h-[260px] text-slate-900 break-inside-avoid">
+              
+              <!-- Printable Scissors & Tape Bar -->
+              <div class="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-3 pb-2 border-b border-slate-300/60">
+                <span>✂️ Cut along line</span>
+                <span class="px-2 py-0.5 rounded bg-amber-200/80 border border-amber-300 font-bold uppercase text-amber-900">
+                  📌 Tape Anchor
+                </span>
+                <span>Rx #{{ note.id }}</span>
               </div>
 
-            </div>
+              <div class="space-y-3">
+                <h3 class="text-sm font-extrabold text-slate-900 leading-snug font-sans flex items-center gap-2">
+                  {{ note.title }}
+                </h3>
+                <p class="text-xs text-slate-800 font-sans leading-relaxed">
+                  {{ note.text }}
+                </p>
+              </div>
 
+              <div class="pt-4 mt-4 border-t border-slate-300/80 flex items-center justify-between text-[10.5px] font-bold font-mono text-slate-700">
+                <span>📍 Anchor: {{ note.pinnedArea || 'Refrigerator / Mirror' }}</span>
+                <span class="uppercase font-extrabold text-slate-900">Pocket-Gull Rx</span>
+              </div>
+            </div>
           </div>
 
         </div>
 
-        <!-- Footer -->
-        <div class="p-4 bg-slate-50 dark:bg-zinc-850 border-t border-slate-200 dark:border-zinc-800 flex items-center justify-between">
-          <span class="text-xs text-slate-500 dark:text-zinc-400">Print or pin these 3D Post-Its to fridge/desk for continuous health & happiness anchors</span>
+        <!-- Printable Document Footer (Print Only) -->
+        <div class="hidden print:block p-4 border-t border-slate-300 text-center font-mono text-[10px] text-slate-500">
+          Pocket-Gull Clinical Intelligence System · Multimodal Healthspan Anchors · Verified HIPAA-Compliant Printout
+        </div>
+
+        <!-- Footer (Screen Only) -->
+        <div class="p-4 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between font-mono text-xs text-zinc-400 no-print">
+          <span>Print or pin these 3D Post-Its for continuous health & happiness anchors</span>
           <pocket-gull-button (click)="closeModal.emit()" variant="secondary" size="sm">
             Close Notes
           </pocket-gull-button>
@@ -162,10 +230,31 @@ export class PostItService {
   styles: [`
     .animate-in { animation: fadeIn 0.2s ease-out; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      app-post-it-notes, app-post-it-notes * {
+        visibility: visible;
+      }
+      app-post-it-notes {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
   `]
 })
 export class PostItNotesComponent {
   closeModal = output<void>();
+  protected readonly state = inject(PatientStateService);
+
+  todayDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
   notes = signal<IPostItNote[]>([
     {
@@ -215,16 +304,6 @@ export class PostItNotesComponent {
     }
   ]);
 
-  getColorClass(color: string): string {
-    switch (color) {
-      case 'yellow': return 'bg-amber-100 text-amber-950 border-amber-300 shadow-amber-900/10';
-      case 'mint': return 'bg-emerald-100 text-emerald-950 border-emerald-300 shadow-emerald-900/10';
-      case 'rose': return 'bg-rose-100 text-rose-950 border-rose-300 shadow-rose-900/10';
-      case 'lavender': return 'bg-purple-100 text-purple-950 border-purple-300 shadow-purple-900/10';
-      default: return 'bg-amber-100 text-amber-950 border-amber-300';
-    }
-  }
-
   addTemplate(type: 'sun' | 'vagal' | 'tea' | 'hawking' | 'water') {
     const id = 'n_' + Date.now();
     if (type === 'sun') {
@@ -250,32 +329,32 @@ export class PostItNotesComponent {
     } else if (type === 'tea') {
       this.notes.update(list => [...list, {
         id,
-        title: '🍵 Warm Herbal Mineralization',
+        title: '🍵 Warm Jujube & Cardamom Elixir',
         category: 'elixir',
-        text: 'Nettle & dandelion leaf infusion with lemon to support Liver Yang & mineral balance.',
+        text: 'Sip warm jujube tea to soothe Stomach Vata and harmonize digestion.',
         color: 'rose',
         rotation: Math.floor(Math.random() * 6) - 3,
-        pinnedArea: 'Liver / Kidney Essence'
+        pinnedArea: 'Digestive Axis'
       }]);
     } else if (type === 'hawking') {
       this.notes.update(list => [...list, {
         id,
-        title: '🎵 Look Up at the Stars',
-        category: 'happiness',
-        text: '"Look up at the stars and not down at your feet. Try to make sense of what you see." — Hawking / Coldplay',
+        title: '⭐ Stephen Hawking Star-Gazing',
+        category: 'longevity',
+        text: 'Look up at the stars rather than down at your feet. Curiosity keeps human spirit alive.',
         color: 'lavender',
         rotation: Math.floor(Math.random() * 6) - 3,
-        pinnedArea: 'Prefrontal Cortex / Vision'
+        pinnedArea: 'Cosmic Perspective'
       }]);
     } else if (type === 'water') {
       this.notes.update(list => [...list, {
         id,
-        title: '🌊 Be Like Water',
+        title: '🌊 Lao Tzu Be Like Water',
         category: 'vagal_calm',
-        text: '"Be like water making its way through cracks. Adjust to the object and find a way through." — Lao Tzu / Bruce Lee',
+        text: 'Water overcomes hard stone by yielding without resistance. Smooth away inner tension.',
         color: 'mint',
         rotation: Math.floor(Math.random() * 6) - 3,
-        pinnedArea: 'Autonomic System / Liver Qi'
+        pinnedArea: 'TCM Qi Flow'
       }]);
     }
   }
@@ -285,9 +364,6 @@ export class PostItNotesComponent {
   }
 
   printNotes() {
-    if (typeof window !== 'undefined') {
-      window.print();
-    }
+    window.print();
   }
 }
-import { Injectable } from '@angular/core';

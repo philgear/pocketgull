@@ -181,6 +181,7 @@ console.log('🔹 Running: Secret / Credential Leak check...');
 let secretsCount = 0;
 const secretPatterns = [
   { name: 'Google/Gemini API Key', regex: /AIzaSy[A-Za-z0-9_-]{33}/g },
+  { name: 'GitHub Token', regex: /gh[pousr]_[A-Za-z0-9\.\-_]{36,}/g },
   { name: 'Generic Private Key Header', regex: /-----BEGIN [A-Z0-9_-]+ PRIVATE KEY-----/g },
   { name: 'AWS Access Key ID', regex: /(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}/g },
   { name: 'Stripe Secret Key', regex: /sk_live_[0-9a-zA-Z]{24}/g },
@@ -232,7 +233,12 @@ for (const file of filesToScanSecrets) {
     continue;
   }
 
-  const content = fs.readFileSync(file, 'utf8');
+  let content = '';
+  try {
+    content = fs.readFileSync(file, 'utf8');
+  } catch (e) {
+    continue;
+  }
   for (const pattern of secretPatterns) {
     let match;
     // Reset regex lastIndex
@@ -274,6 +280,7 @@ if (secretsCount > 0) {
 let pythonCmd = 'python3';
 if (process.platform === 'win32') {
   const possiblePaths = [
+    path.join(workspaceRoot, '.venv', 'Scripts', 'python.exe'),
     path.join(process.env.USERPROFILE || '', 'anaconda3', 'python.exe'),
     'C:\\Users\\philg\\anaconda3\\python.exe',
     'python'
@@ -285,7 +292,7 @@ if (process.platform === 'win32') {
     }
   }
 }
-const pythonScannerPassed = runCommand(`${pythonCmd} scripts/phi_compliance_scanner.py`, 'Python HIPAA/PII and Compliance Scan');
+const pythonScannerPassed = runCommand(`${pythonCmd} -u scripts/phi_compliance_scanner.py`, 'Python HIPAA/PII and Compliance Scan');
 if (!pythonScannerPassed) {
   process.exit(1);
 }

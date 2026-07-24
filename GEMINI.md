@@ -36,7 +36,8 @@ Pocket-Gull is a real-time medical Care Plan Strategy and Live AI Consult engine
 
 ## Deployment & Scripts
 - Start the development server using `npm run dev` (this handles both the client and the integrated SSR Express server).
-- To verify a build, execute `npm run build`.
+- Default TypeScript Typecheck command: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\typescript\lib\tsc.js -p c:\Users\philg\Pocketgull\pocketgull\tsconfig.json --noEmit`
+- Default Angular Build command: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\@angular\cli\bin\ng.js build`
 - Deployment is to Google Cloud Run via `npm run deploy`.
 - **Deployment Strategy**: All deployments MUST target the `gen-lang-client-0540208645` Google Cloud project.
 - **Cloud Bill & Cost Strategy**: Always monitor the cloud bill and ensure services scale to zero to minimize costs.

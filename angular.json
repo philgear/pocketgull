@@ -121,7 +121,11 @@
           "configurations": {
             "production": {
               "outputHashing": "all",
-              "sourceMap": false,
+              "sourceMap": {
+                "scripts": true,
+                "styles": true,
+                "hidden": true
+              },
               "optimization": {
                 "scripts": true,
                 "styles": {

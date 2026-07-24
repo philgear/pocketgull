@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { PatientStateService } from './patient-state.service';
-import DOMPurify from 'dompurify';
+import * as DOMPurify from 'dompurify';
 
 export interface IGcpHealthcareConfig {
   projectId: string;

@@ -1,158 +1,181 @@
-import { Component, ChangeDetectionStrategy, signal, computed, output, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal, computed, output, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { PatientStateService } from '../services/patient-state.service';
+import { ActuarialGleeAudioService, IGleeTrackFull } from '../services/actuarial-glee-audio.service';
+import { SheetMusicNotationComponent } from './sheet-music-notation.component';
 
-export interface IGleeTrack {
-  trackNumber: number;
-  title: string;
-  subtitle: string;
-  paradigm: 'western' | 'eastern' | 'ayurvedic' | 'longevity';
-  duetRoles: { roleA: string; roleB: string };
-  lyrics: { time: number; role: 'A' | 'B' | 'Both'; text: string }[];
-  qalyBonus: number;
-  bpm: number;
-  icon: string;
-  biologicalMechanism?: string;
-}
+export type IGleeTrack = IGleeTrackFull;
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-actuarial-glee-album',
   standalone: true,
-  imports: [CommonModule, PocketGullButtonComponent, PocketGullBadgeComponent],
+  imports: [
+    CommonModule,
+    PocketGullButtonComponent,
+    PocketGullBadgeComponent,
+    SheetMusicNotationComponent
+  ],
   template: `
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/30 backdrop-blur-2xl animate-in">
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in">
       
-      <!-- Glassmorphic Container -->
-      <div class="w-full max-w-5xl max-h-[92vh] bg-slate-950/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/10 overflow-hidden flex flex-col font-['Inter']">
+      <!-- Dieter Rams Braun Functional Shell -->
+      <div class="w-full max-w-6xl max-h-[94vh] bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-800 overflow-hidden flex flex-col font-['Inter']">
         
         <!-- Header -->
-        <div class="p-6 bg-gradient-to-r from-purple-900/40 via-indigo-900/40 to-slate-900 border-b border-purple-500/20 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center text-2xl font-bold shadow-inner">
+        <div class="p-6 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between">
+          <div class="flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-zinc-950 border border-zinc-800 text-orange-400 flex items-center justify-center text-xl font-bold shadow-inner">
               🎵
             </div>
             <div>
-              <div class="flex items-center gap-2">
-                <h2 class="text-xl font-black tracking-tight text-white">Actuarial Glee: Progressive Regeneration</h2>
-                <pocket-gull-badge label="12-Track Duet Album" severity="info"></pocket-gull-badge>
+              <div class="flex items-center gap-2.5">
+                <h2 class="text-lg font-black tracking-tight text-zinc-100 uppercase font-mono">Actuarial Glee: Progressive Regeneration</h2>
+                <pocket-gull-badge label="12-Track Duet Singalong" severity="warning"></pocket-gull-badge>
               </div>
-              <p class="text-xs text-purple-200/80">Interactive 2-Player Singalong Game for Epigenetic Healthspan & Joy</p>
+              <p class="text-xs text-zinc-400 font-sans mt-0.5">Braun Functional Instrumentation Console • Multi-Paradigm Epigenetic Healthspan</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 font-mono">
             <!-- Score & QALY Meter -->
-            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold">
-              <span>🕊️ Glee Points:</span>
-              <span class="text-sm font-black text-emerald-400">{{ gleeScore() }}</span>
-              <span class="text-[10px] text-emerald-200">(+{{ totalQalyGain().toFixed(1) }} QALYs)</span>
+            <div class="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs font-bold">
+              <span class="text-zinc-500">Glee Score:</span>
+              <span class="text-sm font-black text-orange-400">{{ gleeScore() }}</span>
+              <span class="text-[10px] text-zinc-400">(+{{ totalQalyGain().toFixed(1) }} QALYs)</span>
             </div>
 
-            <button (click)="closeModal.emit()" class="text-slate-400 hover:text-white text-2xl font-semibold p-1 cursor-pointer">
+            <button (click)="closeAlbum()" class="text-zinc-400 hover:text-white text-2xl font-semibold p-1 cursor-pointer transition">
               &times;
             </button>
           </div>
         </div>
 
         <!-- Body -->
-        <div class="flex-1 p-6 overflow-y-auto bg-slate-950 text-slate-100 flex flex-col md:flex-row gap-6">
+        <div class="flex-1 p-6 overflow-y-auto bg-zinc-950 text-zinc-100 flex flex-col md:flex-row gap-6">
           
           <!-- Left Column: 12 Tracklist Navigation -->
-          <div class="w-full md:w-80 flex flex-col space-y-2 border-r border-slate-800 pr-0 md:pr-4">
-            <h3 class="text-xs font-mono uppercase tracking-widest text-purple-400 mb-2">12-Track Regeneration Album</h3>
+          <div class="w-full md:w-80 flex flex-col space-y-2.5 border-r border-zinc-800/80 pr-0 md:pr-4">
+            <h3 class="text-[10px] font-mono uppercase tracking-widest text-zinc-400 mb-2">12-Track Regeneration Index</h3>
             
-            <div class="flex-1 overflow-y-auto space-y-2 max-h-[60vh] pr-1">
-              <button *ngFor="let track of orderedTracks(); let i = index"
-                (click)="selectTrack(i)"
-                [class.border-purple-500]="selectedTrackIndex() === i"
-                [class.bg-purple-950\/40]="selectedTrackIndex() === i"
-                [class.text-purple-200]="selectedTrackIndex() === i"
-                class="w-full text-left p-3 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 transition flex items-center justify-between group cursor-pointer">
-                
-                <div class="flex items-center gap-3 min-w-0">
-                  <span class="text-sm font-mono font-bold text-slate-500 group-hover:text-purple-400">#{{ track.trackNumber }}</span>
-                  <div class="min-w-0">
-                    <div class="text-xs font-bold text-slate-200 truncate group-hover:text-white">{{ track.icon }} {{ track.title }}</div>
-                    <div class="text-[10px] text-slate-400 truncate">{{ track.subtitle }}</div>
+            <div class="flex-1 overflow-y-auto space-y-2 max-h-[62vh] pr-1 font-mono">
+              @for (track of orderedTracks(); track track.trackNumber; let i = $index) {
+                @let isSelected = selectedTrackIndex() === i;
+                <button (click)="selectTrack(i)"
+                  [class]="isSelected
+                    ? 'w-full text-left p-3 rounded-xl border-2 border-orange-500 bg-zinc-900 text-orange-400 transition-all shadow-md cursor-pointer flex items-center justify-between group'
+                    : 'w-full text-left p-3 rounded-xl border border-zinc-800/90 bg-zinc-950 hover:bg-zinc-900 hover:border-zinc-700 transition flex items-center justify-between group cursor-pointer text-zinc-300'"
+                  [attr.aria-pressed]="isSelected">
+                  
+                  <div class="flex items-center gap-3 min-w-0">
+                    <span [class]="isSelected ? 'text-xs font-extrabold text-orange-400' : 'text-xs font-bold text-zinc-500 group-hover:text-zinc-300'">
+                      #{{ track.trackNumber }}
+                    </span>
+                    <div class="min-w-0">
+                      <div [class]="isSelected ? 'text-xs font-extrabold text-white truncate' : 'text-xs font-bold text-zinc-200 truncate group-hover:text-white'">
+                        {{ track.icon }} {{ track.title }}
+                      </div>
+                      <div class="text-[10px] text-zinc-400 truncate font-sans">{{ track.subtitle }}</div>
+                    </div>
                   </div>
-                </div>
 
-                <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-800 text-purple-300 shrink-0">
-                  +{{ track.qalyBonus }}y
-                </span>
-              </button>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-900 text-orange-400 shrink-0 border border-zinc-800">
+                    +{{ track.qalyBonus }}y
+                  </span>
+                </button>
+              }
             </div>
           </div>
 
-          <!-- Right Column: Interactive Singalong Game Player -->
+          <!-- Right Column: Interactive Singalong & Sheet Music Player -->
           <div class="flex-1 flex flex-col space-y-6">
             
             @if (activeTrack(); as track) {
               <!-- Player Banner -->
-              <div class="p-6 rounded-2xl bg-gradient-to-r from-purple-900/30 via-slate-900 to-indigo-950 border border-purple-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
                 <div>
-                  <div class="flex items-center gap-2 mb-1">
+                  <div class="flex items-center gap-2.5 mb-1">
                     <span class="text-2xl">{{ track.icon }}</span>
-                    <h3 class="text-lg font-black text-white">Track {{ track.trackNumber }}: {{ track.title }}</h3>
+                    <div>
+                      <span class="text-[10px] font-mono font-bold uppercase tracking-widest text-orange-400">Track {{ track.trackNumber }} • {{ track.keySignature }} • {{ track.bpm }} BPM</span>
+                      <h3 class="text-lg font-black text-white leading-snug font-mono">{{ track.title }}</h3>
+                    </div>
                   </div>
-                  <p class="text-xs text-purple-300 font-serif italic">{{ track.subtitle }}</p>
+                  <p class="text-xs text-zinc-400 font-sans mt-0.5">{{ track.subtitle }}</p>
                 </div>
 
-                <!-- Game Controls -->
-                <div class="flex items-center gap-3">
-                  <button (click)="togglePlay()" 
-                    class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-purple-600/30 transition cursor-pointer">
-                    <span>{{ isPlaying() ? '⏸ Pause Singalong' : '▶ Play Duet Singalong' }}</span>
+                <!-- Game Controls & Mute Audio Toggle -->
+                <div class="flex items-center gap-2.5 shrink-0">
+                  
+                  <!-- Mute / Sound Toggle Button -->
+                  <button (click)="audioService.toggleMute()" 
+                    [class]="audioService.isMuted()
+                      ? 'px-3.5 py-2.5 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/40 font-mono text-xs font-bold transition cursor-pointer hover:bg-orange-500/30'
+                      : 'px-3.5 py-2.5 rounded-xl bg-zinc-950 text-zinc-300 border border-zinc-800 font-mono text-xs font-bold transition cursor-pointer hover:bg-zinc-850'"
+                    [attr.aria-label]="audioService.isMuted() ? 'Unmute Audio' : 'Mute Audio'">
+                    <span>{{ audioService.isMuted() ? '🔇 Audio Muted' : '🔊 Sound On' }}</span>
                   </button>
+
+                  @if (!audioService.isPlaying()) {
+                    <button (click)="togglePlay()" 
+                      class="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-2 shadow-lg transition cursor-pointer active:scale-95 border border-orange-400/50">
+                      <span>▶ Play Singalong</span>
+                    </button>
+                  } @else {
+                    <button (click)="togglePlay()" 
+                      class="px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs font-mono uppercase tracking-wider flex items-center gap-2 shadow-lg transition cursor-pointer active:scale-95 border border-zinc-700">
+                      <span>⏸ Pause Singalong</span>
+                    </button>
+                  }
                 </div>
               </div>
 
               <!-- Interactive Duet Roles Banner -->
-              <div class="grid grid-cols-2 gap-4 text-center">
-                <div class="p-3 rounded-xl bg-blue-950/40 border border-blue-500/30">
-                  <div class="text-[10px] uppercase font-mono font-bold text-blue-400">Singer A (Lead)</div>
-                  <div class="text-xs font-bold text-blue-200 mt-0.5">{{ track.duetRoles.roleA }}</div>
+              <div class="grid grid-cols-2 gap-4 text-center font-mono">
+                <div class="p-3.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <div class="text-[10px] uppercase font-bold text-sky-400 tracking-wider">Singer A (Lead)</div>
+                  <div class="text-xs font-bold text-zinc-200 mt-1 font-sans">{{ track.duetRoles.roleA }}</div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-                  <div class="text-[10px] uppercase font-mono font-bold text-emerald-400">Singer B (Harmony)</div>
-                  <div class="text-xs font-bold text-emerald-200 mt-0.5">{{ track.duetRoles.roleB }}</div>
+                <div class="p-3.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <div class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">Singer B (Harmony)</div>
+                  <div class="text-xs font-bold text-zinc-200 mt-1 font-sans">{{ track.duetRoles.roleB }}</div>
                 </div>
               </div>
 
-              <!-- Interactive Synchronized Lyric Display with Bouncing Gull -->
-              <div class="flex-1 p-6 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col items-center justify-center space-y-6 relative overflow-hidden min-h-[220px]">
+              <!-- Interactive Synchronized Lyric Display -->
+              <div class="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center space-y-4 relative overflow-hidden min-h-[190px]">
                 
-                <!-- Bouncing Seagull Karaoke Ball 🕊️ -->
-                <div class="flex items-center justify-center text-3xl animate-bounce mb-2">
+                <div class="flex items-center justify-center text-2xl animate-bounce">
                   🕊️
                 </div>
 
                 <!-- Active Lyric Prompt -->
                 <div class="text-center space-y-2 max-w-xl">
-                  <div class="text-[11px] font-mono uppercase tracking-widest px-2.5 py-1 rounded-full inline-block"
-                    [class.bg-blue-500\/20]="currentRole() === 'A'"
-                    [class.text-blue-300]="currentRole() === 'A'"
-                    [class.bg-emerald-500\/20]="currentRole() === 'B'"
-                    [class.text-emerald-300]="currentRole() === 'B'"
-                    [class.bg-purple-500\/20]="currentRole() === 'Both'"
-                    [class.text-purple-300]="currentRole() === 'Both'">
-                    Role: {{ currentRole() === 'A' ? 'Singer A' : (currentRole() === 'B' ? 'Singer B' : 'DUET HARMONY (BOTH)') }}
+                  <div class="text-[10px] font-mono uppercase tracking-widest px-3 py-1 rounded bg-zinc-950 border border-zinc-800 inline-block font-bold text-orange-400">
+                    Role: {{ currentRole() === 'A' ? 'Singer A (Lead)' : (currentRole() === 'B' ? 'Singer B (Harmony)' : 'DUET HARMONY (BOTH)') }}
                   </div>
 
-                  <p class="text-lg md:text-xl font-bold font-serif leading-relaxed text-white">
+                  <p class="text-base md:text-lg font-bold font-mono leading-relaxed text-white">
                     "{{ currentLyricText() }}"
                   </p>
                 </div>
 
-                <!-- Singalong Feedback Progress Bar -->
-                <div class="w-full max-w-md h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div class="h-full bg-gradient-to-r from-purple-500 to-emerald-400 transition-all duration-300" [style.width.%]="songProgress()"></div>
+                <!-- Progress Bar -->
+                <div class="w-full max-w-md h-1.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
+                  <div class="h-full bg-orange-500 transition-all duration-300" [style.width.%]="songProgress()"></div>
                 </div>
               </div>
+
+              <!-- Backing Sheet Music Notation SVG Staff Component -->
+              <app-sheet-music-notation 
+                [track]="track" 
+                [activeNoteIndex]="audioService.currentNoteIndex()"
+                [isPlaying]="audioService.isPlaying()">
+              </app-sheet-music-notation>
+
             }
 
           </div>
@@ -160,9 +183,9 @@ export interface IGleeTrack {
         </div>
 
         <!-- Footer -->
-        <div class="p-4 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-          <span>Singing together co-regulates autonomic vagal tone (+12.0 QALYs total album recovery)</span>
-          <pocket-gull-button (click)="closeModal.emit()" variant="secondary" size="sm">
+        <div class="p-4 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400 font-mono">
+          <span>Co-regulates autonomic vagal tone (+12.0 QALYs total recovery)</span>
+          <pocket-gull-button (click)="closeAlbum()" variant="secondary" size="sm">
             Close Singalong Game
           </pocket-gull-button>
         </div>
@@ -175,210 +198,27 @@ export interface IGleeTrack {
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   `]
 })
-export class ActuarialGleeAlbumComponent {
+export class ActuarialGleeAlbumComponent implements OnDestroy {
   closeModal = output<void>();
 
+  audioService = inject(ActuarialGleeAudioService);
+  state = inject(PatientStateService);
+
   selectedTrackIndex = signal<number>(0);
-  isPlaying = signal<boolean>(false);
   currentLyricIndex = signal<number>(0);
   gleeScore = signal<number>(450);
 
-  readonly tracks: IGleeTrack[] = [
-    {
-      trackNumber: 1,
-      title: 'Here Comes the Morning Light',
-      subtitle: 'Circadian Sun Reset & Melatonin Awakening',
-      paradigm: 'western',
-      duetRoles: { roleA: 'Circadian Rhythm Lead', roleB: 'Solar Harmony' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Step outside into the morning gold, 15 minutes as the story unfolds...' },
-        { time: 5, role: 'B', text: 'Melatonin drops, serotonin soars, nature opens up circadian doors!' },
-        { time: 10, role: 'Both', text: 'Here comes the sun, kindling our light, everything is gonna be all right!' }
-      ],
-      qalyBonus: 1.2,
-      bpm: 108,
-      icon: '☀️'
-    },
-    {
-      trackNumber: 2,
-      title: 'Inhale Five, Exhale Five',
-      subtitle: '6.0 bpm Vagal Resonance & HRV Coherence',
-      paradigm: 'western',
-      duetRoles: { roleA: 'Vagus Breath Lead', roleB: 'Resonating Echo' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Inhale deep for five slow counts, feel the peaceful peace that mounts...' },
-        { time: 5, role: 'B', text: 'Exhale smooth for five counts more, calm the heart right to the core!' },
-        { time: 10, role: 'Both', text: 'Resonant breath, six beats a minute, life is rich with calm within it!' }
-      ],
-      qalyBonus: 1.5,
-      bpm: 60,
-      icon: '🫁'
-    },
-    {
-      trackNumber: 3,
-      title: 'Kindle the Agni Fire',
-      subtitle: 'Ayurvedic Ama Detox & Metabolic Spark',
-      paradigm: 'ayurvedic',
-      duetRoles: { roleA: 'Agni Igniter', roleB: 'Doshic Balance' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Warm ginger tea before the noon, metabolic fire coming soon...' },
-        { time: 5, role: 'B', text: 'Clear out Ama, nourish the cell, every organ is feeling well!' },
-        { time: 10, role: 'Both', text: 'Kindle the flame of health today, Ayurvedic strength is on its way!' }
-      ],
-      qalyBonus: 1.1,
-      bpm: 95,
-      icon: '🍵'
-    },
-    {
-      trackNumber: 4,
-      title: 'Be Like Water, Disperse the Qi',
-      subtitle: 'TCM Liver Qi Flow & Emotional Fluidity',
-      paradigm: 'eastern',
-      duetRoles: { roleA: 'Flowing Water', roleB: 'Meridian Breeze' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Flow through obstacles without strain, smooth away the tension and the pain...' },
-        { time: 5, role: 'B', text: 'Liver Qi flows free and clear, harmony is present here!' },
-        { time: 10, role: 'Both', text: 'Be like water, calm and free, in rhythm with eternity!' }
-      ],
-      qalyBonus: 1.4,
-      bpm: 72,
-      icon: '🌊'
-    },
-    {
-      trackNumber: 5,
-      title: 'Ten Thousand Steps of Joy',
-      subtitle: 'Mitochondrial Biogenesis & Aerobic Pulse',
-      paradigm: 'western',
-      duetRoles: { roleA: 'Stride Master', roleB: 'Rhythm Keeper' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Pacing steady through the park, walking bright into the spark...' },
-        { time: 5, role: 'B', text: 'Mitochondria multiply, healthspan climbing to the sky!' },
-        { time: 10, role: 'Both', text: 'Ten thousand steps with joy in stride, longevity is by our side!' }
-      ],
-      qalyBonus: 1.3,
-      bpm: 120,
-      icon: '🚶'
-    },
-    {
-      trackNumber: 6,
-      title: 'Telomere Lullaby',
-      subtitle: 'Epigenetic DNA Repair & Protection',
-      paradigm: 'longevity',
-      duetRoles: { roleA: 'Epigenetic Whisper', roleB: 'Telomerase Echo' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Deep restorative nightly sleep, promises our chromosomes keep...' },
-        { time: 5, role: 'B', text: 'Protecting caps on every strand, living longer in the land!' },
-        { time: 10, role: 'Both', text: 'Sing the telomere lullaby, years of quality pass us by!' }
-      ],
-      qalyBonus: 1.6,
-      bpm: 65,
-      icon: '🧬'
-    },
-    {
-      trackNumber: 7,
-      title: 'Resveratrol & Golden Milk',
-      subtitle: 'Sirtuin Activation & Cellular Defense',
-      paradigm: 'longevity',
-      duetRoles: { roleA: 'Sirtuin Lead', roleB: 'Curcumin Support' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Warm turmeric and golden spice, cellular protection extra nice...' },
-        { time: 5, role: 'B', text: 'NAD+ fuels the sirtuin key, feeling vibrant, young, and free!' },
-        { time: 10, role: 'Both', text: 'Golden milk in every cup, building our longevity up!' }
-      ],
-      qalyBonus: 1.0,
-      bpm: 88,
-      icon: '🍇'
-    },
-    {
-      trackNumber: 8,
-      title: 'Branch by Branch, We Prune the Risk',
-      subtitle: 'Multi-Generational Pedigree Lineage Healing',
-      paradigm: 'western',
-      duetRoles: { roleA: 'Ancestral Gardener', roleB: 'Future Heritage' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Looking through the family tree, pruning risk for you and me...' },
-        { time: 5, role: 'B', text: 'Pre-conception choices bright, giving future generations light!' },
-        { time: 10, role: 'Both', text: 'Branch by branch we heal today, a legacy that is here to stay!' }
-      ],
-      qalyBonus: 1.8,
-      bpm: 90,
-      icon: '🌳'
-    },
-    {
-      trackNumber: 9,
-      title: 'Shen in Harmony',
-      subtitle: 'TCM Mind Tranquilizing & Deep Rest',
-      paradigm: 'eastern',
-      duetRoles: { roleA: 'Tranquil Mind', roleB: 'Peaceful Spirit' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Calm the heart and settle the Shen, resting deeply once again...' },
-        { time: 5, role: 'B', text: 'Quiet thoughts and peaceful eyes, wisdom beneath starry skies!' },
-        { time: 10, role: 'Both', text: 'Shen in harmony tonight, waking up with clear insight!' }
-      ],
-      qalyBonus: 1.2,
-      bpm: 55,
-      icon: '🧠'
-    },
-    {
-      trackNumber: 10,
-      title: 'Whole Foods, Pure Heart',
-      subtitle: 'Metabolic Flexibility & Endothelial Glow',
-      paradigm: 'ayurvedic',
-      duetRoles: { roleA: 'Nourishment Lead', roleB: 'Vessel Harmony' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Rainbow colors on the plate, whole foods that we celebrate...' },
-        { time: 5, role: 'B', text: 'Endothelium smooth and clean, health control like a machine!' },
-        { time: 10, role: 'Both', text: 'Whole foods, pure heart, every day, vitality the natural way!' }
-      ],
-      qalyBonus: 1.1,
-      bpm: 100,
-      icon: '🥑'
-    },
-    {
-      trackNumber: 11,
-      title: 'The Human Dignity Duet',
-      subtitle: 'Social Gravitation & Parasympathetic Co-Regulation',
-      paradigm: 'western',
-      duetRoles: { roleA: 'Co-Regulator A', roleB: 'Co-Regulator B' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Side by side we sing as one, supporting until the day is done...' },
-        { time: 5, role: 'B', text: 'Vagal tone in harmony, bound together, you and me!' },
-        { time: 10, role: 'Both', text: 'Human dignity we hold, stories of health and joy retold!' }
-      ],
-      qalyBonus: 1.5,
-      bpm: 80,
-      icon: '🤝'
-    },
-    {
-      trackNumber: 12,
-      title: 'The Rejuvenated Horizon',
-      subtitle: '+12.0 QALYs Victory Anthem for Generations',
-      paradigm: 'longevity',
-      duetRoles: { roleA: 'Victory Lead', roleB: 'Regeneration Chorus' },
-      lyrics: [
-        { time: 0, role: 'A', text: 'Twelve tracks sung and health restored, blessings of longevity poured...' },
-        { time: 5, role: 'B', text: 'Twelve QALY years of extra life, free from preventable illness and strife!' },
-        { time: 10, role: 'Both', text: 'Onward to the horizon bright, living long in health and light!' }
-      ],
-      qalyBonus: 2.0,
-      bpm: 115,
-      icon: '⌛'
-    }
-  ];
-
-  state = inject(PatientStateService);
-
   orderedTracks = computed(() => {
     const philosophy = this.state.activePhilosophy();
-    return [...this.tracks].sort((a, b) => {
+    return [...this.audioService.gleeTracks].sort((a, b) => {
       if (a.paradigm === philosophy && b.paradigm !== philosophy) return -1;
       if (b.paradigm === philosophy && a.paradigm !== philosophy) return 1;
       return a.trackNumber - b.trackNumber;
     });
   });
 
-  activeTrack = computed(() => this.orderedTracks()[this.selectedTrackIndex()] || this.tracks[0]);
-  totalQalyGain = computed(() => this.tracks.reduce((acc, t) => acc + t.qalyBonus, 0));
+  activeTrack = computed(() => this.orderedTracks()[this.selectedTrackIndex()] || this.audioService.gleeTracks[0]);
+  totalQalyGain = computed(() => this.audioService.gleeTracks.reduce((acc, t) => acc + t.qalyBonus, 0));
 
   currentLyricText = computed(() => {
     const track = this.activeTrack();
@@ -400,22 +240,26 @@ export class ActuarialGleeAlbumComponent {
   selectTrack(index: number) {
     this.selectedTrackIndex.set(index);
     this.currentLyricIndex.set(0);
-    this.isPlaying.set(false);
+    if (this.audioService.isPlaying()) {
+      this.audioService.playTrack(this.activeTrack());
+    }
   }
 
   togglePlay() {
-    this.isPlaying.update(p => !p);
-    if (this.isPlaying()) {
+    if (this.audioService.isPlaying()) {
+      this.audioService.stopTrack();
+    } else {
       this.gleeScore.update(s => s + 50);
-      // Advance lyrics on timer interval
-      const track = this.activeTrack();
-      const interval = setInterval(() => {
-        if (!this.isPlaying()) {
-          clearInterval(interval);
-          return;
-        }
-        this.currentLyricIndex.update(idx => (idx + 1) % track.lyrics.length);
-      }, 4000);
+      this.audioService.playTrack(this.activeTrack());
     }
+  }
+
+  closeAlbum() {
+    this.audioService.stopTrack();
+    this.closeModal.emit();
+  }
+
+  ngOnDestroy() {
+    this.audioService.stopTrack();
   }
 }

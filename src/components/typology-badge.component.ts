@@ -10,18 +10,18 @@ export type TUrgencyTierType = 'critical' | 'high' | 'moderate' | 'routine';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="inline-flex items-center gap-2 p-1.5 px-3 rounded-xl text-xs font-mono tracking-wider border shadow-xs transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 cursor-default select-none"
+    <div class="inline-flex max-w-full flex-wrap sm:flex-nowrap items-center gap-1.5 p-1 px-2.5 rounded-xl text-xs font-mono tracking-wider border shadow-xs transition-all duration-200 hover:shadow-md cursor-default select-none overflow-hidden"
          [class]="badgeContainerClasses()">
       
       <!-- Paradigm Identifier Pill -->
-      <span class="flex items-center gap-1 font-bold uppercase text-[10px] px-2 py-0.5 rounded-md"
+      <span class="flex items-center gap-1 font-bold uppercase text-[9.5px] px-1.5 py-0.5 rounded-md shrink-0"
             [class]="paradigmPillClasses()">
         <span class="w-1.5 h-1.5 rounded-full animate-pulse" [class]="paradigmDotClasses()"></span>
         {{ paradigmLabel() }}
       </span>
 
       <!-- System / Sub-Typology Label -->
-      <span class="font-semibold truncate max-w-[180px]">
+      <span class="font-semibold truncate max-w-[140px] text-[11px]">
         {{ systemTag() }}
       </span>
 

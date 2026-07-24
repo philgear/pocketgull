@@ -14,6 +14,27 @@ export const p001: IPatient = {
     "Metabolic Syndrome"
   ],
   "patientGoals": "Discuss CPAP compliance issues and weight management strategies.",
+  "tcmIntake": {
+    "tongueColor": "pale",
+    "tongueCoating": "thick-white",
+    "pulseQuality": "slippery",
+    "thermalPreference": "aversion-cold",
+    "sweatPattern": "spontaneous-day",
+    "tasteInMouth": "bland",
+    "tcmPattern": "Spleen Qi Deficiency with Phlegm-Damp Accumulation"
+  },
+  "ayurvedicIntake": {
+    "prakritiVata": 3,
+    "prakritiPitta": 4,
+    "prakritiKapha": 8,
+    "vikritiVata": 4,
+    "vikritiPitta": 5,
+    "vikritiKapha": 9,
+    "agniType": "mandagni",
+    "amaScore": 7.2,
+    "nadiPulseType": "swan-kapha",
+    "ayurvedicImbalance": "Kapha Agni Suppression & Medas Dhatu Stagnation"
+  },
   "vitals": {
     "bp": "152/95",
     "hr": "88",
