@@ -109,9 +109,9 @@ import { DomainSuitesNavigatorComponent } from './suites/domain-suites-navigator
 
         <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden relative">
           <div class="flex-1 min-h-0 min-w-0 h-full flex flex-col overflow-y-auto transition-all duration-300 p-4 sm:p-6">
-            <div class="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-hidden relative" [class.slide-in-panel]="isSlidingIn()">
+            <div class="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-y-auto relative" [class.slide-in-panel]="isSlidingIn()">
                 @if (viewMode() === 'suites') {
-                  <app-domain-suites-navigator class="w-full h-full" />
+                  <app-domain-suites-navigator class="w-full h-auto block overflow-visible" />
                 } @else {
                   <app-analysis-report class="flex-1 flex flex-col min-h-0 h-full w-full overflow-hidden" #reportRef (openGleeModal)="showGleeModal.set(true)"></app-analysis-report>
                 }
@@ -150,7 +150,7 @@ import { DomainSuitesNavigatorComponent } from './suites/domain-suites-navigator
                 <div class="flex items-center gap-2">
                   <button id="tour-generate-btn" type="button" (click)="triggerAnalysisGenerate()"
                     [disabled]="intelligence.isLoading()"
-                    class="px-4 py-2 rounded-xl border text-xs font-bold uppercase transition flex items-center gap-1.5 cursor-pointer bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-500 disabled:opacity-50 shadow-md">
+                    class="px-4 py-2.5 rounded-xl border text-xs font-black uppercase tracking-wider transition flex items-center gap-1.5 cursor-pointer bg-emerald-700 text-white border-emerald-800 hover:bg-emerald-600 disabled:opacity-50 shadow-md">
                     <span>🔄 Refresh Analysis</span>
                   </button>
                 </div>
@@ -158,19 +158,19 @@ import { DomainSuitesNavigatorComponent } from './suites/domain-suites-navigator
               </div>
 
               <!-- Metadata Grid & Isolated System Actions -->
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] opacity-80 hover:opacity-100 transition-opacity border-t border-zinc-200/50 dark:border-zinc-800/60 pt-3">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] opacity-90 hover:opacity-100 transition-opacity border-t border-zinc-200/50 dark:border-zinc-800/60 pt-3">
                 <div class="space-y-1">
-                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">System Identification</div>
-                  <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Pocket Gull Analysis Engine v 0.1</div>
+                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-200">System Identification</div>
+                  <div class="text-[12px] font-semibold text-zinc-800 dark:text-zinc-300 uppercase tracking-widest">Pocket Gull Analysis Engine v 0.1</div>
                 </div>
                 <div class="space-y-1">
-                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Analysis Metadata</div>
-                  <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">Generated: {{ intelligence.lastRefreshTime() | date:'yyyy.MM.dd HH:mm:ss' }}</div>
+                  <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-200">Analysis Metadata</div>
+                  <div class="text-[12px] font-semibold text-zinc-800 dark:text-zinc-300 uppercase tracking-widest">Generated: {{ intelligence.lastRefreshTime() | date:'yyyy.MM.dd HH:mm:ss' }}</div>
                 </div>
                 <div class="space-y-1 md:text-right flex flex-col items-start md:items-end justify-between">
                   <div>
-                    <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-[#000000] dark:text-zinc-400">Regulatory Status</div>
-                    <div class="text-[12px] font-medium text-black/60 dark:text-zinc-400 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
+                    <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-200">Regulatory Status</div>
+                    <div class="text-[12px] font-semibold text-zinc-800 dark:text-zinc-300 uppercase tracking-widest">AI Generated Evidence. Physician Oversight Mandated.</div>
                   </div>
 
                   <!-- Isolated Clear Cache Button (Moved far down from Refresh Analysis) -->

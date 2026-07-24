@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-07-24T03:40:54.533Z",
+  "metrics": {
+    "totalFiles": 706,
+    "totalLines": 296604,
+    "totalKSLOC": 296.6,
+    "languages": {
+      "typescript": {
+        "ext": [
+          ".ts"
+        ],
+        "lines": 87218,
+        "files": 314,
+        "ksloc": 87.218
+      },
+      "dart": {
+        "ext": [
+          ".dart"
+        ],
+        "lines": 27427,
+        "files": 156,
+        "ksloc": 27.427
+      },
+      "python": {
+        "ext": [
+          ".py"
+        ],
+        "lines": 4077,
+        "files": 25,
+        "ksloc": 4.077
+      },
+      "css": {
+        "ext": [
+          ".css"
+        ],
+        "lines": 5926,
+        "files": 9,
+        "ksloc": 5.926
+      },
+      "json_yaml": {
+        "ext": [
+          ".json",
+          ".yml",
+          ".yaml"
+        ],
+        "lines": 166328,
+        "files": 138,
+        "ksloc": 166.328
+      },
+      "markdown": {
+        "ext": [
+          ".md"
+        ],
+        "lines": 5628,
+        "files": 64,
+        "ksloc": 5.628
+      }
+    }
+  },
+  "cocomo2": {
+    "effortPersonMonths": 997.13,
+    "scheduleMonths": 28.69,
+    "averageStaffing": 34.8,
+    "totalCostUSD": 14956889,
+    "parameters": {
+      "A": 2.94,
+      "B": 0.91,
+      "E": 0.999,
+      "EAF": 1.15,
+      "monthlyBurdenedRateUSD": 15000
+    }
+  }
+}

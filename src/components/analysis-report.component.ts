@@ -54,7 +54,6 @@ import { StormAnalysisComponent } from './storm-analysis.component';
 import { AndroscogginForagingPhytoncideComponent } from './androscoggin-foraging-phytoncide.component';
 import { ProceduralInvestmentMatrixComponent } from './procedural-investment-matrix.component';
 import { ActuarialQalyCalculatorComponent } from './actuarial-qaly-calculator.component';
-import { SolfeggioAudioDeckComponent } from './solfeggio-audio-deck.component';
 import { VagalBiofeedbackDockComponent } from './vagal-biofeedback-dock.component';
 import { Sec1557AuditModalComponent } from './sec1557-audit-modal.component';
 import { BystanderActionSuiteComponent } from './bystander-action-suite.component';
@@ -110,7 +109,6 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
     AndroscogginForagingPhytoncideComponent,
     ProceduralInvestmentMatrixComponent,
     ActuarialQalyCalculatorComponent,
-    SolfeggioAudioDeckComponent,
     VagalBiofeedbackDockComponent,
     Sec1557AuditModalComponent,
     BystanderActionSuiteComponent,
@@ -375,14 +373,6 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
                       Lens Focus: {{ activeLens() }}
                     </span>
                   </div>
-
-                  <!-- Active Perspective Indicator Badge -->
-                  <div class="flex items-center gap-2">
-                    <span [class]="state.isPlainLanguageMode() ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/40' : 'bg-sky-500/20 text-sky-700 dark:text-sky-300 border-sky-500/40'"
-                          class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border flex items-center gap-1 shadow-sm">
-                      <span>{{ state.isPlainLanguageMode() ? '🌱 Patient Health Literacy Mode' : '🔬 Clinician (Doctor) Deep Rationale Mode' }}</span>
-                    </span>
-                  </div>
                 </div>
                 
                 <div class="mt-3 pt-3 border-t border-slate-200/50 dark:border-zinc-800/80 font-mono">
@@ -571,9 +561,9 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
         } @else {
           <!-- ACM §1.3: AI-Generated Content Disclosure -->
           @if (hasAnyReport() && !state.isEmergencyMode()) {
-            <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-50/50 dark:bg-violet-950/20 border border-violet-200/50 dark:border-violet-800/30">
+            <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-100 dark:bg-violet-950/60 border border-violet-300 dark:border-violet-700">
             <div class="relative group/ai-badge cursor-help">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-bold uppercase tracking-widest bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200/60 dark:border-violet-700/40 select-none">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-black uppercase tracking-widest bg-violet-800 text-white dark:bg-violet-300 dark:text-violet-950 border border-violet-900 select-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 2a4 4 0 0 0-4 4c0 2 1 3.5 2 4.5L12 12l2-1.5c1-1 2-2.5 2-4.5a4 4 0 0 0-4-4z"/><path d="M12 12v10"/><path d="M8 22h8"/>
                 </svg>
@@ -585,51 +575,14 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
                 <div class="absolute left-4 top-full w-2 h-2 bg-zinc-900 dark:bg-zinc-800 rotate-45 -mt-1"></div>
               </div>
             </div>
-            <span class="text-[12px] text-violet-600/80 dark:text-violet-400/70 font-medium">
-              Powered by Google Gemini · Not clinically verified · <a href="/terms-of-service.html#ai-content" target="_blank" class="underline hover:text-violet-800 dark:hover:text-violet-300 transition-colors">Learn about clinical AI verification</a>
+            <span class="text-[12px] text-violet-950 dark:text-violet-100 font-bold">
+              Powered by Google Gemini · Not clinically verified · <a href="/terms-of-service.html#ai-content" target="_blank" class="underline text-violet-800 dark:text-violet-300 font-extrabold hover:text-violet-950 transition-colors">Learn about clinical AI verification</a>
             </span>
           </div>
         }
       }
 
-        <!-- Enterprise Agent SBAR Clinical Handoff Protocol Card (Scoped strictly to EMT Handoff Lens) -->
-        @if (activeLens() === 'EMT Handoff') {
-          <div class="mb-6 p-4 rounded-2xl bg-[#FFFDF8] dark:bg-zinc-950 border-2 border-[#1C1C1C] dark:border-zinc-800 shadow-[4px_4px_0px_0px_rgba(28,28,28,0.85)] font-mono pocket-gull-card">
-            <div class="flex items-center justify-between border-b-2 border-[#1C1C1C] pb-2.5 mb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-base">🚑</span>
-                <h3 class="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-zinc-100">
-                  Enterprise SBAR Clinical Handoff Protocol & HIPAA Telemetry
-                </h3>
-              </div>
-              <span class="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-[#F6B12B] text-zinc-950 border border-[#1C1C1C] uppercase shadow-[1px_1px_0px_0px_rgba(28,28,28,0.9)]">
-                Audit Verified: {{ state.enterpriseAuditLog().length }} Traces
-              </span>
-            </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-              <div class="p-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-850">
-                <strong class="block text-[10px] font-bold uppercase text-sky-700 dark:text-sky-400 mb-0.5">S - Situation:</strong>
-                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">Somatic symptom presentation with active HRV autonomic compensatory response.</span>
-              </div>
-
-              <div class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-850">
-                <strong class="block text-[10px] font-bold uppercase text-purple-700 dark:text-purple-400 mb-0.5">B - Background:</strong>
-                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">CYP2D6 *4/*4 genomic profile; Grade-A randomized trial literature alignment.</span>
-              </div>
-
-              <div class="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-850">
-                <strong class="block text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400 mb-0.5">A - Assessment:</strong>
-                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">Stability Index 94%; Multi-Lens Western/TCM/Ayurvedic consensus verified.</span>
-              </div>
-
-              <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-850">
-                <strong class="block text-[10px] font-bold uppercase text-emerald-700 dark:text-emerald-400 mb-0.5">R - Recommendation:</strong>
-                <span class="text-zinc-800 dark:text-zinc-200 font-sans text-[11px]">Execute 6 bpm 0.1 Hz vagal resonance + prescribed digital therapeutics.</span>
-              </div>
-            </div>
-          </div>
-        }
 
         <!--Clinical Overview Dashboard & Telemetry Gauges-->
         @if (activeLens() !== 'EMT Handoff' && !state.isEmergencyMode() && intel.analysisMetrics(); as metrics) {
@@ -688,23 +641,7 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
                     </button>
                   }
                   
-                  <!-- Solfeggio Tool -->
-                  @if (state.getToolState('solfeggio') !== 'hidden') {
-                    <button (click)="toggleAuxTool('solfeggio')" (dblclick)="state.cycleToolState('solfeggio')"
-                            [class.bg-[#10B981]]="state.getToolState('solfeggio') === 'prescribed'"
-                            [class.text-white]="state.getToolState('solfeggio') === 'prescribed'"
-                            [class.bg-orange-500]="activeAuxTool() === 'solfeggio' && state.getToolState('solfeggio') !== 'prescribed'"
-                            [class.text-zinc-950]="activeAuxTool() === 'solfeggio' && state.getToolState('solfeggio') !== 'prescribed'"
-                            [class.bg-zinc-100]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
-                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
-                            [class.text-zinc-800]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
-                            [class.dark:text-zinc-300]="activeAuxTool() !== 'solfeggio' && state.getToolState('solfeggio') === 'unassigned'"
-                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
-                            title="Single-click to view. Double-click to prescribe to care plan.">
-                      <span>🎵 Solfeggio Synth</span>
-                      @if (state.getToolState('solfeggio') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
-                    </button>
-                  }
+                  
                   
                   <!-- Vagal Tool -->
                   @if (state.getToolState('vagal') !== 'hidden') {
@@ -838,10 +775,6 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
                 @if (activeAuxTool() === 'qaly') {
                   <div class="animate-in fade-in duration-200">
                     <app-actuarial-qaly-calculator></app-actuarial-qaly-calculator>
-                  </div>
-                } @else if (activeAuxTool() === 'solfeggio') {
-                  <div class="animate-in fade-in duration-200">
-                    <app-solfeggio-audio-deck></app-solfeggio-audio-deck>
                   </div>
                 } @else if (activeAuxTool() === 'vagal') {
                   <div class="animate-in fade-in duration-200">
@@ -1664,46 +1597,6 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
               </div>
 
               <div class="flex flex-wrap items-center gap-3 shrink-0">
-                <!-- Analogy Lens Sub-Mode Pill Group -->
-                <div class="flex items-center gap-1 bg-white/30 dark:bg-black/30 p-1 rounded-xl border border-slate-350/50 dark:border-zinc-800/50 font-mono text-[9px] font-bold">
-                  <button type="button" (click)="themeService.setAnalogyLensMode('clinical')"
-                    [class.bg-white]="!themeService.isPlainLanguageMode()"
-                    [class.dark:bg-zinc-800]="!themeService.isPlainLanguageMode()"
-                    [class.text-sky-650]="!themeService.isPlainLanguageMode()"
-                    [class.dark:text-sky-300]="!themeService.isPlainLanguageMode()"
-                    [class.text-zinc-500]="themeService.isPlainLanguageMode()"
-                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
-                    🔬 Clinical
-                  </button>
-                  <button type="button" (click)="themeService.setAnalogyLensMode('arborist')"
-                    [class.bg-emerald-600]="themeService.analogyLensMode() === 'arborist'"
-                    [class.text-white]="themeService.analogyLensMode() === 'arborist'"
-                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'arborist'"
-                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
-                    🌳 Arborist
-                  </button>
-                  <button type="button" (click)="themeService.setAnalogyLensMode('mechanic')"
-                    [class.bg-cyan-600]="themeService.analogyLensMode() === 'mechanic'"
-                    [class.text-white]="themeService.analogyLensMode() === 'mechanic'"
-                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'mechanic'"
-                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
-                    🚗 Mechanic
-                  </button>
-                  <button type="button" (click)="themeService.setAnalogyLensMode('gentleman')"
-                    [class.bg-amber-600]="themeService.analogyLensMode() === 'gentleman'"
-                    [class.text-white]="themeService.analogyLensMode() === 'gentleman'"
-                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'gentleman'"
-                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
-                    🎩 Gentleman
-                  </button>
-                  <button type="button" (click)="themeService.setAnalogyLensMode('muse')"
-                    [class.bg-purple-600]="themeService.analogyLensMode() === 'muse'"
-                    [class.text-white]="themeService.analogyLensMode() === 'muse'"
-                    [class.text-zinc-500]="themeService.analogyLensMode() !== 'muse'"
-                    class="px-2.5 py-1 rounded-md transition cursor-pointer border-0">
-                    ✨ Muse
-                  </button>
-                </div>
                 <!-- Accessibility Text Size Scale Button Group -->
                 <div class="flex items-center gap-1 bg-white/30 dark:bg-black/30 p-1 rounded-xl border border-slate-350/50 dark:border-zinc-800/50 font-mono text-[9px] font-black">
                   <span class="px-2 text-zinc-500 dark:text-zinc-400">TEXT SIZE:</span>
@@ -1739,16 +1632,46 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
                   </button>
                 </div>
 
-                <button type="button" (click)="themeService.togglePlainLanguageMode()"
-                        class="px-3 py-1.5 rounded-xl border font-mono text-[10px] font-extrabold uppercase tracking-wider transition cursor-pointer hover:scale-105"
-                        [class.bg-emerald-600]="themeService.isPlainLanguageMode()"
-                        [class.text-white]="themeService.isPlainLanguageMode()"
-                        [class.border-emerald-700]="themeService.isPlainLanguageMode()"
-                        [class.bg-sky-600]="!themeService.isPlainLanguageMode()"
-                        [class.text-white]="!themeService.isPlainLanguageMode()"
-                        [class.border-sky-700]="!themeService.isPlainLanguageMode()">
-                  Switch to {{ themeService.isPlainLanguageMode() ? '🔬 Deep Rationale' : '📖 Plain Language' }}
-                </button>
+                <!-- Cognitive Output Level Target Selector -->
+                <div class="flex items-center gap-1 bg-white/30 dark:bg-black/30 p-1 rounded-xl border border-slate-350/50 dark:border-zinc-800/50 font-mono text-[9px] font-black">
+                  <span class="px-2 text-zinc-500 dark:text-zinc-400">COGNITIVE OUTPUT:</span>
+                  <button type="button" (click)="state.selectedCognitiveLevel.set('standard')"
+                    [class.bg-white]="state.selectedCognitiveLevel() === 'standard'"
+                    [class.dark:bg-zinc-800]="state.selectedCognitiveLevel() === 'standard'"
+                    [class.text-sky-600]="state.selectedCognitiveLevel() === 'standard'"
+                    [class.dark:text-sky-400]="state.selectedCognitiveLevel() === 'standard'"
+                    [class.text-zinc-500]="state.selectedCognitiveLevel() !== 'standard'"
+                    class="px-2 py-1 rounded-md uppercase transition cursor-pointer border-0">
+                    🔬 Standard
+                  </button>
+                  <button type="button" (click)="state.selectedCognitiveLevel.set('simplified')"
+                    [class.bg-white]="state.selectedCognitiveLevel() === 'simplified'"
+                    [class.dark:bg-zinc-800]="state.selectedCognitiveLevel() === 'simplified'"
+                    [class.text-emerald-600]="state.selectedCognitiveLevel() === 'simplified'"
+                    [class.dark:text-emerald-400]="state.selectedCognitiveLevel() === 'simplified'"
+                    [class.text-zinc-500]="state.selectedCognitiveLevel() !== 'simplified'"
+                    class="px-2 py-1 rounded-md uppercase transition cursor-pointer border-0">
+                    📖 Simplified
+                  </button>
+                  <button type="button" (click)="state.selectedCognitiveLevel.set('dyslexia')"
+                    [class.bg-white]="state.selectedCognitiveLevel() === 'dyslexia'"
+                    [class.dark:bg-zinc-800]="state.selectedCognitiveLevel() === 'dyslexia'"
+                    [class.text-amber-600]="state.selectedCognitiveLevel() === 'dyslexia'"
+                    [class.dark:text-amber-400]="state.selectedCognitiveLevel() === 'dyslexia'"
+                    [class.text-zinc-500]="state.selectedCognitiveLevel() !== 'dyslexia'"
+                    class="px-2 py-1 rounded-md uppercase transition cursor-pointer border-0">
+                    🔤 Dyslexia
+                  </button>
+                  <button type="button" (click)="state.selectedCognitiveLevel.set('child')"
+                    [class.bg-white]="state.selectedCognitiveLevel() === 'child'"
+                    [class.dark:bg-zinc-800]="state.selectedCognitiveLevel() === 'child'"
+                    [class.text-purple-600]="state.selectedCognitiveLevel() === 'child'"
+                    [class.dark:text-purple-400]="state.selectedCognitiveLevel() === 'child'"
+                    [class.text-zinc-500]="state.selectedCognitiveLevel() !== 'child'"
+                    class="px-2 py-1 rounded-md uppercase transition cursor-pointer border-0">
+                    🧸 Child
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -2939,8 +2862,53 @@ export class AnalysisReportComponent implements OnDestroy {
   activeReport = computed(() => {
     const lens = this.activeLens();
     if (lens === 'EMT Handoff') return '';
-    return getSafeProperty(this.intel.analysisResults(), lens) || '';
+    const raw = getSafeProperty(this.intel.analysisResults(), lens) || '';
+    if (!raw) return '';
+
+    const cog = this.state.selectedCognitiveLevel();
+    const isPlain = this.themeService.isPlainLanguageMode();
+
+    if (cog === 'standard' && !isPlain) {
+      return raw;
+    }
+
+    return this.transformCognitiveReportText(raw, cog, isPlain);
   });
+
+  private transformCognitiveReportText(raw: string, cog: 'standard' | 'simplified' | 'dyslexia' | 'child', isPlain: boolean): string {
+    if (!raw) return '';
+
+    let text = raw;
+
+    if (cog === 'child') {
+      text = `### 🌟 Your Health Adventure Care Plan 🌟\n\n` +
+        text.replace(/patient/gi, 'hero')
+            .replace(/symptoms/gi, 'body signals')
+            .replace(/medication/gi, 'helper drops')
+            .replace(/vitals/gi, 'heart & energy scores')
+            .replace(/radiculopathy/gi, 'nerve tingling')
+            .replace(/hypertension/gi, 'fast blood flow')
+            .replace(/inflammation/gi, 'body warmth & soreness');
+    } else if (cog === 'dyslexia') {
+      text = text.split('\n')
+        .map(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return '';
+          if (trimmed.startsWith('#')) return line;
+          return `• **${line.substring(0, Math.min(line.length, 25))}**${line.substring(Math.min(line.length, 25))}`;
+        })
+        .join('\n\n');
+    } else if (cog === 'simplified' || isPlain) {
+      text = text.replace(/radiculopathy/gi, 'nerve pain (radiculopathy)')
+        .replace(/hypertension/gi, 'high blood pressure (hypertension)')
+        .replace(/inflammation/gi, 'swelling & soreness (inflammation)')
+        .replace(/synovial fluid/gi, 'natural joint lubricating fluid')
+        .replace(/mitochondria/gi, 'cellular energy powerhouses')
+        .replace(/autonomic tone/gi, 'automatic nervous system balance');
+    }
+
+    return text;
+  }
 
   isSectionEmpty(section: any): boolean {
     return !section.nodes || section.nodes.length === 0;

@@ -140,7 +140,10 @@ export interface IDomainSuite {
         }
       </div>
     </div>
-  `
+  `,
+  styles: [`
+    :host { display: block; width: 100%; height: auto; overflow: visible; }
+  `]
 })
 export class DomainSuitesNavigatorComponent {
   private patientState = inject(PatientStateService);

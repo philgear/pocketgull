@@ -29,8 +29,10 @@ import { createCarePlan, createConsultationSession } from '../lib/dataconnect/es
   providedIn: 'root'
 })
 export class PatientStateService {
+  private themeService = inject(ThemeService);
+
   // --- UI State & Clinical Tool Prescription State Machine ---
-  readonly isPlainLanguageMode = signal<boolean>(false);
+  readonly isPlainLanguageMode = computed(() => this.themeService.isPlainLanguageMode());
   readonly toolStates = signal<Record<string, 'unassigned' | 'prescribed' | 'hidden'>>({});
 
   // --- Patient 3D Spatial Anatomic Profile & LiDAR Custom Mesh ---
@@ -193,7 +195,7 @@ export class PatientStateService {
   }
 
   togglePlainLanguageMode() {
-    this.isPlainLanguageMode.update(val => !val);
+    this.themeService.togglePlainLanguageMode();
   }
   readonly selectedPartId = signal<string | null>(null);
   readonly hoveredPartIdForOverlay = signal<string | null>(null);
@@ -323,7 +325,6 @@ export class PatientStateService {
 
   private storage = inject(StorageService);
   private game = inject(GamificationService);
-  private themeService = inject(ThemeService);
 
   readonly isSparkModeActive = computed(() => this.themeService.currentTheme() === 'spark');
 

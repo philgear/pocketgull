@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
+import { EmergencySupplyFinderComponent } from './emergency-supply-finder.component';
 
 export interface IBystanderTask {
   id: string;
@@ -14,7 +15,7 @@ export interface IBystanderTask {
 @Component({
   selector: 'app-bystander-action-suite',
   standalone: true,
-  imports: [CommonModule, PocketGullBadgeComponent],
+  imports: [CommonModule, PocketGullBadgeComponent, EmergencySupplyFinderComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full p-5 rounded-2xl bg-red-950/40 border border-red-800/80 backdrop-blur-md shadow-2xl font-mono text-zinc-100 mb-6">
@@ -92,6 +93,9 @@ export interface IBystanderTask {
           }
         </div>
       </div>
+
+      <!-- Emergency Medical Supply & Geolocation Telemetry Radar -->
+      <app-emergency-supply-finder />
 
       <!-- Quick 1-Tap Bystander Event Logger -->
       <div>

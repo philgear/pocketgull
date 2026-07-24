@@ -69,7 +69,7 @@ const PART_NAMES: Record<string, string> = {
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-    <div class="flex flex-col h-full w-full bg-[#FAF8F0] dark:bg-zinc-950 overflow-hidden font-sans">
+    <div class="flex flex-col flex-1 h-full w-full min-h-[540px] bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl overflow-hidden font-sans thematic-3d-container">
       <!-- 1. Dedicated Top Unobstructed HUD Ribbon -->
       <div *ngIf="webglSupported()" class="px-3 py-2 bg-slate-100/90 dark:bg-zinc-950/90 border-b border-slate-300 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 font-mono text-xs">
         <!-- Camera Angle Presets -->
@@ -114,9 +114,9 @@ const PART_NAMES: Record<string, string> = {
       </div>
 
       <!-- 2. Central Unobstructed 3D Viewport Canvas -->
-      <div #canvasContainer class="w-full flex-1 relative bg-[#FAF8F0] dark:bg-zinc-950 overflow-hidden" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
-        <!-- Dynamic Radial Grid Backdrop (Warm Papyrus Glow vs Dark Obsidian Void) -->
-        <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-100/40 via-[#FAF8F0]/90 to-[#F5F2E6] dark:from-cyan-950/30 dark:via-zinc-950/90 dark:to-black"></div>
+      <div #canvasContainer class="w-full flex-1 min-h-[460px] relative bg-transparent overflow-hidden" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+        <!-- Dynamic Translucent Radial Grid Backdrop (Allows Background Textures to Shine Through) -->
+        <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent dark:from-cyan-500/10 dark:via-transparent dark:to-transparent"></div>
         
         <canvas *ngIf="!webglSupported()" class="absolute opacity-0 pointer-events-none w-[1px] h-[1px]" aria-label="3D Anatomical Mannequin Canvas"></canvas>
         <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[#FAF8F0] dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 rounded-lg border border-amber-200 dark:border-zinc-800">
@@ -152,56 +152,11 @@ const PART_NAMES: Record<string, string> = {
           </div>
         </div>
       </div>
-
-      <!-- 3. Bottom Unclipped Environmental & Navigation Telemetry Dock -->
-      <div *ngIf="webglSupported()" class="px-3 py-2 bg-slate-100/90 dark:bg-zinc-950/90 border-t border-slate-300 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 font-mono text-[10px]">
-        <!-- Mouse Navigation Instructions -->
-        <div class="flex items-center gap-3 text-gray-600 dark:text-zinc-400">
-          <span class="font-bold uppercase tracking-wider flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-cyan-400"></span>
-            Left Click: Select Node
-          </span>
-          <span class="font-bold uppercase tracking-wider flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
-            Drag: Orbit 360°
-          </span>
-        </div>
-
-        <!-- Environmental & Barometric Telemetry HUD Bar -->
-        <div class="flex items-center gap-2">
-          <div class="flex items-center gap-2 bg-white dark:bg-zinc-900 px-2.5 py-1 rounded-md border border-slate-300 dark:border-zinc-800 text-gray-800 dark:text-zinc-200 font-bold">
-            <span [class.text-rose-600]="envTelemetry.isStormShieldActive()" [class.dark:text-rose-400]="envTelemetry.isStormShieldActive()" [class.text-emerald-700]="!envTelemetry.isStormShieldActive()" [class.dark:text-emerald-400]="!envTelemetry.isStormShieldActive()">
-              <span [class.animate-pulse]="envTelemetry.isStormShieldActive()">🌩️</span>
-              <span>{{ envTelemetry.telemetry().barometricPressure }} hPa</span>
-            </span>
-            <span class="text-gray-300 dark:text-zinc-600">|</span>
-            <span class="text-sky-700 dark:text-cyan-300">AQI {{ envTelemetry.telemetry().aqi }}</span>
-            <span class="text-gray-300 dark:text-zinc-600">|</span>
-            <span class="text-amber-700 dark:text-amber-300">UV {{ envTelemetry.telemetry().uvIndex }}</span>
-          </div>
-
-          <!-- Environmental Preset Switcher Pills -->
-          <div class="flex items-center gap-1 bg-white dark:bg-zinc-900 p-0.5 rounded-md border border-slate-300 dark:border-zinc-800">
-            <button (click)="envTelemetry.setPreset('coastal_storm')" class="px-2 py-0.5 rounded hover:bg-rose-100 dark:hover:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold transition cursor-pointer">
-              🌧️ Storm
-            </button>
-            <button (click)="envTelemetry.setPreset('high_altitude')" class="px-2 py-0.5 rounded hover:bg-purple-100 dark:hover:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold transition cursor-pointer">
-              🏔️ Altitude
-            </button>
-            <button (click)="envTelemetry.setPreset('desert_dry')" class="px-2 py-0.5 rounded hover:bg-amber-100 dark:hover:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold transition cursor-pointer">
-              🏜️ Arid
-            </button>
-            <button (click)="envTelemetry.setPreset('optimal')" class="px-2 py-0.5 rounded hover:bg-emerald-100 dark:hover:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold transition cursor-pointer">
-              ☀️ Baseline
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   `,
     styles: [`
-    :host { display: block; height: 100%; width: 100%; }
-    canvas { outline: none; }
+    :host { display: flex; flex-direction: column; flex: 1 1 0%; height: 100%; min-height: 540px; width: 100%; }
+    canvas { outline: none; display: block; width: 100% !important; height: 100% !important; }
   `]
 })
 export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
@@ -553,12 +508,13 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         if (!container) return;
         let w = container.clientWidth;
         let h = container.clientHeight;
-        if (w === 0 || h === 0) {
+        if (w === 0 || h === 0 || h < 480) {
             const parentRect = container.parentElement?.getBoundingClientRect();
             w = parentRect?.width || container.offsetWidth || 350;
-            h = parentRect?.height || container.offsetHeight || 480;
+            h = Math.max(parentRect?.height || container.offsetHeight || 0, 480);
         }
-        if (w === 0 || h === 0) return;
+        h = Math.max(h, 480);
+        w = Math.max(w, 300);
         if (this.camera) {
             this.camera.aspect = w / (h || 1);
             this.camera.updateProjectionMatrix();
@@ -656,18 +612,49 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         const theme = this.themeService.currentTheme();
         const active = this.themeService.activeTheme();
-        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'black-marble';
+        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'black-marble' || theme === 'curie' || theme === 'mandala' || theme === 'papyrus';
 
-        if (isDarkTheme) {
-            // Sleek dark obsidian spatial canvas
-            this.renderer.setClearColor(0x09090b, 1.0);
+        // Clear alpha set to 0.0 (fully transparent) so background textures/images show through underneath!
+        this.renderer.setClearColor(0x000000, 0.0);
+
+        if (theme === 'curie') {
+            // Radium Curie emerald glow studio lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0x00ff66); this.ambientLight.intensity = 2.2; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0x00cc66); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 1.2; }
+            if (this.bloomPass) this.bloomPass.strength = 0.35;
+        } else if (theme === 'mandala') {
+            // Cosmic mandala violet & saffron lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0x8b5cf6); this.ambientLight.intensity = 2.0; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xf59e0b); this.directionalLight.intensity = 1.8; }
+            if (this.backLight) { this.backLight.color.setHex(0x06b6d4); this.backLight.intensity = 1.0; }
+            if (this.bloomPass) this.bloomPass.strength = 0.25;
+        } else if (theme === 'papyrus') {
+            // Egyptian torchlight gold
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.2; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xd97706); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0x1e3a8a); this.backLight.intensity = 1.0; }
+            if (this.bloomPass) this.bloomPass.strength = 0.15;
+        } else if (theme === 'white-marble' || theme === 'black-marble') {
+            // Gold vein marble lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.0; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xf6e4a6); this.directionalLight.intensity = 1.8; }
+            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.9; }
+            if (this.bloomPass) this.bloomPass.strength = 0.12;
+        } else if (theme === 'pool') {
+            // Aqua blue water lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0x38bdf8); this.ambientLight.intensity = 2.4; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0x0284c7); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0xfb7185); this.backLight.intensity = 0.8; }
+            if (this.bloomPass) this.bloomPass.strength = 0.10;
+        } else if (isDarkTheme) {
+            // Dark obsidian spatial canvas
             if (this.ambientLight) { this.ambientLight.color.setHex(0xffffff); this.ambientLight.intensity = 1.8; }
             if (this.directionalLight) { this.directionalLight.color.setHex(0x38bdf8); this.directionalLight.intensity = 2.0; }
             if (this.backLight) { this.backLight.color.setHex(0x818cf8); this.backLight.intensity = 1.2; }
             if (this.bloomPass) this.bloomPass.strength = 0.15;
         } else {
-            // Pristine, bright papyrus parchment studio lighting for Papyrus, Light, Parchment, Marble, Hemp, Rice, Construction
-            this.renderer.setClearColor(0xfbf9f2, 1.0);
+            // Parchment/Papercraft studio lighting
             if (this.ambientLight) { this.ambientLight.color.setHex(0xfff8ee); this.ambientLight.intensity = 2.4; }
             if (this.directionalLight) { this.directionalLight.color.setHex(0xfff5e6); this.directionalLight.intensity = 2.0; }
             if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.8; }

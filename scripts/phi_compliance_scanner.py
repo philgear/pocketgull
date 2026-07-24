@@ -33,7 +33,7 @@ SECRET_PATTERNS = {
 }
 
 # Directories to ignore
-IGNORE_DIRS = {"node_modules", ".git", "dist", "dist-ssr", ".angular", "tmp", "test-results", "playwright-report"}
+IGNORE_DIRS = {"node_modules", ".git", "dist", "dist-ssr", ".angular", "tmp", "test-results", "playwright-report", ".vscode", ".venv"}
 
 # Extensions to skip (binary/large assets)
 SKIP_EXTENSIONS = {

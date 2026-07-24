@@ -1213,7 +1213,7 @@ export class MedicalChartSummaryComponent {
     // Fetch aggregated baselines from server
     this.http.get('/api/health/baselines').subscribe({
         next: (data) => this.baselines.set(data),
-        error: (err) => console.error('Failed to load world health baselines', err)
+        error: () => {}
     });
   }
 
