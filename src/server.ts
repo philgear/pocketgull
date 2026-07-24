@@ -980,7 +980,8 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
       if (!item || typeof item !== 'object') return {};
       const cleanItem: Record<string, any> = {};
       for (const k of Object.keys(item)) {
-        if (allowedFields.includes(k) || typeof item[k] === 'object') {
+        if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+        if (Object.prototype.hasOwnProperty.call(item, k) && (allowedFields.includes(k) || typeof item[k] === 'object')) {
           cleanItem[k] = item[k];
         }
       }
@@ -1014,7 +1015,8 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       if (!raw || typeof raw !== 'object') return {};
       const clean: Record<string, any> = {};
       for (const k of Object.keys(raw)) {
-        if (allowedFields.includes(k) || typeof raw[k] === 'object') {
+        if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
+        if (Object.prototype.hasOwnProperty.call(raw, k) && (allowedFields.includes(k) || typeof raw[k] === 'object')) {
           clean[k] = raw[k];
         }
       }

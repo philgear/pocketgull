@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { exec } from 'child_process';
+import { exec, execFile } from 'child_process';
 import http from 'http';
 import readline from 'readline';
 import fs from 'fs';
@@ -534,12 +534,13 @@ function openPatientChartDirect(id) {
     console.error('\x1b[31mError: Please specify patient ID.\x1b[0m');
     return;
   }
-  const protocolUrl = `pocketgull://patient/${id}`;
+  const sanitizedId = String(id).replace(/[^a-zA-Z0-9_-]/g, '');
+  const protocolUrl = `pocketgull://patient/${sanitizedId}`;
   console.log(`Deep-linking shell to launch: ${protocolUrl}`);
-  exec(`start ${protocolUrl}`, (err) => {
+  execFile('cmd.exe', ['/c', 'start', protocolUrl], (err) => {
     if (err) {
-      const fallbackUrl = `http://localhost:4200/patient/${id}`;
-      exec(`start ${fallbackUrl}`);
+      const fallbackUrl = `http://localhost:4200/patient/${sanitizedId}`;
+      execFile('cmd.exe', ['/c', 'start', fallbackUrl]);
     }
   });
 }

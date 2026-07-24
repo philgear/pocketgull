@@ -2248,19 +2248,16 @@ export class AnalysisReportComponent implements OnDestroy {
     const anchor = target?.closest?.('a');
     if (anchor) {
       const href = anchor.getAttribute('href');
-      if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+      if (href && !href.startsWith('#')) {
         event.preventDefault();
         event.stopPropagation();
-
-        if (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//')) {
-          this.state.openResearchUrl(href);
-        } else {
-          try {
-            const fullUrl = new URL(href, window.location.origin).href;
-            this.state.openResearchUrl(fullUrl);
-          } catch {
-            this.state.openResearchUrl(href);
+        try {
+          const parsed = new URL(href, window.location.origin);
+          if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            this.state.openResearchUrl(parsed.href);
           }
+        } catch {
+          // ignore malformed URLs
         }
       }
     }
