@@ -225,9 +225,13 @@ trained_physio_models/
 *.atr
 *.rec
 
-# Temporary build cache & scratch workspace
-tmp/
-scratch/
+# PhysioNet Competition Submission Posters
+!contests/
+!contests/physionet/
+!contests/physionet/2026/
+!contests/physionet/2026/*
+
+
 
 
 
