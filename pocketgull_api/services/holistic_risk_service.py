@@ -7,6 +7,7 @@ and continuous sleep fluidity continuum modeling.
 from typing import Dict, Any, Optional
 import numpy as np
 from pydantic import BaseModel, Field
+from services.conformal_risk_service import ConformalPredictor
 
 
 class AmbientEnvironmentInput(BaseModel):
@@ -126,11 +127,16 @@ def compute_holistic_patient_risk(data: MultiModalPatientStateInput) -> Dict[str
         triage_category = "LOW_PHYSIOLOGICAL_STRESS"
         clinical_recommendation = "Routine Baseline Healthspan Monitoring."
 
+    # 8. 95% Coverage Guaranteed Conformal Prediction Interval
+    conformal_engine = ConformalPredictor(alpha=0.05)
+    conformal_bounds = conformal_engine.predict_interval(holistic_score)
+
     return {
         "holistic_risk_score": round(holistic_score, 4),
         "triage_category": triage_category,
         "clinical_recommendation": clinical_recommendation,
         "continuous_sleep_fluidity_index": round(sleep_fluidity_index, 1),
+        "conformal_uncertainty": conformal_bounds,
         "subdomain_scores": {
             "vitals_baseline_risk": round(vitals_risk, 4),
             "caisr_sleep_architecture_risk": round(caisr_risk, 4),
@@ -143,6 +149,7 @@ def compute_holistic_patient_risk(data: MultiModalPatientStateInput) -> Dict[str
             "glymphatic_sws_status": "OPTIMAL" if data.n3_percentage >= 15 else "IMPAIRED_CLEARANCE",
             "ambient_sanctuary_status": "OPTIMAL" if ambient_risk < 0.25 else "ENVIRONMENTAL_STRESS",
             "data_sieve_filtration": "ACTIVE",
+            "conformal_calibration_guarantee": "95.0% COVERAGE",
             "cross_domain_synapse": "ACTIVE"
         }
     }
