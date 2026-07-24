@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked, output, HostListener } from '@angular/core';
 import { CommonModule, DecimalPipe, TitleCasePipe } from '@angular/common';
 import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
@@ -178,7 +178,13 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
           
           <!-- Primary Lens Navigation Tabs -->
           <div class="flex items-center justify-between gap-1.5 w-full relative z-10 pt-1 border-t border-slate-200/60 dark:border-zinc-800/80">
-            <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
+            <!-- Scroll Left Arrow -->
+            <button type="button" (click)="scrollLensBar('left')" 
+              class="px-1.5 py-1 text-xs font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-white bg-white/80 dark:bg-zinc-900/80 rounded border border-zinc-200 dark:border-zinc-800 shrink-0 cursor-pointer shadow-xs transition" title="Scroll Lenses Left">
+              ◀
+            </button>
+
+            <div #lensBarContainer (wheel)="onLensBarWheel($event)" class="flex items-center gap-1.5 overflow-x-auto scroll-smooth hide-scrollbar flex-1">
               <button (click)="changeLens('Summary Overview')"
                 [class]="activeLens() === 'Summary Overview' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
@@ -239,6 +245,12 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
                 <span>⏳</span> Epigenetic Longevity
               </button>
             </div>
+
+            <!-- Scroll Right Arrow -->
+            <button type="button" (click)="scrollLensBar('right')" 
+              class="px-1.5 py-1 text-xs font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-white bg-white/80 dark:bg-zinc-900/80 rounded border border-zinc-200 dark:border-zinc-800 shrink-0 cursor-pointer shadow-xs transition" title="Scroll Lenses Right">
+              ▶
+            </button>
 
             <!-- Compact Dropdown for All Secondary Lenses -->
             <div class="relative shrink-0">
@@ -2233,6 +2245,35 @@ export class AnalysisReportComponent implements OnDestroy {
   getPreviousLensName = computed((): string => {
     return this.hasPreviousLens() ? this.availableLenses[this.activeLensIndex() - 1] : '';
   });
+
+  lensBarContainer = viewChild<ElementRef<HTMLDivElement>>('lensBarContainer');
+
+  scrollLensBar(direction: 'left' | 'right'): void {
+    const el = this.lensBarContainer()?.nativeElement;
+    if (el) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      el.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  }
+
+  onLensBarWheel(event: WheelEvent): void {
+    const el = this.lensBarContainer()?.nativeElement;
+    if (el && event.deltaY !== 0) {
+      event.preventDefault();
+      el.scrollBy({ left: event.deltaY, behavior: 'smooth' });
+    }
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyboardLensNavigation(event: KeyboardEvent): void {
+    if (event.altKey && event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.navigateToPreviousLens();
+    } else if (event.altKey && event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.navigateToNextLens();
+    }
+  }
 
   navigateToPreviousLens(): void {
     if (this.hasPreviousLens()) {

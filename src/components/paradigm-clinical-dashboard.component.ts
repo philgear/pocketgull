@@ -53,10 +53,10 @@ export interface IParadigmInfo {
       </div>
 
       <!-- Multi-Paradigm Blend & Selection Toolbar -->
-      <div class="flex flex-wrap items-center gap-2 mb-6 relative z-10 font-mono">
+      <div class="flex items-center gap-2 mb-6 relative z-10 font-mono overflow-x-auto scroll-smooth hide-scrollbar flex-nowrap py-1">
         
         <!-- Multi-Paradigm Blend Presets -->
-        <span class="text-xs font-extrabold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mr-1">Integrative Blends:</span>
+        <span class="text-xs font-extrabold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 shrink-0 mr-1">Integrative Blends:</span>
 
         <button (click)="selectBlend('blend_all')"
           [class]="activeMode() === 'blend_all'
