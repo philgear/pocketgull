@@ -15,10 +15,16 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Harden Runner
+        uses: step-security/harden-runner@4d991eb7696c2e30e9314e0def43d804f3f22d9d # v2.11.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: '24'
           cache: 'npm'
@@ -30,7 +36,7 @@ jobs:
         run: npm audit --json > audit.json || true
 
       - name: Upload audit report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb458e05 # v4.6.0
         with:
           name: npm-audit-report
           path: audit.json
@@ -40,7 +46,7 @@ jobs:
         run: npm run lint --if-present
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v5.5.0
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
         with:
           python-version: '3.12'
 
@@ -53,6 +59,7 @@ jobs:
         run: |
           pip install pip-audit
           pip-audit -r pocketgull_api/requirements.txt --local 
+
       # Run unit tests (safety red-team + service logic)
       - name: Run Unit Tests
         run: npx vitest run
@@ -63,16 +70,22 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Harden Runner
+        uses: step-security/harden-runner@4d991eb7696c2e30e9314e0def43d804f3f22d9d # v2.11.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
           node-version: '24'
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install
 
       - name: Build Application
         run: npm run build
@@ -88,7 +101,7 @@ jobs:
           SKIP_HEALTHCARE_PROVISION: 'true'
 
       - name: Upload Playwright Report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v7.0.0
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb458e05 # v4.6.0
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
@@ -106,17 +119,23 @@ jobs:
       pull-requests: 'write'
 
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Harden Runner
+        uses: step-security/harden-runner@4d991eb7696c2e30e9314e0def43d804f3f22d9d # v2.11.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Google Auth
         id: auth
-        uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
+        uses: google-github-actions/auth@71f986410df66e1321f58500205579736cf6b728 # v2.1.8
         with:
           workload_identity_provider: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
           service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
 
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        uses: google-github-actions/setup-gcloud@e30db14379863a8c79db28562d5b6e22f28148b5 # v2.1.4
 
       - name: Build Preview Image
         run: |
@@ -131,7 +150,7 @@ jobs:
 
       - name: Deploy Preview to Cloud Run
         id: deploy-preview
-        uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v2.3.0.14.3.0.1
+        uses: google-github-actions/deploy-cloudrun@f1c50e20f1cb601991d7945d8205562725e2e8be # v2.7.0
         with:
           service: 'pocket-gull-v2'
           region: 'us-central1'
@@ -146,7 +165,7 @@ jobs:
           flags: '--set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest --concurrency=100 --max-instances=1 --min-instances=0'
 
       - name: Comment Preview URL on PR
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
             const url = '${{ steps.deploy-preview.outputs.url }}';
@@ -187,18 +206,24 @@ jobs:
       security-events: 'write' # For Trivy SARIF upload
     
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Harden Runner
+        uses: step-security/harden-runner@4d991eb7696c2e30e9314e0def43d804f3f22d9d # v2.11.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       
       - name: Google Auth
         id: auth
-        uses: google-github-actions/auth@ba79af03959ebeac9769e648f473a284504d9193 # v2.1.10
+        uses: google-github-actions/auth@71f986410df66e1321f58500205579736cf6b728 # v2.1.8
         with:
           # Keyless Workload Identity Federation
           workload_identity_provider: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
           service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
           
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3.0.1
+        uses: google-github-actions/setup-gcloud@e30db14379863a8c79db28562d5b6e22f28148b5 # v2.1.4
           
       - name: Build Docker Image
         run: |
@@ -213,7 +238,7 @@ jobs:
             -t $IMAGE_PATH:latest .
 
       - name: Trivy Container Scan
-        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        uses: aquasecurity/trivy-action@18f2510ee396bbf4004022a106e23297a7a371c6 # v0.29.0
         with:
           image-ref: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/pocket-gull:${{ github.sha }}'
           format: 'sarif'
@@ -223,7 +248,7 @@ jobs:
           exit-code: '0'
 
       - name: Upload Trivy Scan Results
-        uses: github/codeql-action/upload-sarif@df409f7d9260372bd5f19e5b04e83cb3c43714ae # v3.27.9
+        uses: github/codeql-action/upload-sarif@b56e499556dcd48007747c3e601eed992ad82c6d # v3.28.10
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -236,7 +261,7 @@ jobs:
           docker push $IMAGE_PATH:latest
           
       - name: Deploy to Cloud Run
-        uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v2.3.0.14.3.0.1
+        uses: google-github-actions/deploy-cloudrun@f1c50e20f1cb601991d7945d8205562725e2e8be # v2.7.0
         with:
           service: 'pocket-gull-v2'
           region: 'us-central1'

@@ -23,8 +23,9 @@ jobs:
 
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2.10.2
+        uses: step-security/harden-runner@4d991eb7696c2e30e9314e0def43d804f3f22d9d # v2.11.0
         with:
+          disable-sudo: true
           egress-policy: audit
 
       - name: Checkout Repository
@@ -41,12 +42,12 @@ jobs:
           publish_results: false
 
       - name: Upload Scorecard Results to Security Tab
-        uses: github/codeql-action/upload-sarif@df409f7d9260372bd5f19e5b04e83cb3c43714ae # v3.27.9
+        uses: github/codeql-action/upload-sarif@b56e499556dcd48007747c3e601eed992ad82c6d # v3.28.10
         with:
           sarif_file: results.sarif
 
       - name: Upload SARIF Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb458e05 # v4.6.0
         with:
           name: SARIF file
           path: results.sarif
