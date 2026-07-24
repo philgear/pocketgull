@@ -116,6 +116,18 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         svgAnimation: 'playbook-whistle',
         adkMapping: 'head_coach_96_agent',
     },
+    monk: {
+        name: 'Brother Gulliver',
+        role: 'Lenten Ascetic & Circadian Metabolic Autophagy Specialist',
+        emoji: '🕊️',
+        tagline: 'Restraint, silence, and circadian fasting for cellular renewal.',
+        accentColor: '#8A4DAF',
+        accentTailwind: 'purple-600',
+        avatarPath: 'assets/images/agents/monk.png',
+        props: ['Linen Habit', 'Contemplative Hourglass', 'Olive Oil & Herbs'],
+        svgAnimation: 'candle-pulse',
+        adkMapping: 'lenten_monk_agent',
+    },
 };
 
 /**

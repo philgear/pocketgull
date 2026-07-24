@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'dream-team';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'dream-team' | 'lent';
 
 @Injectable({
   providedIn: 'root'

@@ -3347,6 +3347,41 @@ html.theme-dream-team .theme-nav-bar {
   color: #FFFFFF !important;
 }
 
+/* ✝️ Lent / Ascetic Metabolic Reset Theme (Lenten Violet #3B1F52 & Warm Linen #F7F5F0) */
+html.theme-lent {
+  --bg-primary: #1F112B;
+  --bg-card: #2B183B;
+  --text-primary: #F7F5F0;
+  --text-secondary: #E6B800;
+  --border-color: #5D377A;
+  --brand-accent: #8A4DAF;
+
+  background-color: #1F112B !important;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(138, 77, 175, 0.12) 0%, transparent 85%),
+    radial-gradient(rgba(230, 184, 0, 0.08) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 14px 14px !important;
+}
+
+html.theme-lent body {
+  background-color: transparent !important;
+}
+
+html.theme-lent .bg-white,
+html.theme-lent .dark\:bg-zinc-900,
+html.theme-lent .bg-gray-50,
+html.theme-lent .pocket-gull-card {
+  background-color: #2B183B !important;
+  border-color: rgba(138, 77, 175, 0.4) !important;
+  color: #F7F5F0 !important;
+}
+
+html.theme-lent .theme-nav-bar {
+  background-color: #180D22 !important;
+  border-bottom: 2px solid #8A4DAF !important;
+  color: #F7F5F0 !important;
+}
+
 /* 2. Dieter Rams Tactile Controls & Typography Tokens */
 .btn-rams {
   display: inline-flex;

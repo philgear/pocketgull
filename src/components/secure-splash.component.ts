@@ -313,6 +313,7 @@ import { environment } from '../environments/environment';
                           <option value="spark">✨ Spark Mode</option>
                           <option value="calm">🧘 Serene Calm</option>
                           <option value="dream-team">🏀 1996 Dream Team</option>
+                          <option value="lent">✝️ Lent / Ascetic Reset</option>
                         </select>
 
                         <!-- Health Literacy Persona Selector -->
