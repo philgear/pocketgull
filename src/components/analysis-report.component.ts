@@ -2147,6 +2147,7 @@ export class AnalysisReportComponent implements OnDestroy {
     if (theme === 'hemp') return '🌿 Organic Hemp';
     if (theme === 'rice') return '🌾 Rice Paper';
     if (theme === 'construction') return '🎨 Construction';
+    if (theme === 'atomic') return '⚛️ Atomic Bio-Energy';
     if (theme === 'dark') return '🌙 Dark Mode';
     return '📜 Texture Suite';
   }
