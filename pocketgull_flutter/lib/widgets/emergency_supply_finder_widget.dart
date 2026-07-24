@@ -153,7 +153,7 @@ class _EmergencySupplyFinderWidgetState extends State<EmergencySupplyFinderWidge
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                 decoration: BoxDecoration(
-                                  color: item.badgeColor.withOpacity(0.2),
+                                  color: item.badgeColor.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
