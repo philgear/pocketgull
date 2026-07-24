@@ -11,7 +11,7 @@ export interface ISleepToolkitMilestone {
 
 export interface ISleepMicroAction {
   title: string;
-  category: 'Circadian' | 'Digital Detox' | 'Mind-Body' | 'Nutrition';
+  category: 'Circadian' | 'Digital Detox' | 'Mind-Body' | 'Nutrition' | 'Ambient';
   description: string;
   impact: string;
 }
@@ -28,80 +28,96 @@ export interface ISleepMicroAction {
           <div class="flex items-center gap-2">
             <span class="text-2xl">🌙</span>
             <h2 class="text-xl font-bold bg-gradient-to-r from-indigo-400 via-purple-300 to-emerald-400 bg-clip-text text-transparent">
-              Sleep Twin & Holistic Health Sanctuary
+              Sleep Twin & Ambient Sanctuary Engine
             </h2>
           </div>
           <p class="text-xs text-zinc-400 mt-1">
-            Multi-Modal PSG Sleep Architecture & Continuous Passive Wearable Telemetry
+            Contactless Remote Sensing, Continuous Sleep Fluidity & Multi-Modal Wearable Telemetry
           </p>
         </div>
-        <div class="px-3 py-1.5 rounded-full text-xs font-semibold border bg-emerald-950/60 text-emerald-300 border-emerald-800/80 flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Sleep Twin Synapse Active
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-indigo-950/80 text-indigo-300 border border-indigo-800">
+            Sieve Filter Active
+          </span>
+          <div class="px-3 py-1.5 rounded-full text-xs font-semibold border bg-emerald-950/60 text-emerald-300 border-emerald-800/80 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Sleep Twin Synapse Active
+          </div>
         </div>
       </div>
 
-      <!-- Sleep Twin Telemetry & Bio-State Dashboard -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="p-4 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
-          <span class="text-xs font-medium text-zinc-400">Holistic Risk Score</span>
-          <div class="mt-2 flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-indigo-400">{{ (riskScore() * 100).toFixed(1) }}%</span>
-            <span class="text-xs text-emerald-400 font-medium">↓ 4.2% baseline</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1">Fused Sleep PSG & Wearables</p>
-        </div>
-
-        <div class="p-4 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
-          <span class="text-xs font-medium text-zinc-400">Glymphatic SWS (N3)</span>
-          <div class="mt-2 flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-purple-300">{{ n3Percentage() }}%</span>
-            <span class="text-xs text-emerald-400 font-medium">Optimal</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1">Slow-Wave Brain Clearance</p>
-        </div>
-
-        <div class="p-4 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
-          <span class="text-xs font-medium text-zinc-400">Vagal Tone (HRV RMSSD)</span>
-          <div class="mt-2 flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-emerald-400">{{ hrvRmssd() }} ms</span>
-            <span class="text-xs text-emerald-400 font-medium">↑ High Vagal</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1">Autonomic Nervous Balance</p>
-        </div>
-
-        <div class="p-4 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
-          <span class="text-xs font-medium text-zinc-400">Apnea-Hypopnea (AHI)</span>
-          <div class="mt-2 flex items-baseline gap-2">
-            <span class="text-3xl font-extrabold text-teal-300">{{ ahi() }} / hr</span>
-            <span class="text-xs text-emerald-400 font-medium">Mild / Normal</span>
-          </div>
-          <p class="text-[11px] text-zinc-500 mt-1">Respiration Fragmentation</p>
-        </div>
-      </div>
-
-      <!-- Battery Recharger Analogy & Visualizer -->
-      <div class="p-4 bg-gradient-to-r from-indigo-950/40 via-purple-950/30 to-zinc-900/80 rounded-xl border border-indigo-900/40">
+      <!-- Continuous Sleep Fluidity Continuum Gauge -->
+      <div class="p-5 bg-gradient-to-br from-indigo-950/40 via-purple-950/30 to-zinc-900/90 rounded-xl border border-indigo-900/50 space-y-3">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-xl">
-              ⚡
-            </div>
-            <div>
-              <h4 class="text-sm font-semibold text-zinc-200">The Human Battery Recharger</h4>
-              <p class="text-xs text-zinc-400">Sleep charges your body and brain so you wake up refreshed, sharp, and joyful.</p>
-            </div>
+          <div>
+            <span class="text-xs font-semibold text-indigo-300">Continuous Sleep Fluidity & Restorative Depth Index</span>
+            <p class="text-xs text-zinc-400">Dynamic continuum predicting sleep transition stability & restoration</p>
           </div>
-          <div class="w-36 bg-zinc-800 rounded-full h-3 p-0.5 border border-zinc-700">
-            <div class="bg-gradient-to-r from-emerald-500 to-teal-300 h-full rounded-full transition-all duration-700" style="width: 88%"></div>
+          <span class="text-3xl font-extrabold text-emerald-400">{{ sleepFluidityIndex() }}%</span>
+        </div>
+        <div class="w-full bg-zinc-800 rounded-full h-3.5 p-0.5 border border-zinc-700">
+          <div class="bg-gradient-to-r from-indigo-500 via-purple-400 to-emerald-400 h-full rounded-full transition-all duration-700 shadow-sm"
+               [style.width.%]="sleepFluidityIndex()"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-zinc-500 font-mono">
+          <span>Fragmented / Disturbed</span>
+          <span>Light Restoration</span>
+          <span class="text-emerald-400 font-bold">Deep Glymphatic Clearance</span>
+        </div>
+      </div>
+
+      <!-- Telemetry Dashboard: PSG, Wearables & Contactless Ambient -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
+          <span class="text-xs font-medium text-zinc-400">Holistic Risk</span>
+          <div class="mt-1.5 flex items-baseline gap-1.5">
+            <span class="text-2xl font-extrabold text-indigo-400">{{ (riskScore() * 100).toFixed(1) }}%</span>
+            <span class="text-[10px] text-emerald-400">↓ 4.2%</span>
           </div>
+          <p class="text-[10px] text-zinc-500">Cross-Domain Fused</p>
+        </div>
+
+        <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
+          <span class="text-xs font-medium text-zinc-400">Glymphatic SWS (N3)</span>
+          <div class="mt-1.5 flex items-baseline gap-1.5">
+            <span class="text-2xl font-extrabold text-purple-300">{{ n3Percentage() }}%</span>
+            <span class="text-[10px] text-emerald-400">Optimal</span>
+          </div>
+          <p class="text-[10px] text-zinc-500">Slow-Wave SWS</p>
+        </div>
+
+        <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
+          <span class="text-xs font-medium text-zinc-400">Vagal Tone (RMSSD)</span>
+          <div class="mt-1.5 flex items-baseline gap-1.5">
+            <span class="text-2xl font-extrabold text-emerald-400">{{ hrvRmssd() }} ms</span>
+            <span class="text-[10px] text-emerald-400">High Vagal</span>
+          </div>
+          <p class="text-[10px] text-zinc-500">Autonomic Balance</p>
+        </div>
+
+        <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
+          <span class="text-xs font-medium text-zinc-400">Ambient Light</span>
+          <div class="mt-1.5 flex items-baseline gap-1.5">
+            <span class="text-2xl font-extrabold text-amber-300">{{ ambientLightLux() }} lux</span>
+            <span class="text-[10px] text-emerald-400">Dim Sanctuary</span>
+          </div>
+          <p class="text-[10px] text-zinc-500">Contactless Sensing</p>
+        </div>
+
+        <div class="p-3.5 bg-zinc-900/80 rounded-xl border border-zinc-800/80">
+          <span class="text-xs font-medium text-zinc-400">Room Temp / CO2</span>
+          <div class="mt-1.5 flex items-baseline gap-1.5">
+            <span class="text-2xl font-extrabold text-teal-300">{{ roomTempCelsius() }}°C</span>
+            <span class="text-[10px] text-zinc-400">650 ppm</span>
+          </div>
+          <p class="text-[10px] text-zinc-500">Environmental Cues</p>
         </div>
       </div>
 
       <!-- Key Micro-Interventions Toolkit -->
       <div class="space-y-3">
         <h3 class="text-sm font-semibold text-zinc-300 flex items-center gap-2">
-          <span>✨</span> Evidence-Based Sleep Micro-Actions
+          <span>✨</span> Evidence-Based Sleep Micro-Actions & Ambient Sanctuary Cues
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           @for (action of microActions(); track action.title) {
@@ -163,9 +179,12 @@ export class HolisticSleepToolkitComponent {
   private patientService = inject(PatientStateService);
 
   riskScore = signal(0.184);
+  sleepFluidityIndex = signal(88.4);
   n3Percentage = signal(21.5);
   hrvRmssd = signal(44);
   ahi = signal(3.8);
+  ambientLightLux = signal(2.5);
+  roomTempCelsius = signal(18.5);
 
   microActions = signal<ISleepMicroAction[]>([
     {
@@ -181,10 +200,10 @@ export class HolisticSleepToolkitComponent {
       impact: 'Reduces sleep latency by 45% and calms cortical hyper-arousal.'
     },
     {
-      title: 'Vagal Diaphragmatic Breathing',
-      category: 'Mind-Body',
-      description: 'Practice 4-7-8 breathing or gentle bedtime stretches prior to turning off lights.',
-      impact: 'Activates parasympathetic vagal tone and lowers nocturnal heart rate.'
+      title: 'Contactless Ambient Optimization',
+      category: 'Ambient',
+      description: 'Maintain bedroom ambient temp at 18.5°C and ambient light below 5 lux before bedtime.',
+      impact: 'Triggers thermoregulatory sleep onset and minimizes nocturnal awakenings.'
     },
     {
       title: 'Nutrient-Optimized Wind Down',
