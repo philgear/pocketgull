@@ -12,6 +12,7 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
 import { DicomViewerComponent } from './dicom-viewer.component';
 import { BiometricHistoryChartComponent } from './biometric-history-chart.component';
 import { SentinelTriageComponent } from './sentinel-triage.component';
+import { SentinelTelemetryPlotterComponent } from './sentinel-telemetry-plotter.component';
 
 @Component({
   selector: 'app-medical-chart',
@@ -24,7 +25,9 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
     PocketGullCardComponent, 
     MedicalChartSummaryComponent, 
     DicomViewerComponent, 
-    BiometricHistoryChartComponent
+    BiometricHistoryChartComponent,
+    SentinelTriageComponent,
+    SentinelTelemetryPlotterComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -118,6 +121,12 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
           </div>
         }
       </pocket-gull-card>
+
+      <!-- Sentinel Outbreak & Telemetry Plotter Section -->
+      @if (isSentinel()) {
+        <app-sentinel-triage class="block w-full"></app-sentinel-triage>
+        <app-sentinel-telemetry-plotter class="block w-full"></app-sentinel-telemetry-plotter>
+      }
 
       <!-- Biometric Trends Card -->
       <pocket-gull-card 
