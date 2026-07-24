@@ -157,7 +157,7 @@ def is_third_party_or_build(relative_path: str) -> bool:
         "node_modules", ".git", ".angular", "dist", "playwright-report",
         "test-results", "tmp", ".husky", "build", ".dart_tool", "ios", "android",
         "windows", "linux", "macos", "web", "sandbox", "flutter", "venv", ".venv", ".vscode",
-        "__pycache__", ".pytest_cache", "site-packages", ".genkit", ".continue"
+        "__pycache__", ".pytest_cache", "site-packages", ".genkit", ".continue", "python_example_2026"
     }
     if any(part in vendor_dirs for part in parts):
         return True
