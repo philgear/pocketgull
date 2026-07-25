@@ -40,3 +40,5 @@ allow-dependencies-licenses:
   - pkg:npm/uri-templates
   - pkg:npm/url-template
   - pkg:npm/@google-cloud/agones-sdk
+  - pkg:github/actions/checkout
+  - pkg:github/actions/setup-node
