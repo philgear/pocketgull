@@ -16,7 +16,7 @@ export default defineConfig({
   workers: process.env['CI'] ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: process.env['BASE_URL'] || 'http://localhost:4000',
+    baseURL: process.env['BASE_URL'] || 'http://127.0.0.1:4000',
     trace: 'off',
     bypassCSP: true,
     permissions: ['microphone'],
@@ -29,7 +29,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run preview',
-    url: 'http://localhost:4000',
+    url: 'http://127.0.0.1:4000',
     reuseExistingServer: !process.env['CI'],
     timeout: 120 * 1000,
     env: {

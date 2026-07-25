@@ -110,6 +110,7 @@ jobs:
         run: npm run test:e2e
         env:
           CI: true
+          PORT: '4000'
           GEMINI_API_KEY: ''
           SKIP_HEALTHCARE_PROVISION: 'true'
 
