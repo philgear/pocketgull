@@ -323,7 +323,9 @@
         "@esbuild/win32-x64": "0.28.1"
       },
       "http-proxy-middleware": "3.0.7",
-      "webpack-dev-server": "^6.0.0"
+      "webpack-dev-server": "^6.0.0",
+      "brace-expansion": "^2.0.1",
+      "postcss": "^8.5.18"
     }
   },
   "lint-staged": {
