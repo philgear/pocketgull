@@ -94,7 +94,7 @@
     "test": "vitest run --config vitest.config.ts && python3 pocketgull_api/run_tests.py",
     "test:watch": "vitest",
     "test:python": "python3 pocketgull_api/run_tests.py",
-    "test:e2e": "set TMP=tmp && set TEMP=tmp && npx playwright test",
+    "test:e2e": "node run-playwright.cjs test",
     "test:e2e:ui": "playwright test --ui",
     "dns:update": "node scripts/update-porkbun-dns.js",
     "kube:start": "minikube start",

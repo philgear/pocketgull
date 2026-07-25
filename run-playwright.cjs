@@ -67,4 +67,4 @@ Module._load = function(request, parent, isMain) {
 
 // Now launch Playwright CLI with remaining args
 process.argv = [process.argv[0], process.argv[1], ...process.argv.slice(2)];
-require('./node_modules/playwright/cli.js');
+require('./node_modules/@playwright/test/cli.js');
