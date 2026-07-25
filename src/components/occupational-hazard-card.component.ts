@@ -29,18 +29,26 @@ import { ActuarialLongevityService, IOccupationalHazardProfile } from '../servic
             </p>
           </div>
 
-          <!-- Actuarial QALY Pill -->
-          <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border shadow-sm transition-transform hover:scale-105"
-               [class.bg-emerald-500\/10]="prof.actuarialQalyImpact >= 0"
-               [class.text-emerald-700]="prof.actuarialQalyImpact >= 0"
-               [class.dark:text-emerald-300]="prof.actuarialQalyImpact >= 0"
-               [class.border-emerald-500\/30]="prof.actuarialQalyImpact >= 0"
-               [class.bg-amber-500\/10]="prof.actuarialQalyImpact < 0"
-               [class.text-amber-700]="prof.actuarialQalyImpact < 0"
-               [class.dark:text-amber-300]="prof.actuarialQalyImpact < 0"
-               [class.border-amber-500\/30]="prof.actuarialQalyImpact < 0">
-            <span>{{ prof.actuarialQalyImpact >= 0 ? '📈' : '📉' }}</span>
-            <span>Actuarial QALY: {{ prof.actuarialQalyImpact >= 0 ? '+' : '' }}{{ prof.actuarialQalyImpact }} Years</span>
+          <!-- Actuarial QALY Pill & Survival Reserve -->
+          <div class="flex items-center gap-2">
+            @if (actuarialProfile()?.survivalProbability5Year; as survivalProb) {
+              <div class="px-3 py-1.5 rounded-xl text-xs font-bold border shadow-sm bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/30 font-mono">
+                <span>🛡️ 5-Yr Survival: {{ (survivalProb * 100).toFixed(1) }}%</span>
+              </div>
+            }
+
+            <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border shadow-sm transition-transform hover:scale-105"
+                 [class.bg-emerald-500\/10]="prof.actuarialQalyImpact >= 0"
+                 [class.text-emerald-700]="prof.actuarialQalyImpact >= 0"
+                 [class.dark:text-emerald-300]="prof.actuarialQalyImpact >= 0"
+                 [class.border-emerald-500\/30]="prof.actuarialQalyImpact >= 0"
+                 [class.bg-amber-500\/10]="prof.actuarialQalyImpact < 0"
+                 [class.text-amber-700]="prof.actuarialQalyImpact < 0"
+                 [class.dark:text-amber-300]="prof.actuarialQalyImpact < 0"
+                 [class.border-amber-500\/30]="prof.actuarialQalyImpact < 0">
+              <span>{{ prof.actuarialQalyImpact >= 0 ? '📈' : '📉' }}</span>
+              <span>Actuarial QALY: {{ prof.actuarialQalyImpact >= 0 ? '+' : '' }}{{ prof.actuarialQalyImpact }} Years</span>
+            </div>
           </div>
         </div>
 
@@ -54,6 +62,20 @@ import { ActuarialLongevityService, IOccupationalHazardProfile } from '../servic
             SCT {{ prof.snomedCode }}
           </span>
         </div>
+
+        <!-- Gompertz-Makeham Trajectory Curve Ribbon -->
+        @if (survivalCurvePoints(); as points) {
+          <div class="mt-3 p-2.5 rounded-xl bg-cyan-950/30 border border-cyan-500/20 text-xs flex items-center justify-between gap-2 font-mono">
+            <span class="text-cyan-400 font-bold text-[10px] uppercase">Gompertz-Makeham 20-Yr Risk Horizon:</span>
+            <div class="flex items-center gap-1">
+              @for (pt of points.slice(0, 5); track pt.age) {
+                <span class="px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-200 text-[10px] border border-cyan-500/30">
+                  Age {{ pt.age }}: {{ (pt.personalizedSurvival * 100).toFixed(0) }}%
+                </span>
+              }
+            </div>
+          </div>
+        }
 
         <!-- 3. 10D Occupational Hazard Score Grid -->
         <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -167,4 +189,19 @@ export class OccupationalHazardCardComponent {
     }
     return null;
   });
+
+  readonly actuarialProfile = computed(() => {
+    if (!this.actuarialService) return null;
+    const vitals = this.patientState?.vitals() || { hr: '72', spO2: '98' };
+    const age = 45;
+    const soc = this.profile()?.socCode;
+    return this.actuarialService.calculateActuarialProfile(vitals, 75, age, soc);
+  });
+
+  readonly survivalCurvePoints = computed(() => {
+    const prof = this.actuarialProfile();
+    if (!prof || !this.actuarialService) return [];
+    return this.actuarialService.generateLongevityRiskCurve(prof.chronologicalAge, prof.chronologicalAge + 20, prof.gompertzParams);
+  });
 }
+

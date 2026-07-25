@@ -258,4 +258,29 @@ describe('ActuarialLongevityService', () => {
     const anticoagProfile = service.getPersonalizedOccupationalProfile('Renaissance Scholar', {}, ['Eliquis', 'Aspirin']);
     expect(anticoagProfile.precisionOccupationalNutrition.some(n => n.includes('Safety Guardrail: High-DHA Omega-3 capped'))).toBe(true);
   });
+
+  it('should calculate Gompertz-Makeham survival probabilities and generate 5-year survival metrics', () => {
+    const profile = service.calculateActuarialProfile({ hr: '62', spO2: '99' }, 85, 45, '27-2021-ALPINE');
+
+    expect(profile.survivalProbability5Year).toBeDefined();
+    expect(profile.survivalProbability5Year).toBeGreaterThan(0.9);
+    expect(profile.survivalProbability5Year).toBeLessThanOrEqual(1.0);
+    expect(profile.gompertzParams).toBeDefined();
+    expect(profile.gompertzParams?.alpha).toBeGreaterThan(0);
+  });
+
+  it('should generate a multi-point longevity risk curve up to max age', () => {
+    const curvePoints = service.generateLongevityRiskCurve(45, 85);
+    expect(curvePoints.length).toBeGreaterThan(5);
+
+    const firstPoint = curvePoints[0];
+    expect(firstPoint.age).toBe(45);
+    expect(firstPoint.personalizedSurvival).toBe(1.0);
+
+    const lastPoint = curvePoints[curvePoints.length - 1];
+    expect(lastPoint.age).toBe(85);
+    expect(lastPoint.personalizedSurvival).toBeLessThan(firstPoint.personalizedSurvival);
+    expect(lastPoint.hazardRate).toBeGreaterThan(0);
+  });
 });
+

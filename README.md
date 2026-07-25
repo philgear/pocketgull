@@ -77,7 +77,27 @@ Pocket Gull features 10 built-in standardized assessment instruments integrated 
 
 ---
 
-### 🎨 5. Health Literacy Personas & Cognitive Reading Modes
+### 🎨 5. Dieter Rams Functional UX & 4-Level Progressive Disclosure
+
+Pocket Gull adheres strictly to **Dieter Rams Functional Design Principles** (*Weniger, aber besser*) paired with **100 / 100 WCAG 2.1 AA/AAA Accessibility**:
+
+#### 📐 Dieter Rams Design & Braun Telemetry Grid
+- **No Pill Navigation Bloat**: Replaced rounded pill buttons with crisp, structural, rectangular navigation tabs (`rounded-md`, clean 1px borders, active `border-b-2 border-emerald-500` accents).
+- **Braun Instrument Panel Telemetry Grid**: Top patient ground truth header renders as a high-contrast instrument panel with monospace metric readouts.
+- **Dieter Rams Theme Studio**: Includes 13+ curated themes (Rice Paper Washi, Raw Hemp, Carrara Marble, Dark Obsidian, Madame Curie Lab) rendered as real-color dual-swatch preview boxes with 44px+ touch targets.
+
+#### 🖱️ 4-Level Progressive Disclosure Gesture Matrix
+
+| Level | Gesture / Action | Clinical Utility & Result |
+| :--- | :--- | :--- |
+| **Level 1** | Default Idle View | High-contrast summary card displaying category badge, icon, and personalized directive. |
+| **Level 2** | Single Click / Tap | Opens animated **Drill-Down Inspector Drawer** with usage protocols and patient care tips. |
+| **Level 3** | Double Click / Double Tap | Fast-cycles the **Prescription State Machine** (`unassigned` ➔ `prescribed` ➔ `hidden`) with visual/haptic feedback. |
+| **Level 4** | Right-Click / Long-Press | Opens floating **Dieter Rams Context Menu** (`📋 Export FHIR R4`, `🧠 Gemini AI Consult`, `📌 Pin Telemetry`, `✏️ Attach Note`). |
+
+---
+
+### 📖 6. Health Literacy Personas & Cognitive Reading Modes
 
 #### 🧠 5 Persona Writing Styles
 

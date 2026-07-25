@@ -716,7 +716,7 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
       }
 
       const streamingResponse = await ai.models.generateContentStream({
-          model: rawModel.includes('gemini-2.0-flash') ? rawModel : 'gemini-2.0-flash-exp', // Enforce 2.0 flash
+          model: rawModel,
           contents: [{ role: 'user', parts: [{ text: patientData }] }],
           config: configOptions
       });

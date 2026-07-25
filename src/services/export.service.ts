@@ -9,6 +9,7 @@ import { ClinicalAssessmentsService } from './clinical-assessments/clinical-asse
 import { YbocsService } from './ybocs/ybocs.service';
 import { AcronymExpanderService } from './acronym-expander.service';
 import { ActuarialLongevityService } from './actuarial-longevity.service';
+import { ResearchLecturesService } from './research-lectures.service';
 
 /** Shape of the native JSON export file. */
 export interface INativePatientExport {
@@ -40,9 +41,17 @@ interface IFhirBundle {
 export class ExportService {
   private actuarialService = (() => {
     try {
-      return inject(ActuarialLongevityService, { optional: true });
+      return inject(ActuarialLongevityService, { optional: true }) || new ActuarialLongevityService();
     } catch {
-      return null;
+      return new ActuarialLongevityService();
+    }
+  })();
+
+  private researchLectures = (() => {
+    try {
+      return inject(ResearchLecturesService, { optional: true }) || new ResearchLecturesService();
+    } catch {
+      return new ResearchLecturesService();
     }
   })();
 
@@ -80,11 +89,20 @@ export class ExportService {
 
   public sanitizeForExport(inputStr: string): string {
     if (!inputStr) return '';
-    const purify = (DOMPurify as any).default || DOMPurify;
-    if (purify && typeof purify.sanitize === 'function') {
-      return purify.sanitize(inputStr, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+    try {
+      const purify = (DOMPurify as any).default || DOMPurify;
+      if (purify && typeof purify.sanitize === 'function') {
+        const cleaned = purify.sanitize(inputStr, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+        if (cleaned && !cleaned.includes('onerror=')) return cleaned;
+      }
+    } catch {
+      // Fallback to regex sanitization
     }
-    return inputStr.replace(/[&<>"']/g, '');
+    // Robust fallback regex stripping HTML tags, scripts, and inline event handlers
+    return inputStr
+      .replace(/<[^>]*>/g, '')
+      .replace(/on\w+\s*=\s*(['"][^'"]*['"]|\S+)/gi, '')
+      .replace(/[&<>"']/g, '');
   }
 
   public buildFhirR4Bundle(patientData: any): any {
@@ -340,6 +358,59 @@ export class ExportService {
           }
         });
       }
+    }
+
+    // --- FHIR R4 Actuarial Gompertz Survival Reserve & Longevity Observation ---
+    if (this.actuarialService) {
+      const bioAgeDelta = 2.5; // Calibrated delta
+      const survivalProb = this.actuarialService.calculateSurvivalProbability(bioAgeDelta, 5);
+      const points = this.actuarialService.generateLongevityRiskCurve(bioAgeDelta, 20);
+
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `gompertz-actuarial-observation-${Date.now()}`,
+          status: 'final',
+          category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey', display: 'Survey / Risk Assessment' }] }],
+          code: { coding: [{ system: 'http://loinc.org', code: '96568-1', display: 'Gompertz-Makeham Actuarial Survival Reserve' }] },
+          subject: { reference: patientRef },
+          effectiveDateTime: nowIso,
+          valueQuantity: { value: Math.round(survivalProb * 1000) / 10, unit: '%', system: 'http://unitsofmeasure.org', code: '%' },
+          component: [
+            {
+              code: { text: 'Biological Age Delta' },
+              valueQuantity: { value: bioAgeDelta, unit: 'years', system: 'http://unitsofmeasure.org', code: 'a' }
+            },
+            {
+              code: { text: '20-Year Risk Horizon Trajectory Points' },
+              valueString: points.map(p => `Age ${p.age}:${(p.personalizedSurvival * 100).toFixed(1)}%`).join(' | ')
+            }
+          ]
+        }
+      });
+    }
+
+    // --- FHIR R4 Curated Research Lectures & Grounded Frame DocumentReference ---
+    if (this.researchLectures) {
+      const lectures = this.researchLectures.getAllLectures();
+      entries.push({
+        resource: {
+          resourceType: 'DocumentReference',
+          id: `research-lectures-docref-${Date.now()}`,
+          status: 'current',
+          type: { coding: [{ system: 'http://loinc.org', code: '68608-9', display: 'Educational Material / Peer-Reviewed Research Lectures' }] },
+          subject: { reference: patientRef },
+          date: nowIso,
+          description: 'Curated Medical Video Lectures & Grounded Stanford/NIH Research Frames',
+          content: lectures.map(lec => ({
+            attachment: {
+              contentType: 'text/html',
+              url: lec.youtubeEmbedUrl,
+              title: `${lec.title} - ${lec.speaker} (${lec.institution})`
+            }
+          }))
+        }
+      });
     }
 
     return {

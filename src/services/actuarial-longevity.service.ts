@@ -34,6 +34,19 @@ export interface IOccupationalHazardProfile {
   vocalResonanceProtocol?: string;
 }
 
+export interface IGompertzMakehamParams {
+  alpha: number; // Initial intrinsic vulnerability / base hazard rate
+  beta: number;  // Aging acceleration factor per year
+  lambda: number; // Extrinsic background mortality hazard rate
+}
+
+export interface ILongevityRiskPoint {
+  age: number;
+  baselineSurvival: number; // 0.0 - 1.0 (0% - 100%)
+  personalizedSurvival: number; // 0.0 - 1.0 (0% - 100%)
+  hazardRate: number; // Events per 1000 person-years
+}
+
 export interface IActuarialProfile {
   chronologicalAge: number;
   biologicalAge: number;
@@ -41,6 +54,8 @@ export interface IActuarialProfile {
   projectedQalyGain: number;   // e.g. +7.2 QALYs
   baselineLifeExpectancy: number; // e.g. 77.5
   projectedLifespan: number; // e.g. 84.7
+  survivalProbability5Year?: number; // 0.0 - 1.0
+  gompertzParams?: IGompertzMakehamParams;
   occupationalProfile?: IOccupationalHazardProfile;
   hazardReductions: {
     cardiovascular: number; // e.g. 0.62 (38% risk reduction)
@@ -2393,6 +2408,23 @@ export class ActuarialLongevityService {
     const baselineLifeExpectancy = 77.5;
     const projectedLifespan = parseFloat((baselineLifeExpectancy - bioAgeDelta * 0.8).toFixed(1));
 
+    // Gompertz-Makeham hazard model calibration: h(t) = alpha * e^(beta * t) + lambda
+    // Standard baseline calibrated to human actuarial tables: alpha ~ 0.00003, beta ~ 0.085, lambda ~ 0.0005
+    const baseAlpha = 0.00003;
+    const baseBeta = 0.085;
+    const baseLambda = 0.0005;
+
+    // Adjust parameters by biological age acceleration and occupational allostatic load
+    const accelFactor = Math.max(0.6, 1.0 + (bioAgeDelta * 0.02) + (occProfile.allostaticBurnoutScore * 0.015));
+    const gompertzParams: IGompertzMakehamParams = {
+      alpha: parseFloat((baseAlpha * accelFactor).toFixed(6)),
+      beta: parseFloat((baseBeta * (bioAgeDelta > 0 ? 1.02 : 0.98)).toFixed(4)),
+      lambda: parseFloat((baseLambda + (occProfile.chemicalExposureScore * 0.0001)).toFixed(5))
+    };
+
+    // Calculate 5-year survival probability using integrated hazard function
+    const survivalProbability5Year = this.calculateSurvivalProbability(biologicalAge, 5, gompertzParams);
+
     return {
       chronologicalAge: age,
       biologicalAge: parseFloat(biologicalAge.toFixed(1)),
@@ -2400,6 +2432,8 @@ export class ActuarialLongevityService {
       projectedQalyGain: qalyGain,
       baselineLifeExpectancy,
       projectedLifespan,
+      survivalProbability5Year,
+      gompertzParams,
       occupationalProfile: occProfile,
       hazardReductions: {
         cardiovascular: 0.62,
@@ -2408,5 +2442,59 @@ export class ActuarialLongevityService {
         oncological: 0.74
       }
     };
+  }
+
+  /**
+   * Calculates survival probability S(t, t+dt) over a given time horizon using Gompertz-Makeham hazard model:
+   * S(dt) = exp( - (alpha/beta) * e^(beta*t) * (e^(beta*dt) - 1) - lambda * dt )
+   */
+  public calculateSurvivalProbability(
+    currentAge: number,
+    yearsAhead: number,
+    params?: IGompertzMakehamParams
+  ): number {
+    const alpha = params?.alpha ?? 0.00003;
+    const beta = params?.beta ?? 0.085;
+    const lambda = params?.lambda ?? 0.0005;
+
+    const integratedGompertzHazard = (alpha / beta) * Math.exp(beta * currentAge) * (Math.exp(beta * yearsAhead) - 1);
+    const integratedMakehamHazard = lambda * yearsAhead;
+    const totalHazard = integratedGompertzHazard + integratedMakehamHazard;
+
+    const survival = Math.exp(-totalHazard);
+    return parseFloat(Math.min(1.0, Math.max(0.0, survival)).toFixed(4));
+  }
+
+  /**
+   * Generates a multi-point survival curve array from current age up to target max age (default 100).
+   */
+  public generateLongevityRiskCurve(
+    currentAge: number,
+    maxAge: number = 100,
+    params?: IGompertzMakehamParams
+  ): ILongevityRiskPoint[] {
+    const points: ILongevityRiskPoint[] = [];
+    const baselineParams: IGompertzMakehamParams = { alpha: 0.00003, beta: 0.085, lambda: 0.0005 };
+
+    for (let targetAge = currentAge; targetAge <= maxAge; targetAge += 5) {
+      const dt = targetAge - currentAge;
+      const baselineSurvival = this.calculateSurvivalProbability(currentAge, dt, baselineParams);
+      const personalizedSurvival = this.calculateSurvivalProbability(currentAge, dt, params);
+
+      // Instantaneous hazard rate h(t) per 1,000 person-years
+      const alpha = params?.alpha ?? 0.00003;
+      const beta = params?.beta ?? 0.085;
+      const lambda = params?.lambda ?? 0.0005;
+      const hazardRate = parseFloat(((alpha * Math.exp(beta * targetAge) + lambda) * 1000).toFixed(2));
+
+      points.push({
+        age: targetAge,
+        baselineSurvival,
+        personalizedSurvival,
+        hazardRate
+      });
+    }
+
+    return points;
   }
 }

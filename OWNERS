@@ -1,0 +1,10 @@
+# Monorepo Root OWNERS
+# Hierarchy rules: additive down the directory tree.
+# Merges require an LGTM + explicit OWNER approval.
+
+approvers:
+  - philgear
+  - leads@pocketgull.app
+
+labels:
+  - monorepo-root

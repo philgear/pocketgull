@@ -10,10 +10,10 @@ declare var webkitSpeechRecognition: any;
   providedIn: 'root'
 })
 export class DictationService {
-  private state = inject(PatientStateService);
-  private patientMgmt = inject(PatientManagementService);
-  private petAuditory = inject(PetAuditoryService);
-  private lighting = inject(AmbientLightingService);
+  private state = inject(PatientStateService, { optional: true });
+  private patientMgmt = inject(PatientManagementService, { optional: true });
+  private petAuditory = inject(PetAuditoryService, { optional: true });
+  private lighting = inject(AmbientLightingService, { optional: true });
 
   readonly isListening = signal(false);
   readonly isModalOpen = signal(false);
@@ -146,9 +146,9 @@ export class DictationService {
             this.lastCommand.set("EMERGENCY AVS STOPPED");
             
             // Shut down AVS and restore normal lighting and soundscapes
-            this.state.isAvsSessionActive.set(false);
-            this.lighting.setEmergencyOverride(false);
-            this.petAuditory.stop();
+            if (this.state) this.state.isAvsSessionActive.set(false);
+            if (this.lighting) this.lighting.setEmergencyOverride(false);
+            if (this.petAuditory) this.petAuditory.stop();
             
             setTimeout(() => this.lastCommand.set(null), 3000);
             return; // Consume the command
@@ -177,7 +177,7 @@ export class DictationService {
             if (lowerFinal.includes('sync') || lowerFinal.includes('save')) {
                 console.log("[Voice Command] Triggering Sync...");
                 this.lastCommand.set("Data Synced");
-                this.patientMgmt.syncToCloud();
+                if (this.patientMgmt) this.patientMgmt.syncToCloud();
                 
                 // Clear the feedback after 2s
                 setTimeout(() => this.lastCommand.set(null), 2000);
@@ -190,7 +190,7 @@ export class DictationService {
                     if (lowerFinal.includes(partName)) {
                         console.log(`[Voice Command] Highlighting ${partName} (${partKey})`);
                         this.lastCommand.set(`Highlighted ${partName}`);
-                        this.state.selectPart(partKey);
+                        if (this.state) this.state.selectPart(partKey);
                         setTimeout(() => this.lastCommand.set(null), 2000);
                         return; // Consume
                     }
@@ -297,6 +297,31 @@ export class DictationService {
     window.speechSynthesis.speak(utterance);
   }
 
+  public speakResponse(text: string, rate: number = 1.0, pitch: number = 1.0): boolean {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      return false;
+    }
+
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = Math.min(2.0, Math.max(0.5, rate));
+      utterance.pitch = Math.min(2.0, Math.max(0.5, pitch));
+      utterance.lang = this.selectedLanguage();
+
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.lang.startsWith(this.selectedLanguage().split('-')[0])) || voices[0];
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+
+      window.speechSynthesis.speak(utterance);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private playPersonaAudioFx(freqHz: number, waveType: OscillatorType = 'sine') {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -320,3 +345,4 @@ export class DictationService {
     }
   }
 }
+
