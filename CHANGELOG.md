@@ -5,8 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-<<<<<<< HEAD
-=======
 ## [1.5.0] - 2026-07-24
 
 **Enterprise Multi-Tenant Scale Bottleneck Audit Resolution (Bottlenecks 4–11)**
@@ -52,7 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **[Clinical / Interventions] Data-Driven Glymphatic System Protections (`holistic-sleep-toolkit.component.ts`)**:
   - Expanded Evidence-Based Sleep Micro-Action Suite to 8 cards mapping PSG data signals (AHI/$\text{SpO}_2$ desaturations, supine position, N3 SWS deficits, micro-arousals) directly to clinical CPAP, lateral glymphatic positioning, SWS thermoregulation ($18.5^\circ\text{C}$ / $65^\circ\text{F}$), and 90m photic/acoustic shielding.
 
->>>>>>> origin/feat/dieter-rams-sentinel-personas
 ## [1.3.0] - 2026-07-23
 
 **Patient Summary Clinical Assessments & Screener Trajectory, Research Frame Link Interceptor, Clean White 3D Viewport & Mobile Splashscreen Optimizations**

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🕊️ POCKET GULL
 **Aerial Perspective for the Clinical Ocean — Living Medical Intelligence Engine**
 
