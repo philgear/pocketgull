@@ -32,6 +32,8 @@ const APPROVED_EGRESS_DOMAINS = [
   'hl7.org',
   'loinc.org',
   'snomed.info',
+  'ec.europa.eu',
+  'europa.eu',
   'unitsofmeasure.org',
   'epic.com',
   'fhir.epic.com',

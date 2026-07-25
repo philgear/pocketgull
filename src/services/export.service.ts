@@ -8,6 +8,7 @@ import { LaafFhirHapticScheduleService, ILaafHapticItem } from './laaf-fhir-hapt
 import { ClinicalAssessmentsService } from './clinical-assessments/clinical-assessments.service';
 import { YbocsService } from './ybocs/ybocs.service';
 import { AcronymExpanderService } from './acronym-expander.service';
+import { ActuarialLongevityService } from './actuarial-longevity.service';
 
 /** Shape of the native JSON export file. */
 export interface INativePatientExport {
@@ -37,6 +38,14 @@ interface IFhirBundle {
   providedIn: 'root'
 })
 export class ExportService {
+  private actuarialService = (() => {
+    try {
+      return inject(ActuarialLongevityService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
+
   private laafFhir = (() => {
     try {
       return inject(LaafFhirHapticScheduleService, { optional: true });
@@ -148,6 +157,189 @@ export class ExportService {
           valueQuantity: { value: this.acronymService.currentKssScore(), unit: '{scale_1_9}' }
         }
       });
+    }
+
+    // --- Vital Signs Observations (LOINC Standard) ---
+    if (sanitizedP.vitals) {
+      if (sanitizedP.vitals.hr) {
+        const hrVal = parseFloat(String(sanitizedP.vitals.hr));
+        if (!isNaN(hrVal)) {
+          entries.push({
+            resource: {
+              resourceType: 'Observation',
+              id: `hr-observation-${Date.now()}`,
+              status: 'final',
+              category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs', display: 'Vital Signs' }] }],
+              code: { coding: [{ system: 'http://loinc.org', code: '8867-4', display: 'Heart rate' }] },
+              subject: { reference: patientRef },
+              effectiveDateTime: nowIso,
+              valueQuantity: { value: hrVal, unit: '/min', system: 'http://unitsofmeasure.org', code: '/min' }
+            }
+          });
+        }
+      }
+
+      if (sanitizedP.vitals.bp && typeof sanitizedP.vitals.bp === 'string') {
+        const parts = sanitizedP.vitals.bp.split('/');
+        if (parts.length === 2) {
+          const sys = parseFloat(parts[0]);
+          const dia = parseFloat(parts[1]);
+          if (!isNaN(sys) && !isNaN(dia)) {
+            entries.push({
+              resource: {
+                resourceType: 'Observation',
+                id: `bp-observation-${Date.now()}`,
+                status: 'final',
+                category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs', display: 'Vital Signs' }] }],
+                code: { coding: [{ system: 'http://loinc.org', code: '85354-9', display: 'Blood pressure panel with all children optional' }] },
+                subject: { reference: patientRef },
+                effectiveDateTime: nowIso,
+                component: [
+                  {
+                    code: { coding: [{ system: 'http://loinc.org', code: '8480-6', display: 'Systolic blood pressure' }] },
+                    valueQuantity: { value: sys, unit: 'mmHg', system: 'http://unitsofmeasure.org', code: 'mm[Hg]' }
+                  },
+                  {
+                    code: { coding: [{ system: 'http://loinc.org', code: '8462-4', display: 'Diastolic blood pressure' }] },
+                    valueQuantity: { value: dia, unit: 'mmHg', system: 'http://unitsofmeasure.org', code: 'mm[Hg]' }
+                  }
+                ]
+              }
+            });
+          }
+        }
+      }
+
+      if (sanitizedP.vitals.spO2) {
+        const spo2Val = parseFloat(String(sanitizedP.vitals.spO2));
+        if (!isNaN(spo2Val)) {
+          entries.push({
+            resource: {
+              resourceType: 'Observation',
+              id: `spo2-observation-${Date.now()}`,
+              status: 'final',
+              category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs', display: 'Vital Signs' }] }],
+              code: { coding: [{ system: 'http://loinc.org', code: '2708-6', display: 'Oxygen saturation in Arterial blood by Pulse oximetry' }] },
+              subject: { reference: patientRef },
+              effectiveDateTime: nowIso,
+              valueQuantity: { value: spo2Val, unit: '%', system: 'http://unitsofmeasure.org', code: '%' }
+            }
+          });
+        }
+      }
+    }
+
+    // --- Active Clinical Conditions ---
+    const conditionsList = Array.isArray(sanitizedP.preexistingConditions) ? sanitizedP.preexistingConditions : Array.isArray(sanitizedP.conditions) ? sanitizedP.conditions : [];
+    conditionsList.forEach((cond: string, idx: number) => {
+      if (cond && typeof cond === 'string') {
+        entries.push({
+          resource: {
+            resourceType: 'Condition',
+            id: `condition-${idx + 1}-${Date.now()}`,
+            clinicalStatus: { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-clinical', code: 'active' }] },
+            verificationStatus: { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-ver-status', code: 'confirmed' }] },
+            code: { text: cond },
+            subject: { reference: patientRef },
+            recordedDate: nowIso
+          }
+        });
+      }
+    });
+
+    // --- Genomic Observations ---
+    if (Array.isArray(sanitizedP.genomicProfile)) {
+      sanitizedP.genomicProfile.forEach((g: any, idx: number) => {
+        entries.push({
+          resource: {
+            resourceType: 'Observation',
+            id: `genomic-obs-${idx + 1}-${Date.now()}`,
+            status: 'final',
+            category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'laboratory' }] }],
+            code: { text: g.geneSymbol ? `Pharmacogenomic Variant: ${g.geneSymbol}` : 'Genomic Variant' },
+            subject: { reference: patientRef },
+            effectiveDateTime: nowIso,
+            valueString: g.variantCode || '',
+            interpretation: [{ text: g.phenotype ? `${g.phenotype} Metabolizer` : 'Observed' }]
+          }
+        });
+      });
+    }
+
+    // --- FHIR R4 Occupational History & 10D Hazard Profile Observation ---
+    const occStr = sanitizedP.occupation || (sanitizedP.patientState && sanitizedP.patientState.occupation);
+    if (occStr && this.actuarialService) {
+      const prof = this.actuarialService.getOccupationalProfile(occStr);
+      if (prof) {
+        entries.push({
+          resource: {
+            resourceType: 'Observation',
+            id: `occupation-observation-${Date.now()}`,
+            status: 'final',
+            category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'social-history', display: 'Social History' }] }],
+            code: { coding: [{ system: 'http://loinc.org', code: '11341-5', display: 'History of Occupation' }] },
+            subject: { reference: patientRef },
+            effectiveDateTime: nowIso,
+            valueCodeableConcept: {
+              coding: [{
+                system: 'http://ec.europa.eu/esco/soc',
+                code: prof.socCode,
+                display: prof.professionTitle
+              }]
+            },
+            component: [
+              {
+                code: { coding: [{ system: 'http://snomed.info/sct', code: prof.snomedCode, display: prof.snomedDisplay }] },
+                valueString: `Primary Hazard: ${prof.snomedDisplay}`
+              },
+              {
+                code: { text: 'Actuarial QALY Impact' },
+                valueQuantity: { value: prof.actuarialQalyImpact, unit: 'years', system: 'http://unitsofmeasure.org', code: 'a' }
+              },
+              {
+                code: { text: 'Ergonomic Strain Score' },
+                valueQuantity: { value: prof.ergonomicStrainScore, unit: '{score}' }
+              },
+              {
+                code: { text: 'Circadian Disruption Score' },
+                valueQuantity: { value: prof.circadianDisruptionScore, unit: '{score}' }
+              },
+              {
+                code: { text: 'Allostatic Burnout Score' },
+                valueQuantity: { value: prof.allostaticBurnoutScore, unit: '{score}' }
+              },
+              {
+                code: { text: 'Precision Occupational Nutrition' },
+                valueString: prof.precisionOccupationalNutrition.join(' | ')
+              },
+              {
+                code: { text: 'Choral Vocal Resonance Protocol' },
+                valueString: prof.vocalResonanceProtocol || 'N/A'
+              }
+            ]
+          }
+        });
+
+        // Also record an active FHIR Condition for the SNOMED CT occupational hazard
+        entries.push({
+          resource: {
+            resourceType: 'Condition',
+            id: `occupational-condition-${Date.now()}`,
+            clinicalStatus: { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-clinical', code: 'active' }] },
+            verificationStatus: { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/condition-ver-status', code: 'confirmed' }] },
+            code: {
+              coding: [{
+                system: 'http://snomed.info/sct',
+                code: prof.snomedCode,
+                display: prof.snomedDisplay
+              }],
+              text: `${prof.professionTitle} - ${prof.snomedDisplay}`
+            },
+            subject: { reference: patientRef },
+            recordedDate: nowIso
+          }
+        });
+      }
     }
 
     return {
