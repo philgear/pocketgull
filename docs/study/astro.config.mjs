@@ -11,6 +11,9 @@ export default defineConfig({
   vite: {
     // @ts-ignore
     configFile: false,
+    define: {
+      'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || '')
+    },
     server: {
       fs: {
         strict: true

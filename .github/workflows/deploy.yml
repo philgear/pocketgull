@@ -101,6 +101,7 @@ jobs:
           CI: true
           GEMINI_API_KEY: ''
           SKIP_HEALTHCARE_PROVISION: 'true'
+          ASTRO_TELEMETRY_DISABLED: '1'
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
