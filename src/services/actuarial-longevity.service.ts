@@ -1963,7 +1963,167 @@ export class ActuarialLongevityService {
         '🌳 Historic Estate Garden Grounding: Walking among mature estate shade trees'
       ],
       vocalResonanceProtocol: '🎵 Custodial Crew Work Song Glee: Upbeat group vocalization to boost work cadence and release physical maintenance fatigue'
-    }
+    },
+    '55-1011-ASTRO': {
+      socCode: '55-1011-ASTRO',
+      snomedCode: '410526002',
+      snomedDisplay: 'Microgravity cephalad fluid-shift ocular syndrome and trabecular spaceflight osteopenia (disorder)',
+      professionTitle: 'Commercial & Orbital Spaceflight Astronauts',
+      category: 'Sovereignty & Traditional Guardianship',
+      oshaRiskLevel: 'High',
+      ergonomicStrainScore: 7.2,
+      circadianDisruptionScore: 9.2,
+      chemicalExposureScore: 4.0,
+      allostaticBurnoutScore: 8.5,
+      actuarialQalyImpact: 1.8,
+      oshaMitigationDirectives: [
+        'NASA / Spaceflight Ergonomics: 2.5-hour daily ARED resistive loading & cycle ergometer with vibration isolation',
+        'Cephalad Fluid Shift & SANS Mitigation: Lower body negative pressure (LBNP) therapy during sleep',
+        'Cosmic Radiation Protection: Passive shielding monitoring & high-solitary solar particle event shelter protocol'
+      ],
+      therapeuticHobbies: [
+        '📷 Astronomical Astrophotography & Sky Observation: Cosmic observation & deep-space imaging',
+        '🌱 Zero-G Hydroponic Botany: Closed-loop plant cultivation & micro-green gardening',
+        '♟️ 3D Orbital Spatial Chess: Multidimensional mental geometry exercise'
+      ],
+      precisionOccupationalNutrition: [
+        '🦴 Vit K2 (MK-7 100mcg) + Vit D3 (4000 IU) + Calcium Citrate: Trabecular bone mineral preservation',
+        '👁️ Astaxanthin (12mg) + Lutein (20mg): Retinal & optic nerve protection against SANS & cosmic rays',
+        '🫀 Molecular Hydrogen Water + CoQ10 (200mg): Cosmic radiation ROS scavenging'
+      ],
+      tcmOccupationalDirectives: [
+        '☯️ Anchor Upward Rising Qi & Nourish Kidney Essence: Acupressure on KI-1 Yongquan & DU-20 Baihui',
+        '🍵 Tian Wang Bu Xin Dan & Lingzhi (Reishi) Decoction: Settle Shen & calm orbital hyper-alertness'
+      ],
+      ayurvedicOccupationalDirectives: [
+        '🧘 Shiroabhyanga with Warm Brahmi Oil: Relieve cranial fluid pressure & nourish nervous system',
+        '🌿 Ashwagandha & Shilajit Rasayana: Rebuild Ojas & sustain physical bone/muscle density'
+      ],
+      arboristEcologicalDirectives: [
+        '🌳 Orbital Earth Canopy Viewing (Overview Effect): Deep emotional reverence observing Earth forest biomes from orbit'
+      ],
+      vocalResonanceProtocol: '🎵 Zero-G Orbital Resonant Vocal Sweep: Low-frequency vocal sweeps (128 Hz) to relieve intracranial venous congestion caused by microgravity fluid shifts'
+    },
+    '55-1011-AQUA': {
+      socCode: '55-1011-AQUA',
+      snomedCode: '412089004',
+      snomedDisplay: 'Dysbaric osteonecrosis and saturation decompression stress syndrome (disorder)',
+      professionTitle: 'Deep-Sea Aquanauts & Commercial Saturation Divers',
+      category: 'Agriculture & Natural Resources',
+      oshaRiskLevel: 'High',
+      ergonomicStrainScore: 9.0,
+      circadianDisruptionScore: 8.0,
+      chemicalExposureScore: 6.0,
+      allostaticBurnoutScore: 8.2,
+      actuarialQalyImpact: -2.4,
+      oshaMitigationDirectives: [
+        'OSHA 1910.424 Commercial Saturation Diving PPE: Mandatory chamber decompression tables & Trimix gas auditing',
+        'High-Pressure Nervous Syndrome (HPNS) Protocol: Slow compression rates & Heliox gas density optimization',
+        'Hyperbaric Chamber Thermal Management: Active hot-water suit flushing & continuous core temp monitoring'
+      ],
+      therapeuticHobbies: [
+        '🤿 Freediving & Static Apnea Breathing: Breath-hold awareness & parasympathetic heart rate lowering',
+        '📸 Underwater Macro Photography: Marine ecosystem exploration',
+        '⛵ Coastal Sailing & Navigation: Wind-powered surface navigation'
+      ],
+      precisionOccupationalNutrition: [
+        '🫀 Alpha-Lipoic Acid (ALA 600mg) + CoQ10 (200mg): Endothelial cell protection under hyperbaric hyperoxia',
+        '🧠 Magnesium Bisglycinate (400mg): HPNS neuromuscular tremor reduction & GABA activation',
+        '🦴 Vitamin K2 (100mcg) + Collagen Peptides (10g): Prevention of dysbaric osteonecrosis'
+      ],
+      tcmOccupationalDirectives: [
+        '☯️ Warm Kidney Yang & Dispel Cold-Damp: Acupressure on CV-4 Guanyuan & BL-23 Shenshu',
+        '🍵 Cinnamon & Dried Ginger Herbal Decoction: Expel deep aquatic cold & warm blood vessels'
+      ],
+      ayurvedicOccupationalDirectives: [
+        '🧘 Post-Dive Sesame Oil Abhyanga: Expel Vata aggravation caused by pressure changes & cold Heliox',
+        '🌿 Dashamoola & Pippali Decoction: Strengthen respiratory channels & warm deep tissues'
+      ],
+      arboristEcologicalDirectives: [
+        '🌳 Marine Kelp Forest & Mangrove Sanctuary Exploration: Connection with underwater coastal forest biomes'
+      ],
+      vocalResonanceProtocol: '🎵 Heliox Acoustic Pitch Correction & Deep Vagal Glee: Diaphragmatic chest humming to restore vocal fold neuromuscular tone after prolonged compressed Heliox speech'
+    },
+    '27-2021-ALPINE': {
+      socCode: '27-2021-ALPINE',
+      snomedCode: '417893002',
+      snomedDisplay: 'High-altitude hypobaric hypoxia and pulmonary cerebral edema risk syndrome (finding)',
+      professionTitle: 'High-Altitude Alpine Mountaineers & Expedition Sherpas',
+      category: 'Athletics & Professional Sports',
+      oshaRiskLevel: 'High',
+      ergonomicStrainScore: 8.8,
+      circadianDisruptionScore: 7.2,
+      chemicalExposureScore: 2.0,
+      allostaticBurnoutScore: 7.5,
+      actuarialQalyImpact: 2.1,
+      oshaMitigationDirectives: [
+        'UIAA High Altitude Acclimatization Ascent Profile: Max 300-500m daily sleep elevation gain above 3000m',
+        'Hypobaric Hypoxia Monitoring: Continuous pulse oximetry (SpO2 target >80%) & Gamow bag availability',
+        'Glacial UV & Avalanche PPE: Category 4 glacier glasses, avalanche transceiver, probe, & airbag pack'
+      ],
+      therapeuticHobbies: [
+        '🏔️ High-Pass Trail Running & Fastpacking: Alpine cardiovascular endurance',
+        '🧘 Himalayan Meditation & Breathwork: High-altitude mental stillness',
+        '🪵 Traditional Alpine Wood Carving: Tactile indoor focus during storm days'
+      ],
+      precisionOccupationalNutrition: [
+        '🫀 Inorganic Nitrate / Beetroot Extract (500mg): Nitric oxide elevation for hypobaric tissue oxygenation',
+        '🌿 Rhodiola Rosea (300mg): Altitude hypoxia adaptation & stamina enrichment',
+        '🩸 Iron Bisglycinate (25mg) + Vit C (500mg): Sustained erythropoiesis & hemoglobin synthesis'
+      ],
+      tcmOccupationalDirectives: [
+        '☯️ Tonify Lung & Kidney Qi: Acupressure on LU-9 Taiyuan & KI-3 Taixi for altitude endurance',
+        '🍵 Cordyceps Sinensis (Dong Chong Xia Cao) Decoction: Enhance lung oxygen utilization & kidney Jing'
+      ],
+      ayurvedicOccupationalDirectives: [
+        '🧘 Shilajit & Ashwagandha Rasayana: Premier high-altitude mineral & physical endurance tonic',
+        '🌿 Warm Ghee & Cardamom Milk: Soothe high-altitude dry airway & calm Vata'
+      ],
+      arboristEcologicalDirectives: [
+        '🌳 High-Alpine Larch & Bristlecone Pine Immersion: Resilience wisdom from ancient high-elevation trees'
+      ],
+      vocalResonanceProtocol: '🎵 Hypobaric Diaphragmatic Breath Chant: Rhythmic alpine chanting (0.1 Hz) to optimize ventilation-perfusion matching and prevent HAPE'
+    },
+    '51-8011': {
+      socCode: '51-8011',
+      snomedCode: '412089004',
+      snomedDisplay: 'Ionizing radiation vigilance and hyper-attentional control overload (disorder)',
+      professionTitle: 'Nuclear Power Reactor Operators & Health Physicists',
+      category: 'Corporate & Technology',
+      oshaRiskLevel: 'Moderate',
+      ergonomicStrainScore: 4.2,
+      circadianDisruptionScore: 7.0,
+      chemicalExposureScore: 3.5,
+      allostaticBurnoutScore: 7.4,
+      actuarialQalyImpact: 1.2,
+      oshaMitigationDirectives: [
+        'OSHA / NRC 10 CFR 20 Radiation Safety PPE: TLD dosimeter badge tracking & ALARA (As Low As Reasonably Achievable) protocol',
+        'SCADA Control Console Ergonomics: Minimum 14pt typography on alarm displays & ergonomic control seating',
+        'Vigilance Rotation Shift Schedule: Mandatory 45-min console rotation & Pomodoro cognitive reset breaks'
+      ],
+      therapeuticHobbies: [
+        '🎻 Classical Violin or Cello Playing: Auditory precision & acoustic relaxation',
+        '🌱 Indoor Bonsai Cultivation: Patient, long-term meticulous plant shaping',
+        '📷 Film Photography & Darkroom Developing: Analog chemistry & visual art'
+      ],
+      precisionOccupationalNutrition: [
+        '🛡️ Potassium Iodide (130mg emergency backup) + Spirulina (3000mg): Thyroid radioprotection',
+        '🧠 N-Acetyl Cysteine (NAC 1200mg) + Reduced Glutathione (500mg): Radiation ROS DNA repair support',
+        '🌿 L-Theanine (200mg) + Magnesium Taurate (200mg): Sustained attentional focus without jitter'
+      ],
+      tcmOccupationalDirectives: [
+        '☯️ Nourish Yin & Clear Deficiency Fire: Acupressure on KI-6 Zhaohai & HT-7 Shenmen for alarm stress',
+        '🍵 Ophiopogon & Rehmannia (Mai Men Dong) Tea: Protect body fluids from dry control room air'
+      ],
+      ayurvedicOccupationalDirectives: [
+        '🧘 Brahmi & Shankhpushpi Syrup: Sustained cognitive vigilance & mental stress reduction',
+        '🌿 Rose Water Eye Drops: Soothe screen fatigue from multi-monitor SCADA displays'
+      ],
+      arboristEcologicalDirectives: [
+        '🌳 Evergreen Pine Grove Immersion: Absorbing natural phytoncides to balance synthetic control rooms'
+      ],
+      vocalResonanceProtocol: '🎵 Control Room Auditory De-escalation Humming: Low-pitch 432 Hz vocal humming during shift handovers to clear cognitive fatigue'
+    },
   };
 
   /**
@@ -2058,9 +2218,6 @@ export class ActuarialLongevityService {
     if (cleaned.includes('dancer') || cleaned.includes('ballet') || cleaned.includes('ballerina') || cleaned.includes('choreographer') || cleaned.includes('dance')) {
       return this.occupationalDatabase['27-2031'];
     }
-    if (cleaned.includes('actor') || cleaned.includes('actress') || cleaned.includes('performer') || cleaned.includes('theatre')) {
-      return this.occupationalDatabase['27-2011'];
-    }
     if (cleaned.includes('librarian') || cleaned.includes('library') || cleaned.includes('archivist')) {
       return this.occupationalDatabase['25-4022'];
     }
@@ -2070,8 +2227,20 @@ export class ActuarialLongevityService {
     if (cleaned.includes('doctor') || cleaned.includes('physician') || cleaned.includes('surgeon') || cleaned.includes('md') || cleaned.includes('do')) {
       return this.occupationalDatabase['29-1215'];
     }
-    if (cleaned.includes('astronaut') || cleaned.includes('space') || cleaned.includes('cosmonaut') || cleaned.includes('nasa')) {
-      return this.occupationalDatabase['19-2011-NASA'];
+    if (cleaned.includes('astronaut') || cleaned.includes('spaceflight') || cleaned.includes('cosmonaut') || cleaned.includes('orbital') || cleaned.includes('space')) {
+      return this.occupationalDatabase['55-1011-ASTRO'] || this.occupationalDatabase['19-2011-NASA'];
+    }
+    if (cleaned.includes('aquanaut') || cleaned.includes('saturation diver') || cleaned.includes('deep sea') || cleaned.includes('hyperbaric diver') || cleaned.includes('diver')) {
+      return this.occupationalDatabase['55-1011-AQUA'];
+    }
+    if (cleaned.includes('mountaineer') || cleaned.includes('alpine') || cleaned.includes('sherpa') || cleaned.includes('climber') || cleaned.includes('altitude')) {
+      return this.occupationalDatabase['27-2021-ALPINE'];
+    }
+    if (cleaned.includes('nuclear') || cleaned.includes('reactor') || cleaned.includes('health physicist') || cleaned.includes('atomic')) {
+      return this.occupationalDatabase['51-8011'];
+    }
+    if (/\bactor\b/.test(cleaned) || cleaned.includes('actress') || cleaned.includes('performer') || cleaned.includes('theatre')) {
+      return this.occupationalDatabase['27-2011'];
     }
     if (cleaned.includes('pilot') || cleaned.includes('aviator') || cleaned.includes('flight engineer') || cleaned.includes('airline pilot')) {
       return this.occupationalDatabase['53-2011'];

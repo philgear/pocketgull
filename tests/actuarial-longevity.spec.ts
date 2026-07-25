@@ -94,10 +94,10 @@ describe('ActuarialLongevityService', () => {
     expect(pilotProfile.precisionOccupationalNutrition.some(n => n.includes('Astaxanthin'))).toBe(true);
 
     const astronautProfile = service.getOccupationalProfile('NASA Astronaut');
-    expect(astronautProfile.socCode).toBe('19-2011-NASA');
-    expect(astronautProfile.snomedCode).toBe('713399009');
+    expect(astronautProfile.socCode).toBe('55-1011-ASTRO');
+    expect(astronautProfile.snomedCode).toBe('410526002');
     expect(astronautProfile.oshaMitigationDirectives.some(d => d.includes('ARED'))).toBe(true);
-    expect(astronautProfile.therapeuticHobbies.some(h => h.includes('Botanical'))).toBe(true);
+    expect(astronautProfile.therapeuticHobbies.some(h => h.includes('Botany'))).toBe(true);
 
     const publicSafety = service.getOccupationalProfile('Police Officer');
     expect(publicSafety.socCode).toBe('33-3051');
@@ -221,6 +221,25 @@ describe('ActuarialLongevityService', () => {
     const caretaker = service.getOccupationalProfile('Estate Caretaker');
     expect(caretaker.socCode).toBe('37-2011');
     expect(caretaker.category).toBe('Hospitality, Childcare & Service');
-    expect(caretaker.vocalResonanceProtocol).toContain('Custodial Crew Work Song');
+
+    const astro = service.getOccupationalProfile('Orbital Spaceflight Astronaut');
+    expect(astro.socCode).toBe('55-1011-ASTRO');
+    expect(astro.snomedCode).toBe('410526002');
+    expect(astro.vocalResonanceProtocol).toContain('Zero-G Orbital Resonant');
+
+    const aqua = service.getOccupationalProfile('Deep-Sea Saturation Aquanaut');
+    expect(aqua.socCode).toBe('55-1011-AQUA');
+    expect(aqua.snomedCode).toBe('412089004');
+    expect(aqua.vocalResonanceProtocol).toContain('Heliox Acoustic Pitch Correction');
+
+    const alpine = service.getOccupationalProfile('High-Altitude Alpine Sherpa');
+    expect(alpine.socCode).toBe('27-2021-ALPINE');
+    expect(alpine.snomedCode).toBe('417893002');
+    expect(alpine.vocalResonanceProtocol).toContain('Hypobaric Diaphragmatic Breath Chant');
+
+    const nuclear = service.getOccupationalProfile('Nuclear Reactor Operator');
+    expect(nuclear.socCode).toBe('51-8011');
+    expect(nuclear.snomedCode).toBe('412089004');
+    expect(nuclear.vocalResonanceProtocol).toContain('Control Room Auditory De-escalation');
   });
 });

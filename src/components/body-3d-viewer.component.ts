@@ -308,6 +308,18 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
       if (code === '37-2011') {
         return { cameraPreset: 'spinal' as const, focusLabel: '🧹 Maintenance Lumbar Disc & Knee Joint Strain', targetPartIds: ['spine_lumbar', 'r_shin', 'l_shin'], icon: '🧹' };
       }
+      if (code === '55-1011-ASTRO') {
+        return { cameraPreset: 'cranial' as const, focusLabel: '🚀 Cephalad Fluid Shift & Spaceflight SANS Ocular', targetPartIds: ['head', 'spine_cervical', 'spine_lumbar'], icon: '👨‍🚀' };
+      }
+      if (code === '55-1011-AQUA') {
+        return { cameraPreset: 'spinal' as const, focusLabel: '🤿 Hyperbaric Decompression & HPNS Neuromuscular', targetPartIds: ['spine_lumbar', 'r_shin', 'l_shin'], icon: '🤿' };
+      }
+      if (code === '27-2021-ALPINE') {
+        return { cameraPreset: 'visceral' as const, focusLabel: '🏔️ High-Altitude Hypobaric Hypoxia & Pulmonary HAPE', targetPartIds: ['lungs', 'brain', 'r_foot', 'l_foot'], icon: '🏔️' };
+      }
+      if (code === '51-8011') {
+        return { cameraPreset: 'cranial' as const, focusLabel: '⚛️ SCADA Attentional Vigilance & Thyroid Shield', targetPartIds: ['head', 'thyroid', 'spine_cervical'], icon: '⚛️' };
+      }
       if (code === '17-1011' || code === '17-2051') {
         return { cameraPreset: 'cranial' as const, focusLabel: '📐 Drafting Cervical Flexion & FEA Screen Asthenopia', targetPartIds: ['spine_cervical', 'head'], icon: '📐' };
       }
