@@ -25,7 +25,7 @@ test.describe('Good Samaritan Emergency Mode E2E Flow', () => {
     const firstAidBadge = page.locator('text=First Aid Mode');
     await expect(firstAidBadge).toBeVisible({ timeout: 15000 });
 
-    const offlineEmergencyTitle = page.locator('text=Offline Emergency First Aid Active');
+    const offlineEmergencyTitle = page.locator('text=Offline Emergency First Aid Active').first();
     await expect(offlineEmergencyTitle).toBeVisible({ timeout: 10000 });
 
     // 4. Verify CPR Metronome Activation

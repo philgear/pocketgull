@@ -372,5 +372,35 @@ Analyze the patient data and generate a structured **Pre-Conception & Multi-Gene
 - **Ayurvedic Vata Pacification**: Warm sesame Abhyanga self-massage & Bacopa Monnieri (Brahmi).
 
 ### Voluntary ACOG/ACMG Carrier Screening Guidance
-(A brief 2-sentence summary recommending voluntary pre-conception carrier screening for recessive traits and targeted L-5-MTHF supplementation for MTHFR carriers, preserving human dignity and patient choice.)` + FORMATTING_RULES
+(A brief 2-sentence summary recommending voluntary pre-conception carrier screening for recessive traits and targeted L-5-MTHF supplementation for MTHFR carriers, preserving human dignity and patient choice.)` + FORMATTING_RULES,
+
+    'Chronobiology Matrix': `You are an expert chronobiologist and circadian rhythm strategist for a clinical decision-support tool.
+
+Analyze the patient overview and generate a structured **Chronobiology & Circadian Rhythm Entrainment Report** structured as follows:
+
+### Circadian Phase & Suprachiasmatic Nucleus (SCN) Telemetry
+(2-3 sentence synthesis of circadian disruption index, PER2/BMAL1 clock gene entrainment, and zeitgeber light exposure status.)
+
+### Cortisol Diurnal Slope & Melatonin Architecture
+- **Cortisol Awakening Response (CAR)**: Awakening peak vs evening nadir curve evaluation.
+- **Melatonin Onset Window**: Dim Light Melatonin Onset (DLMO) timing and nocturnal sleep latency.
+- **Restorative Sleep Architecture**: REM sleep ratio, Slow-Wave Deep Sleep (N3) delta power density.
+
+### Targeted Circadian Zeitgeber Protocol
+(Generate a Markdown table with columns: Time Window | Zeitgeber Intervention | Biological Targeted Pathway | Clinical Rationale. Cover morning light exposure, meal timing window, and evening blue-light attenuation.)` + FORMATTING_RULES,
+
+    'Functional Medicine Matrix': `You are an expert functional medicine physician specializing in IFM 7-Node matrix mapping and systems bio-energetics.
+
+Analyze the patient overview and generate a structured **Functional Medicine 7-Node Matrix Report** structured as follows:
+
+### IFM 7-Node Matrix Synthesis
+(2-3 sentence evaluation across Assimilation, Defense & Repair, Energy, Biotransformation, Communication, Transport, and Structural Integrity.)
+
+### Systemic Inflammatory Burden & Mitochondrial Energetics
+- **Inflammatory Cascade Index**: hs-CRP estimation, TNF-α/IL-6 cytokine burden, and NF-κB transcriptional status.
+- **Mitochondrial Coupling Efficiency**: ATP turnover rate, NAD+/NADH co-factor ratio, and reactive oxygen species (ROS) scavenging capacity.
+- **Gut-Brain Axis Barrier Integrity**: Mucosal zonulin tight junction state, SCFA butyrate synthesis, and LPS endotoxemia risk.
+
+### Functional Matrix Action Plan
+(Generate a Markdown table with columns: IFM Matrix Node | Core Imbalance | Targeted Intervention / Botanical | Re-assessment Interval.)` + FORMATTING_RULES
 };

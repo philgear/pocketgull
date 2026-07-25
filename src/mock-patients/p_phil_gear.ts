@@ -41,6 +41,13 @@ export const p_phil_gear: IPatient = {
     b12: "580 pg/mL",
     zinc: "92 mcg/dL"
   },
+  customFields: [
+    { key: 'Master Paradigm Coherence', value: '94% Cross-Paradigm Coherence' },
+    { key: 'Ohsumi Autophagy Flux', value: '88% Autophagic Clearing Rate' },
+    { key: 'Turing Cellular Automata State', value: 'Rule B3/S23 Morphogenesis Stable (0 Deadlocks)' },
+    { key: 'Navier-Stokes Glymphatic Velocity', value: '1.8 mm/s Perivascular CSF Flow' },
+    { key: 'Grow Thyself Selections', value: 'Lion\'s Mane (Hericium erinaceus), Rhodiola rosea, Bacopa monnieri' }
+  ],
   oxidativeStressMarkers: [
     { id: "1", name: "Malondialdehyde (MDA)", value: "1.8 μmol/L (Normal)" },
     { id: "2", name: "hsCRP", value: "0.9 mg/L (Optimal)" }
@@ -77,14 +84,14 @@ export const p_phil_gear: IPatient = {
     {
       type: "AnalysisRun",
       date: "2026.05.20",
-      summary: "Comprehensive Clinical Analysis",
+      summary: "Comprehensive Clinical & 10-Dimensional Suite Analysis",
       report: {
         "Summary Overview":
-          "### Clinical Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Focus is on optimization of metabolic pathways, screen time hygiene, and real-time biometric telemetry tracking.\n\n### Priority List\n- **Sleep Latency & BMAL1 Rhythm**: Circadian realignment to achieve rapid sleep onset (< 20 mins).\n- **Autonomic Vagal Regulation**: 0.1 Hz resonant breathing for sympathetic dampening.\n- **Biometric Integration**: Google Health Connect and continuous telemetry monitoring.\n\n### Goals\n- **Short-term**: Reduce sleep latency to < 20 minutes.\n- **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
+          "### Clinical & 10-Dimensional Suite Assessment\nPhil presents with mild tension headaches and sleep latency complaints. Integrated cross-paradigm evaluation shows 94% Master Coherence across Allopathic, Turing Logic, Nobel Evidence Engine, AAAS Science, Lasker mRNA/PIEZO, Eastern TCM, and Ayurvedic Tridosha models.\n\n### Priority List\n- **Sleep Latency & BMAL1 Rhythm**: Circadian realignment to achieve rapid sleep onset (< 20 mins).\n- **Autonomic Vagal Regulation**: 0.1 Hz resonant breathing for sympathetic dampening.\n- **Biometric Integration**: Google Health Connect and continuous telemetry monitoring.\n\n### Goals\n- **Short-term**: Reduce sleep latency to < 20 minutes.\n- **Long-term**: Normalize daily vitals and maintain optimal circadian sync.",
         "Functional Protocols":
-          "### Diagnostic Workup & Lifestyle\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.\n- 0.1 Hz vagal resonant breathing session for 10 minutes before sleep.",
+          "### Diagnostic Workup & 10-Suite Integration\n- Implement blue-light blocking protocols after 8:00 PM.\n- Morning sunlight exposure (10-15 minutes) within 30 minutes of waking.\n- 0.1 Hz vagal resonant breathing session for 10 minutes before sleep.\n- Track Turing Formal Logic cellular automata morphogenesis and Navier-Stokes perivascular CSF clearance.",
         "Nutrition":
-          "### Nutritional Interventions\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.\n- Incorporate 7-day Chrono-Nutrition fast-break porridge and afternoon dark cacao nibs.",
+          "### Nutritional Interventions & Grow Thyself Selections\n- Emphasize magnesium-rich foods (dark leafy greens, pumpkin seeds).\n- Hydrate with electrolytes during training sessions.\n- Incorporate 7-day Chrono-Nutrition fast-break porridge and afternoon dark cacao nibs.\n- Grow Thyself Botanical Protocol: Lion's Mane (BDNF neurogenesis), Rhodiola rosea (cortisol modulation), Bacopa monnieri (synaptic plastic resilience).",
         "Monitoring & Follow-up":
           "### Immediate (24-72 hours) & Clinical Tracking\n- Monitor daily resting heart rate and sleep cycles using Fitbit/Google Health Connect.\n- Follow up in 4 weeks for HRV spectral power density review.",
         "Patient Education":
@@ -115,6 +122,14 @@ export const p_phil_gear: IPatient = {
       date: "2026.04.15",
       description: "Mild sleep latency elevation; zero central sleep apnea. AHI 4.2/hr (Mild), Sleep Efficiency 88%.",
       status: "Reviewed"
+    },
+    {
+      id: "scan_phil_2",
+      title: "Whole Body 3D Spatial LiDAR Telemetry",
+      type: "Ultrasound",
+      date: "2026.05.18",
+      description: "LiDAR spatial surface mesh and skeletal alignment telemetry confirming zero pelvic tilt or spinal subluxation.",
+      status: "Normal"
     }
   ]
 };

@@ -29,8 +29,10 @@ import { createCarePlan, createConsultationSession } from '../lib/dataconnect/es
   providedIn: 'root'
 })
 export class PatientStateService {
+  private themeService = inject(ThemeService);
+
   // --- UI State & Clinical Tool Prescription State Machine ---
-  readonly isPlainLanguageMode = signal<boolean>(false);
+  readonly isPlainLanguageMode = computed(() => this.themeService.isPlainLanguageMode());
   readonly toolStates = signal<Record<string, 'unassigned' | 'prescribed' | 'hidden'>>({});
 
   // --- Patient 3D Spatial Anatomic Profile & LiDAR Custom Mesh ---
@@ -193,7 +195,7 @@ export class PatientStateService {
   }
 
   togglePlainLanguageMode() {
-    this.isPlainLanguageMode.update(val => !val);
+    this.themeService.togglePlainLanguageMode();
   }
   readonly selectedPartId = signal<string | null>(null);
   readonly hoveredPartIdForOverlay = signal<string | null>(null);
@@ -323,7 +325,6 @@ export class PatientStateService {
 
   private storage = inject(StorageService);
   private game = inject(GamificationService);
-  private themeService = inject(ThemeService);
 
   readonly isSparkModeActive = computed(() => this.themeService.currentTheme() === 'spark');
 
@@ -1089,4 +1090,108 @@ Pain Areas:   `;
       return window.location.href;
     }
   }
+
+  // --- Chronobiology & Functional Medicine Matrix Computed Telemetry ---
+  readonly circadianDisruptionIndex = computed(() => {
+    const v = this.vitals();
+    const heartRate = parseInt(v.hr || '72', 10) || 72;
+    const sleep = 7.5;
+    // Base score calculation
+    let index = 25;
+    if (sleep < 6) index += 35;
+    else if (sleep < 7) index += 15;
+    if (heartRate > 85) index += 20;
+    if (this.selectedIssues().some(i => {
+      const txt = (i.name || i.description || '').toLowerCase();
+      return txt.includes('insomnia') || txt.includes('fatigue');
+    })) {
+      index += 20;
+    }
+    return Math.min(100, Math.max(10, index));
+  });
+
+  readonly cortisolDiurnalSlope = computed(() => {
+    const index = this.circadianDisruptionIndex();
+    const awakening = Math.round((22 - (index * 0.08)) * 10) / 10; // nmol/L
+    const afternoon = Math.round((12 - (index * 0.05)) * 10) / 10;
+    const evening = Math.round((3 + (index * 0.06)) * 10) / 10;
+    const isBlunted = (awakening - evening) < 8;
+    return {
+      awakening,
+      afternoon,
+      evening,
+      slope: isBlunted ? 'Blunted / Flattened' : 'Normal Diurnal Curve',
+      status: isBlunted ? 'Circadian Exhaustion' : 'Optimal Adrenal Rhythm'
+    };
+  });
+
+  readonly remSleepArchitectureScore = computed(() => {
+    const sleep = 7.5;
+    const remPct = Math.round(Math.min(25, Math.max(10, (sleep / 8) * 22)));
+    const deepPct = Math.round(Math.min(22, Math.max(8, (sleep / 8) * 18)));
+    const deltaPowerUv2 = Math.round(Math.min(120, Math.max(45, (sleep / 8) * 95)));
+    return {
+      remPct,
+      deepPct,
+      deltaPowerUv2,
+      qualityRating: remPct >= 20 && deepPct >= 15 ? 'Optimal Restorative Architecture' : 'Fragmented Sleep Architecture'
+    };
+  });
+
+  readonly systemicInflammatoryBurden = computed(() => {
+    const issues = this.selectedIssues();
+    let score = 20; // baseline
+    if (issues.some(i => {
+      const txt = (i.name || i.description || '').toLowerCase();
+      return txt.includes('pain') || txt.includes('joint');
+    })) score += 25;
+    if (issues.some(i => {
+      const txt = (i.name || i.description || '').toLowerCase();
+      return txt.includes('gut') || txt.includes('bloat');
+    })) score += 25;
+    if (issues.some(i => {
+      const txt = (i.name || i.description || '').toLowerCase();
+      return txt.includes('skin') || txt.includes('rash');
+    })) score += 15;
+    const hsCrpEstimate = (score * 0.04).toFixed(2);
+    return {
+      score: Math.min(100, score),
+      hsCrpEstimate: `${hsCrpEstimate} mg/L`,
+      status: score > 50 ? 'Elevated Systemic Inflammatory Cascade' : 'Low Inflammatory Baseline'
+    };
+  });
+
+  readonly mitochondrialEfficiencyScore = computed(() => {
+    const sleep = 7.5;
+    const v = this.vitals();
+    const hr = parseInt(v.hr || '72', 10) || 72;
+    const eff = Math.round(Math.min(98, Math.max(35, 100 - (hr - 60) * 0.8 - (8 - sleep) * 5)));
+    const nadRatio = (1.2 + (eff / 100) * 2.8).toFixed(2);
+    return {
+      efficiencyPct: eff,
+      nadNadhRatio: nadRatio,
+      atpTurnoverIndex: eff > 75 ? 'Optimal OxPhos Output' : 'Mitochondrial Coupling Uncoupling Risk'
+    };
+  });
+
+  readonly gutBrainAxisScore = computed(() => {
+    const issues = this.selectedIssues();
+    const hasGi = issues.some(i => {
+      const txt = (i.name || i.description || '').toLowerCase();
+      return txt.includes('gut') || txt.includes('ibs') || txt.includes('bloat');
+    });
+    const hasNeuro = issues.some(i => {
+      const txt = (i.name || i.description || '').toLowerCase();
+      return txt.includes('anxiety') || txt.includes('brain fog') || txt.includes('mood');
+    });
+    let permeabilityScore = 20;
+    if (hasGi) permeabilityScore += 35;
+    if (hasNeuro) permeabilityScore += 25;
+    return {
+      permeabilityIndex: Math.min(100, permeabilityScore),
+      zonulinStatus: permeabilityScore > 50 ? 'Hyperpermeable (Leaky Gut Risk)' : 'Intact Intestinal Barrier',
+      butyrateSynthesis: permeabilityScore > 50 ? 'Suboptimal SCFA Production' : 'Robust SCFA Bio-availability',
+      lpsEndotoxemiaRisk: permeabilityScore > 50 ? 'Moderate/High Translocation Risk' : 'Low Translocation Risk'
+    };
+  });
 }

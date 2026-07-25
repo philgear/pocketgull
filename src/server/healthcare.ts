@@ -765,8 +765,7 @@ healthcareRouter.post('/pubsub/webhook', express.json(), async (req, res) => {
       notificationPayload = { raw: decodedData };
     }
 
-    const safeLogPayload = JSON.stringify(notificationPayload).replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
-    console.log('[Healthcare Pub/Sub Webhook] Received FHIR event notification:', safeLogPayload);
+    console.log('[Healthcare Pub/Sub Webhook] Received FHIR event notification:', JSON.stringify(notificationPayload).replace(/[\r\n]/g, '_'));
 
     const sidecarUrl = process.env['POCKETGULL_API_URL'] || 'http://127.0.0.1:8000';
     try {

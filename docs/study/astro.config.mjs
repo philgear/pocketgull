@@ -9,9 +9,16 @@ export default defineConfig({
   integrations: [mdx()],
   outDir: './dist',
   vite: {
+    // @ts-ignore
+    configFile: false,
     server: {
       fs: {
         strict: true
+      }
+    },
+    build: {
+      rollupOptions: {
+        input: undefined
       }
     }
   }

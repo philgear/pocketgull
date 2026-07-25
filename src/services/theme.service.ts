@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'atomic' | 'curie' | 'lent' | 'dream-team';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +12,12 @@ export class ThemeService {
   public activeParadigm = signal<'western' | 'tcm' | 'ayurveda' | 'unified'>('unified');
   public reduceMotion = signal<boolean>(false);
   public isPlainLanguageMode = signal<boolean>(false);
-  public analogyLensMode = signal<'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse'>('clinical');
+  public analogyLensMode = signal<'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse' | 'coach'>('clinical');
   public activeSeagullPersona = signal<'calm-gull' | 'active-skimmer' | 'deep-navigator' | 'storm-rider'>('deep-navigator');
   public textSizeScale = signal<'standard' | 'large' | 'extra-large'>('standard');
   private platformId = inject(PLATFORM_ID);
 
-  public setAnalogyLensMode(mode: 'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse') {
+  public setAnalogyLensMode(mode: 'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse' | 'coach') {
     this.analogyLensMode.set(mode);
     if (mode !== 'clinical') {
       this.isPlainLanguageMode.set(true);
@@ -156,7 +156,7 @@ export class ThemeService {
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
         : false;
       this.activeTheme.set(isSystemDark ? 'dark' : 'light');
-    } else if (theme === 'spark' || theme === 'black-marble' || theme === 'papyrus' || theme === 'mandala') {
+    } else if (theme === 'spark' || theme === 'black-marble' || theme === 'papyrus' || theme === 'mandala' || theme === 'curie') {
       this.activeTheme.set('dark');
     } else if (theme === 'pool') {
       const hour = new Date().getHours();
@@ -240,6 +240,12 @@ export class ThemeService {
       if (metaThemeColor) {
         metaThemeColor.setAttribute('content', '#16112d');
       }
+    } else if (theme === 'curie') {
+      document.documentElement.classList.add('dark', 'theme-curie');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#0f1416');
+      }
     } else if (resolvedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
@@ -285,6 +291,13 @@ export class ThemeService {
 
   public setReduceMotion(reduce: boolean) {
     this.reduceMotion.set(reduce);
+  }
+
+  public cycleTextSizeScale() {
+    const curr = this.textSizeScale();
+    if (curr === 'standard') this.textSizeScale.set('large');
+    else if (curr === 'large') this.textSizeScale.set('extra-large');
+    else this.textSizeScale.set('standard');
   }
 
   public togglePlainLanguageMode() {

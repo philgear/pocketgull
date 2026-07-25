@@ -1,7 +1,7 @@
 {
-  "name": "Pocket Gull — Clinical Dashboard",
-  "short_name": "Pocket Gull",
-  "description": "Real-time AI consults, 3D visualization & comprehensive medical charting powered by Google Gemini.",
+  "name": "Pocket Gull | Real-Time Clinical AI & FHIR Care Strategy",
+  "short_name": "Pocket Gull AI",
+  "description": "Real-time medical care plan strategy and streaming AI consult engine powered by Google Gemini. Features 10D diagnostic paradigms, FHIR R4 interoperability, and 3D spatial anatomy.",
   "theme_color": "#1C1C1C",
   "background_color": "#F8F8F8",
   "display": "standalone",

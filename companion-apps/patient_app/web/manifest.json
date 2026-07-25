@@ -1,11 +1,11 @@
 {
-    "name": "patient_app",
-    "short_name": "patient_app",
+    "name": "Pocket Gull Patient Companion",
+    "short_name": "Pocket Gull Patient",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Personalized health trajectory and real-time care plan companion powered by Google Gemini.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

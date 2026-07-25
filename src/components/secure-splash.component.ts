@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef, viewChild, input, output, computed, PLATFORM_ID, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef, viewChild, input, output, computed, PLATFORM_ID, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -253,145 +253,144 @@ import { environment } from '../environments/environment';
                    (click)="handleUnlock()" 
                    [disabled]="isChecking()"
                    class="flex-1 min-h-[44px] px-4 py-3 flex justify-center items-center gap-2 text-xs uppercase font-bold tracking-widest bg-emerald-600/20 dark:bg-emerald-600/30 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-950 dark:text-emerald-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed shadow-sm">
-                   <svg *ngIf="!isChecking()" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
-                   <svg *ngIf="isChecking()" class="animate-spin w-4 h-4 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    @if (!isChecking()) {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
+                    }
+                    @if (isChecking()) {
+                      <svg class="animate-spin w-4 h-4 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    }
                    <span>Biometrics</span>
                  </button>
                </div>
 
-                <!-- Centered Protocol Suite Suite (Ordered: 1. Audio, 2. Visual, 3. Animal Comfort) -->
-                <div class="mt-4 w-full space-y-3 z-30">
-
-                  <!-- 1. 🎵 Audio Comfort Protocol Card -->
-                  <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
-                    <span class="text-xs font-bold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
-                      🎵 Audio Comfort Protocol
+                <!-- Collapsible Sensory & Accessibility Quick Settings -->
+                <details class="mt-4 w-full z-30 group">
+                  <summary class="cursor-pointer flex items-center justify-between px-4 py-2.5 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md rounded-xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition select-none">
+                    <span class="flex items-center gap-2">
+                      <span>⚙️</span>
+                      <span>Sensory &amp; Accessibility Settings</span>
                     </span>
-                    
-                    <div class="flex flex-wrap items-center justify-center gap-2 w-full">
-                      <!-- AVS Entrainment Controller -->
-                      <button type="button"
-                              (click)="toggleAvs()"
-                              class="min-h-[42px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1.5 hover:bg-white dark:hover:bg-zinc-700 transition cursor-pointer shadow-2xs">
-                        <span class="relative flex h-2 w-2">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-emerald-400' : 'bg-zinc-400'"></span>
-                          <span class="relative inline-flex rounded-full h-2 w-2" [class]="isAvsPlaying() ? 'bg-emerald-500' : 'bg-zinc-400'"></span>
-                        </span>
-                        <span>{{ isAvsPlaying() ? 'AVS Active' : 'AVS Entrainment' }}</span>
-                      </button>
-                    </div>
-                  </div>
+                    <span class="text-xs transition-transform duration-200 group-open:rotate-180 text-zinc-500">▼</span>
+                  </summary>
 
-                  <!-- 2. 👁️ Visual Comfort Protocol Card -->
-                  <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
-                    <span class="text-xs font-bold uppercase tracking-[0.15em] text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                      👁️ Visual Comfort Protocol
-                    </span>
-
-                    <div class="flex flex-wrap items-center justify-center gap-2 w-full">
-                      <!-- Visual Theme Selector -->
-                      <div class="flex items-center gap-1.5 flex-wrap">
-                        <label for="splash-theme-select-lock" class="text-xs font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-400">
-                          🎨 Theme:
-                        </label>
-                        <select id="splash-theme-select-lock"
-                                [ngModel]="theme.currentTheme()"
-                                (ngModelChange)="theme.currentTheme.set($event)"
-                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                          <option value="light">☀️ Light Parchment</option>
-                          <option value="dark">🌙 Dark Obsidian</option>
-                          <option value="system">💻 System Auto</option>
-                          <option value="papercraft">📦 Cardstock 3D</option>
-                          <option value="hemp">🌿 Raw Hemp Paper</option>
-                          <option value="rice">📜 Rice Paper (Washi)</option>
-                          <option value="construction">🎨 Construction Paper</option>
-                          <option value="white-marble">🏛️ White Carrara Marble</option>
-                          <option value="black-marble">🖤 Obsidian Black Marble</option>
-                          <option value="papyrus">📜 Egyptian Papyrus</option>
-                          <option value="pool">🌊 Ocean Reflection Pool</option>
-                          <option value="mandala">🧘 Sacred Mandala</option>
-                          <option value="spark">✨ Spark Mode</option>
-                          <option value="calm">🧘 Serene Calm</option>
-                        </select>
-
-                        <!-- Health Literacy Persona Selector -->
-                        <label for="splash-persona-select-lock" class="text-xs font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-400 ml-1">
-                          🧠 Persona:
-                        </label>
-                        <select id="splash-persona-select-lock"
-                                [ngModel]="theme.analogyLensMode()"
-                                (ngModelChange)="theme.setAnalogyLensMode($event)"
-                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
-                          <option value="clinical">🔬 Clinical Allopathic</option>
-                          <option value="arborist">🌳 Sylvan Redwood Arborist</option>
-                          <option value="mechanic">🏎️ Car Talk Garage Mechanic</option>
-                          <option value="gentleman">🎩 Victorian Gentleman</option>
-                          <option value="muse">✨ 528 Hz Artistic Muse</option>
-                        </select>
-                      </div>
-
-                      <!-- Reduced Motion Toggle -->
-                      <label for="reduce-motion-lock" class="min-h-[40px] px-3 py-1.5 rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center gap-1.5 cursor-pointer group">
-                        <input type="checkbox"
-                               id="reduce-motion-lock"
-                               name="reduce-motion-lock"
-                               aria-label="Reduce Motion"
-                               [checked]="theme.reduceMotion()"
-                               (change)="theme.setReduceMotion(!theme.reduceMotion())"
-                               class="w-4 h-4 rounded border-zinc-300 dark:border-zinc-700/50 text-[#3ebc9e] cursor-pointer">
-                        <span class="text-xs font-bold text-zinc-900 dark:text-zinc-300 uppercase tracking-wider">
-                          ⚡ Motion
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- 3. 🐾 Animal Comfort Protocol Card -->
-                  <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
-                    <span class="text-xs font-bold uppercase tracking-[0.15em] text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                      🐾 Animal Comfort Protocol
-                    </span>
-
-                    <div class="flex flex-wrap items-center justify-center gap-2 w-full">
-                      <button type="button"
-                              (click)="petAuditory.currentMode === 'canine' ? petAuditory.stop() : petAuditory.playCanineHeartbeat()"
-                              [class.bg-amber-500]="petAuditory.currentMode === 'canine'"
-                              [class.text-zinc-950]="petAuditory.currentMode === 'canine'"
-                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
-                        🐕 Canine
-                      </button>
-                      <button type="button"
-                              (click)="petAuditory.currentMode === 'feline' ? petAuditory.stop() : petAuditory.playFelinePurr()"
-                              [class.bg-amber-500]="petAuditory.currentMode === 'feline'"
-                              [class.text-zinc-950]="petAuditory.currentMode === 'feline'"
-                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
-                        🐈 Feline
-                      </button>
-                      <button type="button"
-                              (click)="petAuditory.currentMode === 'cetacean' ? petAuditory.stop() : petAuditory.playCetaceanTherapy()"
-                              [class.bg-amber-500]="petAuditory.currentMode === 'cetacean'"
-                              [class.text-zinc-950]="petAuditory.currentMode === 'cetacean'"
-                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
-                        🐋 Cetacean
-                      </button>
-                      <button type="button"
-                              (click)="petAuditory.currentMode === 'avian' ? petAuditory.stop() : petAuditory.playAvianTherapy()"
-                              [class.bg-amber-500]="petAuditory.currentMode === 'avian'"
-                              [class.text-zinc-950]="petAuditory.currentMode === 'avian'"
-                              class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
-                        🕊️ Avian
-                      </button>
-                      @if (petAuditory.isCurrentlyPlaying) {
+                  <div class="mt-3 space-y-3 pt-1">
+                    <!-- 1. 🎵 Audio Comfort Protocol Card -->
+                    <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
+                      <span class="text-xs font-bold uppercase tracking-[0.15em] text-indigo-700 dark:text-indigo-400 flex items-center gap-1.5">
+                        🎵 Audio Comfort Protocol
+                      </span>
+                      
+                      <div class="flex flex-wrap items-center justify-center gap-2 w-full">
+                        <!-- AVS Entrainment Controller -->
                         <button type="button"
-                                (click)="petAuditory.stop()"
-                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-rose-600 text-white border border-rose-500 flex items-center gap-1 transition cursor-pointer">
-                          ✕ Stop
+                                (click)="toggleAvs()"
+                                class="min-h-[42px] px-3.5 py-2 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1.5 hover:bg-white dark:hover:bg-zinc-700 transition cursor-pointer shadow-2xs">
+                          <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="isAvsPlaying() ? 'bg-emerald-400' : 'bg-zinc-400'"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2" [class]="isAvsPlaying() ? 'bg-emerald-500' : 'bg-zinc-400'"></span>
+                          </span>
+                          <span>{{ isAvsPlaying() ? 'AVS Active' : 'AVS Entrainment' }}</span>
                         </button>
-                      }
+                      </div>
+                    </div>
+
+                    <!-- 2. 👁️ Visual Comfort Protocol Card -->
+                    <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
+                      <span class="text-xs font-bold uppercase tracking-[0.15em] text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                        👁️ Visual Comfort Protocol
+                      </span>
+
+                      <div class="flex flex-wrap items-center justify-center gap-2 w-full">
+                        <!-- Visual Theme Selector -->
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <label for="splash-theme-select-lock" class="text-xs font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-400">
+                            🎨 Theme:
+                          </label>
+                          <select id="splash-theme-select-lock"
+                                  [ngModel]="theme.currentTheme()"
+                                  (ngModelChange)="theme.currentTheme.set($event)"
+                                  class="min-h-[40px] px-3 py-1.5 text-xs font-bold rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 focus:outline-none cursor-pointer">
+                            <option value="light">☀️ Light Parchment</option>
+                            <option value="dark">🌙 Dark Obsidian</option>
+                            <option value="system">💻 System Auto</option>
+                            <option value="papercraft">📦 Cardstock 3D</option>
+                            <option value="hemp">🌿 Raw Hemp Paper</option>
+                            <option value="rice">📜 Rice Paper (Washi)</option>
+                            <option value="construction">🎨 Construction Paper</option>
+                            <option value="white-marble">🏛️ White Carrara Marble</option>
+                            <option value="black-marble">🖤 Obsidian Black Marble</option>
+                            <option value="papyrus">📜 Egyptian Papyrus</option>
+                            <option value="pool">🌊 Ocean Reflection Pool</option>
+                            <option value="mandala">🧘 Sacred Mandala</option>
+                            <option value="spark">✨ Spark Mode</option>
+                            <option value="calm">🧘 Serene Calm</option>
+                            <option value="lent">✝️ Lent / Ascetic Reset</option>
+                            <option value="curie">🔬 Madame Curie (Radium Lab)</option>
+                          </select>
+                        </div>
+
+                        <!-- Reduced Motion Toggle -->
+                        <label for="reduce-motion-lock" class="min-h-[40px] px-3 py-1.5 rounded-xl bg-white/90 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 flex items-center gap-1.5 cursor-pointer group">
+                          <input type="checkbox"
+                                 id="reduce-motion-lock"
+                                 name="reduce-motion-lock"
+                                 aria-label="Reduce Motion"
+                                 [checked]="theme.reduceMotion()"
+                                 (change)="theme.setReduceMotion(!theme.reduceMotion())"
+                                 class="w-4 h-4 rounded border-zinc-300 dark:border-zinc-700/50 text-[#3ebc9e] cursor-pointer">
+                          <span class="text-xs font-bold text-zinc-900 dark:text-zinc-300 uppercase tracking-wider">
+                            ⚡ Motion
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <!-- 3. 🐾 Animal Comfort Protocol Card -->
+                    <div class="p-3 bg-white/60 dark:bg-zinc-900/50 backdrop-blur-md rounded-2xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs flex flex-col items-center justify-center text-center space-y-2">
+                      <span class="text-xs font-bold uppercase tracking-[0.15em] text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                        🐾 Animal Comfort Protocol
+                      </span>
+
+                      <div class="flex flex-wrap items-center justify-center gap-2 w-full">
+                        <button type="button"
+                                (click)="petAuditory.currentMode === 'canine' ? petAuditory.stop() : petAuditory.playCanineHeartbeat()"
+                                [class.bg-amber-500]="petAuditory.currentMode === 'canine'"
+                                [class.text-zinc-950]="petAuditory.currentMode === 'canine'"
+                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                          🐕 Canine
+                        </button>
+                        <button type="button"
+                                (click)="petAuditory.currentMode === 'feline' ? petAuditory.stop() : petAuditory.playFelinePurr()"
+                                [class.bg-amber-500]="petAuditory.currentMode === 'feline'"
+                                [class.text-zinc-950]="petAuditory.currentMode === 'feline'"
+                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                          🐈 Feline
+                        </button>
+                        <button type="button"
+                                (click)="petAuditory.currentMode === 'cetacean' ? petAuditory.stop() : petAuditory.playCetaceanTherapy()"
+                                [class.bg-amber-500]="petAuditory.currentMode === 'cetacean'"
+                                [class.text-zinc-950]="petAuditory.currentMode === 'cetacean'"
+                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                          🐋 Cetacean
+                        </button>
+                        <button type="button"
+                                (click)="petAuditory.currentMode === 'avian' ? petAuditory.stop() : petAuditory.playAvianTherapy()"
+                                [class.bg-amber-500]="petAuditory.currentMode === 'avian'"
+                                [class.text-zinc-950]="petAuditory.currentMode === 'avian'"
+                                class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-white/80 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-200 flex items-center gap-1 transition cursor-pointer hover:bg-amber-100 dark:hover:bg-zinc-700">
+                          🕊️ Avian
+                        </button>
+                        @if (petAuditory.isCurrentlyPlaying) {
+                          <button type="button"
+                                  (click)="petAuditory.stop()"
+                                  class="min-h-[40px] px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded-xl bg-rose-600 text-white border border-rose-500 flex items-center gap-1 transition cursor-pointer">
+                            ✕ Stop
+                          </button>
+                        }
+                      </div>
                     </div>
                   </div>
-
-                </div>
+                </details>
               </div>
           }
           <!-- Restricted Entry Gateway -->

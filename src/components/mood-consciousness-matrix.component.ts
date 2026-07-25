@@ -1104,7 +1104,6 @@ export class MoodConsciousnessMatrixComponent implements OnDestroy {
       this.isPlayingJukebox.set(false);
       this.oscLeft = null;
       this.oscRight = null;
-      this.audioCtx = null;
     }
   }
 }

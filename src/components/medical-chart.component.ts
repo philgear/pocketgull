@@ -12,6 +12,7 @@ import { MedicalChartSummaryComponent } from './medical-summary.component';
 import { DicomViewerComponent } from './dicom-viewer.component';
 import { BiometricHistoryChartComponent } from './biometric-history-chart.component';
 import { SentinelTriageComponent } from './sentinel-triage.component';
+import { SentinelTelemetryPlotterComponent } from './sentinel-telemetry-plotter.component';
 
 @Component({
   selector: 'app-medical-chart',
@@ -24,7 +25,9 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
     PocketGullCardComponent, 
     MedicalChartSummaryComponent, 
     DicomViewerComponent, 
-    BiometricHistoryChartComponent
+    BiometricHistoryChartComponent,
+    SentinelTriageComponent,
+    SentinelTelemetryPlotterComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -55,8 +58,8 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
 
       <!-- Accessibility & Neuro-Divergence UX Toolbar (Dieter Rams Touch Targets) -->
       <div class="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-xs font-mono text-[11px] no-print">
-        <div class="flex items-center gap-1.5 font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-400">
-          <span class="text-indigo-500">♿ Sensory & Accessibility Controls:</span>
+        <div class="flex items-center gap-1.5 font-black uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
+          <span class="text-indigo-700 dark:text-indigo-300">♿ Sensory & Accessibility Controls:</span>
         </div>
 
         <div class="flex flex-wrap items-center gap-1.5">
@@ -104,9 +107,9 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
         </div>
 
         @if(isViewerExpanded()) {
-          <div class="body-viewer-container h-[450px] xl:h-[550px] overflow-hidden bg-white dark:bg-black/20 shrink-0">
+          <div class="body-viewer-container min-h-[540px] sm:min-h-[580px] xl:min-h-[640px] overflow-hidden bg-white dark:bg-black/20 shrink-0 flex flex-col">
             @defer (on immediate) {
-              <app-body-viewer></app-body-viewer>
+              <app-body-viewer class="h-full w-full flex-1 flex flex-col"></app-body-viewer>
             } @placeholder {
               <div class="h-full w-full flex items-center justify-center text-gray-500 dark:text-zinc-400 bg-gray-50/50 dark:bg-zinc-800/50">
                 <div class="flex flex-col items-center gap-3">
@@ -118,6 +121,12 @@ import { SentinelTriageComponent } from './sentinel-triage.component';
           </div>
         }
       </pocket-gull-card>
+
+      <!-- Sentinel Outbreak & Telemetry Plotter Section -->
+      @if (isSentinel()) {
+        <app-sentinel-triage class="block w-full"></app-sentinel-triage>
+        <app-sentinel-telemetry-plotter class="block w-full"></app-sentinel-telemetry-plotter>
+      }
 
       <!-- Biometric Trends Card -->
       <pocket-gull-card 
