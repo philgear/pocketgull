@@ -40,20 +40,28 @@ export class AdkLiveService {
   public onModelTurnComplete?: () => void;
   public onInterrupted?: () => void;
 
+  private reconnectAttemptCount = 0;
+  private maxReconnectAttempts = 3;
+
   constructor() {}
 
   async connect(apiKey: string, systemInstruction: string, voiceName: string = 'Aoede') {
     if (this.isConnected()) return;
     this.connectionError.set(null);
 
-    // Enhance system instruction with vocal prosody directives for natural human speech
+    // Enhance system instruction with vocal prosody directives & Macro Fleet Sentinel Context
     const enhancedInstruction = `${systemInstruction}
 
 Vocal & Speech Delivery Style:
 - Speak in a warm, conversational, empathetic, and reassuring voice.
 - Use natural speech cadence with appropriate pauses for breathing and emphasis.
 - Dynamically adjust pitch and intonation to match clinical context.
-- Avoid robotic or rapid-fire delivery.`;
+- Avoid robotic or rapid-fire delivery.
+
+Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
+- Arboristic Canopy Sweeps: Provide real-time acoustic feedback on forest canopy photosynthetic flux and xylem hydration dynamics.
+- Mechanical Vehicle Chassis Diagnostics: Analyze powertrain harmonic resonance (480 Hz) and acoustic engine vibration.
+- Gentleman & Muse Entrainment: Synchronize clockwork escapement rhythm and 528 Hz solfeggio audio tones.`;
 
     try {
       // We use the standard WebSocket approach directly to the Gemini API since the 
@@ -167,6 +175,7 @@ Vocal & Speech Delivery Style:
               }
             }
           }));
+          this.reconnectAttemptCount = 0;
           this.ngZone.run(() => {
              this.isConnected.set(true);
              this.isListening.set(true);
@@ -182,17 +191,18 @@ Vocal & Speech Delivery Style:
   
         this.liveClient.onclose = (ev: CloseEvent) => {
           console.warn(`[AdkLiveService] WebSocket closed: Code ${ev.code}, Reason: ${ev.reason || 'None provided'}`);
-          if (ev.code !== 1000 && ev.code !== 1005) {
-              this.ngZone.run(() => this.connectionError.set(`Connection Lost: Code ${ev.code} ${ev.reason}. Reconnecting...`));
-              
-              // Defensive network interruption handling
+          if (ev.code !== 1000 && ev.code !== 1005 && this.reconnectAttemptCount < this.maxReconnectAttempts) {
+              this.reconnectAttemptCount++;
+              const backoffMs = Math.pow(3, this.reconnectAttemptCount - 1) * 1000;
+              this.ngZone.run(() => this.connectionError.set(`Connection Lost: Reconnecting attempt ${this.reconnectAttemptCount}/${this.maxReconnectAttempts} in ${backoffMs / 1000}s...`));
+
               setTimeout(() => {
-                  console.log("[AdkLiveService] Attempting to reconnect after unexpected disconnect...");
-                  this.connect(apiKey, systemInstruction).catch(err => {
-                      console.error("[AdkLiveService] Reconnection failed:", err);
+                  console.log(`[AdkLiveService] Attempting reconnect #${this.reconnectAttemptCount} after ${backoffMs}ms...`);
+                  this.connect(apiKey, systemInstruction, voiceName).catch(err => {
+                      console.error(`[AdkLiveService] Reconnect attempt #${this.reconnectAttemptCount} failed:`, err);
                       this.ngZone.run(() => this.connectionError.set(`Reconnection Failed: ${err.message}`));
                   });
-              }, 2500);
+              }, backoffMs);
           }
           this.handleDisconnect();
           if (ev.code !== 1000 && ev.code !== 1005) {
@@ -295,6 +305,10 @@ Vocal & Speech Delivery Style:
   }
   
   private async enqueueAudio(buffer: ArrayBuffer) {
+    // Cap jitter buffer depth to max 15 chunks (~500ms audio buffer) to prevent backpressure audio stutter
+    if (this.audioQueue.length > 15) {
+      this.audioQueue.splice(0, this.audioQueue.length - 10);
+    }
     this.audioQueue.push(buffer);
     if (!this.isPlaying) {
       this.playNextAudio();

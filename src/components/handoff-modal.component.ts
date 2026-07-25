@@ -124,32 +124,69 @@ export const SPECIALTY_PROFILES: ISpecialtyProfile[] = [
 
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 @for (spec of specialtyProfiles; track spec.id) {
+                  @let isFlipped = isSpecialtyFlipped(spec.id);
+
                   <div (click)="selectSpecialty(spec)"
-                       [class]="selectedSpecialty().id === spec.id ? spec.accentClass + ' ring-2 ring-indigo-500' : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-slate-700 dark:text-zinc-300 hover:border-slate-300 dark:hover:border-zinc-700'"
-                       class="p-3.5 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-2">
+                       (dblclick)="toggleSpecialtyFlip(spec.id); $event.stopPropagation()"
+                       class="relative perspective-1000 group cursor-pointer h-44">
                     
-                    <div class="flex items-center justify-between">
-                      <span class="text-xl">{{ spec.icon }}</span>
-                      <span class="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
-                        {{ spec.targetLens }}
-                      </span>
-                    </div>
+                    <div [class.rotate-y-180]="isFlipped"
+                         class="relative w-full h-full transition-transform duration-500 transform-style-3d">
 
-                    <div>
-                      <h3 class="text-xs font-bold text-slate-900 dark:text-zinc-100 line-clamp-1">
-                        {{ spec.title }}
-                      </h3>
-                      <p class="text-[10px] text-slate-500 dark:text-zinc-400 font-mono">
-                        {{ spec.doctorType }}
-                      </p>
-                    </div>
+                      <!-- FRONT FACE: Clinical Doctor Profile & Focus Tags -->
+                      <div [class]="selectedSpecialty().id === spec.id ? spec.accentClass + ' ring-2 ring-indigo-500' : 'border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-slate-700 dark:text-zinc-300 hover:border-slate-300 dark:hover:border-zinc-700'"
+                           class="p-3.5 rounded-xl border flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden shadow-sm">
+                        
+                        <div class="flex items-center justify-between">
+                          <span class="text-xl">{{ spec.icon }}</span>
+                          <div class="flex items-center gap-1">
+                            <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                              dblclick 🔄
+                            </span>
+                            <span class="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded-md bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400">
+                              {{ spec.targetLens }}
+                            </span>
+                          </div>
+                        </div>
 
-                    <div class="flex flex-wrap gap-1 pt-1">
-                      @for (tag of spec.focusTags.slice(0, 2); track tag) {
-                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-zinc-800/60 text-slate-700 dark:text-zinc-300 font-medium">
-                          {{ tag }}
-                        </span>
-                      }
+                        <div>
+                          <h3 class="text-xs font-bold text-slate-900 dark:text-zinc-100 line-clamp-1">
+                            {{ spec.title }}
+                          </h3>
+                          <p class="text-[10px] text-slate-500 dark:text-zinc-400 font-mono">
+                            {{ spec.doctorType }}
+                          </p>
+                        </div>
+
+                        <div class="flex flex-wrap gap-1 pt-1">
+                          @for (tag of spec.focusTags.slice(0, 2); track tag) {
+                            <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-zinc-800/60 text-slate-700 dark:text-zinc-300 font-medium">
+                              {{ tag }}
+                            </span>
+                          }
+                        </div>
+                      </div>
+
+                      <!-- BACK FACE: Plain-Language Patient Referral Rationale -->
+                      <div class="p-3.5 rounded-xl border border-indigo-500/40 bg-indigo-950 text-white flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden shadow-xl font-sans text-xs">
+                        <div>
+                          <div class="flex items-center justify-between border-b border-indigo-800 pb-1.5 mb-1.5 font-mono text-[10px]">
+                            <span class="text-indigo-300 font-bold uppercase flex items-center gap-1">
+                              <span>💡</span> Patient Literacy Rationale
+                            </span>
+                            <span class="text-indigo-400">dblclick flip</span>
+                          </div>
+                          <p class="text-[11px] text-indigo-100 leading-snug line-clamp-3">
+                            {{ spec.description }}
+                          </p>
+                        </div>
+
+                        <div class="pt-1.5 border-t border-indigo-900 text-[9px] font-mono text-indigo-300 flex justify-between">
+                          <span>Patient Referral Guide</span>
+                          <span>Double-click to return</span>
+                        </div>
+                      </div>
+
                     </div>
                   </div>
                 }
@@ -246,6 +283,19 @@ export class HandoffModalComponent {
   
   specialtyProfiles = SPECIALTY_PROFILES;
   selectedSpecialty = signal<ISpecialtyProfile>(SPECIALTY_PROFILES[0]);
+
+  readonly flippedSpecialties = signal<Set<string>>(new Set());
+
+  toggleSpecialtyFlip(id: string) {
+    const current = new Set(this.flippedSpecialties());
+    if (current.has(id)) current.delete(id);
+    else current.add(id);
+    this.flippedSpecialties.set(current);
+  }
+
+  isSpecialtyFlipped(id: string): boolean {
+    return this.flippedSpecialties().has(id);
+  }
 
   copied = signal<boolean>(false);
   sbarCopied = signal<boolean>(false);

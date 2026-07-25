@@ -7,5 +7,9 @@ export default defineConfig({
   root: import.meta.dirname,
   base: '/docs/study/',
   integrations: [mdx()],
-  outDir: './dist'
+  outDir: './dist',
+  vite: {
+    // @ts-ignore
+    configFile: false
+  }
 });

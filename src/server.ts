@@ -1306,9 +1306,13 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
     setInterval(() => {}, 1000 * 60 * 60 * 24);
 
     // Attach Socket.IO for the Colleague Collaboration Room
+    const allowedOrigins = process.env['NODE_ENV'] === 'production'
+      ? ['https://pocketgull.app', 'https://www.pocketgull.app', 'https://pocketgull.health']
+      : ['http://localhost:4200', 'http://localhost:4000', 'http://127.0.0.1:4200'];
+
     const io = new SocketIOServer(_serverInstance, {
       cors: {
-        origin: "*", // Lock this down to pocketgull.app in a real production scenario
+        origin: allowedOrigins,
         methods: ["GET", "POST"]
       }
     });

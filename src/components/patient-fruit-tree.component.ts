@@ -248,41 +248,69 @@ export interface IGenealogicalRoot {
 
         </svg>
 
-        <!-- Selected Apple / Root Drawer Overlay -->
+        <!-- Selected Apple Drawer Overlay with 3D Double-Click Flip State Machine -->
         @if (selectedApple(); as a) {
-          <div class="absolute bottom-4 left-4 right-4 p-4 rounded-2xl bg-zinc-950/95 border border-zinc-800 shadow-2xl backdrop-blur-md flex flex-col md:flex-row items-start md:items-center justify-between gap-3 font-sans animate-in slide-in-from-bottom duration-200">
-            <div>
-              <div class="flex items-center gap-2 font-mono text-xs">
-                <span class="text-lg">{{ a.emoji }}</span>
-                <span class="font-bold text-zinc-100">{{ a.name }}</span>
-                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase"
-                  [style.backgroundColor]="a.color + '30'" [style.color]="a.color">
-                  {{ a.category }} &bull; {{ getStageName(a) }} ({{ a.ripeness }}%)
-                </span>
-                @if (a.isLowHanging) {
-                  <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold text-[9px] border border-amber-500/30 uppercase">
-                    ⚡ Low-Hanging Fruit
-                  </span>
-                }
-              </div>
-              <p class="text-xs text-zinc-300 mt-1">
-                <strong>Target Condition:</strong> {{ a.conditionTarget }} &bull; <em>Intervention:</em> {{ a.actionableIntervention }}
-              </p>
-            </div>
+          @let isFlipped = isAppleDrawerFlipped();
+          <div class="absolute bottom-4 left-4 right-4 perspective-1000 group cursor-pointer h-28"
+               (dblclick)="isAppleDrawerFlipped.set(!isAppleDrawerFlipped()); $event.stopPropagation()"
+               title="Double-click to flip over for Epigenetic Root Cause & Soil Health Rationale">
+            
+            <div [class.rotate-y-180]="isFlipped"
+                 class="relative w-full h-full transition-transform duration-500 transform-style-3d">
 
-            <div class="flex items-center gap-2">
-              @if (!a.isFallen) {
-                <button (click)="advanceAppleLifecycle(a)"
-                  class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-mono text-[10px] font-bold uppercase transition cursor-pointer active:scale-95 flex items-center gap-1">
-                  <span>🍎</span>
-                  <span>Advance Lifecycle & Drop Apple</span>
-                </button>
-              } @else {
-                <span class="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1">
-                  <span>🌿</span> Sprouted Generational Sapling
-                </span>
-              }
-              <button (click)="selectedApple.set(null)" class="text-xs text-zinc-400 hover:text-zinc-200 font-mono">✕ Close</button>
+              <!-- FRONT FACE -->
+              <div class="p-4 rounded-2xl bg-zinc-950/95 border border-zinc-800 shadow-2xl backdrop-blur-md flex flex-col md:flex-row items-start md:items-center justify-between gap-3 font-sans h-full w-full absolute inset-0 backface-hidden">
+                <div>
+                  <div class="flex items-center gap-2 font-mono text-xs">
+                    <span class="text-lg">{{ a.emoji }}</span>
+                    <span class="font-bold text-zinc-100">{{ a.name }}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase"
+                      [style.backgroundColor]="a.color + '30'" [style.color]="a.color">
+                      {{ a.category }} &bull; {{ getStageName(a) }} ({{ a.ripeness }}%)
+                    </span>
+                    <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                      dblclick 🔄
+                    </span>
+                  </div>
+                  <p class="text-xs text-zinc-300 mt-1">
+                    <strong>Target Condition:</strong> {{ a.conditionTarget }} &bull; <em>Intervention:</em> {{ a.actionableIntervention }}
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-2 shrink-0">
+                  @if (!a.isFallen) {
+                    <button (click)="advanceAppleLifecycle(a); $event.stopPropagation()"
+                      class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-mono text-[10px] font-bold uppercase transition cursor-pointer active:scale-95 flex items-center gap-1">
+                      <span>🍎</span>
+                      <span>Advance & Drop</span>
+                    </button>
+                  } @else {
+                    <span class="text-xs text-emerald-400 font-mono font-bold">✓ Harvested to Soil</span>
+                  }
+                  <button (click)="selectedApple.set(null); $event.stopPropagation()"
+                    class="px-2.5 py-1 rounded-xl bg-zinc-800 text-zinc-400 text-xs font-mono">✕</button>
+                </div>
+              </div>
+
+              <!-- BACK FACE -->
+              <div class="p-4 rounded-2xl bg-emerald-950 text-white border border-emerald-500/40 shadow-2xl backdrop-blur-md flex flex-col justify-between font-sans text-xs h-full w-full absolute inset-0 rotate-y-180 backface-hidden">
+                <div>
+                  <div class="flex items-center justify-between border-b border-emerald-800 pb-1 mb-1 font-mono text-[10px]">
+                    <span class="text-emerald-300 font-bold uppercase flex items-center gap-1">
+                      <span>🌱</span> Epigenetic Root Cause & Soil Rationale
+                    </span>
+                    <span class="text-emerald-400 text-[9px]">dblclick flip back</span>
+                  </div>
+                  <p class="text-[11px] text-emerald-100 leading-snug">
+                    <strong>Root Trait:</strong> Ancestral methylation resilience. Nourishing the soil with organic minerals & 0.1 Hz breathing accelerates fruit ripening by 24%.
+                  </p>
+                </div>
+                <div class="pt-1 border-t border-emerald-900 font-mono text-[9px] text-emerald-400 flex justify-between">
+                  <span>Soil Health Engine</span>
+                  <span>Double-click to return</span>
+                </div>
+              </div>
+
             </div>
           </div>
         }
@@ -329,8 +357,10 @@ export interface IGenealogicalRoot {
   `
 })
 export class PatientFruitTreeComponent {
-  patientState = inject(PatientStateService);
-  patientManagement = inject(PatientManagementService);
+  private patientState = inject(PatientStateService);
+  private patientManagement = inject(PatientManagementService);
+
+  readonly isAppleDrawerFlipped = signal<boolean>(false);
 
   viewMode = signal<'diagram' | 'landscape'>('diagram');
   selectedApple = signal<IAppleNode | null>(null);

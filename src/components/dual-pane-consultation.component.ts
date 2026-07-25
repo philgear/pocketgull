@@ -28,38 +28,6 @@ import { CompassionateAnalogyService } from '../services/compassionate-analogy.s
             Left: Deep clinical rationale, ICD-10 codes & evidence trials. Right: Real-time compassionate persona translation.
           </p>
         </div>
-
-        <!-- Persona Selector Pill Group -->
-        <div class="flex items-center gap-1 bg-zinc-900 p-1.5 rounded-2xl border border-zinc-800 text-xs font-mono">
-          <button (click)="themeService.setAnalogyLensMode('arborist')"
-            [class.bg-emerald-600]="themeService.analogyLensMode() === 'arborist'"
-            [class.text-white]="themeService.analogyLensMode() === 'arborist'"
-            [class.text-zinc-400]="themeService.analogyLensMode() !== 'arborist'"
-            class="px-3 py-1.5 rounded-xl transition cursor-pointer border-0 font-bold flex items-center gap-1">
-            🌳 Arborist
-          </button>
-          <button (click)="themeService.setAnalogyLensMode('mechanic')"
-            [class.bg-cyan-600]="themeService.analogyLensMode() === 'mechanic'"
-            [class.text-white]="themeService.analogyLensMode() === 'mechanic'"
-            [class.text-zinc-400]="themeService.analogyLensMode() !== 'mechanic'"
-            class="px-3 py-1.5 rounded-xl transition cursor-pointer border-0 font-bold flex items-center gap-1">
-            🏎️ Mechanic
-          </button>
-          <button (click)="themeService.setAnalogyLensMode('gentleman')"
-            [class.bg-amber-600]="themeService.analogyLensMode() === 'gentleman'"
-            [class.text-white]="themeService.analogyLensMode() === 'gentleman'"
-            [class.text-zinc-400]="themeService.analogyLensMode() !== 'gentleman'"
-            class="px-3 py-1.5 rounded-xl transition cursor-pointer border-0 font-bold flex items-center gap-1">
-            🎩 Gentleman
-          </button>
-          <button (click)="themeService.setAnalogyLensMode('muse')"
-            [class.bg-purple-600]="themeService.analogyLensMode() === 'muse'"
-            [class.text-white]="themeService.analogyLensMode() === 'muse'"
-            [class.text-zinc-400]="themeService.analogyLensMode() !== 'muse'"
-            class="px-3 py-1.5 rounded-xl transition cursor-pointer border-0 font-bold flex items-center gap-1">
-            ✨ Muse
-          </button>
-        </div>
       </div>
 
       <!-- Dual Split Panes -->

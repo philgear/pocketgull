@@ -43,6 +43,8 @@ const APPROVED_EGRESS_DOMAINS = [
   'orcid.org',
   'pub.orcid.org',
   'doi.org',
+  'zenodo.org',
+  'developers.zenodo.org',
   'fitbit.com',
   'api.fitbit.com',
   'stripe.com',

@@ -27,38 +27,6 @@ import { CompassionateAnalogyService } from '../services/compassionate-analogy.s
             Chronological health trajectory translated through your chosen health literacy persona.
           </p>
         </div>
-
-        <div class="flex items-center gap-1 bg-zinc-900 p-1.5 rounded-2xl border border-zinc-800 text-xs font-mono">
-          <span class="px-2 text-zinc-500 font-bold">PERSONA:</span>
-          <button (click)="themeService.setAnalogyLensMode('arborist')"
-            [class.bg-emerald-600]="themeService.analogyLensMode() === 'arborist'"
-            [class.text-white]="themeService.analogyLensMode() === 'arborist'"
-            [class.text-zinc-500]="themeService.analogyLensMode() !== 'arborist'"
-            class="px-2.5 py-1 rounded-xl transition cursor-pointer border-0 font-bold">
-            🌳 Arborist
-          </button>
-          <button (click)="themeService.setAnalogyLensMode('mechanic')"
-            [class.bg-cyan-600]="themeService.analogyLensMode() === 'mechanic'"
-            [class.text-white]="themeService.analogyLensMode() === 'mechanic'"
-            [class.text-zinc-500]="themeService.analogyLensMode() !== 'mechanic'"
-            class="px-2.5 py-1 rounded-xl transition cursor-pointer border-0 font-bold">
-            🏎️ Mechanic
-          </button>
-          <button (click)="themeService.setAnalogyLensMode('gentleman')"
-            [class.bg-amber-600]="themeService.analogyLensMode() === 'gentleman'"
-            [class.text-white]="themeService.analogyLensMode() === 'gentleman'"
-            [class.text-zinc-500]="themeService.analogyLensMode() !== 'gentleman'"
-            class="px-2.5 py-1 rounded-xl transition cursor-pointer border-0 font-bold">
-            🎩 Gentleman
-          </button>
-          <button (click)="themeService.setAnalogyLensMode('muse')"
-            [class.bg-purple-600]="themeService.analogyLensMode() === 'muse'"
-            [class.text-white]="themeService.analogyLensMode() === 'muse'"
-            [class.text-zinc-500]="themeService.analogyLensMode() !== 'muse'"
-            class="px-2.5 py-1 rounded-xl transition cursor-pointer border-0 font-bold">
-            ✨ Muse
-          </button>
-        </div>
       </div>
 
       <!-- Chronological Timeline Cards -->

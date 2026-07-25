@@ -1,11 +1,11 @@
 {
-    "name": "provider_app",
-    "short_name": "provider_app",
+    "name": "Pocket Gull Provider Companion",
+    "short_name": "Pocket Gull Provider",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Real-time clinician intelligence and streaming AI consult engine powered by Google Gemini.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
