@@ -32,5 +32,9 @@ export default defineConfig({
     url: 'http://localhost:4000',
     reuseExistingServer: !process.env['CI'],
     timeout: 120 * 1000,
+    env: {
+      PORT: '4000',
+      NODE_ENV: 'production',
+    },
   },
 });

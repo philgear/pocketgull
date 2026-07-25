@@ -1165,7 +1165,7 @@ async function initializeAgones() {
 
 let _serverInstance: any = null;
 
-if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT'] || !process.env['NODE_ENV'] || process.env['NODE_ENV'] === 'development') {
+if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT'] || process.env['CI'] || !process.env['NODE_ENV'] || process.env['NODE_ENV'] === 'development') {
   const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4000;
   if (!_serverInstance) {
     _serverInstance = app.listen(port, '0.0.0.0', () => {
