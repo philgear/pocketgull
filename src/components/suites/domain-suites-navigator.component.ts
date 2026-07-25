@@ -12,6 +12,7 @@ import { EasternTcmSuiteComponent } from '../eastern/eastern-tcm-suite.component
 import { AyurvedicSystemsSuiteComponent } from '../ayurvedic/ayurvedic-systems-suite.component';
 import { UnifiedParadigmSynthesizerComponent } from './master-paradigm-synthesizer.component';
 import { OccupationalHazardCardComponent } from '../occupational-hazard-card.component';
+import { FoodSafetyGuardrailCardComponent } from '../food-safety-guardrail-card.component';
 import { PatientStateService } from '../../services/patient-state.service';
 import { CircadianSleepinessService } from '../../services/circadian-sleepiness.service';
 import { ThemeService } from '../../services/theme.service';
@@ -42,12 +43,29 @@ export interface IDomainSuite {
     EasternTcmSuiteComponent,
     AyurvedicSystemsSuiteComponent,
     UnifiedParadigmSynthesizerComponent,
-    OccupationalHazardCardComponent
+    OccupationalHazardCardComponent,
+    FoodSafetyGuardrailCardComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full mb-10 space-y-6 font-sans">
       
+      <!-- Clinician KSS Alert Banner if Fatigue Detected -->
+      <div *ngIf="clinicianKss() >= 7" 
+           class="p-4 rounded-xl border bg-amber-500/10 border-amber-500/30 text-amber-300 flex items-center justify-between shadow-lg backdrop-blur-md">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">⚠️</span>
+          <div>
+            <h4 class="text-sm font-semibold uppercase tracking-wider">Clinician Fatigue Protocol Active (KSS Level {{ clinicianKss() }})</h4>
+            <p class="text-xs opacity-90">Karolinska Sleepiness Scale indicates elevated cognitive fatigue. Multi-lens AI cross-validation is engaged for diagnostic safety.</p>
+          </div>
+        </div>
+        <div class="text-right border-l border-amber-500/20 pl-4">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-amber-400/80 block">Safety Guard</span>
+          <strong class="text-amber-400 text-sm font-bold">Score {{ clinicianKss() }}</strong>
+        </div>
+      </div>
+
       <!-- Top Ground Truth Telemetry Instrument Panel (Dieter Rams Braun Aesthetic) -->
       <div class="p-4 sm:p-5 rounded-lg bg-zinc-900 text-white border border-zinc-800 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono">
         <div class="flex items-center gap-3">
@@ -87,6 +105,9 @@ export interface IDomainSuite {
 
       <!-- Occupational Healthspan & 10D Hazard Profile Card -->
       <app-occupational-hazard-card />
+
+      <!-- Food-Drug & Patient State Safety Matrix Card -->
+      <app-food-safety-guardrail-card />
 
       <!-- Domain Suite Tab Navigation Bar (Dieter Rams Rectangular Precision) -->
       <div 
