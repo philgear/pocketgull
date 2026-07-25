@@ -162,7 +162,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^21.2.17",
     "@astrojs/mdx": "^7.0.3",
     "@aws-sdk/client-bedrock-runtime": "^3.1090.0",
     "@aws-sdk/client-healthlake": "^3.1090.0",
@@ -180,7 +179,6 @@
     "@google/genai": "^2.12.0",
     "@playwright/test": "^1.60.0",
     "@types/compression": "^1.8.1",
-    "@types/dompurify": "^3.2.0",
     "@types/express": "^5.0.1",
     "@types/jasmine": "^6.0.0",
     "@types/jsdom": "^28.0.3",
@@ -292,7 +290,7 @@
         "@esbuild/win32-x64": "0.28.1"
       }
     },
-    "@angular-devkit/build-angular": {
+    "@angular/build": {
       "esbuild": {
         ".": "0.28.1",
         "@esbuild/aix-ppc64": "0.28.1",
