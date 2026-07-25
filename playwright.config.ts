@@ -17,7 +17,7 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: process.env['BASE_URL'] || 'http://localhost:4000',
-    trace: 'on-first-retry',
+    trace: 'off',
     bypassCSP: true,
     permissions: ['microphone'],
   },

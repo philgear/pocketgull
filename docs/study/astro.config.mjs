@@ -19,6 +19,13 @@ export default defineConfig({
       fs: {
         strict: true
       }
+    },
+    build: {
+      rollupOptions: {
+        input: {
+          index: 'src/pages/index.astro'
+        }
+      }
     }
   }
 });
