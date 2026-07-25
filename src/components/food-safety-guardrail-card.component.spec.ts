@@ -43,4 +43,21 @@ describe('FoodSafetyGuardrailCardComponent', () => {
     expect(rules.some(r => r.id === 'hypertension-food')).toBe(true);
     expect(rules.some(r => r.id === 'polymath-hyper-ideation')).toBe(true);
   });
+
+  it('should generate shift worker, executive, outdoor laborer, and athlete safety rules based on profession', () => {
+    const nurseCard = createCard({ bp: '120/80', hr: '72' }, [], 'Registered Nurse (Shift Work)');
+    expect(nurseCard.activeRules().some(r => r.id === 'shift-worker-circadian')).toBe(true);
+
+    const execCard = createCard({ bp: '120/80', hr: '72' }, [], 'Executive CEO & Trader');
+    expect(execCard.activeRules().some(r => r.id === 'executive-caffeine-ceiling')).toBe(true);
+
+    const gardenerCard = createCard({ bp: '120/80', hr: '72' }, [], 'Master Gardener & Landscaper');
+    expect(gardenerCard.activeRules().some(r => r.id === 'outdoor-uv-heat-strain')).toBe(true);
+
+    const devCard = createCard({ bp: '120/80', hr: '72' }, [], 'Software Engineer & Developer');
+    expect(devCard.activeRules().some(r => r.id === 'sedentary-desk-eyestrain')).toBe(true);
+
+    const runnerCard = createCard({ bp: '120/80', hr: '72' }, [], 'Marathon Runner');
+    expect(runnerCard.activeRules().some(r => r.id === 'athlete-tendon-collagen')).toBe(true);
+  });
 });

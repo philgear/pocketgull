@@ -138,6 +138,7 @@ export class FoodSafetyGuardrailCardComponent {
     const meds = (this.patientState.medications() || []).map(m => m.name.toLowerCase());
     const hrVal = parseFloat(vitals?.hr || '72');
     const sysBp = parseFloat((vitals?.bp || '120/80').split('/')[0] || '120');
+    const occ = (this.patientState.occupation() || '').toLowerCase();
 
     // 1. Anticoagulant Rule
     const isAnticoag = meds.some(m => m.includes('eliquis') || m.includes('warfarin') || m.includes('coumadin') || m.includes('aspirin') || m.includes('xarelto'));
@@ -183,8 +184,77 @@ export class FoodSafetyGuardrailCardComponent {
       });
     }
 
-    // 4. Default High-Vigor / Polymath Chrono Rule
-    const occ = this.patientState.occupation().toLowerCase();
+    // 4. Shift Worker / Night Rotation Rule
+    if (occ.includes('nurse') || occ.includes('hospital') || occ.includes('truck') || occ.includes('first responder') || occ.includes('ems') || occ.includes('shift')) {
+      rules.push({
+        id: 'shift-worker-circadian',
+        category: 'metabolic',
+        severity: 'warning',
+        patientStateTrigger: 'Shift Work & Circadian Rhythm Disruption (29-1141 / 53-3032)',
+        foodToAvoid: 'Heavy high-fat/high-carb meals within 2 hours of post-shift morning sleep',
+        clinicalRationale: 'Impaired nocturnal insulin sensitivity leads to post-prandial metabolic endotoxemia.',
+        recommendedAlternatives: '100% blue-blocker commute glasses, low-dose Melatonin (0.5mg), Tart Cherry juice.',
+        icon: '🦉'
+      });
+    }
+
+    // 5. High-Stress Executive & Finance Rule
+    if (occ.includes('ceo') || occ.includes('executive') || occ.includes('trader') || occ.includes('finance') || occ.includes('lawyer')) {
+      rules.push({
+        id: 'executive-caffeine-ceiling',
+        category: 'cardiovascular',
+        severity: 'warning',
+        patientStateTrigger: 'High-Allostatic Executive Stress & Adrenal Strain',
+        foodToAvoid: 'Caffeine >200mg/day, afternoon coffee past 14:00, stimulant energy drink stacking',
+        clinicalRationale: 'Exacerbates HPA-axis burnout, autonomic jitter, and slow-wave sleep fragmentation.',
+        recommendedAlternatives: 'Ashwagandha KSM-66 (600mg) + Rhodiola Rosea (300mg) + Magnesium Bisglycinate.',
+        icon: '📈'
+      });
+    }
+
+    // 6. Outdoor Laborer & UV Heat Strain Rule
+    if (occ.includes('gardener') || occ.includes('landscaper') || occ.includes('construction') || occ.includes('farmer') || occ.includes('field')) {
+      rules.push({
+        id: 'outdoor-uv-heat-strain',
+        category: 'hepatic',
+        severity: 'info',
+        patientStateTrigger: 'Outdoor Solar UV Exposure & Heat Strain (37-3011 / 47-2061)',
+        foodToAvoid: 'Chemical Oxybenzone sunscreens, un-electrolyted plain water during extreme sweating',
+        clinicalRationale: 'Chemical sunscreens elevate systemic endocrine disruptors; pure water risks hyponatremia.',
+        recommendedAlternatives: 'Non-nano Zinc Oxide mineral sunscreen, Astaxanthin (12mg), 1.5L/hr electrolyte fluid.',
+        icon: '☀️'
+      });
+    }
+
+    // 7. Sedentary Desk Worker Rule
+    if (occ.includes('developer') || occ.includes('engineer') || occ.includes('designer') || occ.includes('analyst') || occ.includes('writer')) {
+      rules.push({
+        id: 'sedentary-desk-eyestrain',
+        category: 'metabolic',
+        severity: 'info',
+        patientStateTrigger: 'Sedentary Screen Work & Computer Vision Strain (15-1252)',
+        foodToAvoid: 'Unbroken static sitting >50 minutes, high-refined sugar desk snacking',
+        clinicalRationale: 'Suppresses lipoprotein lipase causing gluteal amnesia and ocular macular oxidation.',
+        recommendedAlternatives: 'Lutein (20mg) + Zeaxanthin (4mg) for eye macular protection, 2-min hourly breaks.',
+        icon: '💻'
+      });
+    }
+
+    // 8. Ultra-Endurance Athlete Rule
+    if (occ.includes('runner') || occ.includes('cyclist') || occ.includes('swimmer') || occ.includes('athlete')) {
+      rules.push({
+        id: 'athlete-tendon-collagen',
+        category: 'metabolic',
+        severity: 'info',
+        patientStateTrigger: 'Ultra-Endurance Tendon & Joint Load (27-2021)',
+        foodToAvoid: 'Training in depleted RED-S energy state (<45 kcal/kg FFM/day)',
+        clinicalRationale: 'Triggers bone stress fractures, athletic amenorrhea, and tendon micro-tears.',
+        recommendedAlternatives: 'Hydrolyzed Collagen Peptides (10-15g) + Vit C (1000mg) 45 mins pre-workout.',
+        icon: '🏃'
+      });
+    }
+
+    // 9. Polymath / High Cognitive Context Switching Rule
     if (occ.includes('polymath') || occ.includes('scholar') || occ.includes('astronaut')) {
       rules.push({
         id: 'polymath-hyper-ideation',
