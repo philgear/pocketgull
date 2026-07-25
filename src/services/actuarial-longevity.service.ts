@@ -2292,6 +2292,71 @@ export class ActuarialLongevityService {
   }
 
   /**
+   * Resolves personalized occupational profile with dynamic nutrition dosage adjustments
+   * based on patient vitals, medications, SDOH score, and active symptoms.
+   */
+  public getPersonalizedOccupationalProfile(
+    occupationOrSocCode?: string,
+    vitals?: { hr?: string; spO2?: string; bp?: string },
+    medications: string[] = [],
+    sdohScore: number = 75
+  ): IOccupationalHazardProfile {
+    const baseProfile = this.getOccupationalProfile(occupationOrSocCode);
+    const hrVal = parseFloat(vitals?.hr || '72');
+    const spO2Val = parseFloat(vitals?.spO2 || '98');
+    const sysBp = parseFloat((vitals?.bp || '120/80').split('/')[0] || '120');
+
+    // Clone array so baseline template remains immutable
+    const personalizedNutrition = [...baseProfile.precisionOccupationalNutrition];
+    const personalizedTcm = [...baseProfile.tcmOccupationalDirectives];
+
+    // 1. Cardiovascular / Autonomic Hyper-arousal Adaptation (HR > 80 or Sys BP > 130)
+    if (hrVal > 80 || sysBp > 130) {
+      const existingMgIndex = personalizedNutrition.findIndex(n => n.includes('Magnesium'));
+      if (existingMgIndex >= 0) {
+        personalizedNutrition[existingMgIndex] = '⚡ Magnesium L-Threonate (144mg–200mg elemental Mg): Scaled for elevated heart rate & autonomic calm';
+      } else {
+        personalizedNutrition.push('⚡ Magnesium L-Threonate (144mg elemental Mg): Upregulated for autonomic sympathetic reduction');
+      }
+      personalizedNutrition.push('🌿 L-Theanine (200mg–400mg): Downregulates central sympathetic overdrive & lowers resting pulse');
+    }
+
+    // 2. Hypoxia / Low Oxygen Saturation Adaptation (SpO2 < 95%)
+    if (spO2Val < 95) {
+      personalizedNutrition.unshift('🫀 Inorganic Nitrate / Beetroot Extract (500mg): Nitric oxide elevation for tissue hypoxia (SpO2 < 95%)');
+      personalizedNutrition.push('🌿 Rhodiola Rosea (300mg): Altitude/hypoxia cellular adaptation & stamina enrichment');
+    }
+
+    // 3. Anticoagulant & Antiplatelet Safety Guardrail
+    const isAnticoagulated = medications.some(m => {
+      const lower = m.toLowerCase();
+      return lower.includes('warfarin') || lower.includes('coumadin') || lower.includes('eliquis') || lower.includes('xarelto') || lower.includes('plavix') || lower.includes('aspirin');
+    });
+
+    if (isAnticoagulated) {
+      personalizedNutrition.forEach((n, idx) => {
+        if (n.includes('Omega-3') || n.includes('DHA') || n.includes('Fish Oil')) {
+          personalizedNutrition[idx] = '⚠️ Safety Guardrail: High-DHA Omega-3 capped at <=1000mg daily due to concomitant anticoagulant therapy';
+        }
+      });
+    }
+
+    // 4. Low SDOH & Allostatic Burnout Adaptation (SDOH < 60)
+    if (sdohScore < 60 || baseProfile.allostaticBurnoutScore >= 8.0) {
+      const existingBacopa = personalizedNutrition.some(n => n.includes('Bacopa'));
+      if (!existingBacopa) {
+        personalizedNutrition.push('🧠 Bacopa Monnieri (300mg 55% Bacosides): Standardized working memory & fatigue resilience');
+      }
+    }
+
+    return {
+      ...baseProfile,
+      precisionOccupationalNutrition: personalizedNutrition,
+      tcmOccupationalDirectives: personalizedTcm
+    };
+  }
+
+  /**
    * Calculates Gompertz-Makeham hazard rate curve parameters, OSHA occupational impact & projected QALY gains.
    * h(t) = alpha * e^(beta * t) + lambda
    */
@@ -2304,8 +2369,8 @@ export class ActuarialLongevityService {
     const hrVal = parseFloat(vitals?.hr || '72');
     const spO2Val = parseFloat(vitals?.spO2 || '98');
     
-    // Resolve OSHA occupational profile from BLS SOC classification
-    const occProfile = this.getOccupationalProfile(occupationOrSocCode);
+    // Resolve OSHA occupational profile from BLS SOC classification with dynamic personalization
+    const occProfile = this.getPersonalizedOccupationalProfile(occupationOrSocCode, vitals, [], sdohScore);
 
     // Calculate biological age penalty/bonus based on vitals, SDOH, and OSHA workplace hazards
     let bioAgeDelta = 0;

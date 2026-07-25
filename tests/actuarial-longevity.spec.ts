@@ -242,4 +242,20 @@ describe('ActuarialLongevityService', () => {
     expect(nuclear.snomedCode).toBe('412089004');
     expect(nuclear.vocalResonanceProtocol).toContain('Control Room Auditory De-escalation');
   });
+
+  it('should dynamically adapt nutrition dosages based on patient vitals, hypoxia, and anticoagulant safety', () => {
+    // 1. High HR & BP -> Upregulates Magnesium L-Threonate & L-Theanine
+    const highHrProfile = service.getPersonalizedOccupationalProfile('Renaissance Scholar', { hr: '92', bp: '138/88' });
+    expect(highHrProfile.precisionOccupationalNutrition.some(n => n.includes('Magnesium L-Threonate (144mg–200mg'))).toBe(true);
+    expect(highHrProfile.precisionOccupationalNutrition.some(n => n.includes('L-Theanine'))).toBe(true);
+
+    // 2. Low SpO2 -> Adds Beetroot Nitrate & Rhodiola Rosea
+    const hypoxiaProfile = service.getPersonalizedOccupationalProfile('Alpine Mountaineer', { spO2: '92' });
+    expect(hypoxiaProfile.precisionOccupationalNutrition.some(n => n.includes('Beetroot Extract'))).toBe(true);
+    expect(hypoxiaProfile.precisionOccupationalNutrition.some(n => n.includes('Rhodiola Rosea'))).toBe(true);
+
+    // 3. Anticoagulants -> Enforces Omega-3 safety cap
+    const anticoagProfile = service.getPersonalizedOccupationalProfile('Renaissance Scholar', {}, ['Eliquis', 'Aspirin']);
+    expect(anticoagProfile.precisionOccupationalNutrition.some(n => n.includes('Safety Guardrail: High-DHA Omega-3 capped'))).toBe(true);
+  });
 });

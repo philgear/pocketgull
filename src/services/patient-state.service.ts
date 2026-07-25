@@ -287,11 +287,17 @@ export class PatientStateService {
   // --- Patient Contextual State (feeds Co-Regulation AVS) ---
   /** Patient's occupational category — informs autonomic baseline and AVS protocol selection. */
   readonly occupation = signal<string>('');
-  /** Reactive actuarial 10D occupational hazard profile derived from patient occupation. */
+  /** Reactive actuarial 10D occupational hazard profile derived from patient occupation with dynamic vitals/safety personalization. */
   readonly occupationalProfile = computed<IOccupationalHazardProfile | null>(() => {
     const occ = this.occupation();
     if (!this.actuarialLongevityService) return null;
-    return this.actuarialLongevityService.getOccupationalProfile(occ);
+    const medNames = (this.medications() || []).map(m => m.name);
+    return this.actuarialLongevityService.getPersonalizedOccupationalProfile(
+      occ,
+      this.vitals(),
+      medNames,
+      75
+    );
   });
   /** Chief complaint / reason for this specific encounter. */
   readonly reasonForVisit = signal<string>('');
