@@ -2239,7 +2239,13 @@ export class AnalysisReportComponent implements OnDestroy {
     const anchor = target?.closest?.('a');
     if (anchor) {
       const href = anchor.getAttribute('href');
-      if (href && !href.startsWith('#') && !href.startsWith('javascript:')) {
+      if (href && !href.startsWith('#')) {
+        const lower = href.trim().toLowerCase();
+        if (lower.startsWith('javascript:') || lower.startsWith('vbscript:') || lower.startsWith('data:')) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
         event.preventDefault();
         event.stopPropagation();
 

@@ -544,7 +544,7 @@ app.put('/api/patients/:id', (req, res) => {
       const clean = {};
       for (const k of Object.keys(raw)) {
         if (k === '__proto__' || k === 'constructor' || k === 'prototype') continue;
-        if (Object.prototype.hasOwnProperty.call(raw, k) && (allowedPatientFields.includes(k) || typeof raw[k] === 'object')) {
+        if (Object.prototype.hasOwnProperty.call(raw, k) && allowedPatientFields.includes(k)) {
           clean[k] = raw[k];
         }
       }
