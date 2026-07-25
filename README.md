@@ -1,4 +1,5 @@
 # 🕊️ POCKET GULL
+
 **Aerial Perspective for the Clinical Ocean — Living Medical Intelligence Engine**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](file:///c:/Users/philg/Pocketgull/pocketgull/LICENSE)
@@ -15,13 +16,14 @@
 ---
 
 ### 🌐 Live Production Application
+
 **[https://pocketgull.app](https://pocketgull.app)** — Deployed on **Google Cloud Run** with Google Vertex AI Enterprise (`gemini-2.5-flash`).
 
 ---
 
 ## 🎯 VISION & PURPOSE
 
-> *"To provide practitioners with the 'Gull's Eye View'—the ability to rise above the turbulent sea of medical data and see the clear, actionable patterns beneath."*
+> _"To provide practitioners with the 'Gull's Eye View'—the ability to rise above the turbulent sea of medical data and see the clear, actionable patterns beneath."_
 
 **Pocket Gull** is an active, living medical Care Plan Strategy and Live AI Consult engine powered by Google Gemini. Designed for clinicians, nurses, researchers, and caregivers, it synthesizes multimodal inputs (3D spatial anatomical mapping, bi-directional voice dictation, and biometric telemetry) into structured, evidence-grounded clinical strategies across Western, Eastern TCM, and Ayurvedic paradigms.
 
@@ -30,6 +32,7 @@
 ## 🔬 LIVING SYSTEM CAPABILITIES
 
 ### 🧠 1. Multimodal AI & Multi-Agent Orchestration
+
 - **Google Agent Development Kit (`@google/adk`)**: Specialized `LlmAgent` experts execute inside an `InMemoryRunner` environment maintaining **context-aware memory** of active patient nodes.
 - **Vertex AI Enterprise Engine**: Regional Google Cloud Vertex AI integration with automatic Application Default Credentials (ADC) token resolution and custom safety thresholds.
 - **Bi-Directional Voice Consult & Barge-In Interruption**: Full-duplex audio streaming powered by the Web Speech API and Express `/ws/gemini-live` WebSocket proxy. Features instant local client-side `onspeechstart` barge-in speech cancellation.
@@ -38,6 +41,7 @@
 ---
 
 ### 📐 2. Interactive 3D Spatial Anatomy & Raycast Loci
+
 - **Three.js Procedural Skeletal & Organ Viewer**: Detailed 3D skeletal geometry and surface mesh rendering with severity-mapped dynamic particle systems.
 - **Anatomical Search & Camera Tracking (`focusOnPart`)**: Instant fuzzy anatomical search bar (Head/Neuro, Organs, Limbs/Spine) that smoothly interpolates WebGL camera targets onto targeted organs.
 - **Interactive 3D Raycast Tooltips & Data Cards**: Hovering over 3D anatomical nodes displays part icons, active paradigm badges, and pain scores. Clicking opens a quick data entry overlay card with pain sliders (0–10) and symptom notes.
@@ -46,35 +50,39 @@
 ---
 
 ### 🩺 3. Dynamic Multi-Paradigm Clinical Lenses
+
 - **🩺 Western Allopathic Lens**: Evidence-grounded ICD-10/SNOMED coding, Comprehensive Metabolic Panels (CMP: Troponin, ALT/AST, eGFR, Fasting Glucose), lab workups, and monitoring protocols.
 - **🌿 Eastern TCM Lens**: Zang-Fu Qi constriction patterns, tongue/pulse diagnostic matrix, Ba Gang (Yin, Yang, Qi, Blood, Cold, Heat) classification, and 3D Acupoint Jing-Luo meridians (`GV-20 Baihui`, `CV-17 Danzhong`, `ST-36 Zusanli`).
-- **🧘 Ayurvedic Medicine Lens**: Tridosha (Vata, Pitta, Kapha) balance, Agni metabolic fire types (*Samagni*, *Vishamagni*, *Mandagni*, *Tikshnagni*), and 3D Sushumna Lotus Chakras (`Sahasrara`, `Ajna`, `Anahata`, `Manipura`).
+- **🧘 Ayurvedic Medicine Lens**: Tridosha (Vata, Pitta, Kapha) balance, Agni metabolic fire types (_Samagni_, _Vishamagni_, _Mandagni_, _Tikshnagni_), and 3D Sushumna Lotus Chakras (`Sahasrara`, `Ajna`, `Anahata`, `Manipura`).
 - **🧪 Orthomolecular Profiling**: Automatic extraction and visualization of biochemical markers (Magnesium, Vit D3, B12, Zinc) into a glassmorphic nutrient matrix.
 
 ---
 
 ### 📋 4. 10 Standardized Clinical & Life Sovereignty Assessment Instruments
+
 Pocket Gull features 10 built-in standardized assessment instruments integrated directly into the patient state:
 
-| Assessment Instrument | Standard Code / System | Metric Range | Clinical Utility & Scope |
-| :--- | :--- | :---: | :--- |
-| 🧠 **PHQ-9 (Depression)** | LOINC `44261-6` | `0 – 27` | Patient Health Questionnaire for depression severity. |
-| ⚡ **GAD-7 (Anxiety)** | LOINC `69725-0` | `0 – 21` | Generalized Anxiety Disorder scale paired with 0.1 Hz vagal breathing biofeedback. |
-| 🌙 **ISI (Insomnia)** | LOINC `86095-7` | `0 – 28` | Insomnia Severity Index with CBT-I sleep restriction directives. |
-| 🛡️ **C-SSRS (Safety)** | LOINC `84411-8` | `0 – 16` | Columbia Suicide Screener with automatic **Sentinel Safety Alerts** & 988 Lifeline routing. |
-| 🩺 **ROS-14 (Review of Systems)** | LOINC `69742-5` | 14 Systems | Comprehensive organ-system symptom intake inventory. |
-| 🫀 **PHQ-15 (Somatic)** | LOINC `81675-1` | `0 – 30` | Somatic Symptom Scale evaluating physical distress & autonomic dysregulation. |
-| 🤝 **PRAPARE (SDOH)** | LOINC `93304-4` | 5 Vectors | Social Determinants of Health protocol exporting ICD-10 Z-codes (`Z59.8`, `Z59.41`, `Z59.6`). |
-| 🧘 **AYURVEDA (Tridosha)** | Samskrita | 6 Vectors | Tridosha Inventory calculating Vata/Pitta/Kapha balance & Agni metabolic fire type. |
-| 🌿 **TCM (Shi Wen)** | Ten Questions | 6 Vectors | Traditional Chinese Medicine 6-vector inventory calculating Ba Gang Qi/Yin/Yang patterns. |
-| 🌱 **GROW_THYSELF** | Epigenetic | `0 – 10` | Life Sovereignty inventory assessing Purpose/Ikigai, Somatic Sovereignty, & Epigenetic Vitality. |
+| Assessment Instrument             | Standard Code / System | Metric Range | Clinical Utility & Scope                                                                         |
+| :-------------------------------- | :--------------------- | :----------: | :----------------------------------------------------------------------------------------------- |
+| 🧠 **PHQ-9 (Depression)**         | LOINC `44261-6`        |   `0 – 27`   | Patient Health Questionnaire for depression severity.                                            |
+| ⚡ **GAD-7 (Anxiety)**            | LOINC `69725-0`        |   `0 – 21`   | Generalized Anxiety Disorder scale paired with 0.1 Hz vagal breathing biofeedback.               |
+| 🌙 **ISI (Insomnia)**             | LOINC `86095-7`        |   `0 – 28`   | Insomnia Severity Index with CBT-I sleep restriction directives.                                 |
+| 🛡️ **C-SSRS (Safety)**            | LOINC `84411-8`        |   `0 – 16`   | Columbia Suicide Screener with automatic **Sentinel Safety Alerts** & 988 Lifeline routing.      |
+| 🩺 **ROS-14 (Review of Systems)** | LOINC `69742-5`        |  14 Systems  | Comprehensive organ-system symptom intake inventory.                                             |
+| 🫀 **PHQ-15 (Somatic)**           | LOINC `81675-1`        |   `0 – 30`   | Somatic Symptom Scale evaluating physical distress & autonomic dysregulation.                    |
+| 🤝 **PRAPARE (SDOH)**             | LOINC `93304-4`        |  5 Vectors   | Social Determinants of Health protocol exporting ICD-10 Z-codes (`Z59.8`, `Z59.41`, `Z59.6`).    |
+| 🧘 **AYURVEDA (Tridosha)**        | Samskrita              |  6 Vectors   | Tridosha Inventory calculating Vata/Pitta/Kapha balance & Agni metabolic fire type.              |
+| 🌿 **TCM (Shi Wen)**              | Ten Questions          |  6 Vectors   | Traditional Chinese Medicine 6-vector inventory calculating Ba Gang Qi/Yin/Yang patterns.        |
+| 🌱 **GROW_THYSELF**               | Epigenetic             |   `0 – 10`   | Life Sovereignty inventory assessing Purpose/Ikigai, Somatic Sovereignty, & Epigenetic Vitality. |
 
 ---
 
 ### 🎨 5. Health Literacy Personas & Cognitive Reading Modes
 
 #### 🧠 5 Persona Writing Styles
+
 Users can toggle between 5 distinct writing personas to suit different cognitive styles:
+
 1. **🔬 Clinical Allopathic**: Formal ICD-10, SNOMED, physiological telemetry, and PubMed trial citations.
 2. **🌳 Arborist Redwood**: Translates body systems into dendrochronology, tree ring growth, and sap velocity (`120/80 hPa`).
 3. **🏎️ Garage Mechanic**: Translates body systems into V8 engine chassis logs, fluid line PSI, and OBD-II DTC diagnostic codes (`DTC P0128`).
@@ -82,6 +90,7 @@ Users can toggle between 5 distinct writing personas to suit different cognitive
 5. **✨ Inspirational Muse**: Health history expressed as a 3-movement epic symphony with 528 Hz Solfeggio frequencies.
 
 #### 📖 4 Adaptive Cognitive Reading Modes
+
 1. 📜 **Classic Literary Reader**: Serif typography with drop-cap chapter headers and warm parchment styling.
 2. ⚡ **Bionic Speed Reader**: Highlighting initial letterforms of clinical terms for accelerated visual cognitive processing.
 3. 🧩 **Dyslexic Accessible**: OpenDyslexic weighted font styling with increased line height (`leading-loose`) and letter spacing (`tracking-wide`).
@@ -90,6 +99,7 @@ Users can toggle between 5 distinct writing personas to suit different cognitive
 ---
 
 ### 🚨 6. Emergency Good Samaritan Care & Geo-Sentinel Triage
+
 - **Good Samaritan Emergency Mode**: Offline override mode featuring a 110 BPM chest-compression metronome, BLS safety-gated local Gemini Nano routing, local FHIR-compliant EMT QR code serialization (`lean-qr`), and global telemetry suppression.
 - **Geo-Sentinel Outbreak Viewpoint Deck**: 3 international public health surveillance modes (Global 🌎 WHO, Regional 🌍 PAHO, Domestic 🇺🇸 CDC/NHI) with real-time AI containment directives.
 - **Urgency Priority Sorting**: Automatically sorts patient rosters by Triage Urgency Score so Level 1 Emergency Resuscitation and Level 2 Emergent cases appear at the top.
@@ -97,6 +107,7 @@ Users can toggle between 5 distinct writing personas to suit different cognitive
 ---
 
 ### 🛡️ 7. Shift-Left Security & Egress Guard
+
 - **Sentinel Security & Egress Guard (`sentinel_security_guard.mjs`)**: Native Node.js security script inspecting source code for unauthorized egress endpoints (enforcing a clinical domain whitelist: `generativelanguage.googleapis.com`, `fhir.org`, `cloudrun.app`).
 - **Shannon Entropy Secret Scanner**: Scans for high-entropy random strings (potential API keys, JWTs, or session tokens) before commit.
 - **CodeQL 100% Remediation**: Fully hardened against SSRF (`normalizeAndValidateModel`), path traversal (`express.static`), prototype pollution (`__proto__`, `constructor`, `prototype`), command injection (`execFile`), ReDoS, and insecure randomness.
@@ -212,8 +223,19 @@ A living record of major system evolutions (Full details in [`docs/study/src/pag
 
 ## ⚡ QUICK START & DEVELOPER GUIDE
 
+### 🖥️ System Requirements
+
+| Resource / Layer | Minimum Requirement | Recommended Specification |
+| :--- | :--- | :--- |
+| **Node.js Runtime** | **`v24.x`** *(Strict `.nvmrc` requirement)* | **`v24.x LTS`** |
+| **Package Manager** | `npm v10.x` | `npm v10.x+` |
+| **Python Sidecar / ML** | `Python 3.10+` | `Python 3.10` (`scikit-learn`, `xgboost`, `edfio`) |
+| **Memory (RAM)** | `4 GB` (Client UI) / `8 GB` (Docker container) | `8 GB+` (Client) / `16 GB` (Parallel ML batch grid) |
+| **Graphics (3D Anatomy)** | WebGL 2.0 compatible GPU / Integrated Graphics | Hardware-Accelerated WebGL (60 fps rendering) |
+| **Browser Compatibility** | Chrome v120+, Edge, Safari 17+, Firefox | Chrome / Chromium (Web Speech & WebGL 2.0 optimized) |
+
 ### Prerequisites
-- **Node.js**: `v24.x` (Strict requirement specified in `.nvmrc`)
+- **Node.js**: `v24.x` (Strict requirement specified in `.nvmrc` and `package.json`)
 - **npm**: `v10.x` or higher
 
 ### Local Spin-Up
@@ -272,7 +294,7 @@ Full documentation is available in the [`docs/study/`](file:///c:/Users/philg/Po
 ## 👨‍💻 MAINTAINER
 
 **Phil Gear** / [g.dev/philgear](https://g.dev/philgear)  
-*Engineering with Kaizen — continuous refinement for clinical excellence.*
+_Engineering with Kaizen — continuous refinement for clinical excellence._
 
 ---
 
@@ -299,4 +321,4 @@ If you reference or use Pocket Gull in clinical research, medical informatics st
 
 ---
 
-*© 2026 Pocket Gull. Licensed under the [MIT License](file:///c:/Users/philg/Pocketgull/pocketgull/LICENSE).*
+_© 2026 Pocket Gull. Licensed under the [MIT License](file:///c:/Users/philg/Pocketgull/pocketgull/LICENSE)._
