@@ -10,21 +10,12 @@ export default defineConfig({
   outDir: './dist',
   vite: {
     root: import.meta.dirname,
-    // @ts-ignore
-    configFile: false,
     define: {
       'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || '')
     },
     server: {
       fs: {
         strict: true
-      }
-    },
-    build: {
-      rollupOptions: {
-        input: {
-          index: 'src/pages/index.astro'
-        }
       }
     }
   }
