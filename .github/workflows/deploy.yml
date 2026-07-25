@@ -97,6 +97,10 @@ jobs:
 
       - name: Build Application
         run: npm run build
+        env:
+          CI: true
+          GEMINI_API_KEY: ''
+          SKIP_HEALTHCARE_PROVISION: 'true'
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
