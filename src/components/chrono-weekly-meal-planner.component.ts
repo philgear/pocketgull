@@ -189,66 +189,95 @@ export interface IDayMealPlan {
         </div>
       </div>
 
-      <!-- Circadian Meal Slots Grid (Morning, Lunch, Snack, Dinner) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10 font-sans">
+      <!-- Circadian Meal Slots Grid with 3D Double-Click Flip State Machines -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10 font-sans">
         @for (slot of filteredMealSlots(); track slot.id) {
-          <div class="p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-emerald-500/50 transition flex flex-col justify-between group">
+          @let isSlotFlipped = isMealFlipped(slot.id);
+          <div (dblclick)="toggleMealFlip(slot.id); $event.stopPropagation()"
+               class="relative perspective-1000 group cursor-pointer h-64"
+               title="Double-click to flip over for BMAL1 Circadian Clock Science & Satiety Rationale">
             
-            <div>
-              <!-- Header Badges -->
-              <div class="flex items-center justify-between border-b border-zinc-800 pb-2.5 mb-3 font-mono text-[10px]">
-                <span class="text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <span>⏰</span> {{ slot.timeWindow }}
-                </span>
+            <div [class.rotate-y-180]="isSlotFlipped"
+                 class="relative w-full h-full transition-transform duration-500 transform-style-3d">
 
-                <div class="flex items-center gap-1.5">
-                  <span class="px-2 py-0.5 rounded font-bold uppercase tracking-wider"
-                    [class.bg-amber-500\/20]="slot.mealType === 'Quick Snack'"
-                    [class.text-amber-300]="slot.mealType === 'Quick Snack'"
-                    [class.bg-sky-500\/20]="slot.mealType === 'Quick Meal'"
-                    [class.text-sky-300]="slot.mealType === 'Quick Meal'"
-                    [class.bg-purple-500\/20]="slot.mealType === 'Full Course'"
-                    [class.text-purple-300]="slot.mealType === 'Full Course'">
-                    {{ slot.mealType === 'Quick Snack' ? '🍿' : slot.mealType === 'Quick Meal' ? '⚡' : '🍲' }} {{ slot.mealType }} ({{ slot.prepTimeMins }}m)
-                  </span>
+              <!-- FRONT FACE -->
+              <div class="p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-emerald-500/50 transition flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden shadow-sm">
+                <div>
+                  <!-- Header Badges -->
+                  <div class="flex items-center justify-between border-b border-zinc-800 pb-2 mb-2 font-mono text-[10px]">
+                    <span class="text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                      <span>⏰</span> {{ slot.timeWindow }}
+                    </span>
+
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                        dblclick 🔄
+                      </span>
+                      <span class="px-2 py-0.5 rounded font-bold uppercase tracking-wider"
+                        [class.bg-amber-500\/20]="slot.mealType === 'Quick Snack'"
+                        [class.text-amber-300]="slot.mealType === 'Quick Snack'"
+                        [class.bg-sky-500\/20]="slot.mealType === 'Quick Meal'"
+                        [class.text-sky-300]="slot.mealType === 'Quick Meal'"
+                        [class.bg-purple-500\/20]="slot.mealType === 'Full Course'"
+                        [class.text-purple-300]="slot.mealType === 'Full Course'">
+                        {{ slot.mealType === 'Quick Snack' ? '🍿' : slot.mealType === 'Quick Meal' ? '⚡' : '🍲' }} {{ slot.mealType }} ({{ slot.prepTimeMins }}m)
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Title & Description -->
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-xl">{{ slot.emoji }}</span>
+                    <h4 class="text-xs font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug">
+                      {{ slot.title }}
+                    </h4>
+                  </div>
+                  <p class="text-[11px] text-zinc-400 leading-relaxed font-sans line-clamp-2">
+                    {{ slot.description }}
+                  </p>
+
+                  <!-- Bioactive Compounds -->
+                  <div class="flex flex-wrap gap-1 mt-2">
+                    @for (cmp of slot.activeBioCompounds; track cmp) {
+                      <span class="text-[9px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono border border-zinc-700">
+                        💊 {{ cmp }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Footer Telemetry -->
+                <div class="pt-2 border-t border-zinc-800/80 flex items-center justify-between font-mono text-[9.5px]">
+                  <span class="text-zinc-400">Target: <strong class="text-emerald-300">{{ slot.clinicalTarget }}</strong></span>
+                  <span class="text-amber-400 font-bold">Glycemic: {{ slot.glycemicLoad }}</span>
                 </div>
               </div>
 
-              <!-- Title & Description -->
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="text-2xl">{{ slot.emoji }}</span>
-                <h4 class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors leading-snug">
-                  {{ slot.title }}
-                </h4>
+              <!-- BACK FACE -->
+              <div class="p-5 rounded-2xl bg-emerald-950 text-white border border-emerald-500/40 shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+                <div>
+                  <div class="flex items-center justify-between border-b border-emerald-800 pb-1.5 mb-2 font-mono text-xs">
+                    <span class="text-emerald-300 font-bold uppercase flex items-center gap-1">
+                      <span>🥦</span> BMAL1 Circadian Clock Science
+                    </span>
+                    <span class="text-emerald-400 font-mono text-[10px]">dblclick flip</span>
+                  </div>
+                  <div class="space-y-1.5 text-emerald-100">
+                    <p class="text-[11px]">
+                      <strong>Circadian Alignment:</strong> Eating within the {{ slot.timeWindow.split('—')[0] }} window aligns with hepatic BMAL1/CLOCK gene transcription, maximizing pancreatic beta-cell insulin sensitivity.
+                    </p>
+                    <p class="text-[11px]">
+                      <strong>Mastication Habit:</strong> Chew each bite 20+ times to stimulate cephalic phase vagal activation and GLP-1 satiety peptide release.
+                    </p>
+                  </div>
+                </div>
+                <div class="pt-1.5 border-t border-emerald-900 font-mono text-[9px] text-emerald-400 flex justify-between">
+                  <span>Circadian Nutrition Active</span>
+                  <span>Double-click to return</span>
+                </div>
               </div>
 
-              <p class="text-xs text-zinc-300 font-sans leading-relaxed mb-3">
-                {{ slot.description }}
-              </p>
-
-              <!-- Bio-Active Compounds Tag -->
-              <div class="flex flex-wrap items-center gap-1.5 mb-3 font-mono text-[10.5px]">
-                <span class="text-zinc-500 font-bold uppercase text-[9.5px]">Key Compounds:</span>
-                @for (compound of slot.activeBioCompounds; track compound) {
-                  <span class="px-2 py-0.5 rounded-md bg-zinc-950 text-emerald-300 border border-zinc-800">
-                    {{ compound }}
-                  </span>
-                }
-              </div>
             </div>
-
-            <!-- Footer Regional Origin & Action Buttons -->
-            <div class="pt-3 border-t border-zinc-800/80 flex items-center justify-between font-mono text-[10px]">
-              <span class="text-zinc-400">
-                🌿 Sourced: <strong class="text-zinc-200">{{ slot.regionalSource }}</strong>
-              </span>
-
-              <button (click)="prescribeChronoSlot(slot)"
-                class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase tracking-wider transition cursor-pointer active:scale-95">
-                ➕ Add to Care Plan
-              </button>
-            </div>
-
           </div>
         }
       </div>
@@ -259,6 +288,19 @@ export interface IDayMealPlan {
 export class ChronoWeeklyMealPlannerComponent implements OnDestroy {
   patientState = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);
+
+  readonly flippedMeals = signal<Set<string>>(new Set());
+
+  toggleMealFlip(id: string) {
+    const current = new Set(this.flippedMeals());
+    if (current.has(id)) current.delete(id);
+    else current.add(id);
+    this.flippedMeals.set(current);
+  }
+
+  isMealFlipped(id: string): boolean {
+    return this.flippedMeals().has(id);
+  }
 
   selectedDay = signal<'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun'>('Mon');
   selectedRegion = signal<string>('Pacific Northwest');

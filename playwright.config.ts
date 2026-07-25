@@ -8,7 +8,11 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   testDir: path.resolve(__dirname, 'e2e'),
   testMatch: '**/*.spec.ts',
+<<<<<<< HEAD
   testIgnore: ['**/src/**', '**/node_modules/**'],
+=======
+  testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.venv/**'],
+>>>>>>> origin/feat/dieter-rams-sentinel-personas
   outputDir: path.resolve(__dirname, 'tmp/playwright-results'),
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],

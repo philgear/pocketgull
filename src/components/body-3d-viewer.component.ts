@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, Output, EventEmitter, input, PLATFORM_ID } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, effect, viewChild, ElementRef, OnDestroy, AfterViewInit, output, input, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -69,130 +69,164 @@ const PART_NAMES: Record<string, string> = {
     imports: [CommonModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
-    <div #canvasContainer class="w-full h-full relative bg-[#FAF8F0] dark:bg-zinc-950 overflow-hidden" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
-      <!-- Dynamic Radial Grid Backdrop (Warm Papyrus Glow vs Dark Obsidian Void) -->
-      <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-100/40 via-[#FAF8F0]/90 to-[#F5F2E6] dark:from-cyan-950/30 dark:via-zinc-950/90 dark:to-black"></div>
-      
-      <canvas *ngIf="!webglSupported()" class="absolute opacity-0 pointer-events-none w-[1px] h-[1px]" aria-label="3D Anatomical Mannequin Canvas"></canvas>
-      <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[#FAF8F0] dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 rounded-lg border border-amber-200 dark:border-zinc-800">
-        <svg class="w-10 h-10 text-teal-600 dark:text-cyan-400 mb-2 opacity-60 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        <span class="text-xs font-bold text-gray-800 dark:text-zinc-300">3D Holographic Engine Initializing...</span>
-        <span *ngIf="webglError()" class="text-[11px] text-rose-500 dark:text-rose-400 mt-2 max-w-xs break-words font-mono">{{ webglError() }}</span>
-      </div>
-
-      <!-- Top-Left Ergonomic Camera Angle Presets Bar (Sleek rounded-lg) -->
-      <div *ngIf="webglSupported()" class="absolute top-3 left-3 z-30 flex items-center gap-1 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1 rounded-lg border border-slate-300 dark:border-zinc-800/80 shadow-md font-mono text-[11px]">
-        <button (click)="setCameraPreset('cranial')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-sky-100 dark:bg-zinc-900 dark:hover:bg-cyan-950 text-sky-900 dark:text-cyan-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Head & Brain">
-          <span>🧠</span><span class="hidden sm:inline">Cranial</span>
-        </button>
-        <button (click)="setCameraPreset('visceral')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-teal-100 dark:bg-zinc-900 dark:hover:bg-teal-950 text-teal-900 dark:text-teal-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Thorax & Organs">
-          <span>🫀</span><span class="hidden sm:inline">Visceral</span>
-        </button>
-        <button (click)="setCameraPreset('spinal')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-indigo-100 dark:bg-zinc-900 dark:hover:bg-indigo-950 text-indigo-900 dark:text-indigo-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Spine & Posterior">
-          <span>🦴</span><span class="hidden sm:inline">Spine</span>
-        </button>
-        <button (click)="setCameraPreset('peripheral')" class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-900 dark:text-amber-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1 min-h-[36px]" title="Focus Legs & Feet">
-          <span>🦵</span><span class="hidden sm:inline">Extremities</span>
-        </button>
-      </div>
-
-      <!-- Floating 3D Hologram HUD Controls (Sleek rounded-lg) -->
-      <div *ngIf="webglSupported()" class="absolute top-3 right-3 z-30 flex items-center gap-1.5 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1.5 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md font-mono text-xs">
-        <button (click)="toggleAutoSpin()" 
-          [class.bg-sky-600]="isAutoSpinning()"
-          [class.text-white]="isAutoSpinning()"
-          [class.bg-slate-100]="!isAutoSpinning()"
-          [class.dark:bg-zinc-900]="!isAutoSpinning()"
-          [class.text-gray-800]="!isAutoSpinning()"
-          [class.dark:text-cyan-300]="!isAutoSpinning()"
-          class="px-2.5 py-1.5 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800 min-h-[36px]"
-          title="Toggle 360° Auto-Spin">
-          <span [class.animate-spin]="isAutoSpinning()">🔄</span>
-          <span class="text-[10px] uppercase font-bold">{{ isAutoSpinning() ? 'Spin ON' : '360°' }}</span>
-        </button>
-
-        <button (click)="resetCameraView()" 
-          class="px-2.5 py-1.5 rounded-md bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-gray-800 dark:text-zinc-300 font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800 min-h-[36px]"
-          title="Reset Camera View">
-          <span>🎯</span>
-          <span class="text-[10px] uppercase font-bold">Reset</span>
-        </button>
-      </div>
-
-      <!-- Sleek Dynamic Hover Tooltip -->
-      <div *ngIf="showHoverTooltip()" 
-           class="absolute pointer-events-none z-50 bg-white/95 dark:bg-zinc-950/95 border border-teal-500/40 backdrop-blur-md rounded-lg p-3 shadow-xl text-xs max-w-xs transition-all duration-75 text-gray-900 dark:text-zinc-100 font-mono"
-           [style.left.px]="tooltipX()"
-           [style.top.px]="tooltipY()"
-           [style.transform]="'translate(12px, 12px)'">
-        <div class="flex items-center gap-2 font-bold text-gray-900 dark:text-white mb-1">
-          <span class="text-base">{{ getPartIcon(hoveredPartId()) }}</span>
-          <span class="text-teal-700 dark:text-cyan-200 font-bold text-xs">{{ hoveredPartName() }}</span>
-        </div>
-        <div class="text-[9.5px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-teal-100 dark:bg-cyan-950 text-teal-900 dark:text-cyan-300 w-fit mb-1.5 border border-teal-300 dark:border-cyan-800/60">
-          {{ hoveredPartSystem() }}
-        </div>
-        <div *ngIf="hoveredPartPain() > 0" class="flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 mb-1">
-          <span>⚠️ Pain Level: {{ hoveredPartPain() }}/10</span>
-        </div>
-        <div *ngIf="hoveredPartNotes()" class="text-[11px] text-gray-600 dark:text-zinc-300 italic mb-1 max-w-[200px] truncate font-sans">
-          "{{ hoveredPartNotes() }}"
-        </div>
-        <div class="text-[9px] text-gray-500 dark:text-zinc-500 font-mono tracking-tight mt-1.5 border-t border-gray-200 dark:border-zinc-800 pt-1 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-cyan-400 animate-ping"></span>
-          <span>Click 3D node to select region</span>
-        </div>
-      </div>
-
-      <!-- Floating Mouse Navigation Instructions -->
-      <div *ngIf="webglSupported()" class="absolute bottom-2 left-3 flex flex-col gap-0.5 pointer-events-none font-mono z-20">
-        <span class="text-[9.5px] font-bold text-gray-600 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-cyan-400"></span>
-          Left Click: Select 3D Node
-        </span>
-        <span class="text-[9.5px] font-bold text-gray-500 dark:text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400"></span>
-          Right Click / Drag: Orbit 360°
-        </span>
-      </div>
-
-      <!-- Environmental & Barometric Telemetry HUD Bar (Unclipped Bottom Positioning) -->
-      <div *ngIf="webglSupported()" class="absolute bottom-2 right-3 z-30 flex flex-col items-end gap-1 font-mono text-[10px] pointer-events-auto">
-        <div class="flex items-center gap-2 bg-white/95 dark:bg-zinc-950/90 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-300 dark:border-zinc-800 shadow-md text-gray-800 dark:text-zinc-200">
-          <span class="flex items-center gap-1 font-bold" [class.text-rose-600]="envTelemetry.isStormShieldActive()" [class.dark:text-rose-400]="envTelemetry.isStormShieldActive()" [class.text-emerald-700]="!envTelemetry.isStormShieldActive()" [class.dark:text-emerald-400]="!envTelemetry.isStormShieldActive()">
-            <span [class.animate-pulse]="envTelemetry.isStormShieldActive()">🌩️</span>
-            <span>{{ envTelemetry.telemetry().barometricPressure }} hPa</span>
-            <span class="text-[9px]">({{ envTelemetry.telemetry().pressureDelta3h > 0 ? '+' : '' }}{{ envTelemetry.telemetry().pressureDelta3h }}hPa/3h)</span>
-          </span>
-          <span class="text-gray-300 dark:text-zinc-600">|</span>
-          <span class="text-sky-700 dark:text-cyan-300 font-bold">AQI {{ envTelemetry.telemetry().aqi }}</span>
-          <span class="text-gray-300 dark:text-zinc-600">|</span>
-          <span class="text-amber-700 dark:text-amber-300 font-bold">UV {{ envTelemetry.telemetry().uvIndex }}</span>
-        </div>
-
-        <!-- Environmental Preset Switcher Pill (Clean rounded-md) -->
-        <div class="flex items-center gap-1 bg-white/90 dark:bg-zinc-950/80 backdrop-blur-md p-1 rounded-md border border-slate-300 dark:border-zinc-800/80 shadow-xs">
-          <button (click)="envTelemetry.setPreset('coastal_storm')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-rose-100 dark:bg-zinc-900 dark:hover:bg-rose-950 text-rose-700 dark:text-rose-300 font-bold transition text-[9px] cursor-pointer">
-            🌧️ Storm
+    <div class="flex flex-col flex-1 h-full w-full min-h-[540px] bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl overflow-hidden font-sans thematic-3d-container">
+      <!-- 1. Dedicated Top Unobstructed HUD Ribbon -->
+      <div *ngIf="webglSupported()" class="px-3 py-2 bg-slate-100/90 dark:bg-zinc-950/90 border-b border-slate-300 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 font-mono text-xs">
+        <!-- Camera Angle Presets -->
+        <div class="flex items-center gap-1">
+          <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mr-1 hidden sm:inline">Camera:</span>
+          <button (click)="setCameraPreset('cranial')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-sky-100 dark:bg-zinc-900 dark:hover:bg-cyan-950 text-sky-900 dark:text-cyan-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Head & Brain">
+            <span>🧠</span><span class="text-[10px] uppercase font-bold">Cranial</span>
           </button>
-          <button (click)="envTelemetry.setPreset('high_altitude')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-purple-100 dark:bg-zinc-900 dark:hover:bg-purple-950 text-purple-700 dark:text-purple-300 font-bold transition text-[9px] cursor-pointer">
-            🏔️ Altitude
+          <button (click)="setCameraPreset('visceral')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-teal-100 dark:bg-zinc-900 dark:hover:bg-teal-950 text-teal-900 dark:text-teal-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Thorax & Organs">
+            <span>🫀</span><span class="text-[10px] uppercase font-bold">Visceral</span>
           </button>
-          <button (click)="envTelemetry.setPreset('desert_dry')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-700 dark:text-amber-300 font-bold transition text-[9px] cursor-pointer">
-            🏜️ Arid
+          <button (click)="setCameraPreset('spinal')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-indigo-100 dark:bg-zinc-900 dark:hover:bg-indigo-950 text-indigo-900 dark:text-indigo-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Spine & Posterior">
+            <span>🦴</span><span class="text-[10px] uppercase font-bold">Spine</span>
           </button>
-          <button (click)="envTelemetry.setPreset('optimal')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-100 dark:bg-zinc-900 dark:hover:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-bold transition text-[9px] cursor-pointer">
-            ☀️ Baseline
+          <button (click)="setCameraPreset('peripheral')" class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-amber-100 dark:bg-zinc-900 dark:hover:bg-amber-950 text-amber-900 dark:text-amber-300 font-bold transition cursor-pointer border border-slate-300 dark:border-zinc-800 flex items-center gap-1" title="Focus Legs & Feet">
+            <span>🦵</span><span class="text-[10px] uppercase font-bold">Extremities</span>
           </button>
         </div>
+
+        <!-- Viewport Spin & Reset Controls -->
+        <div class="flex items-center gap-1.5">
+          <button (click)="toggleAutoSpin()" 
+            [class.bg-sky-600]="isAutoSpinning()"
+            [class.text-white]="isAutoSpinning()"
+            [class.bg-white]="!isAutoSpinning()"
+            [class.dark:bg-zinc-900]="!isAutoSpinning()"
+            [class.text-gray-800]="!isAutoSpinning()"
+            [class.dark:text-cyan-300]="!isAutoSpinning()"
+            class="min-h-[36px] px-2.5 py-1 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Toggle 360° Auto-Spin">
+            <span [class.animate-spin]="isAutoSpinning()">🔄</span>
+            <span class="text-[10px] uppercase font-bold">{{ isAutoSpinning() ? 'Spin ON' : '360°' }}</span>
+          </button>
+
+          <button (click)="resetCameraView()" 
+            class="min-h-[36px] px-2.5 py-1 rounded-md bg-white hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-gray-800 dark:text-zinc-300 font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Reset Camera View">
+            <span>🎯</span>
+            <span class="text-[10px] uppercase font-bold">Reset</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Central Unobstructed 3D Viewport Canvas -->
+      <div #canvasContainer class="w-full flex-1 min-h-[460px] relative bg-transparent overflow-hidden" [class.cursor-grab]="webglSupported()" [class.active:cursor-grabbing]="webglSupported()">
+        <!-- Dynamic Translucent Radial Grid Backdrop (Allows Background Textures to Shine Through) -->
+        <div class="absolute inset-0 pointer-events-none transition-all duration-500 z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent dark:from-cyan-500/10 dark:via-transparent dark:to-transparent"></div>
+        
+        <canvas *ngIf="!webglSupported()" class="absolute opacity-0 pointer-events-none w-[1px] h-[1px]" aria-label="3D Anatomical Mannequin Canvas"></canvas>
+        <div *ngIf="!webglSupported()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-[#FAF8F0] dark:bg-zinc-950 text-gray-900 dark:text-zinc-100 rounded-lg border border-amber-200 dark:border-zinc-800">
+          <svg class="w-10 h-10 text-teal-600 dark:text-cyan-400 mb-2 opacity-60 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span class="text-xs font-bold text-gray-800 dark:text-zinc-300">3D Holographic Engine Initializing...</span>
+          <span *ngIf="webglError()" class="text-[11px] text-rose-500 dark:text-rose-400 mt-2 max-w-xs break-words font-mono">{{ webglError() }}</span>
+        </div>
+
+        <!-- Sleek Dynamic Hover Tooltip -->
+        <div *ngIf="showHoverTooltip()" 
+             class="absolute pointer-events-none z-50 bg-white/95 dark:bg-zinc-950/95 border border-teal-500/40 backdrop-blur-md rounded-lg p-3 shadow-xl text-xs max-w-xs transition-all duration-75 text-gray-900 dark:text-zinc-100 font-mono"
+             [style.left.px]="tooltipX()"
+             [style.top.px]="tooltipY()"
+             [style.transform]="'translate(12px, 12px)'">
+          <div class="flex items-center gap-2 font-bold text-gray-900 dark:text-white mb-1">
+            <span class="text-base">{{ getPartIcon(hoveredPartId()) }}</span>
+            <span class="text-teal-700 dark:text-cyan-200 font-bold text-xs">{{ hoveredPartName() }}</span>
+          </div>
+          <div class="text-[9.5px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-teal-100 dark:bg-cyan-950 text-teal-900 dark:text-cyan-300 w-fit mb-1.5 border border-teal-300 dark:border-cyan-800/60">
+            {{ hoveredPartSystem() }}
+          </div>
+          <div *ngIf="hoveredPartPain() > 0" class="flex items-center gap-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 mb-1">
+            <span>⚠️ Pain Level: {{ hoveredPartPain() }}/10</span>
+          </div>
+          <div *ngIf="hoveredPartNotes()" class="text-[11px] text-gray-600 dark:text-zinc-300 italic mb-1 max-w-[200px] truncate font-sans">
+            "{{ hoveredPartNotes() }}"
+          </div>
+          <div class="text-[9px] text-gray-500 dark:text-zinc-500 font-mono tracking-tight mt-1.5 border-t border-gray-200 dark:border-zinc-800 pt-1 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-teal-500 dark:bg-cyan-400 animate-ping"></span>
+            <span>Click 3D node to select region</span>
+          </div>
+        </div>
+
+        <!-- Selected Anatomical Node Overlay Card with 3D Double-Click Flip State Machine -->
+        @if (state.selectedPartId(); as partId) {
+          @let isFlipped = isSelectedPartFlipped();
+          <div (dblclick)="isSelectedPartFlipped.set(!isSelectedPartFlipped()); $event.stopPropagation()"
+               class="absolute bottom-4 right-4 z-40 max-w-xs sm:max-w-sm w-full perspective-1000 group cursor-pointer h-52 font-mono select-none"
+               title="Double-click to flip over for Somatic Innervation & Vagus Nerve Rationale">
+            
+            <div [class.rotate-y-180]="isFlipped"
+                 class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+              <!-- FRONT FACE: Anatomical Telemetry -->
+              <div class="p-4 rounded-2xl bg-zinc-950/90 text-white border border-teal-500/40 shadow-2xl backdrop-blur-xl flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden">
+                <div>
+                  <div class="flex items-center justify-between border-b border-teal-800/80 pb-1.5 mb-2 font-mono text-xs">
+                    <span class="text-teal-300 font-bold uppercase flex items-center gap-1.5 truncate">
+                      <span>{{ getPartIcon(partId) }}</span>
+                      <span class="truncate">{{ state.selectedPartName() || partId }}</span>
+                    </span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30 uppercase shrink-0">
+                      dblclick 🔄
+                    </span>
+                  </div>
+
+                  <div class="space-y-1.5 text-xs text-zinc-300">
+                    <div class="flex justify-between items-center text-[11px]">
+                      <span>Spatial Lens:</span>
+                      <span class="font-bold text-teal-400 uppercase">{{ anatomyViewMode() }} Paradigm</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px]">
+                      <span>Acute Pain Rating:</span>
+                      <span class="font-bold text-rose-400 font-mono">{{ getPartPainLevel(partId) }}/10</span>
+                    </div>
+                    <div class="flex justify-between items-center text-[11px]">
+                      <span>Reported Issues:</span>
+                      <span class="font-bold text-amber-300">{{ (state.issues()[partId] || []).length }} Note(s)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pt-1.5 border-t border-zinc-800 flex items-center justify-between font-mono text-[9px] text-zinc-400">
+                  <span>3D Node: {{ partId }}</span>
+                  <span class="text-teal-400 font-bold">Double-click flip</span>
+                </div>
+              </div>
+
+              <!-- BACK FACE: Somatic Innervation & Vagal Shield -->
+              <div class="p-4 rounded-2xl bg-teal-950 text-white border border-teal-400/50 shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+                <div>
+                  <div class="flex items-center justify-between border-b border-teal-800 pb-1.5 mb-2 font-mono text-xs">
+                    <span class="text-teal-200 font-bold uppercase flex items-center gap-1">
+                      <span>🧠</span> Somatic & Nerve Innervation
+                    </span>
+                    <span class="text-teal-400 font-mono text-[9px]">dblclick flip</span>
+                  </div>
+                  <div class="space-y-1.5 text-teal-100 font-mono text-[11px]">
+                    <p><strong>Nerve Root:</strong> {{ getPartNerveInnervation(partId) }}</p>
+                    <p><strong>Vagal Co-Regulation:</strong> {{ getPartVagalTip(partId) }}</p>
+                  </div>
+                </div>
+
+                <div class="pt-1.5 border-t border-teal-900 font-mono text-[9px] text-teal-300 flex justify-between">
+                  <span>Somatic Innervation Shield</span>
+                  <span>Double-click to return</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
       </div>
     </div>
   `,
     styles: [`
-    :host { display: block; height: 100%; width: 100%; }
-    canvas { outline: none; }
+    :host { display: flex; flex-direction: column; flex: 1 1 0%; height: 100%; min-height: 540px; width: 100%; }
+    canvas { outline: none; display: block; width: 100% !important; height: 100% !important; }
   `]
 })
 export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
@@ -207,7 +241,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private directionalLight?: THREE.DirectionalLight;
     private backLight?: THREE.DirectionalLight;
 
-    @Output() partSelected = new EventEmitter<{ id: string, name: string }>();
+    partSelected = output<{ id: string, name: string }>();
 
     // Inputs for external control
     rotation = input<number>(0);
@@ -242,6 +276,51 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly showHoverTooltip = signal<boolean>(false);
     readonly quickPainLevel = signal<number>(3);
     readonly quickSymptomText = signal<string>('');
+
+    readonly isSelectedPartFlipped = signal<boolean>(false);
+
+    getPartIcon(partId: string | null): string {
+      if (!partId) return '📍';
+      const id = partId.toLowerCase();
+      if (id.includes('head') || id.includes('brain') || id.includes('cranial')) return '🧠';
+      if (id.includes('heart') || id.includes('cardio')) return '🫀';
+      if (id.includes('lung') || id.includes('resp')) return '🫁';
+      if (id.includes('stomach') || id.includes('digest') || id.includes('abdo') || id.includes('liver')) return '🫄';
+      if (id.includes('spine') || id.includes('cervical') || id.includes('lumbar') || id.includes('dermatome')) return '🦴';
+      if (id.includes('arm') || id.includes('hand') || id.includes('shoulder')) return '🦾';
+      if (id.includes('leg') || id.includes('thigh') || id.includes('foot') || id.includes('shin')) return '🦵';
+      if (id.includes('acupoint')) return '☯️';
+      if (id.includes('chakra')) return '🧘';
+      return '📍';
+    }
+
+    getPartPainLevel(partId: string): number {
+      const issues = this.state.issues()[partId] || [];
+      if (issues.length === 0) return 0;
+      return Math.max(...issues.map(i => i.painLevel || 0));
+    }
+
+    getPartNerveInnervation(partId: string): string {
+      const id = partId.toLowerCase();
+      if (id.includes('head') || id.includes('brain')) return 'Cranial Nerves I-XII & Vagus (CN X)';
+      if (id.includes('heart') || id.includes('chest')) return 'T1-T5 Sympathetic Cardiac Accelerators & Vagus';
+      if (id.includes('lung')) return 'T2-T6 Intercostal Nerves & Phrenic (C3-C5)';
+      if (id.includes('abdo') || id.includes('stomach') || id.includes('liver')) return 'T5-T12 Splanchnic Nerves & Enteric Nervous System (ENS)';
+      if (id.includes('spine_cervical')) return 'C1-C8 Cervical Plexus & Suboccipital Nerve';
+      if (id.includes('spine_lumbar') || id.includes('dermatome_l4')) return 'L1-L5 Lumbar Plexus & Sciatic Nerve Root';
+      if (id.includes('arm') || id.includes('hand') || id.includes('shoulder')) return 'C5-T1 Brachial Plexus & Median/Radial/Ulnar Nerves';
+      if (id.includes('leg') || id.includes('thigh') || id.includes('foot')) return 'L4-S3 Sacral Plexus & Femoral/Tibial Nerves';
+      return 'Autonomic Nervous System & Somosensory Dermatome';
+    }
+
+    getPartVagalTip(partId: string): string {
+      const id = partId.toLowerCase();
+      if (id.includes('heart') || id.includes('chest')) return 'Practice 0.1 Hz RSA diaphragmatic breathing (4s in, 6s out) to increase vagal baroreflex power.';
+      if (id.includes('head') || id.includes('brain')) return 'Apply gentle pressure to suboccipital release points and practice vocal humming (Om/Shen) to stimulate auricular vagus branch.';
+      if (id.includes('abdo') || id.includes('stomach')) return 'Warm castor oil pack over epigastrium to ease splanchnic vasoconstriction and activate parasympathetic digestion.';
+      if (id.includes('spine') || id.includes('dermatome')) return 'Postural decompression and gentle spinal cat-cow rotations to relieve intervertebral nerve root compression.';
+      return 'Perform 5 minutes of physiological sighing (double inhale through nose, long exhale through mouth) for autonomic reset.';
+    }
 
     private isSlidingPatient = false;
 
@@ -435,17 +514,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         return PART_NAMES[id] || id;
     }
 
-    getPartIcon(id: string | null): string {
-        if (!id) return '🎯';
-        if (id.startsWith('acupoint_')) return '☯️';
-        if (id.startsWith('chakra_')) return '🧘';
-        if (id === 'head' || id === 'brain') return '🧠';
-        if (id === 'heart') return '🫀';
-        if (id === 'lungs') return '🫁';
-        if (id.includes('spine')) return '🦴';
-        return '🟡';
-    }
-
     deselectPart(): void {
         this.state.selectPart('');
     }
@@ -542,10 +610,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private handleResize = () => {
         const container = this.canvasContainer()?.nativeElement;
         if (!container) return;
-        const w = container.clientWidth;
-        const h = container.clientHeight;
+        let w = container.clientWidth;
+        let h = container.clientHeight;
+        if (w === 0 || h === 0 || h < 480) {
+            const parentRect = container.parentElement?.getBoundingClientRect();
+            w = parentRect?.width || container.offsetWidth || 350;
+            h = Math.max(parentRect?.height || container.offsetHeight || 0, 480);
+        }
+        h = Math.max(h, 480);
+        w = Math.max(w, 300);
         if (this.camera) {
-            this.camera.aspect = w / h;
+            this.camera.aspect = w / (h || 1);
             this.camera.updateProjectionMatrix();
         }
         if (this.renderer) {
@@ -641,18 +716,49 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         const theme = this.themeService.currentTheme();
         const active = this.themeService.activeTheme();
-        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'black-marble';
+        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'black-marble' || theme === 'curie' || theme === 'mandala' || theme === 'papyrus';
 
-        if (isDarkTheme) {
-            // Sleek dark obsidian spatial canvas
-            this.renderer.setClearColor(0x09090b, 1.0);
+        // Clear alpha set to 0.0 (fully transparent) so background textures/images show through underneath!
+        this.renderer.setClearColor(0x000000, 0.0);
+
+        if (theme === 'curie') {
+            // Radium Curie emerald glow studio lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0x00ff66); this.ambientLight.intensity = 2.2; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0x00cc66); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 1.2; }
+            if (this.bloomPass) this.bloomPass.strength = 0.35;
+        } else if (theme === 'mandala') {
+            // Cosmic mandala violet & saffron lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0x8b5cf6); this.ambientLight.intensity = 2.0; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xf59e0b); this.directionalLight.intensity = 1.8; }
+            if (this.backLight) { this.backLight.color.setHex(0x06b6d4); this.backLight.intensity = 1.0; }
+            if (this.bloomPass) this.bloomPass.strength = 0.25;
+        } else if (theme === 'papyrus') {
+            // Egyptian torchlight gold
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.2; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xd97706); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0x1e3a8a); this.backLight.intensity = 1.0; }
+            if (this.bloomPass) this.bloomPass.strength = 0.15;
+        } else if (theme === 'white-marble' || theme === 'black-marble') {
+            // Gold vein marble lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.0; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xf6e4a6); this.directionalLight.intensity = 1.8; }
+            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.9; }
+            if (this.bloomPass) this.bloomPass.strength = 0.12;
+        } else if (theme === 'pool') {
+            // Aqua blue water lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0x38bdf8); this.ambientLight.intensity = 2.4; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0x0284c7); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0xfb7185); this.backLight.intensity = 0.8; }
+            if (this.bloomPass) this.bloomPass.strength = 0.10;
+        } else if (isDarkTheme) {
+            // Dark obsidian spatial canvas
             if (this.ambientLight) { this.ambientLight.color.setHex(0xffffff); this.ambientLight.intensity = 1.8; }
             if (this.directionalLight) { this.directionalLight.color.setHex(0x38bdf8); this.directionalLight.intensity = 2.0; }
             if (this.backLight) { this.backLight.color.setHex(0x818cf8); this.backLight.intensity = 1.2; }
             if (this.bloomPass) this.bloomPass.strength = 0.15;
         } else {
-            // Pristine, bright papyrus parchment studio lighting for Papyrus, Light, Parchment, Marble, Hemp, Rice, Construction
-            this.renderer.setClearColor(0xfbf9f2, 1.0);
+            // Parchment/Papercraft studio lighting
             if (this.ambientLight) { this.ambientLight.color.setHex(0xfff8ee); this.ambientLight.intensity = 2.4; }
             if (this.directionalLight) { this.directionalLight.color.setHex(0xfff5e6); this.directionalLight.intensity = 2.0; }
             if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.8; }
@@ -682,12 +788,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             }
             window.addEventListener('resize', this.handleResize);
 
+            requestAnimationFrame(() => this.handleResize());
             setTimeout(() => {
                 this.handleResize();
                 if (this.controls) {
                     this.controls.update();
                 }
-            }, 100);
+            }, 50);
+            setTimeout(() => this.handleResize(), 300);
+            setTimeout(() => this.handleResize(), 800);
         } catch (e: any) {
             console.warn("3D Viewer disabled: WebGL not supported on this device.", e);
             this.webglSupported.set(false);
@@ -1288,9 +1397,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         mindMesh.userData['isMindCore'] = true;
         this.mannequinGroup.add(mindMesh);
 
-        // Instantiate procedural 3D TCM Meridians & Ayurvedic Aura Fields
+        // Instantiate procedural 3D TCM Meridians, Ayurvedic Aura Fields, and Curie Radium Isotope Nodes
         this.createTcmMeridians();
         this.createAyurvedicAura();
+        this.createCurieIsotopeNodes();
 
         this.updatePartColors();
         this.updateTransparency(this.anatomyViewMode());
@@ -1483,6 +1593,86 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.ayurvedicAuraGroup!.add(mesh);
             this.parts.set(c.id, new THREE.Group().add(mesh));
         });
+    }
+
+    private curieIsotopeGroup: THREE.Group | null = null;
+
+    private createCurieIsotopeNodes() {
+        this.curieIsotopeGroup = new THREE.Group();
+        this.mannequinGroup.add(this.curieIsotopeGroup);
+
+        // ⚛️ 1950s Gilbert U-238 Radium-226 Isotope Alpha Emission Nodes
+        const isotopes = [
+            { id: 'chest', pos: [0, 1.30, 0.18], color: 0x00ff66, label: 'Radium-226 Hematopoietic Bone Marrow Stem Node' },
+            { id: 'r_hand', pos: [-0.52, 0.80, 0.05], color: 0xfbbf24, label: 'Radium Palmar Desquamation Lesion Node' },
+            { id: 'l_hand', pos: [0.52, 0.80, 0.05], color: 0xfbbf24, label: 'Polonium-210 Dermal Erythema Node' }
+        ];
+
+        isotopes.forEach(iso => {
+            const haloGeo = new THREE.RingGeometry(0.04, 0.065, 24);
+            const haloMat = new THREE.MeshBasicMaterial({
+                color: iso.color,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.85
+            });
+            const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+            haloMesh.position.set(iso.pos[0], iso.pos[1], iso.pos[2]);
+            haloMesh.userData['id'] = iso.id;
+            haloMesh.userData['isCurieNode'] = true;
+            this.curieIsotopeGroup!.add(haloMesh);
+
+            const innerGeo = new THREE.SphereGeometry(0.025, 16, 16);
+            const innerMat = new THREE.MeshStandardMaterial({
+                color: iso.color,
+                emissive: iso.color,
+                emissiveIntensity: 1.0,
+                roughness: 0.1
+            });
+            const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+            innerMesh.position.set(iso.pos[0], iso.pos[1], iso.pos[2]);
+            innerMesh.userData['id'] = iso.id;
+            innerMesh.userData['isCurieNode'] = true;
+            this.curieIsotopeGroup!.add(innerMesh);
+        });
+
+        // Alpha / Beta Decay Particle Emission Cloud
+        const pCount = 120;
+        const pPos = new Float32Array(pCount * 3);
+        const pColors = new Float32Array(pCount * 3);
+        const cGreen = new THREE.Color(0x00ff66);
+        const cAmber = new THREE.Color(0xfbbf24);
+
+        for (let i = 0; i < pCount; i++) {
+            const rad = 0.3 + Math.random() * 0.5;
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI;
+
+            pPos[i * 3] = rad * Math.sin(phi) * Math.cos(theta);
+            pPos[i * 3 + 1] = 1.3 + rad * Math.cos(phi) * 0.6;
+            pPos[i * 3 + 2] = rad * Math.sin(phi) * Math.sin(theta);
+
+            const col = i % 2 === 0 ? cGreen : cAmber;
+            pColors[i * 3] = col.r;
+            pColors[i * 3 + 1] = col.g;
+            pColors[i * 3 + 2] = col.b;
+        }
+
+        const pGeo = new THREE.BufferGeometry();
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        pGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+
+        const pMat = new THREE.PointsMaterial({
+            size: 0.035,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particleCloud = new THREE.Points(pGeo, pMat);
+        particleCloud.userData['isCurieCloud'] = true;
+        this.curieIsotopeGroup.add(particleCloud);
     }
 
     private createArborealTreeModel() {

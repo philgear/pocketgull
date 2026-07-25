@@ -543,80 +543,83 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
               }
             </button>
 
-            <!-- Global Plain Language Health Literacy vs Deep Clinical Rationale Toggle Button & Analogy Sub-Modes -->
-            <div class="shrink-0 flex items-center bg-zinc-900/90 p-0.5 rounded-lg border border-zinc-800 shadow-sm font-mono text-xs">
-              <button (click)="theme.setAnalogyLensMode('clinical')"
-                      aria-label="Deep Rationale Mode"
-                      title="Switch to Deep Clinical Medical Rationale Mode"
-                      [class.bg-sky-600]="!theme.isPlainLanguageMode()"
-                      [class.text-white]="!theme.isPlainLanguageMode()"
-                      [class.text-zinc-400]="theme.isPlainLanguageMode()"
-                      class="px-2.5 py-1 rounded-md transition font-bold cursor-pointer">
-                🔬 Deep Rationale
-              </button>
-
-              <button (click)="theme.setAnalogyLensMode('arborist')"
-                      aria-label="Arborist Botanical Analogy Mode"
-                      title="Switch to Plain Language Arborist Botanical Analogy Mode"
-                      [class.bg-emerald-600]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist'"
-                      [class.text-white]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist'"
-                      [class.text-zinc-400]="!(theme.isPlainLanguageMode() && theme.analogyLensMode() === 'arborist')"
-                      class="px-2 py-1 rounded-md transition font-bold cursor-pointer flex items-center gap-1">
-                <span>🌳</span>
-                <span class="hidden md:inline">Arborist</span>
-              </button>
-
-              <button (click)="theme.setAnalogyLensMode('mechanic')"
-                      aria-label="Mechanic Automotive Analogy Mode"
-                      title="Switch to Plain Language Mechanic Automotive Analogy Mode"
-                      [class.bg-cyan-600]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic'"
-                      [class.text-white]="theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic'"
-                      [class.text-zinc-400]="!(theme.isPlainLanguageMode() && theme.analogyLensMode() === 'mechanic')"
-                      class="px-2 py-1 rounded-md transition font-bold cursor-pointer flex items-center gap-1">
-                <span>🚗</span>
-                <span class="hidden md:inline">Mechanic</span>
-              </button>
-            </div>
+            <!-- Font Size Scale & Legibility Visibility Toggle -->
+            <button (click)="theme.cycleTextSizeScale()"
+                    aria-label="Toggle Font Size & Text Legibility Scale"
+                    [title]="'Text Size Scale: ' + theme.textSizeScale() + ' (Click to cycle A / A+ / A++)'"
+                    class="px-2.5 py-1.5 rounded-lg transition font-mono text-xs font-black cursor-pointer bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-700 flex items-center gap-1 shrink-0 shadow-xs">
+              <span>🔤</span>
+              <span>
+                @switch (theme.textSizeScale()) {
+                  @case ('standard') { A }
+                  @case ('large') { A+ }
+                  @case ('extra-large') { A++ }
+                  @default { A }
+                }
+              </span>
+            </button>
  
             <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-gray-500 dark:text-zinc-400 pl-4 border-l border-gray-100 dark:border-zinc-800">
-              <!-- Gamified Points & Level HUD capsule -->
+              <!-- Gamified Points & Kubernetes Pod Telemetry HUD capsule -->
               <div class="relative group tracking-normal">
-                <div class="flex items-center gap-2.5 px-3 py-1 bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700/80 rounded-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer shadow-xs select-none">
-                  <div class="w-2.5 h-2.5 rounded-xs bg-amber-500 animate-pulse"></div>
-                  <span class="text-[12px] font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wide">
+                <div class="flex items-center gap-2.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800/90 border border-zinc-300 dark:border-zinc-700 hover:border-amber-500 dark:hover:border-amber-500 transition-all cursor-pointer shadow-xs select-none rounded-lg min-h-[36px]">
+                  <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="K8s Clinical Pod Cluster Status: 100% Healthy"></div>
+                  
+                  <span class="text-[11px] font-extrabold text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
                     {{ game.levelTitle() }} (Lvl {{ game.level() }})
                   </span>
-                  <span class="text-[12px] font-mono font-bold text-[#689F38]">
+
+                  <span class="text-[11px] font-mono font-bold text-emerald-700 dark:text-emerald-400">
                     {{ game.points() }} XP
                   </span>
-                  
+
+                  <!-- K8s Cluster Pod Status Badge -->
+                  <span class="px-1.5 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-300 text-[10px] font-mono font-bold border border-sky-500/30">
+                    ☸️ K8s 3/3
+                  </span>
+
                   <!-- Tiny progress bar -->
-                  <div class="w-12 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-xs overflow-hidden shrink-0">
+                  <div class="w-10 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden shrink-0">
                     <div class="h-full bg-amber-500 transition-all duration-500" [style.width.%]="game.progressPercentage()"></div>
                   </div>
                 </div>
 
                 <!-- Hover Details Tooltip Panel -->
-                <div class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-xl p-4 hidden group-hover:flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                <div class="absolute right-0 top-full mt-2 w-88 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl shadow-2xl p-4 hidden group-hover:flex flex-col gap-3.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50 font-mono">
                   <div class="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2">
-                    <span class="text-xs font-extrabold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Clinician Progress</span>
-                    <span class="text-xs font-bold text-amber-500">Lvl {{ game.level() }}</span>
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-black uppercase tracking-widest text-zinc-900 dark:text-zinc-100">Clinician Mastery & K8s Telemetry</span>
+                    </div>
+                    <span class="text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">Lvl {{ game.level() }}</span>
+                  </div>
+
+                  <!-- Kubernetes Pod Cluster Health -->
+                  <div class="p-2.5 bg-sky-950/20 dark:bg-sky-950/40 rounded-lg border border-sky-500/30 text-[11px]">
+                    <div class="flex items-center justify-between font-bold text-sky-400 mb-1">
+                      <span>☸️ K8s Microservice Pod Telemetry</span>
+                      <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/40">Healthy</span>
+                    </div>
+                    <div class="space-y-1 text-[10px] text-zinc-300 font-sans">
+                      <div class="flex justify-between"><span>• pocketgull-frontend-pod:</span> <span class="text-emerald-400 font-mono">🟢 1/1 Ready (12m / 142MB)</span></div>
+                      <div class="flex justify-between"><span>• pocketgull-fastapi-pod:</span> <span class="text-emerald-400 font-mono">🟢 1/1 Ready (8m / 88MB)</span></div>
+                      <div class="flex justify-between"><span>• pocketgull-adk-live-pod:</span> <span class="text-emerald-400 font-mono">🟢 Auto-Scale (0➔10)</span></div>
+                    </div>
                   </div>
 
                   <!-- Next Objective -->
-                  <div class="p-2.5 bg-amber-500/5 dark:bg-amber-500/10 rounded-lg border border-amber-500/10">
-                    <span class="text-[12px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Current Objective:</span>
-                    <p class="text-xs text-zinc-700 dark:text-zinc-300 font-medium leading-normal mt-0.5">
+                  <div class="p-2.5 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Current Objective:</span>
+                    <p class="text-xs text-zinc-200 font-sans leading-normal mt-0.5">
                       {{ game.nextStepText() }}
                     </p>
                   </div>
 
                   <!-- Quests list -->
-                  <div class="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto pr-1">
+                  <div class="flex flex-col gap-1.5 max-h-[160px] overflow-y-auto pr-1">
                     @for (q of game.quests(); track q.id) {
                       <div class="flex items-start justify-between gap-2 text-xs">
                         <div class="flex items-start gap-1.5 min-w-0">
-                          <span class="mt-0.5" [class.text-emerald-500]="q.completed" [class.text-zinc-300]="!q.completed">
+                          <span class="mt-0.5" [class.text-emerald-500]="q.completed" [class.text-zinc-400]="!q.completed">
                             @if (q.completed) {
                               <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
                             } @else {
@@ -625,19 +628,19 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                           </span>
                           <div class="min-w-0">
                             <div class="font-bold truncate" [class.text-zinc-400]="q.completed" [class.text-zinc-800]="!q.completed" [class.dark:text-zinc-200]="!q.completed" [class.dark:text-zinc-500]="q.completed">{{ q.name }}</div>
-                            <div class="text-[12px] text-zinc-500 leading-tight">{{ q.description }}</div>
+                            <div class="text-[11px] text-zinc-400 font-sans leading-tight">{{ q.description }}</div>
                           </div>
                         </div>
-                        <span class="text-[12px] font-mono shrink-0" [class.text-zinc-400]="q.completed" [class.text-amber-500]="!q.completed">+{{ q.xpReward }} XP</span>
+                        <span class="text-[11px] font-mono shrink-0" [class.text-zinc-400]="q.completed" [class.text-amber-400]="!q.completed">+{{ q.xpReward }} XP</span>
                       </div>
                     }
                   </div>
 
                   <!-- Reset -->
-                  <div class="border-t border-gray-100 dark:border-zinc-800 pt-2 flex justify-between items-center text-[12px]">
-                    <span class="text-zinc-500 font-mono">Progress stored locally</span>
-                    <button (click)="game.reset()" class="text-red-500 hover:underline uppercase font-bold tracking-wider">
-                      Reset
+                  <div class="border-t border-gray-100 dark:border-zinc-800 pt-2 flex justify-between items-center text-[11px]">
+                    <span class="text-zinc-400 font-mono">Cloud Run & K8s Telemetry</span>
+                    <button (click)="game.reset()" class="text-red-400 hover:underline uppercase font-bold tracking-wider cursor-pointer">
+                      Reset Progress
                     </button>
                   </div>
                 </div>

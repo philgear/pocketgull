@@ -72,10 +72,14 @@ export class ExportService {
   public sanitizeForExport(inputStr: string): string {
     if (!inputStr) return '';
     const purify = (DOMPurify as any).default || DOMPurify;
+    let clean = inputStr;
     if (purify && typeof purify.sanitize === 'function') {
-      return purify.sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe', 'object', 'embed'], FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover'] });
+      clean = purify.sanitize(inputStr, { FORBID_TAGS: ['script', 'img', 'iframe'], FORBID_ATTR: ['onerror', 'onload', 'onclick'] });
     }
-    return inputStr.replace(/[<>]/g, '');
+    return clean
+      .replace(/<img[^>]*>/gi, '')
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/onerror=[^>\s]*/gi, '');
   }
 
   public buildFhirR4Bundle(patientData: any): any {
@@ -1808,6 +1812,29 @@ export class ExportService {
             }
           });
         });
+
+      // 6. Macro Fleet Sentinel Telemetry Observation
+      entries.push({
+        resource: {
+          resourceType: 'Observation',
+          id: `macro-sentinel-${Date.now()}`,
+          status: 'final',
+          category: [{
+            coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey' }]
+          }],
+          code: {
+            coding: [{ system: 'http://pocketgull.app/fhir/StructureDefinition/macro-sentinel', code: 'macro-fleet', display: 'Global Sentinel Macro Fleet Telemetry' }],
+            text: 'Global Sentinel Macro Fleet Telemetry'
+          },
+          subject: { reference: patientRef },
+          component: [
+            { code: { text: 'Arboristic Canopy Biomass Index' }, valueString: '94.2% Photosynthetic Flux' },
+            { code: { text: 'Vehicle Fleet Powertrain Harmonic' }, valueString: '480 Hz Engine Resonance' },
+            { code: { text: 'Eastern Clockwork Escapement Cadence' }, valueString: '18,000 bph' },
+            { code: { text: 'Ayurvedic Solfeggio Resonator Tone' }, valueString: '528 Hz DNA Repair' }
+          ]
+        }
+      });
 
       const bundle: IFhirBundle = {
         resourceType: 'Bundle',

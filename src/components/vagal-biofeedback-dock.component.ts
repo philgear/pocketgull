@@ -43,58 +43,166 @@ import { PatientStateService } from '../services/patient-state.service';
         </div>
       </div>
 
-      <!-- Quick Action Biofeedback Dock Buttons -->
+      <!-- Quick Action Biofeedback Dock Buttons with 3D Double-Click Flip State Machines -->
       <div class="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
         
-        <!-- Action 1: 5-Min Vagal Breathing -->
-        <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between space-y-4 sub-panel">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight font-mono">
-              <span class="text-lg">🫁</span>
-              <span>5-Min Resonant Breathing</span>
+        <!-- Action 1: 5-Min Vagal Breathing Card -->
+        @let isBreathingFlipped = isCardFlipped('breathing');
+        <div (dblclick)="toggleCardFlip('breathing'); $event.stopPropagation()"
+             class="relative perspective-1000 group cursor-pointer h-60"
+             title="Double-click to flip over for Polyvagal Rationale & Autonomic Science">
+          
+          <div [class.rotate-y-180]="isBreathingFlipped"
+               class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+            <!-- FRONT FACE -->
+            <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden">
+              <div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-xs font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight font-mono">
+                    <span class="text-lg">🫁</span>
+                    <span>5-Min Resonant Breathing</span>
+                  </div>
+                  <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                    dblclick 🔄
+                  </span>
+                </div>
+                <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans leading-relaxed mt-2">
+                  6.0 BPM pace (Inhale 5s, Exhale 5s) to boost RMSSD HRV and activate baroreflex sensitivity.
+                </p>
+              </div>
+              <button (click)="logBreathingSession(); $event.stopPropagation()"
+                class="w-full py-2.5 px-4 rounded-xl border-2 border-[#1C1C1C] bg-[#F6B12B] text-[#1C1C1C] font-mono text-xs font-black uppercase transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)]">
+                ✓ Log 5-Min Session
+              </button>
             </div>
-            <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans leading-relaxed mt-2">
-              6.0 BPM pace (Inhale 5s, Exhale 5s) to boost RMSSD HRV and activate baroreflex sensitivity.
-            </p>
+
+            <!-- BACK FACE -->
+            <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] bg-indigo-950 text-white shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+              <div>
+                <div class="flex items-center justify-between border-b border-indigo-800 pb-1.5 mb-2 font-mono text-xs">
+                  <span class="text-indigo-300 font-bold uppercase flex items-center gap-1">
+                    <span>🧬</span> Baroreflex Mechanism
+                  </span>
+                  <span class="text-indigo-400 text-[10px]">dblclick flip</span>
+                </div>
+                <p class="text-[11px] text-indigo-100 leading-snug">
+                  Breathing at 0.1 Hz synchronizes heart rate variability with respiratory sinus arrhythmia (RSA), signaling safety to the nucleus tractus solitarius (NTS) in the brainstem.
+                </p>
+              </div>
+              <div class="pt-1.5 border-t border-indigo-900 font-mono text-[9px] text-indigo-300 flex justify-between">
+                <span>Ventral Vagal Tone Active</span>
+                <span>Double-click to return</span>
+              </div>
+            </div>
+
           </div>
-          <button (click)="logBreathingSession()"
-            class="w-full py-3 px-4 rounded-xl border-2 border-[#1C1C1C] bg-[#F6B12B] text-[#1C1C1C] font-mono text-xs font-black uppercase transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)]">
-            ✓ Log 5-Min Session
-          </button>
         </div>
 
-        <!-- Action 2: HRV Coherence Check-in -->
-        <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between space-y-4 sub-panel">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight font-mono">
-              <span class="text-lg">💓</span>
-              <span>HRV Coherence Micro-Checkin</span>
+        <!-- Action 2: HRV Coherence Micro-Checkin Card -->
+        @let isHrvFlipped = isCardFlipped('hrv');
+        <div (dblclick)="toggleCardFlip('hrv'); $event.stopPropagation()"
+             class="relative perspective-1000 group cursor-pointer h-60"
+             title="Double-click to flip over for HRV Coherence Rationale">
+          
+          <div [class.rotate-y-180]="isHrvFlipped"
+               class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+            <!-- FRONT FACE -->
+            <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden">
+              <div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-xs font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight font-mono">
+                    <span class="text-lg">💓</span>
+                    <span>HRV Coherence Check-in</span>
+                  </div>
+                  <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                    dblclick 🔄
+                  </span>
+                </div>
+                <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans leading-relaxed mt-2">
+                  Record instantaneous high HRV coherence status post-AVS or meditation exercise.
+                </p>
+              </div>
+              <button (click)="logHrvCoherence(); $event.stopPropagation()"
+                class="w-full py-2.5 px-4 rounded-xl border-2 border-[#1C1C1C] bg-[#F6B12B] text-[#1C1C1C] font-mono text-xs font-black uppercase transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)]">
+                ✓ Record High Coherence
+              </button>
             </div>
-            <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans leading-relaxed mt-2">
-              Record instantaneous high HRV coherence status post-AVS or meditation exercise.
-            </p>
+
+            <!-- BACK FACE -->
+            <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] bg-emerald-950 text-white shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+              <div>
+                <div class="flex items-center justify-between border-b border-emerald-800 pb-1.5 mb-2 font-mono text-xs">
+                  <span class="text-emerald-300 font-bold uppercase flex items-center gap-1">
+                    <span>💚</span> Sympathovagal Balance
+                  </span>
+                  <span class="text-emerald-400 text-[10px]">dblclick flip</span>
+                </div>
+                <p class="text-[11px] text-emerald-100 leading-snug">
+                  High coherence indicates optimal parasympathetic vagal dominance over sympathetic fight-or-flight drivers, promoting cellular repair.
+                </p>
+              </div>
+              <div class="pt-1.5 border-t border-emerald-900 font-mono text-[9px] text-emerald-300 flex justify-between">
+                <span>Parasympathetic Dominance</span>
+                <span>Double-click to return</span>
+              </div>
+            </div>
+
           </div>
-          <button (click)="logHrvCoherence()"
-            class="w-full py-3 px-4 rounded-xl border-2 border-[#1C1C1C] bg-[#F6B12B] text-[#1C1C1C] font-mono text-xs font-black uppercase transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)]">
-            ✓ Record High Coherence
-          </button>
         </div>
 
-        <!-- Action 3: TCM Shen & Vata Calming -->
-        <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between space-y-4 sub-panel">
-          <div>
-            <div class="flex items-center gap-2 text-xs font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight font-mono">
-              <span class="text-lg">☯️</span>
-              <span>Shen & Vata Calming Tea</span>
+        <!-- Action 3: TCM Shen & Vata Calming Card -->
+        @let isTeaFlipped = isCardFlipped('tea');
+        <div (dblclick)="toggleCardFlip('tea'); $event.stopPropagation()"
+             class="relative perspective-1000 group cursor-pointer h-60"
+             title="Double-click to flip over for Energetic & Botanical Rationale">
+          
+          <div [class.rotate-y-180]="isTeaFlipped"
+               class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+            <!-- FRONT FACE -->
+            <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] dark:border-zinc-700 bg-[#FFFFFF] dark:bg-zinc-900 text-[#1C1C1C] dark:text-zinc-100 shadow-[3px_4px_0px_0px_rgba(28,28,28,0.85)] flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden">
+              <div>
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-xs font-black text-[#1C1C1C] dark:text-zinc-100 uppercase tracking-tight font-mono">
+                    <span class="text-lg">☯️</span>
+                    <span>Shen & Vata Calming Tea</span>
+                  </div>
+                  <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+                    dblclick 🔄
+                  </span>
+                </div>
+                <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans leading-relaxed mt-2">
+                  Confirm ingestion of warm ginger jujube tea to soothe Stomach Vata and kindle Agni.
+                </p>
+              </div>
+              <button (click)="logElixirTea(); $event.stopPropagation()"
+                class="w-full py-2.5 px-4 rounded-xl border-2 border-[#1C1C1C] bg-[#F6B12B] text-[#1C1C1C] font-mono text-xs font-black uppercase transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)]">
+                ✓ Confirm Elixir Ingestion
+              </button>
             </div>
-            <p class="text-xs text-[#1C1C1C]/70 dark:text-zinc-400 font-sans leading-relaxed mt-2">
-              Confirm ingestion of warm ginger jujube tea to soothe Stomach Vata and kindle Agni.
-            </p>
+
+            <!-- BACK FACE -->
+            <div class="p-5 rounded-2xl border-2 border-[#1C1C1C] bg-amber-950 text-white shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+              <div>
+                <div class="flex items-center justify-between border-b border-amber-800 pb-1.5 mb-2 font-mono text-xs">
+                  <span class="text-amber-300 font-bold uppercase flex items-center gap-1">
+                    <span>🍵</span> Energetic Botanical Rationale
+                  </span>
+                  <span class="text-amber-400 text-[10px]">dblclick flip</span>
+                </div>
+                <p class="text-[11px] text-amber-100 leading-snug">
+                  Warm ginger & jujube date decoction grounds unrooted Heart Shen, pacifies cold digestive Vata, and kindles metabolic Agni.
+                </p>
+              </div>
+              <div class="pt-1.5 border-t border-amber-900 font-mono text-[9px] text-amber-300 flex justify-between">
+                <span>Shen & Agni Grounding</span>
+                <span>Double-click to return</span>
+              </div>
+            </div>
+
           </div>
-          <button (click)="logElixirTea()"
-            class="w-full py-3 px-4 rounded-xl border-2 border-[#1C1C1C] bg-[#F6B12B] text-[#1C1C1C] font-mono text-xs font-black uppercase transition hover:scale-105 active:scale-95 cursor-pointer shadow-[2px_3px_0px_0px_rgba(28,28,28,0.85)]">
-            ✓ Confirm Elixir Ingestion
-          </button>
         </div>
 
       </div>
@@ -120,6 +228,19 @@ import { PatientStateService } from '../services/patient-state.service';
 export class VagalBiofeedbackDockComponent {
   patientState = inject(PatientStateService);
   sessionCount = signal<number>(2);
+
+  readonly flippedCards = signal<Set<string>>(new Set());
+
+  toggleCardFlip(id: string) {
+    const current = new Set(this.flippedCards());
+    if (current.has(id)) current.delete(id);
+    else current.add(id);
+    this.flippedCards.set(current);
+  }
+
+  isCardFlipped(id: string): boolean {
+    return this.flippedCards().has(id);
+  }
 
   logBreathingSession() {
     this.sessionCount.update(c => c + 1);

@@ -30,6 +30,42 @@ export class GeminiProvider implements IIntelligenceProvider {
         return headers;
     }
 
+    /**
+     * Executes HTTP requests with exponential backoff, jitter, and automatic retry on 429/5xx status codes.
+     */
+    private async fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
+        let attempts = 0;
+        let delay = 1000;
+
+        while (true) {
+            try {
+                attempts++;
+                const response = await fetch(url, options);
+                if (response.ok) {
+                    return response;
+                }
+
+                const isTransient = response.status === 429 || response.status >= 500;
+                if (isTransient && attempts < maxRetries) {
+                    const jitter = Math.floor(Math.random() * 250);
+                    await new Promise(r => setTimeout(r, delay + jitter));
+                    delay *= 2;
+                    continue;
+                }
+
+                return response;
+            } catch (err) {
+                if (attempts < maxRetries) {
+                    const jitter = Math.floor(Math.random() * 250);
+                    await new Promise(r => setTimeout(r, delay + jitter));
+                    delay *= 2;
+                    continue;
+                }
+                throw err;
+            }
+        }
+    }
+
     async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
         // Hybrid Routing Strategy:
         // Use gemini-2.5-pro for heavy reasoning/synthesis lenses,
@@ -38,7 +74,7 @@ export class GeminiProvider implements IIntelligenceProvider {
             ? 'gemini-2.5-pro'
             : 'gemini-2.5-flash';
 
-        const response = await fetch('/api/ai/stream', {
+        const response = await this.fetchWithRetry('/api/ai/stream', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
@@ -100,7 +136,7 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async generateMetrics(reportText: string): Promise<IClinicalMetrics> {
-        const response = await fetch('/api/ai/metrics', {
+        const response = await this.fetchWithRetry('/api/ai/metrics', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({ text: reportText })
@@ -119,7 +155,7 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async detectClinicalChanges(oldData: string, newData: string): Promise<boolean> {
-        const response = await fetch('/api/ai/changes', {
+        const response = await this.fetchWithRetry('/api/ai/changes', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({ oldData, newData })
@@ -139,7 +175,7 @@ export class GeminiProvider implements IIntelligenceProvider {
         cognitiveLevel?: 'standard' | 'simplified' | 'dyslexia' | 'child',
         language?: string
     ): Promise<string> {
-        const response = await fetch('/api/ai/translate', {
+        const response = await this.fetchWithRetry('/api/ai/translate', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({ text, level, cognitiveLevel, language })
@@ -150,7 +186,7 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async analyzeTranslation(original: string, translated: string): Promise<string> {
-        const response = await fetch('/api/ai/analyze-translation', {
+        const response = await this.fetchWithRetry('/api/ai/analyze-translation', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({ original, translated })
@@ -161,7 +197,7 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async analyzeImage(base64Image: string, context?: string): Promise<string> {
-        const response = await fetch('/api/ai/analyze-image', {
+        const response = await this.fetchWithRetry('/api/ai/analyze-image', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({ base64Image, context })
@@ -172,7 +208,7 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async scanDocument(base64Image: string, context?: string): Promise<any> {
-        const response = await fetch('/api/ai/scan-document', {
+        const response = await this.fetchWithRetry('/api/ai/scan-document', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({ base64Image, context })
@@ -182,7 +218,7 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async synthesizeKnowledge(inputText: string): Promise<any> {
-        const response = await fetch('/api/ai/synthesize', {
+        const response = await this.fetchWithRetry('/api/ai/synthesize', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({ text: inputText })
@@ -201,7 +237,7 @@ export class GeminiProvider implements IIntelligenceProvider {
                 .join('');
         this.chatSessionId = `chat_${Date.now()}_${randomPart}`;
 
-        const response = await fetch('/api/ai/chat/start', {
+        const response = await this.fetchWithRetry('/api/ai/chat/start', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({
@@ -228,7 +264,7 @@ export class GeminiProvider implements IIntelligenceProvider {
             });
         }));
 
-        const response = await fetch('/api/ai/chat/message', {
+        const response = await this.fetchWithRetry('/api/ai/chat/message', {
             method: 'POST',
             headers: this.getHeaders(),
             body: JSON.stringify({

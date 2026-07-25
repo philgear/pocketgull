@@ -66,57 +66,70 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
               @let isCritical = marker.level === 'Deficient' || marker.level === 'Excess';
               @let isWarning = marker.level === 'Sub-optimal' || marker.level === 'High';
               @let isOptimal = marker.level === 'Optimal';
+              @let isBiomarkerFlipped = isBiomarkerFlippedMethod(marker.name);
               @let guidelineVisible = isGuidelineExpanded(marker.name);
+              @let guideline = getGuideline(marker.name);
 
-              <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md rounded-xl p-3 md:p-4 border transition-all hover:scale-[1.02] md:hover:scale-105 shadow-sm"
-                   [class.border-red-200]="isCritical"
-                   [class.dark:border-red-900]="isCritical"
-                   [class.border-yellow-200]="isWarning"
-                   [class.dark:border-yellow-900]="isWarning"
-                   [class.border-emerald-200]="isOptimal"
-                   [class.dark:border-emerald-900]="isOptimal">
+              <div (dblclick)="toggleBiomarkerFlip(marker.name); $event.stopPropagation()"
+                   class="relative perspective-1000 group cursor-pointer h-48"
+                   title="Double-click to flip over for Food-as-Medicine Sourcing Guide & Bioavailability">
                 
-                <div class="flex justify-between items-start mb-1.5 md:mb-2">
-                  <span class="text-xs md:text-sm font-bold text-gray-900 dark:text-zinc-100 truncate pr-2" [title]="marker.name">{{ marker.name }}</span>
-                  <div class="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full mt-0.5 md:mt-1 shrink-0 animate-pulse"
-                       [class.bg-red-500]="isCritical"
-                       [class.bg-yellow-500]="isWarning"
-                       [class.bg-emerald-500]="isOptimal"></div>
-                </div>
-                
-                <div class="text-[10px] md:text-xs font-bold uppercase tracking-wider mb-1.5 md:mb-2"
-                     [class.text-red-700]="isCritical"
-                     [class.dark:text-red-400]="isCritical"
-                     [class.text-amber-700]="isWarning"
-                     [class.dark:text-amber-400]="isWarning"
-                     [class.text-emerald-700]="isOptimal"
-                     [class.dark:text-emerald-400]="isOptimal">
-                  {{ marker.level }}
-                </div>
- 
-                <div class="text-[10px] md:text-xs text-gray-600 dark:text-zinc-400 uppercase tracking-widest truncate" [title]="marker.pathway">
-                  {{ marker.pathway }}
-                </div>
+                <div [class.rotate-y-180]="isBiomarkerFlipped"
+                     class="relative w-full h-full transition-transform duration-500 transform-style-3d">
 
-                <!-- WHO/CDC Guideline Toggle -->
-                @if (getGuideline(marker.name); as guideline) {
-                  <div class="mt-2 md:mt-3 pt-2 md:pt-3 border-t border-gray-100 dark:border-zinc-800">
-                    <label class="flex items-center gap-1.5 cursor-pointer select-none group">
-                      <input type="checkbox" class="w-3 h-3 md:w-3.5 md:h-3.5 rounded border-gray-300 dark:border-zinc-600 text-sky-500 focus:ring-sky-400 focus:ring-offset-0 transition-colors" 
-                             [checked]="guidelineVisible"
-                             (change)="toggleGuideline(marker.name)">
-                      <span class="text-[9px] md:text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-zinc-500 group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">WHO/CDC Ref</span>
-                    </label>
-                    @if (guidelineVisible) {
-                      <div class="mt-1.5 md:mt-2 p-1.5 md:p-2 rounded-lg bg-sky-50/80 dark:bg-sky-950/30 border border-sky-200/50 dark:border-sky-800/30 animate-fadeIn">
-                        <div class="flex items-start gap-1">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 md:w-3 md:h-3 text-sky-500 dark:text-sky-400 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
-                          <p class="text-[9px] leading-[13px] md:text-[11px] md:leading-[15px] text-sky-800 dark:text-sky-300/90 font-medium">{{ guideline }}</p>
-                        </div>
+                  <!-- FRONT FACE -->
+                  <div class="p-3 md:p-4 rounded-xl border flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden shadow-sm"
+                       [class.bg-rose-500\/10]="isCritical"
+                       [class.border-rose-500\/30]="isCritical"
+                       [class.bg-amber-500\/10]="isWarning"
+                       [class.border-amber-500\/30]="isWarning"
+                       [class.bg-emerald-500\/10]="isOptimal"
+                       [class.border-emerald-500\/30]="isOptimal">
+                    <div>
+                      <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">{{ marker.name }}</span>
+                        <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                          dblclick 🔄
+                        </span>
+                      </div>
+                      <div class="text-[11px] font-mono font-bold uppercase mb-2"
+                           [class.text-rose-400]="isCritical"
+                           [class.text-amber-400]="isWarning"
+                           [class.text-emerald-400]="isOptimal">
+                        {{ marker.level }}
+                      </div>
+                      <p class="text-[10px] text-gray-600 dark:text-zinc-400 leading-snug line-clamp-2">
+                        {{ marker.pathway }}
+                      </p>
+                    </div>
+
+                    @if (guidelineVisible && guideline) {
+                      <div class="mt-1 p-1 rounded bg-sky-500/10 border border-sky-500/30 text-[9px] text-sky-300">
+                        {{ guideline }}
                       </div>
                     }
                   </div>
-                }
+
+                  <!-- BACK FACE -->
+                  <div class="p-3 md:p-4 rounded-xl bg-emerald-950 text-white border border-emerald-500/40 shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+                    <div>
+                      <div class="flex items-center justify-between border-b border-emerald-800 pb-1 mb-1.5 font-mono text-[10px]">
+                        <span class="text-emerald-300 font-bold uppercase flex items-center gap-1">
+                          <span>🥗</span> Food-as-Medicine Sourcing
+                        </span>
+                        <span class="text-emerald-400 text-[9px]">dblclick flip</span>
+                      </div>
+                      <p class="text-[10px] text-emerald-100 leading-snug">
+                        <strong>Dietary Sources:</strong> Pumpkin seeds, wild Alaskan salmon, organic dark leafy greens, grass-fed venison.
+                      </p>
+                    </div>
+                    <div class="pt-1 border-t border-emerald-900 font-mono text-[9px] text-emerald-400 flex justify-between">
+                      <span>Bioavailability Optimized</span>
+                      <span>Double-click to return</span>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             }
           </div>
@@ -173,6 +186,37 @@ export class BiomarkerMatrixComponent {
     } else {
       this.expandedGuidelines.set(new Set());
     }
+  }
+
+  readonly flippedBiomarkers = signal<Set<string>>(new Set());
+
+  toggleBiomarkerFlip(name: string) {
+    const set = new Set(this.flippedBiomarkers());
+    if (set.has(name)) set.delete(name);
+    else set.add(name);
+    this.flippedBiomarkers.set(set);
+  }
+
+  isBiomarkerFlipped(name: string): boolean {
+    return this.flippedBiomarkers().has(name);
+  }
+
+  isBiomarkerFlippedMethod(name: string): boolean {
+    return this.flippedBiomarkers().has(name);
+  }
+
+  getFoodSourcingGuide(name: string): string {
+    const map: Record<string, string> = {
+      'Magnesium': 'Organic pumpkin seeds, spinach, dark chocolate (85%+), avocados, and Maine mineral spring water.',
+      'Vitamin D3': 'Wild-caught Maine salmon, cod liver oil, egg yolks, shiitake mushrooms, and 15 mins morning sunlight.',
+      'Vitamin B12': 'Grass-fed beef liver, wild sardines, nutritional yeast, clams, and pasture-raised eggs.',
+      'Folate (B9)': 'L-5-MTHF rich foods: dark leafy greens, asparagus, lentils, broccoli, and organic avocado.',
+      'Zinc': 'Wild oysters, pumpkin seeds, grass-fed lamb, hemp seeds, and pasture-raised poultry.',
+      'Homocysteine': 'Reduce refined grains. Support clearance with bioactive L-methylfolate, P5P (B6), and Methyl-B12.',
+      'Ferritin': 'Heme iron: wild venison, grass-fed beef. Non-heme: cooked lentils with Vitamin C (lemon juice) to triple absorption.',
+      'Vitamin C': 'Wild Maine blueberries, rose hips, acerola cherry, bell peppers, and fresh spruce needle tea.'
+    };
+    return map[name] ?? 'Whole food sources rich in co-factors support bioavailable enzymatic conversion.';
   }
 
   /** Check if a specific guideline is expanded */

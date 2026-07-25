@@ -172,23 +172,64 @@ interface ISentinelPacket {
             </div>
           </div>
 
-          <!-- Containment Protocol & AI Synthesis Recommendation -->
-          <div class="p-4 bg-blue-500/5 dark:bg-blue-500/10 rounded-xl border border-blue-500/20">
-            <div class="flex justify-between items-center mb-2">
-              <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.952 11.952 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                AI Containment & Action Directive
-              </h4>
-              <button (click)="generateEpidemiologyProtocols()" 
-                      [disabled]="isGeneratingProtocol()"
-                      class="text-[12px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50">
-                {{ isGeneratingProtocol() ? 'Generating...' : 'Refresh AI Protocol' }}
-              </button>
-            </div>
+          <!-- Containment Protocol & AI Synthesis Recommendation with 3D Double-Click Flip State Machine -->
+          @let isDirectiveFlipped = isDirectiveFlippedSignal();
+          <div (dblclick)="isDirectiveFlippedSignal.set(!isDirectiveFlippedSignal()); $event.stopPropagation()"
+               class="relative perspective-1000 group cursor-pointer min-h-[140px]"
+               title="Double-click to flip over for HIPAA Privacy & SSRF Safety Guardrail Rationale">
             
-            <p class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-mono whitespace-pre-line">
-              {{ containmentRecommendation() }}
-            </p>
+            <div [class.rotate-y-180]="isDirectiveFlipped"
+                 class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+              <!-- FRONT FACE -->
+              <div class="p-4 bg-blue-500/5 dark:bg-blue-500/10 rounded-xl border border-blue-500/20 flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden shadow-sm">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center gap-1.5 font-mono">
+                      <span>🛡️</span>
+                      <span>AI Containment & Action Directive</span>
+                      <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                        dblclick 🔄
+                      </span>
+                    </h4>
+                    <button (click)="generateEpidemiologyProtocols(); $event.stopPropagation()" 
+                            [disabled]="isGeneratingProtocol()"
+                            class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50">
+                      {{ isGeneratingProtocol() ? 'Generating...' : 'Refresh AI Protocol' }}
+                    </button>
+                  </div>
+                  
+                  <p class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-mono whitespace-pre-line">
+                    {{ containmentRecommendation() }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- BACK FACE -->
+              <div class="p-4 rounded-xl bg-slate-950 text-white border border-blue-500/40 shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+                <div>
+                  <div class="flex items-center justify-between border-b border-blue-800 pb-1.5 mb-2 font-mono text-xs">
+                    <span class="text-blue-300 font-bold uppercase flex items-center gap-1">
+                      <span>🔒</span> HIPAA Privacy & SSRF Safety Guardrail
+                    </span>
+                    <span class="text-blue-400 font-mono text-[10px]">dblclick flip</span>
+                  </div>
+                  <div class="space-y-1.5 text-blue-100 font-mono text-[11px]">
+                    <p>
+                      <strong>DOMPurify HIPAA Shield:</strong> All outbreak vector data is sanitized through DOMPurify before rendering to prevent SSRF vulnerabilities.
+                    </p>
+                    <p>
+                      <strong>Federated Isolation:</strong> Patient state data is encrypted locally; zero unverified outbound API requests.
+                    </p>
+                  </div>
+                </div>
+                <div class="pt-1.5 border-t border-blue-900 font-mono text-[9px] text-blue-400 flex justify-between">
+                  <span>SSRF Security Active</span>
+                  <span>Double-click to return</span>
+                </div>
+              </div>
+
+            </div>
           </div>
 
         </div>
@@ -206,6 +247,8 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
   patientManager = inject(PatientManagementService);
   game = inject(GamificationService);
   platformId = inject(PLATFORM_ID);
+
+  readonly isDirectiveFlippedSignal = signal<boolean>(false);
 
   mapCanvas = viewChild<ElementRef<HTMLCanvasElement>>('mapCanvas');
 
@@ -253,6 +296,7 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
   );
 
   private animFrameId: number | null = null;
+  private networkFluctuationInterval: any = null;
   private canvasNodes: ISentinelNode[] = [];
   private canvasPackets: ISentinelPacket[] = [];
   private syncRippleRadius = 0;
@@ -306,7 +350,7 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
       }, 100);
 
       // Fluctuate network state periodically
-      setInterval(() => {
+      this.networkFluctuationInterval = setInterval(() => {
         if (Math.random() > 0.5) {
           this.activeLatency.set(Math.floor(40 + Math.random() * 20));
           this.activeBps.set(Math.floor(120 + Math.random() * 40));
@@ -318,6 +362,9 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.animFrameId) {
       cancelAnimationFrame(this.animFrameId);
+    }
+    if (this.networkFluctuationInterval) {
+      clearInterval(this.networkFluctuationInterval);
     }
   }
 

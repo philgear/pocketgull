@@ -59,8 +59,10 @@ dist_*.json
 .lighthouseci/
 security-report.md
 
-# Sandbox environment
+# Sandbox & Challenge workspace environments
 sandbox/
+python_example_2026/
+contests/
 
 # Agent Rules
 rules.yaml
@@ -227,9 +229,21 @@ trained_physio_models/
 *.atr
 *.rec
 
-# Temporary build cache & scratch workspace
-tmp/
-scratch/
+# PhysioNet Competition Submission Code & Posters
+!contests/
+!contests/physionet/
+!contests/physionet/2026/
+!contests/physionet/2026/*
+!python_example_2026/
+!python_example_2026/**
+python_example_2026/synthetic_dataset/
+python_example_2026/real_physionet_dataset/
+python_example_2026/synthetic_model/
+python_example_2026/real_model_output/
+python_example_2026/synthetic_predictions/
+python_example_2026/*.sav
+
+
 
 
 

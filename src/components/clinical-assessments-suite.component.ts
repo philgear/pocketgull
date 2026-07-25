@@ -15,33 +15,83 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col gap-6 animate-in fade-in duration-300">
-      <!-- Header Suite Card -->
-      <div class="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm">
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1.5">
-            <span class="text-xs uppercase font-extrabold tracking-widest text-zinc-400">Clinical & Life Sovereignty Instrumentation</span>
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-850">
-              Master Life Data Provider & Clinical Suite
-            </span>
-          </div>
-          <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">Multimodal Clinical & Life Assessments</h2>
-          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xl leading-relaxed">
-            Standardized Western, Eastern, & Grow-Thyself Life Sovereignty instruments: PHQ-9, GAD-7, ISI, C-SSRS, ROS-14, PHQ-15, PRAPARE, Ayurveda, TCM, and Grow-Thyself Epigenetic Flourishing.
-          </p>
-        </div>
+    <div class="flex flex-col gap-6 animate-in fade-in duration-300">
+      <!-- Header Suite Card with 3D Double-Click Flip State Machine -->
+      <div class="relative perspective-1000 group cursor-pointer"
+           (dblclick)="isHeaderFlipped.set(!isHeaderFlipped())"
+           title="Double-click to flip over for Motivational Interviewing (OARS) & Plain-Language Rationale">
+        
+        <div [class.rotate-y-180]="isHeaderFlipped()"
+             class="relative w-full transition-transform duration-500 transform-style-3d">
 
-        <div class="flex flex-col items-center shrink-0 p-4 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 rounded-2xl w-full md:w-64 text-center shadow-inner">
-          <div class="text-xs uppercase font-bold text-zinc-400 mb-1 font-mono">
-            Active: {{ currentTitle() }}
+          <!-- FRONT FACE: Quantitative Assessment Telemetry -->
+          <div class="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm backface-hidden">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-xs uppercase font-extrabold tracking-widest text-zinc-400">Clinical & Life Sovereignty Instrumentation</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-850">
+                  Master Life Data Provider & Clinical Suite
+                </span>
+                <span (click)="isHeaderFlipped.set(!isHeaderFlipped()); $event.stopPropagation()"
+                      class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition cursor-pointer select-none">
+                  dblclick 🔄 flip OARS
+                </span>
+              </div>
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-50">Multimodal Clinical & Life Assessments</h2>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xl leading-relaxed">
+                Standardized Western, Eastern, & Grow-Thyself Life Sovereignty instruments: PHQ-9, GAD-7, ISI, C-SSRS, ROS-14, PHQ-15, PRAPARE, Ayurveda, TCM, and Grow-Thyself Epigenetic Flourishing.
+              </p>
+            </div>
+
+            <div class="flex flex-col items-center shrink-0 p-4 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 rounded-2xl w-full md:w-64 text-center shadow-inner">
+              <div class="text-xs uppercase font-bold text-zinc-400 mb-1 font-mono">
+                Active: {{ currentTitle() }}
+              </div>
+              <span class="text-3xl font-black text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">
+                {{ currentScore() }}<span class="text-sm font-normal text-zinc-400">/{{ currentMaxScore() }}</span>
+              </span>
+              <div class="mt-2 w-full">
+                <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold border transition-colors duration-300 w-full justify-center" [class]="currentTier().colorClass">
+                  {{ currentTier().label }}
+                </span>
+              </div>
+            </div>
           </div>
-          <span class="text-3xl font-black text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">
-            {{ currentScore() }}<span class="text-sm font-normal text-zinc-400">/{{ currentMaxScore() }}</span>
-          </span>
-          <div class="mt-2 w-full">
-            <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold border transition-colors duration-300 w-full justify-center" [class]="currentTier().colorClass">
-              {{ currentTier().label }}
-            </span>
+
+          <!-- BACK FACE: Motivational Interviewing (OARS) & Plain-Language Rationale -->
+          <div class="p-6 bg-indigo-950 text-white border border-indigo-500/40 rounded-2xl flex flex-col justify-between gap-4 shadow-2xl absolute inset-0 rotate-y-180 backface-hidden backdrop-blur-xl font-sans">
+            <div>
+              <div class="flex items-center justify-between border-b border-indigo-800 pb-2 mb-3 font-mono text-xs">
+                <div class="flex items-center gap-2 text-indigo-300 font-bold uppercase tracking-wider">
+                  <span>💬</span>
+                  <span>Motivational Interviewing (OARS) & Patient Guidance</span>
+                </div>
+                <span class="text-[10px] text-indigo-400 font-mono">dblclick flip back</span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                <div class="space-y-1.5">
+                  <span class="font-bold text-amber-300 font-mono block uppercase">💬 Open-Ended Reflection Prompt (OARS):</span>
+                  <p class="text-indigo-100 italic leading-relaxed">
+                    "I notice your {{ currentTitle() }} assessment score is {{ currentScore() }}/{{ currentMaxScore() }} ({{ currentTier().label }}). What shifts have you noticed in your daily energy or mood recently?"
+                  </p>
+                </div>
+
+                <div class="space-y-1.5">
+                  <span class="font-bold text-emerald-300 font-mono block uppercase">🧑‍🤝‍🧑 Plain-Language Patient Literacy Tip:</span>
+                  <p class="text-indigo-100 leading-relaxed">
+                    This score reflects your documented symptoms. Small daily habits—like morning light exposure, diaphragmatic breathing, or gentle movement—help support your body's natural balance.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-indigo-900 font-mono text-[10px] text-indigo-400 flex justify-between items-center">
+              <span>Cognitive Load Shield Active</span>
+              <span>Double-click anytime to return to scores</span>
+            </div>
           </div>
+
         </div>
       </div>
 
@@ -152,12 +202,7 @@ import {
           </button>
         }
 
-        @if (svc.activeTab() === 'isi' && svc.isiScore() >= 8) {
-          <button (click)="triggerSolfeggioSleepDeck()"
-            class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold uppercase tracking-wider text-xs transition shadow hover:shadow-md active:scale-95 cursor-pointer">
-            <span>🎶 Activate Solfeggio 432Hz Sleep Deck</span>
-          </button>
-        }
+        
 
         <button (click)="svc.resetAssessment(svc.activeTab())"
           class="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 font-bold uppercase tracking-wider text-xs transition active:scale-95 cursor-pointer">
@@ -293,7 +338,9 @@ import {
   `]
 })
 export class ClinicalAssessmentsSuiteComponent {
-  readonly svc = inject(ClinicalAssessmentsService);
+  svc = inject(ClinicalAssessmentsService);
+
+  readonly isHeaderFlipped = signal<boolean>(false);
   readonly toastMessage = signal<string | null>(null);
 
   readonly currentTitle = computed(() => {

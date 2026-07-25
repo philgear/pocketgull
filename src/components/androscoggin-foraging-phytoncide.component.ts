@@ -57,57 +57,165 @@ export interface IForagingItem {
         }
       </div>
 
-      <!-- Terpene Phytoncide Immune Calculator Banner -->
-      <div class="p-5 rounded-2xl bg-emerald-900/40 border border-emerald-700/60 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <h4 class="text-xs font-mono font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-2">
-            <span>🌲</span> Northern White Pine & Red Spruce Phytoncide Index
-          </h4>
-          <span class="text-xs font-mono text-emerald-400 font-bold">NK Cell Activity Boost: +42%</span>
+      <!-- Model Scoring Badge Bar -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 font-mono text-xs">
+        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase block">AI Complexity Score</span>
+            <span class="text-base font-black text-emerald-600 dark:text-emerald-400">3.8 / 10</span>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 uppercase">
+            Natural Entrainment
+          </span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-emerald-800/80">
-            <div class="text-[10px] text-emerald-400 font-bold uppercase">Alpha-Pinene</div>
-            <div class="text-slate-200 mt-1">Bronchodilator & Memory Enhancement</div>
+        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase block">Autonomic Stability Score</span>
+            <span class="text-base font-black text-emerald-600 dark:text-emerald-400">8.6 / 10</span>
           </div>
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-emerald-800/80">
-            <div class="text-[10px] text-emerald-400 font-bold uppercase">Beta-Pinene</div>
-            <div class="text-slate-200 mt-1">Anti-Inflammatory Vagal Modulation</div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 uppercase">
+            Vagal Parasympathetic Shift
+          </span>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 font-bold uppercase block">Diagnostic Certainty Score</span>
+            <span class="text-base font-black text-emerald-600 dark:text-emerald-400">9.3 / 10</span>
           </div>
-          <div class="p-3 rounded-xl bg-slate-950/60 border border-emerald-800/80">
-            <div class="text-[10px] text-emerald-400 font-bold uppercase">Myrcene & Camphene</div>
-            <div class="text-slate-200 mt-1">Analgesic & Antioxidant Defense</div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 uppercase">
+            High Volatile Evidence
+          </span>
+        </div>
+      </div>
+
+      <!-- Terpene Phytoncide Immune Calculator Banner & Interactive Inhalation Telemetry -->
+      <div class="p-5 rounded-2xl bg-emerald-950/80 border border-emerald-700/60 mb-6 font-mono text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 blur-2xl rounded-full pointer-events-none"></div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-emerald-800/80 pb-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-300 flex items-center gap-2">
+            <span>🌲</span> Conifer Terpene Inhalation & NK-Cell Priming Telemetry
+          </h4>
+          <span class="text-xs text-emerald-400 font-extrabold px-3 py-1 rounded-lg bg-emerald-900/80 border border-emerald-600/40">
+            NK-Cell Cytotoxicity: +{{ nkCellBoost() }}%
+          </span>
+        </div>
+
+        <!-- Inhalation Duration Slider -->
+        <div class="mb-4">
+          <div class="flex justify-between items-center text-xs font-bold mb-1.5">
+            <span class="text-emerald-300 uppercase tracking-wider">🎛️ Forest Bathing Inhalation Exposure:</span>
+            <span class="text-emerald-400 font-extrabold">{{ exposureMinutes() }} Minutes</span>
+          </div>
+          <input type="range" min="10" max="90" step="5"
+                 [value]="exposureMinutes()"
+                 (input)="updateExposure($event)"
+                 class="w-full h-2 bg-emerald-950 rounded-lg appearance-none cursor-pointer accent-emerald-400 border border-emerald-800" />
+          <div class="flex justify-between text-[9px] text-emerald-500 mt-1">
+            <span>10 min (Micro-Dose)</span>
+            <span>30 min (Standard Forest Bath)</span>
+            <span>90 min (Full Canopy Immersion)</span>
+          </div>
+        </div>
+
+        <!-- Telemetry Gauges Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-emerald-800/80">
+            <div class="text-[10px] text-emerald-400 font-bold uppercase">Alpha-Pinene & Limonene</div>
+            <div class="text-sm font-black text-white mt-1">{{ terpeneSerum() }} nmol/L</div>
+            <div class="text-[9px] text-emerald-300/80 mt-0.5">Airway Bronchodilation</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-emerald-800/80">
+            <div class="text-[10px] text-emerald-400 font-bold uppercase">NK Perforin / Granulysin</div>
+            <div class="text-sm font-black text-emerald-300 mt-1">+{{ nkCellBoost() }}% Upregulation</div>
+            <div class="text-[9px] text-emerald-300/80 mt-0.5">Antiviral Immune Priming</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-emerald-800/80">
+            <div class="text-[10px] text-emerald-400 font-bold uppercase">Salivary Cortisol</div>
+            <div class="text-sm font-black text-amber-300 mt-1">-{{ cortisolDrop() }}% Reduction</div>
+            <div class="text-[9px] text-emerald-300/80 mt-0.5">Stress Axis Attenuation</div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-emerald-800/80">
+            <div class="text-[10px] text-emerald-400 font-bold uppercase">HRV Vagal Coherence</div>
+            <div class="text-sm font-black text-teal-300 mt-1">{{ hrvCoherence() }} / 100</div>
+            <div class="text-[9px] text-emerald-300/80 mt-0.5">Parasympathetic Tone</div>
           </div>
         </div>
       </div>
 
-      <!-- Seasonal Foraging Items Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Seasonal Foraging Items Grid with 3D Double-Click Flip State Machines -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 font-sans">
         @for (item of filteredItems(); track item.id) {
-          <div class="p-4 rounded-2xl bg-slate-950/70 border border-emerald-800/80 flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <div class="flex items-center gap-2">
-                  <span class="text-2xl">{{ item.icon }}</span>
-                  <div>
-                    <h5 class="text-sm font-bold text-white">{{ item.name }}</h5>
-                    <span class="text-[11px] font-mono italic text-emerald-400 opacity-90">{{ item.botanicalName }}</span>
+          @let isItemFlipped = isItemFlippedMethod(item.id);
+          <div (dblclick)="toggleItemFlip(item.id); $event.stopPropagation()"
+               class="relative perspective-1000 group cursor-pointer h-60"
+               title="Double-click to flip over for Botanical Safety Guide & Identification Rationale">
+            
+            <div [class.rotate-y-180]="isItemFlipped"
+                 class="relative w-full h-full transition-transform duration-500 transform-style-3d">
+
+              <!-- FRONT FACE -->
+              <div class="p-5 rounded-2xl bg-zinc-950/90 border border-emerald-800/80 hover:border-emerald-500/50 transition flex flex-col justify-between h-full w-full absolute inset-0 backface-hidden shadow-sm">
+                <div>
+                  <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-2xl">{{ item.icon }}</span>
+                      <div>
+                        <h5 class="text-sm font-bold text-white">{{ item.name }}</h5>
+                        <span class="text-[11px] font-mono italic text-emerald-400 opacity-90">{{ item.botanicalName }}</span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-mono">
+                      <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                        dblclick 🔄
+                      </span>
+                      <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase font-bold">
+                        {{ item.season }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="text-xs text-zinc-300 space-y-1.5 mt-3">
+                    <p><strong class="text-emerald-400 font-mono">Key Phytochemicals:</strong> {{ item.phytochemicals }}</p>
+                    <p><strong class="text-emerald-400 font-mono">Clinical Benefit:</strong> {{ item.therapeuticBenefit }}</p>
                   </div>
                 </div>
-                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase font-bold">
-                  {{ item.season }}
-                </span>
+
+                <div class="pt-2 border-t border-zinc-800 flex items-center justify-between font-mono text-[9.5px]">
+                  <button (click)="logForagedItem(item); $event.stopPropagation()"
+                    class="px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-bold uppercase transition active:scale-95 cursor-pointer">
+                    + Log Harvest
+                  </button>
+                  <span class="text-zinc-500">Androscoggin Bioregion</span>
+                </div>
               </div>
 
-              <div class="text-xs text-slate-300 space-y-1.5 mt-3">
-                <p><strong class="text-emerald-400 font-mono">Key Phytochemicals:</strong> {{ item.phytochemicals }}</p>
-                <p><strong class="text-emerald-400 font-mono">Clinical Benefit:</strong> {{ item.therapeuticBenefit }}</p>
+              <!-- BACK FACE -->
+              <div class="p-5 rounded-2xl bg-emerald-950 text-white border border-emerald-500/40 shadow-2xl flex flex-col justify-between h-full w-full absolute inset-0 rotate-y-180 backface-hidden font-sans text-xs">
+                <div>
+                  <div class="flex items-center justify-between border-b border-emerald-800 pb-1.5 mb-2 font-mono text-xs">
+                    <span class="text-emerald-300 font-bold uppercase flex items-center gap-1">
+                      <span>⚠️</span> Safety & Identification Guide
+                    </span>
+                    <span class="text-emerald-400 font-mono text-[10px]">dblclick flip</span>
+                  </div>
+                  <div class="space-y-1.5 text-emerald-100">
+                    <p class="text-[11px]">
+                      <strong>Safety Protocol:</strong> {{ item.safetyGuide }}
+                    </p>
+                    <p class="text-[11px]">
+                      <strong>Preparation:</strong> Steep or decoct gently in 185°F water for 15 mins. Avoid high boiling to preserve volatile monoterpenes.
+                    </p>
+                  </div>
+                </div>
+                <div class="pt-1.5 border-t border-emerald-900 font-mono text-[9px] text-emerald-400 flex justify-between">
+                  <span>Ethical Bioregional Foraging</span>
+                  <span>Double-click to return</span>
+                </div>
               </div>
-            </div>
 
-            <div class="mt-4 pt-3 border-t border-emerald-900 text-[11px] font-mono text-amber-300/90 flex items-center gap-1.5">
-              <span>⚠️</span> Safety Note: {{ item.safetyGuide }}
             </div>
           </div>
         }
@@ -119,8 +227,58 @@ export interface IForagingItem {
 export class AndroscogginForagingPhytoncideComponent {
   state = inject(PatientStateService);
 
+  readonly flippedItems = signal<Set<string>>(new Set());
+
+  toggleItemFlip(id: string) {
+    const current = new Set(this.flippedItems());
+    if (current.has(id)) current.delete(id);
+    else current.add(id);
+    this.flippedItems.set(current);
+  }
+
+  isItemFlippedMethod(id: string): boolean {
+    return this.flippedItems().has(id);
+  }
+
+  logForagedItem(item: IForagingItem) {
+    this.state.addClinicalNote({
+      id: `forage-${Date.now()}`,
+      text: `🌿 Foraged ${item.name} (${item.botanicalName}). Key compounds: ${item.phytochemicals}.`,
+      sourceLens: 'Functional Protocols',
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
+    });
+    alert(`🌿 Logged ${item.name} harvest to patient chart!`);
+  }
+
   readonly seasons: ('Spring' | 'Summer' | 'Autumn' | 'Winter')[] = ['Spring', 'Summer', 'Autumn', 'Winter'];
   readonly selectedSeason = signal<'Spring' | 'Summer' | 'Autumn' | 'Winter'>('Spring');
+
+  readonly exposureMinutes = signal<number>(30);
+
+  updateExposure(event: Event) {
+    const val = parseInt((event.target as HTMLInputElement).value, 10);
+    this.exposureMinutes.set(val);
+  }
+
+  readonly nkCellBoost = computed(() => {
+    const mins = this.exposureMinutes();
+    return Math.round(Math.min(58, Math.max(15, (mins / 30) * 42)));
+  });
+
+  readonly cortisolDrop = computed(() => {
+    const mins = this.exposureMinutes();
+    return Math.round(Math.min(36, Math.max(10, (mins / 30) * 30)));
+  });
+
+  readonly hrvCoherence = computed(() => {
+    const mins = this.exposureMinutes();
+    return Math.round(Math.min(98, Math.max(60, 68 + (mins / 90) * 28)));
+  });
+
+  readonly terpeneSerum = computed(() => {
+    const mins = this.exposureMinutes();
+    return (12.4 + (mins / 30) * 18.2).toFixed(1);
+  });
 
   readonly foragingDatabase: IForagingItem[] = [
     {

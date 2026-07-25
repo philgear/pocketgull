@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, inject, ElementRef, ViewChild, AfterContentChecked, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
+import { PetAuditoryService } from '../../services/pet-auditory.service';
+import { ThemeService } from '../../services/theme.service';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
@@ -305,6 +307,9 @@ export class PocketGullButtonComponent implements AfterContentChecked {
       this.disabled() ? 'disabled' : ''
     ].filter(Boolean).join(' ');
   }
+
+  private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch { return null; } })();
+  private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch { return null; } })();
 
   onClick(event: MouseEvent) {
     if (!this.disabled() && !this.loading()) {

@@ -68,22 +68,21 @@ def generate_synthetic_clinical_data(n_samples: int = 5000, seed: int = 42) -> p
     df["bp_diastolic"] = df["bp_diastolic"].clip(40, 120)
     df["spo2"] = df["spo2"].clip(70, 100)
     
-    # Calculate a non-linear risk probability (latent variable)
-    # Higher HR, extreme BP, lower SpO2, and advanced age increase risk
+    # Calculate non-linear risk probability with physiological noise
+    unobserved_noise = rng.normal(0, 1.2, n_samples)
     logit = (
-        0.02 * (df["hr"] - 75)**2 / 100 +        # Quadratic penalty for extreme HR
-        0.015 * (df["bp_systolic"] - 120)**2 / 100 + # Quadratic penalty for high/low systolic BP
-        -0.25 * (df["spo2"] - 98) +              # Linear penalty for hypoxia
-        0.03 * (df["age"] - 40) -                # Age risk factor
-        2.5                                      # Baseline offset
+        0.015 * (df["hr"] - 75)**2 / 100 +
+        0.012 * (df["bp_systolic"] - 120)**2 / 100 +
+        -0.18 * (df["spo2"] - 98) +
+        0.02 * (df["age"] - 40) +
+        unobserved_noise -
+        2.2
     )
     
     prob = 1 / (1 + np.exp(-logit))
-    
-    # Binarize label based on probability (critical event: 1, stable: 0)
     df["outcome"] = (prob >= 0.35).astype(int)
     
-    print(f"Generated {n_samples} synthetic patient records.")
+    print(f"Generated {n_samples} synthetic patient records with noise.")
     print(f"Outcome distribution: Stable = {np.sum(df['outcome'] == 0)}, Critical Event = {np.sum(df['outcome'] == 1)}")
     return df
 

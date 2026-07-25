@@ -51,20 +51,21 @@ export interface IPedigreeMember {
             <div class="space-y-2">
               <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Generation 1 — Grandparents (Senior Caretaking)</span>
               <div class="grid grid-cols-2 gap-4">
-                <div *ngFor="let member of getMembersByGen('grandparents')" 
-                  (click)="selectMember(member)"
-                  [class]="selectedMember()?.id === member.id
-                    ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
-                    : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
-                  <div>
-                    <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
-                    <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
-                    <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
+                @for (member of getMembersByGen('grandparents'); track member.id) {
+                  <div (click)="selectMember(member)"
+                    [class]="selectedMember()?.id === member.id
+                      ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
+                      : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
+                    <div>
+                      <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
+                      <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
+                      <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
+                    </div>
+                    <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
+                      {{ getStatusText(member.status) }}
+                    </span>
                   </div>
-                  <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
-                    {{ getStatusText(member.status) }}
-                  </span>
-                </div>
+                }
               </div>
             </div>
 
@@ -77,20 +78,21 @@ export interface IPedigreeMember {
             <div class="space-y-2">
               <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Generation 2 — Parents (Pre-Conception & Mid-Life)</span>
               <div class="grid grid-cols-2 gap-4">
-                <div *ngFor="let member of getMembersByGen('parents')" 
-                  (click)="selectMember(member)"
-                  [class]="selectedMember()?.id === member.id
-                    ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
-                    : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
-                  <div>
-                    <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
-                    <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
-                    <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
+                @for (member of getMembersByGen('parents'); track member.id) {
+                  <div (click)="selectMember(member)"
+                    [class]="selectedMember()?.id === member.id
+                      ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
+                      : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
+                    <div>
+                      <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
+                      <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
+                      <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
+                    </div>
+                    <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
+                      {{ getStatusText(member.status) }}
+                    </span>
                   </div>
-                  <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
-                    {{ getStatusText(member.status) }}
-                  </span>
-                </div>
+                }
               </div>
             </div>
 
@@ -103,27 +105,29 @@ export interface IPedigreeMember {
             <div class="space-y-2">
               <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Generation 3 — Offspring (Protected Healthspan)</span>
               <div class="grid grid-cols-1 gap-4">
-                <div *ngFor="let member of getMembersByGen('offspring')" 
-                  (click)="selectMember(member)"
-                  [class]="selectedMember()?.id === member.id
-                    ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
-                    : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
-                  <div>
-                    <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
-                    <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
-                    <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
+                @for (member of getMembersByGen('offspring'); track member.id) {
+                  <div (click)="selectMember(member)"
+                    [class]="selectedMember()?.id === member.id
+                      ? 'p-4 rounded-2xl bg-zinc-900 border-2 border-orange-500 shadow-md cursor-pointer flex items-center justify-between'
+                      : 'p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition cursor-pointer flex items-center justify-between'">
+                    <div>
+                      <span class="text-[10px] font-bold uppercase text-zinc-400 block">{{ member.relation }}</span>
+                      <h4 class="text-xs font-bold text-zinc-100 font-sans mt-0.5">{{ member.name }}</h4>
+                      <p class="text-[11px] text-zinc-400 font-sans mt-0.5">{{ member.riskLabel }}</p>
+                    </div>
+                    <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
+                      {{ getStatusText(member.status) }}
+                    </span>
                   </div>
-                  <span [class]="getStatusBadgeClass(member.status)" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase border">
-                    {{ getStatusText(member.status) }}
-                  </span>
-                </div>
+                }
               </div>
             </div>
 
           </div>
 
           <!-- Drill-Down Detail Drawer -->
-          <div *ngIf="selectedMember() as member" class="w-full lg:w-96 p-6 border-t lg:border-t-0 lg:border-l border-zinc-800 bg-zinc-900 flex flex-col justify-between overflow-y-auto space-y-6 font-mono">
+          @if (selectedMember(); as member) {
+            <div class="w-full lg:w-96 p-6 border-t lg:border-t-0 lg:border-l border-zinc-800 bg-zinc-900 flex flex-col justify-between overflow-y-auto space-y-6 font-mono">
             
             <div class="space-y-4">
               <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
@@ -168,31 +172,33 @@ export interface IPedigreeMember {
 
             <!-- Risk Pruning Action Button -->
             <div class="pt-4 border-t border-zinc-800 space-y-2">
-              <button 
-                *ngIf="member.status === 'active_risk'"
-                (click)="neutralizeBranch(member.id)" 
-                class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 font-bold text-xs uppercase tracking-wider transition shadow-md cursor-pointer border border-orange-400/50">
-                Prune & Neutralize Risk Branch
-              </button>
-
-              <p *ngIf="member.status !== 'active_risk'" class="text-center text-xs text-emerald-400 font-bold py-2">
-                ✓ Risk Branch Neutralized
-              </p>
+              @if (member.status === 'active_risk') {
+                <button 
+                  (click)="neutralizeBranch(member.id)" 
+                  class="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-400 text-zinc-950 font-bold text-xs uppercase tracking-wider transition shadow-md cursor-pointer border border-orange-400/50">
+                  Prune & Neutralize Risk Branch
+                </button>
+              } @else {
+                <p class="text-center text-xs text-emerald-400 font-bold py-2">
+                  ✓ Risk Branch Neutralized
+                </p>
+              }
             </div>
 
           </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="p-4 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between font-mono text-xs text-zinc-400">
-          <span>Family Pedigree Tree • Prune branches to expand offspring healthspan</span>
-          <pocket-gull-button (click)="closeModal.emit()" variant="secondary" size="sm">
-            Close Visualizer
-          </pocket-gull-button>
-        </div>
-
+        }
       </div>
+
+      <!-- Footer -->
+      <div class="p-4 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between font-mono text-xs text-zinc-400">
+        <span>Family Pedigree Tree • Prune branches to expand offspring healthspan</span>
+        <pocket-gull-button (click)="closeModal.emit()" variant="secondary" size="sm">
+          Close Visualizer
+        </pocket-gull-button>
+      </div>
+
     </div>
+  </div>
   `,
   styles: [`
     .animate-in { animation: fadeIn 0.2s ease-out; }

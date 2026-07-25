@@ -10,6 +10,8 @@ import { RulesEngineService } from './rules-engine.service';
 import { PatientStateService } from './patient-state.service';
 import { OrcidService } from './orcid.service';
 import { WebLLMProvider } from './ai/webllm.provider';
+import { PetAuditoryService } from './pet-auditory.service';
+import { ThemeService } from './theme.service';
 import {
     DEMO_ANALYSIS_REPORT_WESTERN,
     DEMO_ANALYSIS_REPORT_EASTERN,
@@ -30,7 +32,7 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health' | 'Chronobiology Matrix' | 'Functional Medicine Matrix';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
@@ -49,6 +51,8 @@ export class ClinicalIntelligenceService {
     private patientState = inject(PatientStateService);
     private orcid = inject(OrcidService);
     private webgpu = inject(WebLLMProvider);
+    private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch { return null; } })();
+    private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch { return null; } })();
 
     readonly isLoading = signal<boolean>(false);
     readonly webgpuProgress = this.webgpu.loadingProgress;
@@ -82,6 +86,8 @@ export class ClinicalIntelligenceService {
             case 'Nutrition':
             case 'Precision Nutrients':
             case 'Treatment Matrix':
+            case 'Functional Medicine Matrix':
+            case 'Chronobiology Matrix':
                 return 'Swoop';
             case 'Monitoring & Follow-up':
                 return 'Sentinel';
@@ -104,6 +110,8 @@ export class ClinicalIntelligenceService {
             case 'Nutrition':
             case 'Precision Nutrients':
             case 'Treatment Matrix':
+            case 'Functional Medicine Matrix':
+            case 'Chronobiology Matrix':
                 return 'Interventions & Precision Dosing Specialist — "Spotted. Locked. Delivering."';
             case 'Monitoring & Follow-up':
                 return 'Recovery Vigilance & Trend Monitor — "I never blink. I never look away."';
