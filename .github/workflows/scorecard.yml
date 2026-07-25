@@ -37,6 +37,7 @@ jobs:
         with:
           results_file: results.sarif
           results_format: sarif
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           # Disable public REST publish if OIDC token is missing, keeping SARIF local upload robust
           publish_results: false
 

@@ -298,6 +298,39 @@ if (!sentinelPassed) {
   process.exit(1);
 }
 
-console.log('\n🎉 All pre-commit validation checks passed successfully. Safe to commit!\n');
+// Check 7: Monorepo Package Boundary Validation
+console.log('🔹 Running: Monorepo Package Boundary validation...');
+let boundaryViolations = 0;
+const workspacePackages = ['companion-apps', 'pocketgull_api', 'docs'];
+
+for (const pkg of workspacePackages) {
+  const pkgDir = path.join(workspaceRoot, pkg);
+  if (!fs.existsSync(pkgDir)) continue;
+
+  const pkgFiles = [];
+  walkDir(pkgDir, '.ts', pkgFiles);
+  walkDir(pkgDir, '.js', pkgFiles);
+
+  for (const file of pkgFiles) {
+    if (file.includes('node_modules') || file.includes('dist') || file.includes('build')) continue;
+    try {
+      const content = fs.readFileSync(file, 'utf8');
+      const relativeBoundaryMatches = content.match(/import\s+.*?from\s+['"](?:\.\.\/){3,}.*?['"]/g);
+      if (relativeBoundaryMatches) {
+        console.error(`❌ Boundary violation in ${path.relative(workspaceRoot, file)}: Deep relative escape import found.`);
+        boundaryViolations++;
+      }
+    } catch (e) {}
+  }
+}
+
+if (boundaryViolations > 0) {
+  console.error(`❌ Monorepo boundary validation failed with ${boundaryViolations} violation(s).\n`);
+  process.exit(1);
+} else {
+  console.log('✅ Monorepo Package Boundary validation passed.\n');
+}
+
+console.log('🎉 All pre-commit validation checks passed successfully. Safe to commit!\n');
 process.exit(0);
 

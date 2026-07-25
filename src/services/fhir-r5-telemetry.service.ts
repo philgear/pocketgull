@@ -2,6 +2,15 @@ import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from './patient-state.service';
 
+function getSecureRandomFloat(): number {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return array[0] / 4294967296;
+  }
+  return Math.random();
+}
+
 export interface IFhirR5TelemetryPacket {
   id: string;
   topic: string;
@@ -166,8 +175,8 @@ export class FhirR5TelemetryService {
       spO2: currentSpO2,
       respirationRate: currentResp,
       hrvMs: currentHrv,
-      eegAlphaHz: 10.2 + (Math.random() * 0.8 - 0.4),
-      eegBetaHz: 18.0 + (Math.random() * 1.2 - 0.6),
+      eegAlphaHz: 10.2 + (getSecureRandomFloat() * 0.8 - 0.4),
+      eegBetaHz: 18.0 + (getSecureRandomFloat() * 1.2 - 0.6),
       hdf5BufferId: `hdf5_chunk_${Date.now()}`,
       ecgWaveform: Array.from({ length: 12 }, () => Math.sin(Date.now() / 100) * 0.5),
       status,
