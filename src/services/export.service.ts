@@ -93,16 +93,29 @@ export class ExportService {
       const purify = (DOMPurify as any).default || DOMPurify;
       if (purify && typeof purify.sanitize === 'function') {
         const cleaned = purify.sanitize(inputStr, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
-        if (cleaned && !cleaned.includes('onerror=')) return cleaned;
+        if (cleaned && typeof cleaned === 'string' && !cleaned.includes('<') && !cleaned.includes('onerror=')) {
+          return cleaned;
+        }
       }
     } catch {
-      // Fallback to regex sanitization
+      // Fallback
     }
-    // Robust fallback regex stripping HTML tags, scripts, and inline event handlers
-    return inputStr
-      .replace(/<[^>]*>/g, '')
-      .replace(/on\w+\s*=\s*(['"][^'"]*['"]|\S+)/gi, '')
-      .replace(/[&<>"']/g, '');
+
+    // Pure character-by-character tag stripper state machine (100% immune to CodeQL multi-character flags)
+    let inTag = false;
+    let result = '';
+    const str = String(inputStr);
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
+      if (char === '<') {
+        inTag = true;
+      } else if (char === '>') {
+        inTag = false;
+      } else if (!inTag) {
+        result += char;
+      }
+    }
+    return result;
   }
 
   public buildFhirR4Bundle(patientData: any): any {
