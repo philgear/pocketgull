@@ -9,6 +9,7 @@ export default defineConfig({
   integrations: [mdx()],
   outDir: './dist',
   vite: {
+    root: import.meta.dirname,
     // @ts-ignore
     configFile: false,
     define: {
