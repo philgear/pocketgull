@@ -99,7 +99,9 @@ jobs:
         run: npm run build
         env:
           CI: true
+          NODE_ENV: 'production'
           GEMINI_API_KEY: 'placeholder-key-for-build'
+          VITE_PUBLIC_API_URL: 'http://127.0.0.1:4000'
           SKIP_HEALTHCARE_PROVISION: 'true'
           ASTRO_TELEMETRY_DISABLED: '1'
 
