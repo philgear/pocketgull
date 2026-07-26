@@ -6,10 +6,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-  testDir: path.resolve(process.cwd(), 'e2e'),
+  testDir: path.resolve(__dirname, 'e2e'),
   testMatch: '**/*.spec.ts',
-  testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.venv/**'],
-  outputDir: path.resolve(process.cwd(), 'tmp/playwright-results'),
+  testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.venv/**', '**/pg2/**', '**/branddesk/**'],
+  outputDir: path.resolve(__dirname, 'tmp/playwright-results'),
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
