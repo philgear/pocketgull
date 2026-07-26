@@ -15,6 +15,11 @@ export default defineConfig({
   outDir: './dist',
   vite: {
     root: __dirname,
+    build: {
+      rollupOptions: {
+        input: []
+      }
+    },
     define: {
       'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || 'placeholder-key-for-build')
     },
