@@ -103,11 +103,15 @@ export interface IDomainSuite {
       <!-- 10-Dimensional Unified Synthesizer Overview -->
       <app-unified-paradigm-synthesizer />
 
-      <!-- Occupational Healthspan & 10D Hazard Profile Card -->
-      <app-occupational-hazard-card />
+      <!-- Occupational Healthspan & 10D Hazard Profile Card (Smart Conditional Display) -->
+      @if (showAllSuites() || hasOccupationalData()) {
+        <app-occupational-hazard-card />
+      }
 
-      <!-- Food-Drug & Patient State Safety Matrix Card -->
-      <app-food-safety-guardrail-card />
+      <!-- Food-Drug & Patient State Safety Matrix Card (Smart Conditional Display) -->
+      @if (showAllSuites() || hasFoodSafetyAlerts()) {
+        <app-food-safety-guardrail-card />
+      }
 
       <!-- Domain Suite Tab Navigation Bar (Dieter Rams Rectangular Precision) -->
       <div 
@@ -203,6 +207,13 @@ export class DomainSuitesNavigatorComponent {
   activePatientName = this.patientState.patientName;
   activePatientAge = this.patientState.patientAge;
   activePatientGender = this.patientState.patientGender;
+  hasOccupationalData = this.patientState.hasOccupationalData;
+  hasFoodSafetyAlerts = computed(() => {
+    const meds = this.patientState.medications() || [];
+    const proto = this.patientState.dietaryProtocol() || '';
+    const vitals = this.patientState.vitals();
+    return meds.length > 0 || proto.trim().length > 0 || !!vitals.bp;
+  });
   clinicianKss = computed(() => this.kssService.clinicianKss() || 1);
 
   suites: IDomainSuite[] = [

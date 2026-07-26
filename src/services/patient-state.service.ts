@@ -337,6 +337,31 @@ export class PatientStateService {
   // A trigger to force the UI to expand the analysis panel when an item is selected/clicked
   readonly uiExpandTrigger = signal<number>(0);
 
+  // --- Clinician Manual Override & Smart Data Presence Computed Signals ---
+  readonly showAllInstrumentsOverride = signal<boolean>(false);
+
+  readonly hasOccupationalData = computed(() => {
+    const occ = this.occupation();
+    return !!(occ && occ.trim().length > 0 && occ.toLowerCase() !== 'unassigned');
+  });
+
+  readonly hasAllergiesOrDietaryData = computed(() => {
+    const proto = this.dietaryProtocol();
+    return !!(proto && proto.trim().length > 0);
+  });
+
+  readonly hasPsychiatricData = computed(() => {
+    const complaint = (this.reasonForVisit() || '').toLowerCase();
+    const issuesStr = Object.keys(this.issues() || {}).join(' ').toLowerCase();
+    return complaint.includes('ocd') || complaint.includes('anxiety') || complaint.includes('compulsive') || complaint.includes('panic') || issuesStr.includes('ocd') || issuesStr.includes('anxiety');
+  });
+
+  readonly hasLabBiomarkerData = computed(() => {
+    const nut = this.dynamicNutrients();
+    const ox = this.oxidativeStressMarkers();
+    return (nut && nut.length > 0) || (ox && ox.length > 0);
+  });
+
   private storage = inject(StorageService);
   private game = inject(GamificationService);
 
