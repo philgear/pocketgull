@@ -99,7 +99,7 @@ jobs:
         run: npm run build
         env:
           CI: true
-          GEMINI_API_KEY: ''
+          GEMINI_API_KEY: 'placeholder-key-for-build'
           SKIP_HEALTHCARE_PROVISION: 'true'
           ASTRO_TELEMETRY_DISABLED: '1'
 
@@ -111,7 +111,7 @@ jobs:
         env:
           CI: true
           PORT: '4000'
-          GEMINI_API_KEY: ''
+          GEMINI_API_KEY: 'placeholder-key-for-build'
           SKIP_HEALTHCARE_PROVISION: 'true'
 
       - name: Upload Playwright Report

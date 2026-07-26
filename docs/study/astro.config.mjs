@@ -11,7 +11,7 @@ export default defineConfig({
   vite: {
     root: import.meta.dirname,
     define: {
-      'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || '')
+      'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || 'placeholder-key-for-build')
     },
     server: {
       fs: {
