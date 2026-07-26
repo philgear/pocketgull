@@ -11,7 +11,7 @@ export type GaugeDisplayMode = 'full' | 'spark';
   imports: [CommonModule],
   template: `
     @if (mode() === 'full') {
-      <div class="p-4 sm:p-5 rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-gray-200/80 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+      <div class="p-4 sm:p-5 rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-gray-200/80 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-all duration-300 ease-out animate-pg-fade-in hover:scale-[1.008] focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
            tabindex="0"
            role="progressbar"
            [attr.aria-valuenow]="value()"

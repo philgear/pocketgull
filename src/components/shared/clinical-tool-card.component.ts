@@ -192,13 +192,13 @@ export class ClinicalToolCardComponent {
 
   cardCssClass = computed(() => {
     const st = this.state();
-    let base = 'p-4 rounded-lg border transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ';
+    let base = 'p-4 rounded-2xl border transition-all duration-300 ease-out cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 animate-pg-fade-in hover:scale-[1.008] active:scale-[0.99] ';
     if (st === 'prescribed') {
-      base += 'bg-emerald-500/5 dark:bg-emerald-950/20 border-emerald-500/50 shadow-sm hover:border-emerald-500';
+      base += 'bg-emerald-500/5 dark:bg-emerald-950/20 border-emerald-500/50 shadow-sm hover:shadow-md hover:border-emerald-500 animate-pg-pulse-glow';
     } else if (st === 'hidden') {
       base += 'bg-zinc-100/50 dark:bg-zinc-900/30 border-zinc-200 dark:border-zinc-800 opacity-60 hover:opacity-100';
     } else {
-      base += 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-zinc-400 dark:hover:border-zinc-700';
+      base += 'bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-md hover:border-emerald-500/30';
     }
     return base;
   });
@@ -206,7 +206,7 @@ export class ClinicalToolCardComponent {
   badgeCssClass = computed(() => {
     const st = this.state();
     if (st === 'prescribed') {
-      return 'min-h-[32px] px-2.5 py-1 rounded-md bg-emerald-600 text-white font-mono font-bold text-[10px] shadow-sm flex items-center gap-1.5 transition-transform active:scale-95 border border-emerald-500';
+      return 'min-h-[32px] px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-bold text-[10px] shadow-sm flex items-center gap-1.5 transition-all active:scale-95 border border-emerald-500';
     }
     if (st === 'hidden') {
       return 'min-h-[32px] px-2.5 py-1 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-mono font-bold text-[10px] flex items-center gap-1.5 transition-transform active:scale-95 border border-zinc-300 dark:border-zinc-700';
