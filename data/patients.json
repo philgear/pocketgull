@@ -4,36 +4,6 @@
     "name": "Robert Davis",
     "age": 58,
     "gender": "Male",
-    "lastVisit": "2024.11.20",
-    "preexistingConditions": [
-      "Essential Hypertension",
-      "Type 2 Diabetes Mellitus",
-      "Obesity (BMI 42)",
-      "Severe Obstructive Sleep Apnea",
-      "Metabolic Syndrome"
-    ],
-    "patientGoals": "Discuss CPAP compliance issues and weight management strategies.",
-    "tcmIntake": {
-      "tongueColor": "pale",
-      "tongueCoating": "thick-white",
-      "pulseQuality": "slippery",
-      "thermalPreference": "aversion-cold",
-      "sweatPattern": "spontaneous-day",
-      "tasteInMouth": "bland",
-      "tcmPattern": "Spleen Qi Deficiency with Phlegm-Damp Accumulation"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 3,
-      "prakritiPitta": 4,
-      "prakritiKapha": 8,
-      "vikritiVata": 4,
-      "vikritiPitta": 5,
-      "vikritiKapha": 9,
-      "agniType": "mandagni",
-      "amaScore": 7.2,
-      "nadiPulseType": "swan-kapha",
-      "ayurvedicImbalance": "Kapha Agni Suppression & Medas Dhatu Stagnation"
-    },
     "vitals": {
       "bp": "152/95",
       "hr": "88",
@@ -41,69 +11,6 @@
       "spO2": "94%",
       "weight": "295 lbs",
       "height": "5'10\""
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Malondialdehyde (MDA)",
-        "value": "3.8 μmol/L"
-      },
-      {
-        "id": "2",
-        "name": "F2-Isoprostanes",
-        "value": "45 pg/mg creatinine"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "1.2 μmol/g Hb"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10",
-        "value": "0.45 μg/mL"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Lisinopril",
-        "value": "20mg Daily"
-      },
-      {
-        "id": "2",
-        "name": "Metformin",
-        "value": "1000mg BID"
-      },
-      {
-        "id": "3",
-        "name": "Atorvastatin",
-        "value": "40mg Daily"
-      }
-    ],
-    "issues": {
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_p001_chest_1",
-          "name": "Chest & Lungs",
-          "painLevel": 1,
-          "description": "Reports waking up gasping for air frequently. Daytime somnolence affecting work performance.",
-          "symptoms": []
-        }
-      ],
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_p001_head_1",
-          "name": "Head & Neck",
-          "painLevel": 2,
-          "description": "Morning headaches nearly every day, likely secondary to hypoxemia and OSA.",
-          "symptoms": []
-        }
-      ]
     },
     "history": [
       {
@@ -168,38 +75,13 @@
           "issues": {}
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_003",
-        "type": "X-Ray",
-        "title": "PA and Lateral Chest",
-        "date": "2024.10.12",
-        "bodyPartId": "chest",
-        "description": "Bilateral hyperinflation consistent with COPD. No focal consolidation, pneumothorax or pleural effusion. Borderline cardiomegaly.",
-        "status": "Reviewed",
-        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Chest_xray_mac.jpg/640px-Chest_xray_mac.jpg"
-      }
-    ],
-    "dynamicNutrients": [],
-    "clinicalNotes": [],
-    "checklist": []
+    ]
   },
   {
     "id": "p002",
     "name": "Sarah Jenkins",
     "age": 42,
     "gender": "Female",
-    "lastVisit": "2024.12.01",
-    "preexistingConditions": [
-      "Asthma",
-      "Anxiety Disorder",
-      "Chronic Lower Back Pain",
-      "Opioid Use Disorder (in remission)",
-      "Depression"
-    ],
-    "patientGoals": "Seeking alternative pain management options to avoid opioid relapse.",
     "vitals": {
       "bp": "118/72",
       "hr": "76",
@@ -207,111 +89,6 @@
       "spO2": "99%",
       "weight": "145 lbs",
       "height": "5'5\""
-    },
-    "biometricHistory": [
-      {
-        "timestamp": "2024-10-15T08:00:00Z",
-        "type": "hr",
-        "value": "78"
-      },
-      {
-        "timestamp": "2024-11-01T08:00:00Z",
-        "type": "hr",
-        "value": "77"
-      },
-      {
-        "timestamp": "2024-12-01T08:00:00Z",
-        "type": "hr",
-        "value": "76"
-      },
-      {
-        "timestamp": "2024-10-15T08:00:00Z",
-        "type": "spO2",
-        "value": "98"
-      },
-      {
-        "timestamp": "2024-11-01T08:00:00Z",
-        "type": "spO2",
-        "value": "98"
-      },
-      {
-        "timestamp": "2024-12-01T08:00:00Z",
-        "type": "spO2",
-        "value": "99"
-      },
-      {
-        "timestamp": "2024-10-15T08:00:00Z",
-        "type": "bp",
-        "value": "120/75"
-      },
-      {
-        "timestamp": "2024-11-01T08:00:00Z",
-        "type": "bp",
-        "value": "119/73"
-      },
-      {
-        "timestamp": "2024-12-01T08:00:00Z",
-        "type": "bp",
-        "value": "118/72"
-      }
-    ],
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Malondialdehyde (MDA)",
-        "value": "2.4 μmol/L"
-      },
-      {
-        "id": "2",
-        "name": "F2-Isoprostanes",
-        "value": "38 pg/mg creatinine"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Vitamin C",
-        "value": "1.2 mg/dL"
-      },
-      {
-        "id": "2",
-        "name": "Glutathione (GSH)",
-        "value": "1.8 μmol/g Hb"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Albuterol Inhaler",
-        "value": "2 puffs PRN"
-      },
-      {
-        "id": "2",
-        "name": "Sertraline",
-        "value": "50mg Daily"
-      },
-      {
-        "id": "3",
-        "name": "Gabapentin",
-        "value": "300mg TID"
-      },
-      {
-        "id": "4",
-        "name": "Ibuprofen",
-        "value": "600mg PRN MSK Pain"
-      }
-    ],
-    "issues": {
-      "mid_back": [
-        {
-          "id": "mid_back",
-          "noteId": "note_p002_back_1",
-          "name": "Lower Back",
-          "painLevel": 7,
-          "description": "Constant aching pain in L4-L5 region radiating to the left glute. Worsens with prolonged standing.",
-          "symptoms": []
-        }
-      ]
     },
     "history": [
       {
@@ -375,29 +152,6 @@
           }
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_001",
-        "type": "MRI",
-        "title": "Lumbar Spine MRI",
-        "date": "2024.11.15",
-        "bodyPartId": "lower_back",
-        "description": "L4-L5 disc desiccation and mild paracentral disc protrusion without significant canal stenosis. Mild bilateral neural foraminal narrowing.",
-        "status": "Reviewed",
-        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/MRI_of_the_Lumbar_Spine_%28Sagittal_View%29.jpg/640px-MRI_of_the_Lumbar_Spine_%28Sagittal_View%29.jpg"
-      },
-      {
-        "id": "scan_002",
-        "type": "X-Ray",
-        "title": "Lumbar Spine AP/Lateral X-Ray",
-        "date": "2024.11.02",
-        "bodyPartId": "lower_back",
-        "description": "Normal alignment. No fracture or acute bony abnormality. Mild degenerative disc disease at L4-L5.",
-        "status": "Reviewed",
-        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/X-ray_of_the_lumbar_spine_%28lateral_view%29.jpg/640px-X-ray_of_the_lumbar_spine_%28lateral_view%29.jpg"
-      }
     ]
   },
   {
@@ -405,15 +159,6 @@
     "name": "William Henderson",
     "age": 81,
     "gender": "Male",
-    "lastVisit": "2024.12.05",
-    "preexistingConditions": [
-      "Ischemic Heart Disease",
-      "Chronic Kidney Disease (Stage 3a)",
-      "Mild Cognitive Impairment / Early Alzheimer's",
-      "Osteoarthritis",
-      "PhysioNet 2026 Challenge: Synaptic Waveform & Gait Telemetry Instability Challenge"
-    ],
-    "patientGoals": "Family requested evaluation for increased confusion, recent fall at home, and gait instability.",
     "vitals": {
       "bp": "135/82",
       "hr": "68",
@@ -425,126 +170,6 @@
       "magnesium": "1.7 mg/dL (Low-normal)",
       "b12": "410 pg/mL",
       "zinc": "72 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "8-OHdG",
-        "value": "15 ng/mg creatinine (Elevated)"
-      },
-      {
-        "id": "2",
-        "name": "Lipid Peroxides",
-        "value": "12 nmol/mL (Elevated)"
-      },
-      {
-        "id": "3",
-        "name": "Amyloid-Beta 42/40 Ratio",
-        "value": "0.08 (Sub-optimal)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Alpha-Tocopherol",
-        "value": "11.5 mg/L"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10 (Ubiquinol)",
-        "value": "0.52 μg/mL (Low)"
-      },
-      {
-        "id": "3",
-        "name": "Glutathione (GSH)",
-        "value": "1.3 μmol/g Hb"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Donepezil",
-        "value": "5mg Daily"
-      },
-      {
-        "id": "2",
-        "name": "Aspirin",
-        "value": "81mg Daily"
-      },
-      {
-        "id": "3",
-        "name": "Furosemide",
-        "value": "20mg Daily"
-      },
-      {
-        "id": "4",
-        "name": "Memantine",
-        "value": "10mg BID"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2024-11-15T08:00:00Z",
-        "type": "hr",
-        "value": "72"
-      },
-      {
-        "timestamp": "2024-12-01T08:00:00Z",
-        "type": "hr",
-        "value": "70"
-      },
-      {
-        "timestamp": "2024-12-05T08:00:00Z",
-        "type": "hr",
-        "value": "68"
-      },
-      {
-        "timestamp": "2024-12-05T08:00:00Z",
-        "type": "bp",
-        "value": "135/82"
-      }
-    ],
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_p003_head_1",
-          "name": "Neuro-Cognitive Decline & Memory",
-          "painLevel": 2,
-          "description": "Progressive short-term memory impairment with occasional disorientation during late afternoon.",
-          "symptoms": [
-            {
-              "name": "Short-term memory loss",
-              "type": "Cognitive",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Sundowning confusion",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Episodic"
-            }
-          ]
-        }
-      ],
-      "limbs": [
-        {
-          "id": "r_thigh",
-          "noteId": "note_p003_limbs_1",
-          "name": "Right Hip & Knee Osteoarthritis",
-          "painLevel": 5,
-          "description": "Moderate right hip joint stiffness contributing to antalgic gait and fall risk.",
-          "symptoms": [
-            {
-              "name": "Gait instability",
-              "type": "Musculoskeletal",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -561,17 +186,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Synaptic Waveform & Gait Telemetry\n- **ECG QRS Duration**: 96 ms (Normal)\n- **ST Segment**: Neutral\n- **Gait Asymmetry Index**: 14.2% (Elevated fall risk threshold: > 10%)\n- **Postural Sway Velocity**: 2.8 cm/s"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_p003_1",
-        "title": "Brain MRI Volumetric Study",
-        "type": "MRI",
-        "date": "2024.11.10",
-        "description": "Mild hippocampal volume loss bilateral; non-specific microvascular white matter ischemic changes (Fazekas Grade 1).",
-        "status": "Reviewed"
-      }
     ]
   },
   {
@@ -579,15 +193,6 @@
     "name": "Global Sentinel",
     "age": 72,
     "gender": "Male",
-    "lastVisit": "2026.03.12",
-    "preexistingConditions": [
-      "Ischemic Heart Disease (IHD)",
-      "Chronic Obstructive Pulmonary Disease (COPD)",
-      "Type 2 Diabetes Mellitus (T2DM)",
-      "Chronic Kidney Disease (CKD) Stage 3a",
-      "PhysioNet 2026 Challenge: Multi-Lead ECG Ischemia & ST-Elevation Telemetry Challenge"
-    ],
-    "patientGoals": "Optimize oxygenation, stabilize blood glucose, manage exertional chest tightness, and protect renal function.",
     "vitals": {
       "bp": "138/82",
       "hr": "74",
@@ -599,121 +204,6 @@
       "magnesium": "1.9 mg/dL",
       "b12": "490 pg/mL",
       "zinc": "78 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "hsCRP",
-        "value": "4.5 mg/L (Elevated)"
-      },
-      {
-        "id": "2",
-        "name": "NT-proBNP",
-        "value": "450 pg/mL (Borderline High)"
-      },
-      {
-        "id": "3",
-        "name": "HbA1c",
-        "value": "7.4%"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "CoQ10 (Ubiquinol)",
-        "value": "0.62 μg/mL"
-      },
-      {
-        "id": "2",
-        "name": "Glutathione (GSH)",
-        "value": "1.4 μmol/g Hb"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Atorvastatin",
-        "value": "40mg PM"
-      },
-      {
-        "id": "2",
-        "name": "Metformin",
-        "value": "1000mg BID"
-      },
-      {
-        "id": "3",
-        "name": "Spiriva (Tiotropium)",
-        "value": "18mcg Daily Inhalation"
-      },
-      {
-        "id": "4",
-        "name": "Empagliflozin (SGLT2i)",
-        "value": "10mg AM"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2026-03-01T08:00:00Z",
-        "type": "hr",
-        "value": "76"
-      },
-      {
-        "timestamp": "2026-03-05T08:00:00Z",
-        "type": "hr",
-        "value": "75"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "hr",
-        "value": "74"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "bp",
-        "value": "138/82"
-      }
-    ],
-    "issues": {
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_p004_chest_1",
-          "name": "Cardiopulmonary Strain (IHD & COPD)",
-          "painLevel": 4,
-          "description": "Comorbid ischemic heart disease and moderate COPD. Reports mild shortness of breath on climbing stairs and chronic morning cough.",
-          "symptoms": [
-            {
-              "name": "Dyspnea on exertion",
-              "type": "Respiratory",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Exertional chest tightness",
-              "type": "Cardiovascular",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "abdomen": [
-        {
-          "id": "abdomen",
-          "noteId": "note_p004_abdomen_1",
-          "name": "Cardiometabolic & Renal Syndrome",
-          "painLevel": 2,
-          "description": "Longstanding type 2 diabetes with eGFR of 52 mL/min/1.73m² (Stage 3a CKD). Patient shows signs of mild fluid retention.",
-          "symptoms": [
-            {
-              "name": "Mild pedal edema",
-              "type": "Renal",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -730,17 +220,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Multi-Lead ECG Ischemia & ST-Elevation Telemetry\n- **QRS Interval Duration**: 102 ms\n- **ST Segment Deviation**: +0.08 mV Lead II (Transient ischemic monitoring)\n- **QTc Interval**: 432 ms\n- **Respiratory Rate**: 18 breaths/min"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_p004_1",
-        "title": "12-Lead Electrocardiogram & Echocardiogram",
-        "type": "Lab Report",
-        "date": "2026.03.01",
-        "description": "Left ventricular ejection fraction 52%; mild concentric LV hypertrophy; zero acute ST elevation.",
-        "status": "Reviewed"
-      }
     ]
   },
   {
@@ -748,15 +227,6 @@
     "name": "CDC Sentinel",
     "age": 78,
     "gender": "Female",
-    "lastVisit": "2026.03.12",
-    "preexistingConditions": [
-      "Hypertensive Heart Disease",
-      "Type 2 Diabetes Mellitus (T2DM)",
-      "Nephritis / Chronic Kidney Disease (Stage 3b)",
-      "Mild Cognitive Impairment (Early Alzheimer's)",
-      "PhysioNet 2026 Challenge: Cardiorenal Fluid Retentive Hemodynamic Challenge"
-    ],
-    "patientGoals": "Manage blood pressure, optimize glycemic status, protect renal clearance, and support cognitive function and fall prevention.",
     "vitals": {
       "bp": "148/92",
       "hr": "82",
@@ -768,121 +238,6 @@
       "magnesium": "1.6 mg/dL (Low)",
       "b12": "380 pg/mL",
       "zinc": "65 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "hsCRP",
-        "value": "5.2 mg/L (Elevated)"
-      },
-      {
-        "id": "2",
-        "name": "Serum Creatinine",
-        "value": "1.8 mg/dL"
-      },
-      {
-        "id": "3",
-        "name": "eGFR",
-        "value": "44 mL/min/1.73m² (Stage 3b CKD)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "1.1 μmol/g Hb"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10",
-        "value": "0.45 μg/mL"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Valsartan",
-        "value": "160mg Daily"
-      },
-      {
-        "id": "2",
-        "name": "Amlodipine",
-        "value": "5mg Daily"
-      },
-      {
-        "id": "3",
-        "name": "Linagliptin",
-        "value": "5mg Daily"
-      },
-      {
-        "id": "4",
-        "name": "Donepezil",
-        "value": "5mg PM"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2026-03-01T08:00:00Z",
-        "type": "hr",
-        "value": "85"
-      },
-      {
-        "timestamp": "2026-03-05T08:00:00Z",
-        "type": "hr",
-        "value": "84"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "hr",
-        "value": "82"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "bp",
-        "value": "148/92"
-      }
-    ],
-    "issues": {
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_p005_chest_1",
-          "name": "Cardiovascular Stress (Hypertensive Heart Disease)",
-          "painLevel": 3,
-          "description": "Essential hypertension with signs of left ventricular strain. Reports occasional heart palpitations and mild breathlessness when walking.",
-          "symptoms": [
-            {
-              "name": "Mild exertional breathlessness",
-              "type": "Respiratory",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Intermittent palpitations",
-              "type": "Cardiovascular",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "abdomen": [
-        {
-          "id": "abdomen",
-          "noteId": "note_p005_abdomen_1",
-          "name": "Metabolic-Renal Insufficiency",
-          "painLevel": 2,
-          "description": "Comorbid T2DM and nephritis (Stage 3b CKD, eGFR 44). Experiencing mild bilateral lower limb swelling due to fluid retention.",
-          "symptoms": [
-            {
-              "name": "Mild lower extremity swelling",
-              "type": "Renal",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -899,17 +254,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Cardiorenal Fluid Retentive Hemodynamic Challenge\n- **QRS Interval Duration**: 98 ms\n- **ST Segment**: Neutral (+0.02 mV)\n- **Pulse Wave Velocity (PWV)**: 11.2 m/s (Elevated arterial stiffness)\n- **Bio-Impedance Fluid Index**: +1.8 L surplus"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_p005_1",
-        "title": "Renal Ultrasound & Echocardiogram",
-        "type": "Ultrasound",
-        "date": "2026.02.20",
-        "description": "Bilateral kidneys display increased cortical echogenicity consistent with chronic parenchymal disease. Concentric LV hypertrophy.",
-        "status": "Reviewed"
-      }
     ]
   },
   {
@@ -917,14 +261,6 @@
     "name": "Pediatric Sentinel",
     "age": 4,
     "gender": "Male",
-    "lastVisit": "2026.03.12",
-    "preexistingConditions": [
-      "Preterm Birth History (32 weeks gestation)",
-      "Mild-Intermittent Asthma",
-      "Recent Rotavirus Enteritis (Resolving)",
-      "PhysioNet 2026 Challenge: Pediatric Autonomic Airway Reactivity & Dehydration Challenge"
-    ],
-    "patientGoals": "Rehydrate after diarrhoeal episode, reduce airway hyperreactivity, and support pediatric immune health.",
     "vitals": {
       "bp": "95/60",
       "hr": "112",
@@ -936,106 +272,6 @@
       "magnesium": "2.0 mg/dL",
       "b12": "610 pg/mL",
       "zinc": "75 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "hsCRP",
-        "value": "1.8 mg/L"
-      },
-      {
-        "id": "2",
-        "name": "Serum Electrolytes",
-        "value": "Na 136 mEq/L, K 4.1 mEq/L"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Vitamin C (Pediatric)",
-        "value": "1.4 mg/dL"
-      },
-      {
-        "id": "2",
-        "name": "Zinc Bio-Availability",
-        "value": "75 mcg/dL"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Albuterol Nebulizer",
-        "value": "1.25mg PRN wheeze"
-      },
-      {
-        "id": "2",
-        "name": "Oral Rehydration Solution (ORS)",
-        "value": "50mL/kg over 4 hours"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2026-03-10T08:00:00Z",
-        "type": "hr",
-        "value": "120"
-      },
-      {
-        "timestamp": "2026-03-11T08:00:00Z",
-        "type": "hr",
-        "value": "115"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "hr",
-        "value": "112"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "bp",
-        "value": "95/60"
-      }
-    ],
-    "issues": {
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_p006_chest_1",
-          "name": "Bronchial Hyperreactivity (Post-Viral Cough)",
-          "painLevel": 3,
-          "description": "Exhibits post-viral bronchial irritation with mild expiratory wheezing. Responds well to occasional albuterol nebulization.",
-          "symptoms": [
-            {
-              "name": "Dry cough",
-              "type": "Respiratory",
-              "verified": true,
-              "timeline": "Acute"
-            },
-            {
-              "name": "Mild expiratory wheeze",
-              "type": "Respiratory",
-              "verified": true,
-              "timeline": "Acute"
-            }
-          ]
-        }
-      ],
-      "abdomen": [
-        {
-          "id": "abdomen",
-          "noteId": "note_p006_abdomen_1",
-          "name": "Gastroenteritis & Dehydration Recovery",
-          "painLevel": 4,
-          "description": "Recovering from multiple episodes of watery diarrhea. Oral intake is improving, but displays slightly dry mucous membranes.",
-          "symptoms": [
-            {
-              "name": "Watery diarrhea",
-              "type": "Gastrointestinal",
-              "verified": true,
-              "timeline": "Acute"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -1052,17 +288,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Pediatric Autonomic Airway Reactivity & Dehydration Challenge\n- **Heart Rate**: 112 bpm (Appropriate for age 4)\n- **Respiratory Rate**: 24 breaths/min\n- **SpO2**: 96%\n- **Acoustic Cough Count**: 4 coughs / hour"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_p006_1",
-        "title": "Pediatric Chest X-Ray",
-        "type": "X-Ray",
-        "date": "2026.03.10",
-        "description": "Mild peribronchial cuffing; no focal consolidation or pneumothorax.",
-        "status": "Normal"
-      }
     ]
   },
   {
@@ -1070,14 +295,6 @@
     "name": "Maternal Sentinel",
     "age": 28,
     "gender": "Female",
-    "lastVisit": "2026.03.12",
-    "preexistingConditions": [
-      "Gestational Hypertension",
-      "Primigravida (32 Weeks Gestation)",
-      "Iron-Deficiency Anemia of Pregnancy",
-      "PhysioNet 2026 Challenge: Maternal-Fetal Hemodynamic & Uterine Artery Doppler Challenge"
-    ],
-    "patientGoals": "Optimize blood pressure, correct anemia, track fetal movements, and establish a postpartum hemorrhage prevention plan.",
     "vitals": {
       "bp": "135/85",
       "hr": "90",
@@ -1089,116 +306,6 @@
       "magnesium": "1.8 mg/dL",
       "b12": "450 pg/mL",
       "zinc": "70 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Hemoglobin",
-        "value": "9.8 g/dL (Low)"
-      },
-      {
-        "id": "2",
-        "name": "Serum Ferritin",
-        "value": "12 ng/mL (Deficient)"
-      },
-      {
-        "id": "3",
-        "name": "Urine Protein/Creatinine Ratio",
-        "value": "0.18 (Normal, < 0.3)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Vitamin C",
-        "value": "1.3 mg/dL"
-      },
-      {
-        "id": "2",
-        "name": "Elemental Iron Bio-Availability",
-        "value": "65mg elemental"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Ferrous Bisglycinate",
-        "value": "65mg elemental Iron BID with Vitamin C"
-      },
-      {
-        "id": "2",
-        "name": "Prenatal Multivitamin",
-        "value": "1 tablet Daily"
-      },
-      {
-        "id": "3",
-        "name": "Labetalol",
-        "value": "100mg BID PRN BP > 140/90"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2026-03-01T08:00:00Z",
-        "type": "hr",
-        "value": "94"
-      },
-      {
-        "timestamp": "2026-03-06T08:00:00Z",
-        "type": "hr",
-        "value": "92"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "hr",
-        "value": "90"
-      },
-      {
-        "timestamp": "2026-03-12T08:00:00Z",
-        "type": "bp",
-        "value": "135/85"
-      }
-    ],
-    "issues": {
-      "pelvis": [
-        {
-          "id": "pelvis",
-          "noteId": "note_p007_pelvis_1",
-          "name": "Uterine & Gestational Status (32 Weeks)",
-          "painLevel": 5,
-          "description": "Third-trimester pregnancy with borderline gestational hypertension (BP 135/85). Undergoing regular fetal kick count tracking and growth scans. Experiencing intermittent Braxton Hicks contractions.",
-          "symptoms": [
-            {
-              "name": "Borderline gestational hypertension",
-              "type": "Obstetric/Cardiovascular",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Intermittent Braxton Hicks contractions",
-              "type": "Obstetric",
-              "verified": true,
-              "timeline": "Intermittent"
-            }
-          ]
-        }
-      ],
-      "full_body": [
-        {
-          "id": "full_body",
-          "noteId": "note_p007_full_1",
-          "name": "Iron-Deficiency Anemia & Fatigue",
-          "painLevel": 4,
-          "description": "Presents with moderate microcytic anemia (Hemoglobin 9.8 g/dL). Reports systemic fatigue, cold sensitivity, and mild orthostatic lightheadedness when standing up quickly.",
-          "symptoms": [
-            {
-              "name": "Maternal fatigue",
-              "type": "Hematologic",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -1215,17 +322,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Maternal-Fetal Hemodynamic & Uterine Artery Doppler Challenge\n- **Maternal HR**: 90 bpm\n- **Fetal Heart Rate Baseline**: 142 bpm (Normal reactive)\n- **Uterine Artery Pulsatility Index (PI)**: 0.95 (Normal resistance)\n- **Accelerations**: 2 in 20 minutes (Category I Tracing)"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_p007_1",
-        "title": "Obstetric Ultrasound & Doppler Biometry",
-        "type": "Ultrasound",
-        "date": "2026.03.05",
-        "description": "Estimated fetal weight 4th percentile for 32 weeks (1850g). Amniotic fluid index 14 cm (Normal).",
-        "status": "Reviewed"
-      }
     ]
   },
   {
@@ -1233,14 +329,6 @@
     "name": "Linus P (Orthomolecular Profile)",
     "age": 93,
     "gender": "Male",
-    "lastVisit": "2024.12.10",
-    "preexistingConditions": [
-      "Prostate Cancer (Sustained Remission)",
-      "Coronary Artery Disease (Pauling Protocol Managed)",
-      "Macular Degeneration",
-      "PhysioNet 2026 Challenge: Orthomolecular High-Dose Ascorbate & Lp(a) Binding Challenge"
-    ],
-    "patientGoals": "Evaluate high-dose ascorbic acid therapy, Lp(a) binding neutralization, and cellular longevity.",
     "vitals": {
       "bp": "125/78",
       "hr": "68",
@@ -1252,120 +340,6 @@
       "magnesium": "2.8 mg/dL (Optimal)",
       "b12": "1200 pg/mL (Optimal)",
       "zinc": "120 mcg/dL (Optimal)"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Malondialdehyde (MDA)",
-        "value": "0.8 μmol/L (Ultra-Low)"
-      },
-      {
-        "id": "2",
-        "name": "Lp(a) Lipoprotein",
-        "value": "14 mg/dL (Controlled)"
-      },
-      {
-        "id": "3",
-        "name": "hsCRP",
-        "value": "0.4 mg/L (Minimal)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Plasma Ascorbic Acid (Vit C)",
-        "value": "18.5 mg/dL (High-Therapeutic)"
-      },
-      {
-        "id": "2",
-        "name": "Glutathione (GSH)",
-        "value": "3.2 μmol/g Hb (Optimal)"
-      },
-      {
-        "id": "3",
-        "name": "CoQ10 (Ubiquinol)",
-        "value": "2.8 μg/mL (Optimal)"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Ascorbic Acid (Vitamin C)",
-        "value": "12g Daily (Divided Doses)"
-      },
-      {
-        "id": "2",
-        "name": "L-Lysine",
-        "value": "6g Daily (Lp(a) Binding Inhibitor)"
-      },
-      {
-        "id": "3",
-        "name": "L-Proline",
-        "value": "2g Daily (Atheroma Support)"
-      },
-      {
-        "id": "4",
-        "name": "Alpha-Tocopherol (Vit E)",
-        "value": "800 IU Daily"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2024-11-01T08:00:00Z",
-        "type": "hr",
-        "value": "70"
-      },
-      {
-        "timestamp": "2024-11-20T08:00:00Z",
-        "type": "hr",
-        "value": "69"
-      },
-      {
-        "timestamp": "2024-12-10T08:00:00Z",
-        "type": "hr",
-        "value": "68"
-      },
-      {
-        "timestamp": "2024-12-10T08:00:00Z",
-        "type": "bp",
-        "value": "125/78"
-      }
-    ],
-    "issues": {
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_p008_chest_1",
-          "name": "Cardiovascular & Endothelial Integrity",
-          "painLevel": 1,
-          "description": "Mild angina on heavy exertion. Controlled via Pauling Lp(a) binding inhibition protocol.",
-          "symptoms": [
-            {
-              "name": "Exertional tightness",
-              "type": "Cardiovascular",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "pelvis": [
-        {
-          "id": "pelvis",
-          "noteId": "note_p008_pelvis_1",
-          "name": "Prostate & Cellular Health",
-          "painLevel": 2,
-          "description": "PSA stable at 4.2 ng/mL. High-dose antioxidant status maintaining cellular defense.",
-          "symptoms": [
-            {
-              "name": "Prostate hypertrophy",
-              "type": "Oncologic",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -1382,17 +356,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Orthomolecular High-Dose Ascorbate & Lp(a) Binding Challenge\n- **Heart Rate**: 68 bpm\n- **QRS Interval**: 88 ms\n- **ST Segment**: Neutral (+0.01 mV)\n- **Arterial Stiffness Index**: 6.2 m/s (Optimal youthful elasticity)"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_p008_1",
-        "title": "Coronary Artery Calcium (CAC) Scan",
-        "type": "CT Scan",
-        "date": "2024.11.15",
-        "description": "CAC score stable; calcified plaque display zero progression compared to 2022 baseline.",
-        "status": "Reviewed"
-      }
     ]
   },
   {
@@ -1400,36 +363,6 @@
     "name": "Mara Santos",
     "age": 34,
     "gender": "Female",
-    "lastVisit": "2026.06.20",
-    "preexistingConditions": [
-      "Relapsing-Remitting Multiple Sclerosis (RRMS)",
-      "History of Optic Neuritis (Left Eye, 2024)",
-      "Chronic Fatigue",
-      "Mild Depression (reactive)",
-      "Vitamin D Deficiency"
-    ],
-    "patientGoals": "Extend relapse-free interval, manage fatigue without additional sedating medications, preserve cognitive function, and explore integrative approaches alongside DMT.",
-    "tcmIntake": {
-      "tongueColor": "pale",
-      "tongueCoating": "peeled",
-      "pulseQuality": "deep-thready",
-      "thermalPreference": "aversion-cold",
-      "sweatPattern": "night-sweats",
-      "tasteInMouth": "normal",
-      "tcmPattern": "Liver & Kidney Yin Deficiency with Internal Wind & Jing Depletion"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 7,
-      "prakritiPitta": 5,
-      "prakritiKapha": 2,
-      "vikritiVata": 9,
-      "vikritiPitta": 6,
-      "vikritiKapha": 2,
-      "agniType": "vishamagni",
-      "amaScore": 6.8,
-      "nadiPulseType": "snake-vata",
-      "ayurvedicImbalance": "Severe Vata Resurgence in Majja Dhatu (Nerve Sheath)"
-    },
     "vitals": {
       "bp": "108/68",
       "hr": "76",
@@ -1441,216 +374,6 @@
       "magnesium": "1.6 mg/dL (Low)",
       "b12": "310 pg/mL (Low-normal)",
       "zinc": "68 mcg/dL (Low-normal)"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "hsCRP",
-        "value": "3.2 mg/L (Elevated)"
-      },
-      {
-        "id": "2",
-        "name": "Homocysteine",
-        "value": "14.1 μmol/L (Elevated)"
-      },
-      {
-        "id": "3",
-        "name": "Neurofilament Light Chain (NfL)",
-        "value": "18.2 pg/mL (Elevated)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "1.1 μmol/g Hb (Low)"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10",
-        "value": "0.38 μg/mL (Low)"
-      },
-      {
-        "id": "3",
-        "name": "Alpha-Lipoic Acid",
-        "value": "Not tested"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Ocrevus (Ocrelizumab)",
-        "value": "600mg IV q6mo"
-      },
-      {
-        "id": "2",
-        "name": "Baclofen",
-        "value": "10mg TID (spasticity)"
-      },
-      {
-        "id": "3",
-        "name": "Modafinil",
-        "value": "100mg AM (fatigue)"
-      },
-      {
-        "id": "4",
-        "name": "Escitalopram",
-        "value": "10mg Daily"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2025-12-01T08:00:00Z",
-        "type": "hr",
-        "value": "82"
-      },
-      {
-        "timestamp": "2026-01-15T08:00:00Z",
-        "type": "hr",
-        "value": "80"
-      },
-      {
-        "timestamp": "2026-03-10T08:00:00Z",
-        "type": "hr",
-        "value": "78"
-      },
-      {
-        "timestamp": "2026-04-20T08:00:00Z",
-        "type": "hr",
-        "value": "77"
-      },
-      {
-        "timestamp": "2026-06-20T08:00:00Z",
-        "type": "hr",
-        "value": "76"
-      },
-      {
-        "timestamp": "2025-12-01T08:00:00Z",
-        "type": "spO2",
-        "value": "96"
-      },
-      {
-        "timestamp": "2026-01-15T08:00:00Z",
-        "type": "spO2",
-        "value": "97"
-      },
-      {
-        "timestamp": "2026-03-10T08:00:00Z",
-        "type": "spO2",
-        "value": "97"
-      },
-      {
-        "timestamp": "2026-04-20T08:00:00Z",
-        "type": "spO2",
-        "value": "97"
-      },
-      {
-        "timestamp": "2026-06-20T08:00:00Z",
-        "type": "spO2",
-        "value": "97"
-      },
-      {
-        "timestamp": "2025-12-01T08:00:00Z",
-        "type": "bp",
-        "value": "112/72"
-      },
-      {
-        "timestamp": "2026-01-15T08:00:00Z",
-        "type": "bp",
-        "value": "110/70"
-      },
-      {
-        "timestamp": "2026-03-10T08:00:00Z",
-        "type": "bp",
-        "value": "108/68"
-      },
-      {
-        "timestamp": "2026-04-20T08:00:00Z",
-        "type": "bp",
-        "value": "110/70"
-      },
-      {
-        "timestamp": "2026-06-20T08:00:00Z",
-        "type": "bp",
-        "value": "108/68"
-      }
-    ],
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_mara_head_1",
-          "name": "Head & Neurological",
-          "painLevel": 4,
-          "description": "Cognitive fog ('cog fog') worsening in afternoon. Word-finding difficulty during conversations. Mild persistent headache post-Ocrevus infusion (resolves in 48h). History of left optic neuritis with residual color desaturation.",
-          "symptoms": [
-            {
-              "name": "Cognitive fog",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Word-finding difficulty",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Progressive"
-            },
-            {
-              "name": "Visual color desaturation (L)",
-              "type": "Ophthalmological",
-              "verified": true,
-              "timeline": "Residual"
-            }
-          ]
-        }
-      ],
-      "lower_back": [
-        {
-          "id": "lower_back",
-          "noteId": "note_mara_back_1",
-          "name": "Lumbar Spine & Lower Extremities",
-          "painLevel": 5,
-          "description": "Bilateral lower extremity spasticity, worse in the morning. Lhermitte's sign positive — electric shock sensation down spine on neck flexion. Gait instability increasing over last 3 months, using a cane intermittently.",
-          "symptoms": [
-            {
-              "name": "Lower limb spasticity",
-              "type": "Neurological/Motor",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Lhermitte's sign",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Active"
-            },
-            {
-              "name": "Gait instability",
-              "type": "Neurological/Motor",
-              "verified": true,
-              "timeline": "Progressive"
-            }
-          ]
-        }
-      ],
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_mara_chest_1",
-          "name": "Chest & Respiratory",
-          "painLevel": 2,
-          "description": "Occasional MS hug — band-like tightness around the ribcage, typically triggered by heat or stress. Resolves with cooling and rest. No cardiac involvement suspected.",
-          "symptoms": [
-            {
-              "name": "MS hug (dysesthesia)",
-              "type": "Neurological/Sensory",
-              "verified": true,
-              "timeline": "Intermittent"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -1718,46 +441,13 @@
           "dateCreated": "2026-05-19T14:30:00Z"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": []
+    ]
   },
   {
     "id": "p_frida_kahlo",
     "name": "Frida Kahlo",
     "age": 47,
     "gender": "Female",
-    "lastVisit": "1954.07.13",
-    "preexistingConditions": [
-      "Poliomyelitis (childhood, right leg atrophy)",
-      "Severe streetcar accident trauma (1925)",
-      "Multiple spinal fractures & pelvic fractures",
-      "Right foot amputation (1953)",
-      "Chronic neuropathic pain",
-      "PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge"
-    ],
-    "patientGoals": "Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.",
-    "tcmIntake": {
-      "tongueColor": "purple",
-      "tongueCoating": "peeled",
-      "pulseQuality": "choppy",
-      "thermalPreference": "aversion-cold",
-      "sweatPattern": "night-sweats",
-      "tasteInMouth": "bitter",
-      "tcmPattern": "Traumatic Blood Stasis with Kidney Yin & Jing Depletion"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 6,
-      "prakritiPitta": 7,
-      "prakritiKapha": 2,
-      "vikritiVata": 9,
-      "vikritiPitta": 8,
-      "vikritiKapha": 2,
-      "agniType": "vishamagni",
-      "amaScore": 8.5,
-      "nadiPulseType": "snake-vata",
-      "ayurvedicImbalance": "Severe Vata-Pitta Aggravation in Asthi & Majja Dhatu"
-    },
     "vitals": {
       "bp": "115/75",
       "hr": "82",
@@ -1769,106 +459,6 @@
       "magnesium": "1.6 mg/dL (Low)",
       "b12": "320 pg/mL",
       "zinc": "62 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "hsCRP",
-        "value": "8.4 mg/L (Severe Inflammation)"
-      },
-      {
-        "id": "2",
-        "name": "Substance P",
-        "value": "220 pg/mL (Elevated Nociception)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "0.9 μmol/g Hb (Low)"
-      },
-      {
-        "id": "2",
-        "name": "Vitamin C",
-        "value": "0.8 mg/dL"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Demerol (Meperidine)",
-        "value": "50mg PRN Severe Pain"
-      },
-      {
-        "id": "2",
-        "name": "Morphine Sulfate",
-        "value": "10mg SC PRN"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "1954-07-01T08:00:00Z",
-        "type": "hr",
-        "value": "88"
-      },
-      {
-        "timestamp": "1954-07-10T08:00:00Z",
-        "type": "hr",
-        "value": "84"
-      },
-      {
-        "timestamp": "1954-07-13T08:00:00Z",
-        "type": "hr",
-        "value": "82"
-      },
-      {
-        "timestamp": "1954-07-13T08:00:00Z",
-        "type": "bp",
-        "value": "115/75"
-      }
-    ],
-    "issues": {
-      "spine": [
-        {
-          "id": "spine",
-          "noteId": "note_frida_spine_1",
-          "name": "Spinal & Pelvic Trauma",
-          "painLevel": 8,
-          "description": "Chronic pain, spinal instability requiring steel corsets. Post-operative status of 30+ surgeries.",
-          "symptoms": [
-            {
-              "name": "Severe back pain",
-              "type": "Neuropathic",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "r_leg": [
-        {
-          "id": "r_leg",
-          "noteId": "note_frida_leg_1",
-          "name": "Right Leg Atrophy & Amputation",
-          "painLevel": 9,
-          "description": "Right leg exhibits marked atrophy (post-polio). Right foot/lower leg amputated in 1953 due to gangrene, resulting in severe phantom limb sensations and burning.",
-          "symptoms": [
-            {
-              "name": "Phantom foot pain",
-              "type": "Neuropathic",
-              "verified": true,
-              "timeline": "Chronic"
-            },
-            {
-              "name": "Right lower leg atrophy",
-              "type": "Musculoskeletal",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -1885,17 +475,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge\n- **Heart Rate**: 82 bpm\n- **QRS Interval**: 90 ms\n- **ST Segment**: Neutral\n- **EMG Phantom Spiking Frequency**: 14 spikes/min (Central wind-up active)"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_frida_1",
-        "title": "Spine AP & Lateral Radiograph",
-        "type": "X-Ray",
-        "date": "1954.06.10",
-        "description": "Severe lumbar scoliosis, post-fusion metallic hardware artifacts, and pelvic tilt consistent with limb length inequality.",
-        "status": "Abnormal"
-      }
     ]
   },
   {
@@ -1903,35 +482,6 @@
     "name": "Edwin Smith Case 3",
     "age": 30,
     "gender": "Male",
-    "lastVisit": "-1600.01.01",
-    "preexistingConditions": [
-      "Traumatic Skull Fracture",
-      "Meningeal exposure",
-      "Cervical rigidity",
-      "PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge"
-    ],
-    "patientGoals": "Stabilize acute head injury, wound care, and address neck stiffness.",
-    "tcmIntake": {
-      "tongueColor": "purple",
-      "tongueCoating": "thick-white",
-      "pulseQuality": "wiry",
-      "thermalPreference": "neutral",
-      "sweatPattern": "spontaneous-day",
-      "tasteInMouth": "metallic",
-      "tcmPattern": "Acute Traumatic Qi & Blood Stagnation in Du Mai Channel"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 5,
-      "prakritiPitta": 6,
-      "prakritiKapha": 3,
-      "vikritiVata": 9,
-      "vikritiPitta": 7,
-      "vikritiKapha": 3,
-      "agniType": "vishamagni",
-      "amaScore": 7.9,
-      "nadiPulseType": "snake-vata",
-      "ayurvedicImbalance": "Severe Vata Wind Collapse in Pranavaha & Majjavaha Srotas"
-    },
     "vitals": {
       "bp": "110/70",
       "hr": "64",
@@ -1943,79 +493,6 @@
       "magnesium": "2.0 mg/dL",
       "b12": "500 pg/mL",
       "zinc": "80 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "hsCRP",
-        "value": "12.5 mg/L (Severe Acute Trauma)"
-      },
-      {
-        "id": "2",
-        "name": "WBC Count",
-        "value": "14,200 /μL (Leukocytosis)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Honey (Honey & Lint Dressing)",
-        "value": "High Enzymatic Osmotic Defense"
-      },
-      {
-        "id": "2",
-        "name": "Glutathione (GSH)",
-        "value": "1.6 μmol/g Hb"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Fresh Meat & Grease Dressing",
-        "value": "Day 1 Hemostasis"
-      },
-      {
-        "id": "2",
-        "name": "Honey & Lint Poultice",
-        "value": "Daily Antimicrobial Wound Shield"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "-1600-01-01T08:00:00Z",
-        "type": "hr",
-        "value": "64"
-      },
-      {
-        "timestamp": "-1600-01-01T08:00:00Z",
-        "type": "bp",
-        "value": "110/70"
-      }
-    ],
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_smith_head_1",
-          "name": "Skull & Cervical Spine Trauma",
-          "painLevel": 9,
-          "description": "Gaping wound in the head penetrating to the bone, smashing the skull. Patient is unable to look at his shoulders, suggesting severe cervical spine stiffness / meningeal irritation.",
-          "symptoms": [
-            {
-              "name": "Gaping head wound",
-              "type": "Trauma",
-              "verified": true,
-              "timeline": "Acute"
-            },
-            {
-              "name": "Cervical rigidity (stiff neck)",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Acute"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -2032,17 +509,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge\n- **Heart Rate**: 64 bpm (Bradycardic autonomic response)\n- **QRS Duration**: 92 ms\n- **Intracranial Pressure (ICP)**: 16 mmHg (Borderline elevated)\n- **Cervical Alignment Angle**: 12° Kyphotic tilt"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_smith_1",
-        "title": "Cranial & Cervical Spine Inspection",
-        "type": "Document",
-        "date": "-1600.01.01",
-        "description": "Gaping skull fracture with visible meningeal pulsation; cervical spine rigidity upon passive lateral rotation.",
-        "status": "Abnormal"
-      }
     ]
   },
   {
@@ -2050,15 +516,6 @@
     "name": "Charles Darwin",
     "age": 73,
     "gender": "Male",
-    "lastVisit": "1882.04.19",
-    "preexistingConditions": [
-      "Chronic Gastrointestinal Disease",
-      "Cyclic Vomiting Syndrome (suspected)",
-      "Systemic eczema & skin rashes",
-      "Mitochondrial dysfunction / Chagas disease (suspected)",
-      "PhysioNet 2026 Challenge: Trypanosoma Cardiac Conduction & Vagal Gastric Dysmotility Challenge"
-    ],
-    "patientGoals": "Resolve debilitating chronic fatigue, severe episodic vomiting, flatulence, and chest palpitations.",
     "vitals": {
       "bp": "110/70",
       "hr": "68",
@@ -2070,111 +527,6 @@
       "magnesium": "1.7 mg/dL (Low-normal)",
       "b12": "420 pg/mL",
       "zinc": "68 mcg/dL"
-    },
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Trypanosoma cruzi Antibodies",
-        "value": "Positive (Suspected Chagas exposure 1835)"
-      },
-      {
-        "id": "2",
-        "name": "hsCRP",
-        "value": "3.8 mg/L (Elevated)"
-      },
-      {
-        "id": "3",
-        "name": "Lactate/Pyruvate Ratio",
-        "value": "24 (Mitochondrial Overload)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "1.2 μmol/g Hb"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10",
-        "value": "0.48 μg/mL"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Bismuth Subnitrate",
-        "value": "Gastrointestinal soothing"
-      },
-      {
-        "id": "2",
-        "name": "Hydrotherapy (Malvern Water Cure)",
-        "value": "Cold compress & spa regimen"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "1882-04-01T08:00:00Z",
-        "type": "hr",
-        "value": "72"
-      },
-      {
-        "timestamp": "1882-04-10T08:00:00Z",
-        "type": "hr",
-        "value": "70"
-      },
-      {
-        "timestamp": "1882-04-19T08:00:00Z",
-        "type": "hr",
-        "value": "68"
-      },
-      {
-        "timestamp": "1882-04-19T08:00:00Z",
-        "type": "bp",
-        "value": "110/70"
-      }
-    ],
-    "issues": {
-      "abdomen": [
-        {
-          "id": "abdomen",
-          "noteId": "note_darwin_gut_1",
-          "name": "Chronic Gastrointestinal Syndrome",
-          "painLevel": 6,
-          "description": "Debilitating abdominal pain, severe flatulence, acid reflux, and cyclical episodes of vomiting triggered by stress or intellectual exertion.",
-          "symptoms": [
-            {
-              "name": "Cyclic vomiting",
-              "type": "Gastrointestinal",
-              "verified": true,
-              "timeline": "Chronic/Episodic"
-            },
-            {
-              "name": "Severe flatulence & dyspepsia",
-              "type": "Gastrointestinal",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_darwin_chest_1",
-          "name": "Cardiac Palpitations",
-          "painLevel": 4,
-          "description": "Recurrent palpitations and chest discomfort, typically co-occurring with episodes of anxiety or intense focus.",
-          "symptoms": [
-            {
-              "name": "Palpitations",
-              "type": "Cardiovascular",
-              "verified": true,
-              "timeline": "Intermittent"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -2191,17 +543,6 @@
           "PhysioNet Telemetry": "### PhysioNet 2026 Challenge: Trypanosoma Cardiac Conduction & Vagal Gastric Dysmotility Challenge\n- **Heart Rate**: 68 bpm\n- **PR Interval**: 198 ms (Borderline 1st degree AV block)\n- **QRS Duration**: 94 ms\n- **Gastric Slow-Wave Frequency**: 2.2 cpm (Tachygastria/Bradygastria dysrhythmia)"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_darwin_1",
-        "title": "Electrocardiographic & Gastric Motility Study",
-        "type": "Lab Report",
-        "date": "1882.04.10",
-        "description": "Borderline PR interval prolongations; gastric dysrhythmia during post-prandial recording.",
-        "status": "Reviewed"
-      }
     ]
   },
   {
@@ -2209,14 +550,6 @@
     "name": "Madame Marie Curie",
     "age": 66,
     "gender": "Female",
-    "lastVisit": "1934.07.04",
-    "preexistingConditions": [
-      "Radiologic Aplastic Anemia",
-      "Radiologic Dermatitis",
-      "Bone Marrow Hematopoietic Suppression",
-      "Mitochondrial Oxidative Stress"
-    ],
-    "patientGoals": "Regenerate bone marrow hematopoietic stem cells, upregulate Phase II antioxidant Nrf2, and repair radiologic cutaneous burns.",
     "vitals": {
       "bp": "108/68",
       "hr": "64",
@@ -2224,119 +557,6 @@
       "temp": "97.8°F",
       "weight": "123 lbs",
       "height": "5'3\""
-    },
-    "customFields": [
-      {
-        "key": "Atomic Lab Aesthetic",
-        "value": "⚛️ 1950s Gilbert U-238 Atomic Energy Lab (Brushed Lead & Steel Plate)"
-      },
-      {
-        "key": "Isotope Activity",
-        "value": "☢️ Radium-226 (2.5 μCi / 1,600 yr Half-Life)"
-      },
-      {
-        "key": "Geiger Counter Telemetry",
-        "value": "🎛️ 420 CPM (Alpha / Beta Particle Flux)"
-      },
-      {
-        "key": "Lead Shielding Enclosure",
-        "value": "🛡️ 4.5 cm Solid Lead Crucible (Purity 99.8%)"
-      },
-      {
-        "key": "Grow Thyself Radioprotection",
-        "value": "🌿 Ashwagandha, Ginkgo biloba, Centella asiatica"
-      }
-    ],
-    "tcmIntake": {
-      "tongueColor": "pale",
-      "tongueCoating": "thin-white",
-      "pulseQuality": "deep-thready",
-      "thermalPreference": "aversion-cold",
-      "sweatPattern": "spontaneous-day",
-      "tasteInMouth": "bland",
-      "tcmPattern": "Bone Marrow Jing Depletion & Blood Qi Deficiency"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 7,
-      "prakritiPitta": 5,
-      "prakritiKapha": 3,
-      "vikritiVata": 9,
-      "vikritiPitta": 7,
-      "vikritiKapha": 2,
-      "agniType": "mandagni",
-      "amaScore": 6.2,
-      "nadiPulseType": "snake-vata",
-      "ayurvedicImbalance": "Severe Vata Aggravation in Majja Dhatu (Bone Marrow) & Ojas Depletion"
-    },
-    "medications": [
-      {
-        "id": "1",
-        "name": "N-Acetylcysteine (NAC)",
-        "value": "1,200mg BID (Glutathione Precursor)"
-      },
-      {
-        "id": "2",
-        "name": "Sulforaphane Extract",
-        "value": "50mg daily (Nrf2 Activation)"
-      },
-      {
-        "id": "3",
-        "name": "CoQ10 (Ubiquinol)",
-        "value": "300mg daily (Mitochondrial Protection)"
-      },
-      {
-        "id": "4",
-        "name": "Specialized Pro-Resolving Mediators (SPMs)",
-        "value": "1,000mg BID"
-      }
-    ],
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "8-hydroxy-2'-deoxyguanosine (8-OHdG)",
-        "value": "18.4 ng/mg Cr (DNA Oxidative Damage)"
-      },
-      {
-        "id": "2",
-        "name": "Radium-226 Serum Isotope Activity",
-        "value": "Elevated Internal Alpha Emitter"
-      }
-    ],
-    "issues": {
-      "chest": [
-        {
-          "id": "chest",
-          "noteId": "note_curie_marrow_1",
-          "name": "Bone Marrow Hematopoietic Suppression",
-          "painLevel": 6,
-          "description": "Severe radiologic aplastic anemia from chronic unshielded radium-226 and polonium-210 exposure.",
-          "symptoms": [
-            {
-              "name": "Hematopoietic stem cell fatigue",
-              "type": "Systemic",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ],
-      "skin": [
-        {
-          "id": "skin",
-          "noteId": "note_curie_dermatitis_1",
-          "name": "Radiologic Cutaneous Dermatitis",
-          "painLevel": 5,
-          "description": "Bilateral palmar and forearm radiologic erythema, desquamation, and superficial tissue ulceration.",
-          "symptoms": [
-            {
-              "name": "Palmar desquamation",
-              "type": "Dermatologic",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -2350,22 +570,13 @@
           "Precision Nutrients": "### Orthomolecular & Botanical Grow Thyself Protocols\n- **Ashwagandha (Withania somnifera)**: 500mg BID (Bone marrow radioprotection & adaptogenic GABAergic support).\n- **Ginkgo biloba Extract**: 120mg BID (Microvascular cutaneous and cerebral perfusion).\n- **Centella asiatica (Gotu Kola)**: 400mg daily (Collagen type I/III synthesis for radiologic skin remodeling)."
         }
       }
-    ],
-    "bookmarks": []
+    ]
   },
   {
     "id": "p_srinivasa_ramanujan",
     "name": "Srinivasa Ramanujan",
     "age": 32,
     "gender": "Male",
-    "lastVisit": "1920.04.26",
-    "preexistingConditions": [
-      "Hepatic Amoebiasis",
-      "Gastric Malabsorption & Dyspepsia",
-      "Vishamagni (Irregular Metabolic Fire)",
-      "Vata-Pitta Irregularity"
-    ],
-    "patientGoals": "Restore gastric Agni metabolic fire, pacify Vata motility irregularity, heal intestinal mucosal barrier, and restore physical energy for mathematical research.",
     "vitals": {
       "bp": "112/72",
       "hr": "76",
@@ -2373,80 +584,6 @@
       "temp": "98.2°F",
       "weight": "115 lbs",
       "height": "5'6\""
-    },
-    "tcmIntake": {
-      "tongueColor": "pale",
-      "tongueCoating": "yellow-greasy",
-      "pulseQuality": "wiry",
-      "thermalPreference": "aversion-cold",
-      "sweatPattern": "spontaneous-day",
-      "tasteInMouth": "bitter",
-      "tcmPattern": "Spleen Qi Deficiency with Damp-Heat in Liver & Gallbladder"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 7,
-      "prakritiPitta": 6,
-      "prakritiKapha": 2,
-      "vikritiVata": 9,
-      "vikritiPitta": 8,
-      "vikritiKapha": 2,
-      "agniType": "vishamagni",
-      "amaScore": 7.8,
-      "nadiPulseType": "snake-vata",
-      "ayurvedicImbalance": "Severe Vata-Pitta Spasm in Annavaha Srotas & Vishamagni"
-    },
-    "medications": [
-      {
-        "id": "1",
-        "name": "Deglycyrrhizinated Licorice (DGL)",
-        "value": "400mg chewed 20 min before meals"
-      },
-      {
-        "id": "2",
-        "name": "L-Glutamine Powder",
-        "value": "5g morning on empty stomach"
-      },
-      {
-        "id": "3",
-        "name": "Zinc Carnosine (PepZin GI)",
-        "value": "75mg BID"
-      },
-      {
-        "id": "4",
-        "name": "Tinospora cordifolia (Guduchi)",
-        "value": "500mg BID"
-      }
-    ],
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Fecal Calprotectin",
-        "value": "185 mcg/g (Gut Mucosal Inflammation)"
-      },
-      {
-        "id": "2",
-        "name": "Intestinal Permeability (Zonulin)",
-        "value": "64 ng/mL (Elevated Leaky Gut)"
-      }
-    ],
-    "issues": {
-      "abdomen": [
-        {
-          "id": "abdomen",
-          "noteId": "note_ramanujan_hepatic_1",
-          "name": "Hepatic Amoebic Inflammation & Agni Debility",
-          "painLevel": 7,
-          "description": "Right upper quadrant hepatic tender distress, chronic dysentery history (Cambridge 1917–1919), and severe gastric malabsorption.",
-          "symptoms": [
-            {
-              "name": "Gastric spasm & malabsorption",
-              "type": "Gastrointestinal",
-              "verified": true,
-              "timeline": "Chronic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -2460,42 +597,13 @@
           "Precision Nutrients": "### Botanical Grow Thyself Protocols\n- **Tulsi (Ocimum sanctum / Holy Basil)**: 400mg BID (Vata-Kapha balancing adaptogen & antimicrobial defense).\n- **Zingiber officinale (Ginger)**: 500mg BID (Kindles Agni metabolic fire & disperses TCM Dampness).\n- **Phyllanthus emblica (Amalaki)**: 500mg daily (Pitta-soothing Rasayana for mucosal tissue regeneration)."
         }
       }
-    ],
-    "bookmarks": []
+    ]
   },
   {
     "id": "p_phil_gear",
     "name": "Phil Gear",
     "age": 42,
     "gender": "Male",
-    "lastVisit": "2026.05.20",
-    "preexistingConditions": [
-      "Hypertension",
-      "Mild Sleep Apnea",
-      "Google Health Integration"
-    ],
-    "patientGoals": "Optimize metabolic health, synchronize all personal biometrics from Google Health Connect, and reduce sleep latency.",
-    "tcmIntake": {
-      "tongueColor": "pink",
-      "tongueCoating": "thin-white",
-      "pulseQuality": "normal",
-      "thermalPreference": "neutral",
-      "sweatPattern": "normal",
-      "tasteInMouth": "normal",
-      "tcmPattern": "Zang-Fu Balance with Mild Liver Qi Constriction (Executive Stress)"
-    },
-    "ayurvedicIntake": {
-      "prakritiVata": 3,
-      "prakritiPitta": 5,
-      "prakritiKapha": 3,
-      "vikritiVata": 4,
-      "vikritiPitta": 6,
-      "vikritiKapha": 3,
-      "agniType": "samagni",
-      "amaScore": 1.8,
-      "nadiPulseType": "frog-pitta",
-      "ayurvedicImbalance": "Samagni Metabolic Balance with Mild Pitta Exertion"
-    },
     "vitals": {
       "bp": "122/82",
       "hr": "68",
@@ -2507,105 +615,6 @@
       "magnesium": "2.1 mg/dL",
       "b12": "580 pg/mL",
       "zinc": "92 mcg/dL"
-    },
-    "customFields": [
-      {
-        "key": "Master Paradigm Coherence",
-        "value": "94% Cross-Paradigm Coherence"
-      },
-      {
-        "key": "Ohsumi Autophagy Flux",
-        "value": "88% Autophagic Clearing Rate"
-      },
-      {
-        "key": "Turing Cellular Automata State",
-        "value": "Rule B3/S23 Morphogenesis Stable (0 Deadlocks)"
-      },
-      {
-        "key": "Navier-Stokes Glymphatic Velocity",
-        "value": "1.8 mm/s Perivascular CSF Flow"
-      },
-      {
-        "key": "Grow Thyself Selections",
-        "value": "Lion's Mane (Hericium erinaceus), Rhodiola rosea, Bacopa monnieri"
-      }
-    ],
-    "oxidativeStressMarkers": [
-      {
-        "id": "1",
-        "name": "Malondialdehyde (MDA)",
-        "value": "1.8 μmol/L (Normal)"
-      },
-      {
-        "id": "2",
-        "name": "hsCRP",
-        "value": "0.9 mg/L (Optimal)"
-      }
-    ],
-    "antioxidantSources": [
-      {
-        "id": "1",
-        "name": "Glutathione (GSH)",
-        "value": "2.4 μmol/g Hb (Optimal)"
-      },
-      {
-        "id": "2",
-        "name": "CoQ10",
-        "value": "1.1 μg/mL (Normal)"
-      }
-    ],
-    "medications": [
-      {
-        "id": "1",
-        "name": "Lisinopril",
-        "value": "10mg Daily"
-      },
-      {
-        "id": "2",
-        "name": "Magnesium Glycinate",
-        "value": "400mg PM"
-      }
-    ],
-    "biometricHistory": [
-      {
-        "timestamp": "2026-05-18T08:00:00Z",
-        "type": "hr",
-        "value": "70"
-      },
-      {
-        "timestamp": "2026-05-19T08:00:00Z",
-        "type": "hr",
-        "value": "69"
-      },
-      {
-        "timestamp": "2026-05-20T08:00:00Z",
-        "type": "hr",
-        "value": "68"
-      },
-      {
-        "timestamp": "2026-05-20T08:00:00Z",
-        "type": "bp",
-        "value": "122/82"
-      }
-    ],
-    "issues": {
-      "head": [
-        {
-          "id": "head",
-          "noteId": "note_phil_head_1",
-          "name": "Head & Neck",
-          "painLevel": 2,
-          "description": "Mild tension headaches occasionally in the evening, related to screens and desk posture.",
-          "symptoms": [
-            {
-              "name": "Occidental tension headache",
-              "type": "Neurological",
-              "verified": true,
-              "timeline": "Episodic"
-            }
-          ]
-        }
-      ]
     },
     "history": [
       {
@@ -2632,32 +641,6 @@
           "dateCreated": "2026-05-20T10:00:00Z"
         }
       }
-    ],
-    "bookmarks": [],
-    "scans": [
-      {
-        "id": "scan_phil_1",
-        "title": "Polysomnography Sleep Study",
-        "type": "Lab Report",
-        "date": "2026.04.15",
-        "description": "Mild sleep latency elevation; zero central sleep apnea. AHI 4.2/hr (Mild), Sleep Efficiency 88%.",
-        "status": "Reviewed"
-      },
-      {
-        "id": "scan_phil_2",
-        "title": "Whole Body 3D Spatial LiDAR Telemetry",
-        "type": "Ultrasound",
-        "date": "2026.05.18",
-        "description": "LiDAR spatial surface mesh and skeletal alignment telemetry confirming zero pelvic tilt or spinal subluxation.",
-        "status": "Normal"
-      }
-    ],
-    "dietaryProtocol": "",
-    "activePhilosophy": "western",
-    "dynamicNutrients": [],
-    "clinicalNotes": [],
-    "checklist": [],
-    "shoppingList": [],
-    "ayurvedicStatus": {}
+    ]
   }
 ]

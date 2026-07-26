@@ -21,6 +21,7 @@ export { BODY_PART_NAMES };
 import { StorageService } from './storage.service';
 import { GamificationService } from './gamification.service';
 import { ThemeService } from './theme.service';
+import { ActuarialLongevityService, IOccupationalHazardProfile } from './actuarial-longevity.service';
 import { dataConnect } from '../lib/firebase';
 import { createCarePlan, createConsultationSession } from '../lib/dataconnect/esm/index.esm.js';
 
@@ -30,6 +31,7 @@ import { createCarePlan, createConsultationSession } from '../lib/dataconnect/es
 })
 export class PatientStateService {
   private themeService = inject(ThemeService);
+  private actuarialLongevityService = inject(ActuarialLongevityService, { optional: true });
 
   // --- UI State & Clinical Tool Prescription State Machine ---
   readonly isPlainLanguageMode = computed(() => this.themeService.isPlainLanguageMode());
@@ -285,6 +287,18 @@ export class PatientStateService {
   // --- Patient Contextual State (feeds Co-Regulation AVS) ---
   /** Patient's occupational category — informs autonomic baseline and AVS protocol selection. */
   readonly occupation = signal<string>('');
+  /** Reactive actuarial 10D occupational hazard profile derived from patient occupation with dynamic vitals/safety personalization. */
+  readonly occupationalProfile = computed<IOccupationalHazardProfile | null>(() => {
+    const occ = this.occupation();
+    if (!this.actuarialLongevityService) return null;
+    const medNames = (this.medications() || []).map(m => m.name);
+    return this.actuarialLongevityService.getPersonalizedOccupationalProfile(
+      occ,
+      this.vitals(),
+      medNames,
+      75
+    );
+  });
   /** Chief complaint / reason for this specific encounter. */
   readonly reasonForVisit = signal<string>('');
   /** Dietary Protocol / Nutrition Strategy to integrate into intake */
@@ -943,6 +957,51 @@ export class PatientStateService {
     } else {
       this.biometricHistory.set([]);
     }
+    this.autoPrescribeToolsFromPatientData(patient);
+  }
+
+  /** Auto-infer tool prescriptions dynamically based on the patient's specific clinical data */
+  autoPrescribeToolsFromPatientData(patient: any) {
+    const states: Record<string, 'unassigned' | 'prescribed' | 'hidden'> = {};
+    if (!patient) {
+      this.toolStates.set(states);
+      return;
+    }
+
+    const conds = (patient.preexistingConditions || []).map((c: string) => c.toLowerCase());
+    const goals = (patient.patientGoals || '').toLowerCase();
+    const vitals = patient.vitals || {};
+    const sys = parseInt(String(vitals.bp || '').split('/')[0], 10) || 0;
+    const hr = parseInt(String(vitals.hr || ''), 10) || 0;
+    const issues = patient.issues || {};
+    const issueNotes = Object.values(issues).flat().map((i: any) => (i.description || '').toLowerCase()).join(' ');
+
+    const hasCardio = conds.some((c: string) => c.includes('hypertension') || c.includes('cardio') || c.includes('heart') || c.includes('arrhythmia')) || sys > 130 || hr > 85;
+    const hasPainOrStigma = conds.some((c: string) => c.includes('pain') || c.includes('arthritis') || c.includes('spine') || c.includes('back') || c.includes('trauma')) || issueNotes.includes('pain');
+    const hasStressOrAnxiety = goals.includes('anxiety') || goals.includes('stress') || goals.includes('sleep') || conds.some((c: string) => c.includes('anxiety') || c.includes('insomnia') || c.includes('ocd'));
+    const hasMetabolicOrLongevity = conds.some((c: string) => c.includes('diabetes') || c.includes('metabolic') || c.includes('obesity') || c.includes('longevity')) || goals.includes('longevity') || goals.includes('weight');
+    const hasTcmOrAma = patient.tcmIntake || patient.ayurvedicIntake || goals.includes('digestion') || goals.includes('detox');
+
+    if (hasMetabolicOrLongevity) {
+      states['qaly'] = 'prescribed';
+      states['investment'] = 'prescribed';
+    }
+    if (hasStressOrAnxiety || hasCardio) {
+      states['solfeggio'] = 'prescribed';
+      states['vagal'] = 'prescribed';
+    }
+    if (hasPainOrStigma || hasStressOrAnxiety) {
+      states['perils'] = 'prescribed';
+      states['karaoke'] = 'prescribed';
+    }
+    if (hasTcmOrAma) {
+      states['foraging'] = 'prescribed';
+    }
+    if (hasCardio || hasPainOrStigma) {
+      states['storm'] = 'prescribed';
+    }
+
+    this.toolStates.set(states);
   }
 
   /** Returns the current patient state for saving. */

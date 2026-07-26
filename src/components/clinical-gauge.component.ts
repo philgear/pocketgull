@@ -1,7 +1,7 @@
 import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-export type GaugeType = 'complexity' | 'stability' | 'certainty';
+export type GaugeType = 'complexity' | 'stability' | 'certainty' | 'survival' | 'longevity';
 export type GaugeDisplayMode = 'full' | 'spark';
 
 @Component({
@@ -26,17 +26,36 @@ export type GaugeDisplayMode = 'full' | 'spark';
               {{ statusText() }}
             </span>
           </div>
-          <span class="text-xl font-black text-gray-900 dark:text-zinc-100 font-mono tracking-tight">{{ value() }}<span class="text-xs font-normal text-gray-400 dark:text-zinc-500">/10</span></span>
+          <span class="text-xl font-black text-gray-900 dark:text-zinc-100 font-mono tracking-tight">
+            {{ displayValue() }}
+            @if (type() !== 'survival' && type() !== 'longevity') {
+              <span class="text-xs font-normal text-gray-400 dark:text-zinc-500">/10</span>
+            }
+          </span>
         </div>
 
         <!-- Accessible Track -->
         <div class="w-full h-3 bg-gray-100 dark:bg-zinc-800/80 rounded-full overflow-hidden relative shadow-inner">
           <div class="h-full rounded-full transition-all duration-700 ease-out relative"
-               [style.width.%]="value() * 10"
+               [style.width.%]="fillPercentage()"
                [style.background]="barColor()">
             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
           </div>
         </div>
+
+        <!-- Micro Survival Curve Trajectory Sparkline for Survival/Longevity Gauges -->
+        @if (survivalCurvePoints() && survivalCurvePoints()!.length > 0) {
+          <div class="mt-3 pt-2.5 border-t border-gray-100 dark:border-zinc-800/60 flex items-center justify-between gap-3 text-[10px] font-mono">
+            <span class="text-gray-400 dark:text-zinc-500 font-bold uppercase">Gompertz-Makeham Trajectory:</span>
+            <div class="flex items-center gap-1">
+              @for (pt of survivalCurvePoints()!.slice(0, 6); track pt.age) {
+                <span class="px-1 py-0.5 rounded bg-zinc-800/40 text-cyan-300 text-[9px] border border-cyan-500/20">
+                  {{ pt.age }}y: {{ (pt.personalizedSurvival * 100).toFixed(0) }}%
+                </span>
+              }
+            </div>
+          </div>
+        }
 
         @if (description()) {
           <p class="mt-2.5 text-xs text-gray-600 dark:text-zinc-400 leading-relaxed font-sans font-medium">
@@ -62,7 +81,7 @@ export type GaugeDisplayMode = 'full' | 'spark';
                   [attr.stroke-dasharray]="dashArray()"
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
           </svg>
-          <span class="absolute text-[10px] font-extrabold text-zinc-100">{{ value() }}</span>
+          <span class="absolute text-[10px] font-extrabold text-zinc-100">{{ displayValue() }}</span>
         </div>
 
         <!-- Spark Label & Status -->
@@ -80,15 +99,43 @@ export class ClinicalGaugeComponent {
   readonly description = input<string>('');
   readonly type = input<GaugeType>('certainty');
   readonly mode = input<GaugeDisplayMode>('full');
+  readonly survivalProbability = input<number | undefined>(undefined);
+  readonly survivalCurvePoints = input<Array<{ age: number; personalizedSurvival: number }> | undefined>(undefined);
+
+  readonly fillPercentage = computed(() => {
+    if (this.survivalProbability() !== undefined) {
+      return Math.min(100, Math.max(0, this.survivalProbability()! * 100));
+    }
+    return Math.min(100, Math.max(0, this.value() * 10));
+  });
+
+  readonly displayValue = computed(() => {
+    if (this.survivalProbability() !== undefined) {
+      return `${(this.survivalProbability()! * 100).toFixed(1)}%`;
+    }
+    return `${this.value()}`;
+  });
 
   readonly accessibilityLabel = computed(() => {
     const desc = this.description() ? `. ${this.description()}` : '';
-    return `${this.label()}: ${this.value()} out of 10, Status: ${this.statusText()}${desc}`;
+    const valStr = (this.type() === 'survival' || this.type() === 'longevity')
+      ? this.displayValue()
+      : `${this.value()} out of 10`;
+    const labelPrefix = this.label() ? `${this.label()}: ` : '';
+    return `${labelPrefix}${valStr}, Status: ${this.statusText()}${desc}`;
   });
 
   readonly statusText = computed(() => {
     const val = this.value();
     const t = this.type();
+    const prob = this.survivalProbability();
+
+    if (t === 'survival' || t === 'longevity') {
+      const p = prob !== undefined ? prob * 100 : val * 10;
+      if (p >= 90) return 'High Survival Reserve';
+      if (p >= 75) return 'Compensated Longevity';
+      return 'Elevated Actuarial Risk';
+    }
 
     if (t === 'stability') {
       if (val >= 8) return 'Optimal Stability';
@@ -111,6 +158,14 @@ export class ClinicalGaugeComponent {
   readonly statusBadgeClasses = computed(() => {
     const val = this.value();
     const t = this.type();
+    const prob = this.survivalProbability();
+
+    if (t === 'survival' || t === 'longevity') {
+      const p = prob !== undefined ? prob * 100 : val * 10;
+      if (p >= 90) return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+      if (p >= 75) return 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20';
+      return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    }
 
     if (t === 'stability') {
       if (val >= 8) return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
@@ -133,6 +188,14 @@ export class ClinicalGaugeComponent {
   readonly barColor = computed(() => {
     const val = this.value();
     const t = this.type();
+    const prob = this.survivalProbability();
+
+    if (t === 'survival' || t === 'longevity') {
+      const p = prob !== undefined ? prob * 100 : val * 10;
+      if (p >= 90) return 'linear-gradient(90deg, #10b981, #059669)';
+      if (p >= 75) return 'linear-gradient(90deg, #06b6d4, #0891b2)';
+      return 'linear-gradient(90deg, #f59e0b, #d97706)';
+    }
 
     if (t === 'stability') {
       if (val >= 8) return 'linear-gradient(90deg, #10b981, #059669)';
@@ -154,6 +217,14 @@ export class ClinicalGaugeComponent {
   readonly ringColor = computed(() => {
     const val = this.value();
     const t = this.type();
+    const prob = this.survivalProbability();
+
+    if (t === 'survival' || t === 'longevity') {
+      const p = prob !== undefined ? prob * 100 : val * 10;
+      if (p >= 90) return '#10b981';
+      if (p >= 75) return '#06b6d4';
+      return '#f59e0b';
+    }
 
     if (t === 'stability') {
       if (val >= 8) return '#10b981';
@@ -173,7 +244,8 @@ export class ClinicalGaugeComponent {
   });
 
   readonly dashArray = computed(() => {
-    const pct = Math.min(100, Math.max(0, this.value() * 10));
+    const pct = this.fillPercentage();
     return `${pct}, 100`;
   });
 }
+

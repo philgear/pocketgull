@@ -12,7 +12,10 @@ import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (dictation.isModalOpen()) {
-      <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm">
+      <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="dictation-modal-title">
         <div class="bg-white rounded-lg shadow-2xl border border-gray-200 w-full max-w-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
           
           <!-- Header -->
@@ -23,13 +26,13 @@ import { PocketGullInputComponent } from './shared/pocket-gull-input.component';
                    [class.text-brand-red-600]="dictation.isListening()"
                    [class.bg-gray-100]="!dictation.isListening()"
                    [class.text-gray-500]="!dictation.isListening()">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
                     <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
                   </svg>
               </div>
               <div>
-                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide">Voice Dictation</h3>
+                <h3 id="dictation-modal-title" class="text-sm font-bold text-gray-900 uppercase tracking-wide">Voice Dictation</h3>
                 <p class="text-xs text-gray-500">
                   @if (dictation.isListening()) {
                     Listening... Speak clearly.

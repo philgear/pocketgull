@@ -12,16 +12,19 @@ def run_all_tests():
     api_dir = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(api_dir)
     
-    test_files = [f for f in os.listdir(api_dir) if f.startswith("test_") and f.endswith(".py")]
+    test_files = [(api_dir, f) for f in os.listdir(api_dir) if f.startswith("test_") and f.endswith(".py")]
+    tests_dir = os.path.join(api_dir, "tests")
+    if os.path.exists(tests_dir):
+        test_files.extend([(tests_dir, f) for f in os.listdir(tests_dir) if f.startswith("test_") and f.endswith(".py")])
     
     total_run = 0
     total_failed = 0
     
     print("=== Running Python Data Bridge Unit Tests ===")
     
-    for file in test_files:
+    for dir_path, file in test_files:
         module_name = file[:-3]
-        file_path = os.path.join(api_dir, file)
+        file_path = os.path.join(dir_path, file)
         
         # Load module dynamically
         spec = importlib.util.spec_from_file_location(module_name, file_path)

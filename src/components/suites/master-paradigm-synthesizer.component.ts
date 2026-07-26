@@ -13,7 +13,7 @@ export interface IParadigmVector {
 }
 
 @Component({
-  selector: 'app-master-paradigm-synthesizer',
+  selector: 'app-unified-paradigm-synthesizer',
   standalone: true,
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +25,7 @@ export interface IParadigmVector {
           <span class="text-2xl">🌌</span>
           <div>
             <h3 class="text-base sm:text-lg font-black uppercase tracking-wider text-zinc-100">
-              10-Dimensional Master Paradigm Health Vector
+              10-Dimensional Unified Paradigm Health Vector
             </h3>
             <p class="text-xs text-zinc-400">
               Real-time cross-paradigm synthesis combining Allopathic, Eastern, Ayurvedic, Turing, Nobel, AAAS & Lasker models
@@ -65,7 +65,7 @@ export interface IParadigmVector {
     :host { display: block; width: 100%; }
   `]
 })
-export class MasterParadigmSynthesizerComponent {
+export class UnifiedParadigmSynthesizerComponent {
   private patientState = inject(PatientStateService);
 
   readonly alignmentScore = signal<number>(94);

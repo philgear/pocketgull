@@ -89,6 +89,15 @@ const PART_NAMES: Record<string, string> = {
           </button>
         </div>
 
+        <!-- Occupational Hazard & Strain Telemetry Badge -->
+        <div *ngIf="occupationalStrainInfo() as info" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 dark:bg-cyan-950/50 border border-amber-500/30 dark:border-cyan-700/40 text-amber-900 dark:text-cyan-200">
+          <span>{{ info.icon }}</span>
+          <span class="text-[10.5px] font-bold tracking-wide hidden md:inline">{{ info.focusLabel }}</span>
+          <button (click)="setCameraPreset(info.cameraPreset)" class="px-1.5 py-0.5 rounded bg-amber-500/20 dark:bg-cyan-800/40 hover:bg-amber-500/30 text-[9.5px] uppercase font-extrabold cursor-pointer border border-amber-500/40 dark:border-cyan-600/50 transition" title="Focus Ergonomic Strain Region">
+            Focus Strain 🎯
+          </button>
+        </div>
+
         <!-- Viewport Spin & Reset Controls -->
         <div class="flex items-center gap-1.5">
           <button (click)="toggleAutoSpin()" 
@@ -265,6 +274,57 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
       }
     });
     readonly isAutoSpinning = signal<boolean>(false);
+
+    readonly occupationalProfile = computed(() => this.state.occupationalProfile());
+    readonly occupationalStrainInfo = computed(() => {
+      const prof = this.occupationalProfile();
+      if (!prof) return null;
+
+      const code = prof.socCode;
+      if (code.includes('SWIM')) {
+        return { cameraPreset: 'visceral' as const, focusLabel: '🫁 Pulmonary & Shoulder Rotator Cuff Strain', targetPartIds: ['r_shoulder', 'l_shoulder', 'lungs'], icon: '🏊‍♂️' };
+      }
+      if (code.includes('BIKE')) {
+        return { cameraPreset: 'spinal' as const, focusLabel: '🦴 Pudendal Nerve & Cervical Spine Strain', targetPartIds: ['spine_cervical', 'spine_lumbar', 'pelvis'], icon: '🚴‍♂️' };
+      }
+      if (code.includes('RUN')) {
+        return { cameraPreset: 'peripheral' as const, focusLabel: '🦵 Plantar Fascia & Tibial Stress Strain', targetPartIds: ['r_shin', 'l_shin', 'r_foot', 'l_foot'], icon: '🏃‍♂️' };
+      }
+      if (code === '27-2031') {
+        return { cameraPreset: 'peripheral' as const, focusLabel: '🩰 Metatarsal & Ankle Flexor Strain', targetPartIds: ['r_foot', 'l_foot', 'r_shin', 'l_shin'], icon: '💃' };
+      }
+      if (code === '11-1011-ROYAL') {
+        return { cameraPreset: 'cranial' as const, focusLabel: '👑 C1-C7 Crown Compression & Cervical Posture', targetPartIds: ['spine_cervical', 'head'], icon: '👑' };
+      }
+      if (code === '21-2011') {
+        return { cameraPreset: 'peripheral' as const, focusLabel: '✝️ Genuflection Knee & Pastoral Grief Heart', targetPartIds: ['r_shin', 'l_shin', 'heart'], icon: '✝️' };
+      }
+      if (code === '11-1021-POLY') {
+        return { cameraPreset: 'cranial' as const, focusLabel: '🌐 Interdisciplinary Brain & Hyper-Synthesis Matrix', targetPartIds: ['brain', 'head'], icon: '🌐' };
+      }
+      if (code === '37-3011') {
+        return { cameraPreset: 'peripheral' as const, focusLabel: '🌿 Hand Vibrational Raynaud & Lumbar Back Strain', targetPartIds: ['r_hand', 'l_hand', 'spine_lumbar', 'lungs'], icon: '🌿' };
+      }
+      if (code === '37-2011') {
+        return { cameraPreset: 'spinal' as const, focusLabel: '🧹 Maintenance Lumbar Disc & Knee Joint Strain', targetPartIds: ['spine_lumbar', 'r_shin', 'l_shin'], icon: '🧹' };
+      }
+      if (code === '55-1011-ASTRO') {
+        return { cameraPreset: 'cranial' as const, focusLabel: '🚀 Cephalad Fluid Shift & Spaceflight SANS Ocular', targetPartIds: ['head', 'spine_cervical', 'spine_lumbar'], icon: '👨‍🚀' };
+      }
+      if (code === '55-1011-AQUA') {
+        return { cameraPreset: 'spinal' as const, focusLabel: '🤿 Hyperbaric Decompression & HPNS Neuromuscular', targetPartIds: ['spine_lumbar', 'r_shin', 'l_shin'], icon: '🤿' };
+      }
+      if (code === '27-2021-ALPINE') {
+        return { cameraPreset: 'visceral' as const, focusLabel: '🏔️ High-Altitude Hypobaric Hypoxia & Pulmonary HAPE', targetPartIds: ['lungs', 'brain', 'r_foot', 'l_foot'], icon: '🏔️' };
+      }
+      if (code === '51-8011') {
+        return { cameraPreset: 'cranial' as const, focusLabel: '⚛️ SCADA Attentional Vigilance & Thyroid Shield', targetPartIds: ['head', 'thyroid', 'spine_cervical'], icon: '⚛️' };
+      }
+      if (code === '17-1011' || code === '17-2051') {
+        return { cameraPreset: 'cranial' as const, focusLabel: '📐 Drafting Cervical Flexion & FEA Screen Asthenopia', targetPartIds: ['spine_cervical', 'head'], icon: '📐' };
+      }
+      return { cameraPreset: 'spinal' as const, focusLabel: `${prof.professionTitle} Ergonomic Strain`, targetPartIds: ['spine_lumbar'], icon: '🛡️' };
+    });
 
     readonly hoveredPartId = signal<string | null>(null);
     readonly hoveredPartName = signal<string>('');

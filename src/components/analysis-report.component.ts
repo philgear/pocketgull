@@ -54,6 +54,7 @@ import { StormAnalysisComponent } from './storm-analysis.component';
 import { AndroscogginForagingPhytoncideComponent } from './androscoggin-foraging-phytoncide.component';
 import { ProceduralInvestmentMatrixComponent } from './procedural-investment-matrix.component';
 import { ActuarialQalyCalculatorComponent } from './actuarial-qaly-calculator.component';
+import { OccupationalHazardCardComponent } from './occupational-hazard-card.component';
 import { VagalBiofeedbackDockComponent } from './vagal-biofeedback-dock.component';
 import { Sec1557AuditModalComponent } from './sec1557-audit-modal.component';
 import { BystanderActionSuiteComponent } from './bystander-action-suite.component';
@@ -82,6 +83,7 @@ import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.
     TitleCasePipe,
     SummaryNodeComponent,
     Body3DViewerComponent,
+    OccupationalHazardCardComponent,
     PocketGullCardComponent,
     BiomarkerMatrixComponent,
     CostBenefitAnalysisComponent,
@@ -612,6 +614,7 @@ import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.
             <!-- Multi-Paradigm Switchable Clinical Dashboard (Shown for Functional Protocols or Non-Western Paradigms) -->
             @if (activeLens() === 'Functional Protocols' || state.activePhilosophy() !== 'western') {
               <div class="col-span-full mb-4 space-y-4 font-mono">
+                <app-occupational-hazard-card></app-occupational-hazard-card>
                 <app-paradigm-clinical-dashboard></app-paradigm-clinical-dashboard>
               </div>
             }

@@ -97,6 +97,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+app.get('/api/config', (req, res) => {
+  res.json({ apiKey: process.env['GEMINI_API_KEY'] || '' });
+});
+
 const rootDir = normalize(resolve(__dirname, '..'));
 
 
@@ -716,7 +724,7 @@ app.post('/api/ai/stream', express.json(), async (req, res) => {
       }
 
       const streamingResponse = await ai.models.generateContentStream({
-          model: rawModel.includes('gemini-2.0-flash') ? rawModel : 'gemini-2.0-flash-exp', // Enforce 2.0 flash
+          model: rawModel,
           contents: [{ role: 'user', parts: [{ text: patientData }] }],
           config: configOptions
       });
@@ -1165,7 +1173,7 @@ async function initializeAgones() {
 
 let _serverInstance: any = null;
 
-if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT'] || !process.env['NODE_ENV'] || process.env['NODE_ENV'] === 'development') {
+if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERVICE'] || process.env['PORT'] || process.env['CI'] || !process.env['NODE_ENV'] || process.env['NODE_ENV'] === 'development') {
   const port = process.env['PORT'] ? parseInt(process.env['PORT'], 10) : 4000;
   if (!_serverInstance) {
     _serverInstance = app.listen(port, '0.0.0.0', () => {

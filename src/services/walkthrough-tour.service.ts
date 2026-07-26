@@ -49,8 +49,8 @@ export class WalkthroughTourService {
       },
       {
         targetId: 'tour-report-node',
-        title: 'Step 5: Double-Click Prescriptions & Dual Perspective Toggle',
-        body: 'Single-click tools to view guidelines; double-click to cycle state (Unassigned ➔ 💊 Prescribed ➔ 🙈 Hidden). Toggle 🌱 Plain Language / 🔬 Deep Rationale for clinician vs patient literacy.',
+        title: 'Step 5: 4-Level Progressive Disclosure & Right-Click Context Actions',
+        body: 'Single-click cards for details; double-click/tap to cycle state (Unassigned ➔ 💊 Prescribed ➔ 🙈 Hidden); right-click or long-press for Level 4 Clinical Context Actions (FHIR R4 Export, Gemini Consult, Pin Telemetry, Attach Note). Toggle 🌱 Plain Language / 🔬 Deep Rationale for clinician vs patient literacy.',
         position: 'left',
       },
       {
@@ -73,8 +73,8 @@ export class WalkthroughTourService {
       },
       {
         targetId: 'tour-theme-trigger',
-        title: 'Step 9: High-Contrast Texture & Theme Suite',
-        body: 'Configure the interface aesthetics with options like Organic Hemp, Rice Paper, Cardstock, and Dark Mode.',
+        title: 'Step 9: Dieter Rams Functional Theme Studio',
+        body: 'Select from structured rectangular theme swatches (Rice Paper Washi, Raw Hemp, Carrara Marble, Obsidian Black, Madame Curie Lab) with real-color dual-swatch contrast previews and ADA 44px touch targets.',
         position: 'bottom',
       },
       {

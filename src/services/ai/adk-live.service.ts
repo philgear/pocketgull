@@ -4,6 +4,8 @@
  */
 import { Injectable, signal, NgZone, inject } from '@angular/core';
 
+import { ActuarialLongevityService, IOccupationalHazardProfile } from '../actuarial-longevity.service';
+
 export interface ILiveMessageEvent {
   text?: string;
   isFinal?: boolean;
@@ -13,7 +15,20 @@ export interface ILiveMessageEvent {
   providedIn: 'root'
 })
 export class AdkLiveService {
-  private ngZone = inject(NgZone);
+  private ngZone = (() => {
+    try {
+      return inject(NgZone);
+    } catch {
+      return null;
+    }
+  })();
+  private actuarialService = (() => {
+    try {
+      return inject(ActuarialLongevityService, { optional: true });
+    } catch {
+      return null;
+    }
+  })();
 
   public isConnected = signal(false);
   public isListening = signal(false);
@@ -45,12 +60,38 @@ export class AdkLiveService {
 
   constructor() {}
 
-  async connect(apiKey: string, systemInstruction: string, voiceName: string = 'Aoede') {
+  private runInZone(fn: () => void) {
+    if (this.ngZone) {
+      this.ngZone.run(fn);
+    } else {
+      fn();
+    }
+  }
+
+  public buildOccupationalPromptSegment(occupationalProfile?: IOccupationalHazardProfile | null): string {
+    const prof = occupationalProfile;
+    if (!prof) return '';
+
+    return `
+
+Occupational Healthspan & Precision Strategy Context:
+- Patient Profession: ${prof.professionTitle} (SOC Code: ${prof.socCode})
+- Primary Occupational Hazard (SNOMED CT): ${prof.snomedDisplay} (SNOMED: ${prof.snomedCode})
+- Actuarial QALY Longevity Impact: ${prof.actuarialQalyImpact > 0 ? '+' : ''}${prof.actuarialQalyImpact} years
+- 10D Hazard Biometrics: Ergonomic Strain ${prof.ergonomicStrainScore}/10 | Circadian Disruption ${prof.circadianDisruptionScore}/10 | Chemical Exposure ${prof.chemicalExposureScore}/10 | Allostatic Burnout ${prof.allostaticBurnoutScore}/10
+- OSHA Mitigation Directives: ${prof.oshaMitigationDirectives.join('; ')}
+- Precision Occupational Nutrition: ${prof.precisionOccupationalNutrition.join('; ')}
+- Choral Vocal Resonance & Glee Protocol: ${prof.vocalResonanceProtocol || 'N/A'}`;
+  }
+
+  async connect(apiKey: string, systemInstruction: string, voiceName: string = 'Aoede', modelName: string = 'models/gemini-2.5-flash', occupationalProfile?: IOccupationalHazardProfile | null) {
     if (this.isConnected()) return;
     this.connectionError.set(null);
 
-    // Enhance system instruction with vocal prosody directives & Macro Fleet Sentinel Context
-    const enhancedInstruction = `${systemInstruction}
+    const occSegment = this.buildOccupationalPromptSegment(occupationalProfile);
+
+    // Enhance system instruction with vocal prosody directives, Occupational Hazard Context, & Macro Fleet Sentinel Context
+    const enhancedInstruction = `${systemInstruction}${occSegment}
 
 Vocal & Speech Delivery Style:
 - Speak in a warm, conversational, empathetic, and reassuring voice.
@@ -155,7 +196,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
         const average = sum / dataArray.length;
         // Map 0-100 range logically for UI reaction (0-255 is byte limit, clipping around 128 usually for normal speech)
         const vol = Math.min(100, Math.round((average / 128) * 100));
-        this.ngZone.run(() => this.volumeLevel.set(vol));
+        this.runInZone(() => this.volumeLevel.set(vol));
         this.volumeAnimationFrame = requestAnimationFrame(updateVolume);
       };
 
@@ -165,7 +206,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
         this.liveClient.onopen = () => {
           this.liveClient.send(JSON.stringify({
             setup: {
-              model: 'models/gemini-2.0-flash-exp',
+              model: modelName,
               systemInstruction: { parts: [{ text: enhancedInstruction }] },
               generationConfig: {
                 responseModalities: ["TEXT", "AUDIO"],
@@ -176,12 +217,12 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
             }
           }));
           this.reconnectAttemptCount = 0;
-          this.ngZone.run(() => {
+          this.runInZone(() => {
              this.isConnected.set(true);
              this.isListening.set(true);
           });
           updateVolume(); // Start the VU loop
-          console.log(`[AdkLiveService] Connected to Gemini Live API with HD Voice '${voiceName}'`);
+          console.log(`[AdkLiveService] Connected to Gemini Live API with HD Voice '${voiceName}' (model: ${modelName})`);
           resolve();
         };
   
@@ -194,13 +235,13 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
           if (ev.code !== 1000 && ev.code !== 1005 && this.reconnectAttemptCount < this.maxReconnectAttempts) {
               this.reconnectAttemptCount++;
               const backoffMs = Math.pow(3, this.reconnectAttemptCount - 1) * 1000;
-              this.ngZone.run(() => this.connectionError.set(`Connection Lost: Reconnecting attempt ${this.reconnectAttemptCount}/${this.maxReconnectAttempts} in ${backoffMs / 1000}s...`));
+              this.runInZone(() => this.connectionError.set(`Connection Lost: Reconnecting attempt ${this.reconnectAttemptCount}/${this.maxReconnectAttempts} in ${backoffMs / 1000}s...`));
 
               setTimeout(() => {
                   console.log(`[AdkLiveService] Attempting reconnect #${this.reconnectAttemptCount} after ${backoffMs}ms...`);
-                  this.connect(apiKey, systemInstruction, voiceName).catch(err => {
+                  this.connect(apiKey, systemInstruction, voiceName, modelName).catch(err => {
                       console.error(`[AdkLiveService] Reconnect attempt #${this.reconnectAttemptCount} failed:`, err);
-                      this.ngZone.run(() => this.connectionError.set(`Reconnection Failed: ${err.message}`));
+                      this.runInZone(() => this.connectionError.set(`Reconnection Failed: ${err.message}`));
                   });
               }, backoffMs);
           }
@@ -214,14 +255,14 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
         
         this.liveClient.onerror = (err: Event) => {
           console.error('[AdkLiveService] Live API Error:', err);
-          this.ngZone.run(() => this.connectionError.set('WebSocket Error'));
+          this.runInZone(() => this.connectionError.set('WebSocket Error'));
           // Do not disconnect aggressively on error, let onclose handle reconnects
         };
       });
 
     } catch (err: any) {
       console.error('Failed to connect to Live API:', err);
-      this.ngZone.run(() => this.connectionError.set(err.message));
+      this.runInZone(() => this.connectionError.set(err.message));
       this.disconnect();
       throw err;
     }
@@ -259,7 +300,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
     if (data.error) {
       console.error("[AdkLiveService] Server returned error:", data.error);
       if (this.onMessage) {
-         this.ngZone.run(() => {
+         this.runInZone(() => {
              this.onMessage!({ text: `System Error: ${data.error.message || 'Unknown stream error'}` });
              if (this.onModelTurnComplete) this.onModelTurnComplete();
          });
@@ -272,7 +313,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       for (const part of parts) {
         if (part.text) {
           if (this.onMessage) {
-             this.ngZone.run(() => this.onMessage!({ text: part.text }));
+             this.runInZone(() => this.onMessage!({ text: part.text }));
           }
         }
         if (part.inlineData && part.inlineData.data) {
@@ -290,7 +331,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
     
     if (data.serverContent?.turnComplete) {
       if (this.onModelTurnComplete) {
-         this.ngZone.run(() => this.onModelTurnComplete!());
+         this.runInZone(() => this.onModelTurnComplete!());
       }
     }
     
@@ -299,7 +340,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       // Dump the audio queue immediately 
       this.clearAudioQueue();
       if (this.onInterrupted) {
-        this.ngZone.run(() => this.onInterrupted!());
+        this.runInZone(() => this.onInterrupted!());
       }
     }
   }
@@ -318,12 +359,12 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
   private async playNextAudio() {
     if (this.audioQueue.length === 0 || !this.playbackContext) {
       this.isPlaying = false;
-      this.ngZone.run(() => this.isSpeaking.set(false));
+      this.runInZone(() => this.isSpeaking.set(false));
       return;
     }
     
     this.isPlaying = true;
-    this.ngZone.run(() => this.isSpeaking.set(true));
+    this.runInZone(() => this.isSpeaking.set(true));
     
     const arrayBuffer = this.audioQueue.shift()!;
     try {
@@ -355,7 +396,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
   private clearAudioQueue() {
     this.audioQueue = [];
     this.isPlaying = false;
-    this.ngZone.run(() => this.isSpeaking.set(false));
+    this.runInZone(() => this.isSpeaking.set(false));
     
     if (this.activeSource) {
         try { this.activeSource.stop(); } catch (e) {}
@@ -387,7 +428,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
   }
 
   disconnect() {
-    this.ngZone.run(() => {
+    this.runInZone(() => {
       this.isListening.set(false);
       this.isConnected.set(false);
       this.isSpeaking.set(false);
@@ -397,7 +438,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       cancelAnimationFrame(this.volumeAnimationFrame);
       this.volumeAnimationFrame = null;
     }
-    this.ngZone.run(() => this.volumeLevel.set(0));
+    this.runInZone(() => this.volumeLevel.set(0));
 
     if (this.liveClient) {
       try { this.liveClient.close(); } catch(e){}
@@ -428,7 +469,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
   }
   
   private handleDisconnect() {
-    this.ngZone.run(() => {
+    this.runInZone(() => {
       this.isConnected.set(false);
       this.isListening.set(false);
       this.isSpeaking.set(false);

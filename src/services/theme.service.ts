@@ -30,9 +30,11 @@ export class ThemeService {
     if (isPlatformBrowser(this.platformId)) {
       this.initTheme();
       
-      const savedPersona = localStorage.getItem('pocket_gull_seagull_persona') as any;
-      if (savedPersona && ['calm-gull', 'active-skimmer', 'deep-navigator', 'storm-rider'].includes(savedPersona)) {
-        this.activeSeagullPersona.set(savedPersona);
+      if (typeof localStorage !== 'undefined') {
+        const savedPersona = localStorage.getItem('pocket_gull_seagull_persona') as any;
+        if (savedPersona && ['calm-gull', 'active-skimmer', 'deep-navigator', 'storm-rider'].includes(savedPersona)) {
+          this.activeSeagullPersona.set(savedPersona);
+        }
       }
 
       // Setup effect to save and apply the theme when the signal changes
@@ -57,46 +59,93 @@ export class ThemeService {
       // Setup effect to apply the seagull persona attribute
       effect(() => {
         const persona = this.activeSeagullPersona();
-        localStorage.setItem('pocket_gull_seagull_persona', persona);
-        document.documentElement.setAttribute('data-seagull-persona', persona);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('pocket_gull_seagull_persona', persona);
+        }
+        if (typeof document !== 'undefined') {
+          document.documentElement.setAttribute('data-seagull-persona', persona);
+        }
       });
 
       // Setup effect to apply the reduce-motion class based on user preference
       effect(() => {
         const reduce = this.reduceMotion();
-        if (reduce) {
-          localStorage.setItem('pocket_gull_reduce_motion', 'true');
-          document.documentElement.classList.add('reduce-motion');
-        } else {
-          localStorage.setItem('pocket_gull_reduce_motion', 'false');
-          document.documentElement.classList.remove('reduce-motion');
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('pocket_gull_reduce_motion', reduce ? 'true' : 'false');
+        }
+        if (typeof document !== 'undefined') {
+          if (reduce) {
+            document.documentElement.classList.add('reduce-motion');
+          } else {
+            document.documentElement.classList.remove('reduce-motion');
+          }
         }
       });
 
       // Setup effect to apply plain language mode persistence
       effect(() => {
         const isPlain = this.isPlainLanguageMode();
-        if (isPlain) {
-          localStorage.setItem('pocket_gull_plain_language', 'true');
-          document.documentElement.classList.add('plain-language-mode');
-        } else {
-          localStorage.setItem('pocket_gull_plain_language', 'false');
-          document.documentElement.classList.remove('plain-language-mode');
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('pocket_gull_plain_language', isPlain ? 'true' : 'false');
+        }
+        if (typeof document !== 'undefined') {
+          if (isPlain) {
+            document.documentElement.classList.add('plain-language-mode');
+          } else {
+            document.documentElement.classList.remove('plain-language-mode');
+          }
         }
       });
 
       // Setup effect to apply text size scale class to document root
       effect(() => {
         const scale = this.textSizeScale();
-        localStorage.setItem('pocket_gull_text_size_scale', scale);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('pocket_gull_text_size_scale', scale);
+        }
         
-        document.documentElement.classList.remove('text-scale-standard', 'text-scale-large', 'text-scale-extra-large');
-        document.documentElement.classList.add(`text-scale-${scale}`);
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.remove('text-scale-standard', 'text-scale-large', 'text-scale-extra-large');
+          document.documentElement.classList.add(`text-scale-${scale}`);
+        }
       });
+
+      if (typeof localStorage !== 'undefined') {
+        const savedReduceMotion = localStorage.getItem('pocket_gull_reduce_motion');
+        if (savedReduceMotion === 'true') {
+          this.reduceMotion.set(true);
+        } else if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+          // Auto-detect OS prefers-reduced-motion preference if not explicitly set
+          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            this.reduceMotion.set(true);
+          }
+        }
+      } else if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          this.reduceMotion.set(true);
+        }
+      }
+
+      // Listen to OS prefers-color-scheme & prefers-reduced-motion changes
+      if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addEventListener?.('change', (e) => {
+          if (this.currentTheme() === 'system') {
+            this.activeTheme.set(e.matches ? 'dark' : 'light');
+          }
+        });
+
+        const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        motionQuery.addEventListener?.('change', (e) => {
+          this.reduceMotion.set(e.matches);
+        });
+      }
     }
   }
 
   private initTheme() {
+    if (typeof localStorage === 'undefined') return;
+
     const savedPlainLanguage = localStorage.getItem('pocket_gull_plain_language');
     if (savedPlainLanguage === 'true') {
       this.isPlainLanguageMode.set(true);
@@ -131,16 +180,6 @@ export class ThemeService {
     const savedReduceMotion = localStorage.getItem('pocket_gull_reduce_motion');
     if (savedReduceMotion === 'true') {
       this.reduceMotion.set(true);
-    }
-
-    // Listen to OS prefers-color-scheme changes
-    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener?.('change', (e) => {
-        if (this.currentTheme() === 'system') {
-          this.activeTheme.set(e.matches ? 'dark' : 'light');
-        }
-      });
     }
   }
 
@@ -197,7 +236,7 @@ export class ThemeService {
       // Update meta theme-color for PWA
       const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#0a0503'); // Custom dark copper/ember background
+        metaThemeColor.setAttribute('content', '#09090B');
       }
     } else if (theme === 'calm') {
       document.documentElement.classList.add('theme-calm');
@@ -281,16 +320,171 @@ export class ThemeService {
     }
   }
 
+  /**
+   * Synthesizes Web Audio API acoustic UI feedback with frequency harmonics matched to active theme, paradigm & gesture interactions.
+   */
+  public playThemeUiAudioFx(actionType: 'click' | 'double-click' | 'flip' | 'state-cycle' | 'long-press' | 'toggle' | 'theme-change' | 'modal-open' | 'success' = 'click') {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+
+      const ctx = new AudioCtx();
+      if (ctx.state === 'suspended') ctx.resume();
+
+      // Resolve base harmonic frequency from clinical paradigm & theme
+      const paradigm = this.activeParadigm();
+      let baseFreq = 528; // Default Solfeggio 528 Hz
+      let waveType: OscillatorType = 'sine';
+
+      if (paradigm === 'western') {
+        baseFreq = 880; // High precision A5 note
+        waveType = 'sine';
+      } else if (paradigm === 'tcm') {
+        baseFreq = 432; // Earth 432 Hz tone
+        waveType = 'triangle';
+      } else if (paradigm === 'ayurveda') {
+        baseFreq = 528; // Transformation 528 Hz Medha tone
+        waveType = 'sine';
+      } else {
+        baseFreq = 660; // E5 Rosetta Purple chime
+        waveType = 'sine';
+      }
+
+      if (actionType === 'double-click' || actionType === 'flip') {
+        // Double-click / Card Flip: 2-tone rising octave-fifth step (F0 -> 1.5*F0)
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = waveType;
+        osc1.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+        osc2.type = waveType;
+        osc2.frequency.setValueAtTime(baseFreq * 1.5, ctx.currentTime + 0.06);
+
+        gain.gain.setValueAtTime(0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0005, ctx.currentTime + 0.18);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(ctx.currentTime);
+        osc1.stop(ctx.currentTime + 0.06);
+        osc2.start(ctx.currentTime + 0.06);
+        osc2.stop(ctx.currentTime + 0.18);
+
+        this.triggerHapticFeedback('double');
+        return;
+      }
+
+      if (actionType === 'state-cycle') {
+        // State Machine Transition: 3-note ascending arpeggio sweep (F0 -> 1.25*F0 -> 1.5*F0)
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+        osc.frequency.setValueAtTime(baseFreq * 1.25, ctx.currentTime + 0.05);
+        osc.frequency.setValueAtTime(baseFreq * 1.5, ctx.currentTime + 0.10);
+
+        gain.gain.setValueAtTime(0.06, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0005, ctx.currentTime + 0.20);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.20);
+
+        this.triggerHapticFeedback('heavy');
+        return;
+      }
+
+      if (actionType === 'long-press') {
+        // Long Press / Context Menu: Deep sub-bass resonance tone
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(baseFreq * 0.5, ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0005, ctx.currentTime + 0.30);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.30);
+
+        this.triggerHapticFeedback('heavy');
+        return;
+      }
+
+      // Standard single click / toggle / modal-open
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      if (actionType === 'toggle') baseFreq *= 1.25;
+      if (actionType === 'theme-change') baseFreq *= 1.5;
+      if (actionType === 'modal-open') baseFreq *= 0.85;
+
+      osc.type = waveType;
+      osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+
+      const duration = actionType === 'theme-change' ? 0.25 : 0.12;
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0005, ctx.currentTime + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+
+      if (actionType === 'click') this.triggerHapticFeedback('light');
+      else if (actionType === 'toggle') this.triggerHapticFeedback('medium');
+    } catch {
+      // AudioContext fail safe
+    }
+  }
+
+  /**
+   * Triggers haptic vibration feedback on supported touch & mobile devices.
+   */
+  public triggerHapticFeedback(pattern: 'light' | 'medium' | 'heavy' | 'double' | 'success' = 'light') {
+    if (!isPlatformBrowser(this.platformId) || typeof navigator === 'undefined' || !('vibrate' in navigator)) {
+      return;
+    }
+
+    try {
+      if (pattern === 'light') navigator.vibrate(10);
+      else if (pattern === 'medium') navigator.vibrate(20);
+      else if (pattern === 'heavy') navigator.vibrate(35);
+      else if (pattern === 'double') navigator.vibrate([15, 30, 15]);
+      else if (pattern === 'success') navigator.vibrate([10, 20, 25, 40]);
+    } catch {
+      // Haptic fail safe
+    }
+  }
+
   public setTheme(theme: AppTheme) {
     this.currentTheme.set(theme);
+    this.playThemeUiAudioFx('theme-change');
+    this.triggerHapticFeedback('double');
   }
 
   public setParadigm(paradigm: 'western' | 'tcm' | 'ayurveda' | 'unified') {
     this.activeParadigm.set(paradigm);
+    this.playThemeUiAudioFx('toggle');
+    this.triggerHapticFeedback('medium');
   }
 
   public setReduceMotion(reduce: boolean) {
     this.reduceMotion.set(reduce);
+    this.triggerHapticFeedback('light');
   }
 
   public cycleTextSizeScale() {
@@ -298,9 +492,16 @@ export class ThemeService {
     if (curr === 'standard') this.textSizeScale.set('large');
     else if (curr === 'large') this.textSizeScale.set('extra-large');
     else this.textSizeScale.set('standard');
+
+    this.playThemeUiAudioFx('click');
+    this.triggerHapticFeedback('light');
   }
 
   public togglePlainLanguageMode() {
     this.isPlainLanguageMode.update(curr => !curr);
+    this.playThemeUiAudioFx('toggle');
+    this.triggerHapticFeedback('medium');
   }
 }
+
+

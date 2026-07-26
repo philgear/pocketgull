@@ -1,0 +1,6 @@
+# Python FastAPI Sidecar OWNERS
+
+approvers:
+  - backend-leads@pocketgull.app
+  - ml-leads@pocketgull.app
+  - philgear

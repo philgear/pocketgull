@@ -10,7 +10,9 @@ import { AaasBreakthroughsSuiteComponent } from '../aaas/aaas-breakthroughs-suit
 import { LaskerBreakthroughSuiteComponent } from '../lasker/lasker-breakthrough-suite.component';
 import { EasternTcmSuiteComponent } from '../eastern/eastern-tcm-suite.component';
 import { AyurvedicSystemsSuiteComponent } from '../ayurvedic/ayurvedic-systems-suite.component';
-import { MasterParadigmSynthesizerComponent } from './master-paradigm-synthesizer.component';
+import { UnifiedParadigmSynthesizerComponent } from './master-paradigm-synthesizer.component';
+import { OccupationalHazardCardComponent } from '../occupational-hazard-card.component';
+import { FoodSafetyGuardrailCardComponent } from '../food-safety-guardrail-card.component';
 import { PatientStateService } from '../../services/patient-state.service';
 import { CircadianSleepinessService } from '../../services/circadian-sleepiness.service';
 import { ThemeService } from '../../services/theme.service';
@@ -40,70 +42,112 @@ export interface IDomainSuite {
     LaskerBreakthroughSuiteComponent,
     EasternTcmSuiteComponent,
     AyurvedicSystemsSuiteComponent,
-    MasterParadigmSynthesizerComponent
+    UnifiedParadigmSynthesizerComponent,
+    OccupationalHazardCardComponent,
+    FoodSafetyGuardrailCardComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full mb-10 space-y-6 font-sans">
       
-      <!-- Top Ground Truth Telemetry Bar -->
-      <div class="p-4 sm:p-5 rounded-2xl bg-zinc-900 text-white border border-zinc-800 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono">
+      <!-- Clinician KSS Alert Banner if Fatigue Detected -->
+      <div *ngIf="clinicianKss() >= 7" 
+           class="p-4 rounded-xl border bg-amber-500/10 border-amber-500/30 text-amber-300 flex items-center justify-between shadow-lg backdrop-blur-md">
         <div class="flex items-center gap-3">
-          <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-2xl">⚠️</span>
           <div>
-            <span class="text-xs text-zinc-400 uppercase tracking-widest block font-bold">Unified Patient Ground Truth</span>
-            <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+            <h4 class="text-sm font-semibold uppercase tracking-wider">Clinician Fatigue Protocol Active (KSS Level {{ clinicianKss() }})</h4>
+            <p class="text-xs opacity-90">Karolinska Sleepiness Scale indicates elevated cognitive fatigue. Multi-lens AI cross-validation is engaged for diagnostic safety.</p>
+          </div>
+        </div>
+        <div class="text-right border-l border-amber-500/20 pl-4">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-amber-400/80 block">Safety Guard</span>
+          <strong class="text-amber-400 text-sm font-bold">Score {{ clinicianKss() }}</strong>
+        </div>
+      </div>
+
+      <!-- Top Ground Truth Telemetry Instrument Panel (Dieter Rams Braun Aesthetic) -->
+      <div class="p-4 sm:p-5 rounded-lg bg-zinc-900 text-white border border-zinc-800 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono">
+        <div class="flex items-center gap-3">
+          <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500 animate-pulse"></span>
+          <div>
+            <span class="text-[10px] text-zinc-400 uppercase tracking-widest block font-bold">Unified Patient Ground Truth</span>
+            <h2 class="text-base font-bold text-white flex items-center gap-2">
               <span>{{ activePatientName() }}</span>
               <span class="text-xs font-normal text-zinc-400">({{ activePatientAge() }} y/o {{ activePatientGender() }})</span>
             </h2>
           </div>
         </div>
 
-        <!-- Telemetry Pill Indicators -->
-        <div class="flex flex-wrap items-center gap-2 text-xs">
-          <span class="px-3 py-1 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700">
-            BP: <strong class="text-emerald-400">{{ vitals().bp || '120/80' }}</strong>
-          </span>
-          <span class="px-3 py-1 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700">
-            HR: <strong class="text-emerald-400">{{ vitals().hr || 72 }} bpm</strong>
-          </span>
-          <span class="px-3 py-1 rounded-xl bg-zinc-800 text-zinc-300 border border-zinc-700">
-            SpO2: <strong class="text-emerald-400">{{ vitals().spO2 || '98%' }}</strong>
-          </span>
-          <span class="px-3 py-1 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/40">
-            KSS Readiness: <strong class="text-amber-400">Score {{ clinicianKss() }}</strong>
-          </span>
+        <!-- Telemetry Instrument Cells (Grid Structured, High Contrast) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <div class="px-3 py-2 rounded-md bg-zinc-950 text-zinc-300 border border-zinc-800 flex flex-col">
+            <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Blood Pressure</span>
+            <strong class="text-emerald-400 text-sm font-bold">{{ vitals().bp || '120/80' }}</strong>
+          </div>
+          <div class="px-3 py-2 rounded-md bg-zinc-950 text-zinc-300 border border-zinc-800 flex flex-col">
+            <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">Heart Rate</span>
+            <strong class="text-emerald-400 text-sm font-bold">{{ vitals().hr || 72 }} bpm</strong>
+          </div>
+          <div class="px-3 py-2 rounded-md bg-zinc-950 text-zinc-300 border border-zinc-800 flex flex-col">
+            <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">SpO2 Saturation</span>
+            <strong class="text-emerald-400 text-sm font-bold">{{ vitals().spO2 || '98%' }}</strong>
+          </div>
+          <div class="px-3 py-2 rounded-md bg-zinc-950 text-zinc-300 border border-zinc-800 flex flex-col">
+            <span class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold">KSS Readiness</span>
+            <strong class="text-amber-400 text-sm font-bold">Score {{ clinicianKss() }}</strong>
+          </div>
         </div>
       </div>
 
-      <!-- 10-Dimensional Master Synthesizer Overview -->
-      <app-master-paradigm-synthesizer />
+      <!-- 10-Dimensional Unified Synthesizer Overview -->
+      <app-unified-paradigm-synthesizer />
 
-      <!-- Domain Suite Selector & Paradigm Diff Bar -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+      <!-- Occupational Healthspan & 10D Hazard Profile Card -->
+      <app-occupational-hazard-card />
+
+      <!-- Food-Drug & Patient State Safety Matrix Card -->
+      <app-food-safety-guardrail-card />
+
+      <!-- Domain Suite Tab Navigation Bar (Dieter Rams Rectangular Precision) -->
+      <div 
+        role="tablist" 
+        aria-label="Clinical Domain Suites Navigation"
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-2 rounded-lg bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
         
-        <!-- Functional Domain Suite Tabs -->
-        <div class="flex flex-wrap items-center gap-1.5 font-mono">
-          @for (suite of suites; track suite.id) {
+        <!-- Structural Functional Tabs (No Pills - Clean Edge Geometry) -->
+        <div class="flex flex-wrap items-center gap-1 font-mono">
+          @for (suite of displayedSuites(); track suite.id) {
             <button 
+              role="tab"
+              [attr.aria-selected]="activeSuite() === suite.id"
+              [attr.aria-controls]="'suite-panel-' + suite.id"
               (click)="activeSuite.set(suite.id)"
               [class]="activeSuite() === suite.id
-                ? 'px-4 py-2.5 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold text-xs shadow-md transition-all flex items-center gap-2'
-                : 'px-3.5 py-2 rounded-xl text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 text-xs font-semibold transition-all flex items-center gap-2'">
+                ? 'min-h-[44px] px-4 py-2.5 rounded-md bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 font-bold text-xs shadow-sm flex items-center gap-2 border-b-2 border-emerald-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'
+                : 'min-h-[44px] px-3.5 py-2.5 rounded-md text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-xs font-semibold flex items-center gap-2 border-b-2 border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500'">
               <span>{{ suite.icon }}</span>
               <span>{{ suite.name }}</span>
             </button>
           }
+
+          <button 
+            (click)="toggleShowAllSuites()"
+            aria-label="Toggle all domain suite paradigms view"
+            class="min-h-[44px] px-3.5 py-2.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 text-xs font-mono font-bold transition flex items-center gap-1.5 border border-emerald-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500">
+            <span>{{ showAllSuites() ? '⚡ High-Signal Only' : '🔍 All Paradigms (10)' }}</span>
+          </button>
         </div>
 
         <!-- Paradigm Diff Mode Toggle -->
         <div class="flex items-center gap-2 font-mono text-xs border-t md:border-t-0 md:border-l border-zinc-200 dark:border-zinc-800 pt-2 md:pt-0 md:pl-4">
-          <span class="text-zinc-500 font-bold uppercase">Paradigm Diff:</span>
+          <span class="text-zinc-500 font-bold uppercase text-[10px]">Paradigm Diff:</span>
           <button 
             (click)="toggleParadigmDiff()"
+            aria-label="Toggle paradigm differential mode"
             [class]="showParadigmDiff() 
-              ? 'px-3 py-1.5 rounded-xl bg-orange-600 text-white font-bold transition shadow-sm'
-              : 'px-3 py-1.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold transition'">
+              ? 'min-h-[36px] px-3 py-1.5 rounded-md bg-orange-600 text-white font-bold transition shadow-sm focus-visible:ring-2 focus-visible:ring-orange-500'
+              : 'min-h-[36px] px-3 py-1.5 rounded-md bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold transition focus-visible:ring-2 focus-visible:ring-emerald-500'">
             {{ showParadigmDiff() ? '⚡ Diff Active' : 'Off (Full Lens)' }}
           </button>
         </div>
@@ -111,7 +155,7 @@ export interface IDomainSuite {
 
       <!-- Paradigm Diff Notice Banner -->
       @if (showParadigmDiff()) {
-        <div class="p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-orange-950 dark:text-orange-200 text-xs font-mono flex items-center justify-between gap-3 animate-in fade-in duration-200">
+        <div class="p-4 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-950 dark:text-orange-200 text-xs font-mono flex items-center justify-between gap-3 animate-in fade-in duration-200">
           <div class="flex items-center gap-2.5">
             <span class="text-lg">⚡</span>
             <div>
@@ -125,7 +169,7 @@ export interface IDomainSuite {
       }
 
       <!-- Active Suite Component View -->
-      <div class="animate-in fade-in duration-300">
+      <div [id]="'suite-panel-' + activeSuite()" role="tabpanel" class="animate-in fade-in duration-300">
         @switch (activeSuite()) {
           @case ('biomedical') { <app-biomedical-suite /> }
           @case ('therapeutics') { <app-therapeutics-suite /> }
@@ -152,6 +196,7 @@ export class DomainSuitesNavigatorComponent {
 
   activeSuite = signal<DomainSuiteId>('biomedical');
   showParadigmDiff = signal<boolean>(false);
+  showAllSuites = signal<boolean>(false);
 
   activePhilosophy = this.patientState.activePhilosophy;
   vitals = this.patientState.vitals;
@@ -173,7 +218,25 @@ export class DomainSuitesNavigatorComponent {
     { id: 'ayurvedic_systems', name: 'Ayurvedic Tridosha', subtitle: 'Vata/Pitta/Kapha Ratios & Agni Fire', icon: '🪷', badge: 'Ayurveda' }
   ];
 
+  displayedSuites = computed(() => {
+    if (this.showAllSuites()) {
+      return this.suites;
+    }
+    const phil = this.activePhilosophy();
+    if (phil === 'eastern') {
+      return this.suites.filter(s => s.id === 'eastern_tcm' || s.id === 'biomedical' || s.id === 'therapeutics');
+    }
+    if (phil === 'ayurvedic') {
+      return this.suites.filter(s => s.id === 'ayurvedic_systems' || s.id === 'therapeutics' || s.id === 'nutrition');
+    }
+    return this.suites.filter(s => s.id === 'biomedical' || s.id === 'therapeutics' || s.id === 'nutrition' || s.id === 'recovery');
+  });
+
   toggleParadigmDiff() {
     this.showParadigmDiff.set(!this.showParadigmDiff());
+  }
+
+  toggleShowAllSuites() {
+    this.showAllSuites.set(!this.showAllSuites());
   }
 }
