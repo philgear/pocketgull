@@ -239,6 +239,24 @@ export interface IChatEntry {
                                                     <div [innerHTML]="(entry.htmlContent || entry.text) | safeHtml"></div>
                                                 </div>
 
+                                                <!-- Inline Micro-Component Drill-Down Widgets -->
+                                                @if (entry.role === 'model') {
+                                                  <div class="mt-3 pt-2 border-t border-blue-500/20 flex flex-wrap gap-1.5 font-mono text-[10px]">
+                                                    <button (click)="openDrilldown('biomarkers'); $event.stopPropagation()" class="px-2.5 py-1 rounded bg-blue-500/10 hover:bg-blue-500/20 text-blue-600 dark:text-blue-300 border border-blue-500/30 font-bold transition flex items-center gap-1">
+                                                      <span>🧬</span> <span>Biomarker Matrix</span>
+                                                    </button>
+                                                    <button (click)="openDrilldown('food_safety'); $event.stopPropagation()" class="px-2.5 py-1 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 font-bold transition flex items-center gap-1">
+                                                      <span>🥗</span> <span>Food Safety</span>
+                                                    </button>
+                                                    <button (click)="openDrilldown('occupational'); $event.stopPropagation()" class="px-2.5 py-1 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30 font-bold transition flex items-center gap-1">
+                                                      <span>⚠️</span> <span>Hazard Profile</span>
+                                                    </button>
+                                                    <button (click)="openDrilldown('qaly'); $event.stopPropagation()" class="px-2.5 py-1 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-600 dark:text-purple-300 border border-purple-500/30 font-bold transition flex items-center gap-1">
+                                                      <span>⏳</span> <span>QALY Longevity</span>
+                                                    </button>
+                                                  </div>
+                                                }
+
                                                 <!-- Rich Media Cards -->
                                                 @if (entry.richCards && entry.richCards.length > 0) {
                                                      <div class="rm-panel mt-3 opacity-90">
@@ -298,23 +316,17 @@ export interface IChatEntry {
                          <div class="w-full max-w-3xl flex flex-col gap-3 relative">
                             <!-- Smart Suggestions -->
                             @if (agentState() === 'idle') {
-                              <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500 font-mono text-xs">
-                                 <button type="button" (click)="messageText.set('Explain my clinical health as an Arborist Tree system.'); sendMessage()" class="px-3 py-1.5 bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 rounded-xl hover:bg-emerald-900 transition-all shadow-sm flex items-center gap-1">
-                                     <span>🌳</span> Arborist Tree Consult
-                                 </button>
-                                 <button type="button" (click)="messageText.set('Explain my vitals as a Mechanic Automotive Chassis with DTC trouble codes.'); sendMessage()" class="px-3 py-1.5 bg-cyan-950/80 border border-cyan-700/60 text-cyan-300 rounded-xl hover:bg-cyan-900 transition-all shadow-sm flex items-center gap-1">
-                                     <span>🏎️</span> Mechanic Vehicle Consult
-                                 </button>
-                                 <button type="button" (click)="messageText.set('Provide an erudite telemetry review as an Extraordinary Gentleman scholar.'); sendMessage()" class="px-3 py-1.5 bg-amber-950/80 border border-amber-700/60 text-amber-300 rounded-xl hover:bg-amber-900 transition-all shadow-sm flex items-center gap-1">
-                                     <span>🎩</span> Gentleman Consult
-                                 </button>
-                                 <button type="button" (click)="messageText.set('Express my physiological journey through the voice of an inspiring Artistic Muse.'); sendMessage()" class="px-3 py-1.5 bg-purple-950/80 border border-purple-700/60 text-purple-300 rounded-xl hover:bg-purple-900 transition-all shadow-sm flex items-center gap-1">
-                                     <span>✨</span> Muse Consult
-                                 </button>
-                                 <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm">
-                                     Critical evidence?
-                                 </button>
-                              </div>
+                                <div class="flex flex-wrap items-center justify-center gap-2 mb-2 w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-500 font-mono text-xs">
+                                  <button type="button" (click)="messageText.set('What is the most critical evidence here?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm">
+                                      📌 Critical evidence?
+                                  </button>
+                                  <button type="button" (click)="messageText.set('Summarize the primary treatment plan and safety guardrails.'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm">
+                                      🛡️ Treatment Plan & Safety
+                                  </button>
+                                  <button type="button" (click)="messageText.set('What are the key lab biomarker targets for this patient?'); sendMessage()" class="px-3 py-1.5 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-xs font-medium text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all shadow-sm">
+                                      🧬 Biomarker Targets
+                                  </button>
+                                </div>
                             }
 
                             @if (permissionError()) {
@@ -432,6 +444,10 @@ export class VoiceAssistantComponent implements OnDestroy {
 
 
     panelMode = signal<'selection' | 'chat' | 'dictation'>('selection');
+
+    openDrilldown(target: 'biomarkers' | 'occupational' | 'food_safety' | 'ybocs' | 'qaly' | 'foraging' | 'vagal') {
+      this.state.activeDrilldownComponent.set(target);
+    }
 
     transcriptContainer = viewChild<ElementRef<HTMLDivElement>>('transcriptContainer');
     fileInputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
