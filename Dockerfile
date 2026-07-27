@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:24.1.0-alpine AS builder
+FROM node:26.5.0-alpine AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN npm prune --omit=dev --legacy-peer-deps
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:24.1.0-alpine
+FROM node:26.5.0-alpine
 
 WORKDIR /app
 
