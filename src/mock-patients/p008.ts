@@ -6,6 +6,17 @@ export const p008: IPatient = {
   age: 93,
   gender: "Male",
   lastVisit: "2024.12.10",
+  genomicVariants: [
+    { "rsId": "rs1801131", "gene": "MTHFR", "chromosome": "1", "position": "11796320", "genotype": "A/A (Normal)", "clinicalSignificance": "Optimal folate cycle function", "pathogenicity": "Benign" },
+    { "rsId": "rs4343", "gene": "ACE", "chromosome": "17", "position": "63477061", "genotype": "I/D (Heterozygous)", "clinicalSignificance": "Moderate ACE activity, responds well to lifestyle/antioxidants", "pathogenicity": "Benign" }
+  ],
+  biochemicalPathways: [
+    { "id": "path_ascorbate", "name": "Collagen Synthesis & Matrix Stabilization", "status": "Optimal", "activeEnzymes": ["PLOD1", "P4HA1"], "blocks": ["Optimal ascorbate substrate saturation enabling prolyl hydroxylase"] },
+    { "id": "path_lpa", "name": "Atherogenic Lipoprotein Binding", "status": "Optimal", "activeEnzymes": ["LPA", "APOB"], "blocks": ["Lysine/Proline supplementation successfully inhibiting Lp(a) adhesion"] }
+  ],
+  pkInteractions: [
+    { "agent": "Ascorbic Acid + L-Lysine", "target": "Lp(a) Lipoprotein Receptors", "affinity": "Competitive Inhibition", "effect": "Prevention of arterial wall plaque deposition", "riskLevel": "Low" }
+  ],
   preexistingConditions: [
     "Prostate Cancer (Sustained Remission)",
     "Coronary Artery Disease (Pauling Protocol Managed)",

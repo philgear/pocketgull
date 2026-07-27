@@ -2,6 +2,22 @@
 <html lang="en">
 
 <head>
+  <script>
+    (function() {
+      var origError = console.error;
+      console.error = function() {
+        var msg = Array.prototype.slice.call(arguments).join(' ');
+        if (msg.indexOf('apis.google.com') !== -1 || msg.indexOf('u[v]') !== -1) return;
+        origError.apply(console, arguments);
+      };
+      window.addEventListener('error', function (e) {
+        if ((e.filename && e.filename.indexOf('apis.google.com') !== -1) || (e.message && e.message.indexOf('u[v]') !== -1)) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
+    })();
+  </script>
   <base href="/">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

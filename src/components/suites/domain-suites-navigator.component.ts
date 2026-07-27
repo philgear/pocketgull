@@ -11,13 +11,15 @@ import { LaskerBreakthroughSuiteComponent } from '../lasker/lasker-breakthrough-
 import { EasternTcmSuiteComponent } from '../eastern/eastern-tcm-suite.component';
 import { AyurvedicSystemsSuiteComponent } from '../ayurvedic/ayurvedic-systems-suite.component';
 import { UnifiedParadigmSynthesizerComponent } from './master-paradigm-synthesizer.component';
+import { BiochemicalSuiteComponent } from '../biochemical-suite.component';
+import { PublicHealthSentinelSuiteComponent } from '../public-health-sentinel-suite.component';
 import { OccupationalHazardCardComponent } from '../occupational-hazard-card.component';
 import { FoodSafetyGuardrailCardComponent } from '../food-safety-guardrail-card.component';
 import { PatientStateService } from '../../services/patient-state.service';
 import { CircadianSleepinessService } from '../../services/circadian-sleepiness.service';
 import { ThemeService } from '../../services/theme.service';
 
-export type DomainSuiteId = 'biomedical' | 'therapeutics' | 'nutrition' | 'recovery' | 'turing' | 'nobel' | 'aaas' | 'lasker' | 'eastern_tcm' | 'ayurvedic_systems';
+export type DomainSuiteId = 'biomedical' | 'biochemical' | 'public_health' | 'therapeutics' | 'nutrition' | 'recovery' | 'turing' | 'nobel' | 'aaas' | 'lasker' | 'eastern_tcm' | 'ayurvedic_systems';
 
 export interface IDomainSuite {
   id: DomainSuiteId;
@@ -44,7 +46,9 @@ export interface IDomainSuite {
     AyurvedicSystemsSuiteComponent,
     UnifiedParadigmSynthesizerComponent,
     OccupationalHazardCardComponent,
-    FoodSafetyGuardrailCardComponent
+    FoodSafetyGuardrailCardComponent,
+    BiochemicalSuiteComponent,
+    PublicHealthSentinelSuiteComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -176,6 +180,8 @@ export interface IDomainSuite {
       <div [id]="'suite-panel-' + activeSuite()" role="tabpanel" class="animate-in fade-in duration-300">
         @switch (activeSuite()) {
           @case ('biomedical') { <app-biomedical-suite /> }
+          @case ('biochemical') { <app-biochemical-suite /> }
+          @case ('public_health') { <app-public-health-sentinel-suite /> }
           @case ('therapeutics') { <app-therapeutics-suite /> }
           @case ('nutrition') { <app-nutrition-suite /> }
           @case ('recovery') { <app-recovery-suite /> }
@@ -217,7 +223,9 @@ export class DomainSuitesNavigatorComponent {
   clinicianKss = computed(() => this.kssService.clinicianKss() || 1);
 
   suites: IDomainSuite[] = [
-    { id: 'biomedical', name: 'Biomedical & Diagnostic', subtitle: 'Ground Truth Telemetry', icon: '🧬', badge: 'Lab & Vitals' },
+    { id: 'biomedical', name: 'Biomedical & Diagnostic', subtitle: 'Ground Truth Telemetry', icon: '🩺', badge: 'Lab & Vitals' },
+    { id: 'biochemical', name: 'Biochemical & Molecular', subtitle: 'Genomics & Pathways', icon: '🧬', badge: 'Genomics' },
+    { id: 'public_health', name: 'WHO / CDC Public Health', subtitle: 'Epidemiological & EWARS', icon: '📡', badge: 'Surveillance' },
     { id: 'therapeutics', name: 'Therapeutics & Botanical', subtitle: 'Precision Formulas', icon: '🌿', badge: 'Nutrients & Herbs' },
     { id: 'nutrition', name: 'Nutritional & Metabolic', subtitle: 'Circadian Meal Planning', icon: '🥗', badge: 'Thermal Matrix' },
     { id: 'recovery', name: 'Kinetic & Recovery', subtitle: '120 BPM Entrainment', icon: '⚡', badge: 'Vagal & Playbook' },
@@ -235,12 +243,12 @@ export class DomainSuitesNavigatorComponent {
     }
     const phil = this.activePhilosophy();
     if (phil === 'eastern') {
-      return this.suites.filter(s => s.id === 'eastern_tcm' || s.id === 'biomedical' || s.id === 'therapeutics');
+      return this.suites.filter(s => s.id === 'eastern_tcm' || s.id === 'biochemical' || s.id === 'biomedical' || s.id === 'therapeutics');
     }
     if (phil === 'ayurvedic') {
-      return this.suites.filter(s => s.id === 'ayurvedic_systems' || s.id === 'therapeutics' || s.id === 'nutrition');
+      return this.suites.filter(s => s.id === 'ayurvedic_systems' || s.id === 'biochemical' || s.id === 'therapeutics' || s.id === 'nutrition');
     }
-    return this.suites.filter(s => s.id === 'biomedical' || s.id === 'therapeutics' || s.id === 'nutrition' || s.id === 'recovery');
+    return this.suites.filter(s => s.id === 'biomedical' || s.id === 'biochemical' || s.id === 'public_health' || s.id === 'therapeutics' || s.id === 'nutrition' || s.id === 'recovery');
   });
 
   toggleParadigmDiff() {

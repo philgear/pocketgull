@@ -238,59 +238,6 @@ async def get_holistic_patient_risk(payload: MultiModalPatientStateInput) -> dic
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ML: SOMATIC COHERENCE INDEX API
-# ══════════════════════════════════════════════════════════════════════════════
-
-class SomaticCoherenceRequest(BaseModel):
-    hrv_rmssd: float = Field(default=42.0, description="HRV RMSSD in milliseconds")
-    vocal_jitter: float = Field(default=0.015, description="Vocal pitch jitter ratio")
-    wu_xing_stagnation_score: float = Field(default=0.20, description="TCM Organ Clock stagnation index (0.0 - 1.0)")
-    solfeggio_frequency_hz: float = Field(default=528.0, description="Target AVS Solfeggio carrier frequency")
-
-
-class SomaticCoherenceResponse(BaseModel):
-    somatic_coherence_index: float
-    status: str
-    recommended_avs_frequency_hz: float
-    recommended_binaural_pulse_hz: float
-    clinical_recommendation: str
-
-
-@app.post("/api/ml/somatic-coherence-score", response_model=SomaticCoherenceResponse, tags=["ML"])
-async def calculate_somatic_coherence(payload: SomaticCoherenceRequest) -> SomaticCoherenceResponse:
-    """Calculates real-time Somatic Coherence Index (0 - 100%) combining HRV, Vocal Jitter, and TCM Stagnation."""
-    hrv_component = min(1.0, payload.hrv_rmssd / 80.0) * 40.0
-    vocal_component = max(0.0, (1.0 - (payload.vocal_jitter / 0.05))) * 30.0
-    tcm_component = (1.0 - payload.wu_xing_stagnation_score) * 30.0
-
-    score = round(hrv_component + vocal_component + tcm_component, 1)
-
-    if score >= 80.0:
-        status = "High Autonomic Coherence (Sattva)"
-        rec_avs = 528.0
-        rec_pulse = 10.0
-        rec_text = "Optimal autonomic vagal tone. Maintain 528 Hz Solfeggio 10 Hz Alpha entrainment."
-    elif score >= 50.0:
-        status = "Moderate Stress Vulnerability (Rajas)"
-        rec_avs = 432.0
-        rec_pulse = 6.0
-        rec_text = "Elevated sympathetic activation. Prescribe 432 Hz Solfeggio 6 Hz Theta relaxation."
-    else:
-        status = "Severe Somatic Disruption (Tamas / Stagnation)"
-        rec_avs = 174.0
-        rec_pulse = 2.5
-        rec_text = "High anxiety / pain burden. Trigger 174 Hz Anxiolytic Solfeggio 2.5 Hz Delta grounding."
-
-    return SomaticCoherenceResponse(
-        somatic_coherence_index=score,
-        status=status,
-        recommended_avs_frequency_hz=rec_avs,
-        recommended_binaural_pulse_hz=rec_pulse,
-        clinical_recommendation=rec_text
-    )
-
-
-# ══════════════════════════════════════════════════════════════════════════════
 # INGEST: PANDAS DATAFRAME → IPatientVitals
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -1169,4 +1116,98 @@ async def translate_persona_endpoint(req: IPersonaTranslationRequest) -> IPerson
             ],
             reassurance_statement="Your story is one of profound beauty and resilience. You are the artist, and your health is your masterpiece."
         )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ML: WHO / CDC EPIDEMIOLOGICAL OUTBREAK SCORING ENDPOINT
+# ══════════════════════════════════════════════════════════════════════════════
+
+class OutbreakRiskInput(BaseModel):
+    viral_copy_count: float = Field(..., description="Wastewater copies/mL (e.g. 480000.0)")
+    aqi: int = Field(..., ge=0, le=500, description="Air Quality Index")
+    pathogen: str = Field(default="SARS-CoV-2", description="Target pathogen symbol")
+    has_respiratory_history: bool = Field(default=False, description="Patient respiratory condition flag")
+
+class OutbreakRiskResponse(BaseModel):
+    outbreak_probability: float = Field(..., description="Calculated outbreak transmission risk probability (0.0 - 1.0)")
+    risk_level: str = Field(..., description="Triage tier: Low, Moderate, High, Critical")
+    epidemiological_recommendation: str = Field(..., description="WHO/CDC sentinel clinical action guidance")
+
+
+@app.post("/ml/outbreak-risk", response_model=OutbreakRiskResponse)
+async def predict_outbreak_risk(input_data: OutbreakRiskInput) -> OutbreakRiskResponse:
+    """
+    Computes real-time epidemiological transmission risk vector from wastewater viral copies and AQI.
+    """
+    copy_scaled = min(1.0, max(0.0, (np.log10(max(1.0, input_data.viral_copy_count)) - 3.0) / 3.0))
+    aqi_scaled = min(1.0, input_data.aqi / 300.0)
+    respiratory_factor = 1.25 if input_data.has_respiratory_history else 1.0
+
+    raw_score = (0.65 * copy_scaled + 0.35 * aqi_scaled) * respiratory_factor
+    outbreak_probability = float(np.clip(raw_score, 0.0, 1.0))
+
+    if outbreak_probability > 0.75:
+        tier = "Critical"
+        recommendation = "Immediate WHO EWARS isolation protocol & N95 respirator deployment recommended."
+    elif outbreak_probability > 0.50:
+        tier = "High"
+        recommendation = "Active surge precautions; initiate PCR diagnostic verification & daily viral load tracking."
+    elif outbreak_probability > 0.25:
+        tier = "Moderate"
+        recommendation = "Increased community surveillance; monitor patient for early upper respiratory symptoms."
+    else:
+        tier = "Low"
+        recommendation = "Baseline WHO surveillance active; routine preventive hygiene."
+
+    return OutbreakRiskResponse(
+        outbreak_probability=round(outbreak_probability, 4),
+        risk_level=tier,
+        epidemiological_recommendation=recommendation
+    )
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# BIOPHYSICS & KAGGLE COMPETITION ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+class BiophysicsTelemetryInput(BaseModel):
+    patient_id: str = Field(default="PATIENT-001")
+    heart_rate_bpm: float = Field(default=72.0, ge=30.0, le=220.0)
+    hrv_rmssd_ms: float = Field(default=45.0, ge=5.0, le=200.0)
+    blood_hco3_mEq: float = Field(default=24.0, ge=10.0, le=40.0)
+    pco2_mmHg: float = Field(default=40.0, ge=15.0, le=80.0)
+
+class BiophysicsTelemetryResponse(BaseModel):
+    calculated_ph: float
+    buffer_state: str
+    action_friction_score: float
+    free_energy_negentropy: float
+    markov_blanket_status: str
+
+@app.post("/api/biophysics/telemetry", response_model=BiophysicsTelemetryResponse)
+async def compute_biophysics_telemetry(input_data: BiophysicsTelemetryInput) -> BiophysicsTelemetryResponse:
+    """Computes Henderson-Hasselbalch blood pH and Friston Free Energy negentropy."""
+    # Henderson-Hasselbalch: pH = 6.1 + log10(HCO3 / (0.03 * pCO2))
+    ph = 6.1 + np.log10(input_data.blood_hco3_mEq / (0.03 * input_data.pco2_mmHg))
+    ph_calc = float(round(ph, 2))
+
+    buffer_state = "Normal Homeostasis"
+    if ph_calc < 7.35:
+        buffer_state = "Acidemia (Low Buffer Capacity)"
+    elif ph_calc > 7.45:
+        buffer_state = "Alkalemia (High Buffer Ratio)"
+
+    # Action Friction & Negentropy
+    friction = float(round(1.0 + (input_data.heart_rate_bpm / input_data.hrv_rmssd_ms), 2))
+    negentropy = float(min(100.0, max(0.0, input_data.hrv_rmssd_ms * 1.8)))
+
+    return BiophysicsTelemetryResponse(
+        calculated_ph=ph_calc,
+        buffer_state=buffer_state,
+        action_friction_score=friction,
+        free_energy_negentropy=negentropy,
+        markov_blanket_status="Intact & Exporting"
+    )
+
+
 

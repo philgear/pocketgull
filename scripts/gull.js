@@ -663,6 +663,10 @@ function executeWebMcpToolDirect(toolName, jsonArgsStr) {
           patientId: activePatient.id || 'p001',
           name: activePatient.name || 'Demo Patient',
           vitals: activePatient.vitals || {},
+          preexistingConditions: activePatient.preexistingConditions || [],
+          genomicVariants: activePatient.genomicVariants || [],
+          biochemicalPathways: activePatient.biochemicalPathways || [],
+          pkInteractions: activePatient.pkInteractions || [],
           selectedPhilosophy: activePatient.selectedPhilosophy || 'western',
           catalogs: catalog
         }

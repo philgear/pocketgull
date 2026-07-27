@@ -259,6 +259,13 @@ export class PatientStateService {
     { resourceType: 'Observation', geneSymbol: 'CYP2D6', variantCode: '*4/*4', phenotype: 'Poor' },
     { resourceType: 'Observation', geneSymbol: 'CYP2C19', variantCode: '*2/*2', phenotype: 'Poor' }
   ]);
+  readonly genomicVariants = signal<import('./patient.types').IGeneticVariant[]>([]);
+  readonly biochemicalPathways = signal<import('./patient.types').IBiochemicalPathway[]>([]);
+  readonly pkInteractions = signal<import('./patient.types').IPharmacokineticInteraction[]>([]);
+  readonly ewarsAlerts = signal<import('./patient.types').IEwarsOutbreakAlert[]>([]);
+  readonly travelProfile = signal<import('./patient.types').ITravelMedicineProfile | null>(null);
+  readonly awareStewardship = signal<import('./patient.types').IWhoAwareClassification[]>([]);
+  readonly environmentalIndex = signal<import('./patient.types').IEnvironmentalHealthIndex | null>(null);
   readonly clinicianRole = signal<'Cardiology' | 'Integrative' | 'Public Health' | 'General'>('General');
   readonly paretoWeights = signal<import('./patient.types').IMlParetoWeights>({ costWeight: 0.33, speedWeight: 0.33, adherenceWeight: 0.34 });
   readonly banditState = signal<import('./patient.types').IMlBanditState>({
@@ -926,6 +933,13 @@ export class PatientStateService {
     this.patientAge.set(0);
     this.patientGender.set('');
     this.patientHistory.set([]);
+    this.genomicVariants.set([]);
+    this.biochemicalPathways.set([]);
+    this.pkInteractions.set([]);
+    this.ewarsAlerts.set([]);
+    this.travelProfile.set(null);
+    this.awareStewardship.set([]);
+    this.environmentalIndex.set(null);
   }
 
   /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
@@ -983,6 +997,13 @@ export class PatientStateService {
     } else {
       this.biometricHistory.set([]);
     }
+    this.genomicVariants.set(state.genomicVariants || []);
+    this.biochemicalPathways.set(state.biochemicalPathways || []);
+    this.pkInteractions.set(state.pkInteractions || []);
+    this.ewarsAlerts.set(state.ewarsAlerts || []);
+    this.travelProfile.set(state.travelProfile || null);
+    this.awareStewardship.set(state.awareStewardship || []);
+    this.environmentalIndex.set(state.environmentalIndex || null);
     this.autoPrescribeToolsFromPatientData(patient);
   }
 
@@ -1049,6 +1070,13 @@ export class PatientStateService {
             shoppingList: this.shoppingList(),
             ayurvedicStatus: this.ayurvedicStatus(),
             biometricHistory: this.biometricHistory(),
+            genomicVariants: this.genomicVariants(),
+            biochemicalPathways: this.biochemicalPathways(),
+            pkInteractions: this.pkInteractions(),
+            ewarsAlerts: this.ewarsAlerts(),
+            travelProfile: this.travelProfile(),
+            awareStewardship: this.awareStewardship(),
+            environmentalIndex: this.environmentalIndex(),
         } as any;
   }
 

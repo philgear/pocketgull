@@ -63,6 +63,8 @@ const PART_NAMES: Record<string, string> = {
     'chakra_muladhara': 'Muladhara (Root Earth Base Support Chakra)'
 };
 
+export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive' | 'escher' | 'orch_or';
+
 @Component({
     selector: 'app-body-3d-viewer',
     standalone: true,
@@ -249,13 +251,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private ambientLight?: THREE.AmbientLight;
     private directionalLight?: THREE.DirectionalLight;
     private backLight?: THREE.DirectionalLight;
+    private molecularScienceGroup?: THREE.Group;
+    private escherMobiusGroup?: THREE.Group;
 
     partSelected = output<{ id: string, name: string }>();
 
     // Inputs for external control
     rotation = input<number>(0);
     zoom = input<number>(1);
-    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive'>('skin');
+    anatomyViewMode = input<AnatomyViewMode>('skin');
     customModelUrl = input<string | null>(null);
 
     readonly webglSupported = signal<boolean>(true);
@@ -837,6 +841,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.createMannequin();
             this.createArborealTreeModel();
             this.createAutomotiveChassisModel();
+            this.createMolecularScienceModel();
             this.startAnimation();
             this.setupInteractions();
 
@@ -1112,6 +1117,80 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             MIDDLE: THREE.MOUSE.DOLLY,
             RIGHT: THREE.MOUSE.ROTATE
         };
+
+        this.escherMobiusGroup = this.createEscherMobiusStrip();
+        this.scene.add(this.escherMobiusGroup);
+    }
+
+    private createEscherMobiusStrip(): THREE.Group {
+        const mobiusGroup = new THREE.Group();
+        mobiusGroup.name = 'escher_mobius_lens';
+
+        const uSegments = 140;
+        const vSegments = 24;
+        const R = 2.2;
+
+        const geometry = new THREE.BufferGeometry();
+        const positions: number[] = [];
+        const uvs: number[] = [];
+        const colors: number[] = [];
+
+        for (let i = 0; i <= uSegments; i++) {
+            const u = (i / uSegments) * Math.PI * 2;
+            for (let j = 0; j <= vSegments; j++) {
+                const v = (j / vSegments - 0.5) * 0.9;
+                const x = (R + v * Math.cos(u / 2)) * Math.cos(u);
+                const y = (R + v * Math.cos(u / 2)) * Math.sin(u);
+                const z = v * Math.sin(u / 2) + 1.0;
+
+                positions.push(x, y, z);
+                uvs.push(i / uSegments, j / vSegments);
+
+                const t = u / (Math.PI * 2);
+                let r = 0, g = 0, b = 0;
+                if (t < 0.33) {
+                    r = 0.02 + t * 0.1; g = 0.71; b = 0.83;
+                } else if (t < 0.66) {
+                    r = 0.06; g = 0.72; b = 0.50;
+                } else {
+                    r = 0.96; g = 0.62; b = 0.04;
+                }
+                colors.push(r, g, b);
+            }
+        }
+
+        const indices: number[] = [];
+        for (let i = 0; i < uSegments; i++) {
+            for (let j = 0; j < vSegments; j++) {
+                const a = i * (vSegments + 1) + j;
+                const b = (i + 1) * (vSegments + 1) + j;
+                const c = (i + 1) * (vSegments + 1) + (j + 1);
+                const d = i * (vSegments + 1) + (j + 1);
+
+                indices.push(a, b, d);
+                indices.push(b, c, d);
+            }
+        }
+
+        geometry.setIndex(indices);
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        geometry.computeVertexNormals();
+
+        const material = new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            wireframe: true,
+            side: THREE.DoubleSide,
+            transparent: true,
+            opacity: 0.75,
+            roughness: 0.2,
+            metalness: 0.8
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        mobiusGroup.add(mesh);
+        return mobiusGroup;
     }
 
     private createMannequin() {
@@ -1896,10 +1975,12 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.automotiveChassisGroup.add(tongueLoadMesh);
 
         const strutPositions = [
-            { x: -0.22, y: -0.1, z: 0, id: 'r_shin' },
-            { x: 0.22, y: -0.1, z: 0, id: 'l_shin' },
-            { x: -0.45, y: 1.45, z: 0, id: 'r_shoulder' },
-            { x: 0.45, y: 1.45, z: 0, id: 'l_shoulder' }
+            { x: -0.18, y: 0.35, z: 0, id: 'r_thigh' },
+            { x: 0.18, y: 0.35, z: 0, id: 'l_thigh' },
+            { x: -0.18, y: -0.25, z: 0, id: 'r_shin' },
+            { x: 0.18, y: -0.25, z: 0, id: 'l_shin' },
+            { x: -0.32, y: 1.45, z: 0, id: 'r_shoulder' },
+            { x: 0.32, y: 1.45, z: 0, id: 'l_shoulder' }
         ];
 
         strutPositions.forEach(s => {
@@ -1911,6 +1992,67 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             coilMesh.userData['layer'] = 'bone';
             this.automotiveChassisGroup!.add(coilMesh);
         });
+    }
+
+    private createMolecularScienceModel() {
+        this.molecularScienceGroup = new THREE.Group();
+        this.scene.add(this.molecularScienceGroup);
+        this.molecularScienceGroup.visible = false;
+
+        const helixRadius = 0.55;
+        const height = 2.4;
+        const turns = 3;
+        const numPoints = 80;
+        
+        const matA = new THREE.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x0891b2, emissiveIntensity: 0.9, roughness: 0.2 }); // Cyan
+        const matT = new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xe11d48, emissiveIntensity: 0.9, roughness: 0.2 }); // Rose
+        const matG = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.9, roughness: 0.2 }); // Emerald
+        const matC = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xd97706, emissiveIntensity: 0.9, roughness: 0.2 }); // Amber
+        const backboneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xcbd5e1, emissiveIntensity: 0.4, transparent: true, opacity: 0.8, roughness: 0.1 });
+
+        for (let i = 0; i < numPoints; i++) {
+            const t = i / numPoints;
+            const angle = t * turns * Math.PI * 2;
+            const y = (t * height) - (height / 2) + 1.0;
+
+            const x1 = Math.cos(angle) * helixRadius;
+            const z1 = Math.sin(angle) * helixRadius;
+            const p1 = new THREE.Vector3(x1, y, z1);
+
+            const x2 = Math.cos(angle + Math.PI) * helixRadius;
+            const z2 = Math.sin(angle + Math.PI) * helixRadius;
+            const p2 = new THREE.Vector3(x2, y, z2);
+
+            const sphereGeo = new THREE.SphereGeometry(0.035, 12, 12);
+            const s1 = new THREE.Mesh(sphereGeo, backboneMat);
+            s1.position.copy(p1);
+            this.molecularScienceGroup.add(s1);
+
+            const s2 = new THREE.Mesh(sphereGeo, backboneMat);
+            s2.position.copy(p2);
+            this.molecularScienceGroup.add(s2);
+
+            if (i % 3 === 0) {
+                const rungCurve = new THREE.LineCurve3(p1, p2);
+                const rungGeo = new THREE.TubeGeometry(rungCurve, 4, 0.012, 8, false);
+                
+                let mat = matA;
+                if (i % 12 === 0) mat = matA;
+                else if (i % 12 === 3) mat = matT;
+                else if (i % 12 === 6) mat = matG;
+                else mat = matC;
+
+                const rungMesh = new THREE.Mesh(rungGeo, mat);
+                this.molecularScienceGroup.add(rungMesh);
+
+                const centerGeo = new THREE.SphereGeometry(0.045, 12, 12);
+                const centerMesh = new THREE.Mesh(centerGeo, new THREE.MeshStandardMaterial({
+                    color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1.2
+                }));
+                centerMesh.position.lerpVectors(p1, p2, 0.5);
+                this.molecularScienceGroup.add(centerMesh);
+            }
+        }
     }
 
     private applyPos(mesh: THREE.Mesh, pos: any) {
@@ -2002,19 +2144,28 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.controls.update();
     }
 
-    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive') {
+    private updateTransparency(mode: AnatomyViewMode) {
         if (mode === 'arboreal') {
             if (this.mannequinGroup) this.mannequinGroup.visible = false;
             if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
+            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = true;
         } else if (mode === 'automotive') {
             if (this.mannequinGroup) this.mannequinGroup.visible = false;
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
+            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
             if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = true;
+        } else if (mode === 'escher') {
+            if (this.mannequinGroup) this.mannequinGroup.visible = true;
+            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
+            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
+            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
+            if (this.escherMobiusGroup) this.escherMobiusGroup.visible = true;
         } else {
             if (this.mannequinGroup) this.mannequinGroup.visible = true;
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
             if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
+            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
         }
 
         this.parts.forEach((group) => {
@@ -2058,8 +2209,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     else { material.opacity = 0.15; material.depthWrite = false; }
                 }
                 else if (mode === 'molecular') {
-                    if (layer === 'skin') { material.opacity = 0.30; material.depthWrite = false; }
-                    else if (layer === 'molecular') { material.opacity = 0.9; material.depthWrite = true; }
+                    if (layer === 'skin') { material.opacity = 0.10; material.depthWrite = false; }
+                    else if (layer === 'molecular') { material.opacity = 0.85; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
                 else if (mode === 'eastern') {
@@ -2117,6 +2268,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.animationFrameId = requestAnimationFrame(animate);
 
             if (this.controls) this.controls.update();
+            
+            if (this.molecularScienceGroup && this.molecularScienceGroup.visible) {
+                this.molecularScienceGroup.rotation.y += 0.012;
+            }
 
             this.timer.update();
             const time = this.timer.getElapsed();
@@ -2169,10 +2324,14 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     });
                 }
                 
-                // 2. Gentle floating
+                // 2. Gentle floating & Escher Möbius Strange Loop Rotation
                 this.mannequinGroup.position.y = Math.sin(time * 1.5) * 0.02;
                 if (this.customModelGroup) {
                     this.customModelGroup.position.y = Math.sin(time * 1.5) * 0.02;
+                }
+                if (this.escherMobiusGroup) {
+                    this.escherMobiusGroup.rotation.y += 0.008;
+                    this.escherMobiusGroup.rotation.z += 0.003;
                 }
                 
                 // 3. Update Shader Uniforms for Heatmaps

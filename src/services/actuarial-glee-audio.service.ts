@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject, computed } from '@angular/core';
+import { PatientStateService } from './patient-state.service';
 
 export interface ISheetNote {
   pitch: string; // e.g. 'C4', 'E4', 'G4', 'C5'
@@ -29,6 +30,39 @@ export interface IGleeTrackFull {
   providedIn: 'root'
 })
 export class ActuarialGleeAudioService {
+  private state = inject(PatientStateService);
+
+  // FHIR Telemetry-Adapted Dynamic Audio Parameters
+  readonly fhirAudioTelemetry = computed(() => {
+    const vitals = this.state.vitals();
+    const hr = parseFloat(vitals.hr) || 72;
+    const temp = parseFloat(vitals.temp) || 98.6;
+    const issues = this.state.issues();
+    const allIssues = Object.values(issues).flat();
+    const hasStress = allIssues.some(i => 
+      (i.description && (i.description.toLowerCase().includes('anxiety') || i.description.toLowerCase().includes('stress') || i.description.toLowerCase().includes('pain'))) ||
+      (i.name && (i.name.toLowerCase().includes('anxiety') || i.name.toLowerCase().includes('stress') || i.name.toLowerCase().includes('pain')))
+    );
+
+    // Dynamic Target Entrainment Tempo: deceleration towards 60 bpm if tachycardic
+    const targetBpm = hr > 90 ? 60 : (hr < 55 ? 72 : Math.round(hr * 0.85));
+
+    // Dynamic Solfeggio Carrier Offset based on inflammatory temperature
+    const solfeggioCarrierHz = temp > 99.5 ? 432.0 : 528.0;
+
+    // Vagal Respiratory Breathing LFO Frequency (0.08 Hz - 0.1 Hz)
+    const vagalLfoHz = hasStress ? 0.08 : 0.1;
+
+    return {
+      heartRate: hr,
+      temperature: temp,
+      targetBpm,
+      solfeggioCarrierHz,
+      vagalLfoHz,
+      hasStress
+    };
+  });
+
   isPlaying = signal<boolean>(false);
   isMuted = signal<boolean>(false);
   currentNoteIndex = signal<number>(0);
@@ -351,6 +385,186 @@ export class ActuarialGleeAudioService {
       ]
     },
     {
+      trackNumber: 5,
+      title: 'Ten Thousand Steps of Joy',
+      subtitle: 'Mitochondrial Biogenesis & Aerobic Pulse',
+      paradigm: 'western',
+      duetRoles: { roleA: 'Stride Master', roleB: 'Rhythm Keeper' },
+      keySignature: 'G Major',
+      timeSignature: '4/4',
+      bpm: 120,
+      icon: '🚶',
+      qalyBonus: 1.3,
+      biologicalMechanism: 'Upregulates PGC-1alpha transcription for muscular mitochondrial fission and vascular endothelial growth factor (VEGF).',
+      lyrics: [
+        { time: 0, role: 'A', text: 'Pacing steady through the park, walking bright into the spark...' },
+        { time: 5, role: 'B', text: 'Mitochondria multiply, healthspan climbing to the sky!' },
+        { time: 10, role: 'Both', text: 'Ten thousand steps with joy in stride, longevity is by our side!' }
+      ],
+      chordFrequencies: [
+        [196.00, 246.94, 293.66], // G Maj
+        [164.81, 196.00, 246.94], // E Min
+        [130.81, 164.81, 196.00], // C Maj
+        [146.83, 185.00, 220.00]  // D Maj
+      ],
+      sheetNotes: [
+        { pitch: 'G4', label: 'G', role: 'A', duration: 'quarter', staffStep: 4 },
+        { pitch: 'B4', label: 'B', role: 'A', duration: 'quarter', staffStep: 6 },
+        { pitch: 'D5', label: 'D', role: 'B', duration: 'quarter', staffStep: 8 },
+        { pitch: 'G5', label: 'G', role: 'Both', duration: 'half', staffStep: 11 },
+        { pitch: 'E5', label: 'E', role: 'B', duration: 'quarter', staffStep: 9 },
+        { pitch: 'D5', label: 'D', role: 'Both', duration: 'half', staffStep: 8 }
+      ]
+    },
+    {
+      trackNumber: 6,
+      title: 'Telomere Lullaby',
+      subtitle: 'Epigenetic DNA Repair & Protection',
+      paradigm: 'longevity',
+      duetRoles: { roleA: 'Epigenetic Whisper', roleB: 'Telomerase Echo' },
+      keySignature: 'E Minor',
+      timeSignature: '3/4',
+      bpm: 65,
+      icon: '🧬',
+      qalyBonus: 1.6,
+      biologicalMechanism: 'Reduces DNA double-strand break accumulation and maintains TERT telomerase reverse transcriptase activity.',
+      lyrics: [
+        { time: 0, role: 'A', text: 'Deep restorative nightly sleep, promises our chromosomes keep...' },
+        { time: 5, role: 'B', text: 'Protecting caps on every strand, living longer in the land!' },
+        { time: 10, role: 'Both', text: 'Sing the telomere lullaby, years of quality pass us by!' }
+      ],
+      chordFrequencies: [
+        [164.81, 196.00, 246.94], // E Min
+        [130.81, 164.81, 196.00], // C Maj
+        [110.00, 130.81, 164.81], // A Min
+        [123.47, 155.56, 185.00]  // B7
+      ],
+      sheetNotes: [
+        { pitch: 'E4', label: 'E', role: 'A', duration: 'half', staffStep: 2 },
+        { pitch: 'G4', label: 'G', role: 'A', duration: 'quarter', staffStep: 4 },
+        { pitch: 'B4', label: 'B', role: 'B', duration: 'half', staffStep: 6 },
+        { pitch: 'E5', label: 'E', role: 'Both', duration: 'whole', staffStep: 9 }
+      ]
+    },
+    {
+      trackNumber: 7,
+      title: 'Resveratrol & Golden Milk',
+      subtitle: 'Sirtuin Activation & Cellular Defense',
+      paradigm: 'longevity',
+      duetRoles: { roleA: 'Sirtuin Lead', roleB: 'Curcumin Support' },
+      keySignature: 'A Mixolydian',
+      timeSignature: '4/4',
+      bpm: 88,
+      icon: '🍇',
+      qalyBonus: 1.0,
+      biologicalMechanism: 'Activates SIRT1 deacetylase pathways and neutralizes NF-kB nuclear inflammatory signaling cascades.',
+      lyrics: [
+        { time: 0, role: 'A', text: 'Warm turmeric and golden spice, cellular protection extra nice...' },
+        { time: 5, role: 'B', text: 'NAD+ fuels the sirtuin key, feeling vibrant, young, and free!' },
+        { time: 10, role: 'Both', text: 'Golden milk in every cup, building our longevity up!' }
+      ],
+      chordFrequencies: [
+        [220.00, 277.18, 329.63], // A Maj
+        [196.00, 246.94, 293.66], // G Maj
+        [146.83, 185.00, 220.00], // D Maj
+        [220.00, 277.18, 329.63]  // A Maj
+      ],
+      sheetNotes: [
+        { pitch: 'A4', label: 'A', role: 'A', duration: 'quarter', staffStep: 5 },
+        { pitch: 'C#5', label: 'C#', role: 'A', duration: 'quarter', staffStep: 7.5 },
+        { pitch: 'E5', label: 'E', role: 'B', duration: 'half', staffStep: 9 },
+        { pitch: 'G5', label: 'G', role: 'Both', duration: 'whole', staffStep: 11 }
+      ]
+    },
+    {
+      trackNumber: 8,
+      title: 'Branch by Branch, We Prune the Risk',
+      subtitle: 'Multi-Generational Pedigree Lineage Healing',
+      paradigm: 'western',
+      duetRoles: { roleA: 'Ancestral Gardener', roleB: 'Future Heritage' },
+      keySignature: 'C Major',
+      timeSignature: '4/4',
+      bpm: 90,
+      icon: '🌳',
+      qalyBonus: 1.8,
+      biologicalMechanism: 'Mitigates polygenic inheritance risk through epigenomic histone acetylation and trans-generational health choices.',
+      lyrics: [
+        { time: 0, role: 'A', text: 'Looking through the family tree, pruning risk for you and me...' },
+        { time: 5, role: 'B', text: 'Pre-conception choices bright, giving future generations light!' },
+        { time: 10, role: 'Both', text: 'Branch by branch we heal today, a legacy that is here to stay!' }
+      ],
+      chordFrequencies: [
+        [261.63, 329.63, 392.00], // C Maj
+        [164.81, 196.00, 246.94], // E Min
+        [174.61, 220.00, 261.63], // F Maj
+        [196.00, 246.94, 293.66]  // G Maj
+      ],
+      sheetNotes: [
+        { pitch: 'C4', label: 'C', role: 'A', duration: 'quarter', staffStep: 0 },
+        { pitch: 'E4', label: 'E', role: 'A', duration: 'quarter', staffStep: 2 },
+        { pitch: 'G4', label: 'G', role: 'B', duration: 'quarter', staffStep: 4 },
+        { pitch: 'C5', label: 'C', role: 'Both', duration: 'half', staffStep: 7 }
+      ]
+    },
+    {
+      trackNumber: 9,
+      title: 'Shen in Harmony',
+      subtitle: 'TCM Mind Tranquilizing & Deep Rest',
+      paradigm: 'eastern',
+      duetRoles: { roleA: 'Tranquil Mind', roleB: 'Peaceful Spirit' },
+      keySignature: 'D Dorian',
+      timeSignature: '4/4',
+      bpm: 55,
+      icon: '🧠',
+      qalyBonus: 1.2,
+      biologicalMechanism: 'Tonifies Heart Blood and anchors Shen, lowering sympathetic cardiac beta-adrenergic stimulation.',
+      lyrics: [
+        { time: 0, role: 'A', text: 'Calm the heart and settle the Shen, resting deeply once again...' },
+        { time: 5, role: 'B', text: 'Quiet thoughts and peaceful eyes, wisdom beneath starry skies!' },
+        { time: 10, role: 'Both', text: 'Shen in harmony tonight, waking up with clear insight!' }
+      ],
+      chordFrequencies: [
+        [146.83, 174.61, 220.00], // D Min
+        [130.81, 164.81, 196.00], // C Maj
+        [116.54, 146.83, 174.61], // Bb Maj
+        [110.00, 146.83, 174.61]  // A7
+      ],
+      sheetNotes: [
+        { pitch: 'D4', label: 'D', role: 'A', duration: 'half', staffStep: 1 },
+        { pitch: 'F4', label: 'F', role: 'A', duration: 'half', staffStep: 3 },
+        { pitch: 'A4', label: 'A', role: 'B', duration: 'whole', staffStep: 5 }
+      ]
+    },
+    {
+      trackNumber: 10,
+      title: 'Whole Foods, Pure Heart',
+      subtitle: 'Metabolic Flexibility & Endothelial Glow',
+      paradigm: 'ayurvedic',
+      duetRoles: { roleA: 'Nourishment Lead', roleB: 'Vessel Harmony' },
+      keySignature: 'E Major',
+      timeSignature: '4/4',
+      bpm: 100,
+      icon: '🥑',
+      qalyBonus: 1.1,
+      biologicalMechanism: 'Improves eNOS endothelial nitric oxide generation and prevents postprandial triglyceride oxidative stress.',
+      lyrics: [
+        { time: 0, role: 'A', text: 'Rainbow colors on the plate, whole foods that we celebrate...' },
+        { time: 5, role: 'B', text: 'Endothelium smooth and clean, health control like a machine!' },
+        { time: 10, role: 'Both', text: 'Whole foods, pure heart, every day, vitality the natural way!' }
+      ],
+      chordFrequencies: [
+        [164.81, 207.65, 246.94], // E Maj
+        [123.47, 155.56, 185.00], // B Maj
+        [138.59, 164.81, 207.65], // C#m
+        [110.00, 138.59, 164.81]  // A Maj
+      ],
+      sheetNotes: [
+        { pitch: 'E4', label: 'E', role: 'A', duration: 'quarter', staffStep: 2 },
+        { pitch: 'G#4', label: 'G#', role: 'A', duration: 'quarter', staffStep: 4.5 },
+        { pitch: 'B4', label: 'B', role: 'B', duration: 'half', staffStep: 6 }
+      ]
+    },
+    {
       trackNumber: 11,
       title: 'The Human Dignity Duet',
       subtitle: 'Social Gravitation & Parasympathetic Co-Regulation',
@@ -410,6 +624,64 @@ export class ActuarialGleeAudioService {
         { pitch: 'C5', label: 'C', role: 'Both', duration: 'half', staffStep: 7 },
         { pitch: 'E5', label: 'E', role: 'Both', duration: 'whole', staffStep: 9 }
       ]
+    },
+    {
+      trackNumber: 13,
+      title: 'The Bach Crab Canon Entrainment',
+      subtitle: 'Polyphonic Counterpoint & Vagal Retrograde Loop',
+      paradigm: 'longevity',
+      duetRoles: { roleA: 'Voice 1: 528 Hz Inhalation Theme', roleB: 'Voice 2: 432 Hz Crab Canon Retrograde' },
+      keySignature: 'C Minor (Sacred Solfeggio)',
+      timeSignature: '4/4',
+      bpm: 60,
+      icon: '🎼',
+      qalyBonus: 1.8,
+      biologicalMechanism: 'Hofstadter-Bach polyphonic counterpoint: Voice 1 (528 Hz Solfeggio) drives parasympathetic vagal stimulation during 4s inhalation; Voice 2 (432 Hz Retrograde) mirrors exhalation to establish an acoustic Strange Loop.',
+      lyrics: [
+        { time: 0, role: 'A', text: 'Inhale 528 Hz ascension theme, opening the mind like a golden dream...' },
+        { time: 5, role: 'B', text: 'Exhale 432 Hz retrograde flow, strange loop resonance down below!' },
+        { time: 10, role: 'Both', text: 'Gödel, Escher, Bach entwined, perfect harmony of heart and mind!' }
+      ],
+      chordFrequencies: [
+        [528.0, 432.0, 639.0],
+        [396.0, 528.0, 741.0],
+        [415.3, 528.0, 852.0],
+        [528.0, 432.0, 963.0]
+      ],
+      sheetNotes: [
+        { pitch: 'C4', label: '528', role: 'A', duration: 'half', staffStep: 0 },
+        { pitch: 'G4', label: '432', role: 'B', duration: 'half', staffStep: 4 },
+        { pitch: 'Eb4', label: '639', role: 'Both', duration: 'whole', staffStep: 2 }
+      ]
+    },
+    {
+      trackNumber: 14,
+      title: 'The Penrose Orch-OR Quantum Coherence',
+      subtitle: 'Tubulin Lattice 40 Hz Gamma & Quantum Reduction',
+      paradigm: 'longevity',
+      duetRoles: { roleA: 'Voice 1: 40 Hz Gamma Coherence', roleB: 'Voice 2: 8 Hz Tubulin Resonance' },
+      keySignature: 'A Minor (Quantum Coherence)',
+      timeSignature: '4/4',
+      bpm: 80,
+      icon: '🧠',
+      qalyBonus: 2.2,
+      biologicalMechanism: 'Penrose-Hameroff Orchestrated Objective Reduction (Orch-OR): 40 Hz Gamma auditory entrainment stabilizes quantum superposition states across 13-protofilament microtubule tubulin dimers during deep cognitive rest.',
+      lyrics: [
+        { time: 0, role: 'A', text: '40 Hz Gamma pulses through the cortical dome, quantum coherence in tubulin home...' },
+        { time: 5, role: 'B', text: 'Objective reduction in micro-space, non-algorithmic mind in time and space!' },
+        { time: 10, role: 'Both', text: 'Penrose Orch-OR, conscious light, guiding our healthcare into the night!' }
+      ],
+      chordFrequencies: [
+        [440.0, 523.25, 659.25],
+        [349.23, 440.0, 523.25],
+        [392.0, 493.88, 587.33],
+        [440.0, 523.25, 659.25]
+      ],
+      sheetNotes: [
+        { pitch: 'A4', label: '440', role: 'A', duration: 'quarter', staffStep: 5 },
+        { pitch: 'C5', label: '523', role: 'A', duration: 'quarter', staffStep: 7 },
+        { pitch: 'E5', label: '659', role: 'Both', duration: 'half', staffStep: 9 }
+      ]
     }
   ];
 
@@ -441,6 +713,15 @@ export class ActuarialGleeAudioService {
 
       this.isPlaying.set(true);
       this.currentNoteIndex.set(0);
+
+      if (track.trackNumber === 13) {
+        this.playCrabCanonPolyphony();
+        return;
+      }
+      if (track.trackNumber === 14) {
+        this.playOrchOrMicrotubuleCoherence();
+        return;
+      }
 
       // Play continuous polyphonic chord progression
       let chordIndex = 0;
@@ -505,15 +786,94 @@ export class ActuarialGleeAudioService {
   }
 
   stopTrack() {
+    this.isPlaying.set(false);
     if (this.chordInterval) clearInterval(this.chordInterval);
     if (this.noteInterval) clearInterval(this.noteInterval);
     if (this.audioCtx) {
       try {
         this.audioCtx.close();
-      } catch {}
+      } catch (e) {}
+      this.audioCtx = null;
     }
-    this.isPlaying.set(false);
-    this.audioCtx = null;
     this.masterGain = null;
+  }
+
+  playCrabCanonPolyphony() {
+    if (!this.audioCtx || !this.masterGain) return;
+
+    const telem = this.fhirAudioTelemetry();
+
+    // Voice 1: Dynamic FHIR Solfeggio Forward Theme (Inhalation - e.g. 528 Hz or 432 Hz)
+    const osc1 = this.audioCtx.createOscillator();
+    const gain1 = this.audioCtx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(telem.solfeggioCarrierHz, this.audioCtx.currentTime);
+
+    // Voice 2: Retrograde Counter-Melodic Theme (Exhalation - 432 Hz / 396 Hz)
+    const osc2 = this.audioCtx.createOscillator();
+    const gain2 = this.audioCtx.createGain();
+    osc2.type = 'triangle';
+    const retroFreq = telem.solfeggioCarrierHz === 528.0 ? 432.0 : 396.0;
+    osc2.frequency.setValueAtTime(retroFreq, this.audioCtx.currentTime);
+
+    // LFO: FHIR Vagal Respiratory Modulation (0.08 Hz - 0.1 Hz)
+    const lfo = this.audioCtx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(telem.vagalLfoHz, this.audioCtx.currentTime);
+
+    const lfoGain = this.audioCtx.createGain();
+    lfoGain.gain.setValueAtTime(0.15, this.audioCtx.currentTime);
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain1.gain);
+
+    osc1.connect(gain1);
+    osc2.connect(gain2);
+
+    gain1.connect(this.masterGain);
+    gain2.connect(this.masterGain);
+
+    osc1.start();
+    osc2.start();
+    lfo.start();
+  }
+
+  playOrchOrMicrotubuleCoherence() {
+    if (!this.audioCtx || !this.masterGain) return;
+
+    const telem = this.fhirAudioTelemetry();
+
+    // Carrier 1: Base Carrier (440 Hz or FHIR Solfeggio)
+    const osc1 = this.audioCtx.createOscillator();
+    const gain1 = this.audioCtx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(telem.solfeggioCarrierHz, this.audioCtx.currentTime);
+
+    // Carrier 2: 40 Hz Gamma difference pulse for Orch-OR quantum tubulin entrainment
+    const osc2 = this.audioCtx.createOscillator();
+    const gain2 = this.audioCtx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(telem.solfeggioCarrierHz + 40.0, this.audioCtx.currentTime);
+
+    // Tubulin Resonance LFO: 8 Hz Alpha / Vagal Coherence Pulse
+    const lfo = this.audioCtx.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(telem.hasStress ? 8.0 : 10.0, this.audioCtx.currentTime);
+
+    const lfoGain = this.audioCtx.createGain();
+    lfoGain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain1.gain);
+
+    osc1.connect(gain1);
+    osc2.connect(gain2);
+
+    gain1.connect(this.masterGain);
+    gain2.connect(this.masterGain);
+
+    osc1.start();
+    osc2.start();
+    lfo.start();
   }
 }

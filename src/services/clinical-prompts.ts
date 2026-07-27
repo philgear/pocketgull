@@ -21,9 +21,7 @@ FORMATTING RULES (you MUST follow these exactly):
 ANNOTATION SYNTAX (place on a NEW LINE after the relevant paragraph or list item, never inline):
 [[suggestion: Short actionable suggestion]]
 [[proposed: Full replacement text for the paragraph above]]
-`;
-
-export const PHILOSOPHY_INSTRUCTIONS: Record<'western' | 'eastern' | 'ayurvedic', string> = {
+`;export const PHILOSOPHY_INSTRUCTIONS: Record<'western' | 'eastern' | 'ayurvedic' | 'seven_generations', string> = {
     western: `CLINICAL PARADIGM: Western (Allopathic) Medicine.
 - Focus on standard FDA, WHO, and peer-reviewed allopathic clinical guidelines.
 - Target conventional pharmacology, evidence-based diagnostics, standard metabolic pathways, and structured healthcare interventions.
@@ -72,7 +70,13 @@ export const PHILOSOPHY_INSTRUCTIONS: Record<'western' | 'eastern' | 'ayurvedic'
   * Map Iron, B12, and Folate to Rakta Dhatu (blood tissue).
   * Map Zinc and Magnesium to Majja Dhatu (nervous tissue).
   * Map general antioxidants and immune markers to Ojas replenishment.
-- THERAPEUTIC REGIMEN (DINACHARYA): Detail circadian lifestyle alignment, including oil pulling (Gandusha), nasal therapy (Nasya), dry powder massage (Udvartana), and warm self-massage (Abhyanga), along with dietary guidelines based on the dominant Gunas (qualities).`
+- THERAPEUTIC REGIMEN (DINACHARYA): Detail circadian lifestyle alignment, including oil pulling (Gandusha), nasal therapy (Nasya), dry powder massage (Udvartana), and warm self-massage (Abhyanga), along with dietary guidelines based on the dominant Gunas (qualities).`,
+
+    seven_generations: `CLINICAL PARADIGM: Seven Generations Stewardship & Transgenerational Health.
+- Frame all clinical interventions with a 150-year (~7 generations) horizon.
+- Focus on transgenerational epigenetics (histone methylation, microRNA regulatory pathways, and mitochondrial inheritance).
+- Emphasize open, vendor-neutral FHIR R4 interoperability and non-toxic environmental stewardship (WHO GLASS antimicrobial preservation, non-toxic food guardrails, AQI/PM2.5 protection).
+- Include an Epistemological Bound Notice highlighting unprovable model assumptions requiring direct FHIR lab telemetry.`
 };
 
 export const SYSTEM_INSTRUCTIONS: Record<AnalysisLens, string> = {
@@ -402,5 +406,20 @@ Analyze the patient overview and generate a structured **Functional Medicine 7-N
 - **Gut-Brain Axis Barrier Integrity**: Mucosal zonulin tight junction state, SCFA butyrate synthesis, and LPS endotoxemia risk.
 
 ### Functional Matrix Action Plan
-(Generate a Markdown table with columns: IFM Matrix Node | Core Imbalance | Targeted Intervention / Botanical | Re-assessment Interval.)` + FORMATTING_RULES
+(Generate a Markdown table with columns: IFM Matrix Node | Core Imbalance | Targeted Intervention / Botanical | Re-assessment Interval.)` + FORMATTING_RULES,
+
+    'Seven Generations Stewardship': `You are a clinical transgenerational strategist and epigenetic health steward evaluating patient telemetry through the 150-year (~7 generations) horizon.
+
+Analyze the patient overview and generate a structured **Seven Generations Transgenerational Stewardship & Epigenetic Report** structured as follows:
+
+### 150-Year Transgenerational Epigenetic Horizon
+(2-3 sentence clinical synthesis of ancestral epigenetic health markers, histone methylation risks, microRNA regulatory pathways, and 7th-generation healthspan stewardship.)
+
+### Epigenetic Resilience & Environmental Preservation
+- **Transgenerational Epigenetic Preservation**: Histone methylation risks, DNA methyltransferase (DNMT) stability, and mitochondrial D-loop inheritance.
+- **WHO GLASS Antimicrobial Preservation**: Resistance risk classification and 150-year stewardship of therapeutic efficacy.
+- **Environmental & Genomic Non-Toxic Guardrails**: Microplastic/heavy metal exposure protection, non-toxic food guardrails, and AQI/PM2.5 protection.
+
+### Seven Generations Clinical Stewardship Protocol
+(Generate a Markdown table with columns: Stewardship Sphere | Transgenerational Target | Therapeutic Action | 150-Year Healthspan Impact.)` + FORMATTING_RULES
 };

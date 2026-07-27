@@ -2,7 +2,9 @@ import { InjectionToken } from '@angular/core';
 
 export type AiModelId =
     | 'gemini-2.5-flash'
-    | 'gemini-2.5-pro';
+    | 'gemini-2.5-pro'
+    | 'pubgemma-7b'
+    | 'medgemma-27b';
 
 export interface IAiModelConfig {
     modelId: AiModelId;

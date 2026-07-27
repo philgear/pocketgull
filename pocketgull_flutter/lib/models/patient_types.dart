@@ -700,6 +700,16 @@ class PatientState extends Equatable {
   final AvsProtocol? avsProtocol;
   final MedicalPhilosophy? activePhilosophy;
 
+  final List<GeneticVariant>? genomicVariants;
+  final List<BiochemicalPathway>? biochemicalPathways;
+  final List<PharmacokineticInteraction>? pkInteractions;
+  final List<EwarsOutbreakAlert>? ewarsAlerts;
+  final TravelMedicineProfile? travelProfile;
+  final List<WhoAwareClassification>? awareStewardship;
+  final EnvironmentalHealthIndex? environmentalIndex;
+  final GodelIncompletenessBound? godelBound;
+  final BachCrabCanonTrack? crabCanonTrack;
+
   const PatientState({
     this.name = 'Selected Patient',
     required this.issues,
@@ -727,6 +737,15 @@ class PatientState extends Equatable {
     this.traumaFlags,
     this.avsProtocol,
     this.activePhilosophy,
+    this.genomicVariants,
+    this.biochemicalPathways,
+    this.pkInteractions,
+    this.ewarsAlerts,
+    this.travelProfile,
+    this.awareStewardship,
+    this.environmentalIndex,
+    this.godelBound,
+    this.crabCanonTrack,
   });
 
   @override
@@ -738,6 +757,9 @@ class PatientState extends Equatable {
         antioxidantSources, medications, biometricHistory,
         occupation, reasonForVisit, dietaryProtocol,
         traumaFlags, avsProtocol, activePhilosophy,
+        genomicVariants, biochemicalPathways, pkInteractions,
+        ewarsAlerts, travelProfile, awareStewardship, environmentalIndex,
+        godelBound, crabCanonTrack,
       ];
 
   PatientState copyWith({
@@ -1101,6 +1123,13 @@ class Patient extends PatientState {
     super.viewMode = AnatomicalViewMode.standard,
     super.occupation,
     super.reasonForVisit,
+    super.genomicVariants,
+    super.biochemicalPathways,
+    super.pkInteractions,
+    super.ewarsAlerts,
+    super.travelProfile,
+    super.awareStewardship,
+    super.environmentalIndex,
   });
 
   @override
@@ -1109,5 +1138,541 @@ class Patient extends PatientState {
         bookmarks, triageScore, kaizenColor, activeTimerSeconds,
         recommendedGuidelines, ...super.props,
       ];
+}
+
+class GeneticVariant extends Equatable {
+  final String rsId;
+  final String gene;
+  final String chromosome;
+  final String position;
+  final String genotype;
+  final String clinicalSignificance;
+  final String pathogenicity;
+
+  const GeneticVariant({
+    required this.rsId,
+    required this.gene,
+    required this.chromosome,
+    required this.position,
+    required this.genotype,
+    required this.clinicalSignificance,
+    required this.pathogenicity,
+  });
+
+  factory GeneticVariant.fromJson(Map<String, dynamic> json) {
+    return GeneticVariant(
+      rsId: json['rsId'] ?? '',
+      gene: json['gene'] ?? '',
+      chromosome: json['chromosome'] ?? '',
+      position: json['position'] ?? '',
+      genotype: json['genotype'] ?? '',
+      clinicalSignificance: json['clinicalSignificance'] ?? '',
+      pathogenicity: json['pathogenicity'] ?? 'VUS',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'rsId': rsId,
+      'gene': gene,
+      'chromosome': chromosome,
+      'position': position,
+      'genotype': genotype,
+      'clinicalSignificance': clinicalSignificance,
+      'pathogenicity': pathogenicity,
+    };
+  }
+
+  @override
+  List<Object?> get props => [rsId, gene, chromosome, position, genotype, clinicalSignificance, pathogenicity];
+}
+
+class BiochemicalPathway extends Equatable {
+  final String id;
+  final String name;
+  final String status;
+  final List<String> activeEnzymes;
+  final List<String> blocks;
+
+  const BiochemicalPathway({
+    required this.id,
+    required this.name,
+    required this.status,
+    required this.activeEnzymes,
+    required this.blocks,
+  });
+
+  factory BiochemicalPathway.fromJson(Map<String, dynamic> json) {
+    return BiochemicalPathway(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      status: json['status'] ?? 'Sub-optimal',
+      activeEnzymes: List<String>.from(json['activeEnzymes'] ?? []),
+      blocks: List<String>.from(json['blocks'] ?? []),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'status': status,
+      'activeEnzymes': activeEnzymes,
+      'blocks': blocks,
+    };
+  }
+
+  @override
+  List<Object?> get props => [id, name, status, activeEnzymes, blocks];
+}
+
+class PharmacokineticInteraction extends Equatable {
+  final String agent;
+  final String target;
+  final String affinity;
+  final String effect;
+  final String riskLevel;
+
+  const PharmacokineticInteraction({
+    required this.agent,
+    required this.target,
+    required this.affinity,
+    required this.effect,
+    required this.riskLevel,
+  });
+
+  factory PharmacokineticInteraction.fromJson(Map<String, dynamic> json) {
+    return PharmacokineticInteraction(
+      agent: json['agent'] ?? '',
+      target: json['target'] ?? '',
+      affinity: json['affinity'] ?? '',
+      effect: json['effect'] ?? '',
+      riskLevel: json['riskLevel'] ?? 'Low',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'agent': agent,
+      'target': target,
+      'affinity': affinity,
+      'effect': effect,
+      'riskLevel': riskLevel,
+    };
+  }
+
+  @override
+  List<Object?> get props => [agent, target, affinity, effect, riskLevel];
+}
+
+class EwarsOutbreakAlert extends Equatable {
+  final String id;
+  final String pathogen;
+  final String viralCopyCount;
+  final String surgeStatus;
+  final String whoBulletin;
+  final String riskToPatient;
+
+  const EwarsOutbreakAlert({
+    required this.id,
+    required this.pathogen,
+    required this.viralCopyCount,
+    required this.surgeStatus,
+    required this.whoBulletin,
+    required this.riskToPatient,
+  });
+
+  factory EwarsOutbreakAlert.fromJson(Map<String, dynamic> json) {
+    return EwarsOutbreakAlert(
+      id: json['id'] ?? '',
+      pathogen: json['pathogen'] ?? '',
+      viralCopyCount: json['viralCopyCount'] ?? '',
+      surgeStatus: json['surgeStatus'] ?? 'Baseline',
+      whoBulletin: json['whoBulletin'] ?? '',
+      riskToPatient: json['riskToPatient'] ?? 'Low',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'pathogen': pathogen,
+      'viralCopyCount': viralCopyCount,
+      'surgeStatus': surgeStatus,
+      'whoBulletin': whoBulletin,
+      'riskToPatient': riskToPatient,
+    };
+  }
+
+  @override
+  List<Object?> get props => [id, pathogen, viralCopyCount, surgeStatus, whoBulletin, riskToPatient];
+}
+
+class TravelMedicineProfile extends Equatable {
+  final String destination;
+  final String departureDate;
+  final String cdcNoticeLevel;
+  final List<String> requiredVaccines;
+  final List<String> vectorRisks;
+  final List<String> prophylacticProtocol;
+
+  const TravelMedicineProfile({
+    required this.destination,
+    required this.departureDate,
+    required this.cdcNoticeLevel,
+    required this.requiredVaccines,
+    required this.vectorRisks,
+    required this.prophylacticProtocol,
+  });
+
+  factory TravelMedicineProfile.fromJson(Map<String, dynamic> json) {
+    return TravelMedicineProfile(
+      destination: json['destination'] ?? '',
+      departureDate: json['departureDate'] ?? '',
+      cdcNoticeLevel: json['cdcNoticeLevel'] ?? 'Level 1 - Watch',
+      requiredVaccines: List<String>.from(json['requiredVaccines'] ?? []),
+      vectorRisks: List<String>.from(json['vectorRisks'] ?? []),
+      prophylacticProtocol: List<String>.from(json['prophylacticProtocol'] ?? []),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'destination': destination,
+      'departureDate': departureDate,
+      'cdcNoticeLevel': cdcNoticeLevel,
+      'requiredVaccines': requiredVaccines,
+      'vectorRisks': vectorRisks,
+      'prophylacticProtocol': prophylacticProtocol,
+    };
+  }
+
+  @override
+  List<Object?> get props => [destination, departureDate, cdcNoticeLevel, requiredVaccines, vectorRisks, prophylacticProtocol];
+}
+
+class WhoAwareClassification extends Equatable {
+  final String medication;
+  final String category;
+  final String resistanceRisk;
+  final String stewardshipNote;
+
+  const WhoAwareClassification({
+    required this.medication,
+    required this.category,
+    required this.resistanceRisk,
+    required this.stewardshipNote,
+  });
+
+  factory WhoAwareClassification.fromJson(Map<String, dynamic> json) {
+    return WhoAwareClassification(
+      medication: json['medication'] ?? '',
+      category: json['category'] ?? 'Access',
+      resistanceRisk: json['resistanceRisk'] ?? 'Low',
+      stewardshipNote: json['stewardshipNote'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'medication': medication,
+      'category': category,
+      'resistanceRisk': resistanceRisk,
+      'stewardshipNote': stewardshipNote,
+    };
+  }
+
+  @override
+  List<Object?> get props => [medication, category, resistanceRisk, stewardshipNote];
+}
+
+class EnvironmentalHealthIndex extends Equatable {
+  final int aqi;
+  final String pm25;
+  final String ozone;
+  final String pollenDensity;
+  final String heatIndex;
+  final String vulnerabilityWarning;
+
+  const EnvironmentalHealthIndex({
+    required this.aqi,
+    required this.pm25,
+    required this.ozone,
+    required this.pollenDensity,
+    required this.heatIndex,
+    required this.vulnerabilityWarning,
+  });
+
+  factory EnvironmentalHealthIndex.fromJson(Map<String, dynamic> json) {
+    return EnvironmentalHealthIndex(
+      aqi: json['aqi'] ?? 0,
+      pm25: json['pm25'] ?? '',
+      ozone: json['ozone'] ?? '',
+      pollenDensity: json['pollenDensity'] ?? 'Low',
+      heatIndex: json['heatIndex'] ?? '',
+      vulnerabilityWarning: json['vulnerabilityWarning'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'aqi': aqi,
+      'pm25': pm25,
+      'ozone': ozone,
+      'pollenDensity': pollenDensity,
+      'heatIndex': heatIndex,
+      'vulnerabilityWarning': vulnerabilityWarning,
+    };
+  }
+
+  @override
+  List<Object?> get props => [aqi, pm25, ozone, pollenDensity, heatIndex, vulnerabilityWarning];
+}
+
+class GodelIncompletenessBound extends Equatable {
+  final String formalSystemProofStatus;
+  final List<String> unprovableAssumptions;
+  final String epistemologicalBoundNotice;
+  final List<String> missingGroundTruthTelemetry;
+
+  const GodelIncompletenessBound({
+    this.formalSystemProofStatus = 'INCOMPLETE_CONSISTENT',
+    required this.unprovableAssumptions,
+    required this.epistemologicalBoundNotice,
+    required this.missingGroundTruthTelemetry,
+  });
+
+  factory GodelIncompletenessBound.fromJson(Map<String, dynamic> json) {
+    return GodelIncompletenessBound(
+      formalSystemProofStatus: json['formalSystemProofStatus'] as String? ?? 'INCOMPLETE_CONSISTENT',
+      unprovableAssumptions: (json['unprovableAssumptions'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      epistemologicalBoundNotice: json['epistemologicalBoundNotice'] as String? ?? '',
+      missingGroundTruthTelemetry: (json['missingGroundTruthTelemetry'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'formalSystemProofStatus': formalSystemProofStatus,
+    'unprovableAssumptions': unprovableAssumptions,
+    'epistemologicalBoundNotice': epistemologicalBoundNotice,
+    'missingGroundTruthTelemetry': missingGroundTruthTelemetry,
+  };
+
+  @override
+  List<Object?> get props => [formalSystemProofStatus, unprovableAssumptions, epistemologicalBoundNotice, missingGroundTruthTelemetry];
+}
+
+class BachCrabCanonTrack extends Equatable {
+  final int trackNumber;
+  final String title;
+  final String subtitle;
+  final double voice1CarrierHz;
+  final double voice2RetrogradeHz;
+  final double vagalLfoBpm;
+
+  const BachCrabCanonTrack({
+    this.trackNumber = 13,
+    this.title = 'The Bach Crab Canon Entrainment',
+    this.subtitle = 'Polyphonic Counterpoint & Vagal Retrograde Loop',
+    this.voice1CarrierHz = 528.0,
+    this.voice2RetrogradeHz = 432.0,
+    this.vagalLfoBpm = 6.0,
+  });
+
+  factory BachCrabCanonTrack.fromJson(Map<String, dynamic> json) {
+    return BachCrabCanonTrack(
+      trackNumber: json['trackNumber'] as int? ?? 13,
+      title: json['title'] as String? ?? 'The Bach Crab Canon Entrainment',
+      subtitle: json['subtitle'] as String? ?? '',
+      voice1CarrierHz: (json['voice1CarrierHz'] as num?)?.toDouble() ?? 528.0,
+      voice2RetrogradeHz: (json['voice2RetrogradeHz'] as num?)?.toDouble() ?? 432.0,
+      vagalLfoBpm: (json['vagalLfoBpm'] as num?)?.toDouble() ?? 6.0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'trackNumber': trackNumber,
+    'title': title,
+    'subtitle': subtitle,
+    'voice1CarrierHz': voice1CarrierHz,
+    'voice2RetrogradeHz': voice2RetrogradeHz,
+    'vagalLfoBpm': vagalLfoBpm,
+  };
+
+  @override
+  List<Object?> get props => [trackNumber, title, subtitle, voice1CarrierHz, voice2RetrogradeHz, vagalLfoBpm];
+}
+
+class PubGemmaConfig extends Equatable {
+  final String modelId;
+  final bool isLocalEdge;
+  final bool pubMedMeshGrounding;
+
+  const PubGemmaConfig({
+    this.modelId = 'pubgemma-7b',
+    this.isLocalEdge = true,
+    this.pubMedMeshGrounding = true,
+  });
+
+  factory PubGemmaConfig.fromJson(Map<String, dynamic> json) {
+    return PubGemmaConfig(
+      modelId: json['modelId'] as String? ?? 'pubgemma-7b',
+      isLocalEdge: json['isLocalEdge'] as bool? ?? true,
+      pubMedMeshGrounding: json['pubMedMeshGrounding'] as bool? ?? true,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'modelId': modelId,
+    'isLocalEdge': isLocalEdge,
+    'pubMedMeshGrounding': pubMedMeshGrounding,
+  };
+
+  @override
+  List<Object?> get props => [modelId, isLocalEdge, pubMedMeshGrounding];
+}
+
+class ClinicalBiochemistryResult extends Equatable {
+  final double calculatedPh;
+  final String bufferState;
+  final int osmolalityMOsmKg;
+  final String tonicityStatus;
+  final double gshGssgRatio;
+  final String cellularOxidativeState;
+
+  const ClinicalBiochemistryResult({
+    this.calculatedPh = 7.40,
+    this.bufferState = 'Normal Homeostasis',
+    this.osmolalityMOsmKg = 285,
+    this.tonicityStatus = 'Isotonic',
+    this.gshGssgRatio = 100.0,
+    this.cellularOxidativeState = 'Optimal Anti-Oxidant Reserve',
+  });
+
+  factory ClinicalBiochemistryResult.fromJson(Map<String, dynamic> json) {
+    return ClinicalBiochemistryResult(
+      calculatedPh: (json['calculatedPh'] as num?)?.toDouble() ?? 7.40,
+      bufferState: json['bufferState'] as String? ?? 'Normal Homeostasis',
+      osmolalityMOsmKg: json['osmolalityMOsmKg'] as int? ?? 285,
+      tonicityStatus: json['tonicityStatus'] as String? ?? 'Isotonic',
+      gshGssgRatio: (json['gshGssgRatio'] as num?)?.toDouble() ?? 100.0,
+      cellularOxidativeState: json['cellularOxidativeState'] as String? ?? 'Optimal Anti-Oxidant Reserve',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'calculatedPh': calculatedPh,
+    'bufferState': bufferState,
+    'osmolalityMOsmKg': osmolalityMOsmKg,
+    'tonicityStatus': tonicityStatus,
+    'gshGssgRatio': gshGssgRatio,
+    'cellularOxidativeState': cellularOxidativeState,
+  };
+
+  @override
+  List<Object?> get props => [calculatedPh, bufferState, osmolalityMOsmKg, tonicityStatus, gshGssgRatio, cellularOxidativeState];
+}
+
+class PhysicsBiophysicsResult extends Equatable {
+  final double totalActionFrictionScore;
+  final int variationalFreeEnergyScore;
+  final int negentropicHomeostasisScore;
+  final String markovBlanketStatus;
+  final double circadianNoetherSymmetryPercent;
+
+  const PhysicsBiophysicsResult({
+    this.totalActionFrictionScore = 1.62,
+    this.variationalFreeEnergyScore = 20,
+    this.negentropicHomeostasisScore = 80,
+    this.markovBlanketStatus = 'Intact & Exporting',
+    this.circadianNoetherSymmetryPercent = 92.0,
+  });
+
+  factory PhysicsBiophysicsResult.fromJson(Map<String, dynamic> json) {
+    return PhysicsBiophysicsResult(
+      totalActionFrictionScore: (json['totalActionFrictionScore'] as num?)?.toDouble() ?? 1.62,
+      variationalFreeEnergyScore: json['variationalFreeEnergyScore'] as int? ?? 20,
+      negentropicHomeostasisScore: json['negentropicHomeostasisScore'] as int? ?? 80,
+      markovBlanketStatus: json['markovBlanketStatus'] as String? ?? 'Intact & Exporting',
+      circadianNoetherSymmetryPercent: (json['circadianNoetherSymmetryPercent'] as num?)?.toDouble() ?? 92.0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'totalActionFrictionScore': totalActionFrictionScore,
+    'variationalFreeEnergyScore': variationalFreeEnergyScore,
+    'negentropicHomeostasisScore': negentropicHomeostasisScore,
+    'markovBlanketStatus': markovBlanketStatus,
+    'circadianNoetherSymmetryPercent': circadianNoetherSymmetryPercent,
+  };
+
+  @override
+  List<Object?> get props => [totalActionFrictionScore, variationalFreeEnergyScore, negentropicHomeostasisScore, markovBlanketStatus, circadianNoetherSymmetryPercent];
+}
+
+class SkepticalEpistemologyReport extends Equatable {
+  final String metricName;
+  final double pValue;
+  final bool isFalsified;
+  final int epistemicConfidencePercent;
+  final String overallRiskOfBias;
+
+  const SkepticalEpistemologyReport({
+    this.metricName = 'Vagal RSA Deceleration',
+    this.pValue = 0.02,
+    this.isFalsified = true,
+    this.epistemicConfidencePercent = 98,
+    this.overallRiskOfBias = 'Low Risk of Bias',
+  });
+
+  factory SkepticalEpistemologyReport.fromJson(Map<String, dynamic> json) {
+    return SkepticalEpistemologyReport(
+      metricName: json['metricName'] as String? ?? 'Vagal RSA Deceleration',
+      pValue: (json['pValue'] as num?)?.toDouble() ?? 0.02,
+      isFalsified: json['isFalsified'] as bool? ?? true,
+      epistemicConfidencePercent: json['epistemicConfidencePercent'] as int? ?? 98,
+      overallRiskOfBias: json['overallRiskOfBias'] as String? ?? 'Low Risk of Bias',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'metricName': metricName,
+    'pValue': pValue,
+    'isFalsified': isFalsified,
+    'epistemicConfidencePercent': epistemicConfidencePercent,
+    'overallRiskOfBias': overallRiskOfBias,
+  };
+
+  @override
+  List<Object?> get props => [metricName, pValue, isFalsified, epistemicConfidencePercent, overallRiskOfBias];
+}
+
+class Fhir7BundleMeta extends Equatable {
+  final String fhirVersion;
+  final String postQuantumEncryption;
+  final String securityLabel;
+
+  const Fhir7BundleMeta({
+    this.fhirVersion = '7.0.0-horizon',
+    this.postQuantumEncryption = 'NIST ML-KEM-1024 / Dilithium-5',
+    this.securityLabel = 'HIPAA-ZKP-ZERO-KNOWLEDGE',
+  });
+
+  factory Fhir7BundleMeta.fromJson(Map<String, dynamic> json) {
+    return Fhir7BundleMeta(
+      fhirVersion: json['fhirVersion'] as String? ?? '7.0.0-horizon',
+      postQuantumEncryption: json['postQuantumEncryption'] as String? ?? 'NIST ML-KEM-1024 / Dilithium-5',
+      securityLabel: json['securityLabel'] as String? ?? 'HIPAA-ZKP-ZERO-KNOWLEDGE',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'fhirVersion': fhirVersion,
+    'postQuantumEncryption': postQuantumEncryption,
+    'securityLabel': securityLabel,
+  };
+
+  @override
+  List<Object?> get props => [fhirVersion, postQuantumEncryption, securityLabel];
 }
 

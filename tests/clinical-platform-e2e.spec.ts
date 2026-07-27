@@ -123,7 +123,7 @@ describe('Clinical Platform & Progressive Disclosure E2E Suite', () => {
 
     navigator.toggleShowAllSuites();
     expect(navigator.showAllSuites()).toBe(true);
-    expect(navigator.displayedSuites().length).toBe(10);
+    expect(navigator.displayedSuites().length).toBe(12);
   });
 
   it('5. Verifies Dieter Rams Theme Studio drawer palette selection and primary fast-cycling', () => {
