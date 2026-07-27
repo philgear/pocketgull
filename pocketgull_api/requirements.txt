@@ -14,7 +14,7 @@ pandas>=2.0.0
 fhir.resources>=7.0.0
 
 # HDF5 biosignal archive reader (P2)
-h5py>=3.8.0
+h5py>=3.16.0
 scipy>=1.10.0
 
 # ML risk scoring (P3 — only needed when a trained model is present)
