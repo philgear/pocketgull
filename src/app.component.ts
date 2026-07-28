@@ -1397,9 +1397,7 @@ export class AppComponent implements OnDestroy {
     const hasKey = this.hasApiKey();
     const onboard = this.session.isOnboardingComplete();
     const emergency = this.state.isEmergencyMode();
-    const show = (locked || !hasKey || !onboard) && !emergency;
-    console.log('[DEBUG SHOW SPLASH]', { locked, hasKey, onboard, emergency, show });
-    return show;
+    return (locked || !hasKey || !onboard) && !emergency;
   });
   isDemoMode = this.state.isDemoMode;
   readonly showCompanionSyncModal = signal<boolean>(false);

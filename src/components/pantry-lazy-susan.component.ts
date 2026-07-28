@@ -198,7 +198,7 @@ export class PantryLazySusanComponent implements AfterViewInit, OnDestroy {
       this.renderer.setSize(width, height);
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       this.renderer.shadowMap.enabled = true;
-      this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      this.renderer.shadowMap.type = THREE.PCFShadowMap;
       container.appendChild(this.renderer.domElement);
     } catch (e) {
       this.webglSupported.set(false);
@@ -245,10 +245,10 @@ export class PantryLazySusanComponent implements AfterViewInit, OnDestroy {
     });
 
     // 8. Animation loop
-    let clock = new THREE.Clock();
+    const startTime = performance.now();
     const animate = () => {
       this.animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) / 1000;
 
       // Smooth interpolation for Carousel rotation Y
       if (this.carouselGroup) {
