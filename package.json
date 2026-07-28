@@ -77,6 +77,7 @@
     "postinstall": "patch-package",
     "dev": "node --max-old-space-size=8192 node_modules/@angular/cli/bin/ng.js serve",
     "sentinel:audit": "node scripts/sentinel_security_guard.mjs",
+    "sbom:generate": "node scripts/generate-sbom.mjs",
     "mcp:warmup": "node scripts/mcp-warmup.js",
     "build": "node scripts/build-all.mjs",
     "deploy": "gcloud builds submit . --tag us-central1-docker.pkg.dev/gen-lang-client-0540208645/cloud-run-source-deploy/pocketgull/pocket-gull:latest --project gen-lang-client-0540208645 && gcloud run deploy pocket-gull --image us-central1-docker.pkg.dev/gen-lang-client-0540208645/cloud-run-source-deploy/pocketgull/pocket-gull:latest --project gen-lang-client-0540208645 --region=us-central1 --min-instances=0 --update-env-vars=OTEL_SDK_DISABLED=true --timeout=25m --quiet",

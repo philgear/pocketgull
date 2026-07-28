@@ -33,6 +33,7 @@ import { SecureSplashComponent } from './components/secure-splash.component';
 import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
 import { PocketGullInputComponent } from './components/shared/pocket-gull-input.component';
+import { ClinicalCdsDisclaimerBannerComponent } from './components/clinical-cds-disclaimer-banner.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 import { PetAuditoryService } from './services/pet-auditory.service';
@@ -72,7 +73,8 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
     ConsentModalComponent,
     ZamecznikCanvasComponent,
     CompanionSyncModalComponent,
-    GlossaryModalComponent
+    GlossaryModalComponent,
+    ClinicalCdsDisclaimerBannerComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -1324,6 +1326,7 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
         </div>
       </div>
     }
+    <app-clinical-cds-disclaimer-banner></app-clinical-cds-disclaimer-banner>
     <app-zamecznik-canvas></app-zamecznik-canvas>
   `,
   styles: [`
