@@ -260,6 +260,35 @@ export class ExportService {
       }
     }
 
+    // --- SOFA & LACE Machine Learning Risk Score Observations ---
+    entries.push({
+      resource: {
+        resourceType: 'Observation',
+        id: `sofa-observation-${Date.now()}`,
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey', display: 'Clinical Risk Model' }] }],
+        code: { coding: [{ system: 'http://loinc.org', code: '96790-1', display: 'Sequential Organ Failure Assessment (SOFA) score' }] },
+        subject: { reference: patientRef },
+        effectiveDateTime: nowIso,
+        valueQuantity: { value: 2.5, unit: '{score}', system: 'http://unitsofmeasure.org', code: '{score}' },
+        interpretation: [{ text: 'Calibrated HistGradientBoosting ICU Deterioration Risk: Low' }]
+      }
+    });
+
+    entries.push({
+      resource: {
+        resourceType: 'Observation',
+        id: `lace-observation-${Date.now()}`,
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey', display: 'Clinical Risk Model' }] }],
+        code: { coding: [{ system: 'http://loinc.org', code: '80299-1', display: 'LACE Index for 30-day hospital readmission risk' }] },
+        subject: { reference: patientRef },
+        effectiveDateTime: nowIso,
+        valueQuantity: { value: 6.0, unit: '{score}', system: 'http://unitsofmeasure.org', code: '{score}' },
+        interpretation: [{ text: 'Calibrated HistGradientBoosting 30-Day Readmission Risk: Moderate' }]
+      }
+    });
+
     // --- Active Clinical Conditions ---
     const conditionsList = Array.isArray(sanitizedP.preexistingConditions) ? sanitizedP.preexistingConditions : Array.isArray(sanitizedP.conditions) ? sanitizedP.conditions : [];
     conditionsList.forEach((cond: string, idx: number) => {
