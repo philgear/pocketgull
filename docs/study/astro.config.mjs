@@ -20,7 +20,7 @@ export default defineConfig({
         name: 'fix-vite6-ssr-input',
         configResolved(config) {
           if (!config.build.rollupOptions.input) {
-            config.build.rollupOptions.input = 'virtual:astro:legacy-ssr-entry';
+            config.build.rollupOptions.input = { entry: 'virtual:astro:legacy-ssr-entry' };
           }
         },
         resolveId(id) {
