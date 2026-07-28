@@ -140,6 +140,18 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         svgAnimation: 'radium-glow',
         adkMapping: 'madame_curie_agent',
     },
+    debugger: {
+        name: 'Zero',
+        role: 'Console Integrity & Error Resolution',
+        emoji: '🧹',
+        tagline: 'Warnings are just errors waiting to happen. Let’s get to zero.',
+        accentColor: '#10B981',
+        accentTailwind: 'emerald-500',
+        avatarPath: 'assets/images/agents/zero.png',
+        props: ['Digital Broom', 'Magnifying Glass', 'Source Map Scroll'],
+        svgAnimation: 'error-sweep',
+        adkMapping: 'debug_integrity_agent',
+    },
 };
 
 /**
@@ -160,6 +172,8 @@ export function getPersonaForLens(lens: AnalysisLens): IAgentPersona {
             return AGENT_PERSONAS['sentinel'];
         case 'Patient Education':
             return AGENT_PERSONAS['scribes'];
+        case 'Console Debugging & Integrity':
+            return AGENT_PERSONAS['debugger'];
         default:
             return AGENT_PERSONAS['gulliver'];
     }
