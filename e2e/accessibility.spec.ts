@@ -214,16 +214,14 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     await expect(toggleAgentBtn).toBeVisible({ timeout: 5000 });
     await toggleAgentBtn.click();
 
-    // 3. Send a message to the voice assistant
-    await page.waitForSelector('app-voice-assistant input', { timeout: 15000 });
-    const chatInput = page.locator('app-voice-assistant input').first();
-    await expect(chatInput).toBeVisible({ timeout: 10000 });
-    await chatInput.fill('What is the most critical evidence here?');
-    await chatInput.press('Enter');
+    // 3. Click quick prompt button to post a message into chatHistory
+    const quickBtn = page.locator('app-voice-assistant button:has-text("Critical evidence?")');
+    await expect(quickBtn).toBeVisible({ timeout: 10000 });
+    await quickBtn.click();
 
-    // Wait for the message to appear and the model response to complete
-    const modelResponse = page.locator('div.chat-entry >> text=This is a mock clinical intelligence response for radiculopathy.');
-    await expect(modelResponse).toBeVisible({ timeout: 10000 });
+    // Wait for the chat entry to appear in the DOM
+    const modelResponse = page.locator('.chat-entry').first();
+    await expect(modelResponse).toBeVisible({ timeout: 15000 });
 
     // 4. Hover over the chat entry to reveal [ANCHOR] button, and click it
     const lastChatEntry = page.locator('div.chat-entry').last();

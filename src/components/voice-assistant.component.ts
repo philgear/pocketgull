@@ -198,7 +198,7 @@ export interface IChatEntry {
                                 @for (entry of chatHistory(); track $index; let idx = $index) {
                                     @let isEntryFlipped = isChatEntryFlipped(idx);
                                     <div (dblclick)="toggleChatEntryFlip(idx); $event.stopPropagation()"
-                                         class="relative perspective-1000 group cursor-pointer mb-4 min-h-[100px]"
+                                         class="chat-entry relative perspective-1000 group cursor-pointer mb-4 min-h-[100px]"
                                          title="Double-click to flip over for Multimodal Telemetry & Evidence Trail">
                                         
                                         <div [class.rotate-y-180]="isEntryFlipped"
@@ -443,7 +443,7 @@ export class VoiceAssistantComponent implements OnDestroy {
     ybocsQuestionIndex = signal<number>(-1);
 
 
-    panelMode = signal<'selection' | 'chat' | 'dictation'>('selection');
+    panelMode = signal<'selection' | 'chat' | 'dictation'>('chat');
 
     openDrilldown(target: 'biomarkers' | 'occupational' | 'food_safety' | 'ybocs' | 'qaly' | 'foraging' | 'vagal') {
       this.state.activeDrilldownComponent.set(target);
