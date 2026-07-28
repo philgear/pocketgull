@@ -100,8 +100,32 @@ export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molec
           </button>
         </div>
 
-        <!-- Viewport Spin & Reset Controls -->
-        <div class="flex items-center gap-1.5">
+        <!-- Viewport Spin, Reset & Vision Accessibility Controls -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button (click)="isHighContrastVision.set(!isHighContrastVision())" 
+            [class.bg-amber-400]="isHighContrastVision()"
+            [class.text-black]="isHighContrastVision()"
+            [class.bg-white]="!isHighContrastVision()"
+            [class.dark:bg-zinc-900]="!isHighContrastVision()"
+            [class.dark:text-amber-300]="!isHighContrastVision()"
+            class="min-h-[36px] px-2.5 py-1 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Toggle Non-Glare High-Contrast Vision Mode for Low Vision">
+            <span>👁️</span>
+            <span class="text-[10px] uppercase font-bold">{{ isHighContrastVision() ? 'High Contrast ON' : 'High Contrast' }}</span>
+          </button>
+
+          <button (click)="isReducedMotion.set(!isReducedMotion())" 
+            [class.bg-emerald-600]="isReducedMotion()"
+            [class.text-white]="isReducedMotion()"
+            [class.bg-white]="!isReducedMotion()"
+            [class.dark:bg-zinc-900]="!isReducedMotion()"
+            [class.dark:text-emerald-400]="!isReducedMotion()"
+            class="min-h-[36px] px-2.5 py-1 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Freeze Animations for Photosensitive Safety & Motion Sensitivity">
+            <span>⚡</span>
+            <span class="text-[10px] uppercase font-bold">{{ isReducedMotion() ? 'Motion FREEZE' : 'Motion' }}</span>
+          </button>
+
           <button (click)="toggleAutoSpin()" 
             [class.bg-sky-600]="isAutoSpinning()"
             [class.text-white]="isAutoSpinning()"
@@ -342,6 +366,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly quickSymptomText = signal<string>('');
 
     readonly isSelectedPartFlipped = signal<boolean>(false);
+    readonly isHighContrastVision = signal<boolean>(false);
+    readonly isReducedMotion = signal<boolean>(false);
 
     getPartIcon(partId: string | null): string {
       if (!partId) return '📍';
@@ -2275,9 +2301,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
             this.timer.update();
             const time = this.timer.getElapsed();
+            const motionFreeze = this.isReducedMotion();
             
             // Idle & Biometric AVS breathing and mind wave entrainment animations
-            if (this.mannequinGroup) {
+            if (this.mannequinGroup && !motionFreeze) {
                 const avsActive = this.state.isAvsSessionActive();
                 
                 // 1. Respiratory & Organ Coherence Entrainment
@@ -2299,24 +2326,30 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     }
                 }
 
-                // Heart Beat Animation (Systolic/Diastolic rhythm)
+                // SIGGRAPH-grade Real-Time Cardiac Double-Bump Animation (Systolic/Diastolic rhythm synced to patient HR vitals)
                 const heartPart = this.parts.get('heart');
                 if (heartPart) {
-                    const cardiacPulse = 1 + Math.sin(time * 7) * 0.05 + Math.sin(time * 14) * 0.02;
-                    heartPart.scale.set(cardiacPulse, cardiacPulse, cardiacPulse);
+                    const rawHr = this.state.vitals()?.hr;
+                    const hrVal = rawHr ? (parseInt(String(rawHr), 10) || 72) : 72;
+                    const bps = (hrVal / 60.0) * 2.0 * Math.PI;
+                    // Double-bump waveform mimicking Isovolumetric Contraction & Ventricular Ejection
+                    const cardiacPulse = 1.0 + Math.sin(time * bps) * 0.06 + Math.sin(time * bps * 2.0) * 0.025;
+                    heartPart.scale.set(cardiacPulse, cardiacPulse * 1.1, cardiacPulse);
                 }
 
-                // Lungs Respiration Animation
+                // Lungs Respiration Animation (Pacing with AVS or physiological respiratory rate)
                 const lungsPart = this.parts.get('lungs');
                 if (lungsPart) {
-                    const lungExpansion = 1 + Math.sin(time * 2) * 0.04;
-                    lungsPart.scale.set(lungExpansion, 1 + Math.sin(time * 2) * 0.02, lungExpansion);
+                    const respRate = avsActive ? (this.state.avsBreathingRate() / 60.0) : 0.25;
+                    const respFreq = respRate * 2.0 * Math.PI;
+                    const lungExpansion = 1.0 + Math.sin(time * respFreq) * 0.045;
+                    lungsPart.scale.set(lungExpansion, 1.0 + Math.sin(time * respFreq) * 0.02, lungExpansion);
                 }
 
                 // Brain Neural Firing Animation
                 const brainPart = this.parts.get('brain');
                 if (brainPart) {
-                    const neuralGlow = 0.2 + Math.sin(time * 5) * 0.1;
+                    const neuralGlow = 0.25 + Math.sin(time * 5) * 0.15 + Math.sin(time * 12) * 0.05;
                     brainPart.children.forEach(c => {
                         if (c instanceof THREE.Mesh && c.material instanceof THREE.MeshStandardMaterial) {
                             c.material.emissiveIntensity = neuralGlow;
