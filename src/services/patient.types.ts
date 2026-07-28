@@ -144,6 +144,8 @@ export interface IPatientVitals {
     spO2: string;    // Oxygen Saturation
     weight: string;
     height: string;
+    // Continuous Glucose Monitoring (CGM)
+    cgmGlucoseMgDl?: string;
     // Biochemical Telemetry
     vitC?: string;
     vitD3?: string;
@@ -247,6 +249,73 @@ export interface IPatientState {
     ayurvedicIntake?: IAyurvedicIntake;
     /** Custom expansive key-value biomarker and note fields. */
     customFields?: { key: string; value: string }[];
+    genomicVariants?: IGeneticVariant[];
+    biochemicalPathways?: IBiochemicalPathway[];
+    pkInteractions?: IPharmacokineticInteraction[];
+    ewarsAlerts?: IEwarsOutbreakAlert[];
+    travelProfile?: ITravelMedicineProfile;
+    awareStewardship?: IWhoAwareClassification[];
+    environmentalIndex?: IEnvironmentalHealthIndex;
+}
+
+export interface IEwarsOutbreakAlert {
+    id: string;
+    pathogen: string;
+    viralCopyCount: string; // e.g., "4.2x10^5 copies/mL (CDC NWSS)"
+    surgeStatus: 'Baseline' | 'Monitoring' | 'Active Surge' | 'Outbreak Alert';
+    whoBulletin: string;
+    riskToPatient: 'Low' | 'Moderate' | 'High' | 'Critical';
+}
+
+export interface ITravelMedicineProfile {
+    destination: string;
+    departureDate: string;
+    cdcNoticeLevel: 'Level 1 - Watch' | 'Level 2 - Alert' | 'Level 3 - Avoid';
+    requiredVaccines: string[];
+    vectorRisks: string[];
+    prophylacticProtocol: string[];
+}
+
+export interface IWhoAwareClassification {
+    medication: string;
+    category: 'Access' | 'Watch' | 'Reserve';
+    resistanceRisk: 'Low' | 'Moderate' | 'High';
+    stewardshipNote: string;
+}
+
+export interface IEnvironmentalHealthIndex {
+    aqi: number;
+    pm25: string;
+    ozone: string;
+    pollenDensity: 'Low' | 'Moderate' | 'High' | 'Severe';
+    heatIndex: string;
+    vulnerabilityWarning: string;
+}
+
+export interface IGeneticVariant {
+    rsId: string;
+    gene: string;
+    chromosome: string;
+    position: string;
+    genotype: string;
+    clinicalSignificance: string;
+    pathogenicity: 'Benign' | 'Likely Benign' | 'VUS' | 'Likely Pathogenic' | 'Pathogenic';
+}
+
+export interface IBiochemicalPathway {
+    id: string;
+    name: string;
+    status: 'Optimal' | 'Sub-optimal' | 'Blocked';
+    activeEnzymes: string[];
+    blocks: string[];
+}
+
+export interface IPharmacokineticInteraction {
+    agent: string;
+    target: string;
+    affinity: string; // e.g., "Ki = 1.2 nM" or similar bioactivity value
+    effect: string;   // e.g., "Inhibition", "Activation"
+    riskLevel: 'Low' | 'Moderate' | 'High' | 'Severe';
 }
 
 export interface ITcmIntake {

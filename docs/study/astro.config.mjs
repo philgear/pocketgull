@@ -16,9 +16,7 @@ export default defineConfig({
   vite: {
     root: __dirname,
     build: {
-      rollupOptions: {
-        input: []
-      }
+      // no explicit rollupOptions.input — allow Astro/Vite to determine entrypoints
     },
     define: {
       'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || 'placeholder-key-for-build')

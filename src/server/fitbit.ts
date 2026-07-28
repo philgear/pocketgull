@@ -18,6 +18,7 @@ import { Router, Request, json } from 'express';
 import crypto from 'node:crypto';
 import { createWriteStream, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { sanitizeLogInput } from '../utils/security-helper';
 
 export const fitbitRouter = Router();
 fitbitRouter.use(json());
@@ -36,8 +37,9 @@ function auditLog(event: string, patientId: string, detail: Record<string, unkno
     patientId: safePatientId,
     ...detail,
   }).replace(/[\r\n]/g, ' ');
-  auditStream.write(entry + '\n');
-  console.log(`[Audit] ${entry}`);
+  const cleanEntry = sanitizeLogInput(entry);
+  auditStream.write(cleanEntry + '\n');
+  console.log(`[Audit] ${cleanEntry}`);
 }
 
 // ── In-memory stores (ephemeral — never persisted to disk) ────────────────────
@@ -133,7 +135,7 @@ async function refreshTokenIfNeeded(patientId: string): Promise<IGoogleHealthTok
   if (!token) return null;
   if (Date.now() < token.expiresAt - 60_000) return token;
 
-  console.log(`[GoogleHealth] Refreshing token for patient ${patientId}...`);
+  console.log(`[GoogleHealth] Refreshing token for patient ${sanitizeLogInput(patientId)}...`);
   try {
     const res = await fetch(GOOGLE_TOKEN_URL, {
       method: 'POST',

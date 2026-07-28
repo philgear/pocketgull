@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'calm' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'atomic' | 'curie' | 'lent' | 'dream-team';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
 
 @Injectable({
   providedIn: 'root'
@@ -37,26 +37,22 @@ export class ThemeService {
         }
       }
 
-      // Setup effect to save and apply the theme when the signal changes
       effect(() => {
         const theme = this.currentTheme();
         this.saveTheme(theme);
         this.resolveTheme(theme);
       });
 
-      // Setup effect to actually apply the active theme classes to the DOM
       effect(() => {
         const resolvedTheme = this.activeTheme();
         this.applyThemeToDom(resolvedTheme);
       });
 
-      // Setup effect to apply paradigm reactive CSS variables & data attributes
       effect(() => {
         const paradigm = this.activeParadigm();
         this.applyParadigmToDom(paradigm);
       });
 
-      // Setup effect to apply the seagull persona attribute
       effect(() => {
         const persona = this.activeSeagullPersona();
         if (typeof localStorage !== 'undefined') {
@@ -67,7 +63,6 @@ export class ThemeService {
         }
       });
 
-      // Setup effect to apply the reduce-motion class based on user preference
       effect(() => {
         const reduce = this.reduceMotion();
         if (typeof localStorage !== 'undefined') {
@@ -82,7 +77,6 @@ export class ThemeService {
         }
       });
 
-      // Setup effect to apply plain language mode persistence
       effect(() => {
         const isPlain = this.isPlainLanguageMode();
         if (typeof localStorage !== 'undefined') {
@@ -97,7 +91,6 @@ export class ThemeService {
         }
       });
 
-      // Setup effect to apply text size scale class to document root
       effect(() => {
         const scale = this.textSizeScale();
         if (typeof localStorage !== 'undefined') {
@@ -115,7 +108,6 @@ export class ThemeService {
         if (savedReduceMotion === 'true') {
           this.reduceMotion.set(true);
         } else if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-          // Auto-detect OS prefers-reduced-motion preference if not explicitly set
           if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             this.reduceMotion.set(true);
           }
@@ -126,7 +118,6 @@ export class ThemeService {
         }
       }
 
-      // Listen to OS prefers-color-scheme & prefers-reduced-motion changes
       if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
         mediaQuery.addEventListener?.('change', (e) => {
@@ -156,19 +147,17 @@ export class ThemeService {
       this.textSizeScale.set(savedTextSize);
     }
 
-    // Check URL query parameters first for testing, audits, or direct links
     const urlParams = new URLSearchParams(window.location.search);
     const urlTheme = urlParams.get('theme') as AppTheme;
-    if (urlTheme && ['light', 'dark', 'system', 'spark', 'calm', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala'].includes(urlTheme)) {
+    if (urlTheme && ['light', 'dark', 'system', 'spark'].includes(urlTheme)) {
       this.currentTheme.set(urlTheme);
       this.resolveTheme(urlTheme);
     } else {
       const savedTheme = localStorage.getItem('pocket_gull_theme') as AppTheme;
-      // Never default to Spark Mode on load for clinical safety reasons.
-      if (savedTheme && savedTheme !== 'spark') {
+      if (savedTheme && ['light', 'dark', 'system', 'spark'].includes(savedTheme) && savedTheme !== 'spark') {
         this.currentTheme.set(savedTheme);
       } else {
-        this.currentTheme.set('rice');
+        this.currentTheme.set('light');
       }
     }
 
@@ -195,14 +184,8 @@ export class ThemeService {
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
         : false;
       this.activeTheme.set(isSystemDark ? 'dark' : 'light');
-    } else if (theme === 'spark' || theme === 'black-marble' || theme === 'papyrus' || theme === 'mandala' || theme === 'curie') {
+    } else if (theme === 'spark') {
       this.activeTheme.set('dark');
-    } else if (theme === 'pool') {
-      const hour = new Date().getHours();
-      const isNight = hour < 6 || hour > 18;
-      this.activeTheme.set(isNight ? 'dark' : 'light');
-    } else if (theme === 'calm' || theme === 'papercraft' || theme === 'hemp' || theme === 'rice' || theme === 'construction' || theme === 'white-marble') {
-      this.activeTheme.set('light');
     } else {
       this.activeTheme.set(theme === 'dark' ? 'dark' : 'light');
     }
@@ -211,91 +194,19 @@ export class ThemeService {
   private applyThemeToDom(resolvedTheme: 'light' | 'dark') {
     if (typeof document === 'undefined') return;
     
-    // Always remove existing classes first to clean up state
-    document.documentElement.classList.remove(
-      'dark', 'theme-spark', 'theme-calm',
-      'papercraft-mode', 'papercraft-hemp', 'papercraft-rice', 'papercraft-construction',
-      'theme-white-marble', 'theme-black-marble', 'theme-papyrus',
-      'theme-pool', 'theme-pool-light', 'theme-pool-dark',
-      'theme-mandala'
-    );
-    
-    const theme = this.currentTheme();
-    if (theme === 'papercraft' || theme === 'hemp' || theme === 'rice' || theme === 'construction') {
-      document.documentElement.classList.add('papercraft-mode');
-      if (theme === 'hemp') document.documentElement.classList.add('papercraft-hemp');
-      if (theme === 'rice') document.documentElement.classList.add('papercraft-rice');
-      if (theme === 'construction') document.documentElement.classList.add('papercraft-construction');
+    document.documentElement.classList.remove('dark', 'theme-spark');
+    document.documentElement.setAttribute('data-theme', this.currentTheme());
 
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#F9F3D9');
-      }
-    } else if (theme === 'spark') {
-      document.documentElement.classList.add('dark', 'theme-spark');
-      // Update meta theme-color for PWA
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#09090B');
-      }
-    } else if (theme === 'calm') {
-      document.documentElement.classList.add('theme-calm');
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#FAF9F6'); // soft paper-white background
-      }
-    } else if (theme === 'white-marble') {
-      document.documentElement.classList.add('theme-white-marble');
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#FAF9F6');
-      }
-    } else if (theme === 'black-marble') {
-      document.documentElement.classList.add('dark', 'theme-black-marble');
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#0d0d11');
-      }
-    } else if (theme === 'papyrus') {
-      document.documentElement.classList.add('dark', 'theme-papyrus');
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#13100c');
-      }
-    } else if (theme === 'pool') {
-      document.documentElement.classList.add('theme-pool');
-      if (resolvedTheme === 'dark') {
-        document.documentElement.classList.add('dark', 'theme-pool-dark');
-      } else {
-        document.documentElement.classList.add('theme-pool-light');
-      }
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#081f3d' : '#7dd3fc');
-      }
-    } else if (theme === 'mandala') {
-      document.documentElement.classList.add('dark', 'theme-mandala');
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#16112d');
-      }
-    } else if (theme === 'curie') {
-      document.documentElement.classList.add('dark', 'theme-curie');
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#0f1416');
-      }
-    } else if (resolvedTheme === 'dark') {
+    if (resolvedTheme === 'dark') {
       document.documentElement.classList.add('dark');
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#111827');
-      }
-    } else {
-      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (metaThemeColor) {
-        metaThemeColor.setAttribute('content', '#1C1C1C'); 
-      }
+    }
+    if (this.currentTheme() === 'spark') {
+      document.documentElement.classList.add('theme-spark');
+    }
+
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#09090B' : '#F8F8F8');
     }
   }
 

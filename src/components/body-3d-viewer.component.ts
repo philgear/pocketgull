@@ -11,6 +11,7 @@ import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ThemeService } from '../services/theme.service';
 import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
+import { AdobeFireflyTextureService } from '../services/adobe-firefly-texture.service';
 import { IBodyPartIssue } from '../services/patient.types';
 
 const PART_NAMES: Record<string, string> = {
@@ -56,12 +57,16 @@ const PART_NAMES: Record<string, string> = {
     // 🧘 Ayurvedic 7 Sushumna Chakra Touch Nodes
     'chakra_sahasrara': 'Sahasrara (Crown 1000-Petal Lotus Chakra)',
     'chakra_ajna': 'Ajna (Third Eye Command Center Chakra)',
-    'chakra_vishuddha': 'Vishuddha (Throat Purity Sound Chakra)',
-    'chakra_anahata': 'Anahata (Heart Unstruck Anahata Chakra)',
+    'chakra_vishuddha': 'Throat & Oral FDI Odontogram Spatial Lens',
+    'chakra_anahata': 'Anahata (Heart & Acoustic Respiratory Airway Lens)',
+    'oral_fdi_teeth': 'Teledentistry FDI 32-Tooth Matrix & Smith-Knight TWI Lens',
+    'respiratory_airway': 'Micro-Acoustic Wheeze & Stridor Spectrum Lens',
     'chakra_manipura': 'Manipura (Solar Plexus Agni Fire City)',
     'chakra_svadhisthana': 'Svadhisthana (Sacral Water Dwell Chakra)',
     'chakra_muladhara': 'Muladhara (Root Earth Base Support Chakra)'
 };
+
+export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive' | 'orch_or';
 
 @Component({
     selector: 'app-body-3d-viewer',
@@ -98,8 +103,32 @@ const PART_NAMES: Record<string, string> = {
           </button>
         </div>
 
-        <!-- Viewport Spin & Reset Controls -->
-        <div class="flex items-center gap-1.5">
+        <!-- Viewport Spin, Reset & Vision Accessibility Controls -->
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button (click)="isHighContrastVision.set(!isHighContrastVision())" 
+            [class.bg-amber-400]="isHighContrastVision()"
+            [class.text-black]="isHighContrastVision()"
+            [class.bg-white]="!isHighContrastVision()"
+            [class.dark:bg-zinc-900]="!isHighContrastVision()"
+            [class.dark:text-amber-300]="!isHighContrastVision()"
+            class="min-h-[36px] px-2.5 py-1 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Toggle Non-Glare High-Contrast Vision Mode for Low Vision">
+            <span>👁️</span>
+            <span class="text-[10px] uppercase font-bold">{{ isHighContrastVision() ? 'High Contrast ON' : 'High Contrast' }}</span>
+          </button>
+
+          <button (click)="isReducedMotion.set(!isReducedMotion())" 
+            [class.bg-emerald-600]="isReducedMotion()"
+            [class.text-white]="isReducedMotion()"
+            [class.bg-white]="!isReducedMotion()"
+            [class.dark:bg-zinc-900]="!isReducedMotion()"
+            [class.dark:text-emerald-400]="!isReducedMotion()"
+            class="min-h-[36px] px-2.5 py-1 rounded-md font-bold transition cursor-pointer flex items-center gap-1 border border-slate-300 dark:border-zinc-800"
+            title="Freeze Animations for Photosensitive Safety & Motion Sensitivity">
+            <span>⚡</span>
+            <span class="text-[10px] uppercase font-bold">{{ isReducedMotion() ? 'Motion FREEZE' : 'Motion' }}</span>
+          </button>
+
           <button (click)="toggleAutoSpin()" 
             [class.bg-sky-600]="isAutoSpinning()"
             [class.text-white]="isAutoSpinning()"
@@ -243,19 +272,21 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private readonly patientManagement = inject(PatientManagementService);
     protected readonly themeService = inject(ThemeService);
     protected readonly envTelemetry = inject(EnvironmentalTelemetryService);
+    protected readonly fireflyTexture = inject(AdobeFireflyTextureService);
     private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
     private ambientLight?: THREE.AmbientLight;
     private directionalLight?: THREE.DirectionalLight;
     private backLight?: THREE.DirectionalLight;
+    private molecularScienceGroup?: THREE.Group;
 
     partSelected = output<{ id: string, name: string }>();
 
     // Inputs for external control
     rotation = input<number>(0);
     zoom = input<number>(1);
-    anatomyViewMode = input<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive'>('skin');
+    anatomyViewMode = input<AnatomyViewMode>('skin');
     customModelUrl = input<string | null>(null);
 
     readonly webglSupported = signal<boolean>(true);
@@ -338,6 +369,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly quickSymptomText = signal<string>('');
 
     readonly isSelectedPartFlipped = signal<boolean>(false);
+    readonly isHighContrastVision = signal<boolean>(false);
+    readonly isReducedMotion = signal<boolean>(false);
 
     getPartIcon(partId: string | null): string {
       if (!partId) return '📍';
@@ -776,41 +809,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         const theme = this.themeService.currentTheme();
         const active = this.themeService.activeTheme();
-        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'black-marble' || theme === 'curie' || theme === 'mandala' || theme === 'papyrus';
+        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'spark';
 
         // Clear alpha set to 0.0 (fully transparent) so background textures/images show through underneath!
         this.renderer.setClearColor(0x000000, 0.0);
 
-        if (theme === 'curie') {
-            // Radium Curie emerald glow studio lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0x00ff66); this.ambientLight.intensity = 2.2; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0x00cc66); this.directionalLight.intensity = 2.0; }
-            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 1.2; }
-            if (this.bloomPass) this.bloomPass.strength = 0.35;
-        } else if (theme === 'mandala') {
-            // Cosmic mandala violet & saffron lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0x8b5cf6); this.ambientLight.intensity = 2.0; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0xf59e0b); this.directionalLight.intensity = 1.8; }
-            if (this.backLight) { this.backLight.color.setHex(0x06b6d4); this.backLight.intensity = 1.0; }
+        if (theme === 'spark') {
+            // Ember Spark Mode studio lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xfb923c); this.ambientLight.intensity = 2.2; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xf97316); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0xe11d48); this.backLight.intensity = 1.2; }
             if (this.bloomPass) this.bloomPass.strength = 0.25;
-        } else if (theme === 'papyrus') {
-            // Egyptian torchlight gold
-            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.2; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0xd97706); this.directionalLight.intensity = 2.0; }
-            if (this.backLight) { this.backLight.color.setHex(0x1e3a8a); this.backLight.intensity = 1.0; }
-            if (this.bloomPass) this.bloomPass.strength = 0.15;
-        } else if (theme === 'white-marble' || theme === 'black-marble') {
-            // Gold vein marble lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.0; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0xf6e4a6); this.directionalLight.intensity = 1.8; }
-            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.9; }
-            if (this.bloomPass) this.bloomPass.strength = 0.12;
-        } else if (theme === 'pool') {
-            // Aqua blue water lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0x38bdf8); this.ambientLight.intensity = 2.4; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0x0284c7); this.directionalLight.intensity = 2.0; }
-            if (this.backLight) { this.backLight.color.setHex(0xfb7185); this.backLight.intensity = 0.8; }
-            if (this.bloomPass) this.bloomPass.strength = 0.10;
         } else if (isDarkTheme) {
             // Dark obsidian spatial canvas
             if (this.ambientLight) { this.ambientLight.color.setHex(0xffffff); this.ambientLight.intensity = 1.8; }
@@ -818,7 +827,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             if (this.backLight) { this.backLight.color.setHex(0x818cf8); this.backLight.intensity = 1.2; }
             if (this.bloomPass) this.bloomPass.strength = 0.15;
         } else {
-            // Parchment/Papercraft studio lighting
+            // Light Parchment studio lighting
             if (this.ambientLight) { this.ambientLight.color.setHex(0xfff8ee); this.ambientLight.intensity = 2.4; }
             if (this.directionalLight) { this.directionalLight.color.setHex(0xfff5e6); this.directionalLight.intensity = 2.0; }
             if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.8; }
@@ -837,6 +846,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.createMannequin();
             this.createArborealTreeModel();
             this.createAutomotiveChassisModel();
+            this.createMolecularScienceModel();
             this.startAnimation();
             this.setupInteractions();
 
@@ -1118,15 +1128,21 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.mannequinGroup = new THREE.Group();
         this.scene.add(this.mannequinGroup);
 
-        // Base Layer Materials
+        // Adobe Firefly AI Procedural PBR Textures
+        const skinTexture = this.fireflyTexture.getFireflyTexture('skin');
+        const muscleTexture = this.fireflyTexture.getFireflyTexture('muscle');
+        const boneTexture = this.fireflyTexture.getFireflyTexture('skeleton');
+        const organTexture = this.fireflyTexture.getFireflyTexture('organs');
+
+        // Base Layer Materials wrapped with Adobe Firefly Generative Textures
         const skinMaterial = new THREE.MeshStandardMaterial({
-            color: 0x38bdf8, roughness: 0.3, metalness: 0.2, emissive: 0x0369a1, emissiveIntensity: 0.15, transparent: true, opacity: 0.92, depthWrite: true
+            color: 0x38bdf8, bumpMap: skinTexture, bumpScale: 0.04, roughness: 0.35, metalness: 0.15, emissive: 0x0369a1, emissiveIntensity: 0.15, transparent: true, opacity: 0.92, depthWrite: true
         });
         const muscleMaterial = new THREE.MeshStandardMaterial({
-            color: 0xbe123c, roughness: 0.65, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xbe123c, bumpMap: muscleTexture, bumpScale: 0.08, roughness: 0.65, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
         const boneMaterial = new THREE.MeshStandardMaterial({
-            color: 0xf5f5f4, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xf5f5f4, bumpMap: boneTexture, bumpScale: 0.03, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
 
         // Organ Layer Materials with Distinct Anatomical Colors & Emissive Highlights
@@ -1896,10 +1912,12 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.automotiveChassisGroup.add(tongueLoadMesh);
 
         const strutPositions = [
-            { x: -0.22, y: -0.1, z: 0, id: 'r_shin' },
-            { x: 0.22, y: -0.1, z: 0, id: 'l_shin' },
-            { x: -0.45, y: 1.45, z: 0, id: 'r_shoulder' },
-            { x: 0.45, y: 1.45, z: 0, id: 'l_shoulder' }
+            { x: -0.18, y: 0.35, z: 0, id: 'r_thigh' },
+            { x: 0.18, y: 0.35, z: 0, id: 'l_thigh' },
+            { x: -0.18, y: -0.25, z: 0, id: 'r_shin' },
+            { x: 0.18, y: -0.25, z: 0, id: 'l_shin' },
+            { x: -0.32, y: 1.45, z: 0, id: 'r_shoulder' },
+            { x: 0.32, y: 1.45, z: 0, id: 'l_shoulder' }
         ];
 
         strutPositions.forEach(s => {
@@ -1911,6 +1929,67 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             coilMesh.userData['layer'] = 'bone';
             this.automotiveChassisGroup!.add(coilMesh);
         });
+    }
+
+    private createMolecularScienceModel() {
+        this.molecularScienceGroup = new THREE.Group();
+        this.scene.add(this.molecularScienceGroup);
+        this.molecularScienceGroup.visible = false;
+
+        const helixRadius = 0.55;
+        const height = 2.4;
+        const turns = 3;
+        const numPoints = 80;
+        
+        const matA = new THREE.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x0891b2, emissiveIntensity: 0.9, roughness: 0.2 }); // Cyan
+        const matT = new THREE.MeshStandardMaterial({ color: 0xf43f5e, emissive: 0xe11d48, emissiveIntensity: 0.9, roughness: 0.2 }); // Rose
+        const matG = new THREE.MeshStandardMaterial({ color: 0x10b981, emissive: 0x059669, emissiveIntensity: 0.9, roughness: 0.2 }); // Emerald
+        const matC = new THREE.MeshStandardMaterial({ color: 0xfbbf24, emissive: 0xd97706, emissiveIntensity: 0.9, roughness: 0.2 }); // Amber
+        const backboneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xcbd5e1, emissiveIntensity: 0.4, transparent: true, opacity: 0.8, roughness: 0.1 });
+
+        for (let i = 0; i < numPoints; i++) {
+            const t = i / numPoints;
+            const angle = t * turns * Math.PI * 2;
+            const y = (t * height) - (height / 2) + 1.0;
+
+            const x1 = Math.cos(angle) * helixRadius;
+            const z1 = Math.sin(angle) * helixRadius;
+            const p1 = new THREE.Vector3(x1, y, z1);
+
+            const x2 = Math.cos(angle + Math.PI) * helixRadius;
+            const z2 = Math.sin(angle + Math.PI) * helixRadius;
+            const p2 = new THREE.Vector3(x2, y, z2);
+
+            const sphereGeo = new THREE.SphereGeometry(0.035, 12, 12);
+            const s1 = new THREE.Mesh(sphereGeo, backboneMat);
+            s1.position.copy(p1);
+            this.molecularScienceGroup.add(s1);
+
+            const s2 = new THREE.Mesh(sphereGeo, backboneMat);
+            s2.position.copy(p2);
+            this.molecularScienceGroup.add(s2);
+
+            if (i % 3 === 0) {
+                const rungCurve = new THREE.LineCurve3(p1, p2);
+                const rungGeo = new THREE.TubeGeometry(rungCurve, 4, 0.012, 8, false);
+                
+                let mat = matA;
+                if (i % 12 === 0) mat = matA;
+                else if (i % 12 === 3) mat = matT;
+                else if (i % 12 === 6) mat = matG;
+                else mat = matC;
+
+                const rungMesh = new THREE.Mesh(rungGeo, mat);
+                this.molecularScienceGroup.add(rungMesh);
+
+                const centerGeo = new THREE.SphereGeometry(0.045, 12, 12);
+                const centerMesh = new THREE.Mesh(centerGeo, new THREE.MeshStandardMaterial({
+                    color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1.2
+                }));
+                centerMesh.position.lerpVectors(p1, p2, 0.5);
+                this.molecularScienceGroup.add(centerMesh);
+            }
+        }
     }
 
     private applyPos(mesh: THREE.Mesh, pos: any) {
@@ -2002,19 +2081,22 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.controls.update();
     }
 
-    private updateTransparency(mode: 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive') {
+    private updateTransparency(mode: AnatomyViewMode) {
         if (mode === 'arboreal') {
             if (this.mannequinGroup) this.mannequinGroup.visible = false;
             if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
+            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = true;
         } else if (mode === 'automotive') {
             if (this.mannequinGroup) this.mannequinGroup.visible = false;
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
+            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
             if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = true;
         } else {
             if (this.mannequinGroup) this.mannequinGroup.visible = true;
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
             if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
+            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
         }
 
         this.parts.forEach((group) => {
@@ -2058,8 +2140,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     else { material.opacity = 0.15; material.depthWrite = false; }
                 }
                 else if (mode === 'molecular') {
-                    if (layer === 'skin') { material.opacity = 0.30; material.depthWrite = false; }
-                    else if (layer === 'molecular') { material.opacity = 0.9; material.depthWrite = true; }
+                    if (layer === 'skin') { material.opacity = 0.10; material.depthWrite = false; }
+                    else if (layer === 'molecular') { material.opacity = 0.85; material.depthWrite = true; }
                     else { material.opacity = 0; material.depthWrite = false; }
                 }
                 else if (mode === 'eastern') {
@@ -2117,12 +2199,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             this.animationFrameId = requestAnimationFrame(animate);
 
             if (this.controls) this.controls.update();
+            
+            if (this.molecularScienceGroup && this.molecularScienceGroup.visible) {
+                this.molecularScienceGroup.rotation.y += 0.012;
+            }
 
             this.timer.update();
             const time = this.timer.getElapsed();
+            const motionFreeze = this.isReducedMotion();
             
             // Idle & Biometric AVS breathing and mind wave entrainment animations
-            if (this.mannequinGroup) {
+            if (this.mannequinGroup && !motionFreeze) {
                 const avsActive = this.state.isAvsSessionActive();
                 
                 // 1. Respiratory & Organ Coherence Entrainment
@@ -2144,24 +2231,32 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     }
                 }
 
-                // Heart Beat Animation (Systolic/Diastolic rhythm)
+                // SIGGRAPH-grade Real-Time Cardiac Double-Bump & Pulmonary Respiration (Synced to patient vitals)
                 const heartPart = this.parts.get('heart');
                 if (heartPart) {
-                    const cardiacPulse = 1 + Math.sin(time * 7) * 0.05 + Math.sin(time * 14) * 0.02;
-                    heartPart.scale.set(cardiacPulse, cardiacPulse, cardiacPulse);
+                    const rawHr = this.state.vitals()?.hr;
+                    const hrVal = rawHr ? (parseInt(String(rawHr), 10) || 72) : 72;
+                    const bps = (hrVal / 60.0);
+                    const cardiacCycle = (time * bps * 2 * Math.PI) % (2 * Math.PI);
+                    const heartDoubleBump = Math.pow(Math.sin(cardiacCycle), 8) * 0.12 + Math.pow(Math.sin(cardiacCycle * 2 + 0.5), 12) * 0.06;
+                    heartPart.scale.set(1 + heartDoubleBump, (1 + heartDoubleBump) * 1.1, 1 + heartDoubleBump);
+                    heartPart.children.forEach(c => {
+                        if (c instanceof THREE.Mesh && c.material instanceof THREE.MeshStandardMaterial) {
+                            c.material.emissiveIntensity = 0.3 + heartDoubleBump * 1.5;
+                        }
+                    });
                 }
 
-                // Lungs Respiration Animation
-                const lungsPart = this.parts.get('lungs');
-                if (lungsPart) {
-                    const lungExpansion = 1 + Math.sin(time * 2) * 0.04;
-                    lungsPart.scale.set(lungExpansion, 1 + Math.sin(time * 2) * 0.02, lungExpansion);
+                const lungPart = this.parts.get('lungs');
+                if (lungPart) {
+                    const breathCycle = Math.sin(time * 1.2) * 0.05;
+                    lungPart.scale.set(1 + breathCycle, 1 + breathCycle * 1.5, 1 + breathCycle);
                 }
 
-                // Brain Neural Firing Animation
+                // 1. Brain Neural Oscillations
                 const brainPart = this.parts.get('brain');
                 if (brainPart) {
-                    const neuralGlow = 0.2 + Math.sin(time * 5) * 0.1;
+                    const neuralGlow = 0.25 + Math.sin(time * 5) * 0.15 + Math.sin(time * 12) * 0.05;
                     brainPart.children.forEach(c => {
                         if (c instanceof THREE.Mesh && c.material instanceof THREE.MeshStandardMaterial) {
                             c.material.emissiveIntensity = neuralGlow;
@@ -2169,7 +2264,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     });
                 }
                 
-                // 2. Gentle floating
+                // 2. Gentle floating animation
                 this.mannequinGroup.position.y = Math.sin(time * 1.5) * 0.02;
                 if (this.customModelGroup) {
                     this.customModelGroup.position.y = Math.sin(time * 1.5) * 0.02;

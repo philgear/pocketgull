@@ -1,28 +1,28 @@
 # 📊 COCOMO II Software Cost & Effort Estimation Report
 
-**Generated**: 7/23/2026, 8:40:54 PM
+**Generated**: 7/27/2026, 8:29:24 PM
 **Target System**: Pocket Gull Medical Intelligence Monorepo
 
 ## 1. Codebase Size & Language Metrics
 
 | Language / Layer | Files | Source Lines (SLOC) | KSLOC |
 | :--- | :--- | :--- | :--- |
-| **TypeScript (Angular Core Web)** | 314 | 87,218 | 87.22 |
-| **Dart (Flutter Mobile Suite)** | 156 | 27,427 | 27.43 |
-| **Python (FastAPI Sidecar & ML)** | 25 | 4,077 | 4.08 |
-| **CSS / Styling System** | 9 | 5,926 | 5.93 |
-| **JSON & YAML Manifests** | 138 | 166,328 | 166.33 |
-| **Markdown Documentation** | 64 | 5,628 | 5.63 |
-| **TOTAL MONOREPO** | **706** | **296,604** | **296.60 KSLOC** |
+| **TypeScript (Angular Core Web)** | 404 | 103,770 | 103.77 |
+| **Dart (Flutter Mobile Suite)** | 167 | 28,853 | 28.85 |
+| **Python (FastAPI Sidecar & ML)** | 56 | 9,430 | 9.43 |
+| **CSS / Styling System** | 9 | 6,072 | 6.07 |
+| **JSON & YAML Manifests** | 156 | 158,990 | 158.99 |
+| **Markdown Documentation** | 71 | 5,866 | 5.87 |
+| **TOTAL MONOREPO** | **863** | **312,981** | **312.98 KSLOC** |
 
 ## 2. COCOMO II Post-Architecture Model Output
 
 | Metric | COCOMO II Estimation |
 | :--- | :--- |
-| **Effort Estimate** | **997.13 Person-Months** |
-| **Estimated Development Time (TDEV)** | **28.69 Months** |
-| **Average Full-Time Staffing** | **34.8 Engineers** |
-| **Estimated Project Cost** | **$14,956,889 USD** ($15k/month rate) |
+| **Effort Estimate** | **1052.13 Person-Months** |
+| **Estimated Development Time (TDEV)** | **29.15 Months** |
+| **Average Full-Time Staffing** | **36.1 Engineers** |
+| **Estimated Project Cost** | **$15,781,885 USD** ($15k/month rate) |
 
 ## 3. Scale Factors & Effort Multipliers (EAF)
 

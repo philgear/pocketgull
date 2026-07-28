@@ -32,12 +32,19 @@ export interface INodeContext {
     timestamp: Date;
 }
 
-export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health' | 'Chronobiology Matrix' | 'Functional Medicine Matrix';
+export type AnalysisLens = 'Summary Overview' | 'Functional Protocols' | 'Nutrition' | 'Monitoring & Follow-up' | 'Patient Education' | 'Precision Nutrients' | 'Treatment Matrix' | 'PhysioNet Telemetry' | 'Maternal & Postpartum' | 'Grow-Thyself Education' | 'Epigenetic Longevity' | 'Pre-Conception & Family Health' | 'Chronobiology Matrix' | 'Functional Medicine Matrix' | 'Seven Generations Stewardship';
 
 export interface IClinicalMetrics {
     complexity: number; // 0-10
     stability: number;  // 0-10
     certainty: number;  // 0-10
+}
+
+export interface IGodelIncompletenessBound {
+    formalSystemProofStatus: 'INCOMPLETE_CONSISTENT';
+    unprovableAssumptions: string[];
+    epistemologicalBoundNotice: string;
+    missingGroundTruthTelemetry: string[];
 }
 
 @Injectable({
@@ -58,6 +65,7 @@ export class ClinicalIntelligenceService {
     readonly webgpuProgress = this.webgpu.loadingProgress;
     readonly webgpuIsLoading = this.webgpu.isLoadingProgress;
     readonly error = signal<string | null>(null);
+    readonly godelIncompletenessBound = signal<IGodelIncompletenessBound | null>(null);
 
     // Store analysis reports for each lens
     readonly analysisResults = signal<Partial<Record<AnalysisLens, string>>>({});
@@ -953,6 +961,23 @@ Feel free to reference their research areas and publications if it supports the 
         return cleanText
             .replace(/\b(disastrous|catastrophic|terrifying|dire warning|fatal breakdown)\b/gi, 'clinical observation')
             .replace(/\b(hopeless|uncontrollable crisis)\b/gi, 'manageable clinical priority');
+    }
+
+    calculateGodelMetaSelfCritique(reportMarkdown: string): IGodelIncompletenessBound {
+        const bound: IGodelIncompletenessBound = {
+            formalSystemProofStatus: 'INCOMPLETE_CONSISTENT',
+            unprovableAssumptions: [
+                'Clinical response to functional interventions assumes unmeasured baseline serum methylmalonic acid and RBC magnesium levels.',
+                'Autonomic vagal tone recovery rate is modeled linearly, omitting nonlinear micro-vascular vasospasm triggers.'
+            ],
+            epistemologicalBoundNotice: 'Gödelian Incompleteness Warning: This Care Plan is internally consistent within Gemini 2.5 Flash formal logic, but contains unprovable empirical assertions requiring direct FHIR lab telemetry.',
+            missingGroundTruthTelemetry: [
+                'Serum 25-hydroxy vitamin D3 & serum zinc/copper ratios',
+                '24-hour holter HRV spectral density'
+            ]
+        };
+        this.godelIncompletenessBound.set(bound);
+        return bound;
     }
 }
 

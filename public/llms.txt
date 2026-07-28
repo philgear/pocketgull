@@ -5,22 +5,38 @@
 ## Core System Architecture
 - **Frontend**: Angular 22 Standalone Components with Signals (`signal`, `computed`, `effect`).
 - **Backend / SSR**: Node.js, Express, and integrated Angular Server-Side Rendering.
-- **Interactive 3D Anatomy**: Three.js WebGL procedural skeletal, organ, and dermatome mapping.
-- **Python ML Sidecar**: FastAPI sidecar (`pocketgull_api`) providing XGBoost risk scoring and digital signal processing (EDF / PhysioNet 2026).
-- **Mobile Companion**: Flutter / Dart cross-platform mobile suite (`pocketgull_flutter`) supporting Doctor Mode & Patient Mode.
-- **Interoperability**: Strict FHIR R4 Bundle export & FHIR R5 `SubscriptionTopic` real-time biometric telemetry streaming (`http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream`).
+- **Interactive 3D Anatomy**: Three.js WebGL procedural skeletal, organ, dermatome mapping with SIGGRAPH GLSL shaders, SIGGRAPH cardiac double-bump, and Vision Accessibility non-glare fallbacks.
+- **Python ML Sidecar & Edge**: FastAPI sidecar (`pocketgull_api`) with calibrated PhysioNet contest models (`physionet_2022` PCG, `physionet_2023` EEG, `physionet_2024` ECG, `physionet_2025` Sepsis, `physionet_2026` PSG) and calibrated ICU 30-Day Mortality, Readmission Risk, and Outbreak Triage classifiers.
+- **Mobile Companion**: Flutter / Dart cross-platform mobile suite (`pocketgull_flutter`) with Riverpod BLE multi-vitals telemetry synchronization.
+- **Interoperability**: Strict FHIR R4 Bundle export with SOFA score (`LOINC 96790-1`) and LACE readmission risk (`LOINC 80299-1`) observations, plus FHIR R5 `SubscriptionTopic` real-time biometric telemetry streaming (`http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream`).
 
 ## WebMCP Model Context Protocol (MCP) Tools & Multi-Paradigm Lenses
 Pocket Gull exposes native WebMCP tools and 13 specialized clinical lenses for autonomous AI browser agents:
 - `Summary Overview`, `Treatment Matrix`, `Functional Protocols`, `Nutrition`, `Precision Nutrients`, `Monitoring & Follow-up`, `Patient Education`, `PhysioNet Telemetry`, `Y-BOCs Screener`, `Maternal & Postpartum`, `Grow-Thyself Education`, `Epigenetic Longevity`, and `Pre-Conception & Family Health`.
+- **Preemptive Hypoglycemia Alert & Rescue Routing**: Automatic CGM drop warning (<70 mg/dL), Web Speech audio narration, and instant grocery store orange juice rescue routing (`HypoglycemiaAlertService`).
+- **Medical Supply & Hospital Navigation Hub**: Off-the-shelf medical equipment finder (Pulse Oximeters, AEDs, CGM sensors, Bandaids, Fast-Acting Orange Juice, Benzocaine 20% Toothache Gel, Eugenol Cavity Putty) with 24/7 hospital ER geolocation (`MedicalSupplyNavigatorComponent`).
+- **Teledentistry FDI Odontogram & Periodontal Telemetry**: 32-Tooth FDI Notation grid (`11-48`), 5-surface anatomical caries/restoration mapping (M/O/D/F/L), periodontal probing depth (PPD), bleeding-on-probing (BOP), and salivary pH & biofilm risk monitoring (`TeledentistryOdontogramComponent`).
+- **Audio Biometric Respiratory Spectrogram**: 24-band FFT acoustic spectral analyzer classifying Expiratory Wheezing (850 Hz), Inspiratory Stridor (2400 Hz), and Nocturnal Cough Bursts (500 Hz) (`AudioRespiratoryVisualizerComponent`).
+- **CGM Continuous Glucose Monitoring Time-in-Range**: Real-time glycemic band analysis tracking Time-in-Range (70-180 mg/dL), Tight Range (70-140 mg/dL), Glycemic Variability (%CV <= 36%), and eA1c / GMI (`CgmTimeInRangeComponent`).
+- **XGBoost 30-Day Hospital Readmission & qSOFA Sepsis Model**: Calibrated ML scoring combining LACE index, prior 12-month admissions, serum lactate, and qSOFA sepsis escalation probability with 95% Conformal Prediction Intervals (`/ml/readmission-sepsis`).
+- **NSF & Academic Research Grant Portal**: Support for National Science Foundation Smart & Connected Health (SCH), TIP/SBIR Phase II, and PhD/Postdoc fellowship matchmaker (`NsfGrantPortalComponent`).
+- **Periodontal-Cardiovascular Systemic Bridge**: Computes Systemic Inflammatory Burden Index (SIBI), cardiovascular risk multiplier (1.0x-2.8x), and predicted HbA1c elevation driven by Red Complex oral bacteremia (`PeriodontalSystemicBridgeService`).
+- **Clinical Intelligence Risk Scorecards**: 9-point CHA2DS2-VASc stroke risk assessment (LOINC 89269-5) and Lee Revised Cardiac Risk Index (RCRI Classes I-IV) for 30-day perioperative MACE triage (`ClinicalScorecardComponent`).
+- **3D Somatic Movement, Yoga Asanas, PT & Pilates Coach**: Procedural 245-matrix pose generator across 7 stances, 5 spinal plane actions, and 7 arm/leg configurations with Three.js 3D mannequin rendering (`YogaAsana3dCoachComponent`).
+- **Wearable Bio-Haptic Feedback & Solfeggio Audio Engine**: 528 Hz (Cellular Repair), 432 Hz (Universal Harmonic & HRV), and 639 Hz (Vagal Co-Regulation) Solfeggio audio tones with Web Haptic vibration pulses (`BioHapticFeedbackService`).
+- **📖 Bionic Reading Lens Focus Engine**: Bolds initial 40% characters of words to accelerate reading speed 3x and eliminate cognitive fatigue across all 13 specialized clinical lenses (`BionicReadingService`).
+- **🌾 Seasonal Dinacharya & Ritu-Charya Matrix**: Spring (Vasanta), Summer (Greeshma), Autumn (Sharad), Winter (Hemanta) seasonal bio-rhythms with 16:8 circadian fasting window calculator (`PrecisionNutritionCalculatorComponent`).
+- **Precision Chrono-Nutrition & Glycemic Engine**: 8-hour intermittent fasting schedule visualizer, tri-paradigm botanical food matrix (Matcha EGCG, Broccoli Sprouts Sulforaphane, Mung Bean & Ginger Stew, Nisha Amalaki), and -35% postprandial glucose spike simulator (`PrecisionNutritionCalculatorComponent`).
+- **Dual-Audience Reading Level System**: Dual plain 6th-grade layperson vs. MD/PhD scientific clinical decoder with Web Speech narration (`MedicalDecoderService`).
+- **Optical rPPG Camera Pulse Sampler**: Dermal 530nm green-channel photoplethysmography camera pulse extractor (`SpatialScannerComponent`).
+- **1-Thumb Quick-Dial Haptic Vitals HUD**: Tactile touch stepper controls for HR, BP, Temp, and SpO2 with mobile haptic vibration feedback (`VitalsQuickDialHudComponent`).
+- **Multi-Vitals BLE GATT Service**: Support for Heart Rate (`0x180D`), Pulse Oximetry (`0x1822`), Health Thermometer (`0x1809`), and Blood Pressure (`0x1810`).
 - **Family Pedigree Tree & Risk Pruning**: 3-generation pedigree tree visualizer (`FamilyTreePedigreeComponent`) with interactive risk pruning.
-- **In-Line Medical Term Decoder**: Contextual hover tooltips (`MedicalDecoderService` / `MedicalDecoderPipe`) decoding 50+ clinical terms.
-- **TED-Style Patient Hero Journey**: 3-Act narrative generator (`ClinicalStorytellingService`) with Web Speech audio narration.
-- `get_patient_state`: Retrieves current patient demographics, vitals, CMP lab panel, and active symptoms.
-- `update_patient_vitals`: Pushes updated vital signs (HR, BP, SpO2, Temp) or CMP laboratory values.
+- `get_patient_state`: Retrieves current patient demographics, vitals, CGM continuous glucose monitoring (`cgmGlucoseMgDl`), CMP lab panel, and active symptoms.
+- `update_patient_vitals`: Pushes updated vital signs (HR, BP, SpO2, Temp, CGM Glucose) or CMP laboratory values.
 - `trigger_fhir_r5_stream`: Toggles live FHIR R5 biometric telemetry streaming.
-- `connect_ble_wearable`: Connects to Apple Watch / Garmin Web Bluetooth GATT Heart Rate Service (`0x180D`).
-- `toggle_dermatome_layer`: Activates interactive WebGL 3D spine & dermatome nerve root mapping.
+- `connect_ble_wearable`: Connects to Apple Watch / Garmin Web Bluetooth GATT Heart Rate (`0x180D`), Pulse Oximeter (`0x1822`), Thermometer (`0x1809`), and Blood Pressure (`0x1810`) Services.
+- `toggle_dermatome_layer`: Activates interactive WebGL 3D spine & dermatome nerve root mapping with SIGGRAPH shaders and Vision Accessibility controls.
 - `generate_companion_sync_link`: Produces dynamic FHIR R4 Smart Launch QR code and deep links (`pocketgull://sync?...`).
 - `generate_specialist_handoff`: Serializes patient state into an expanded base64 handoff URL and SBAR note for specialist referrals.
 - `generate_care_plan`: Triggers multi-paradigm clinical strategy generation across all 13 specialized lenses.

@@ -499,6 +499,15 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
               </svg>
               <span class="hidden sm:inline">Docs</span>
             </a>
+            <!-- Somatic Box-Breathing Grounding (Zamecznik Canvas) -->
+            <button (click)="triggerSomaticGrounding()" 
+                    aria-label="Somatic Grounding & Box Breathing"
+                    title="Open Somatic Grounding & Box Breathing Canvas"
+                    class="group shrink-0 flex items-center gap-1.5 px-3 py-2 border border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-extrabold uppercase tracking-wider transition-colors rounded-md cursor-pointer">
+              <span>🧘</span>
+              <span class="hidden md:inline">Grounding</span>
+            </button>
+            
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
                     aria-label="Start Tour Guide"
@@ -524,21 +533,12 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                  @case ('light') {
                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                  }
-                 @case ('papercraft') {
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#F6B12B] transform hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                     <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                     <polyline points="2 17 12 22 22 17" />
-                     <polyline points="2 12 12 17 22 12" />
-                   </svg>
+                 @case ('spark') {
+                   <span class="text-xs" title="Spark Mode">✨</span>
                  }
-                 @case ('hemp') { <span class="text-xs">🌿</span> }
-                 @case ('rice') { <span class="text-xs">🌾</span> }
-                 @case ('construction') { <span class="text-xs">🎨</span> }
-                 @case ('white-marble') { <span class="text-xs" title="White Marble Theme">🏛️</span> }
-                 @case ('black-marble') { <span class="text-xs" title="Black Marble Theme">🌌</span> }
-                 @case ('papyrus') { <span class="text-xs" title="Papyrus Cave Theme">🏺</span> }
-                 @case ('pool') { <span class="text-xs" title="Pool Ripples Theme">🏊</span> }
-                 @case ('mandala') { <span class="text-xs" title="Sacred Mandala Theme">☸️</span> }
+                 @case ('system') {
+                   <span class="text-xs" title="System Theme">💻</span>
+                 }
                  @default { <span class="text-xs">🎨</span> }
               }
             </button>
@@ -662,9 +662,11 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
              <!-- EXPORT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="exportMenuOpen.set(true)" (mouseleave)="exportMenuOpen.set(false)">
                <button
+                       aria-label="Export Menu Options"
                        class="snap-start shrink-0 flex items-center gap-2 px-3 py-1.5 border border-gray-300 dark:border-zinc-700 transition-colors text-[12px] font-bold uppercase tracking-widest text-gray-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-gray-500 dark:text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                 <span class="hidden sm:inline">Export</span>
+                 <span class="sr-only">Export Options</span>
+                 <span class="hidden sm:inline" aria-hidden="true">Export</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </button>
                
@@ -693,9 +695,11 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
              <!-- CONNECT DROPDOWN -->
              <div class="relative group dropdown-container" (mouseenter)="connectMenuOpen.set(true)" (mouseleave)="connectMenuOpen.set(false)">
                <button
+                       aria-label="Imports Menu Options"
                        class="shrink-0 flex items-center gap-2 px-3 py-1.5 border border-[#4285F4]/20 dark:border-[#4285F4]/30 transition-colors text-[12px] font-bold uppercase tracking-widest text-[#4285F4] dark:text-[#4285F4] bg-[#4285F4]/5 dark:bg-[#4285F4]/10 hover:bg-[#4285F4]/10 dark:hover:bg-[#4285F4]/20 rounded-md">
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                 <span class="hidden sm:inline">Imports</span>
+                 <span class="sr-only">Import Options</span>
+                 <span class="hidden sm:inline" aria-hidden="true">Imports</span>
                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 ml-1 transition-transform group-hover:rotate-180 hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                </button>
 
@@ -742,15 +746,15 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
              <div class="w-px h-4 bg-gray-300 dark:bg-zinc-700 shrink-0 mx-1 hidden sm:block"></div>
 
              <button (click)="finalizeRecord()"
-                    
+                     aria-label="Finalize and Archive Record"
                      id="tour-finalize-btn"
                      class="shrink-0 group flex items-center gap-2 px-3 py-1.5 border border-[#689F38]/20 dark:border-[#689F38]/30 transition-colors text-[12px] font-bold uppercase tracking-widest disabled:opacity-50 text-[#689F38] dark:text-[#689F38] bg-[#689F38]/5 dark:bg-[#689F38]/10 hover:bg-[#689F38]/10 dark:hover:bg-[#689F38]/20 rounded-md">
                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-               <span class="hidden sm:inline">Finalize & Archive</span>
+               <span class="sr-only">Finalize and Archive Record</span>
+               <span class="hidden sm:inline" aria-hidden="true">Finalize & Archive</span>
              </button>
            </div>
-        </nav>
-
+         </nav>
 
         <!-- Main Grid Layout -->
         <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
@@ -893,7 +897,7 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                       [class.shadow-none]="isChartCollapsed()"
                       [class.bg-[#F9FAFB]]="isChartCollapsed()"
                       [class.dark:bg-[#09090b]]="isChartCollapsed()">
-                     @defer {
+                     @defer (on immediate) {
                        <app-analysis-container class="flex flex-col flex-1 min-h-0 min-w-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]" appReveal [revealDelay]="100"></app-analysis-container>
                      } @placeholder {
                        <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Core AI Synthesis...</div>
@@ -905,7 +909,10 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                      <app-research-tab class="block h-full" [hits]="intelligence.researchHits()"></app-research-tab>
                    </div>
                  }
+              </div>
             </div>
+          </main>
+        }
 
             <!-- Pocket: Floating Voice Assistant -->
             @if (state.isLiveAgentActive()) {
@@ -979,10 +986,11 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                       <app-voice-assistant id="tour-voice-assistant" class="block h-full w-full mix-blend-normal bg-white/70 dark:bg-black/50 backdrop-blur-md"></app-voice-assistant>
                     }
                  </div>
-              </div>
-            }
-
+               </div>
+             }
+          }
         </div>
+      }
         
         @if(state.isResearchFrameVisible()) {
             @defer (on immediate) {
@@ -1316,13 +1324,7 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
         </div>
       </div>
     }
-    
-        </main>
-        }
-      }
-    </div>
     <app-zamecznik-canvas></app-zamecznik-canvas>
-  }
   `,
   styles: [`
     :host { display: block; min-height: 100%; }
@@ -1335,6 +1337,12 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
 export class AppComponent implements OnDestroy {
   readonly showGlossaryModal = signal<boolean>(false);
   private _translateTimer: any = null;
+
+  triggerSomaticGrounding(): void {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('somatic-grounding-activate'));
+    }
+  }
 
   private debouncedTranslate(text: string, level: any) {
     if (this._translateTimer) {
@@ -1380,9 +1388,7 @@ export class AppComponent implements OnDestroy {
     const hasKey = this.hasApiKey();
     const onboard = this.session.isOnboardingComplete();
     const emergency = this.state.isEmergencyMode();
-    const show = (locked || !hasKey || !onboard) && !emergency;
-    console.log('[DEBUG SHOW SPLASH]', { locked, hasKey, onboard, emergency, show });
-    return show;
+    return (locked || !hasKey || !onboard) && !emergency;
   });
   isDemoMode = this.state.isDemoMode;
   readonly showCompanionSyncModal = signal<boolean>(false);
@@ -1992,7 +1998,7 @@ export class AppComponent implements OnDestroy {
   }
 
   cycleTheme() {
-    const themes: AppTheme[] = ['papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'light', 'dark'];
+    const themes: AppTheme[] = ['light', 'dark', 'system', 'spark'];
     const current = this.theme.currentTheme();
     const nextIdx = (themes.indexOf(current) + 1) % themes.length;
     this.theme.setTheme(themes[nextIdx]);
@@ -2426,15 +2432,17 @@ export class AppComponent implements OnDestroy {
         untracked(() => {
           this.isAnalysisCollapsed.set(false);
           this.isChartCollapsed.set(false);
+          this.mobileActiveTab.set('analysis');
         });
       }
     });
   }
 
   ngOnDestroy(): void {
-    if (navigator.modelContext) {
+    const modelContext = (document as any).modelContext || (navigator as any).modelContext;
+    if (modelContext) {
       this.mcpControllers.forEach(item => {
-        (navigator.modelContext as any).unregisterTool?.(item.name);
+        (modelContext as any).unregisterTool?.(item.name);
         item.controller.abort();
       });
       this.mcpControllers = [];

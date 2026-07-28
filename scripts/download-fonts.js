@@ -74,7 +74,11 @@ async function main() {
     }
     
     // Write the local CSS to public/fonts/fonts.css
-    fs.writeFileSync(path.join(fontsDir, 'fonts.css'), localCssText);
+    const cssPath = path.resolve(fontsDir, 'fonts.css');
+    if (!cssPath.startsWith(fontsDir)) {
+      throw new Error(`Security Exception: Path traversal attempt detected: ${cssPath}`);
+    }
+    fs.writeFileSync(cssPath, localCssText);
     console.log("Fonts CSS written to public/fonts/fonts.css");
 }
 

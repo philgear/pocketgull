@@ -20,6 +20,7 @@ import { GoogleAuth } from 'google-auth-library';
 import { WebSocketServer, WebSocket } from 'ws';
 // @ts-ignore
 import AgonesSDK from '@google-cloud/agones-sdk';
+import { sanitizeLogInput, securePathResolve, isValidRedirectUrl } from './utils/security-helper';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -92,7 +93,9 @@ const redirectDomains = [
 app.use((req, res, next) => {
   const host = req.hostname;
   if (redirectDomains.includes(host)) {
-    return res.redirect(301, `https://${targetDomain}${req.originalUrl}`);
+    const rawPath = req.originalUrl || '/';
+    const safePath = isValidRedirectUrl(rawPath) ? rawPath : '/';
+    return res.redirect(301, `https://${targetDomain}${safePath}`);
   }
   next();
 });
@@ -295,7 +298,7 @@ app.post('/api/csp-report', express.json({ type: ['application/json', 'applicati
   if (process.env['NODE_ENV'] === 'production') {
     return res.status(404).send('Not Found');
   }
-  console.log('[CSP Violation Report]:', req.body);
+  console.log('[CSP Violation Report]:', sanitizeLogInput(req.body));
   res.status(204).end();
 });
 
@@ -884,8 +887,10 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
 
       const safeContents = sanitizeApiPayload(session.history);
       const safeSystemInstruction = typeof session.systemInstruction === 'string' ? session.systemInstruction : '';
+      const allowedModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemma-2-9b-it', 'medgemma-2-9b'];
+      const safeModel = allowedModels.includes(rawModel) ? rawModel : 'gemini-2.5-flash';
 
-      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${rawModel}:generateContent?key=${key}`, {
+      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${safeModel}:generateContent?key=${key}`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -997,9 +1002,10 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
     });
 
     // Save sanitized patient objects
-    fs.writeFileSync(patientsDbPath, JSON.stringify(sanitizedArray, null, 2));
+    const safePatientsDbPath = securePathResolve(__dirname, 'data', 'patients.json');
+    fs.writeFileSync(safePatientsDbPath, JSON.stringify(sanitizedArray, null, 2));
 
-    console.log(`[API] Saved ${req.body.length} patients to database.`);
+    console.log(`[API] Saved ${sanitizeLogInput(req.body?.length)} patients to database.`);
     res.status(200).json({ success: true, count: req.body.length });
   } catch (err: any) {
     console.error('[API] Error saving patients database:', err);
@@ -1014,7 +1020,8 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
     }
 
-    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    const safePatientsDbPath = securePathResolve(__dirname, 'data', 'patients.json');
+    const data = fs.readFileSync(safePatientsDbPath, 'utf8');
     const patients = JSON.parse(data);
     const index = patients.findIndex((p: any) => p.id === id);
 
@@ -1038,8 +1045,8 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       patients.push({ ...sanitizedPayload, id });
     }
 
-    fs.writeFileSync(patientsDbPath, JSON.stringify(patients, null, 2));
-    console.log(`[API] Synced patient ${id} from mobile/app to database.`);
+    fs.writeFileSync(safePatientsDbPath, JSON.stringify(patients, null, 2));
+    console.log(`[API] Synced patient ${sanitizeLogInput(id)} from mobile/app to database.`);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
   } catch (err: any) {
     console.error('[API] Error syncing patient to database:', err);

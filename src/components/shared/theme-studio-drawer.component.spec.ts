@@ -31,20 +31,20 @@ describe('ThemeStudioDrawerComponent', () => {
   it('should initialize theme options and categories', () => {
     const studio = createStudio();
     expect(studio).toBeTruthy();
-    expect(studio.categories.length).toBe(4);
-    expect(studio.themeOptions.length).toBeGreaterThan(10);
+    expect(studio.categories.length).toBe(2);
+    expect(studio.themeOptions.length).toBe(4);
   });
 
   it('should filter themes by category cleanly', () => {
     const studio = createStudio();
-    const tactile = studio.getThemesByCategory('Tactile Paper');
-    expect(tactile.length).toBe(4);
-    expect(tactile.some(t => t.id === 'rice')).toBe(true);
+    const clinical = studio.getThemesByCategory('Clinical');
+    expect(clinical.length).toBe(3);
+    expect(clinical.some(t => t.id === 'light')).toBe(true);
   });
 
   it('should cycle primary themes correctly on fast cycle', () => {
     const studio = createStudio();
-    studio.themeService.currentTheme.set('rice');
+    studio.themeService.currentTheme.set('light');
     studio.cyclePrimaryTheme();
     expect(studio.themeService.currentTheme()).toBe('dark');
   });

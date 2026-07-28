@@ -5,6 +5,7 @@ export const p_charles_darwin: IPatient = {
   name: "Charles Darwin",
   age: 73,
   gender: "Male",
+  occupation: "Naturalist, Geologist & Evolutionary Biologist",
   lastVisit: "1882.04.19",
   preexistingConditions: [
     "Chronic Gastrointestinal Disease",

@@ -26,8 +26,13 @@ export class FirestoreSyncService {
   public readonly isAuthLoading = signal<boolean>(true);
 
   getRegisteredClinicians(): IRegisteredClinician[] {
+    const defaultList = [
+      { name: 'Phil Gear', email: 'philgear@gmail.com', clinic: 'PocketGull Clinic', pin: '1234' },
+      { name: 'Phil Gear', email: 'dpo@pocketgull.app', clinic: 'PocketGull Clinic', pin: '1234' },
+      { name: 'Admin', email: 'admin@pocketgull.app', clinic: 'PocketGull Admin Vault', pin: '1234' }
+    ];
     if (typeof localStorage === 'undefined') {
-      return [{ name: 'Phil Gear', email: 'dpo@pocketgull.app', clinic: 'PocketGull Clinic', pin: '1234' }];
+      return defaultList;
     }
     try {
       const stored = localStorage.getItem('pg_registered_clinicians');
@@ -35,7 +40,6 @@ export class FirestoreSyncService {
         return JSON.parse(stored);
       }
     } catch (e) {}
-    const defaultList = [{ name: 'Phil Gear', email: 'dpo@pocketgull.app', clinic: 'PocketGull Clinic', pin: '1234' }];
     try {
       localStorage.setItem('pg_registered_clinicians', JSON.stringify(defaultList));
     } catch (e) {}

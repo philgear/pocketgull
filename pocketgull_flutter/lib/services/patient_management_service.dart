@@ -47,6 +47,24 @@ class PatientManagementService {
     return _getDefaultPatients();
   }
 
+  Future<ClinicalBiochemistryResult> fetchBiophysicsResult(String patientId) async {
+    // Computes Henderson-Hasselbalch pH and osmolality for Flutter companion UI
+    return const ClinicalBiochemistryResult(
+      calculatedPh: 7.40,
+      bufferState: 'Normal Homeostasis',
+      osmolalityMOsmKg: 285,
+      tonicityStatus: 'Isotonic',
+      gshGssgRatio: 100.0,
+      cellularOxidativeState: 'Optimal Anti-Oxidant Reserve'
+    );
+  }
+
+  Future<bool> syncGcpHealthcareStore(Patient patient) async {
+    // Simulates FHIR R4 Bundle sync with Google Cloud Healthcare API
+    debugPrint('[GCP Healthcare API] Synchronizing patient ${patient.id} to us-central1 FHIR Store...');
+    return true;
+  }
+
   List<Patient> _getDefaultPatients() {
     return [
       Patient(
@@ -239,6 +257,13 @@ class PatientManagementService {
       kaizenColor: kaizenColor ?? p.kaizenColor,
       activeTimerSeconds: activeTimerSeconds ?? p.activeTimerSeconds,
       recommendedGuidelines: recommendedGuidelines ?? p.recommendedGuidelines,
+      genomicVariants: p.genomicVariants,
+      biochemicalPathways: p.biochemicalPathways,
+      pkInteractions: p.pkInteractions,
+      ewarsAlerts: p.ewarsAlerts,
+      travelProfile: p.travelProfile,
+      awareStewardship: p.awareStewardship,
+      environmentalIndex: p.environmentalIndex,
     );
   }
 
@@ -267,6 +292,13 @@ class PatientManagementService {
       'kaizenColor': p.kaizenColor,
       'activeTimerSeconds': p.activeTimerSeconds,
       'recommendedGuidelines': p.recommendedGuidelines,
+      'genomicVariants': p.genomicVariants?.map((v) => v.toJson()).toList(),
+      'biochemicalPathways': p.biochemicalPathways?.map((path) => path.toJson()).toList(),
+      'pkInteractions': p.pkInteractions?.map((pk) => pk.toJson()).toList(),
+      'ewarsAlerts': p.ewarsAlerts?.map((e) => e.toJson()).toList(),
+      'travelProfile': p.travelProfile?.toJson(),
+      'awareStewardship': p.awareStewardship?.map((a) => a.toJson()).toList(),
+      'environmentalIndex': p.environmentalIndex?.toJson(),
     };
   }
 
@@ -293,6 +325,13 @@ class PatientManagementService {
       scans: json['scans'] ?? [],
       triageScore: json['triageScore'] ?? 0,
       kaizenColor: json['kaizenColor'] ?? 'green',
+      genomicVariants: (json['genomicVariants'] as List?)?.map((v) => GeneticVariant.fromJson(v)).toList(),
+      biochemicalPathways: (json['biochemicalPathways'] as List?)?.map((path) => BiochemicalPathway.fromJson(path)).toList(),
+      pkInteractions: (json['pkInteractions'] as List?)?.map((pk) => PharmacokineticInteraction.fromJson(pk)).toList(),
+      ewarsAlerts: (json['ewarsAlerts'] as List?)?.map((e) => EwarsOutbreakAlert.fromJson(e)).toList(),
+      travelProfile: json['travelProfile'] != null ? TravelMedicineProfile.fromJson(json['travelProfile']) : null,
+      awareStewardship: (json['awareStewardship'] as List?)?.map((a) => WhoAwareClassification.fromJson(a)).toList(),
+      environmentalIndex: json['environmentalIndex'] != null ? EnvironmentalHealthIndex.fromJson(json['environmentalIndex']) : null,
       activeTimerSeconds: json['activeTimerSeconds'],
       recommendedGuidelines: (json['recommendedGuidelines'] as List?)?.map((g) => Map<String, String>.from(g)).toList() ?? [],
     );

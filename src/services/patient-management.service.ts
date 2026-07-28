@@ -189,7 +189,7 @@ export class PatientManagementService implements OnDestroy {
             return;
           }
         } catch (err) {
-          console.warn('[PatientManagementService] Failed to load roster from SQL Connect, trying backend HTTP:', err);
+          console.log('[PatientManagementService] SQL Connect offline, initializing roster via backend HTTP & local cache');
         }
 
         try {
@@ -373,7 +373,7 @@ export class PatientManagementService implements OnDestroy {
     this.selectedPatientId.set(id);
 
     if (id === 'p_marie_curie') {
-      this.themeService.setTheme('curie');
+      this.themeService.setTheme('dark');
     }
   }
 

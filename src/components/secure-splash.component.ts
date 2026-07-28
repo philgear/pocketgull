@@ -609,39 +609,39 @@ import { environment } from '../environments/environment';
             <div class="space-y-4 text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
               
               <!-- Doctor-Patient Confidentiality Info -->
-              <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
+              <div class="p-3.5 bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/80 rounded-2xl space-y-1 shadow-sm">
                 <div class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Confidentiality & Privacy</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-700 dark:text-emerald-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  <span class="text-xs font-black uppercase tracking-wider text-emerald-900 dark:text-emerald-200">Confidentiality & Privacy</span>
                 </div>
-                <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
+                <p class="text-[11.5px] text-zinc-800 dark:text-zinc-200 font-medium leading-relaxed">
                   Demo Environment Active: All clinical data and consults run in an isolated sandbox. Patient details are fully simulated, ensuring zero transmission or disclosure of actual protected health information (PHI).
                 </p>
               </div>
 
               <!-- Good Samaritan Details -->
-              <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
+              <div class="p-3.5 bg-rose-50/90 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800/80 rounded-2xl space-y-1 shadow-sm">
                 <div class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-655 dark:text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">Good Samaritan Bypass</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-rose-700 dark:text-rose-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <span class="text-xs font-black uppercase tracking-wider text-rose-900 dark:text-rose-200">Good Samaritan Bypass</span>
                 </div>
-                <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
+                <p class="text-[11.5px] text-zinc-800 dark:text-zinc-200 font-medium leading-relaxed">
                   In acute crises, bypass the lock screen using the emergency trigger at the bottom. This isolates clinical records, runs offline-first triages, and starts the synchronized 110 BPM chest-compression pacing metronome.
                 </p>
               </div>
 
               <!-- ACM Code of Ethics (No False Data) Details -->
-              <div class="p-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-xl space-y-1">
+              <div class="p-3.5 bg-sky-50/90 dark:bg-sky-950/40 border border-sky-300 dark:border-sky-800/80 rounded-2xl space-y-1 shadow-sm">
                 <div class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-brand-blue-600 dark:text-brand-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-sky-700 dark:text-sky-300 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14 2 14 8 20 8"/>
                     <line x1="16" y1="13" x2="8" y2="13"/>
                     <line x1="16" y1="17" x2="8" y2="17"/>
                   </svg>
-                  <span class="text-[12px] font-bold uppercase tracking-widest text-zinc-700 dark:text-zinc-300">ACM Code of Ethics (No False Data)</span>
+                  <span class="text-xs font-black uppercase tracking-wider text-sky-900 dark:text-sky-200">ACM Code of Ethics (No False Data)</span>
                 </div>
-                <p class="text-[8.5px] text-zinc-655 dark:text-zinc-400 leading-normal">
+                <p class="text-[11.5px] text-zinc-800 dark:text-zinc-200 font-medium leading-relaxed">
                   In compliance with ACM Principle 1.3: We prohibit fabrication or falsification of data. Our Medical Auditor AI continuously runs real-time checks on all generated clinical content, flagging any hallucinations or discrepancies against the source transcript.
                 </p>
               </div>
@@ -653,8 +653,8 @@ import { environment } from '../environments/environment';
                        name="pledge-accepted"
                        [checked]="pledgeAccepted()"
                        (change)="pledgeAccepted.set(!pledgeAccepted())"
-                       class="w-3.5 h-3.5 mt-0.5 shrink-0 rounded border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-black text-[#ef6658] focus:ring-[#ef6658]/30 cursor-pointer transition-colors">
-                <span class="text-[12px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-800 dark:group-hover:text-zinc-300 transition-colors leading-normal uppercase tracking-wide">
+                       class="w-4 h-4 mt-0.5 shrink-0 rounded border-zinc-400 dark:border-zinc-600 bg-zinc-50 dark:bg-black text-[#ef6658] focus:ring-[#ef6658]/30 cursor-pointer transition-colors">
+                <span class="text-xs text-zinc-700 dark:text-zinc-300 font-medium group-hover:text-zinc-900 dark:group-hover:text-white transition-colors leading-relaxed uppercase tracking-wide">
                   I pledge to uphold doctor-patient confidentiality, the ACM Code of Ethics (Principle 1.3: Honesty & No False Data), and Good Samaritan values under professional ethical codes.
                 </span>
               </label>
@@ -764,12 +764,12 @@ import { environment } from '../environments/environment';
         <button 
           type="button" 
           (click)="handleEmergencyBypass()"
-          class="mt-3 w-full py-2.5 bg-red-50/80 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/50 border border-red-200 dark:border-red-800/60 hover:border-red-300 dark:hover:border-red-600/80 text-red-655 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-[10px] font-bold uppercase tracking-[0.15em] rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-xs active:scale-[0.98]"
+          class="mt-3.5 w-full py-3.5 bg-rose-600 hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-600 text-white font-extrabold text-xs uppercase tracking-[0.18em] rounded-2xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg border border-rose-400 dark:border-rose-500 cursor-pointer active:scale-[0.98]"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-red-600 dark:text-red-500 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5v14M5 12h14"/>
           </svg>
-          <span>Good Samaritan Mode (Bypass)</span>
+          <span class="font-extrabold">Good Samaritan Mode (Bypass)</span>
         </button>
 
         <!-- Terms and Privacy Links -->

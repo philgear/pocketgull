@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'dart:html' as html; // Only works on web
+import 'web_download.dart';
 import '../models/patient_types.dart';
 import 'clinical_intelligence_service.dart';
 
@@ -271,11 +271,6 @@ class ExportService {
     };
 
     final jsonString = jsonEncode(bundle);
-    final blob = html.Blob([jsonString], 'application/json');
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    html.AnchorElement(href: url)
-      ..setAttribute("download", "PocketGull_FHIR_${patient.name.replaceAll(' ', '_')}.json")
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    triggerWebDownload(jsonString, "PocketGull_FHIR_${patient.name.replaceAll(' ', '_')}.json");
   }
 }

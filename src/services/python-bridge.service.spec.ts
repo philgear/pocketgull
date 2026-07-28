@@ -33,10 +33,18 @@ describe('PythonBridgeService', () => {
     };
 
     // Spy on global fetch
-    fetchSpy = vi.fn().mockImplementation(() => 
+    fetchSpy = vi.fn().mockImplementation((url: string) => 
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
+        json: () => Promise.resolve(url.includes('readmission-sepsis') ? {
+          readmission_30d_probability: 0.22,
+          readmission_risk_level: 'Moderate',
+          lace_index_score: 8,
+          qsofa_sepsis_score: 1,
+          sepsis_escalation_risk: 'Moderate Sepsis Risk',
+          conformal_confidence_interval: [0.14, 0.30],
+          primary_driving_features: ['Elevated Serum Lactate']
+        } : {
           risk_level: 'moderate',
           risk_score: 0.35,
           confidence: 0.85,
@@ -61,6 +69,13 @@ describe('PythonBridgeService', () => {
 
     // Clear initial health check call to isolate tests
     fetchSpy.mockClear();
+  });
+
+  it('should fetch readmission and sepsis score from Python bridge or use fallback', async () => {
+    const result = await service.fetchReadmissionSepsisScore();
+    expect(result).toBeTruthy();
+    expect(result.readmission_30d_probability).toBeGreaterThanOrEqual(0.0);
+    expect(result.qsofa_sepsis_score).toBeGreaterThanOrEqual(0);
   });
 
   it('should format payload correctly and fetch risk score', async () => {

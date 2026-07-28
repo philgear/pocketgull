@@ -44,6 +44,17 @@ export class PatientStateService {
     customLiDARScanUrl: null
   });
 
+  readonly hasActiveIssues = computed(() => {
+    const issues = this.issues();
+    const vitals = this.vitals();
+    const cgm = parseFloat(vitals?.cgmGlucoseMgDl || '110');
+    const hr = parseFloat(vitals?.hr || '72');
+    const spO2 = parseFloat(vitals?.spO2 || '98');
+    const hasBodyPartPain = Object.keys(issues).length > 0;
+    const hasVitalsDeviation = hr > 100 || hr < 50 || spO2 < 95 || cgm < 70 || cgm > 180;
+    return hasBodyPartPain || hasVitalsDeviation || this.isEmergencyMode();
+  });
+
   readonly prescribedToolsList = computed(() => {
     const states = this.toolStates();
     const prescribedKeys = Object.keys(states).filter(k => states[k] === 'prescribed');
@@ -225,6 +236,7 @@ export class PatientStateService {
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
+  readonly isQuietMinimalUiMode = signal<boolean>(true);
   readonly isAudioPrimaryMode = signal<boolean>(false);
   readonly isGammaSyncActive = signal<boolean>(false);
   readonly sentinelScope = signal<'micro-patient' | 'macro-fleet'>('micro-patient');
@@ -259,6 +271,13 @@ export class PatientStateService {
     { resourceType: 'Observation', geneSymbol: 'CYP2D6', variantCode: '*4/*4', phenotype: 'Poor' },
     { resourceType: 'Observation', geneSymbol: 'CYP2C19', variantCode: '*2/*2', phenotype: 'Poor' }
   ]);
+  readonly genomicVariants = signal<import('./patient.types').IGeneticVariant[]>([]);
+  readonly biochemicalPathways = signal<import('./patient.types').IBiochemicalPathway[]>([]);
+  readonly pkInteractions = signal<import('./patient.types').IPharmacokineticInteraction[]>([]);
+  readonly ewarsAlerts = signal<import('./patient.types').IEwarsOutbreakAlert[]>([]);
+  readonly travelProfile = signal<import('./patient.types').ITravelMedicineProfile | null>(null);
+  readonly awareStewardship = signal<import('./patient.types').IWhoAwareClassification[]>([]);
+  readonly environmentalIndex = signal<import('./patient.types').IEnvironmentalHealthIndex | null>(null);
   readonly clinicianRole = signal<'Cardiology' | 'Integrative' | 'Public Health' | 'General'>('General');
   readonly paretoWeights = signal<import('./patient.types').IMlParetoWeights>({ costWeight: 0.33, speedWeight: 0.33, adherenceWeight: 0.34 });
   readonly banditState = signal<import('./patient.types').IMlBanditState>({
@@ -309,19 +328,32 @@ export class PatientStateService {
   // --- Patient Data State ---
   readonly issues = signal<Record<string, IBodyPartIssue[]>>({});
   readonly patientGoals = signal<string>("");
-  readonly    vitals = signal<IPatientVitals>({
+  readonly vitals = signal<IPatientVitals>({
         bp: '',
         hr: '',
         temp: '',
         spO2: '',
         weight: '',
         height: '',
+        cgmGlucoseMgDl: '',
         vitC: '',
         vitD3: '',
         magnesium: '',
         zinc: '',
         b12: ''
     });
+
+  /** Computed CGM Glucose status derived from real-time continuous glucose monitor telemetry. */
+  readonly cgmGlucoseStatus = computed<'normal' | 'elevated' | 'hypoglycemic' | 'hyperglycemic' | 'unknown'>(() => {
+    const raw = this.vitals()?.cgmGlucoseMgDl;
+    if (!raw) return 'unknown';
+    const val = parseFloat(raw);
+    if (isNaN(val)) return 'unknown';
+    if (val < 70) return 'hypoglycemic';
+    if (val <= 140) return 'normal';
+    if (val <= 180) return 'elevated';
+    return 'hyperglycemic';
+  });
 
     readonly dynamicNutrients = signal<import('./patient.types').IDynamicMarker[]>([]);
   readonly oxidativeStressMarkers = signal<import('./patient.types').IDynamicMarker[]>([]);
@@ -336,6 +368,32 @@ export class PatientStateService {
 
   // A trigger to force the UI to expand the analysis panel when an item is selected/clicked
   readonly uiExpandTrigger = signal<number>(0);
+
+  // --- Clinician Manual Override & Smart Data Presence Computed Signals ---
+  readonly showAllInstrumentsOverride = signal<boolean>(false);
+  readonly activeDrilldownComponent = signal<'biomarkers' | 'occupational' | 'food_safety' | 'ybocs' | 'qaly' | 'foraging' | 'vagal' | null>(null);
+
+  readonly hasOccupationalData = computed(() => {
+    const occ = this.occupation();
+    return !!(occ && occ.trim().length > 0 && occ.toLowerCase() !== 'unassigned');
+  });
+
+  readonly hasAllergiesOrDietaryData = computed(() => {
+    const proto = this.dietaryProtocol();
+    return !!(proto && proto.trim().length > 0);
+  });
+
+  readonly hasPsychiatricData = computed(() => {
+    const complaint = (this.reasonForVisit() || '').toLowerCase();
+    const issuesStr = Object.keys(this.issues() || {}).join(' ').toLowerCase();
+    return complaint.includes('ocd') || complaint.includes('anxiety') || complaint.includes('compulsive') || complaint.includes('panic') || issuesStr.includes('ocd') || issuesStr.includes('anxiety');
+  });
+
+  readonly hasLabBiomarkerData = computed(() => {
+    const nut = this.dynamicNutrients();
+    const ox = this.oxidativeStressMarkers();
+    return (nut && nut.length > 0) || (ox && ox.length > 0);
+  });
 
   private storage = inject(StorageService);
   private game = inject(GamificationService);
@@ -900,6 +958,13 @@ export class PatientStateService {
     this.patientAge.set(0);
     this.patientGender.set('');
     this.patientHistory.set([]);
+    this.genomicVariants.set([]);
+    this.biochemicalPathways.set([]);
+    this.pkInteractions.set([]);
+    this.ewarsAlerts.set([]);
+    this.travelProfile.set(null);
+    this.awareStewardship.set([]);
+    this.environmentalIndex.set(null);
   }
 
   /** Set AI-detected anomaly highlights on body parts. Called after analysis completes. */
@@ -957,6 +1022,13 @@ export class PatientStateService {
     } else {
       this.biometricHistory.set([]);
     }
+    this.genomicVariants.set(state.genomicVariants || []);
+    this.biochemicalPathways.set(state.biochemicalPathways || []);
+    this.pkInteractions.set(state.pkInteractions || []);
+    this.ewarsAlerts.set(state.ewarsAlerts || []);
+    this.travelProfile.set(state.travelProfile || null);
+    this.awareStewardship.set(state.awareStewardship || []);
+    this.environmentalIndex.set(state.environmentalIndex || null);
     this.autoPrescribeToolsFromPatientData(patient);
   }
 
@@ -1023,6 +1095,13 @@ export class PatientStateService {
             shoppingList: this.shoppingList(),
             ayurvedicStatus: this.ayurvedicStatus(),
             biometricHistory: this.biometricHistory(),
+            genomicVariants: this.genomicVariants(),
+            biochemicalPathways: this.biochemicalPathways(),
+            pkInteractions: this.pkInteractions(),
+            ewarsAlerts: this.ewarsAlerts(),
+            travelProfile: this.travelProfile(),
+            awareStewardship: this.awareStewardship(),
+            environmentalIndex: this.environmentalIndex(),
         } as any;
   }
 

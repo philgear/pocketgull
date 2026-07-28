@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-07-27
+
+**Container Security Hardening (5 CVE Fixes), Google Cloud Data Agent Proxy Integration, Multiplatform Flutter Web Download Architecture, and Java 21 Toolchain Alignment**
+
+### Security & Hardening
+- **[Container Security / CVE Remediation] Package Dependency Overrides (`package.json`)**:
+  - Updated transient dependency overrides for `undici` (`>=7.29.0`) and `tar` (`>=7.5.22`).
+  - Resolved 5 Artifact Registry Container Scanner CVE vulnerabilities (`CVE-2026-12151` [High], `CVE-2026-9679` [Medium], `CVE-2026-53655` [Medium], `CVE-2026-6733` [Low], `CVE-2026-11525` [Low]) with 0 residual high/critical vulnerabilities.
+
+### Added & Infrastructure
+- **[GCP / Data Agent Kit] Google Cloud Proxy & Telemetry Integration**:
+  - Configured Google Cloud CLI component bundles (`cloud-run-proxy` v0.5.1, `cloud-sql-proxy` v2.22.0) and IDE plugin `googlecloudtools.datacloud_telemetry`.
+  - Hardened non-interactive environment execution via `CLOUDSDK_PYTHON` binding.
+
+### Fixed
+- **[Flutter / Multiplatform] Conditional Web Download Service (`web_download.dart`)**:
+  - Extracted browser DOM download logic from `export_service.dart` into conditional compilation targets (`web_download_web.dart` vs `web_download_stub.dart`).
+  - Eliminated unconditional `dart:html` imports, enabling clean native Android Gradle APK compilation (`flutter build apk`).
+- **[Toolchain / Java 21] JDK Directory Alignment**:
+  - Bound Flutter build toolchain to OpenJDK 21.0.10 (`C:\Program Files\Android\Android Studio\jbr`), resolving Java 8 target deprecation warnings.
+
+---
+
 ## [1.6.0] - 2026-07-25
 
 **Dieter Rams Functional UX Refactoring, 4-Level Progressive Disclosure & Context Menu, Dieter Rams Theme Studio, Clean Slate Patient State, and E2E Clinical Platform Test Suite**

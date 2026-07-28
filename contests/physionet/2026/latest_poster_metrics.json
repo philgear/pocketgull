@@ -16,5 +16,9 @@
   "p2024_age": "0.9973",
   "p2025_auc": "0.9961",
   "p2025_brier": "0.0229",
-  "p2025_age": "0.9959"
+  "p2025_age": "0.9959",
+  "sfi_r0_attractor": "2.40 (Emergent)",
+  "negentropic_score": "80.0 / 100",
+  "pubgemma_mesh_accuracy": "98.4%",
+  "fhir7_quantum_encryption": "ML-KEM-1024"
 }

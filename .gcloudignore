@@ -40,3 +40,5 @@ trained_physio_models/
 *.hea
 *.atr
 *.rec
+Intel/
+source.tgz

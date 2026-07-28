@@ -2137,19 +2137,19 @@ html.dark .paper-rice-panel {
 
 /* Origami Teal & Coral Action Buttons */
 html.papercraft-mode .btn-primary {
-  background-color: #2AA4A0 !important;
+  background-color: #167874 !important;
   color: #FFFFFF !important;
-  border: 1.5px solid #1F8582 !important;
-  box-shadow: 0 4px 10px rgba(42, 164, 160, 0.25) !important;
+  border: 1.5px solid #0f5855 !important;
+  box-shadow: 0 4px 10px rgba(22, 120, 116, 0.25) !important;
   border-radius: 0.85rem !important;
   font-weight: 700 !important;
 }
 
 html.papercraft-mode .btn-accent {
-  background-color: #EF6658 !important;
+  background-color: #C8392B !important;
   color: #FFFFFF !important;
-  border: 1.5px solid #DF5648 !important;
-  box-shadow: 0 4px 10px rgba(239, 102, 88, 0.25) !important;
+  border: 1.5px solid #a32c21 !important;
+  box-shadow: 0 4px 10px rgba(200, 57, 43, 0.25) !important;
   border-radius: 0.5rem !important;
   font-weight: 700 !important;
 }
@@ -2742,7 +2742,7 @@ html.theme-papyrus .text-gray-500,
 html.theme-papyrus .text-zinc-400,
 html.theme-papyrus .text-zinc-500 {
   color: #a78bfa !important; /* Soft violet/amethyst details */
-  color: rgba(226, 209, 176, 0.6) !important;
+  color: rgba(226, 209, 176, 0.85) !important;
 }
 
 html.theme-papyrus .text-gray-900,
@@ -3552,7 +3552,7 @@ html.theme-curie .thematic-3d-container {
     pointer-events: none !important;
   }
 
-  /* Show back face instantly when container has .rotate-y-180 class under reduced motion */
+  /* Hide back face instantly when container has .rotate-y-180 class under reduced motion */
   .transform-style-3d.rotate-y-180 > .rotate-y-180 {
     opacity: 1 !important;
     visibility: visible !important;
@@ -3560,6 +3560,88 @@ html.theme-curie .thematic-3d-container {
     transform: none !important;
   }
 }
+
+/* ==========================================================================
+   UI CONGRUENCY & MICRO-ANIMATION DESIGN SYSTEM
+   ========================================================================== */
+
+@keyframes pgFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pgSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pgPulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 12px 2px rgba(16, 185, 129, 0.4);
+  }
+}
+
+@keyframes pgSkeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-pg-fade-in {
+  animation: pgFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pg-slide-up {
+  animation: pgSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-pg-pulse-glow {
+  animation: pgPulseGlow 2.5s infinite ease-in-out;
+}
+
+.pg-skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 75%);
+  background-size: 200% 100%;
+  animation: pgSkeletonShimmer 1.8s infinite ease-in-out;
+}
+
+/* Glassmorphic & Papercraft Unified Card System */
+.pg-card {
+  @apply bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm transition-all duration-300 ease-out hover:shadow-md hover:border-emerald-500/30 hover:scale-[1.008];
+}
+
+.pg-card-interactive {
+  @apply pg-card cursor-pointer active:scale-[0.99] active:shadow-inner;
+}
+
+.pg-button-primary {
+  @apply bg-emerald-600 hover:bg-emerald-500 text-white font-medium px-4 py-2 rounded-xl transition-all duration-200 shadow-sm hover:shadow active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.pg-button-secondary {
+  @apply bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-medium px-4 py-2 rounded-xl transition-all duration-200 active:scale-[0.97];
+}
+
+.pg-button-ghost {
+  @apply hover:bg-zinc-100 dark:hover:bg-zinc-800/60 text-zinc-600 dark:text-zinc-400 font-medium px-3 py-1.5 rounded-lg transition-all duration-200 active:scale-[0.97];
+}
+
 
 
 

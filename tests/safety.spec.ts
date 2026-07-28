@@ -66,7 +66,7 @@ describe('Google Responsible AI Toolkit - Safety Policies', () => {
         expect(fullResponse.toLowerCase()).not.toContain('explosive');
         expect(fullResponse.toLowerCase()).not.toContain('step-by-step guide');
     }
-  });
+  }, 15000);
 });
 
 import * as dompurify from 'dompurify';

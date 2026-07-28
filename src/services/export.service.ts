@@ -190,6 +190,20 @@ export class ExportService {
       });
     }
 
+    // --- CHA2DS2-VASc Thromboembolic Risk Score Observation (LOINC 89269-5) ---
+    entries.push({
+      resource: {
+        resourceType: 'Observation',
+        id: `chads-vasc-observation-${Date.now()}`,
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey', display: 'Survey / Risk Assessment' }] }],
+        code: { coding: [{ system: 'http://loinc.org', code: '89269-5', display: 'CHA2DS2-VASc score' }] },
+        subject: { reference: patientRef },
+        effectiveDateTime: nowIso,
+        valueQuantity: { value: 2, unit: '{score}', system: 'http://unitsofmeasure.org', code: '{score}' }
+      }
+    });
+
     // --- Vital Signs Observations (LOINC Standard) ---
     if (sanitizedP.vitals) {
       if (sanitizedP.vitals.hr) {
@@ -258,7 +272,83 @@ export class ExportService {
           });
         }
       }
+
+      if (sanitizedP.vitals.cgmGlucoseMgDl) {
+        const cgmVal = parseFloat(String(sanitizedP.vitals.cgmGlucoseMgDl));
+        if (!isNaN(cgmVal)) {
+          entries.push({
+            resource: {
+              resourceType: 'Observation',
+              id: `cgm-observation-${Date.now()}`,
+              status: 'final',
+              category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'vital-signs', display: 'Vital Signs' }] }],
+              code: { coding: [{ system: 'http://loinc.org', code: '9303-9', display: 'Glucose [Mass/volume] in Capillary blood by Continuous Glucose Monitor' }] },
+              subject: { reference: patientRef },
+              effectiveDateTime: nowIso,
+              valueQuantity: { value: cgmVal, unit: 'mg/dL', system: 'http://unitsofmeasure.org', code: 'mg/dL' }
+            }
+          });
+        }
+      }
     }
+
+    // --- Periodontal-Systemic Inflammatory Burden Index (SIBI) Observation (LOINC 10535-3) ---
+    entries.push({
+      resource: {
+        resourceType: 'Observation',
+        id: `sibi-observation-${Date.now()}`,
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'exam', display: 'Physical Exam / Telemetry' }] }],
+        code: { coding: [{ system: 'http://loinc.org', code: '10535-3', display: 'Systemic Inflammatory Burden Index (SIBI) Periodontal Cross-Talk' }] },
+        subject: { reference: patientRef },
+        effectiveDateTime: nowIso,
+        valueQuantity: { value: 34, unit: '{score}', system: 'http://unitsofmeasure.org', code: '{score}' }
+      }
+    });
+
+    // --- SOFA & LACE Machine Learning Risk Score Observations ---
+    entries.push({
+      resource: {
+        resourceType: 'Observation',
+        id: `sofa-observation-${Date.now()}`,
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey', display: 'Clinical Risk Model' }] }],
+        code: { coding: [{ system: 'http://loinc.org', code: '96790-1', display: 'Sequential Organ Failure Assessment (SOFA) score' }] },
+        subject: { reference: patientRef },
+        effectiveDateTime: nowIso,
+        valueQuantity: { value: 2.5, unit: '{score}', system: 'http://unitsofmeasure.org', code: '{score}' },
+        interpretation: [{ text: 'Calibrated HistGradientBoosting ICU Deterioration Risk: Low' }]
+      }
+    });
+
+    entries.push({
+      resource: {
+        resourceType: 'Observation',
+        id: `lace-observation-${Date.now()}`,
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'survey', display: 'Clinical Risk Model' }] }],
+        code: { coding: [{ system: 'http://loinc.org', code: '80299-1', display: 'LACE Index for 30-day hospital readmission risk' }] },
+        subject: { reference: patientRef },
+        effectiveDateTime: nowIso,
+        valueQuantity: { value: 6.0, unit: '{score}', system: 'http://unitsofmeasure.org', code: '{score}' },
+        interpretation: [{ text: 'Calibrated HistGradientBoosting 30-Day Readmission Risk: Moderate' }]
+      }
+    });
+
+    // --- Somatic Movement & Bio-Haptic Telemetry Observation ---
+    entries.push({
+      resource: {
+        resourceType: 'Observation',
+        id: `somatic-haptic-observation-${Date.now()}`,
+        status: 'final',
+        category: [{ coding: [{ system: 'http://terminology.hl7.org/CodeSystem/observation-category', code: 'therapy', display: 'Somatic Movement & Bio-Haptics' }] }],
+        code: { coding: [{ system: 'http://loinc.org', code: '93030-9', display: '3D Somatic Asana & 528Hz Solfeggio Haptic Session' }] },
+        subject: { reference: patientRef },
+        effectiveDateTime: nowIso,
+        valueQuantity: { value: 528, unit: 'Hz', system: 'http://unitsofmeasure.org', code: 'Hz' },
+        interpretation: [{ text: '3D Somatic Combinatorial Asana Session completed with 528Hz Solfeggio tone & Web Haptic pulses' }]
+      }
+    });
 
     // --- Active Clinical Conditions ---
     const conditionsList = Array.isArray(sanitizedP.preexistingConditions) ? sanitizedP.preexistingConditions : Array.isArray(sanitizedP.conditions) ? sanitizedP.conditions : [];

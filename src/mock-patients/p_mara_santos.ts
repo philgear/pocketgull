@@ -6,6 +6,45 @@ export const p_mara_santos: IPatient = {
   "age": 34,
   "gender": "Female",
   "lastVisit": "2026.06.20",
+  "genomicVariants": [
+    { "rsId": "rs1801133", "gene": "MTHFR", "chromosome": "1", "position": "11796321", "genotype": "T/T (Homozygous)", "clinicalSignificance": "Reduced folate conversion capacity by ~70%", "pathogenicity": "Pathogenic" },
+    { "rsId": "rs3135388", "gene": "HLA-DRB1", "chromosome": "6", "position": "32552134", "genotype": "C/T (Heterozygous)", "clinicalSignificance": "Associated with Relapsing-Remitting Multiple Sclerosis susceptibility", "pathogenicity": "Likely Pathogenic" },
+    { "rsId": "rs3892760", "gene": "CYP2D6", "chromosome": "22", "position": "42127891", "genotype": "G/A (Intermediate)", "clinicalSignificance": "Altered metabolizer status for beta-blockers, pain medications, and SSRIs", "pathogenicity": "VUS" }
+  ],
+  "biochemicalPathways": [
+    { "id": "path_meth", "name": "Folate / Methylation Cycle", "status": "Sub-optimal", "activeEnzymes": ["MTHFR", "MTR", "MTRR"], "blocks": ["Deficiency in L-methylfolate synthesis driving homocysteine to 14.1 μmol/L"] },
+    { "id": "path_mito", "name": "Mitochondrial Electron Transport Chain", "status": "Sub-optimal", "activeEnzymes": ["Complex I", "Complex III", "CoQ10"], "blocks": ["Depleted CoQ10 (0.38 μg/mL) limiting oxidative phosphorylation"] },
+    { "id": "path_myelin", "name": "Myelin Sheath Repair & Maintenance", "status": "Blocked", "activeEnzymes": ["MBP", "PLP1"], "blocks": ["Active auto-antigen presentation and immune-mediated demyelination"] }
+  ],
+  "pkInteractions": [
+    { "agent": "Ocrevus (Ocrelizumab)", "target": "CD20 B-Cells", "affinity": "Kd = 1.6 nM", "effect": "Depletion of CD20+ B lymphocytes", "riskLevel": "Low" },
+    { "agent": "Modafinil + CoQ10", "target": "Mitochondrial Energy Pathway", "affinity": "Synergy", "effect": "Synergistic enhancement of ATP production and alertness", "riskLevel": "Low" },
+    { "agent": "Baclofen + Valerian Root", "target": "GABA-B Receptor", "affinity": "Additive", "effect": "Enhanced CNS depression and somnolence", "riskLevel": "Moderate" }
+  ],
+  "ewarsAlerts": [
+    { "id": "ewars_01", "pathogen": "SARS-CoV-2 (KP.3.1.1 Subvariant)", "viralCopyCount": "4.8x10^5 copies/mL (CDC NWSS)", "surgeStatus": "Active Surge", "whoBulletin": "WHO-DON-2026-EU-04", "riskToPatient": "High" },
+    { "id": "ewars_02", "pathogen": "Influenza A (H5N1 Clade 2.3.4.4b)", "viralCopyCount": "1.2x10^3 copies/mL (Monitoring)", "surgeStatus": "Monitoring", "whoBulletin": "WHO-DON-2026-GLOBAL-12", "riskToPatient": "Moderate" }
+  ],
+  "travelProfile": {
+    "destination": "Geneva, Switzerland (WHO Global Health Forum)",
+    "departureDate": "2026.08.15",
+    "cdcNoticeLevel": "Level 1 - Watch",
+    "requiredVaccines": ["Tick-Borne Encephalitis (TBE)", "Seasonal Influenza 2026/2027"],
+    "vectorRisks": ["Ixodes ricinus tick-borne encephalitis in sub-alpine woodland trails"],
+    "prophylacticProtocol": ["Permethrin 0.5% clothing treatment", "DEET 30% dermal application"]
+  },
+  "awareStewardship": [
+    { "medication": "Amoxicillin / Clavulanate", "category": "Access", "resistanceRisk": "Low", "stewardshipNote": "First-line respiratory coverage if secondary bacterial infection occurs" },
+    { "medication": "Ciprofloxacin", "category": "Watch", "resistanceRisk": "High", "stewardshipNote": "Reserve for acute complicated pyelonephritis or severe UTI only" }
+  ],
+  "environmentalIndex": {
+    "aqi": 72,
+    "pm25": "22.4 µg/m³",
+    "ozone": "48 ppb",
+    "pollenDensity": "High",
+    "heatIndex": "84°F",
+    "vulnerabilityWarning": "Moderate PM2.5 and High Birch Pollen may exacerbate MS autonomic fatigue and neuro-inflammatory flare risk."
+  },
   "preexistingConditions": [
     "Relapsing-Remitting Multiple Sclerosis (RRMS)",
     "History of Optic Neuritis (Left Eye, 2024)",
