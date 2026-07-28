@@ -144,6 +144,8 @@ export interface IPatientVitals {
     spO2: string;    // Oxygen Saturation
     weight: string;
     height: string;
+    // Continuous Glucose Monitoring (CGM)
+    cgmGlucoseMgDl?: string;
     // Biochemical Telemetry
     vitC?: string;
     vitD3?: string;

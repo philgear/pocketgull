@@ -323,3 +323,36 @@ describe('Age Calculation Helpers', () => {
     expect(Math.abs(reconstructedAge - originalAge)).toBeLessThanOrEqual(1);
   });
 });
+
+describe('CGM Glucose Status Classifier', () => {
+  function classifyCgm(mgDlStr?: string): 'normal' | 'elevated' | 'hypoglycemic' | 'hyperglycemic' | 'unknown' {
+    if (!mgDlStr) return 'unknown';
+    const val = parseFloat(mgDlStr);
+    if (isNaN(val)) return 'unknown';
+    if (val < 70) return 'hypoglycemic';
+    if (val <= 140) return 'normal';
+    if (val <= 180) return 'elevated';
+    return 'hyperglycemic';
+  }
+
+  it('classifies < 70 as hypoglycemic', () => {
+    expect(classifyCgm('65')).toBe('hypoglycemic');
+  });
+
+  it('classifies 70-140 as normal', () => {
+    expect(classifyCgm('98')).toBe('normal');
+  });
+
+  it('classifies 141-180 as elevated', () => {
+    expect(classifyCgm('162')).toBe('elevated');
+  });
+
+  it('classifies > 180 as hyperglycemic', () => {
+    expect(classifyCgm('210')).toBe('hyperglycemic');
+  });
+
+  it('handles empty or missing value gracefully', () => {
+    expect(classifyCgm('')).toBe('unknown');
+    expect(classifyCgm(undefined)).toBe('unknown');
+  });
+});

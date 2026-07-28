@@ -316,19 +316,32 @@ export class PatientStateService {
   // --- Patient Data State ---
   readonly issues = signal<Record<string, IBodyPartIssue[]>>({});
   readonly patientGoals = signal<string>("");
-  readonly    vitals = signal<IPatientVitals>({
+  readonly vitals = signal<IPatientVitals>({
         bp: '',
         hr: '',
         temp: '',
         spO2: '',
         weight: '',
         height: '',
+        cgmGlucoseMgDl: '',
         vitC: '',
         vitD3: '',
         magnesium: '',
         zinc: '',
         b12: ''
     });
+
+  /** Computed CGM Glucose status derived from real-time continuous glucose monitor telemetry. */
+  readonly cgmGlucoseStatus = computed<'normal' | 'elevated' | 'hypoglycemic' | 'hyperglycemic' | 'unknown'>(() => {
+    const raw = this.vitals()?.cgmGlucoseMgDl;
+    if (!raw) return 'unknown';
+    const val = parseFloat(raw);
+    if (isNaN(val)) return 'unknown';
+    if (val < 70) return 'hypoglycemic';
+    if (val <= 140) return 'normal';
+    if (val <= 180) return 'elevated';
+    return 'hyperglycemic';
+  });
 
     readonly dynamicNutrients = signal<import('./patient.types').IDynamicMarker[]>([]);
   readonly oxidativeStressMarkers = signal<import('./patient.types').IDynamicMarker[]>([]);
