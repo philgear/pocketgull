@@ -13,10 +13,11 @@ try {
 }
 
 export async function sendPushNotification(fcmToken: string, title: string, body: string, data?: any) {
+  const sanitize = (str: any) => String(str || '').replace(/[\r\n\u2028\u2029]+/g, ' ').replace(/[\x00-\x1F\x7F]+/g, ' ').slice(0, 500);
   if (!isFirebaseInitialized || !fcmToken) {
-    console.log(`[Notification Service Mock] Sending push notification to ${fcmToken || 'UNKNOWN'}:`);
-    console.log(`  Title: ${title}`);
-    console.log(`  Body:  ${body}`);
+    console.log(`[Notification Service Mock] Sending push notification to ${sanitize(fcmToken) || 'UNKNOWN'}:`);
+    console.log(`  Title: ${sanitize(title)}`);
+    console.log(`  Body:  ${sanitize(body)}`);
     return;
   }
 

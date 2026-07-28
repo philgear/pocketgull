@@ -33,6 +33,12 @@ app.use('/docs', apiLimiter);
 app.use('/api-docs', apiLimiter);
 app.use('/health', apiLimiter);
 
+function sanitizeLogInput(val) {
+  if (val === null || val === undefined) return String(val);
+  const str = typeof val === 'object' ? JSON.stringify(val) : String(val);
+  return str.replace(/[\r\n\u2028\u2029]+/g, ' _ ').replace(/[\x00-\x1F\x7F]+/g, ' ').slice(0, 2000);
+}
+
 // Trust single hop Google Cloud Run load balancer proxy
 app.set('trust proxy', 1);
 
@@ -519,17 +525,17 @@ app.post('/api/patients', (req, res) => {
     // Save validated data to file
     fs.writeFileSync(patientsDbPath, JSON.stringify(sanitized, null, 2));
 
-    console.log(`[API] Saved ${req.body.length} patients to database.`);
-    res.status(200).json({ success: true, count: req.body.length });
+    console.log(`[API] Saved ${sanitized.length} patients to database.`);
+    res.status(200).json({ success: true, count: sanitized.length });
   } catch (err) {
-    console.error('[API] Error saving patients database:', err);
+    console.error('[API] Error saving patients database:', sanitizeLogInput(err?.message || err));
     res.status(500).json({ error: 'Internal server error while saving database' });
   }
 });
 
 app.put('/api/patients/:id', (req, res) => {
   try {
-    const { id } = req.params;
+    const id = sanitizeLogInput(req.params.id);
     if (!req.body || typeof req.body !== 'object') {
       return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
     }
@@ -563,7 +569,7 @@ app.put('/api/patients/:id', (req, res) => {
     console.log(`[API] Synced patient ${id} from mobile/app to database.`);
     res.status(200).json({ success: true, patient: patients.find(p => p.id === id) });
   } catch (err) {
-    console.error('[API] Error syncing patient to database:', err);
+    console.error('[API] Error syncing patient to database:', sanitizeLogInput(err?.message || err));
     res.status(500).json({ error: 'Internal server error while syncing patient' });
   }
 });
@@ -584,7 +590,7 @@ app.get(/(.*)/, (req, res) => {
 
   if (!isDoc) {
     // If it's not a doc and wasn't caught by express.static, it's a 404
-    console.log(`[SERVER] 404 Not Found: ${req.url}`);
+    console.log(`[SERVER] 404 Not Found: ${sanitizeLogInput(req.url)}`);
     return res.status(404).send('Not Found');
   }
 
