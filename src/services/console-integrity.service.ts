@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, isDevMode } from '@angular/core';
 
 export interface IConsoleLogItem {
   id: string;
@@ -29,7 +29,8 @@ export class ConsoleIntegrityService {
   }
 
   private initConsoleHooks() {
-    if (typeof window === 'undefined') return;
+    // Only intercept console hooks in development / automated test environments
+    if (typeof window === 'undefined' || !isDevMode()) return;
 
     // Intercept console.error
     console.error = (...args: any[]) => {
@@ -74,6 +75,21 @@ export class ConsoleIntegrityService {
     };
 
     this.logs.update(current => [item, ...current.slice(0, 49)]); // Keep last 50 entries
+  }
+
+  /**
+   * Creates a structured DevTools console group for Gull Squadron agent diagnostic telemetry.
+   */
+  startGroup(agentName: string, label: string) {
+    if (typeof console !== 'undefined' && console.group) {
+      console.group(`🧹 [${agentName} Integrity Agent] ${label}`);
+    }
+  }
+
+  endGroup() {
+    if (typeof console !== 'undefined' && console.groupEnd) {
+      console.groupEnd();
+    }
   }
 
   /**
