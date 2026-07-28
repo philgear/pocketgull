@@ -499,6 +499,15 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
               </svg>
               <span class="hidden sm:inline">Docs</span>
             </a>
+            <!-- Somatic Box-Breathing Grounding (Zamecznik Canvas) -->
+            <button (click)="triggerSomaticGrounding()" 
+                    aria-label="Somatic Grounding & Box Breathing"
+                    title="Open Somatic Grounding & Box Breathing Canvas"
+                    class="group shrink-0 flex items-center gap-1.5 px-3 py-2 border border-emerald-500/40 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-extrabold uppercase tracking-wider transition-colors rounded-md cursor-pointer">
+              <span>🧘</span>
+              <span class="hidden md:inline">Grounding</span>
+            </button>
+            
             <!-- Tour Guide Toggle -->
             <button (click)="tour.forceStart()" 
                     aria-label="Start Tour Guide"
@@ -754,6 +763,7 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                <span class="hidden sm:inline" aria-hidden="true">Finalize & Archive</span>
              </button>
            </div>
+         </nav>
 
         <!-- Main Grid Layout -->
         <div #mainContainer class="flex-1 flex flex-col md:flex-row max-md:overflow-visible overflow-y-auto md:overflow-hidden relative bg-[#F9FAFB] dark:bg-[#09090b] p-2 md:p-6 gap-3 md:gap-6 min-h-0">
@@ -896,7 +906,7 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                       [class.shadow-none]="isChartCollapsed()"
                       [class.bg-[#F9FAFB]]="isChartCollapsed()"
                       [class.dark:bg-[#09090b]]="isChartCollapsed()">
-                     @defer {
+                     @defer (on immediate) {
                        <app-analysis-container class="flex flex-col flex-1 min-h-0 min-w-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]" appReveal [revealDelay]="100"></app-analysis-container>
                      } @placeholder {
                        <div class="h-full flex items-center justify-center text-zinc-400 text-xs uppercase tracking-widest font-bold border-2 border-dashed border-zinc-200 dark:border-zinc-800 m-4 rounded-xl">Loading Core AI Synthesis...</div>
@@ -908,7 +918,10 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                      <app-research-tab class="block h-full" [hits]="intelligence.researchHits()"></app-research-tab>
                    </div>
                  }
+              </div>
             </div>
+          </main>
+        }
 
             <!-- Pocket: Floating Voice Assistant -->
             @if (state.isLiveAgentActive()) {
@@ -982,10 +995,11 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                       <app-voice-assistant id="tour-voice-assistant" class="block h-full w-full mix-blend-normal bg-white/70 dark:bg-black/50 backdrop-blur-md"></app-voice-assistant>
                     }
                  </div>
-              </div>
-            }
-
+               </div>
+             }
+          }
         </div>
+      }
         
         @if(state.isResearchFrameVisible()) {
             @defer (on immediate) {
@@ -1319,12 +1333,7 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
         </div>
       </div>
     }
-    
-        }
-      }
-    </div>
     <app-zamecznik-canvas></app-zamecznik-canvas>
-  }
   `,
   styles: [`
     :host { display: block; min-height: 100%; }
@@ -1337,6 +1346,12 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
 export class AppComponent implements OnDestroy {
   readonly showGlossaryModal = signal<boolean>(false);
   private _translateTimer: any = null;
+
+  triggerSomaticGrounding(): void {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('somatic-grounding-activate'));
+    }
+  }
 
   private debouncedTranslate(text: string, level: any) {
     if (this._translateTimer) {
@@ -2428,6 +2443,7 @@ export class AppComponent implements OnDestroy {
         untracked(() => {
           this.isAnalysisCollapsed.set(false);
           this.isChartCollapsed.set(false);
+          this.mobileActiveTab.set('analysis');
         });
       }
     });

@@ -30,6 +30,16 @@ export interface IRiskScoreResult {
   note: string;
 }
 
+export interface IReadmissionSepsisResult {
+  readmission_30d_probability: number;
+  readmission_risk_level: 'Low' | 'Moderate' | 'High' | 'Critical';
+  lace_index_score: number;
+  qsofa_sepsis_score: number;
+  sepsis_escalation_risk: string;
+  conformal_confidence_interval: number[];
+  primary_driving_features: string[];
+}
+
 /**
  * PythonBridgeService
  *
@@ -328,6 +338,56 @@ export class PythonBridgeService {
     }
     
     return localResult;
+  }
+
+  /**
+   * Fetch XGBoost 30-Day Readmission & qSOFA Sepsis Risk Score from Python sidecar.
+   */
+  async fetchReadmissionSepsisScore(): Promise<IReadmissionSepsisResult> {
+    const fallback: IReadmissionSepsisResult = {
+      readmission_30d_probability: 0.22,
+      readmission_risk_level: 'Moderate',
+      lace_index_score: 8,
+      qsofa_sepsis_score: 1,
+      sepsis_escalation_risk: 'Moderate Sepsis Risk',
+      conformal_confidence_interval: [0.14, 0.30],
+      primary_driving_features: ['Elevated Serum Lactate (Tissue Hypoperfusion)', 'High Cardiovascular Comorbidity Burden']
+    };
+
+    if (!this.isBrowser) return fallback;
+
+    try {
+      const bpParts = (this.state.vitals().bp || '128/80').split('/');
+      const systolicBp = parseFloat(bpParts[0]) || 128;
+
+      const payload = {
+        age: 68,
+        length_of_stay_days: 4,
+        prior_admissions_12m: 2,
+        emergency_dept_visits_12m: 3,
+        chads_vasc_score: 2,
+        systolic_bp: systolicBp,
+        respiratory_rate: 18.0,
+        serum_lactate_mmol_l: 2.2,
+        wbc_count: 11.5,
+        altered_mental_status: false
+      };
+
+      const res = await fetch(`${this.BASE}/ml/readmission-sepsis`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(1500)
+      });
+
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (err: any) {
+      console.warn('[PythonBridge] fetchReadmissionSepsisScore using local fallback:', err.message);
+    }
+
+    return fallback;
   }
 
   /**

@@ -56,8 +56,10 @@ const PART_NAMES: Record<string, string> = {
     // 🧘 Ayurvedic 7 Sushumna Chakra Touch Nodes
     'chakra_sahasrara': 'Sahasrara (Crown 1000-Petal Lotus Chakra)',
     'chakra_ajna': 'Ajna (Third Eye Command Center Chakra)',
-    'chakra_vishuddha': 'Vishuddha (Throat Purity Sound Chakra)',
-    'chakra_anahata': 'Anahata (Heart Unstruck Anahata Chakra)',
+    'chakra_vishuddha': 'Throat & Oral FDI Odontogram Spatial Lens',
+    'chakra_anahata': 'Anahata (Heart & Acoustic Respiratory Airway Lens)',
+    'oral_fdi_teeth': 'Teledentistry FDI 32-Tooth Matrix & Smith-Knight TWI Lens',
+    'respiratory_airway': 'Micro-Acoustic Wheeze & Stridor Spectrum Lens',
     'chakra_manipura': 'Manipura (Solar Plexus Agni Fire City)',
     'chakra_svadhisthana': 'Svadhisthana (Sacral Water Dwell Chakra)',
     'chakra_muladhara': 'Muladhara (Root Earth Base Support Chakra)'

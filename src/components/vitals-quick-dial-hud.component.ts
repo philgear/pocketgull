@@ -60,10 +60,16 @@ type VitalTarget = 'hr' | 'bp_sys' | 'bp_dia' | 'temp' | 'spO2';
           <button (click)="adjustValue(5)" class="w-12 h-12 rounded-2xl bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-white font-black text-lg transition cursor-pointer flex items-center justify-center border border-zinc-700 shadow-sm">+5</button>
         </div>
 
-        <!-- Commit Button -->
-        <button (click)="commitActiveVital()" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-xs uppercase tracking-wider transition cursor-pointer shadow-lg border border-emerald-400 flex items-center justify-center gap-2">
-          <span>✅ Commit Vital</span>
-        </button>
+        <!-- Commit & Somatic Grounding Buttons -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button (click)="commitActiveVital()" class="flex-1 px-5 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold text-xs uppercase tracking-wider transition cursor-pointer shadow-lg border border-emerald-400 flex items-center justify-center gap-1.5">
+            <span>✅ Commit Vital</span>
+          </button>
+          <button (click)="triggerSomaticGrounding()" title="Open Somatic Grounding Box Breathing" class="px-4 py-3.5 rounded-2xl bg-teal-950/80 hover:bg-teal-900 border border-teal-500/50 text-teal-300 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1">
+            <span>🧘</span>
+            <span class="hidden sm:inline">Grounding</span>
+          </button>
+        </div>
 
       </div>
 
@@ -73,6 +79,12 @@ type VitalTarget = 'hr' | 'bp_sys' | 'bp_dia' | 'temp' | 'spO2';
 })
 export class VitalsQuickDialHudComponent {
   private patientState = inject(PatientStateService);
+
+  triggerSomaticGrounding(): void {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('somatic-grounding-activate'));
+    }
+  }
 
   readonly activeTarget = signal<VitalTarget>('hr');
   

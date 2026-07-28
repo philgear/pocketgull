@@ -7,7 +7,7 @@ import { MedicalDecoderService } from '../services/medical-decoder.service';
 export interface IMedicalSupplyItem {
   id: string;
   name: string;
-  category: 'Diagnostic Vitals' | 'Emergency & Resuscitation' | 'Wound Care & Sterile' | 'Metabolic & Diabetes';
+  category: 'Diagnostic Vitals' | 'Emergency & Resuscitation' | 'Wound Care & Sterile' | 'Metabolic & Diabetes' | 'Dental & Oral Health Care';
   availability: 'Over-the-Counter (OTC)' | 'DME Prescription Required' | 'Hospital Emergency Supply';
   typicalCostRange: string;
   whereToAcquire: string[];
@@ -263,6 +263,30 @@ export class MedicalSupplyNavigatorComponent {
       clinicalIndication: 'Rapid-acting oral simple carbohydrates (15g glucose equivalent) for acute hypoglycemia emergency reversal (Rule of 15).',
       patientPlainSummary: '4 oz of orange juice, apple juice, or glucose gel available at any grocery store or bodega to quickly rescue low blood sugar.',
       loincOrStandardCode: 'LOINC 97507-8',
+      isUrgentNeed: true
+    },
+    {
+      id: 'sup-7',
+      name: 'Benzocaine 20% Toothache & Oral Anesthetic Gel',
+      category: 'Dental & Oral Health Care',
+      availability: 'Over-the-Counter (OTC)',
+      typicalCostRange: '$4 - $10',
+      whereToAcquire: ['Grocery Stores & Supermarkets', 'Retail Pharmacies', 'Convenience Stores'],
+      clinicalIndication: 'Topical ester local anesthetic for temporary pain mitigation in acute odontalgia, aphthous ulcers, and gingival irritation.',
+      patientPlainSummary: 'Fast-acting numbing gel available at any grocery store or pharmacy to relieve sharp toothache or gum pain.',
+      loincOrStandardCode: 'CDT D9630',
+      isUrgentNeed: true
+    },
+    {
+      id: 'sup-8',
+      name: 'Eugenol Clove Oil & Zinc-Oxide Temporary Tooth Filling Putty',
+      category: 'Dental & Oral Health Care',
+      availability: 'Over-the-Counter (OTC)',
+      typicalCostRange: '$6 - $14',
+      whereToAcquire: ['Retail Pharmacies', 'Supermarkets', 'Emergency Medical Outlets'],
+      clinicalIndication: 'Analgesic essential oil and temporary cavity sealant to protect exposed dentin tubules until emergency dental repair.',
+      patientPlainSummary: 'A temporary dental putty with natural clove oil to cover lost fillings or cracked teeth until you see a dentist.',
+      loincOrStandardCode: 'CDT D2940',
       isUrgentNeed: true
     }
   ]);

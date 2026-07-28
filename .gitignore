@@ -18,6 +18,7 @@ tmp/
 test-results/
 playwright-report/
 source.tgz
+deploy.tgz
 *.local
 *.local.*
 

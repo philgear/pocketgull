@@ -56,6 +56,16 @@ export interface IFunctionalFoodItem {
                   class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer">
             🌿 Functional Foods
           </button>
+          <button (click)="activeTab.set('dinacharya')"
+                  [class.bg-emerald-600]="activeTab() === 'dinacharya'"
+                  [class.text-white]="activeTab() === 'dinacharya'"
+                  [class.bg-gray-100]="activeTab() !== 'dinacharya'"
+                  [class.dark:bg-zinc-800]="activeTab() !== 'dinacharya'"
+                  [class.text-gray-700]="activeTab() !== 'dinacharya'"
+                  [class.dark:text-zinc-300]="activeTab() !== 'dinacharya'"
+                  class="px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition cursor-pointer">
+            🍂 Seasonal Dinacharya
+          </button>
           <button (click)="activeTab.set('glycemic')"
                   [class.bg-emerald-600]="activeTab() === 'glycemic'"
                   [class.text-white]="activeTab() === 'glycemic'"
@@ -191,6 +201,53 @@ export interface IFunctionalFoodItem {
           </div>
         </div>
       }
+
+      <!-- Tab 4: Seasonal Dinacharya & Ritu-Charya Matrix -->
+      @if (activeTab() === 'dinacharya') {
+        <div class="space-y-4 text-xs">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="p-3.5 bg-emerald-500/5 border border-emerald-500/30 rounded-xl space-y-1.5">
+              <div class="font-black text-emerald-900 dark:text-emerald-300 uppercase tracking-wide flex items-center gap-1">
+                🌱 Spring (Vasanta)
+              </div>
+              <p class="text-gray-600 dark:text-zinc-300 text-[11px]">
+                Kapha liquefaction season. Emphasize bitter greens, dandelion tea, matcha EGCG, and light digestive warmth.
+              </p>
+              <span class="inline-block px-2 py-0.5 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded font-mono text-[10px]">Agni: Samagni</span>
+            </div>
+
+            <div class="p-3.5 bg-amber-500/5 border border-amber-500/30 rounded-xl space-y-1.5">
+              <div class="font-black text-amber-900 dark:text-amber-300 uppercase tracking-wide flex items-center gap-1">
+                ☀️ Summer (Greeshma)
+              </div>
+              <p class="text-gray-600 dark:text-zinc-300 text-[11px]">
+                Pitta accumulation season. Emphasize cooling coconut water, sweet juicy fruits, mint tea, and shade hydration.
+              </p>
+              <span class="inline-block px-2 py-0.5 bg-amber-500/20 text-amber-700 dark:text-amber-300 rounded font-mono text-[10px]">Agni: Tikshnagni</span>
+            </div>
+
+            <div class="p-3.5 bg-purple-500/5 border border-purple-500/30 rounded-xl space-y-1.5">
+              <div class="font-black text-purple-900 dark:text-purple-300 uppercase tracking-wide flex items-center gap-1">
+                🍂 Autumn (Sharad)
+              </div>
+              <p class="text-gray-600 dark:text-zinc-300 text-[11px]">
+                Pitta aggravation & liver detox. Consume Amla berry, organic ghee, warm mung bean dahl soup, and bitter herbs.
+              </p>
+              <span class="inline-block px-2 py-0.5 bg-purple-500/20 text-purple-700 dark:text-purple-300 rounded font-mono text-[10px]">Agni: Vishamagni</span>
+            </div>
+
+            <div class="p-3.5 bg-blue-500/5 border border-blue-500/30 rounded-xl space-y-1.5">
+              <div class="font-black text-blue-900 dark:text-blue-300 uppercase tracking-wide flex items-center gap-1">
+                ❄️ Winter (Hemanta)
+              </div>
+              <p class="text-gray-600 dark:text-zinc-300 text-[11px]">
+                Vata grounding season. Emphasize warm ginger-cinnamon stews, roasted root vegetables, sesame oil, and dense proteins.
+              </p>
+              <span class="inline-block px-2 py-0.5 bg-blue-500/20 text-blue-700 dark:text-blue-300 rounded font-mono text-[10px]">Agni: Mandagni</span>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   `
 })
@@ -211,7 +268,7 @@ export class PrecisionNutritionCalculatorComponent {
     }
   })();
 
-  readonly activeTab = signal<'chrono' | 'matrix' | 'glycemic'>('chrono');
+  readonly activeTab = signal<'chrono' | 'matrix' | 'dinacharya' | 'glycemic'>('chrono');
   readonly feedingStartHour = signal<number>(10); // 10 AM default
   readonly carbGrams = signal<number>(45);
   readonly hasFiberBuffer = signal<boolean>(true);

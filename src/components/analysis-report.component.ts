@@ -70,6 +70,7 @@ import { DualPaneConsultationComponent } from './dual-pane-consultation.componen
 import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashboard.component';
 import { ChronobiologyMatrixComponent } from './chronobiology-matrix.component';
 import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.component';
+import { BionicReadingService } from '../services/bionic-reading.service';
 
 @Component({
   selector: 'app-analysis-report',
@@ -291,6 +292,20 @@ import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.
                 </div>
               }
             </div>
+
+            <!-- Bionic Reading Mode Lens Accent Toggle -->
+            <button (click)="bionicReading.toggleBionicReading()"
+                    [class.bg-amber-600]="bionicReading.isBionicReadingEnabled()"
+                    [class.text-white]="bionicReading.isBionicReadingEnabled()"
+                    [class.bg-white]="!bionicReading.isBionicReadingEnabled()"
+                    [class.dark:bg-zinc-900]="!bionicReading.isBionicReadingEnabled()"
+                    [class.text-amber-800]="!bionicReading.isBionicReadingEnabled()"
+                    [class.dark:text-amber-300]="!bionicReading.isBionicReadingEnabled()"
+                    class="py-1.5 px-3 rounded-lg border border-amber-500/40 text-[11px] font-bold uppercase tracking-wider transition cursor-pointer flex items-center gap-1 shrink-0"
+                    title="Toggle Bionic Reading Focus across all 13 Clinical Lenses">
+              <span>📖 Bionic Focus</span>
+              <span>{{ bionicReading.isBionicReadingEnabled() ? 'ON' : 'OFF' }}</span>
+            </button>
 
           </div>
 
@@ -3234,6 +3249,7 @@ export class AnalysisReportComponent implements OnDestroy {
     }
   });
 
+  protected readonly bionicReading = inject(BionicReadingService);
   get lensAnnotations() { return this.state.lensAnnotations; }  // Track save status per node
   readonly nodeSaveStatuses = signal<Record<string, 'idle' | 'saving' | 'saved'>>({});
 

@@ -44,6 +44,17 @@ export class PatientStateService {
     customLiDARScanUrl: null
   });
 
+  readonly hasActiveIssues = computed(() => {
+    const issues = this.issues();
+    const vitals = this.vitals();
+    const cgm = parseFloat(vitals?.cgmGlucoseMgDl || '110');
+    const hr = parseFloat(vitals?.hr || '72');
+    const spO2 = parseFloat(vitals?.spO2 || '98');
+    const hasBodyPartPain = Object.keys(issues).length > 0;
+    const hasVitalsDeviation = hr > 100 || hr < 50 || spO2 < 95 || cgm < 70 || cgm > 180;
+    return hasBodyPartPain || hasVitalsDeviation || this.isEmergencyMode();
+  });
+
   readonly prescribedToolsList = computed(() => {
     const states = this.toolStates();
     const prescribedKeys = Object.keys(states).filter(k => states[k] === 'prescribed');
@@ -225,6 +236,7 @@ export class PatientStateService {
   readonly lensAnnotations = signal<Record<string, Record<string, any>>>({});
   readonly isEmergencyMode = signal<boolean>(false);
   readonly isDemoMode = signal<boolean>(false);
+  readonly isQuietMinimalUiMode = signal<boolean>(true);
   readonly isAudioPrimaryMode = signal<boolean>(false);
   readonly isGammaSyncActive = signal<boolean>(false);
   readonly sentinelScope = signal<'micro-patient' | 'macro-fleet'>('micro-patient');

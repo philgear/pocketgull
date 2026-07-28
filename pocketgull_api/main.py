@@ -33,6 +33,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from services.holistic_risk_service import MultiModalPatientStateInput, compute_holistic_patient_risk
+from services.readmission_sepsis_model import ReadmissionSepsisInput, predict_readmission_and_sepsis
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ML: CLINICAL RISK SCORING (joblib / scikit-learn) STATE & LOADING
@@ -195,6 +196,12 @@ class SomaticCoherenceResponse(BaseModel):
     recommended_avs_frequency_hz: float
     recommended_binaural_pulse_hz: float
     clinical_recommendation: str
+
+
+@app.post("/ml/readmission-sepsis", tags=["ML"])
+async def predict_readmission_sepsis_route(payload: ReadmissionSepsisInput):
+    """XGBoost 30-Day Hospital Readmission & qSOFA ICU Sepsis Escalation ML Scoring."""
+    return predict_readmission_and_sepsis(payload)
 
 
 @app.post("/api/ml/somatic-coherence-score", response_model=SomaticCoherenceResponse, tags=["ML"])
