@@ -4,8 +4,9 @@ import { YbocsScreenerComponent } from '../ybocs-screener.component';
 import { ClinicalAssessmentsSuiteComponent } from '../clinical-assessments-suite.component';
 import { MultiParadigmVennComponent } from '../multi-paradigm-venn.component';
 import { KaizenQualitySuiteComponent } from '../kaizen-quality-suite.component';
+import { TeledentistrySystemicLensComponent } from './teledentistry-systemic-lens.component';
 
-export type ScreenerSubTab = 'ybocs' | 'suite' | 'venn' | 'kaizen' | 'suggestions';
+export type ScreenerSubTab = 'ybocs' | 'suite' | 'venn' | 'kaizen' | 'teledentistry' | 'suggestions';
 
 @Component({
   selector: 'app-assessments-lens-tab',
@@ -15,7 +16,8 @@ export type ScreenerSubTab = 'ybocs' | 'suite' | 'venn' | 'kaizen' | 'suggestion
     YbocsScreenerComponent,
     ClinicalAssessmentsSuiteComponent,
     MultiParadigmVennComponent,
-    KaizenQualitySuiteComponent
+    KaizenQualitySuiteComponent,
+    TeledentistrySystemicLensComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -66,6 +68,17 @@ export type ScreenerSubTab = 'ybocs' | 'suite' | 'venn' | 'kaizen' | 'suggestion
           class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
           📈 Kaizen Optimization (SPC/Pareto)
         </button>
+        <button (click)="screenerTab.set('teledentistry')"
+          data-testid="tab-teledentistry"
+          [class.bg-white]="screenerTab() === 'teledentistry'"
+          [class.dark:bg-zinc-800]="screenerTab() === 'teledentistry'"
+          [class.text-indigo-650]="screenerTab() === 'teledentistry'"
+          [class.dark:text-indigo-400]="screenerTab() === 'teledentistry'"
+          [class.text-zinc-500]="screenerTab() !== 'teledentistry'"
+          [class.shadow-xs]="screenerTab() === 'teledentistry'"
+          class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
+          🦷 Teledentistry (32-Tooth)
+        </button>
         <button (click)="screenerTab.set('suggestions')"
           [class.bg-white]="screenerTab() === 'suggestions'"
           [class.dark:bg-zinc-800]="screenerTab() === 'suggestions'"
@@ -93,6 +106,10 @@ export type ScreenerSubTab = 'ybocs' | 'suite' | 'venn' | 'kaizen' | 'suggestion
       } @else if (screenerTab() === 'kaizen') {
         <div class="w-full">
           <app-kaizen-quality-suite></app-kaizen-quality-suite>
+        </div>
+      } @else if (screenerTab() === 'teledentistry') {
+        <div class="w-full">
+          <app-teledentistry-systemic-lens></app-teledentistry-systemic-lens>
         </div>
       } @else {
         <!-- Intake & Motivational interviewing Suggestions Panel -->

@@ -72,11 +72,14 @@ import { ChronobiologyMatrixComponent } from './chronobiology-matrix.component';
 import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.component';
 import { BionicReadingService } from '../services/bionic-reading.service';
 
+import { TeledentistrySystemicLensComponent } from './analysis-report/teledentistry-systemic-lens.component';
+
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
   imports: [
     CommonModule,
+    TeledentistrySystemicLensComponent,
     ClinicalSleepTwinDashboardComponent,
     ChronobiologyMatrixComponent,
     FunctionalMedicineMatrixComponent,
@@ -492,6 +495,10 @@ import { BionicReadingService } from '../services/bionic-reading.service';
             </div>
           }
         }
+
+          @if (activeLens() === 'Teledentistry & Systemic Health') {
+            <app-teledentistry-systemic-lens class="block my-6"></app-teledentistry-systemic-lens>
+          }
 
           @if (activeLens() === 'ASSESSMENTS') {
             <app-assessments-lens-tab></app-assessments-lens-tab>
