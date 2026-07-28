@@ -103,36 +103,57 @@ export async function enterDemoMode(page: Page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
 
-  // PIN entry
-  const pinInput = page.locator('input[placeholder="1234"]');
-  if (await pinInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-    await pinInput.fill('1234');
-    await pinInput.press('Enter');
-  }
-
-  // Demo Mode button
-  const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-  if (await demoBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-    await demoBtn.click();
-  }
-
-  // Skip KSS if present
-  const skipBtn = page.locator('button', { hasText: 'Skip' });
-  if (await skipBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await skipBtn.click();
-  }
-
-  // Ethics pledge (if present)
-  const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-  if (await acceptBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    const pledgeCheckbox = page.locator('input[type="checkbox"]').last();
-    if (await pledgeCheckbox.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await pledgeCheckbox.check().catch(() => {});
+  const startTime = Date.now();
+  while (Date.now() - startTime < 30000) {
+    // Check if main app dropdown is already rendered and visible
+    const dropdownBtn = page.locator('app-patient-dropdown button').first();
+    if (await dropdownBtn.isVisible().catch(() => false)) {
+      return;
     }
-    await acceptBtn.click();
+
+    // 1. PIN entry
+    const pinInput = page.locator('input[placeholder="1234"]');
+    if (await pinInput.isVisible().catch(() => false)) {
+      await pinInput.fill('1234');
+      await pinInput.press('Enter');
+      await page.waitForTimeout(300);
+      continue;
+    }
+
+    // 2. Demo Mode button
+    const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
+    if (await demoBtn.isVisible().catch(() => false)) {
+      await demoBtn.click();
+      await page.waitForTimeout(300);
+      continue;
+    }
+
+    // 3. Skip KSS button
+    const skipBtn = page.locator('button', { hasText: 'Skip' });
+    if (await skipBtn.isVisible().catch(() => false)) {
+      await skipBtn.click();
+      await page.waitForTimeout(300);
+      continue;
+    }
+
+    // 4. Ethics pledge checkbox & Accept button
+    const pledgeCheckbox = page.locator('#pledge-accepted, input[type="checkbox"]').first();
+    if (await pledgeCheckbox.isVisible().catch(() => false)) {
+      if (!(await pledgeCheckbox.isChecked().catch(() => false))) {
+        await pledgeCheckbox.check().catch(() => {});
+      }
+    }
+
+    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
+    if (await acceptBtn.isVisible().catch(() => false)) {
+      await acceptBtn.click().catch(() => {});
+      await page.waitForTimeout(300);
+      continue;
+    }
+
+    await page.waitForTimeout(400);
   }
 
-  // Wait for main app or container to render
-  await page.waitForSelector('app-analysis-container, app-analysis-report, main', { timeout: 20000 });
-  await page.waitForSelector('app-patient-dropdown button', { state: 'visible', timeout: 20000 }).catch(() => {});
+  // Final wait for main patient dropdown to be visible
+  await page.waitForSelector('app-patient-dropdown button', { state: 'visible', timeout: 15000 });
 }

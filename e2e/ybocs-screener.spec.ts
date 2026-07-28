@@ -25,6 +25,11 @@ test.describe('Y-BOCs Diagnostic Screener E2E Tests', () => {
     // Wait for core AI container (deferred block) to be visible
     await expect(page.locator('app-analysis-container')).toBeVisible({ timeout: 15000 });
 
+    // Switch to ASSESSMENTS lens tab
+    const assessmentsBtn = page.locator('button', { hasText: 'ASSESSMENTS' }).first();
+    await expect(assessmentsBtn).toBeVisible({ timeout: 15000 });
+    await assessmentsBtn.click();
+
     // 3. Select Y-BOCs Screener Tab
     const ybocsTab = page.getByTestId('tab-ybocs-screener');
     await expect(ybocsTab).toBeVisible({ timeout: 15000 });

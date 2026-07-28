@@ -43,6 +43,7 @@ async function enterDemoMode(page: import('@playwright/test').Page) {
 async function selectPatientByName(page: import('@playwright/test').Page, name: string) {
   // Click patient dropdown
   const dropdownBtn = page.locator('app-patient-dropdown button').first();
+  await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
   await dropdownBtn.click();
 
   const option = page.locator('.origin-top-left button', { hasText: name }).first();

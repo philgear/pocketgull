@@ -498,6 +498,7 @@ import { BionicReadingService } from '../services/bionic-reading.service';
             <!-- Screener Sub-Lens Tab Selection -->
             <div class="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 max-w-2xl">
               <button (click)="screenerTab.set('ybocs')"
+                data-testid="tab-ybocs-screener"
                 [class.bg-white]="screenerTab() === 'ybocs'"
                 [class.dark:bg-zinc-800]="screenerTab() === 'ybocs'"
                 [class.text-indigo-650]="screenerTab() === 'ybocs'"
