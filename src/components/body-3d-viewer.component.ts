@@ -2326,27 +2326,29 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     }
                 }
 
-                // SIGGRAPH-grade Real-Time Cardiac Double-Bump Animation (Systolic/Diastolic rhythm synced to patient HR vitals)
+                // SIGGRAPH-grade Real-Time Cardiac Double-Bump & Pulmonary Respiration (Synced to patient vitals)
                 const heartPart = this.parts.get('heart');
                 if (heartPart) {
                     const rawHr = this.state.vitals()?.hr;
                     const hrVal = rawHr ? (parseInt(String(rawHr), 10) || 72) : 72;
-                    const bps = (hrVal / 60.0) * 2.0 * Math.PI;
-                    // Double-bump waveform mimicking Isovolumetric Contraction & Ventricular Ejection
-                    const cardiacPulse = 1.0 + Math.sin(time * bps) * 0.06 + Math.sin(time * bps * 2.0) * 0.025;
-                    heartPart.scale.set(cardiacPulse, cardiacPulse * 1.1, cardiacPulse);
+                    const bps = (hrVal / 60.0);
+                    const cardiacCycle = (time * bps * 2 * Math.PI) % (2 * Math.PI);
+                    const heartDoubleBump = Math.pow(Math.sin(cardiacCycle), 8) * 0.12 + Math.pow(Math.sin(cardiacCycle * 2 + 0.5), 12) * 0.06;
+                    heartPart.scale.set(1 + heartDoubleBump, (1 + heartDoubleBump) * 1.1, 1 + heartDoubleBump);
+                    heartPart.children.forEach(c => {
+                        if (c instanceof THREE.Mesh && c.material instanceof THREE.MeshStandardMaterial) {
+                            c.material.emissiveIntensity = 0.3 + heartDoubleBump * 1.5;
+                        }
+                    });
                 }
 
-                // Lungs Respiration Animation (Pacing with AVS or physiological respiratory rate)
-                const lungsPart = this.parts.get('lungs');
-                if (lungsPart) {
-                    const respRate = avsActive ? (this.state.avsBreathingRate() / 60.0) : 0.25;
-                    const respFreq = respRate * 2.0 * Math.PI;
-                    const lungExpansion = 1.0 + Math.sin(time * respFreq) * 0.045;
-                    lungsPart.scale.set(lungExpansion, 1.0 + Math.sin(time * respFreq) * 0.02, lungExpansion);
+                const lungPart = this.parts.get('lungs');
+                if (lungPart) {
+                    const breathCycle = Math.sin(time * 1.2) * 0.05;
+                    lungPart.scale.set(1 + breathCycle, 1 + breathCycle * 1.5, 1 + breathCycle);
                 }
 
-                // Brain Neural Firing Animation
+                // 1. Brain Neural Oscillations
                 const brainPart = this.parts.get('brain');
                 if (brainPart) {
                     const neuralGlow = 0.25 + Math.sin(time * 5) * 0.15 + Math.sin(time * 12) * 0.05;
