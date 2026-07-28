@@ -152,6 +152,18 @@ export const AGENT_PERSONAS: Record<string, IAgentPersona> = {
         svgAnimation: 'error-sweep',
         adkMapping: 'debug_integrity_agent',
     },
+    beacon: {
+        name: 'Beacon',
+        role: 'Performance Optimization & Lighthouse Core Web Vitals',
+        emoji: '🕯️',
+        tagline: 'Illuminating the path to a perfect 100.',
+        accentColor: '#FBBF24',
+        accentTailwind: 'amber-400',
+        avatarPath: 'assets/images/agents/beacon.png',
+        props: ['Golden Lighthouse Trophy', 'Stopwatch', 'Prism Lens'],
+        svgAnimation: 'beam-sweep-100',
+        adkMapping: 'performance_optimization_agent',
+    },
 };
 
 /**
@@ -174,6 +186,8 @@ export function getPersonaForLens(lens: AnalysisLens): IAgentPersona {
             return AGENT_PERSONAS['scribes'];
         case 'Console Debugging & Integrity':
             return AGENT_PERSONAS['debugger'];
+        case 'Performance Optimization & Web Vitals':
+            return AGENT_PERSONAS['beacon'];
         default:
             return AGENT_PERSONAS['gulliver'];
     }
