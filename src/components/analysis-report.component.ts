@@ -31,6 +31,8 @@ import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
 import { YbocsScreenerComponent } from './ybocs-screener.component';
 import { ClinicalAssessmentsSuiteComponent } from './clinical-assessments-suite.component';
+import { MultiParadigmVennComponent } from './multi-paradigm-venn.component';
+import { KaizenQualitySuiteComponent } from './kaizen-quality-suite.component';
 import { ClinicalMenuComponent } from './clinical-menu.component';
 import { KssCognitiveShieldComponent } from './kss-cognitive-shield.component';
 import { CarePlanPrintPreviewComponent } from './care-plan-print-preview.component';
@@ -97,6 +99,8 @@ import { BionicReadingService } from '../services/bionic-reading.service';
     NodeAgentDialogComponent,
     YbocsScreenerComponent,
     ClinicalAssessmentsSuiteComponent,
+    MultiParadigmVennComponent,
+    KaizenQualitySuiteComponent,
     ClinicalMenuComponent,
     KssCognitiveShieldComponent,
     EmergencyNutritionalBypassComponent,
@@ -496,7 +500,7 @@ import { BionicReadingService } from '../services/bionic-reading.service';
           @if (activeLens() === 'ASSESSMENTS') {
           <div class="w-full space-y-6">
             <!-- Screener Sub-Lens Tab Selection -->
-            <div class="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 max-w-2xl">
+            <div class="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 max-w-4xl overflow-x-auto">
               <button (click)="screenerTab.set('ybocs')"
                 data-testid="tab-ybocs-screener"
                 [class.bg-white]="screenerTab() === 'ybocs'"
@@ -505,8 +509,8 @@ import { BionicReadingService } from '../services/bionic-reading.service';
                 [class.dark:text-indigo-400]="screenerTab() === 'ybocs'"
                 [class.text-zinc-500]="screenerTab() !== 'ybocs'"
                 [class.shadow-xs]="screenerTab() === 'ybocs'"
-                class="flex-1 py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0">
-                ⚡ Y-BOCs OCD Screener
+                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
+                ⚡ Y-BOCs OCD
               </button>
               <button (click)="screenerTab.set('suite')"
                 data-testid="tab-clinical-suite"
@@ -516,8 +520,30 @@ import { BionicReadingService } from '../services/bionic-reading.service';
                 [class.dark:text-indigo-400]="screenerTab() === 'suite'"
                 [class.text-zinc-500]="screenerTab() !== 'suite'"
                 [class.shadow-xs]="screenerTab() === 'suite'"
-                class="flex-1 py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0">
-                📋 General Clinical Suite
+                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
+                📋 Clinical Suite
+              </button>
+              <button (click)="screenerTab.set('venn')"
+                data-testid="tab-venn-matrix"
+                [class.bg-white]="screenerTab() === 'venn'"
+                [class.dark:bg-zinc-800]="screenerTab() === 'venn'"
+                [class.text-indigo-650]="screenerTab() === 'venn'"
+                [class.dark:text-indigo-400]="screenerTab() === 'venn'"
+                [class.text-zinc-500]="screenerTab() !== 'venn'"
+                [class.shadow-xs]="screenerTab() === 'venn'"
+                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
+                ⭕ Venn Consensus (W∩F∩E)
+              </button>
+              <button (click)="screenerTab.set('kaizen')"
+                data-testid="tab-kaizen-suite"
+                [class.bg-white]="screenerTab() === 'kaizen'"
+                [class.dark:bg-zinc-800]="screenerTab() === 'kaizen'"
+                [class.text-indigo-650]="screenerTab() === 'kaizen'"
+                [class.dark:text-indigo-400]="screenerTab() === 'kaizen'"
+                [class.text-zinc-500]="screenerTab() !== 'kaizen'"
+                [class.shadow-xs]="screenerTab() === 'kaizen'"
+                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
+                📈 Kaizen Optimization (SPC/Pareto)
               </button>
               <button (click)="screenerTab.set('suggestions')"
                 [class.bg-white]="screenerTab() === 'suggestions'"
@@ -526,7 +552,7 @@ import { BionicReadingService } from '../services/bionic-reading.service';
                 [class.dark:text-indigo-400]="screenerTab() === 'suggestions'"
                 [class.text-zinc-500]="screenerTab() !== 'suggestions'"
                 [class.shadow-xs]="screenerTab() === 'suggestions'"
-                class="flex-1 py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0">
+                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
                 💡 Intake & Interviewing
               </button>
             </div>
@@ -538,6 +564,14 @@ import { BionicReadingService } from '../services/bionic-reading.service';
             } @else if (screenerTab() === 'suite') {
               <div class="w-full">
                 <app-clinical-assessments-suite></app-clinical-assessments-suite>
+              </div>
+            } @else if (screenerTab() === 'venn') {
+              <div class="w-full">
+                <app-multi-paradigm-venn></app-multi-paradigm-venn>
+              </div>
+            } @else if (screenerTab() === 'kaizen') {
+              <div class="w-full">
+                <app-kaizen-quality-suite></app-kaizen-quality-suite>
               </div>
             } @else {
               <!-- Intake & Motivational interviewing Suggestions Panel -->
@@ -2421,7 +2455,7 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
   activeLens = signal<AnalysisLens | 'EMT Handoff' | 'ASSESSMENTS' | 'Maternal & Postpartum'>('Summary Overview');
-  screenerTab = signal<'ybocs' | 'suite' | 'suggestions'>('ybocs');
+  screenerTab = signal<'ybocs' | 'suite' | 'venn' | 'kaizen' | 'suggestions'>('ybocs');
   showRawFhir = signal(false);
 
   intakeSuggestions = computed(() => {
