@@ -11,6 +11,7 @@ import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ThemeService } from '../services/theme.service';
 import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
+import { AdobeFireflyTextureService } from '../services/adobe-firefly-texture.service';
 import { IBodyPartIssue } from '../services/patient.types';
 
 const PART_NAMES: Record<string, string> = {
@@ -271,6 +272,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private readonly patientManagement = inject(PatientManagementService);
     protected readonly themeService = inject(ThemeService);
     protected readonly envTelemetry = inject(EnvironmentalTelemetryService);
+    protected readonly fireflyTexture = inject(AdobeFireflyTextureService);
     private readonly platformId = inject(PLATFORM_ID);
     private readonly canvasContainer = viewChild<ElementRef<HTMLDivElement>>('canvasContainer');
 
@@ -807,41 +809,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         const theme = this.themeService.currentTheme();
         const active = this.themeService.activeTheme();
-        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'black-marble' || theme === 'curie' || theme === 'mandala' || theme === 'papyrus';
+        const isDarkTheme = active === 'dark' || theme === 'dark' || theme === 'spark';
 
         // Clear alpha set to 0.0 (fully transparent) so background textures/images show through underneath!
         this.renderer.setClearColor(0x000000, 0.0);
 
-        if (theme === 'curie') {
-            // Radium Curie emerald glow studio lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0x00ff66); this.ambientLight.intensity = 2.2; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0x00cc66); this.directionalLight.intensity = 2.0; }
-            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 1.2; }
-            if (this.bloomPass) this.bloomPass.strength = 0.35;
-        } else if (theme === 'mandala') {
-            // Cosmic mandala violet & saffron lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0x8b5cf6); this.ambientLight.intensity = 2.0; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0xf59e0b); this.directionalLight.intensity = 1.8; }
-            if (this.backLight) { this.backLight.color.setHex(0x06b6d4); this.backLight.intensity = 1.0; }
+        if (theme === 'spark') {
+            // Ember Spark Mode studio lights
+            if (this.ambientLight) { this.ambientLight.color.setHex(0xfb923c); this.ambientLight.intensity = 2.2; }
+            if (this.directionalLight) { this.directionalLight.color.setHex(0xf97316); this.directionalLight.intensity = 2.0; }
+            if (this.backLight) { this.backLight.color.setHex(0xe11d48); this.backLight.intensity = 1.2; }
             if (this.bloomPass) this.bloomPass.strength = 0.25;
-        } else if (theme === 'papyrus') {
-            // Egyptian torchlight gold
-            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.2; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0xd97706); this.directionalLight.intensity = 2.0; }
-            if (this.backLight) { this.backLight.color.setHex(0x1e3a8a); this.backLight.intensity = 1.0; }
-            if (this.bloomPass) this.bloomPass.strength = 0.15;
-        } else if (theme === 'white-marble' || theme === 'black-marble') {
-            // Gold vein marble lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0xd4af37); this.ambientLight.intensity = 2.0; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0xf6e4a6); this.directionalLight.intensity = 1.8; }
-            if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.9; }
-            if (this.bloomPass) this.bloomPass.strength = 0.12;
-        } else if (theme === 'pool') {
-            // Aqua blue water lights
-            if (this.ambientLight) { this.ambientLight.color.setHex(0x38bdf8); this.ambientLight.intensity = 2.4; }
-            if (this.directionalLight) { this.directionalLight.color.setHex(0x0284c7); this.directionalLight.intensity = 2.0; }
-            if (this.backLight) { this.backLight.color.setHex(0xfb7185); this.backLight.intensity = 0.8; }
-            if (this.bloomPass) this.bloomPass.strength = 0.10;
         } else if (isDarkTheme) {
             // Dark obsidian spatial canvas
             if (this.ambientLight) { this.ambientLight.color.setHex(0xffffff); this.ambientLight.intensity = 1.8; }
@@ -849,7 +827,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             if (this.backLight) { this.backLight.color.setHex(0x818cf8); this.backLight.intensity = 1.2; }
             if (this.bloomPass) this.bloomPass.strength = 0.15;
         } else {
-            // Parchment/Papercraft studio lighting
+            // Light Parchment studio lighting
             if (this.ambientLight) { this.ambientLight.color.setHex(0xfff8ee); this.ambientLight.intensity = 2.4; }
             if (this.directionalLight) { this.directionalLight.color.setHex(0xfff5e6); this.directionalLight.intensity = 2.0; }
             if (this.backLight) { this.backLight.color.setHex(0x38bdf8); this.backLight.intensity = 0.8; }
@@ -1150,15 +1128,21 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         this.mannequinGroup = new THREE.Group();
         this.scene.add(this.mannequinGroup);
 
-        // Base Layer Materials
+        // Adobe Firefly AI Procedural PBR Textures
+        const skinTexture = this.fireflyTexture.getFireflyTexture('skin');
+        const muscleTexture = this.fireflyTexture.getFireflyTexture('muscle');
+        const boneTexture = this.fireflyTexture.getFireflyTexture('skeleton');
+        const organTexture = this.fireflyTexture.getFireflyTexture('organs');
+
+        // Base Layer Materials wrapped with Adobe Firefly Generative Textures
         const skinMaterial = new THREE.MeshStandardMaterial({
-            color: 0x38bdf8, roughness: 0.3, metalness: 0.2, emissive: 0x0369a1, emissiveIntensity: 0.15, transparent: true, opacity: 0.92, depthWrite: true
+            color: 0x38bdf8, bumpMap: skinTexture, bumpScale: 0.04, roughness: 0.35, metalness: 0.15, emissive: 0x0369a1, emissiveIntensity: 0.15, transparent: true, opacity: 0.92, depthWrite: true
         });
         const muscleMaterial = new THREE.MeshStandardMaterial({
-            color: 0xbe123c, roughness: 0.65, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xbe123c, bumpMap: muscleTexture, bumpScale: 0.08, roughness: 0.65, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
         const boneMaterial = new THREE.MeshStandardMaterial({
-            color: 0xf5f5f4, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
+            color: 0xf5f5f4, bumpMap: boneTexture, bumpScale: 0.03, roughness: 0.4, metalness: 0.1, transparent: true, opacity: 0.0, depthWrite: false
         });
 
         // Organ Layer Materials with Distinct Anatomical Colors & Emissive Highlights

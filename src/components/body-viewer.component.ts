@@ -391,13 +391,6 @@ export class BodyViewerComponent implements OnDestroy {
         this.state.anatomyViewMode.set('skin');
       }
     });
-
-    effect(() => {
-      const theme = this.themeService.currentTheme();
-      if (theme === 'mandala') {
-        this.state.activePhilosophy.set('ayurvedic');
-      }
-    });
   }
 
   readonly allParts = [

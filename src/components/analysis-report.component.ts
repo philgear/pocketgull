@@ -2121,12 +2121,10 @@ export class AnalysisReportComponent implements OnDestroy {
   }
 
   getPaperTextureLabel(theme: AppTheme): string {
-    if (theme === 'papercraft') return '📜 Cardstock';
-    if (theme === 'hemp') return '🌿 Organic Hemp';
-    if (theme === 'rice') return '🌾 Rice Paper';
-    if (theme === 'construction') return '🎨 Construction';
     if (theme === 'dark') return '🌙 Dark Mode';
-    return '📜 Texture Suite';
+    if (theme === 'spark') return '✨ Spark Mode';
+    if (theme === 'system') return '💻 System OS';
+    return '☀️ Light Mode';
   }
 
   toggleAuxTool(tool: 'qaly' | 'solfeggio' | 'vagal' | 'storm' | 'foraging' | 'investment' | 'perils' | 'karaoke' | 'assessments') {

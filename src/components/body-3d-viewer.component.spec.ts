@@ -6,6 +6,7 @@ import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ThemeService } from '../services/theme.service';
 import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
+import { AdobeFireflyTextureService } from '../services/adobe-firefly-texture.service';
 
 // Mock Angular effect to avoid ChangeDetectionScheduler requirement in headless Vitest tests
 vi.mock('@angular/core', async (importOriginal) => {
@@ -36,7 +37,8 @@ describe('Body3DViewerComponent Signal & Spatial Anatomy Behavioral Suite', () =
         { provide: PatientStateService, useValue: mockPatientState },
         { provide: PatientManagementService, useValue: {} },
         { provide: ThemeService, useValue: { isDarkMode: signal(true) } },
-        { provide: EnvironmentalTelemetryService, useValue: {} }
+        { provide: EnvironmentalTelemetryService, useValue: {} },
+        AdobeFireflyTextureService
       ]
     });
     return runInInjectionContext(injector, () => new Body3DViewerComponent());

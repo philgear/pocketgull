@@ -114,29 +114,15 @@ export interface IThemeOption {
 export class ThemeStudioDrawerComponent {
   public themeService = inject(ThemeService);
 
-  categories: Array<'Clinical' | 'Tactile Paper' | 'Mineral & Organic' | 'Special Diagnostic'> = [
+  categories: Array<'Clinical' | 'Special Diagnostic'> = [
     'Clinical',
-    'Tactile Paper',
-    'Mineral & Organic',
     'Special Diagnostic'
   ];
 
   themeOptions: IThemeOption[] = [
-    { id: 'rice', name: 'Rice Paper (Washi)', category: 'Tactile Paper', icon: '📜', bgHex: '#F9F3D9', borderHex: '#D3C29E', textHex: '#2C2519', accentHex: '#3ebc9e', description: 'Traditional warm tactile Japanese rice paper texture.' },
-    { id: 'hemp', name: 'Raw Hemp Paper', category: 'Tactile Paper', icon: '🌿', bgHex: '#F4EEDD', borderHex: '#C5B99F', textHex: '#28241A', accentHex: '#10b981', description: 'Natural unbleached organic hemp fiber.' },
-    { id: 'papercraft', name: 'Cardstock 3D', category: 'Tactile Paper', icon: '📦', bgHex: '#F5E6C8', borderHex: '#D5BC98', textHex: '#332414', accentHex: '#f59e0b', description: 'Heavyweight architectural cardstock paper.' },
-    { id: 'papyrus', name: 'Egyptian Papyrus', category: 'Tactile Paper', icon: '📜', bgHex: '#13100c', borderHex: '#3a2d1d', textHex: '#e6cca0', accentHex: '#d97706', description: 'Dark woven ancient papyrus reed texture.' },
-
-    { id: 'light', name: 'Light Parchment', category: 'Clinical', icon: '☀️', bgHex: '#F8F8F8', borderHex: '#E5E5E5', textHex: '#1C1C1C', accentHex: '#3ebc9e', description: 'Standard clinical high-contrast light mode.' },
+    { id: 'light', name: 'Light Parchment', category: 'Clinical', icon: '☀️', bgHex: '#F8F8F8', borderHex: '#E5E5E5', textHex: '#1C1C1C', accentHex: '#0284c7', description: 'Standard clinical high-contrast light mode.' },
     { id: 'dark', name: 'Dark Obsidian', category: 'Clinical', icon: '🌙', bgHex: '#09090b', borderHex: '#27272a', textHex: '#fafafa', accentHex: '#10b981', description: 'Deep dark mode optimized for night shifts.' },
-    { id: 'calm', name: 'Serene Calm', category: 'Clinical', icon: '🧘', bgHex: '#FAF9F6', borderHex: '#E2E0D8', textHex: '#212529', accentHex: '#0ea5e9', description: 'Soft off-white paper tone reducing eye fatigue.' },
-
-    { id: 'white-marble', name: 'White Carrara Marble', category: 'Mineral & Organic', icon: '🏛️', bgHex: '#FAF9F6', borderHex: '#DDDCD6', textHex: '#1F2421', accentHex: '#64748b', description: 'Polished white Carrara marble veins.' },
-    { id: 'black-marble', name: 'Obsidian Black Marble', category: 'Mineral & Organic', icon: '🖤', bgHex: '#0d0d11', borderHex: '#242430', textHex: '#f1f5f9', accentHex: '#94a3b8', description: 'Deep obsidian black marble texture.' },
-    { id: 'pool', name: 'Ocean Reflection Pool', category: 'Mineral & Organic', icon: '🌊', bgHex: '#081f3d', borderHex: '#1e3a8a', textHex: '#e0f2fe', accentHex: '#38bdf8', description: 'Restorative ocean water bio-reflection.' },
-
-    { id: 'curie', name: 'Madame Curie Lab', category: 'Special Diagnostic', icon: '🔬', bgHex: '#0f1416', borderHex: '#1e292b', textHex: '#22d3ee', accentHex: '#06b6d4', description: 'Radium laboratory cyan fluorescence.' },
-    { id: 'mandala', name: 'Sacred Mandala', category: 'Special Diagnostic', icon: '🧘', bgHex: '#16112d', borderHex: '#2d225c', textHex: '#a78bfa', accentHex: '#8b5cf6', description: 'Deep violet meditative bio-geometry.' },
+    { id: 'system', name: 'System OS Sync', category: 'Clinical', icon: '💻', bgHex: '#18181b', borderHex: '#3f3f46', textHex: '#e4e4e7', accentHex: '#a855f7', description: 'Automatically synchronizes with your device operating system theme.' },
     { id: 'spark', name: 'Spark Mode', category: 'Special Diagnostic', icon: '✨', bgHex: '#0a0503', borderHex: '#2e1208', textHex: '#fb923c', accentHex: '#f97316', description: 'Ember glow high-contrast emergency lens.' }
   ];
 
@@ -150,7 +136,7 @@ export class ThemeStudioDrawerComponent {
 
   cyclePrimaryTheme() {
     const current = this.themeService.currentTheme();
-    const sequence: AppTheme[] = ['rice', 'dark', 'curie', 'calm', 'white-marble'];
+    const sequence: AppTheme[] = ['light', 'dark', 'system', 'spark'];
     const idx = sequence.indexOf(current);
     const next = sequence[(idx + 1) % sequence.length];
     this.themeService.currentTheme.set(next);

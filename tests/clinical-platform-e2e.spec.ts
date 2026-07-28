@@ -135,8 +135,8 @@ describe('Clinical Platform & Progressive Disclosure E2E Suite', () => {
     });
     const studio = runInInjectionContext(injector, () => new ThemeStudioDrawerComponent());
 
-    studio.themeService.currentTheme.set('rice');
-    expect(studio.themeService.currentTheme()).toBe('rice');
+    studio.themeService.currentTheme.set('light');
+    expect(studio.themeService.currentTheme()).toBe('light');
 
     studio.cyclePrimaryTheme();
     expect(studio.themeService.currentTheme()).toBe('dark');

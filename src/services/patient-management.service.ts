@@ -373,7 +373,7 @@ export class PatientManagementService implements OnDestroy {
     this.selectedPatientId.set(id);
 
     if (id === 'p_marie_curie') {
-      this.themeService.setTheme('curie');
+      this.themeService.setTheme('dark');
     }
   }
 

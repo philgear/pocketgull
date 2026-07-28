@@ -2007,7 +2007,7 @@ export class AppComponent implements OnDestroy {
   }
 
   cycleTheme() {
-    const themes: AppTheme[] = ['papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'light', 'dark'];
+    const themes: AppTheme[] = ['light', 'dark', 'system', 'spark'];
     const current = this.theme.currentTheme();
     const nextIdx = (themes.indexOf(current) + 1) % themes.length;
     this.theme.setTheme(themes[nextIdx]);
