@@ -5,8 +5,8 @@
 ## Core System Architecture
 - **Frontend**: Angular 22 Standalone Components with Signals (`signal`, `computed`, `effect`).
 - **Backend / SSR**: Node.js, Express, and integrated Angular Server-Side Rendering.
-- **Interactive 3D Anatomy**: Three.js WebGL procedural skeletal, organ, and dermatome mapping.
-- **Python ML Sidecar**: FastAPI sidecar (`pocketgull_api`) providing XGBoost risk scoring and digital signal processing (EDF / PhysioNet 2026).
+- **Interactive 3D Anatomy**: Three.js WebGL procedural skeletal, organ, dermatome mapping with SIGGRAPH GLSL shaders, SIGGRAPH cardiac double-bump, and Vision Accessibility non-glare fallbacks.
+- **Python ML Sidecar & Edge**: FastAPI sidecar (`pocketgull_api`) with `HistGradientBoostingClassifier` clinical risk scoring, Google Pixel AVF Linux container installer (`setup-pixel-linux.sh`), and in-browser Pyodide WebAssembly Python runtime for iOS PWAs.
 - **Mobile Companion**: Flutter / Dart cross-platform mobile suite (`pocketgull_flutter`) supporting Doctor Mode & Patient Mode.
 - **Interoperability**: Strict FHIR R4 Bundle export & FHIR R5 `SubscriptionTopic` real-time biometric telemetry streaming (`http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream`).
 
@@ -16,11 +16,11 @@ Pocket Gull exposes native WebMCP tools and 13 specialized clinical lenses for a
 - **Family Pedigree Tree & Risk Pruning**: 3-generation pedigree tree visualizer (`FamilyTreePedigreeComponent`) with interactive risk pruning.
 - **In-Line Medical Term Decoder**: Contextual hover tooltips (`MedicalDecoderService` / `MedicalDecoderPipe`) decoding 50+ clinical terms.
 - **TED-Style Patient Hero Journey**: 3-Act narrative generator (`ClinicalStorytellingService`) with Web Speech audio narration.
-- `get_patient_state`: Retrieves current patient demographics, vitals, CMP lab panel, and active symptoms.
-- `update_patient_vitals`: Pushes updated vital signs (HR, BP, SpO2, Temp) or CMP laboratory values.
+- `get_patient_state`: Retrieves current patient demographics, vitals, CGM continuous glucose monitoring (`cgmGlucoseMgDl`), CMP lab panel, and active symptoms.
+- `update_patient_vitals`: Pushes updated vital signs (HR, BP, SpO2, Temp, CGM Glucose) or CMP laboratory values.
 - `trigger_fhir_r5_stream`: Toggles live FHIR R5 biometric telemetry streaming.
 - `connect_ble_wearable`: Connects to Apple Watch / Garmin Web Bluetooth GATT Heart Rate Service (`0x180D`).
-- `toggle_dermatome_layer`: Activates interactive WebGL 3D spine & dermatome nerve root mapping.
+- `toggle_dermatome_layer`: Activates interactive WebGL 3D spine & dermatome nerve root mapping with SIGGRAPH shaders and Vision Accessibility controls.
 - `generate_companion_sync_link`: Produces dynamic FHIR R4 Smart Launch QR code and deep links (`pocketgull://sync?...`).
 - `generate_specialist_handoff`: Serializes patient state into an expanded base64 handoff URL and SBAR note for specialist referrals.
 - `generate_care_plan`: Triggers multi-paradigm clinical strategy generation across all 13 specialized lenses.
