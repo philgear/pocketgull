@@ -114,8 +114,8 @@ export async function enterDemoMode(page: Page) {
     // 1. PIN entry
     const pinInput = page.locator('input[placeholder="1234"]');
     if (await pinInput.isVisible().catch(() => false)) {
-      await pinInput.fill('1234');
-      await pinInput.press('Enter');
+      await pinInput.fill('1234').catch(() => {});
+      await pinInput.press('Enter').catch(() => {});
       await page.waitForTimeout(300);
       continue;
     }
