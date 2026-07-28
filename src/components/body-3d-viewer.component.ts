@@ -65,7 +65,7 @@ const PART_NAMES: Record<string, string> = {
     'chakra_muladhara': 'Muladhara (Root Earth Base Support Chakra)'
 };
 
-export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive' | 'escher' | 'orch_or';
+export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive' | 'orch_or';
 
 @Component({
     selector: 'app-body-3d-viewer',
@@ -278,7 +278,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     private directionalLight?: THREE.DirectionalLight;
     private backLight?: THREE.DirectionalLight;
     private molecularScienceGroup?: THREE.Group;
-    private escherMobiusGroup?: THREE.Group;
 
     partSelected = output<{ id: string, name: string }>();
 
@@ -1145,80 +1144,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             MIDDLE: THREE.MOUSE.DOLLY,
             RIGHT: THREE.MOUSE.ROTATE
         };
-
-        this.escherMobiusGroup = this.createEscherMobiusStrip();
-        this.scene.add(this.escherMobiusGroup);
-    }
-
-    private createEscherMobiusStrip(): THREE.Group {
-        const mobiusGroup = new THREE.Group();
-        mobiusGroup.name = 'escher_mobius_lens';
-
-        const uSegments = 140;
-        const vSegments = 24;
-        const R = 2.2;
-
-        const geometry = new THREE.BufferGeometry();
-        const positions: number[] = [];
-        const uvs: number[] = [];
-        const colors: number[] = [];
-
-        for (let i = 0; i <= uSegments; i++) {
-            const u = (i / uSegments) * Math.PI * 2;
-            for (let j = 0; j <= vSegments; j++) {
-                const v = (j / vSegments - 0.5) * 0.9;
-                const x = (R + v * Math.cos(u / 2)) * Math.cos(u);
-                const y = (R + v * Math.cos(u / 2)) * Math.sin(u);
-                const z = v * Math.sin(u / 2) + 1.0;
-
-                positions.push(x, y, z);
-                uvs.push(i / uSegments, j / vSegments);
-
-                const t = u / (Math.PI * 2);
-                let r = 0, g = 0, b = 0;
-                if (t < 0.33) {
-                    r = 0.02 + t * 0.1; g = 0.71; b = 0.83;
-                } else if (t < 0.66) {
-                    r = 0.06; g = 0.72; b = 0.50;
-                } else {
-                    r = 0.96; g = 0.62; b = 0.04;
-                }
-                colors.push(r, g, b);
-            }
-        }
-
-        const indices: number[] = [];
-        for (let i = 0; i < uSegments; i++) {
-            for (let j = 0; j < vSegments; j++) {
-                const a = i * (vSegments + 1) + j;
-                const b = (i + 1) * (vSegments + 1) + j;
-                const c = (i + 1) * (vSegments + 1) + (j + 1);
-                const d = i * (vSegments + 1) + (j + 1);
-
-                indices.push(a, b, d);
-                indices.push(b, c, d);
-            }
-        }
-
-        geometry.setIndex(indices);
-        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-        geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-        geometry.computeVertexNormals();
-
-        const material = new THREE.MeshStandardMaterial({
-            vertexColors: true,
-            wireframe: true,
-            side: THREE.DoubleSide,
-            transparent: true,
-            opacity: 0.75,
-            roughness: 0.2,
-            metalness: 0.8
-        });
-
-        const mesh = new THREE.Mesh(geometry, material);
-        mobiusGroup.add(mesh);
-        return mobiusGroup;
     }
 
     private createMannequin() {
@@ -2183,12 +2108,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
             if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
             if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = true;
-        } else if (mode === 'escher') {
-            if (this.mannequinGroup) this.mannequinGroup.visible = true;
-            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
-            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
-            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
-            if (this.escherMobiusGroup) this.escherMobiusGroup.visible = true;
         } else {
             if (this.mannequinGroup) this.mannequinGroup.visible = true;
             if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
@@ -2361,14 +2280,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     });
                 }
                 
-                // 2. Gentle floating & Escher Möbius Strange Loop Rotation
+                // 2. Gentle floating animation
                 this.mannequinGroup.position.y = Math.sin(time * 1.5) * 0.02;
                 if (this.customModelGroup) {
                     this.customModelGroup.position.y = Math.sin(time * 1.5) * 0.02;
-                }
-                if (this.escherMobiusGroup) {
-                    this.escherMobiusGroup.rotation.y += 0.008;
-                    this.escherMobiusGroup.rotation.z += 0.003;
                 }
                 
                 // 3. Update Shader Uniforms for Heatmaps
