@@ -179,6 +179,9 @@ export class MedicalDecoderService {
     }
   };
 
+  /** Active Web Speech narration status signal */
+  readonly isSpeaking = signal<boolean>(false);
+
   public toggleReadingLevel(): void {
     this.readingLevel.update(mode => mode === 'patient' ? 'clinical' : 'patient');
   }
@@ -186,6 +189,35 @@ export class MedicalDecoderService {
   public getDefinition(term: string): ITermDefinition | null {
     const key = term.toLowerCase().trim();
     return this.dictionary[key] || null;
+  }
+
+  public speakTermDefinition(term: string): void {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    const def = this.getDefinition(term);
+    if (!def) return;
+
+    window.speechSynthesis.cancel();
+    const isClinical = this.readingLevel() === 'clinical';
+    const textToSpeak = isClinical && def.clinicalDefinition
+      ? `Clinical Specification for ${def.term}: ${def.clinicalDefinition}`
+      : `Plain Summary for ${def.term}: ${def.definition}`;
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+
+    utterance.onstart = () => this.isSpeaking.set(true);
+    utterance.onend = () => this.isSpeaking.set(false);
+    utterance.onerror = () => this.isSpeaking.set(false);
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  public stopSpeech(): void {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      this.isSpeaking.set(false);
+    }
   }
 
   public annotateText(html: string): string {
