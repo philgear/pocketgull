@@ -14,7 +14,27 @@ export default defineConfig({
   integrations: [mdx()],
   outDir: './dist',
   vite: {
-    appType: 'custom',
+    root: __dirname,
+    plugins: [
+      {
+        name: 'fix-vite6-ssr-input',
+        configResolved(config) {
+          if (!config.build.rollupOptions.input) {
+            config.build.rollupOptions.input = 'virtual:astro:legacy-ssr-entry';
+          }
+        },
+        resolveId(id) {
+          if (id === 'virtual:astro:legacy-ssr-entry') {
+            return '\0virtual:astro:legacy-ssr-entry';
+          }
+        },
+        load(id) {
+          if (id === '\0virtual:astro:legacy-ssr-entry') {
+            return 'export const app = { manifest: { routes: [] }, setInternals() {}, setOptions() {}, async render() { return new Response(); } };';
+          }
+        }
+      }
+    ],
     define: {
       'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || 'placeholder-key-for-build')
     }

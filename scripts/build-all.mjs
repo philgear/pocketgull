@@ -19,7 +19,7 @@ delete cleanEnv.npm_package_json;
 delete cleanEnv.NPM_PREFIX;
 
 console.log('Building Astro study docs with isolated env...');
-execSync('npx astro build --root .', {
+execSync('npx astro build', {
   cwd: docsDir,
   env: cleanEnv,
   stdio: 'inherit'
