@@ -2742,7 +2742,7 @@ html.theme-papyrus .text-gray-500,
 html.theme-papyrus .text-zinc-400,
 html.theme-papyrus .text-zinc-500 {
   color: #a78bfa !important; /* Soft violet/amethyst details */
-  color: rgba(226, 209, 176, 0.6) !important;
+  color: rgba(226, 209, 176, 0.85) !important;
 }
 
 html.theme-papyrus .text-gray-900,
