@@ -56,10 +56,11 @@ export class PetAuditoryService {
 
       this.recognition.onerror = (err: any) => {
         const errType = err.error || '';
-        console.warn('Pet Auditory STT error:', errType || err);
         if (errType === 'not-allowed' || errType === 'service-not-allowed') {
           console.warn('[Pet Auditory] Microphone permission denied or service unavailable. Disabling STT.');
           this.stopWakeWordListening();
+        } else {
+          console.warn('Pet Auditory STT error:', errType || err);
         }
       };
 

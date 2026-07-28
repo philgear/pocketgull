@@ -843,8 +843,8 @@ export class PatientManagementService implements OnDestroy {
       await firstValueFrom(this.http.post('/api/patients', patientsToSync, { headers }));
       console.log('[PatientManagementService] Successfully synced to cloud');
       return true;
-    } catch (error) {
-      console.error('[PatientManagementService] Error syncing to cloud', error);
+    } catch (error: any) {
+      console.warn('[PatientManagementService] Cloud sync unavailable (HTTP/Cloud):', error?.message || error);
       return false;
     }
   }
