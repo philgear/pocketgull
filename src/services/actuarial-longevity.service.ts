@@ -11,6 +11,7 @@ export interface IOccupationalHazardProfile {
     | 'Healthcare & First Responders' 
     | 'Agriculture & Natural Resources' 
     | 'Corporate & Technology'
+    | 'Life Sciences & Research'
     | 'Arts, Media & Entertainment'
     | 'Public Service, Legal & Governance'
     | 'Education & Clergy'
@@ -347,6 +348,46 @@ export class ActuarialLongevityService {
       arboristEcologicalDirectives: [
         '🌳 Phototropism Reversal: Visual focus on natural green tree canopy divergence'
       ]
+    },
+    '19-1029': {
+      socCode: '19-1029',
+      snomedCode: '410005002',
+      snomedDisplay: 'Biological research strain and field investigation fatigue (disorder)',
+      professionTitle: 'Naturalist, Geologist & Evolutionary Biologist',
+      category: 'Life Sciences & Research',
+      oshaRiskLevel: 'Standard',
+      ergonomicStrainScore: 4.5,
+      circadianDisruptionScore: 3.2,
+      chemicalExposureScore: 2.1,
+      allostaticBurnoutScore: 5.8,
+      actuarialQalyImpact: 1.5,
+      oshaMitigationDirectives: [
+        'Field Expedition Safety: Tropical vector protection (mosquito netting & insect repellent for Chagas/malaria risk)',
+        'Desk & Microscope Ergonomics: Adjustable specimen posture & optical lighting for asthenopia',
+        'Post-Voyage Recovery Protocol: Structured physical rest cycles following long sea voyages & intensive writing'
+      ],
+      therapeuticHobbies: [
+        '🪴 Down House Garden Botany & Earthworm Studies: Gentle soil ecology & plant breeding',
+        '🚶 Daily Sandwalk Strolls: Rhythmic nature walks for contemplative mental restoration',
+        '✍️ Scientific Correspondence & Epistolary Writing: Structured intellectual reflection'
+      ],
+      precisionOccupationalNutrition: [
+        '🫀 CoQ10 (Ubiquinol 200mg): Mitochondrial bioenergetics & bio-energetic stamina',
+        '🌿 Ginger & Peppermint Infusion: Soothe gastric hyper-reactivity & post-prandial dysmotility',
+        '⚡ Magnesium Glycinate (400mg): Neuromuscular relaxation & stress mitigation'
+      ],
+      tcmOccupationalDirectives: [
+        '☯️ Harmonize Spleen & Stomach Qi: Acupressure on ST-36 Zusanli & CV-12 Zhongwan for digestive agni',
+        '🍵 Warm Chamomile & Licorice Root Tea: Calm liver wood overacting on spleen earth'
+      ],
+      ayurvedicOccupationalDirectives: [
+        '🧘 Pacify Vata & Agni Balance: Warm, spiced kitchari & ghee for intestinal vishamagni',
+        '🌿 Ashwagandha & Brahmi Rasayana: Rejuvenate nervous tissue & calm intellectual exertion'
+      ],
+      arboristEcologicalDirectives: [
+        '🌳 Down House Oak & Orchids: Deep connection to botanical evolutionary selection'
+      ],
+      vocalResonanceProtocol: '🎵 Resonant Pastoral Humming (0.1 Hz): Parasympathetic vagal activation to calm post-expedition stomach motility'
     },
     '27-1024': {
       socCode: '27-1024',
@@ -2301,6 +2342,9 @@ export class ActuarialLongevityService {
     }
     if (cleaned.includes('farm') || cleaned.includes('agri') || cleaned.includes('crop')) {
       return this.occupationalDatabase['45-2092'];
+    }
+    if (cleaned.includes('naturalist') || cleaned.includes('biologist') || cleaned.includes('evolution') || cleaned.includes('geologist') || cleaned.includes('botanist') || cleaned.includes('zoologist') || cleaned.includes('darwin')) {
+      return this.occupationalDatabase['19-1029'];
     }
 
     return this.occupationalDatabase['15-1252'];
