@@ -509,6 +509,7 @@ import { BionicReadingService } from '../services/bionic-reading.service';
                 ⚡ Y-BOCs OCD Screener
               </button>
               <button (click)="screenerTab.set('suite')"
+                data-testid="tab-clinical-suite"
                 [class.bg-white]="screenerTab() === 'suite'"
                 [class.dark:bg-zinc-800]="screenerTab() === 'suite'"
                 [class.text-indigo-650]="screenerTab() === 'suite'"
