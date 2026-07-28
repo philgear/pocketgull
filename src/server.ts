@@ -90,6 +90,18 @@ app.use((req, res, next) => {
 // Trust the 1st hop Google Cloud Run proxy so req.hostname and rate limiting resolve securely
 app.set('trust proxy', 1);
 
+// US Regional Access Enforcement Guard
+app.use((req, res, next) => {
+  const country = req.headers['x-appengine-country'] || req.headers['cf-ipcountry'] || req.headers['x-client-geo-location'];
+  if (country && typeof country === 'string' && country.toUpperCase() !== 'US' && country.toUpperCase() !== 'ZZ') {
+    return res.status(403).json({
+      error: 'Access Restricted',
+      message: 'Pocket-Gull Clinical Intelligence Service is currently restricted to the United States region.'
+    });
+  }
+  next();
+});
+
 // Forced domain redirect to pocketgull.app
 const targetDomain = 'pocketgull.app';
 const redirectDomains = [
