@@ -1,5 +1,5 @@
 import { genkit, z } from 'genkit';
-import { googleAI } from '@genkit-ai/googleai';
+import { googleAI } from '@genkit-ai/google-genai';
 
 // Polyfill fetch to append our referer and bypass strict API key restrictions
 const originalFetch = globalThis.fetch;
