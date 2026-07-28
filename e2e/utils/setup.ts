@@ -134,4 +134,5 @@ export async function enterDemoMode(page: Page) {
 
   // Wait for main app or container to render
   await page.waitForSelector('app-analysis-container, app-analysis-report, main', { timeout: 20000 });
+  await page.waitForSelector('app-patient-dropdown button', { state: 'visible', timeout: 20000 }).catch(() => {});
 }
