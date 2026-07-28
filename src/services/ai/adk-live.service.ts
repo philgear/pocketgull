@@ -3,6 +3,7 @@
  * Telemetry Stream Privacy & HIPAA Guard: Uses DOMPurify and anonymizePatient metadata filters before sending live stream data.
  */
 import { Injectable, signal, NgZone, inject } from '@angular/core';
+import { sanitizeLogInput } from '../../utils/security-helper';
 
 import { ActuarialLongevityService, IOccupationalHazardProfile } from '../actuarial-longevity.service';
 
@@ -292,13 +293,13 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       unparsedData = rawData;
     }
     
-    console.log("[AdkLiveService] Raw Live Message:", unparsedData);
+    console.log("[AdkLiveService] Raw Live Message:", sanitizeLogInput(unparsedData));
     this.processJsonMessage(unparsedData);
   }
 
   private processJsonMessage(data: any) {
     if (data.error) {
-      console.error("[AdkLiveService] Server returned error:", data.error);
+      console.error("[AdkLiveService] Server returned error:", sanitizeLogInput(data.error));
       if (this.onMessage) {
          this.runInZone(() => {
              this.onMessage!({ text: `System Error: ${data.error.message || 'Unknown stream error'}` });

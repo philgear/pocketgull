@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Builder
 # ==========================================
-FROM python:3.13.2-alpine AS builder
+FROM python:3.13.2-alpine@sha256:323a717dc4a010fee21e3f1aac738ee10bb485de4e7593ce242b36ee48d6b352 AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN pip install --no-cache-dir pip==24.3.1 && \
 # ==========================================
 # Stage 2: Runtime
 # ==========================================
-FROM python:3.13.2-alpine
+FROM python:3.13.2-alpine@sha256:323a717dc4a010fee21e3f1aac738ee10bb485de4e7593ce242b36ee48d6b352
 
 # Create a non-root user and group for security
 RUN addgroup -S appuser && adduser -S appuser -G appuser

@@ -326,6 +326,19 @@ export class ResearchFrameComponent implements OnDestroy {
 
   @HostListener('window:message', ['$event'])
   onMessage(event: MessageEvent) {
+    const allowedOrigins = [
+      'https://api.pocketgull.app',
+      'https://pocketgull.app',
+      'https://pocketgull.com',
+      'http://localhost:4000',
+      'http://localhost:4200',
+      'http://127.0.0.1:4000',
+      'http://127.0.0.1:4200'
+    ];
+    if (event.origin && !allowedOrigins.includes(event.origin) && !event.origin.endsWith('.pocketgull.app')) {
+      return;
+    }
+
     if (event.data && event.data.type === 'OPEN_LINK') {
       this.loadUrl(event.data.url);
     } else if (event.data && event.data.type === 'BOOKMARK_RESULT') {
