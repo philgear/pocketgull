@@ -98,22 +98,226 @@ import { ThemeService } from '../services/theme.service';
             </div>
           }
         } @else {
-          <!-- 2D SVG Schematic -->
-          <div class="h-full w-full flex items-center justify-center p-4">
-            <svg viewBox="0 0 200 450" class="h-full w-auto relative z-10 drop-shadow-sm">
+          <!-- 2D SVG Schematic (Redrawn Holographic Medical Vector Twin) -->
+          <div class="h-full w-full flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-b from-slate-900/50 via-zinc-900/40 to-slate-950/60 rounded-xl">
+            <!-- Background Radial Glow -->
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.08)_0%,transparent_70%)] pointer-events-none"></div>
+
+            <svg viewBox="0 0 200 450" class="h-full w-auto relative z-10 filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+              <defs>
+                <!-- Skin Gradient -->
+                <linearGradient id="skinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25" />
+                  <stop offset="50%" stop-color="#0284c7" stop-opacity="0.15" />
+                  <stop offset="100%" stop-color="#0369a1" stop-opacity="0.30" />
+                </linearGradient>
+
+                <!-- Muscle Gradient -->
+                <linearGradient id="muscleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#0d9488" stop-opacity="0.6" />
+                  <stop offset="100%" stop-color="#115e59" stop-opacity="0.8" />
+                </linearGradient>
+
+                <!-- Organ Gradients -->
+                <radialGradient id="heartGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.9" />
+                  <stop offset="70%" stop-color="#e11d48" stop-opacity="0.6" />
+                  <stop offset="100%" stop-color="#881337" stop-opacity="0.2" />
+                </radialGradient>
+
+                <radialGradient id="lungGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.7" />
+                  <stop offset="100%" stop-color="#0284c7" stop-opacity="0.2" />
+                </radialGradient>
+
+                <!-- Chakra Glow Filter -->
+                <filter id="chakraGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="2" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
+
               <g [attr.transform]="bodyTransform()">
                 @if (view() === 'front') {
                   <g id="static-anatomy-front">
-                    <path class="skin-base" [attr.d]="fullBodySkinPathFront()" [class.opacity-20]="state.anatomyViewMode() !== 'skin'" />
-                    <g class="skeleton-layer" [class.opacity-100]="state.anatomyViewMode() === 'skeleton'" [class.opacity-40]="state.anatomyViewMode() !== 'skeleton'">
-                      <path class="skeleton-path" d="M100 18 C 90 18, 85 24, 85 38 V 48 H 115 V 38 C 115 24, 110 18, 100 18 Z M 95 54 C 92 58, 93 62, 98 62 H 102 C 107 62, 108 58, 105 54 Z" />
-                      <path class="skeleton-path" d="M100 65 V 170 M 82 75 H 118 M 80 85 C 85 95, 85 115, 80 125 M 120 85 C 115 95, 115 115, 120 125 M 82 100 H 118 M 85 115 H 115" />
+                    <!-- 1. SKIN BASE CONTOUR (Anatomically Proportional Body Outline) -->
+                    <path class="skin-base fill-[url(#skinGradient)] stroke-sky-400/40 stroke-[1.5] transition-all duration-500" 
+                          [attr.d]="fullBodySkinPathFront()" 
+                          [class.opacity-20]="state.anatomyViewMode() !== 'skin'" />
+
+                    <!-- 2. MUSCLE LAYER (Pectoralis, Abdominals, Quadriceps, Deltoids) -->
+                    <g class="muscle-layer transition-opacity duration-500" 
+                       [class.opacity-100]="state.anatomyViewMode() === 'muscle'" 
+                       [class.opacity-0]="state.anatomyViewMode() !== 'muscle'">
+                      <!-- Deltoids -->
+                      <path d="M 68 70 Q 55 90 62 110 Q 75 105 78 85 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <path d="M 132 70 Q 145 90 138 110 Q 125 105 122 85 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <!-- Pectoralis Major -->
+                      <path d="M 78 80 Q 100 85 100 110 Q 82 115 78 95 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <path d="M 122 80 Q 100 85 100 110 Q 118 115 122 95 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <!-- Rectus Abdominis Six-Pack -->
+                      <path d="M 88 115 H 112 V 130 H 88 Z M 88 133 H 112 V 148 H 88 Z M 88 151 H 112 V 166 H 88 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <!-- Biceps -->
+                      <path d="M 62 112 Q 52 135 60 155 Q 70 150 72 125 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <path d="M 138 112 Q 148 135 140 155 Q 130 150 128 125 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <!-- Quadriceps Femoris -->
+                      <path d="M 82 215 Q 75 255 88 290 Q 98 285 96 230 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
+                      <path d="M 118 215 Q 125 255 112 290 Q 102 285 104 230 Z" fill="url(#muscleGradient)" stroke="#14b8a6" stroke-width="0.75" />
                     </g>
+
+                    <!-- 3. SKELETON LAYER (Cranium, Rib Cage, Spine, Pelvis, Limbs) -->
+                    <g class="skeleton-layer transition-opacity duration-500" 
+                       [class.opacity-100]="state.anatomyViewMode() === 'skeleton'" 
+                       [class.opacity-20]="state.anatomyViewMode() !== 'skeleton'">
+                      <!-- Cranium & Jaw -->
+                      <path class="skeleton-path" d="M 100 18 C 88 18 84 26 84 38 C 84 46 88 52 92 56 C 96 60 104 60 108 56 C 112 52 116 46 116 38 C 116 26 112 18 100 18 Z" stroke="#e2e8f0" stroke-width="1.5" fill="none" />
+                      <path class="skeleton-path" d="M 94 56 L 96 64 H 104 L 106 56" stroke="#cbd5e1" stroke-width="1" fill="none" />
+                      <!-- Cervical & Thoracic Spine -->
+                      <path class="skeleton-path" d="M 100 65 V 205" stroke="#e2e8f0" stroke-dasharray="2,2" stroke-width="2" />
+                      <!-- Clavicles -->
+                      <path class="skeleton-path" d="M 100 70 Q 82 68 70 72 M 100 70 Q 118 68 130 72" stroke="#e2e8f0" stroke-width="1.8" fill="none" />
+                      <!-- Sternum & Rib Cage -->
+                      <path class="skeleton-path" d="M 100 75 V 125" stroke="#f8fafc" stroke-width="3" />
+                      <path class="skeleton-path" d="M 80 82 Q 95 86 100 86 Q 105 86 120 82 M 78 92 Q 95 97 100 97 Q 105 97 122 92 M 77 102 Q 95 107 100 107 Q 105 107 123 102 M 78 112 Q 95 117 100 117 Q 105 117 122 112 M 80 122 Q 95 125 100 125 Q 105 125 120 122" stroke="#cbd5e1" stroke-width="1.2" fill="none" />
+                      <!-- Pelvic Girdle -->
+                      <path class="skeleton-path" d="M 82 170 Q 75 190 85 205 Q 100 210 100 195 Q 100 210 115 205 Q 125 190 118 170 Z" stroke="#e2e8f0" stroke-width="1.5" fill="none" />
+                      <!-- Femurs -->
+                      <path class="skeleton-path" d="M 86 205 L 82 290 M 114 205 L 118 290" stroke="#f1f5f9" stroke-width="2.5" />
+                      <!-- Tibia / Fibula -->
+                      <path class="skeleton-path" d="M 82 295 L 75 390 M 118 295 L 125 390" stroke="#cbd5e1" stroke-width="2" />
+                    </g>
+
+                    <!-- 4. VISCERAL ORGAN LAYER (Lungs, Heart, Stomach, Liver, Kidneys) -->
+                    <g class="organ-layer transition-opacity duration-500" 
+                       [class.opacity-100]="state.anatomyViewMode() === 'organs'" 
+                       [class.opacity-30]="state.anatomyViewMode() !== 'organs'">
+                      <!-- Right & Left Lungs -->
+                      <path d="M 76 80 C 72 95 72 120 88 122 C 94 122 96 100 96 82 C 90 78 80 78 76 80 Z" fill="url(#lungGlow)" stroke="#38bdf8" stroke-width="1" class="cursor-pointer hover:opacity-100 transition-opacity" (click)="select('lungs', 'Pulmonary Lungs')" />
+                      <path d="M 124 80 C 128 95 128 120 112 122 C 106 122 104 100 104 82 C 110 78 120 78 124 80 Z" fill="url(#lungGlow)" stroke="#38bdf8" stroke-width="1" class="cursor-pointer hover:opacity-100 transition-opacity" (click)="select('lungs', 'Pulmonary Lungs')" />
+                      <!-- Cardiac Heart (Tilted Left) -->
+                      <path d="M 94 92 C 90 85 100 80 106 90 C 112 80 120 85 116 95 C 112 108 102 116 100 118 C 98 116 92 104 94 92 Z" fill="url(#heartGlow)" stroke="#f43f5e" stroke-width="1.2" class="cursor-pointer animate-pulse" (click)="select('heart', 'Cardiac / Heart')" />
+                      <!-- Liver (Right Upper Abdomen) -->
+                      <path d="M 76 126 C 74 135 78 148 98 148 C 102 148 104 135 102 126 C 94 124 82 124 76 126 Z" fill="#b45309" fill-opacity="0.7" stroke="#f59e0b" stroke-width="1" class="cursor-pointer hover:opacity-100 transition-opacity" (click)="select('liver', 'Hepatic / Liver')" />
+                      <!-- Stomach (Left Upper Abdomen) -->
+                      <path d="M 104 126 C 104 136 110 148 122 144 C 126 138 124 128 118 126 Z" fill="#d97706" fill-opacity="0.65" stroke="#fbbf24" stroke-width="1" class="cursor-pointer hover:opacity-100 transition-opacity" (click)="select('stomach', 'Gastric / Stomach')" />
+                      <!-- Bilateral Kidneys -->
+                      <ellipse cx="86" cy="155" rx="5" ry="8" fill="#9f1239" fill-opacity="0.8" stroke="#f43f5e" stroke-width="0.8" class="cursor-pointer" (click)="select('kidneys', 'Renal Kidneys')" />
+                      <ellipse cx="114" cy="155" rx="5" ry="8" fill="#9f1239" fill-opacity="0.8" stroke="#f43f5e" stroke-width="0.8" class="cursor-pointer" (click)="select('kidneys', 'Renal Kidneys')" />
+                    </g>
+
+                    <!-- 5. EASTERN TCM MERIDIANS & ACUPOINTS OVERLAY -->
+                    <g class="tcm-layer transition-opacity duration-500" 
+                       [class.opacity-100]="state.anatomyViewMode() === 'eastern'" 
+                       [class.opacity-0]="state.anatomyViewMode() !== 'eastern'">
+                      <!-- Ren Mai (Conception Vessel - Central Front Meridian) -->
+                      <path d="M 100 25 V 200" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,2" />
+                      <!-- ST-36 Zusanli (Bilateral Leg Acupoints) -->
+                      <circle cx="78" cy="305" r="4" fill="#34d399" class="cursor-pointer animate-ping" />
+                      <circle cx="78" cy="305" r="3" fill="#059669" class="cursor-pointer" (click)="select('acupoint_st36', 'ST-36 Zusanli (Leg Three Miles)')" />
+                      <circle cx="122" cy="305" r="4" fill="#34d399" class="cursor-pointer animate-ping" />
+                      <circle cx="122" cy="305" r="3" fill="#059669" class="cursor-pointer" (click)="select('acupoint_st36', 'ST-36 Zusanli (Leg Three Miles)')" />
+                      <!-- CV-12 Zhongwan (Stomach Alarm Point) -->
+                      <circle cx="100" cy="135" r="3.5" fill="#10b981" class="cursor-pointer" (click)="select('acupoint_cv12', 'CV-12 Zhongwan (Middle Cavity)')" />
+                      <!-- PC-6 Neiguan (Inner Pass) -->
+                      <circle cx="56" cy="165" r="3" fill="#059669" class="cursor-pointer" (click)="select('acupoint_pc6', 'PC-6 Neiguan (Inner Pass)')" />
+                      <circle cx="144" cy="165" r="3" fill="#059669" class="cursor-pointer" (click)="select('acupoint_pc6', 'PC-6 Neiguan (Inner Pass)')" />
+                    </g>
+
+                    <!-- 6. AYURVEDIC CHAKRA & NADIS OVERLAY -->
+                    <g class="ayurvedic-layer transition-opacity duration-500" 
+                       [class.opacity-100]="state.anatomyViewMode() === 'ayurvedic'" 
+                       [class.opacity-0]="state.anatomyViewMode() !== 'ayurvedic'">
+                      <!-- Sushumna Nadi Core Energy Channel -->
+                      <path d="M 100 20 V 205" stroke="#f59e0b" stroke-width="2" filter="url(#chakraGlow)" />
+                      <!-- 7 Chakra Energy Nodes -->
+                      <circle cx="100" cy="22" r="5" fill="#8b5cf6" class="cursor-pointer" (click)="select('chakra_7', 'Crown Chakra (Sahasrara)')" />
+                      <circle cx="100" cy="38" r="4.5" fill="#6366f1" class="cursor-pointer" (click)="select('chakra_6', 'Third Eye Chakra (Ajna)')" />
+                      <circle cx="100" cy="65" r="4.5" fill="#0ea5e9" class="cursor-pointer" (click)="select('chakra_5', 'Throat Chakra (Vishuddha)')" />
+                      <circle cx="100" cy="100" r="5" fill="#10b981" class="cursor-pointer" (click)="select('chakra_4', 'Heart Chakra (Anahata)')" />
+                      <circle cx="100" cy="135" r="4.5" fill="#eab308" class="cursor-pointer" (click)="select('chakra_3', 'Solar Plexus (Manipura)')" />
+                      <circle cx="100" cy="165" r="4.5" fill="#f97316" class="cursor-pointer" (click)="select('chakra_2', 'Sacral Chakra (Svadhisthana)')" />
+                      <circle cx="100" cy="195" r="5" fill="#ef4444" class="cursor-pointer" (click)="select('chakra_1', 'Root Chakra (Muladhara)')" />
+                    </g>
+
+                    <!-- 7. INTERACTIVE TAP REGIONS FOR ALL ANATOMICAL BODY PARTS -->
                     <g id="regions-2d-front">
-                      <path d="M100 18 C 88 18, 82 25, 82 40 V 65 H 118 V 40 C 118 25, 112 18, 100 18 Z" 
+                      <!-- Head & Brain -->
+                      <path d="M100 18 C 88 18, 84 26, 84 38 C 84 46, 88 52, 92 56 L 94 64 H 106 L 108 56 C 112 52, 116 46, 116 38 C 116 26, 112 18, 100 18 Z" 
                             [class]="getPartClass('head')" 
-                            (click)="select('head', 'Head & Neck')"
-                            (mousemove)="showTooltip($event, 'Head & Neck')" 
+                            (click)="select('head', 'Head & Brain (Cranial)')"
+                            (mousemove)="showTooltip($event, 'Head & Brain (Cranial)')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Cervical Spine & Neck -->
+                      <path d="M 86 58 H 114 V 72 H 86 Z" 
+                            [class]="getPartClass('neck')" 
+                            (click)="select('neck', 'Neck & Cervical Spine')"
+                            (mousemove)="showTooltip($event, 'Neck & Cervical Spine')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Chest & Thorax -->
+                      <path d="M 72 72 H 128 V 120 H 72 Z" 
+                            [class]="getPartClass('chest')" 
+                            (click)="select('chest', 'Chest & Thorax')"
+                            (mousemove)="showTooltip($event, 'Chest & Thorax')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Abdomen & Viscera -->
+                      <path d="M 76 120 H 124 V 170 H 76 Z" 
+                            [class]="getPartClass('abdomen')" 
+                            (click)="select('abdomen', 'Abdomen & Digestive')"
+                            (mousemove)="showTooltip($event, 'Abdomen & Digestive')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Pelvis & Lumbar -->
+                      <path d="M 78 170 H 122 V 205 H 78 Z" 
+                            [class]="getPartClass('pelvis')" 
+                            (click)="select('pelvis', 'Pelvis & Hip Girdle')"
+                            (mousemove)="showTooltip($event, 'Pelvis & Hip Girdle')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Left Shoulder & Upper Arm -->
+                      <path d="M 45 72 L 72 72 L 65 140 L 40 140 Z" 
+                            [class]="getPartClass('shoulder_left')" 
+                            (click)="select('shoulder_left', 'Left Shoulder & Biceps')"
+                            (mousemove)="showTooltip($event, 'Left Shoulder & Biceps')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Right Shoulder & Upper Arm -->
+                      <path d="M 128 72 L 155 72 L 160 140 L 135 140 Z" 
+                            [class]="getPartClass('shoulder_right')" 
+                            (click)="select('shoulder_right', 'Right Shoulder & Biceps')"
+                            (mousemove)="showTooltip($event, 'Right Shoulder & Biceps')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Left Forearm & Hand -->
+                      <path d="M 40 140 L 65 140 L 55 195 L 30 195 Z" 
+                            [class]="getPartClass('hand_left')" 
+                            (click)="select('hand_left', 'Left Forearm & Hand')"
+                            (mousemove)="showTooltip($event, 'Left Forearm & Hand')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Right Forearm & Hand -->
+                      <path d="M 135 140 L 160 140 L 170 195 L 145 195 Z" 
+                            [class]="getPartClass('hand_right')" 
+                            (click)="select('hand_right', 'Right Forearm & Hand')"
+                            (mousemove)="showTooltip($event, 'Right Forearm & Hand')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Left Thigh & Leg -->
+                      <path d="M 78 205 L 100 205 L 94 395 L 70 395 Z" 
+                            [class]="getPartClass('leg_left')" 
+                            (click)="select('leg_left', 'Left Leg & Knee')"
+                            (mousemove)="showTooltip($event, 'Left Leg & Knee')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Right Thigh & Leg -->
+                      <path d="M 100 205 L 122 205 L 130 395 L 106 395 Z" 
+                            [class]="getPartClass('leg_right')" 
+                            (click)="select('leg_right', 'Right Leg & Knee')"
+                            (mousemove)="showTooltip($event, 'Right Leg & Knee')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Left Foot & Ankle -->
+                      <path d="M 70 395 H 94 V 435 H 60 Z" 
+                            [class]="getPartClass('foot_left')" 
+                            (click)="select('foot_left', 'Left Foot & Ankle')"
+                            (mousemove)="showTooltip($event, 'Left Foot & Ankle')" 
+                            (mouseleave)="hideTooltip()"/>
+                      <!-- Right Foot & Ankle -->
+                      <path d="M 106 395 H 130 V 435 H 140 Z" 
+                            [class]="getPartClass('foot_right')" 
+                            (click)="select('foot_right', 'Right Foot & Ankle')"
+                            (mousemove)="showTooltip($event, 'Right Foot & Ankle')" 
                             (mouseleave)="hideTooltip()"/>
                     </g>
                   </g>
@@ -294,8 +498,8 @@ export class BodyViewerComponent implements OnDestroy {
     return `translate(${cx}, ${cy}) scale(${finalScaleX}, ${finalScaleY}) translate(${- cx}, ${- cy})`;
   });
 
-  fullBodySkinPathFront = computed(() => "M82 40 C 82 25 88 18 100 18 S 118 25 118 40 V 65 L 122 70 L 132 110 L 148 158 L 160 180 L 165 190 L 155 195 L 150 185 L 138 160 L 122 115 L 122 125 L 118 170 L 115 205 L 122 295 L 127 395 L 135 420 L 140 430 H 120 L 115 420 L 110 400 L 105 300 H 115 H 100 H 85 H 95 L 90 400 L 85 420 L 80 430 H 60 L 65 420 L 73 395 L 78 295 L 85 205 L 82 170 L 78 125 L 78 115 L 62 160 L 50 185 L 45 195 L 35 190 L 40 180 L 52 158 L 68 110 L 78 70 L 82 65 Z");
-  fullBodySkinPathBack = computed(() => "M82 40 C 82 25 88 18 100 18 S 118 25 118 40 V 65 L 122 70 L 132 110 L 148 158 L 160 180 L 165 190 L 155 195 L 150 185 L 138 160 L 122 115 L 120 120 L 115 170 L 120 205 L 122 295 L 127 395 L 135 420 L 140 430 H 120 L 115 420 L 110 400 L 105 300 H 115 H 100 H 85 H 95 L 90 400 L 85 420 L 80 430 H 60 L 65 420 L 73 395 L 78 295 L 80 205 L 85 170 L 80 120 L 78 115 L 62 160 L 50 185 L 45 195 L 35 190 L 40 180 L 52 158 L 68 110 L 78 70 L 82 65 Z");
+  fullBodySkinPathFront = computed(() => "M 100 18 C 88 18 84 26 84 38 C 84 48 88 56 86 64 C 84 68 70 72 65 78 C 58 88 48 135 38 185 C 36 195 46 198 52 190 C 60 145 68 115 72 105 C 72 120 74 170 78 205 C 74 245 72 290 70 395 C 68 410 60 425 60 435 H 94 V 395 L 100 205 L 106 395 V 435 H 140 C 140 425 132 410 130 395 C 128 290 126 245 122 205 C 126 170 128 120 128 105 C 132 115 140 145 148 190 C 154 198 164 195 162 185 C 152 135 142 88 135 78 C 130 72 116 68 114 64 C 112 56 116 48 116 38 C 116 26 112 18 100 18 Z");
+  fullBodySkinPathBack = computed(() => "M 100 18 C 88 18 84 26 84 38 C 84 48 88 56 86 64 C 84 68 70 72 65 78 C 58 88 48 135 38 185 C 36 195 46 198 52 190 C 60 145 68 115 72 105 C 72 120 74 170 78 205 C 74 245 72 290 70 395 C 68 410 60 425 60 435 H 94 V 395 L 100 205 L 106 395 V 435 H 140 C 140 425 132 410 130 395 C 128 290 126 245 122 205 C 126 170 128 120 128 105 C 132 115 140 145 148 190 C 154 198 164 195 162 185 C 152 135 142 88 135 78 C 130 72 116 68 114 64 C 112 56 116 48 116 38 C 116 26 112 18 100 18 Z");
 
   select(id: string, name: string) {
     this.tempSelectedId.set(id);
