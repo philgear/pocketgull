@@ -49,6 +49,9 @@ import { ResearchTabComponent } from './components/research-tab.component';
 import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
 import { CompanionSyncModalComponent } from './components/companion-sync-modal.component';
 import { GlossaryModalComponent } from './components/glossary-modal.component';
+import { VagusTelemetryHudComponent } from './app/components/vagus-telemetry-hud/vagus-telemetry-hud.component';
+import { PharmacogenomicRadarComponent } from './app/components/pharmacogenomic-radar/pharmacogenomic-radar.component';
+import { FhirQrPassportComponent } from './app/components/fhir-qr-passport/fhir-qr-passport.component';
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -74,7 +77,10 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
     ZamecznikCanvasComponent,
     CompanionSyncModalComponent,
     GlossaryModalComponent,
-    ClinicalCdsDisclaimerBannerComponent
+    ClinicalCdsDisclaimerBannerComponent,
+    VagusTelemetryHudComponent,
+    PharmacogenomicRadarComponent,
+    FhirQrPassportComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -906,6 +912,13 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                      }
                  </div>
                  
+                 <!-- Next-Gen Clinical Intelligence Suite Dock -->
+                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 shrink-0 no-print">
+                   <app-vagus-telemetry-hud></app-vagus-telemetry-hud>
+                   <app-pharmacogenomic-radar [medications]="patientMgmt.selectedPatient()?.preexistingConditions || ['Metformin', 'Atorvastatin']"></app-pharmacogenomic-radar>
+                   <app-fhir-qr-passport [patientData]="patientMgmt.selectedPatient()"></app-fhir-qr-passport>
+                 </div>
+
                  @if (intelligence.researchHits()) {
                    <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md h-[300px] shrink-0">
                      <app-research-tab class="block h-full" [hits]="intelligence.researchHits()"></app-research-tab>

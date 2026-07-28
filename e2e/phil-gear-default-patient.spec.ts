@@ -67,7 +67,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
 
     // The analysis report component should be present (loaded for Phil Gear)
-    await expect(page.locator('app-analysis-container, app-analysis-report')).toBeVisible({ timeout: 20000 });
+    await expect(page.locator('app-analysis-container, app-analysis-report').first()).toBeVisible({ timeout: 20000 });
 
     // await page.screenshot({
     //   path: path.join(SCREENSHOT_DIR, 'phil_gear_default_patient.png'),
