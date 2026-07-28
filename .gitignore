@@ -194,6 +194,7 @@ e2e/chaos-engineering.spec.ts
 # Contests & Hackathon Artifacts
 contests/
 *contest*
+!pocketgull_api/*contest*
 
 # Trained Models, Machine Learning Weights & Checkpoints
 *.onnx
