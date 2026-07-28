@@ -1,5 +1,6 @@
 import * as DOMPurify from 'dompurify';
 import { Injectable, signal, inject } from '@angular/core';
+import { DefensiveGuardrailsService } from './defensive-guardrails.service';
 import { IIntelligenceProvider } from './ai/intelligence.provider';
 import { AiCacheService } from './ai-cache.service';
 import { IVerificationIssue } from '../components/analysis-report.types';
@@ -58,6 +59,7 @@ export class ClinicalIntelligenceService {
     private patientState = inject(PatientStateService);
     private orcid = inject(OrcidService);
     private webgpu = inject(WebLLMProvider);
+    readonly guardrails = inject(DefensiveGuardrailsService);
     private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch { return null; } })();
     private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch { return null; } })();
 

@@ -69,6 +69,16 @@ function getAngularApp() {
 
 app.use(compression());
 
+// Defensive Security Headers Middleware (NIST / OWASP Hardening)
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+  next();
+});
+
 // Fix for Node 20+ undici fetch rejecting 0.0.0.0 host header during SSR
 app.use((req, res, next) => {
   if (req.headers.host && req.headers.host.includes('0.0.0.0')) {
