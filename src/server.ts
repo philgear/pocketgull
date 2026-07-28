@@ -94,7 +94,7 @@ app.use((req, res, next) => {
   const host = req.hostname;
   if (redirectDomains.includes(host)) {
     const rawPath = req.originalUrl || '/';
-    const safePath = rawPath.startsWith('/') && !rawPath.startsWith('//') && !rawPath.startsWith('/\\') ? rawPath : '/';
+    const safePath = isValidRedirectUrl(rawPath) ? rawPath : '/';
     return res.redirect(301, `https://${targetDomain}${safePath}`);
   }
   next();
