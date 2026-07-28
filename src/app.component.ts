@@ -1320,7 +1320,6 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
       </div>
     }
     
-        </main>
         }
       }
     </div>
