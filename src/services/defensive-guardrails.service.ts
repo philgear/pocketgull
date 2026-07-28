@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import * as DOMPurify from 'dompurify';
 
 export interface IVitalBoundaryResult {
   heartRate: number;
@@ -19,7 +20,7 @@ export class DefensiveGuardrailsService {
     /system\s+prompt\s+(override|reset)/i,
     /you\s+are\s+now\s+a/i,
     /disregard\s+all\s+rules/i,
-    /<script[\s\S]*?>[\s\S]*?<\/script>/i,
+    /<script\b[^>]*>([\s\S]*?)<\/script[^>]*>/gi,
     /javascript:/i,
     /onload\s*=/i,
     /onerror\s*=/i
@@ -36,6 +37,18 @@ export class DefensiveGuardrailsService {
 
     let isInjected = false;
     let safeInput = input;
+
+    // Use DOMPurify for HIPAA & OWASP compliant script & HTML tag sanitization
+    const hasOwnDefault = Object.prototype.hasOwnProperty.call(DOMPurify, 'default');
+    const purify = hasOwnDefault ? (DOMPurify as any).default : (DOMPurify as any);
+
+    if (typeof window !== 'undefined' && purify && typeof purify.sanitize === 'function') {
+      const sanitized = purify.sanitize(safeInput, { ALLOWED_TAGS: [] });
+      if (sanitized !== safeInput) {
+        isInjected = true;
+        safeInput = sanitized;
+      }
+    }
 
     for (const pattern of this.PROMPT_INJECTION_PATTERNS) {
       if (pattern.test(safeInput)) {
