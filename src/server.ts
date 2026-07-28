@@ -970,10 +970,22 @@ const docsRateLimiter = rateLimit({
   message: { error: 'Too many requests. Please try again later.' }
 });
 
+function getSafePatientsDbPath(): string {
+  const dir = securePathResolve(process.cwd(), 'data');
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch {}
+  return join(dir, 'patients.json');
+}
+
 // Patients API Endpoints
 app.get('/api/patients', patientsRateLimiter, (req, res) => {
   try {
-    const data = fs.readFileSync(patientsDbPath, 'utf8');
+    const dbPath = getSafePatientsDbPath();
+    if (!fs.existsSync(dbPath)) {
+      fs.writeFileSync(dbPath, JSON.stringify([], null, 2));
+    }
+    const data = fs.readFileSync(dbPath, 'utf8');
     res.setHeader('Content-Type', 'application/json');
     res.send(data);
   } catch (err: any) {
@@ -1002,8 +1014,8 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
     });
 
     // Save sanitized patient objects
-    const safePatientsDbPath = securePathResolve(__dirname, 'data', 'patients.json');
-    fs.writeFileSync(safePatientsDbPath, JSON.stringify(sanitizedArray, null, 2));
+    const dbPath = getSafePatientsDbPath();
+    fs.writeFileSync(dbPath, JSON.stringify(sanitizedArray, null, 2));
 
     console.log(`[API] Saved ${sanitizeLogInput(req.body?.length)} patients to database.`);
     res.status(200).json({ success: true, count: req.body.length });
@@ -1020,9 +1032,14 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
     }
 
-    const safePatientsDbPath = securePathResolve(__dirname, 'data', 'patients.json');
-    const data = fs.readFileSync(safePatientsDbPath, 'utf8');
-    const patients = JSON.parse(data);
+    const dbPath = getSafePatientsDbPath();
+    let patients: any[] = [];
+    if (fs.existsSync(dbPath)) {
+      try {
+        const data = fs.readFileSync(dbPath, 'utf8');
+        patients = JSON.parse(data);
+      } catch {}
+    }
     const index = patients.findIndex((p: any) => p.id === id);
 
     const allowedFields = ['id', 'name', 'age', 'gender', 'vitals', 'symptoms', 'history', 'conditions', 'carePlan', 'metrics', 'demographics', 'assessment'];
@@ -1045,7 +1062,7 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       patients.push({ ...sanitizedPayload, id });
     }
 
-    fs.writeFileSync(safePatientsDbPath, JSON.stringify(patients, null, 2));
+    fs.writeFileSync(dbPath, JSON.stringify(patients, null, 2));
     console.log(`[API] Synced patient ${sanitizeLogInput(id)} from mobile/app to database.`);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
   } catch (err: any) {
