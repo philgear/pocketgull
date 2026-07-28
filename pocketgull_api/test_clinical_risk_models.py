@@ -3,7 +3,6 @@ Test suite for ICU Mortality, Readmission, and Outbreak Risk Models
 """
 
 import os
-import pytest
 import joblib
 import numpy as np
 import pandas as pd
