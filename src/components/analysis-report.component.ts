@@ -73,6 +73,9 @@ import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.
 import { BionicReadingService } from '../services/bionic-reading.service';
 
 import { TeledentistrySystemicLensComponent } from './analysis-report/teledentistry-systemic-lens.component';
+import { ChronobiologyMatrixLensTabComponent } from './analysis-report/chronobiology-matrix-lens-tab.component';
+import { MaternalPostpartumLensTabComponent } from './analysis-report/maternal-postpartum-lens-tab.component';
+import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/seven-generations-stewardship-lens-tab.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -80,6 +83,9 @@ import { TeledentistrySystemicLensComponent } from './analysis-report/teledentis
   imports: [
     CommonModule,
     TeledentistrySystemicLensComponent,
+    ChronobiologyMatrixLensTabComponent,
+    MaternalPostpartumLensTabComponent,
+    SevenGenerationsStewardshipLensTabComponent,
     ClinicalSleepTwinDashboardComponent,
     ChronobiologyMatrixComponent,
     FunctionalMedicineMatrixComponent,
@@ -495,6 +501,18 @@ import { TeledentistrySystemicLensComponent } from './analysis-report/teledentis
             </div>
           }
         }
+
+          @if (activeLens() === 'Chronobiology Matrix') {
+            <app-chronobiology-matrix-lens-tab class="block my-6"></app-chronobiology-matrix-lens-tab>
+          }
+
+          @if (activeLens() === 'Maternal & Postpartum') {
+            <app-maternal-postpartum-lens-tab class="block my-6"></app-maternal-postpartum-lens-tab>
+          }
+
+          @if (activeLens() === 'Seven Generations Stewardship') {
+            <app-seven-generations-stewardship-lens-tab class="block my-6"></app-seven-generations-stewardship-lens-tab>
+          }
 
           @if (activeLens() === 'Teledentistry & Systemic Health') {
             <app-teledentistry-systemic-lens class="block my-6"></app-teledentistry-systemic-lens>
