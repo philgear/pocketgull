@@ -14,17 +14,9 @@ export default defineConfig({
   integrations: [mdx()],
   outDir: './dist',
   vite: {
-    root: __dirname,
-    build: {
-      // no explicit rollupOptions.input — allow Astro/Vite to determine entrypoints
-    },
+    appType: 'custom',
     define: {
       'import.meta.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY || 'placeholder-key-for-build')
-    },
-    server: {
-      fs: {
-        strict: true
-      }
     }
   }
 });
