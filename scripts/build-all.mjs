@@ -18,6 +18,22 @@ delete cleanEnv.npm_config_local_prefix;
 delete cleanEnv.npm_package_json;
 delete cleanEnv.NPM_PREFIX;
 
+console.log('🧹 [Zero Agent] Executing Pre-Build Console Integrity & Type Safety Audit...');
+execSync('node node_modules/typescript/lib/tsc.js -p tsconfig.json --noEmit', {
+  cwd: rootDir,
+  env: cleanEnv,
+  stdio: 'inherit'
+});
+console.log('✅ [Zero Agent] TypeScript & Console Integrity Audit Passed (0 Errors).\n');
+
+console.log('🕯️ [Beacon Agent] Running Sentinel Security & Bundle Budget Pre-Audit...');
+execSync('node scripts/sentinel_security_guard.mjs', {
+  cwd: rootDir,
+  env: cleanEnv,
+  stdio: 'inherit'
+});
+console.log('✅ [Beacon Agent] Pre-Build Performance & Security Guard Passed.\n');
+
 console.log('Building Astro study docs with isolated env...');
 execSync('npx astro build', {
   cwd: docsDir,
