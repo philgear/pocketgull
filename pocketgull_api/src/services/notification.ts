@@ -15,7 +15,9 @@ try {
 export async function sendPushNotification(fcmToken: string, title: string, body: string, data?: any) {
   const sanitize = (str: any) => String(str || '').replace(/[\r\n\u2028\u2029]+/g, ' ').replace(/[\x00-\x1F\x7F]+/g, ' ').slice(0, 500);
   if (!isFirebaseInitialized || !fcmToken) {
-    console.log(`[Notification Service Mock] Sending push notification to ${sanitize(fcmToken) || 'UNKNOWN'}:`);
+    const tokenProvided = Boolean(fcmToken);
+    const tokenLength = tokenProvided ? String(fcmToken).length : 0;
+    console.log(`[Notification Service Mock] Sending push notification (tokenProvided=${tokenProvided}, tokenLength=${tokenLength}):`);
     console.log(`  Title: ${sanitize(title)}`);
     console.log(`  Body:  ${sanitize(body)}`);
     return;
