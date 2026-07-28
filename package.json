@@ -291,7 +291,7 @@
       },
       "http-proxy-middleware": "3.0.7",
       "webpack-dev-server": "^6.0.0",
-      "brace-expansion": "^2.0.1",
+      "brace-expansion": "^2.1.2",
       "postcss": "^8.5.18"
     }
   },
