@@ -1499,8 +1499,8 @@ import { BionicReadingService } from '../services/bionic-reading.service';
                       }
                     </div>
 
-                    <!-- Seagullian Persona Influence Selector (Visible only in Mandala Theme) -->
-                    @if (themeService.currentTheme() === 'mandala') {
+                    <!-- Seagullian Persona Influence Selector (Visible in Spark & Dark Modes) -->
+                    @if (themeService.currentTheme() === 'spark' || themeService.currentTheme() === 'dark') {
                       <div class="flex items-center gap-1.5 bg-zinc-950 p-1.5 rounded-md border border-zinc-800 text-xs text-zinc-300">
                         <span class="text-zinc-400 font-bold uppercase tracking-wider pl-1">🕊️ Persona:</span>
                         <select [value]="themeService.activeSeagullPersona()" (change)="themeService.activeSeagullPersona.set($any($event.target).value)" class="bg-zinc-900 border border-zinc-800 text-zinc-100 rounded px-2 py-1 outline-none cursor-pointer text-xs font-bold">

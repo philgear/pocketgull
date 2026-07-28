@@ -533,21 +533,12 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                  @case ('light') {
                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transition-transform group-hover:animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                  }
-                 @case ('papercraft') {
-                   <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-[#F6B12B] transform hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                     <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                     <polyline points="2 17 12 22 22 17" />
-                     <polyline points="2 12 12 17 22 12" />
-                   </svg>
+                 @case ('spark') {
+                   <span class="text-xs" title="Spark Mode">✨</span>
                  }
-                 @case ('hemp') { <span class="text-xs">🌿</span> }
-                 @case ('rice') { <span class="text-xs">🌾</span> }
-                 @case ('construction') { <span class="text-xs">🎨</span> }
-                 @case ('white-marble') { <span class="text-xs" title="White Marble Theme">🏛️</span> }
-                 @case ('black-marble') { <span class="text-xs" title="Black Marble Theme">🌌</span> }
-                 @case ('papyrus') { <span class="text-xs" title="Papyrus Cave Theme">🏺</span> }
-                 @case ('pool') { <span class="text-xs" title="Pool Ripples Theme">🏊</span> }
-                 @case ('mandala') { <span class="text-xs" title="Sacred Mandala Theme">☸️</span> }
+                 @case ('system') {
+                   <span class="text-xs" title="System Theme">💻</span>
+                 }
                  @default { <span class="text-xs">🎨</span> }
               }
             </button>
@@ -2448,9 +2439,10 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (navigator.modelContext) {
+    const modelContext = (document as any).modelContext || (navigator as any).modelContext;
+    if (modelContext) {
       this.mcpControllers.forEach(item => {
-        (navigator.modelContext as any).unregisterTool?.(item.name);
+        (modelContext as any).unregisterTool?.(item.name);
         item.controller.abort();
       });
       this.mcpControllers = [];

@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import * as THREE from 'three';
 
-export type FireflyTextureType = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'chassis' | 'arboreal' | 'papercraft';
+export type FireflyTextureType = 'skin' | 'muscle' | 'skeleton' | 'organs';
 
 export interface IFireflyTextureMetadata {
   type: FireflyTextureType;
@@ -19,7 +19,9 @@ export interface IFireflyTextureMetadata {
 })
 export class AdobeFireflyTextureService {
   public isFireflyEnabled = signal<boolean>(true);
-  private textureCache = new Map<FireflyTextureType, THREE.CanvasTexture>();
+  private textureCache = new Map<FireflyTextureType, THREE.Texture>();
+  private imageCache = new Map<FireflyTextureType, string>();
+  private textureLoader = new THREE.TextureLoader();
 
   private readonly textureConfigs: Record<FireflyTextureType, IFireflyTextureMetadata> = {
     skin: {
@@ -61,47 +63,73 @@ export class AdobeFireflyTextureService {
       bumpScale: 0.06,
       emissiveHex: 0xf43f5e,
       emissiveIntensity: 0.25
-    },
-    chassis: {
-      type: 'chassis',
-      prompt: 'Adobe Firefly AI: Ultra-light carbon fiber weave & titanium alloy chassis mesh',
-      resolution: 512,
-      roughness: 0.20,
-      metalness: 0.85,
-      bumpScale: 0.10,
-      emissiveHex: 0x38bdf8,
-      emissiveIntensity: 0.15
-    },
-    arboreal: {
-      type: 'arboreal',
-      prompt: 'Adobe Firefly AI: Ancient cedar bark grain, xylem ring structure & chlorophyll veins',
-      resolution: 512,
-      roughness: 0.70,
-      metalness: 0.05,
-      bumpScale: 0.12,
-      emissiveHex: 0x10b981,
-      emissiveIntensity: 0.10
-    },
-    papercraft: {
-      type: 'papercraft',
-      prompt: 'Adobe Firefly AI: Architectural heavyweight cardstock paper, unbleached hemp fibers',
-      resolution: 512,
-      roughness: 0.85,
-      metalness: 0.0,
-      bumpScale: 0.05,
-      emissiveHex: 0xd97706,
-      emissiveIntensity: 0.05
     }
   };
 
+  constructor() {
+    // Register cached static PNG texture assets generated via Firefly AI
+    this.imageCache.set('skin', 'assets/textures/firefly_skin.png');
+    this.imageCache.set('muscle', 'assets/textures/firefly_muscle.png');
+    this.imageCache.set('skeleton', 'assets/textures/firefly_skeleton.png');
+    this.imageCache.set('organs', 'assets/textures/firefly_organs.png');
+  }
+
   /**
-   * Generates a procedural PBR normal/bump texture map mimicking Adobe Firefly AI generative texture synthesis.
+   * Retrieves a cached Firefly PBR texture map (image or procedural fallback).
    */
-  public getFireflyTexture(type: FireflyTextureType): THREE.CanvasTexture {
+  public getFireflyTexture(type: FireflyTextureType): THREE.Texture {
     if (this.textureCache.has(type)) {
       return this.textureCache.get(type)!;
     }
 
+    const imageUrl = this.imageCache.get(type);
+    if (imageUrl && typeof window !== 'undefined') {
+      try {
+        const loadedTexture = this.textureLoader.load(
+          imageUrl,
+          (tex) => {
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(4, 4);
+            tex.needsUpdate = true;
+          },
+          undefined,
+          () => {
+            // Fall back to procedural canvas texture on load error
+            const fallback = this.generateProceduralCanvasTexture(type);
+            this.textureCache.set(type, fallback);
+          }
+        );
+
+        loadedTexture.wrapS = THREE.RepeatWrapping;
+        loadedTexture.wrapT = THREE.RepeatWrapping;
+        loadedTexture.repeat.set(4, 4);
+
+        this.textureCache.set(type, loadedTexture);
+        return loadedTexture;
+      } catch {
+        // Fallback on exception
+      }
+    }
+
+    const fallback = this.generateProceduralCanvasTexture(type);
+    this.textureCache.set(type, fallback);
+    return fallback;
+  }
+
+  /**
+   * Dynamically updates or swaps a cached texture asset at runtime.
+   */
+  public updateCachedTextureImage(type: FireflyTextureType, newImageUrl: string) {
+    this.imageCache.set(type, newImageUrl);
+    this.textureCache.delete(type);
+    return this.getFireflyTexture(type);
+  }
+
+  /**
+   * Generates a procedural PBR normal/bump texture map mimicking Adobe Firefly AI generative texture synthesis.
+   */
+  private generateProceduralCanvasTexture(type: FireflyTextureType): THREE.CanvasTexture {
     const config = this.textureConfigs[type] || this.textureConfigs.skin;
     const canvas = document.createElement('canvas');
     canvas.width = config.resolution;
@@ -109,11 +137,9 @@ export class AdobeFireflyTextureService {
     const ctx = canvas.getContext('2d');
 
     if (ctx) {
-      // 1. Base Fill
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(0, 0, config.resolution, config.resolution);
 
-      // 2. Adobe Firefly Procedural Noise & Fiber Synthesis
       const imgData = ctx.getImageData(0, 0, config.resolution, config.resolution);
       const data = imgData.data;
 
@@ -124,14 +150,9 @@ export class AdobeFireflyTextureService {
           
           if (type === 'muscle') {
             const fiber = Math.sin((x + y * 0.5) * 0.15) * 60;
-            data[idx] = Math.min(255, Math.max(0, 15 + fiber + noise)); // R
-            data[idx + 1] = Math.min(255, Math.max(0, 140 + fiber + noise)); // G
-            data[idx + 2] = Math.min(255, Math.max(0, 130 + fiber + noise)); // B
-          } else if (type === 'chassis') {
-            const carbonPattern = ((x % 8 < 4 ? 1 : -1) * (y % 8 < 4 ? 1 : -1)) * 50;
-            data[idx] = Math.min(255, Math.max(0, 50 + carbonPattern));
-            data[idx + 1] = Math.min(255, Math.max(0, 60 + carbonPattern));
-            data[idx + 2] = Math.min(255, Math.max(0, 80 + carbonPattern));
+            data[idx] = Math.min(255, Math.max(0, 15 + fiber + noise));
+            data[idx + 1] = Math.min(255, Math.max(0, 140 + fiber + noise));
+            data[idx + 2] = Math.min(255, Math.max(0, 130 + fiber + noise));
           } else if (type === 'organs') {
             const vascular = Math.sin(Math.sqrt(x * x + y * y) * 0.1) * 70;
             data[idx] = Math.min(255, Math.max(0, 220 + vascular));
@@ -153,8 +174,6 @@ export class AdobeFireflyTextureService {
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(4, 4);
-
-    this.textureCache.set(type, texture);
     return texture;
   }
 
