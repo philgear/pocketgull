@@ -55,7 +55,9 @@ export class PythonBridgeService {
   readonly lastBiosignal  = signal<IBiosignalEvent | null>(null);
   readonly riskScore      = signal<IRiskScoreResult | null>(null);
   readonly isImporting    = signal<boolean>(false);
+  readonly pyodideStatus  = signal<'unloaded' | 'loading' | 'ready' | 'error'>('unloaded');
 
+  private pyodideInstance: any = null;
   private biosignalSource: EventSource | null = null;
 
   constructor() {
@@ -429,6 +431,60 @@ export class PythonBridgeService {
       return res.json();
     } catch (err: any) {
       console.error('[PythonBridge] readHdf5Segment error:', err.message);
+      return null;
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // 6. IN-BROWSER PYODIDE / WEBASSEMBLY ENGINE (iOS & Client-Side Edge)
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Initializes Pyodide WebAssembly Python runtime directly in the browser context.
+   * Enables client-side Python execution without server infrastructure (ideal for iOS Safari / PWAs).
+   */
+  async initPyodideWebAssembly(): Promise<boolean> {
+    if (!this.isBrowser) return false;
+    if (this.pyodideInstance) return true;
+    if (this.pyodideStatus() === 'loading') return false;
+
+    this.pyodideStatus.set('loading');
+    try {
+      if (typeof (window as any).loadPyodide === 'undefined') {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js';
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error('Failed to load Pyodide CDN script'));
+          document.head.appendChild(script);
+        });
+      }
+
+      this.pyodideInstance = await (window as any).loadPyodide();
+      this.pyodideStatus.set('ready');
+      return true;
+    } catch (err: any) {
+      console.warn('[PythonBridge] Pyodide WebAssembly initialization failed:', err.message);
+      this.pyodideStatus.set('error');
+      return false;
+    }
+  }
+
+  /**
+   * Runs a Python code snippet inside the client-side Pyodide WebAssembly engine.
+   *
+   * @param code - Python code string to execute.
+   * @returns Evaluated result or null.
+   */
+  async runPyodideScript<T = any>(code: string): Promise<T | null> {
+    const ready = await this.initPyodideWebAssembly();
+    if (!ready || !this.pyodideInstance) return null;
+
+    try {
+      const result = await this.pyodideInstance.runPythonAsync(code);
+      return result;
+    } catch (err: any) {
+      console.error('[PythonBridge] Pyodide script execution error:', err.message);
       return null;
     }
   }
