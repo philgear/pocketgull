@@ -6,19 +6,21 @@
 - **Frontend**: Angular 22 Standalone Components with Signals (`signal`, `computed`, `effect`).
 - **Backend / SSR**: Node.js, Express, and integrated Angular Server-Side Rendering.
 - **Interactive 3D Anatomy**: Three.js WebGL procedural skeletal, organ, dermatome mapping with SIGGRAPH GLSL shaders, SIGGRAPH cardiac double-bump, and Vision Accessibility non-glare fallbacks.
-- **Python ML Sidecar & Edge**: FastAPI sidecar (`pocketgull_api`) with 5 distinct calibrated PhysioNet contest models (`physionet_2022` PCG, `physionet_2023` EEG, `physionet_2024` ECG, `physionet_2025` Sepsis, `physionet_2026` PSG) with dedicated endpoints (`/ml/predict/physionet-*`), Google Pixel AVF Linux container installer (`setup-pixel-linux.sh`), and in-browser Pyodide WebAssembly Python runtime for iOS PWAs.
-- **Mobile Companion**: Flutter / Dart cross-platform mobile suite (`pocketgull_flutter`) supporting Doctor Mode & Patient Mode.
-- **Interoperability**: Strict FHIR R4 Bundle export & FHIR R5 `SubscriptionTopic` real-time biometric telemetry streaming (`http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream`).
+- **Python ML Sidecar & Edge**: FastAPI sidecar (`pocketgull_api`) with calibrated PhysioNet contest models (`physionet_2022` PCG, `physionet_2023` EEG, `physionet_2024` ECG, `physionet_2025` Sepsis, `physionet_2026` PSG) and calibrated ICU 30-Day Mortality, Readmission Risk, and Outbreak Triage classifiers.
+- **Mobile Companion**: Flutter / Dart cross-platform mobile suite (`pocketgull_flutter`) with Riverpod BLE multi-vitals telemetry synchronization.
+- **Interoperability**: Strict FHIR R4 Bundle export with SOFA score (`LOINC 96790-1`) and LACE readmission risk (`LOINC 80299-1`) observations, plus FHIR R5 `SubscriptionTopic` real-time biometric telemetry streaming (`http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream`).
 
 ## WebMCP Model Context Protocol (MCP) Tools & Multi-Paradigm Lenses
 Pocket Gull exposes native WebMCP tools and 13 specialized clinical lenses for autonomous AI browser agents:
 - `Summary Overview`, `Treatment Matrix`, `Functional Protocols`, `Nutrition`, `Precision Nutrients`, `Monitoring & Follow-up`, `Patient Education`, `PhysioNet Telemetry`, `Y-BOCs Screener`, `Maternal & Postpartum`, `Grow-Thyself Education`, `Epigenetic Longevity`, and `Pre-Conception & Family Health`.
-- **Optical rPPG Camera Pulse Sampler**: Dermal $530\text{nm}$ green-channel photoplethysmography camera pulse extractor (`SpatialScannerComponent`).
+- **Preemptive Hypoglycemia Alert & Rescue Routing**: Automatic CGM drop warning (<70 mg/dL), Web Speech audio narration, and instant grocery store orange juice rescue routing (`HypoglycemiaAlertService`).
+- **Medical Supply & Hospital Navigation Hub**: Off-the-shelf medical equipment finder (Pulse Oximeters, AEDs, CGM sensors, Bandaids, Fast-Acting Orange Juice / Rescue Glucose Gel) with 24/7 hospital ER geolocation (`MedicalSupplyNavigatorComponent`).
+- **Precision Chrono-Nutrition & Glycemic Engine**: 8-hour intermittent fasting schedule visualizer, tri-paradigm botanical food matrix (Matcha EGCG, Broccoli Sprouts Sulforaphane, Mung Bean & Ginger Stew, Nisha Amalaki), and -35% postprandial glucose spike simulator (`PrecisionNutritionCalculatorComponent`).
+- **Dual-Audience Reading Level System**: Dual plain 6th-grade layperson vs. MD/PhD scientific clinical decoder with Web Speech narration (`MedicalDecoderService`).
+- **Optical rPPG Camera Pulse Sampler**: Dermal 530nm green-channel photoplethysmography camera pulse extractor (`SpatialScannerComponent`).
 - **1-Thumb Quick-Dial Haptic Vitals HUD**: Tactile touch stepper controls for HR, BP, Temp, and SpO2 with mobile haptic vibration feedback (`VitalsQuickDialHudComponent`).
 - **Multi-Vitals BLE GATT Service**: Support for Heart Rate (`0x180D`), Pulse Oximetry (`0x1822`), Health Thermometer (`0x1809`), and Blood Pressure (`0x1810`).
 - **Family Pedigree Tree & Risk Pruning**: 3-generation pedigree tree visualizer (`FamilyTreePedigreeComponent`) with interactive risk pruning.
-- **In-Line Medical Term Decoder**: Contextual hover tooltips (`MedicalDecoderService` / `MedicalDecoderPipe`) decoding 50+ clinical terms.
-- **TED-Style Patient Hero Journey**: 3-Act narrative generator (`ClinicalStorytellingService`) with Web Speech audio narration.
 - `get_patient_state`: Retrieves current patient demographics, vitals, CGM continuous glucose monitoring (`cgmGlucoseMgDl`), CMP lab panel, and active symptoms.
 - `update_patient_vitals`: Pushes updated vital signs (HR, BP, SpO2, Temp, CGM Glucose) or CMP laboratory values.
 - `trigger_fhir_r5_stream`: Toggles live FHIR R5 biometric telemetry streaming.
