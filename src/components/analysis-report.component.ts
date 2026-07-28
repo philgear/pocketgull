@@ -29,10 +29,8 @@ import { PocketGullButtonComponent } from './shared/pocket-gull-button.component
 import { MedicalDecoderService } from '../services/medical-decoder.service';
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
-import { YbocsScreenerComponent } from './ybocs-screener.component';
 import { ClinicalAssessmentsSuiteComponent } from './clinical-assessments-suite.component';
-import { MultiParadigmVennComponent } from './multi-paradigm-venn.component';
-import { KaizenQualitySuiteComponent } from './kaizen-quality-suite.component';
+import { AssessmentsLensTabComponent } from './analysis-report/assessments-lens-tab.component';
 import { ClinicalMenuComponent } from './clinical-menu.component';
 import { KssCognitiveShieldComponent } from './kss-cognitive-shield.component';
 import { CarePlanPrintPreviewComponent } from './care-plan-print-preview.component';
@@ -97,10 +95,8 @@ import { BionicReadingService } from '../services/bionic-reading.service';
     PocketGullButtonComponent,
     RevealDirective,
     NodeAgentDialogComponent,
-    YbocsScreenerComponent,
     ClinicalAssessmentsSuiteComponent,
-    MultiParadigmVennComponent,
-    KaizenQualitySuiteComponent,
+    AssessmentsLensTabComponent,
     ClinicalMenuComponent,
     KssCognitiveShieldComponent,
     EmergencyNutritionalBypassComponent,
@@ -498,141 +494,8 @@ import { BionicReadingService } from '../services/bionic-reading.service';
         }
 
           @if (activeLens() === 'ASSESSMENTS') {
-          <div class="w-full space-y-6">
-            <!-- Screener Sub-Lens Tab Selection -->
-            <div class="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 max-w-4xl overflow-x-auto">
-              <button (click)="screenerTab.set('ybocs')"
-                data-testid="tab-ybocs-screener"
-                [class.bg-white]="screenerTab() === 'ybocs'"
-                [class.dark:bg-zinc-800]="screenerTab() === 'ybocs'"
-                [class.text-indigo-650]="screenerTab() === 'ybocs'"
-                [class.dark:text-indigo-400]="screenerTab() === 'ybocs'"
-                [class.text-zinc-500]="screenerTab() !== 'ybocs'"
-                [class.shadow-xs]="screenerTab() === 'ybocs'"
-                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
-                ⚡ Y-BOCs OCD
-              </button>
-              <button (click)="screenerTab.set('suite')"
-                data-testid="tab-clinical-suite"
-                [class.bg-white]="screenerTab() === 'suite'"
-                [class.dark:bg-zinc-800]="screenerTab() === 'suite'"
-                [class.text-indigo-650]="screenerTab() === 'suite'"
-                [class.dark:text-indigo-400]="screenerTab() === 'suite'"
-                [class.text-zinc-500]="screenerTab() !== 'suite'"
-                [class.shadow-xs]="screenerTab() === 'suite'"
-                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
-                📋 Clinical Suite
-              </button>
-              <button (click)="screenerTab.set('venn')"
-                data-testid="tab-venn-matrix"
-                [class.bg-white]="screenerTab() === 'venn'"
-                [class.dark:bg-zinc-800]="screenerTab() === 'venn'"
-                [class.text-indigo-650]="screenerTab() === 'venn'"
-                [class.dark:text-indigo-400]="screenerTab() === 'venn'"
-                [class.text-zinc-500]="screenerTab() !== 'venn'"
-                [class.shadow-xs]="screenerTab() === 'venn'"
-                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
-                ⭕ Venn Consensus (W∩F∩E)
-              </button>
-              <button (click)="screenerTab.set('kaizen')"
-                data-testid="tab-kaizen-suite"
-                [class.bg-white]="screenerTab() === 'kaizen'"
-                [class.dark:bg-zinc-800]="screenerTab() === 'kaizen'"
-                [class.text-indigo-650]="screenerTab() === 'kaizen'"
-                [class.dark:text-indigo-400]="screenerTab() === 'kaizen'"
-                [class.text-zinc-500]="screenerTab() !== 'kaizen'"
-                [class.shadow-xs]="screenerTab() === 'kaizen'"
-                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
-                📈 Kaizen Optimization (SPC/Pareto)
-              </button>
-              <button (click)="screenerTab.set('suggestions')"
-                [class.bg-white]="screenerTab() === 'suggestions'"
-                [class.dark:bg-zinc-800]="screenerTab() === 'suggestions'"
-                [class.text-indigo-650]="screenerTab() === 'suggestions'"
-                [class.dark:text-indigo-400]="screenerTab() === 'suggestions'"
-                [class.text-zinc-500]="screenerTab() !== 'suggestions'"
-                [class.shadow-xs]="screenerTab() === 'suggestions'"
-                class="py-1.5 px-3 text-xs font-bold uppercase tracking-wider rounded-lg transition cursor-pointer active:scale-95 border-0 whitespace-nowrap">
-                💡 Intake & Interviewing
-              </button>
-            </div>
-
-            @if (screenerTab() === 'ybocs') {
-              <div class="w-full">
-                <app-ybocs-screener></app-ybocs-screener>
-              </div>
-            } @else if (screenerTab() === 'suite') {
-              <div class="w-full">
-                <app-clinical-assessments-suite></app-clinical-assessments-suite>
-              </div>
-            } @else if (screenerTab() === 'venn') {
-              <div class="w-full">
-                <app-multi-paradigm-venn></app-multi-paradigm-venn>
-              </div>
-            } @else if (screenerTab() === 'kaizen') {
-              <div class="w-full">
-                <app-kaizen-quality-suite></app-kaizen-quality-suite>
-              </div>
-            } @else {
-              <!-- Intake & Motivational interviewing Suggestions Panel -->
-              <div class="w-full flex flex-col gap-5">
-                <div class="p-5 bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-850 rounded-2xl shadow-xs">
-                  <div class="flex items-center gap-3.5 border-b border-zinc-200/60 dark:border-zinc-800 pb-4 mb-4">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl shrink-0 font-bold">
-                      💡
-                    </div>
-                    <div>
-                      <h4 class="text-sm font-black uppercase text-zinc-900 dark:text-zinc-150">Patient Assessment Intake Suggestions</h4>
-                      <p class="text-xs text-zinc-500 dark:text-zinc-400">Intelligent alerts on which tools to run or refresh and motivational interviewing cues matching current state.</p>
-                    </div>
-                  </div>
-
-                  <div class="flex flex-col gap-4">
-                    @for (sug of intakeSuggestions(); track sug.assessment) {
-                      <div class="p-4 rounded-xl border border-zinc-200/70 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/30 flex flex-col gap-3">
-                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-200/30 dark:border-zinc-800/30 pb-2">
-                          <span class="text-xs font-extrabold uppercase text-indigo-650 dark:text-indigo-400 flex items-center gap-1.5">
-                            📌 Recommended: {{ sug.assessment }}
-                          </span>
-                          <span class="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded bg-zinc-200/60 dark:bg-zinc-850 text-zinc-600 dark:text-zinc-450 border border-zinc-300/40 dark:border-zinc-800">
-                            State Triggered
-                          </span>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                          <!-- Clinical Triggers -->
-                          <div class="flex flex-col gap-1">
-                            <span class="font-bold text-zinc-500 dark:text-zinc-400">Clinical Reason / Trigger:</span>
-                            <span class="text-zinc-800 dark:text-zinc-200 leading-relaxed font-semibold">{{ sug.reason }}</span>
-                          </div>
-                          <!-- Clinical Recommendation -->
-                          <div class="flex flex-col gap-1">
-                            <span class="font-bold text-zinc-500 dark:text-zinc-400">Recommended Action:</span>
-                            <span class="text-zinc-800 dark:text-zinc-200 leading-relaxed font-semibold">{{ sug.action }}</span>
-                          </div>
-                        </div>
-
-                        <!-- Motivational Interviewing Prompts -->
-                        <div class="mt-2.5 p-3 rounded-lg border border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/3 flex flex-col gap-2">
-                          <span class="text-[10px] font-bold uppercase text-amber-600 dark:text-amber-400 tracking-wider flex items-center gap-1">
-                            💬 Suggested Motivational Interviewing Prompts (OARS):
-                          </span>
-                          <div class="flex flex-col gap-2 font-serif text-xs text-zinc-700 dark:text-zinc-300 italic leading-relaxed">
-                            @for (prompt of sug.interviewPrompts; track prompt) {
-                              <div class="pl-3 border-l-2 border-amber-500/40">
-                                {{ prompt }}
-                              </div>
-                            }
-                          </div>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        } @else {
+            <app-assessments-lens-tab></app-assessments-lens-tab>
+          } @else {
           <!-- ACM §1.3: AI-Generated Content Disclosure -->
           @if (hasAnyReport() && !state.isEmergencyMode()) {
             <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-100 dark:bg-violet-950/60 border border-violet-300 dark:border-violet-700">
