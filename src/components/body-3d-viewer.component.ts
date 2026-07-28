@@ -12,6 +12,7 @@ import { PatientManagementService } from '../services/patient-management.service
 import { ThemeService } from '../services/theme.service';
 import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
 import { AdobeFireflyTextureService } from '../services/adobe-firefly-texture.service';
+import { Holographic3DAnatomyComponent } from './holographic-3d-anatomy.component';
 import { IBodyPartIssue } from '../services/patient.types';
 
 const PART_NAMES: Record<string, string> = {
@@ -71,10 +72,13 @@ export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molec
 @Component({
     selector: 'app-body-3d-viewer',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, Holographic3DAnatomyComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
     <div class="flex flex-col flex-1 h-full w-full min-h-[540px] bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl overflow-hidden font-sans thematic-3d-container">
+      <!-- Embedded Holographic 3D Spatial Anatomy Viewer -->
+      <app-holographic-3d-anatomy class="block w-full mb-4"></app-holographic-3d-anatomy>
+
       <!-- 1. Dedicated Top Unobstructed HUD Ribbon -->
       <div *ngIf="webglSupported()" class="px-3 py-2 bg-slate-100/90 dark:bg-zinc-950/90 border-b border-slate-300 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 shrink-0 z-20 font-mono text-xs">
         <!-- Camera Angle Presets -->
