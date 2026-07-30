@@ -71,9 +71,12 @@ import { ClinicalSleepTwinDashboardComponent } from './clinical-sleep-twin-dashb
 import { ChronobiologyMatrixComponent } from './chronobiology-matrix.component';
 import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.component';
 import { BionicReadingService } from '../services/bionic-reading.service';
+import { SkepticalEpistemologyService } from '../services/skeptical-epistemology.service';
+import { SocraticChallengeCardComponent } from './socratic-challenge-card.component';
 
 import { TeledentistrySystemicLensComponent } from './analysis-report/teledentistry-systemic-lens.component';
 import { ChronobiologyMatrixLensTabComponent } from './analysis-report/chronobiology-matrix-lens-tab.component';
+import { FunctionalMedicineMatrixLensTabComponent } from './analysis-report/functional-medicine-matrix-lens-tab.component';
 import { MaternalPostpartumLensTabComponent } from './analysis-report/maternal-postpartum-lens-tab.component';
 import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/seven-generations-stewardship-lens-tab.component';
 
@@ -84,6 +87,7 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
     CommonModule,
     TeledentistrySystemicLensComponent,
     ChronobiologyMatrixLensTabComponent,
+    FunctionalMedicineMatrixLensTabComponent,
     MaternalPostpartumLensTabComponent,
     SevenGenerationsStewardshipLensTabComponent,
     ClinicalSleepTwinDashboardComponent,
@@ -135,7 +139,8 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
     ChronoClockDecisionRailComponent,
     ChronoWeeklyMealPlannerComponent,
     ClinicalTrajectoryBiographyComponent,
-    DualPaneConsultationComponent
+    DualPaneConsultationComponent,
+    SocraticChallengeCardComponent
   ],
 
 
@@ -479,10 +484,10 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
           </div>
 
           <!-- Circadian Chronobiology & Functional Medicine Biomarker Telemetry -->
-          @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up' || activeLens() === 'Chronobiology Matrix' || activeLens() === 'Functional Medicine Matrix') {
+          @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
             <div class="my-6 space-y-6 font-mono no-print">
               <!-- Chronobiology Rhythm Matrix & Clock Decision Rail -->
-              @if (activeLens() === 'Chronobiology Matrix' || activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols') {
+              @if (activeLens() === 'Nutrition' || activeLens() === 'Functional Protocols') {
                 <app-chronobiology-matrix></app-chronobiology-matrix>
                 <app-chrono-clock-decision-rail></app-chrono-clock-decision-rail>
               }
@@ -493,7 +498,7 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
               }
 
               <!-- Functional Medicine Biomarker Matrix & Clinical Sleep Twin Simulator -->
-              @if (activeLens() === 'Functional Medicine Matrix' || activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
+              @if (activeLens() === 'Functional Protocols' || activeLens() === 'Precision Nutrients' || activeLens() === 'Monitoring & Follow-up') {
                 <app-functional-medicine-matrix></app-functional-medicine-matrix>
                 <app-biomarker-matrix></app-biomarker-matrix>
                 <app-clinical-sleep-twin-dashboard></app-clinical-sleep-twin-dashboard>
@@ -503,7 +508,59 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
         }
 
           @if (activeLens() === 'Chronobiology Matrix') {
+            <div class="mb-6 p-4 rounded-2xl bg-zinc-950/80 border border-orange-500/20 shadow-lg font-mono text-zinc-100 backdrop-blur-md">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-orange-500 text-sm">📡</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400">Circadian Real-Time Telemetry</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">Disruption Index</span>
+                  <span class="text-orange-400 font-extrabold text-sm">{{ state.circadianDisruptionIndex() }} / 100</span>
+                </div>
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">Cortisol Curve</span>
+                  <span class="text-orange-300 font-extrabold text-sm truncate block">{{ state.cortisolDiurnalSlope().slope }}</span>
+                </div>
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">Adrenal Status</span>
+                  <span class="text-orange-300 font-extrabold text-sm truncate block">{{ state.cortisolDiurnalSlope().status }}</span>
+                </div>
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">Delta Power</span>
+                  <span class="text-orange-200 font-extrabold text-sm">{{ state.remSleepArchitectureScore().deltaPowerUv2 }} µV²</span>
+                </div>
+              </div>
+            </div>
             <app-chronobiology-matrix-lens-tab class="block my-6"></app-chronobiology-matrix-lens-tab>
+          }
+
+          @if (activeLens() === 'Functional Medicine Matrix') {
+            <div class="mb-6 p-4 rounded-2xl bg-zinc-950/80 border border-emerald-500/20 shadow-lg font-mono text-zinc-100 backdrop-blur-md">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="text-emerald-500 text-sm">📡</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-zinc-400">Functional Systemic Telemetry</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">hs-CRP Estimate</span>
+                  <span class="text-emerald-400 font-extrabold text-sm">{{ state.systemicInflammatoryBurden().hsCrpEstimate }}</span>
+                </div>
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">ATP Turnover</span>
+                  <span class="text-emerald-300 font-extrabold text-sm truncate block">{{ state.mitochondrialEfficiencyScore().atpTurnoverIndex }}</span>
+                </div>
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">Zonulin Status</span>
+                  <span class="text-emerald-300 font-extrabold text-sm truncate block">{{ state.gutBrainAxisScore().zonulinStatus }}</span>
+                </div>
+                <div class="p-2 rounded bg-zinc-900 border border-zinc-800">
+                  <span class="text-zinc-500 block text-[10px] uppercase">Translocation Risk</span>
+                  <span class="text-emerald-200 font-extrabold text-sm truncate block">{{ state.gutBrainAxisScore().lpsEndotoxemiaRisk }}</span>
+                </div>
+              </div>
+            </div>
+            <app-functional-medicine-matrix-lens-tab class="block my-6"></app-functional-medicine-matrix-lens-tab>
           }
 
           @if (activeLens() === 'Maternal & Postpartum') {
@@ -1359,6 +1416,13 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
 
             @if (hasAnyReport()) {
               <app-lens-insight-spark-shield [activeLens]="activeLens()"></app-lens-insight-spark-shield>
+            }
+
+            <!-- Socratic Challenge Questions (Bionic Reading Mode only) -->
+            @if (bionicReading.isBionicReadingEnabled() && hasAnyReport()) {
+              @for (challenge of activeLensChallenges(); track challenge.id) {
+                <app-socratic-challenge-card [challenge]="challenge"></app-socratic-challenge-card>
+              }
             }
 
             @if (activeLens() === 'Patient Education' && hasAnyReport()) {
@@ -3172,6 +3236,19 @@ export class AnalysisReportComponent implements OnDestroy {
   });
 
   protected readonly bionicReading = inject(BionicReadingService);
+  private readonly skepticalEpistemology = inject(SkepticalEpistemologyService);
+
+  /**
+   * Socratic challenge questions for the active lens, generated from content keywords.
+   * Only computed when Bionic Reading mode is enabled to avoid unnecessary work.
+   */
+  activeLensChallenges = computed(() => {
+    if (!this.bionicReading.isBionicReadingEnabled()) return [];
+    const lens = this.activeLens();
+    const content = this.activeReport();
+    if (!content) return [];
+    return this.skepticalEpistemology.generateSocraticChallenges(lens, content, 2);
+  });
   get lensAnnotations() { return this.state.lensAnnotations; }  // Track save status per node
   readonly nodeSaveStatuses = signal<Record<string, 'idle' | 'saving' | 'saved'>>({});
 
