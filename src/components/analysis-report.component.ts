@@ -207,72 +207,84 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
 
             <div #lensBarContainer (wheel)="onLensBarWheel($event)" class="flex items-center gap-1.5 overflow-x-auto scroll-smooth hide-scrollbar flex-1">
               <button (click)="changeLens('Summary Overview')"
+                data-testid="tab-overview"
                 [class]="activeLens() === 'Summary Overview' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>📋</span> Overview
               </button>
-
+ 
               <button (click)="changeLens('Treatment Matrix')"
+                data-testid="tab-treatment-matrix"
                 [class]="activeLens() === 'Treatment Matrix' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>💊</span> Treatment Matrix
               </button>
-
+ 
               <button (click)="changeLens('Functional Protocols')"
+                data-testid="tab-functional-protocols"
                 [class]="activeLens() === 'Functional Protocols' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>🧠</span> Functional Protocols
               </button>
-
+ 
               <button (click)="changeLens('Nutrition')"
+                data-testid="tab-nutrition"
                 [class]="activeLens() === 'Nutrition' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>🥗</span> Nutrition
               </button>
-
+ 
               <button (click)="changeLens('Precision Nutrients')"
+                data-testid="tab-precision-nutrients"
                 [class]="activeLens() === 'Precision Nutrients' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>🧬</span> Precision Nutrients
               </button>
-
+ 
               <button (click)="changeLens('Monitoring & Follow-up')"
+                data-testid="tab-monitoring-follow-up"
                 [class]="activeLens() === 'Monitoring & Follow-up' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>📊</span> Monitoring & Follow-up
               </button>
-
+ 
               <button (click)="changeLens('Patient Education')"
+                data-testid="tab-patient-education"
                 [class]="activeLens() === 'Patient Education' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>📖</span> Patient Education
               </button>
-
+ 
               <button (click)="changeLens('ASSESSMENTS')"
+                data-testid="tab-assessments"
                 [class]="activeLens() === 'ASSESSMENTS' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>⚡</span> ASSESSMENTS
               </button>
-
+ 
               <button (click)="changeLens('Maternal & Postpartum')"
+                data-testid="tab-maternal-postpartum"
                 [class]="activeLens() === 'Maternal & Postpartum' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>🤱</span> Maternal & Postpartum
               </button>
-
+ 
               <button (click)="changeLens('Epigenetic Longevity')"
+                data-testid="tab-epigenetic-longevity"
                 [class]="activeLens() === 'Epigenetic Longevity' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>⏳</span> Epigenetic Longevity
               </button>
-
+ 
               <button (click)="changeLens('Chronobiology Matrix')"
+                data-testid="tab-chronobiology"
                 [class]="activeLens() === 'Chronobiology Matrix' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>⏰</span> Chronobiology
               </button>
-
+ 
               <button (click)="changeLens('Functional Medicine Matrix')"
+                data-testid="tab-functional-matrix"
                 [class]="activeLens() === 'Functional Medicine Matrix' ? '!bg-indigo-600 !text-white border-indigo-600 shadow-md font-extrabold' : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-800 hover:bg-indigo-50 dark:hover:bg-zinc-800 font-semibold'"
                 class="py-1.5 px-3 rounded-lg tracking-wider text-[11px] uppercase whitespace-nowrap transition-all border flex items-center gap-1 shrink-0 cursor-pointer">
                 <span>🧬</span> Functional Matrix

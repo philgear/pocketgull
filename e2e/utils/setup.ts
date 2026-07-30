@@ -24,8 +24,35 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
   // Wait for the local Express server backend to finish booting and seeding
   await waitForBackendToBeReady();
 
-  page.on('console', msg => {
-    console.log(`PAGE LOG [${msg.type()}]:`, msg.text());
+  page.on('console', async msg => {
+    const parts = [];
+    for (const arg of msg.args()) {
+      try {
+        const val = await arg.jsonValue();
+        if (val && typeof val === 'object') {
+          parts.push(JSON.stringify(val));
+        } else {
+          parts.push(val);
+        }
+      } catch (e) {
+        parts.push(arg.toString());
+      }
+    }
+    console.log(`PAGE LOG [${msg.type()}]:`, parts.join(' '));
+  });
+
+  page.on('pageerror', err => {
+    console.error('PAGE ERROR EXCEPTION:', err.stack || err.message);
+  });
+
+  page.on('requestfailed', request => {
+    console.error(`REQUEST FAILED: ${request.method()} ${request.url()} - ${request.failure()?.errorText || 'unknown error'}`);
+  });
+
+  page.on('response', response => {
+    if (response.status() >= 400) {
+      console.error(`HTTP ERROR: ${response.request().method()} ${response.url()} status ${response.status()}`);
+    }
   });
 
   // Intercept config endpoint to return empty API key so splash screen shows Demo Mode
@@ -58,6 +85,63 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify([])
+    });
+  });
+
+  // Intercept AI Metrics endpoint
+  await page.route('**/api/ai/metrics', async route => {
+    console.log('E2E MOCK: Intercepted POST /api/ai/metrics');
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ complexity: 5, stability: 5, certainty: 5 })
+    });
+  });
+
+  // Intercept AI Stream endpoint to return standard test keywords for all lens verification
+  await page.route('**/api/ai/stream', async route => {
+    console.log('E2E MOCK: Intercepted POST /api/ai/stream');
+    const mockMarkdown = `# Clinical Assessment\nDetails of clinical assessment.\n\n# Diagnostic Workup\nDetails of diagnostic workup.\n\n# Nutritional Interventions\nDetails of nutritional interventions.\n\n# Biomarker Matrix\nDetails of biomarker matrix: Magnesium.\n\n# Immediate (24-72 hours)\nDetails of immediate monitoring.\n\n# Understanding Your health plan\nDetails of patient education.`;
+    const chunk = {
+      candidates: [{
+        content: {
+          parts: [{
+            text: mockMarkdown
+          }]
+        }
+      }]
+    };
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/event-stream',
+      body: `data: ${JSON.stringify(chunk)}\ndata: [DONE]\n`
+    });
+  });
+
+  // Intercept AI Changes detection endpoint
+  await page.route('**/api/ai/changes', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ significant: false })
+    });
+  });
+
+  // Intercept AI Chat Start endpoint
+  await page.route('**/api/ai/chat/start', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ sessionId: 'mock-session-id' })
+    });
+  });
+
+  // Intercept AI Chat Message endpoint
+  await page.route('**/api/ai/chat/message', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ text: 'This is a mock clinical intelligence response.' })
     });
   });
 

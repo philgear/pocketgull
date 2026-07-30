@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,46 +10,19 @@ const __dirname = path.dirname(__filename);
 // Screenshot output directory
 const SCREENSHOT_DIR = path.join(__dirname, '..', 'test-results', 'screenshots');
 
-/** Shared login + demo mode entry flow */
-async function enterDemoMode(page: import('@playwright/test').Page) {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/');
-
-  // PIN entry
-  const pinInput = page.locator('input[placeholder="1234"]');
-  await expect(pinInput).toBeVisible({ timeout: 10000 });
-  await pinInput.fill('1234');
-  await pinInput.press('Enter');
-
-  // Demo Mode button
-  const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-  await expect(demoBtn).toBeVisible({ timeout: 10000 });
-  await demoBtn.click();
-
-  // Skip KSS if present
-  const skipBtn = page.locator('button', { hasText: 'Skip' });
-  if (await skipBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await skipBtn.click();
-  }
-
-  // Ethics pledge (if present)
-  const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-  if (await acceptBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    const pledgeCheckbox = page.locator('input[type="checkbox"]').last();
-    if (await pledgeCheckbox.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await pledgeCheckbox.check().catch(() => {});
-    }
-    await acceptBtn.click();
-  }
-
-  // Wait for main app or container to render
-  await page.waitForSelector('app-analysis-container, app-analysis-report, main', { timeout: 20000 });
-}
-
 /** Helper to enter demo mode and select Phil Gear */
 async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) {
   await enterDemoMode(page);
-  await page.waitForTimeout(1000);
+
+  // Select patient Phil Gear from the dropdown
+  const dropdownBtn = page.locator('app-patient-dropdown button').first();
+  await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
+  await dropdownBtn.click();
+
+  const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
+  await expect(philGearOption).toBeVisible({ timeout: 10000 });
+  await philGearOption.click();
+  await page.waitForTimeout(1500);
 }
 
 test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
@@ -94,11 +67,11 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await westernBtn.click();
     await page.waitForTimeout(1500);
 
+    // Wait for the Generate/Refresh button to be visible and click it
     const generateBtn = page.locator('button', { hasText: /Generate|Refresh/ }).first();
-    if (await generateBtn.isVisible()) {
-      await generateBtn.click();
-      await page.waitForTimeout(3000);
-    }
+    await expect(generateBtn).toBeVisible({ timeout: 15000 });
+    await generateBtn.click();
+    await page.waitForTimeout(3000);
 
     // Verify all 6 tabs are present
     const expectedTabs = [
@@ -119,20 +92,20 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     const overviewTab = page.getByTestId('tab-overview');
     await overviewTab.click();
     await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Clinical Assessment')).toBeVisible({ timeout: 5000 });
+    await expect(reportEl.locator('text=Clinical').first()).toBeVisible({ timeout: 5000 });
 
     // Functional Protocols tab
     const funcTab = page.getByTestId('tab-functional-protocols');
     await funcTab.click();
     await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Diagnostic Workup')).toBeVisible({ timeout: 5000 });
+    await expect(reportEl.locator('text=Diagnostic Workup').first()).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Functional Protocols tab populated.');
 
     // Nutrition tab
     const nutritionTab = page.getByTestId('tab-nutrition');
     await nutritionTab.click();
     await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Nutritional Interventions')).toBeVisible({ timeout: 5000 });
+    await expect(reportEl.locator('text=Nutritional Interventions').first()).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Nutrition tab populated.');
 
     // Precision Nutrients tab
@@ -147,14 +120,14 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     const monitorTab = page.getByTestId('tab-monitoring-follow-up');
     await monitorTab.click();
     await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Immediate (24-72 hours)')).toBeVisible({ timeout: 5000 });
+    await expect(reportEl.locator('text=Immediate (24-72 hours)').first()).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Monitoring & Follow-up tab populated.');
 
     // Patient Education tab
     const educationTab = page.getByTestId('tab-patient-education');
     await educationTab.click();
     await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Understanding Your')).toBeVisible({ timeout: 5000 });
+    await expect(reportEl.locator('text=Understanding Your').first()).toBeVisible({ timeout: 5000 });
     console.log('[PASS] Patient Education tab populated.');
 
     // Take a full-page screenshot at the end
@@ -185,11 +158,11 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await page.locator('button', { hasText: 'Western' }).first().click();
     await page.waitForTimeout(1500);
 
+    // Wait for the Generate/Refresh button to be visible and click it
     const generateBtn = page.locator('button', { hasText: /Generate|Refresh/ }).first();
-    if (await generateBtn.isVisible()) {
-      await generateBtn.click();
-      await page.waitForTimeout(3000);
-    }
+    await expect(generateBtn).toBeVisible({ timeout: 15000 });
+    await generateBtn.click();
+    await page.waitForTimeout(3000);
     await orthoTab.click();
     await page.waitForTimeout(500);
     await expect(reportEl.locator('text=Biomarker Matrix').first()).toBeVisible({ timeout: 5000 });
@@ -199,7 +172,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     console.log('[PASS] Western Orthomolecular Profiling verified.');
 
     // Eastern paradigm
-    await page.locator('button', { hasText: 'Eastern (TCM)' }).first().click();
+    await page.locator('button', { hasText: 'Eastern' }).first().click();
     await page.waitForTimeout(1500);
     await orthoTab.click();
     await page.waitForTimeout(500);

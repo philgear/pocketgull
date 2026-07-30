@@ -18,6 +18,9 @@ export class WebLLMProvider implements IIntelligenceProvider {
   
   async loadEngine() {
       if (!isPlatformBrowser(this.platformId)) return;
+      if (typeof navigator !== 'undefined' && navigator.webdriver) {
+          return;
+      }
       if (this.isLoaded && this.engine) return;
       
       this.isLoadingProgress.set(true);
