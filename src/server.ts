@@ -1099,7 +1099,8 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
     }
 
     fs.writeFileSync(targetDbFile, JSON.stringify(patients, null, 2));
-    console.log('[API] Synced patient from mobile/app to database.');
+    const safePatientId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
+    console.log('[API] Synced patient %s from mobile/app to database.', safePatientId);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
   } catch (err: any) {
     console.error('[API] Error syncing patient to database:', sanitizeLogInput(String(err?.message || err)));
