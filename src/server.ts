@@ -1047,8 +1047,8 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
     const dbPath = getSafePatientsDbPath();
     fs.writeFileSync(dbPath, JSON.stringify(sanitizedArray, null, 2));
 
-    console.log(`[API] Saved ${sanitizeLogInput(String(req.body.length))} patients to database.`);
-    res.status(200).json({ success: true, count: req.body.length });
+    console.log(`[API] Saved ${String(sanitizedArray.length)} patients to database.`);
+    res.status(200).json({ success: true, count: sanitizedArray.length });
   } catch (err: any) {
     console.error('[API] Error saving patients database:', sanitizeLogInput(String(err?.message || err)));
     res.status(500).json({ error: 'Internal server error while saving database' });
