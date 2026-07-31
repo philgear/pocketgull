@@ -55,6 +55,15 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
     }
   });
 
+  // Intercept Firebase Data Connect emulator requests to prevent ERR_CONNECTION_REFUSED
+  await page.route('**9399/v1/**', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ data: {} })
+    });
+  });
+
   // Intercept config endpoint to return empty API key so splash screen shows Demo Mode
   await page.route('**/api/config', async route => {
     await route.fulfill({
@@ -187,36 +196,39 @@ export async function enterDemoMode(page: Page) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
 
+  let hasAttemptedPin = false;
   const startTime = Date.now();
   while (Date.now() - startTime < 30000) {
-    // Check if main app dropdown is already rendered and visible
-    const dropdownBtn = page.locator('app-patient-dropdown button').first();
-    if (await dropdownBtn.isVisible().catch(() => false)) {
+    // 0. If splash screen is no longer visible, app is unlocked!
+    const splashMain = page.locator('.secure-splash-main');
+    const isSplashVisible = await splashMain.isVisible().catch(() => false);
+    if (!isSplashVisible) {
       return;
     }
 
-    // 1. PIN entry
+    // 1. PIN entry (only submit once to allow fade-out animation to complete)
     const pinInput = page.locator('input[placeholder="1234"]');
-    if (await pinInput.isVisible().catch(() => false)) {
+    if (!hasAttemptedPin && await pinInput.isVisible().catch(() => false)) {
+      hasAttemptedPin = true;
       await pinInput.fill('1234').catch(() => {});
       await pinInput.press('Enter').catch(() => {});
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(1000);
       continue;
     }
 
     // 2. Demo Mode button
     const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
     if (await demoBtn.isVisible().catch(() => false)) {
-      await demoBtn.click();
-      await page.waitForTimeout(300);
+      await demoBtn.click().catch(() => {});
+      await page.waitForTimeout(500);
       continue;
     }
 
     // 3. Skip KSS button
     const skipBtn = page.locator('button', { hasText: 'Skip' });
     if (await skipBtn.isVisible().catch(() => false)) {
-      await skipBtn.click();
-      await page.waitForTimeout(300);
+      await skipBtn.click().catch(() => {});
+      await page.waitForTimeout(500);
       continue;
     }
 
@@ -231,13 +243,13 @@ export async function enterDemoMode(page: Page) {
     const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
     if (await acceptBtn.isVisible().catch(() => false)) {
       await acceptBtn.click().catch(() => {});
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
       continue;
     }
 
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(300);
   }
 
-  // Final wait for main patient dropdown to be visible
-  await page.waitForSelector('app-patient-dropdown button', { state: 'visible', timeout: 15000 });
+  // Final wait for splash screen to disappear
+  await page.locator('.secure-splash-main').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
 }

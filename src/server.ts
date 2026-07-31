@@ -303,9 +303,11 @@ app.use((req, res, next) => {
   next();
 });
 
+const isTestingEnv = Boolean(process.env['CI'] || process.env['PLAYWRIGHT_TESTING'] || process.env['NODE_ENV'] === 'test');
+
 const apiLimiter = rateLimit({
   windowMs: 60_000,
-  max: 100,
+  max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },
@@ -977,7 +979,7 @@ try {
 
 const patientsRateLimiter = rateLimit({
   windowMs: 60_000,
-  max: 100,
+  max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },
@@ -986,7 +988,7 @@ const patientsRateLimiter = rateLimit({
 
 const docsRateLimiter = rateLimit({
   windowMs: 60_000,
-  max: 300,
+  max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 300,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },
