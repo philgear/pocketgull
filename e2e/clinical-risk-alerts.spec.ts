@@ -1,43 +1,10 @@
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-/** Shared login + demo mode entry flow */
-async function enterDemoMode(page: import('@playwright/test').Page) {
-  await page.goto('/');
-
-  // PIN entry
-  const pinInput = page.locator('input[placeholder="1234"]');
-  await expect(pinInput).toBeVisible({ timeout: 10000 });
-  await pinInput.fill('1234');
-  await pinInput.press('Enter');
-
-  // Demo Mode button
-  const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-  await expect(demoBtn).toBeVisible({ timeout: 10000 });
-  await demoBtn.click();
-
-  // Skip KSS
-  const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-  await expect(skipBtn).toBeVisible({ timeout: 10000 });
-  await skipBtn.click();
-
-  // Ethics pledge
-  const pledgeCheckbox = page.locator('input[type="checkbox"]');
-  await expect(pledgeCheckbox).toBeVisible({ timeout: 10000 });
-  await pledgeCheckbox.check();
-
-  const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-  await expect(acceptBtn).toBeVisible({ timeout: 10000 });
-  await acceptBtn.click();
-
-  // Wait for main app to render
-  await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-}
 
 /** Helper to select a patient by name from the dropdown */
 async function selectPatientByName(page: import('@playwright/test').Page, name: string) {
@@ -46,7 +13,7 @@ async function selectPatientByName(page: import('@playwright/test').Page, name: 
   await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
   await dropdownBtn.click();
 
-  const option = page.locator('.origin-top-left button', { hasText: name }).first();
+  const option = page.locator('app-patient-dropdown button', { hasText: name }).first();
   await expect(option).toBeVisible({ timeout: 10000 });
   await option.click();
 

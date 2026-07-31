@@ -32,7 +32,7 @@ test.describe('Multimodal Voice Consult & Speech Simulation', () => {
   });
 
   test('should trigger voice consultation and verify simulated speech recognition stream', async ({ page }) => {
-    await page.goto('http://localhost:4000/');
+    await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
     const title = await page.title();

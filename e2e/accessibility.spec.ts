@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 test.describe('WCAG & ARIA Accessibility Audit', () => {
   
@@ -180,34 +179,7 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
       window.localStorage.setItem('pg_mock_clinician', '1');
       window.localStorage.setItem('pg_data_consent_v1', 'true');
     });
-    await page.goto('/');
-    
-    // Unlock using PIN code 1234
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 5000 });
-    await pinInput.fill('1234');
-    // Auto-submits on length 4, wait for transition
-    await page.waitForTimeout(300);
-    
-    // Bypass auth to enter main clinical dashboard
-    const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-    await expect(demoBtn).toBeVisible({ timeout: 5000 });
-    await demoBtn.click();
-
-    // Dismiss the Karolinska Sleepiness Scale (KSS) assessment
-    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-    await expect(skipBtn).toBeVisible({ timeout: 5000 });
-    await skipBtn.click();
-
-    // Accept ethics pledge
-    const pledgeCheckbox = page.locator('input[type="checkbox"]');
-    await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
-    await pledgeCheckbox.check();
-
-    // Click Accept & Enter System
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
-    await acceptBtn.click();
+    await enterDemoMode(page);
 
     // Open the voice assistant panel
     const toggleAgentBtn = page.locator('button[aria-label="Toggle Live Agent"]');

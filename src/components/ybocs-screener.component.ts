@@ -27,9 +27,7 @@ import { SymptomItem } from '../services/ybocs/types';
         </div>
 
         <div class="flex flex-col items-center shrink-0 p-4 bg-white dark:bg-zinc-950 border border-zinc-200/60 dark:border-zinc-800 rounded-2xl w-full md:w-56 text-center shadow-inner">
-          <span class="text-3xl font-black text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">
-            {{ ybocs.totalScore() }}<span class="text-sm font-normal text-zinc-400">/40</span>
-          </span>
+          <span class="text-3xl font-black text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">{{ ybocs.totalScore() }}<span class="text-sm font-normal text-zinc-400">/40</span></span>
           <div class="mt-2 w-full">
             <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold border transition-colors duration-300 w-full justify-center" [class]="ybocs.severityDetails().color">
               {{ ybocs.severityDetails().name }}

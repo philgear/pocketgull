@@ -230,6 +230,7 @@ export interface IChatEntry {
                                                             <button (click)="speakPersona(entry.text, 'sentinel'); $event.stopPropagation()" class="hover:text-sky-500 font-bold" title="Speak with Sentinel voice">[🔦 SENTINEL]</button>
                                                             <button (click)="speakPersona(entry.text, 'scribes'); $event.stopPropagation()" class="hover:text-emerald-500 font-bold" title="Speak with Scribes voice">[📖 SCRIBES]</button>
                                                             <button (click)="actionInsert(entry.text); $event.stopPropagation()" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
+                                                            <button (click)="actionAnchor(entry.text); $event.stopPropagation()" class="hover:text-purple-400 font-bold" title="Anchor to Memory Palace">[ANCHOR]</button>
                                                          }
                                                      </div>
                                                 </div>

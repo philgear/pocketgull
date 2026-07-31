@@ -22,11 +22,17 @@ test.describe('10-Dimensional Master Domain Suites E2E Verification', () => {
     await expect(domainSuitesToggle).toBeVisible({ timeout: 45000 });
     await domainSuitesToggle.click();
 
-    // Verify Master Paradigm Synthesizer Card is rendered
-    const synthesizerHeader = page.locator('h3:has-text("10-Dimensional Master Paradigm Health Vector")');
+    // Verify Unified Paradigm Synthesizer Card is rendered
+    const synthesizerHeader = page.locator('h3:has-text("10-Dimensional Unified Paradigm Health Vector")');
     await expect(synthesizerHeader).toBeVisible({ timeout: 20000 });
 
-    // Define all 10 Domain Suite tab names to test
+    // Click "All Paradigms" toggle to reveal all 10+ suites
+    const showAllBtn = page.locator('button[aria-label="Toggle all domain suite paradigms view"]');
+    if (await showAllBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await showAllBtn.click();
+    }
+
+    // Define suite tab names to test
     const suites = [
       'Biomedical & Diagnostic',
       'Therapeutics & Botanical',
