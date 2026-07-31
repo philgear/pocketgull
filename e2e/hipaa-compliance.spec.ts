@@ -61,7 +61,7 @@ test.describe('HIPAA Compliance & Privacy Guardrails E2E Suite', () => {
           vitals: { heartRate: 72, systolicBp: 120, diastolicBp: 80, spo2: 98 }
         };
 
-        const cleanName = String(mockPatient.name).replace(/[\r\n\t]/g, ' ').replace(/[^\x20-\x7E]/g, '');
+        const cleanName = mockPatient.name.split('<')[0].trim();
 
         const fhirBundle = {
           resourceType: 'Bundle',

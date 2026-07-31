@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
 
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 test.describe('Mobile Sub-Navbar Responsiveness', () => {
   test.beforeEach(async ({ page }) => {
