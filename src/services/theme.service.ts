@@ -1,7 +1,7 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'curie';
 
 @Injectable({
   providedIn: 'root'
@@ -147,14 +147,15 @@ export class ThemeService {
       this.textSizeScale.set(savedTextSize);
     }
 
+    const ALL_THEMES: AppTheme[] = ['light', 'dark', 'system', 'spark', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'curie'];
     const urlParams = new URLSearchParams(window.location.search);
     const urlTheme = urlParams.get('theme') as AppTheme;
-    if (urlTheme && ['light', 'dark', 'system', 'spark'].includes(urlTheme)) {
+    if (urlTheme && ALL_THEMES.includes(urlTheme)) {
       this.currentTheme.set(urlTheme);
       this.resolveTheme(urlTheme);
     } else {
       const savedTheme = localStorage.getItem('pocket_gull_theme') as AppTheme;
-      if (savedTheme && ['light', 'dark', 'system', 'spark'].includes(savedTheme) && savedTheme !== 'spark') {
+      if (savedTheme && ALL_THEMES.includes(savedTheme) && savedTheme !== 'spark') {
         this.currentTheme.set(savedTheme);
       } else {
         this.currentTheme.set('light');
@@ -184,8 +185,14 @@ export class ThemeService {
         ? window.matchMedia('(prefers-color-scheme: dark)').matches
         : false;
       this.activeTheme.set(isSystemDark ? 'dark' : 'light');
-    } else if (theme === 'spark') {
+    } else if (theme === 'spark' || theme === 'black-marble' || theme === 'papyrus' || theme === 'mandala' || theme === 'curie') {
       this.activeTheme.set('dark');
+    } else if (theme === 'pool') {
+      const hour = new Date().getHours();
+      const isNight = hour < 6 || hour > 18;
+      this.activeTheme.set(isNight ? 'dark' : 'light');
+    } else if (theme === 'papercraft' || theme === 'hemp' || theme === 'rice' || theme === 'construction' || theme === 'white-marble') {
+      this.activeTheme.set('light');
     } else {
       this.activeTheme.set(theme === 'dark' ? 'dark' : 'light');
     }
@@ -194,19 +201,84 @@ export class ThemeService {
   private applyThemeToDom(resolvedTheme: 'light' | 'dark') {
     if (typeof document === 'undefined') return;
     
-    document.documentElement.classList.remove('dark', 'theme-spark');
+    document.documentElement.classList.remove(
+      'dark', 'theme-spark',
+      'papercraft-mode', 'papercraft-hemp', 'papercraft-rice', 'papercraft-construction',
+      'theme-white-marble', 'theme-black-marble', 'theme-papyrus',
+      'theme-pool', 'theme-pool-light', 'theme-pool-dark',
+      'theme-mandala', 'theme-curie'
+    );
     document.documentElement.setAttribute('data-theme', this.currentTheme());
 
-    if (resolvedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-    }
-    if (this.currentTheme() === 'spark') {
-      document.documentElement.classList.add('theme-spark');
-    }
+    const theme = this.currentTheme();
+    if (theme === 'papercraft' || theme === 'hemp' || theme === 'rice' || theme === 'construction') {
+      document.documentElement.classList.add('papercraft-mode');
+      if (theme === 'hemp') document.documentElement.classList.add('papercraft-hemp');
+      if (theme === 'rice') document.documentElement.classList.add('papercraft-rice');
+      if (theme === 'construction') document.documentElement.classList.add('papercraft-construction');
 
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#09090B' : '#F8F8F8');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#F9F3D9');
+      }
+    } else if (theme === 'spark') {
+      document.documentElement.classList.add('dark', 'theme-spark');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#0a0503');
+      }
+    } else if (theme === 'white-marble') {
+      document.documentElement.classList.add('theme-white-marble');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#FAF9F6');
+      }
+    } else if (theme === 'black-marble') {
+      document.documentElement.classList.add('dark', 'theme-black-marble');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#0d0d11');
+      }
+    } else if (theme === 'papyrus') {
+      document.documentElement.classList.add('dark', 'theme-papyrus');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#13100c');
+      }
+    } else if (theme === 'pool') {
+      document.documentElement.classList.add('theme-pool');
+      if (resolvedTheme === 'dark') {
+        document.documentElement.classList.add('dark', 'theme-pool-dark');
+      } else {
+        document.documentElement.classList.add('theme-pool-light');
+      }
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', resolvedTheme === 'dark' ? '#081f3d' : '#7dd3fc');
+      }
+    } else if (theme === 'mandala') {
+      document.documentElement.classList.add('dark', 'theme-mandala');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#16112d');
+      }
+    } else if (theme === 'curie') {
+      document.documentElement.classList.add('dark', 'theme-curie');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#0f1416');
+      }
+    } else if (resolvedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#09090B');
+      }
+    } else {
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#F8F8F8');
+      }
     }
   }
 

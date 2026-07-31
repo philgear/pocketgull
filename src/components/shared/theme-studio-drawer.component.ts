@@ -114,8 +114,10 @@ export interface IThemeOption {
 export class ThemeStudioDrawerComponent {
   public themeService = inject(ThemeService);
 
-  categories: Array<'Clinical' | 'Special Diagnostic'> = [
+  categories: Array<'Clinical' | 'Tactile Paper' | 'Mineral & Organic' | 'Special Diagnostic'> = [
     'Clinical',
+    'Tactile Paper',
+    'Mineral & Organic',
     'Special Diagnostic'
   ];
 
@@ -123,7 +125,20 @@ export class ThemeStudioDrawerComponent {
     { id: 'light', name: 'Light Parchment', category: 'Clinical', icon: '☀️', bgHex: '#F8F8F8', borderHex: '#E5E5E5', textHex: '#1C1C1C', accentHex: '#0284c7', description: 'Standard clinical high-contrast light mode.' },
     { id: 'dark', name: 'Dark Obsidian', category: 'Clinical', icon: '🌙', bgHex: '#09090b', borderHex: '#27272a', textHex: '#fafafa', accentHex: '#10b981', description: 'Deep dark mode optimized for night shifts.' },
     { id: 'system', name: 'System OS Sync', category: 'Clinical', icon: '💻', bgHex: '#18181b', borderHex: '#3f3f46', textHex: '#e4e4e7', accentHex: '#a855f7', description: 'Automatically synchronizes with your device operating system theme.' },
-    { id: 'spark', name: 'Spark Mode', category: 'Special Diagnostic', icon: '✨', bgHex: '#0a0503', borderHex: '#2e1208', textHex: '#fb923c', accentHex: '#f97316', description: 'Ember glow high-contrast emergency lens.' }
+
+    { id: 'papercraft', name: 'Papercraft Kraft', category: 'Tactile Paper', icon: '📜', bgHex: '#F9F3D9', borderHex: '#E5D6A7', textHex: '#3B2E1E', accentHex: '#b45309', description: 'Tactile natural kraft paper with soft warm fiber texture.' },
+    { id: 'hemp', name: 'Hemp Fiber', category: 'Tactile Paper', icon: '🌿', bgHex: '#F2EFE6', borderHex: '#D8D3C3', textHex: '#2C3529', accentHex: '#15803d', description: 'Organic unbleached hemp linen paper texture.' },
+    { id: 'rice', name: 'Washi Rice Paper', category: 'Tactile Paper', icon: '🌾', bgHex: '#FAF8F0', borderHex: '#EAE5D5', textHex: '#2A2723', accentHex: '#d97706', description: 'Translucent Japanese washi paper aesthetic.' },
+    { id: 'construction', name: 'Construction High-Vis', category: 'Tactile Paper', icon: '👷', bgHex: '#FDF6E2', borderHex: '#F3D27B', textHex: '#1E1B13', accentHex: '#eab308', description: 'High-visibility industrial safety paper for daylight readability.' },
+
+    { id: 'white-marble', name: 'Carrara White Marble', category: 'Mineral & Organic', icon: '🏛️', bgHex: '#FAF9F6', borderHex: '#E2E8F0', textHex: '#0F172A', accentHex: '#0ea5e9', description: 'Elegant Carrara white marble with gold/slate veins.' },
+    { id: 'black-marble', name: 'Nero Marquina Marble', category: 'Mineral & Organic', icon: '🪨', bgHex: '#0D0D11', borderHex: '#1E1E26', textHex: '#F8FAFC', accentHex: '#eab308', description: 'Deep Spanish black marble with white and gold veins.' },
+    { id: 'papyrus', name: 'Ancient Papyrus', category: 'Mineral & Organic', icon: '🏺', bgHex: '#13100C', borderHex: '#282119', textHex: '#F5E6D3', accentHex: '#d97706', description: 'Dark gilded Egyptian papyrus texture.' },
+
+    { id: 'spark', name: 'Spark Emergency Glow', category: 'Special Diagnostic', icon: '✨', bgHex: '#0a0503', borderHex: '#2e1208', textHex: '#fb923c', accentHex: '#f97316', description: 'Ember glow high-contrast emergency diagnostic lens.' },
+    { id: 'pool', name: 'Circadian Aquatic Pool', category: 'Special Diagnostic', icon: '🌊', bgHex: '#081F3D', borderHex: '#0E3A70', textHex: '#E0F2FE', accentHex: '#38bdf8', description: 'Deep ocean pool blue light filtering lens.' },
+    { id: 'mandala', name: 'Sacred Mandala Violet', category: 'Special Diagnostic', icon: '🧘', bgHex: '#16112D', borderHex: '#2A2052', textHex: '#F5F3FF', accentHex: '#a855f7', description: 'Solfeggio 528Hz meditative violet lens.' },
+    { id: 'curie', name: 'Curie Atomic Radium', category: 'Special Diagnostic', icon: '⚛️', bgHex: '#0F1416', borderHex: '#162025', textHex: '#E2F8EE', accentHex: '#00ff66', description: 'Madame Curie 1950s atomic lead-shielded green radium glow.' }
   ];
 
   getThemesByCategory(cat: string) {
@@ -136,7 +151,7 @@ export class ThemeStudioDrawerComponent {
 
   cyclePrimaryTheme() {
     const current = this.themeService.currentTheme();
-    const sequence: AppTheme[] = ['light', 'dark', 'system', 'spark'];
+    const sequence: AppTheme[] = ['light', 'dark', 'system', 'spark', 'papercraft', 'hemp', 'rice', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'curie'];
     const idx = sequence.indexOf(current);
     const next = sequence[(idx + 1) % sequence.length];
     this.themeService.currentTheme.set(next);
