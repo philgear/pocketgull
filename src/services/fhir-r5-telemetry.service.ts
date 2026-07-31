@@ -154,14 +154,14 @@ export class FhirR5TelemetryService {
     const baseSpO2 = parseInt(String(currentVitals.spO2 || '98'), 10);
 
     // Small stochastic variance simulating continuous sensor telemetry
-    const hrDelta = Math.floor(Math.random() * 5) - 2;
-    const spO2Delta = Math.floor(Math.random() * 3) - 1;
-    const respDelta = Math.floor(Math.random() * 3) - 1;
+    const hrDelta = Math.floor(getSecureRandomFloat() * 5) - 2;
+    const spO2Delta = Math.floor(getSecureRandomFloat() * 3) - 1;
+    const respDelta = Math.floor(getSecureRandomFloat() * 3) - 1;
 
     const currentHr = Math.max(50, Math.min(160, baseHr + hrDelta));
     const currentSpO2 = Math.max(88, Math.min(100, baseSpO2 + spO2Delta));
     const currentResp = Math.max(8, Math.min(32, 16 + respDelta));
-    const currentHrv = Math.max(15, Math.min(95, 45 + Math.floor(Math.random() * 10) - 5));
+    const currentHrv = Math.max(15, Math.min(95, 45 + Math.floor(getSecureRandomFloat() * 10) - 5));
 
     let alertFlag: string | undefined;
     let status: 'active' | 'paused' | 'alert' = 'active';

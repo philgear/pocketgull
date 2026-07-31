@@ -12,34 +12,7 @@ test.describe('Mobile Sub-Navbar Responsiveness', () => {
     // Set mobile viewport
     await page.setViewportSize({ width: 360, height: 640 });
 
-    // Go to home page
-    await page.goto('/');
-
-    // 1. PIN Code Entry
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 10000 });
-    await pinInput.fill('1234');
-    // Auto-submits on length 4
-
-    // 2. Select Demo Mode
-    const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-    await expect(demoBtn).toBeVisible({ timeout: 10000 });
-    await demoBtn.click();
-
-    // 3. Skip KSS
-    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-    await expect(skipBtn).toBeVisible({ timeout: 10000 });
-    await skipBtn.click();
-
-    // 4. Accept Ethics Pledge
-    const pledgeCheckbox = page.locator('input[type="checkbox"]');
-    await expect(pledgeCheckbox).toBeVisible({ timeout: 10000 });
-    await pledgeCheckbox.check();
-
-    // Click Accept & Enter System
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-    await expect(acceptBtn).toBeVisible({ timeout: 10000 });
-    await acceptBtn.click();
+    await enterDemoMode(page);
 
     // 5. Verify Main Viewport loads
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });

@@ -115,9 +115,10 @@ const redirectDomains = [
 app.use((req, res, next) => {
   const host = req.hostname;
   if (redirectDomains.includes(host)) {
-    const rawPath = req.originalUrl || '/';
+    const rawPath = String(req.originalUrl || '/').replace(/[\r\n\s]+/g, '');
     const safePath = isValidRedirectUrl(rawPath) ? rawPath : '/';
-    return res.redirect(301, `https://${targetDomain}${safePath}`);
+    const targetUrl = new URL(safePath, `https://${targetDomain}`).pathname;
+    return res.redirect(301, `https://${targetDomain}${targetUrl}`);
   }
   next();
 });
@@ -302,9 +303,11 @@ app.use((req, res, next) => {
   next();
 });
 
+const isTestingEnv = Boolean(process.env['CI'] || process.env['PLAYWRIGHT_TESTING'] || process.env['NODE_ENV'] === 'test');
+
 const apiLimiter = rateLimit({
   windowMs: 60_000,
-  max: 100,
+  max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },
@@ -976,7 +979,7 @@ try {
 
 const patientsRateLimiter = rateLimit({
   windowMs: 60_000,
-  max: 100,
+  max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },
@@ -985,7 +988,7 @@ const patientsRateLimiter = rateLimit({
 
 const docsRateLimiter = rateLimit({
   windowMs: 60_000,
-  max: 300,
+  max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 300,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },
@@ -997,33 +1000,41 @@ function getSafePatientsDbPath(): string {
   try {
     fs.mkdirSync(dir, { recursive: true });
   } catch {}
-  return join(dir, 'patients.json');
+  return securePathResolve(dir, 'patients.json');
 }
 
 // Patients API Endpoints
 app.get('/api/patients', patientsRateLimiter, (req, res) => {
   try {
     const dbPath = getSafePatientsDbPath();
-    if (!fs.existsSync(dbPath)) {
-      fs.writeFileSync(dbPath, JSON.stringify([], null, 2));
+    let data: string;
+    try {
+      data = fs.readFileSync(dbPath, 'utf8');
+    } catch (readErr: any) {
+      if (readErr.code === 'ENOENT') {
+        data = JSON.stringify([], null, 2);
+        fs.writeFileSync(dbPath, data);
+      } else {
+        throw readErr;
+      }
     }
-    const data = fs.readFileSync(dbPath, 'utf8');
     res.setHeader('Content-Type', 'application/json');
     res.send(data);
   } catch (err: any) {
-    console.error('[API] Error reading patients database:', err);
+    console.error('[API] Error reading patients database:', sanitizeLogInput(String(err?.message || err)));
     res.status(500).json({ error: 'Internal server error while reading database' });
   }
 });
 
 app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
   try {
-    if (!req.body || !Array.isArray(req.body)) {
+    const rawBody: unknown = req.body;
+    if (!Array.isArray(rawBody)) {
       return res.status(400).json({ error: 'Body must be a JSON array of patients' });
     }
 
     const allowedFields = ['id', 'name', 'age', 'gender', 'vitals', 'symptoms', 'history', 'conditions', 'carePlan', 'metrics', 'demographics', 'assessment'];
-    const sanitizedArray = req.body.map((item: any) => {
+    const sanitizedArray = rawBody.map((item: any) => {
       if (!item || typeof item !== 'object') return {};
       const cleanItem: Record<string, any> = {};
       for (const k of Object.keys(item)) {
@@ -1035,33 +1046,36 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
       return cleanItem;
     });
 
-    // Save sanitized patient objects
-    const dbPath = getSafePatientsDbPath();
-    fs.writeFileSync(dbPath, JSON.stringify(sanitizedArray, null, 2));
+    // Save sanitized patient objects to safe DB path
+    const targetDbFile = getSafePatientsDbPath();
+    fs.writeFileSync(targetDbFile, JSON.stringify(sanitizedArray, null, 2));
 
-    console.log(`[API] Saved ${sanitizeLogInput(req.body?.length)} patients to database.`);
-    res.status(200).json({ success: true, count: req.body.length });
+    const totalCount = Number(sanitizedArray.length) || 0;
+    console.log('[API] Saved %d patients to database.', totalCount);
+    res.status(200).json({ success: true, count: totalCount });
   } catch (err: any) {
-    console.error('[API] Error saving patients database:', err);
+    console.error('[API] Error saving patients database:', sanitizeLogInput(String(err?.message || err)));
     res.status(500).json({ error: 'Internal server error while saving database' });
   }
 });
 
 app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
   try {
-    const { id } = req.params;
-    if (!req.body || typeof req.body !== 'object') {
+    const rawId: unknown = req.params['id'];
+    const id = sanitizeLogInput(String(rawId || ''));
+
+    const rawBody: unknown = req.body;
+    if (!rawBody || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
       return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
     }
 
-    const dbPath = getSafePatientsDbPath();
+    const targetDbFile = getSafePatientsDbPath();
     let patients: any[] = [];
-    if (fs.existsSync(dbPath)) {
-      try {
-        const data = fs.readFileSync(dbPath, 'utf8');
-        patients = JSON.parse(data);
-      } catch {}
-    }
+    try {
+      const data = fs.readFileSync(targetDbFile, 'utf8');
+      patients = JSON.parse(data);
+    } catch {}
+
     const index = patients.findIndex((p: any) => p.id === id);
 
     const allowedFields = ['id', 'name', 'age', 'gender', 'vitals', 'symptoms', 'history', 'conditions', 'carePlan', 'metrics', 'demographics', 'assessment'];
@@ -1077,18 +1091,19 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       return clean;
     };
 
-    const sanitizedPayload = cleanPatientObj(req.body);
+    const sanitizedPayload = cleanPatientObj(rawBody);
     if (index !== -1) {
       patients[index] = { ...patients[index], ...sanitizedPayload, id }; // Ensure ID stays same
     } else {
       patients.push({ ...sanitizedPayload, id });
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(patients, null, 2));
-    console.log(`[API] Synced patient ${sanitizeLogInput(id)} from mobile/app to database.`);
+    fs.writeFileSync(targetDbFile, JSON.stringify(patients, null, 2));
+    const safePatientId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
+    console.log('[API] Synced patient %s from mobile/app to database.', safePatientId);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
   } catch (err: any) {
-    console.error('[API] Error syncing patient to database:', err);
+    console.error('[API] Error syncing patient to database:', sanitizeLogInput(String(err?.message || err)));
     res.status(500).json({ error: 'Internal server error while syncing patient' });
   }
 });

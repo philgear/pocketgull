@@ -63,31 +63,7 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     });
     await page.goto('/');
     
-    // Unlock using PIN code 1234
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 5000 });
-    await pinInput.fill('1234');
-    // Auto-submits on length 4, wait for transition to next screen
-    
-    // Bypass auth to enter main clinical dashboard (using our new secure Mock SSO or Demo mode)
-    const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-    await expect(demoBtn).toBeVisible({ timeout: 5000 });
-    await demoBtn.click();
-
-    // Dismiss the Karolinska Sleepiness Scale (KSS) assessment to enter the system
-    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-    await expect(skipBtn).toBeVisible({ timeout: 5000 });
-    await skipBtn.click();
-
-    // Accept ethics pledge
-    const pledgeCheckbox = page.locator('input[type="checkbox"]');
-    await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
-    await pledgeCheckbox.check();
-
-    // Click Accept & Enter System
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
-    await acceptBtn.click();
+    await enterDemoMode(page);
 
     // Wait for the main viewport to load
     await expect(page.locator('main')).toBeVisible();

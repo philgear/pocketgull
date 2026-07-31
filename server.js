@@ -22,7 +22,7 @@ app.use('/api', cors()); // Enable CORS for API routes so Flutter apps can sync 
 
 const apiLimiter = rateLimit({
   windowMs: 60_000,
-  max: 100,
+  max: process.env['CI'] || process.env['NODE_ENV'] !== 'production' ? 10_000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   validate: { trustProxy: false },

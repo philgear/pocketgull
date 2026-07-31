@@ -30,11 +30,12 @@ export default defineConfig({
   webServer: {
     command: 'npm run preview',
     url: 'http://127.0.0.1:4000',
-    reuseExistingServer: !process.env['CI'],
+    reuseExistingServer: true,
     timeout: 120 * 1000,
     env: {
       PORT: '4000',
       NODE_ENV: 'production',
+      PLAYWRIGHT_TESTING: 'true',
     },
   },
 });
