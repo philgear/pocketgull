@@ -293,16 +293,17 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       unparsedData = rawData;
     }
     
-    console.log("[AdkLiveService] Raw Live Message:", sanitizeLogInput(unparsedData));
+    console.log("[AdkLiveService] Raw Live Message:", sanitizeLogInput(String(typeof unparsedData === 'object' ? JSON.stringify(unparsedData) : unparsedData)));
     this.processJsonMessage(unparsedData);
   }
 
   private processJsonMessage(data: any) {
-    if (data.error) {
-      console.error("[AdkLiveService] Server returned error:", sanitizeLogInput(data.error));
+    if (data && typeof data === 'object' && 'error' in data && (data as any).error) {
+      const errObj = (data as any).error;
+      console.error("[AdkLiveService] Server returned error:", sanitizeLogInput(String(errObj?.message || errObj)));
       if (this.onMessage) {
          this.runInZone(() => {
-             this.onMessage!({ text: `System Error: ${data.error.message || 'Unknown stream error'}` });
+             this.onMessage!({ text: `System Error: ${sanitizeLogInput(String(errObj?.message || 'Unknown stream error'))}` });
              if (this.onModelTurnComplete) this.onModelTurnComplete();
          });
       }

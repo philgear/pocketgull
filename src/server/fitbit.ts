@@ -18,15 +18,15 @@ import { Router, Request, json } from 'express';
 import crypto from 'node:crypto';
 import { createWriteStream, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { sanitizeLogInput } from '../utils/security-helper';
+import { sanitizeLogInput, securePathResolve } from '../utils/security-helper';
 
 export const fitbitRouter = Router();
 fitbitRouter.use(json());
 
 // ── Audit log setup ───────────────────────────────────────────────────────────
-const LOG_DIR = join(process.cwd(), 'logs');
+const LOG_DIR = securePathResolve(process.cwd(), 'logs');
 if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true });
-const auditStream = createWriteStream(join(LOG_DIR, 'health-data-audit.log'), { flags: 'a' });
+const auditStream = createWriteStream(securePathResolve(LOG_DIR, 'health-data-audit.log'), { flags: 'a' });
 
 function auditLog(event: string, patientId: string, detail: Record<string, unknown> = {}): void {
   const safePatientId = String(patientId || '').replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');

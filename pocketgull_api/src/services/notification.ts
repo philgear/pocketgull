@@ -4,13 +4,14 @@ import * as admin from 'firebase-admin';
 // If not configured, we'll gracefully mock the dispatch.
 let isFirebaseInitialized = false;
 
-try {
-  admin.initializeApp();
-  isFirebaseInitialized = true;
-  console.log('[Notification Service] Firebase Admin initialized.');
-} catch (error: any) {
-  console.warn('[Notification Service] Firebase Admin not initialized. Push notifications will be mocked. Error:', error.message);
-}
+  try {
+    admin.initializeApp();
+    isFirebaseInitialized = true;
+    console.log('[Notification Service] Firebase Admin initialized.');
+  } catch (error: any) {
+    const safeErr = String(error?.message || error || '').replace(/[\r\n\u2028\u2029]+/g, ' ').slice(0, 500);
+    console.warn('[Notification Service] Firebase Admin not initialized. Push notifications will be mocked. Error:', safeErr);
+  }
 
 export async function sendPushNotification(fcmToken: string, title: string, body: string, data?: any) {
   const sanitize = (str: any) => String(str || '').replace(/[\r\n\u2028\u2029]+/g, ' ').replace(/[\x00-\x1F\x7F]+/g, ' ').slice(0, 500);
@@ -34,8 +35,8 @@ export async function sendPushNotification(fcmToken: string, title: string, body
 
   try {
     const response = await admin.messaging().send(message);
-    console.log('[Notification Service] Successfully sent message:', response);
+    console.log('[Notification Service] Successfully sent message:', sanitize(response));
   } catch (error: any) {
-    console.error('[Notification Service] Error sending push notification:', error.message);
+    console.error('[Notification Service] Error sending push notification:', sanitize(error?.message));
   }
 }
