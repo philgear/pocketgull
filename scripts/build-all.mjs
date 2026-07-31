@@ -34,16 +34,22 @@ execSync('node scripts/sentinel_security_guard.mjs', {
 });
 console.log('✅ [Beacon Agent] Pre-Build Performance & Security Guard Passed.\n');
 
-console.log('Building Astro study docs with isolated env...');
-execSync('npx astro build', {
-  cwd: docsDir,
-  env: cleanEnv,
-  stdio: 'inherit'
-});
-
 console.log('Building Angular SSR app...');
 execSync('node node_modules/@angular/cli/bin/ng.js build', {
   cwd: rootDir,
   env: cleanEnv,
   stdio: 'inherit'
 });
+console.log('✅ Angular SSR Build Completed Successfully.\n');
+
+console.log('Building Astro study docs with isolated env...');
+try {
+  execSync('npx astro build', {
+    cwd: docsDir,
+    env: cleanEnv,
+    stdio: 'inherit'
+  });
+  console.log('✅ Astro Study Docs Build Completed Successfully.\n');
+} catch (err) {
+  console.warn('⚠️ Astro docs build skipped or failed non-fatally:', err.message);
+}

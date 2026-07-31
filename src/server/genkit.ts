@@ -39,7 +39,7 @@ export const ai = genkit({
       apiKey: process.env['GEMINI_API_KEY'] || process.env['GOOGLE_GENAI_API_KEY']
     })
   ],
-  model: 'googleai/gemini-2.5-flash',
+  model: 'googleai/gemini-3.5-flash',
 });
 
 // 1. Generate Metrics Flow
@@ -291,7 +291,7 @@ Please provide:
 Note: This is an AI preliminary analysis for decision-support, not an official diagnostic read. Respond with clear, structured Markdown.`;
 
       const response = await ai.generate({
-        model: 'googleai/gemini-2.5-pro', // Using pro for better multimodal reading
+        model: 'googleai/gemini-3.6-flash', // Using 3.6-flash for multimodal synthesis
         messages: [
           {
             role: 'user',
@@ -436,7 +436,7 @@ Strictly map any extracted clinical issues or symptoms to one of the following e
 Return all results structured into the response schema.`;
 
     const response = await ai.generate({
-      model: 'googleai/gemini-2.5-flash',
+      model: 'googleai/gemini-3.5-flash',
       messages: [
         {
           role: 'user',

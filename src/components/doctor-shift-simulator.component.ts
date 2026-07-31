@@ -323,7 +323,7 @@ export class DoctorShiftSimulatorComponent implements OnDestroy {
       id: 2,
       timeRange: '13:00 – 14:00',
       title: 'Multimodal Voice Dictation & SBAR Note Sync',
-      subtitle: 'Gemini 2.5 Flash Voice Assistant & Specialist Handoffs',
+      subtitle: 'Gemini 3.6 Flash Voice Assistant, PubGemma 27B MeSH & Specialist Handoffs',
       patientCount: 2,
       fatigueBaseline: 82,
       fatigueShielded: 30,

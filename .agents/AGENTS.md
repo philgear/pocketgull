@@ -65,3 +65,7 @@
 - **Strict Requirement**: Always use the explicit project Node module paths for typechecking and builds to prevent PATH resolution mismatches:
   - **TypeScript Typecheck**: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\typescript\lib\tsc.js -p c:\Users\philg\Pocketgull\pocketgull\tsconfig.json --noEmit`
   - **Angular Build**: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\@angular\cli\bin\ng.js build`
+
+## AI Coding Hygiene & Continuous Cleanup
+- **End-of-Session Pruning**: Before wrapping up features or releases, proactively purge unused imports, delete unreferenced dead code, merge duplicate helper functions, and remove commented-out blocks.
+- **Secret & Egress Boundaries**: Never commit API keys or credentials. Ensure `.env*` is strictly matched in `.gitignore`, and verify all external domains with `Sentinel Security Guard`.

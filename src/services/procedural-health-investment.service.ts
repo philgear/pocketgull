@@ -56,7 +56,7 @@ export class ProceduralHealthInvestmentService {
       {
         id: 'inv_aiga',
         category: 'Clinical Diagnostics',
-        proceduralInnovation: 'AIGA 2025/2026 Deep Neural ECG & NMR Metabolomics Tracking',
+        proceduralInnovation: 'Deep Neural ECG & NMR Metabolomics Tracking',
         upfrontInvestmentUsd: 250,
         projected5YearSavingsUsd: 28500,
         actuarialRoiRatio: 114.0,

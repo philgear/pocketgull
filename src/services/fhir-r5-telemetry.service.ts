@@ -3,18 +3,19 @@ import { isPlatformBrowser } from '@angular/common';
 import { PatientStateService } from './patient-state.service';
 
 function getSecureRandomFloat(): number {
-  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+  if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
     const array = new Uint32Array(1);
-    window.crypto.getRandomValues(array);
+    globalThis.crypto.getRandomValues(array);
     return array[0] / 4294967296;
   }
-  // Cryptographically secure fallback using node:crypto or fallback webcrypto
   try {
     const cryptoMod = require('crypto');
-    return cryptoMod.randomBytes(4).readUInt32LE(0) / 4294967296;
+    if (typeof cryptoMod.randomInt === 'function') {
+      return cryptoMod.randomInt(0, 4294967296) / 4294967296;
+    }
+    return cryptoMod.randomBytes(4).readUInt32BE(0) / 4294967296;
   } catch {
-    // Standard secure random ratio
-    return (Date.now() % 1000) / 1000;
+    return Math.random();
   }
 }
 
@@ -33,6 +34,11 @@ export interface IFhirR5TelemetryPacket {
   status: 'active' | 'paused' | 'alert';
   flaggedBiomarker?: string;
   isWebSocketConnected?: boolean;
+  /** Adaptive alarm suppression evaluation (Wachter Doctrine) */
+  alarmSuppressionState?: 'active_alert' | 'suppressed_transient' | 'normal';
+  confidenceScore?: number;
+  suppressionReason?: string;
+  trendWindowSize?: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -148,6 +154,102 @@ export class FhirR5TelemetryService {
     }
   }
 
+  /** Sliding window history for multi-biometric trend fusion (Wachter Doctrine) */
+  private slidingWindow: Array<{ hr: number; spO2: number; resp: number; hrv: number }> = [];
+  private readonly maxWindowSize = 5;
+
+  /**
+   * Evaluates biometrics against sliding trend window to suppress false-positive alarms (motion artifacts/isolated spikes).
+   */
+  public evaluateAdaptiveAlert(
+    hr: number,
+    spO2: number,
+    resp: number,
+    hrv: number
+  ): {
+    status: 'active' | 'paused' | 'alert';
+    flaggedBiomarker?: string;
+    alarmSuppressionState: 'active_alert' | 'suppressed_transient' | 'normal';
+    confidenceScore: number;
+    suppressionReason?: string;
+  } {
+    this.slidingWindow.push({ hr, spO2, resp, hrv });
+    if (this.slidingWindow.length > this.maxWindowSize) {
+      this.slidingWindow.shift();
+    }
+
+    const windowLen = this.slidingWindow.length;
+    const hrHistory = this.slidingWindow.map(w => w.hr);
+    const spO2History = this.slidingWindow.map(w => w.spO2);
+
+    const isHrOutlier = hr > 120 || hr < 55;
+    const isSpO2Outlier = spO2 < 93;
+
+    if (!isHrOutlier && !isSpO2Outlier) {
+      return {
+        status: 'active',
+        alarmSuppressionState: 'normal',
+        confidenceScore: 0.99
+      };
+    }
+
+    // Check if HR outlier is sustained over consecutive window samples
+    const hrOutlierCount = hrHistory.filter(h => h > 120 || h < 55).length;
+    const isHrSustained = hrOutlierCount >= Math.min(2, windowLen);
+
+    // Multi-biometric correlation: low HRV (<25ms) or high respiration (>22 rpm) reinforces true arrhythmia/distress
+    const hasCorrelatedDistress = hrv < 25 || resp > 22;
+
+    if (isHrOutlier) {
+      if (isHrSustained || hasCorrelatedDistress || windowLen <= 1) {
+        return {
+          status: 'alert',
+          flaggedBiomarker: `Tachycardia/Bradycardia Warning: ${hr} bpm (Sustained/Correlated)`,
+          alarmSuppressionState: 'active_alert',
+          confidenceScore: hasCorrelatedDistress ? 0.96 : 0.88
+        };
+      } else {
+        // Suppress transient isolated spike (motion artifact / transient burst)
+        return {
+          status: 'active',
+          flaggedBiomarker: `Transient HR Spike (${hr} bpm) - Suppressed`,
+          alarmSuppressionState: 'suppressed_transient',
+          confidenceScore: 0.35,
+          suppressionReason: `Transient HR anomaly (${hr} bpm) suppressed: Normal HRV (${hrv}ms) & Respiration (${resp} rpm) sustained across ${windowLen}-sample window`
+        };
+      }
+    }
+
+    if (isSpO2Outlier) {
+      const spO2OutlierCount = spO2History.filter(s => s < 93).length;
+      const isSpO2Sustained = spO2OutlierCount >= Math.min(2, windowLen);
+
+      if (isSpO2Sustained || resp > 22 || windowLen <= 1) {
+        return {
+          status: 'alert',
+          flaggedBiomarker: `Hypoxemia Warning: SpO2 ${spO2}% (Sustained)`,
+          alarmSuppressionState: 'active_alert',
+          confidenceScore: 0.93
+        };
+      } else {
+        // Suppress transient sensor displacement
+        return {
+          status: 'active',
+          flaggedBiomarker: `Transient SpO2 Dip (${spO2}%) - Suppressed`,
+          alarmSuppressionState: 'suppressed_transient',
+          confidenceScore: 0.40,
+          suppressionReason: `Single-point SpO2 dip (${spO2}%) suppressed: Likely optical probe displacement`
+        };
+      }
+    }
+
+    return {
+      status: 'active',
+      alarmSuppressionState: 'normal',
+      confidenceScore: 0.95
+    };
+  }
+
   private generatePacket(): void {
     const currentVitals = this.patientState.vitals();
     const baseHr = parseInt(String(currentVitals.hr || '72'), 10);
@@ -163,16 +265,7 @@ export class FhirR5TelemetryService {
     const currentResp = Math.max(8, Math.min(32, 16 + respDelta));
     const currentHrv = Math.max(15, Math.min(95, 45 + Math.floor(getSecureRandomFloat() * 10) - 5));
 
-    let alertFlag: string | undefined;
-    let status: 'active' | 'paused' | 'alert' = 'active';
-
-    if (currentHr > 120 || currentHr < 55) {
-      status = 'alert';
-      alertFlag = `Tachycardia/Bradycardia Warning: ${currentHr} bpm`;
-    } else if (currentSpO2 < 93) {
-      status = 'alert';
-      alertFlag = `Hypoxemia Warning: SpO2 ${currentSpO2}%`;
-    }
+    const evalResult = this.evaluateAdaptiveAlert(currentHr, currentSpO2, currentResp, currentHrv);
 
     const packet: IFhirR5TelemetryPacket = {
       id: `r5-obs-${Date.now()}`,
@@ -186,8 +279,12 @@ export class FhirR5TelemetryService {
       eegBetaHz: 18.0 + (getSecureRandomFloat() * 1.2 - 0.6),
       hdf5BufferId: `hdf5_chunk_${Date.now()}`,
       ecgWaveform: Array.from({ length: 12 }, () => Math.sin(Date.now() / 100) * 0.5),
-      status,
-      flaggedBiomarker: alertFlag,
+      status: evalResult.status,
+      flaggedBiomarker: evalResult.flaggedBiomarker,
+      alarmSuppressionState: evalResult.alarmSuppressionState,
+      confidenceScore: evalResult.confidenceScore,
+      suppressionReason: evalResult.suppressionReason,
+      trendWindowSize: this.slidingWindow.length,
       isWebSocketConnected: this.wsConnectionStatus() === 'connected'
     };
 

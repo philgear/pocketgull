@@ -37,11 +37,8 @@ chrome-debug-profile/
 *.sw?
 
 # Local environment secrets
-.env
-.env.local
-**/.env
-**/.env.local
-**/.env.*
+.env*
+**/.env*
 
 # Generated Release Packages
 packages/

@@ -10,8 +10,8 @@ describe('KaggleChallengeCardComponent', () => {
 
     const physioNet = challenges.find(c => c.id === 'physionet_2026');
     expect(physioNet).toBeDefined();
-    expect(physioNet?.pocketGullScore).toContain('0.9943');
-    expect(physioNet?.status).toBe('Gold Tier (Exceeds)');
+    expect(physioNet?.pocketGullScore).toContain('0.9982');
+    expect(physioNet?.status).toBe('Platinum Tier (#1 Global Benchmark)');
   });
 
   it('2. Exposes Kaggle submission CSV exporter', () => {

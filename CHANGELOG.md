@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-07-31
+
+**Gemini 3 GA Model Upgrade, Amazon Affiliate Links Integration, CodeQL & Scorecard Security Remediation, Component Streamlining, and Debian 12 Bookworm Container Hardening**
+
+### Security & Hardening
+- **[CodeQL & OpenSSF Scorecard] 23 Security Alert Remediation**:
+  - Replaced biased random modulo in [fhir-r5-telemetry.service.ts](file:///c:/Users/philg/Pocketgull/pocketgull/src/services/fhir-r5-telemetry.service.ts) with unbiased 32-bit `crypto.getRandomValues()` float calculations.
+  - Eliminated TOCTOU file system race condition in [scripts/pre-commit-check.cjs](file:///c:/Users/philg/Pocketgull/pocketgull/scripts/pre-commit-check.cjs).
+  - Sanitized patient IDs against strict regex `/^[a-zA-Z0-9_-]{1,64}$/` and added log injection stripping across server loggers.
+  - Hardened [.gitignore](file:///c:/Users/philg/Pocketgull/pocketgull/.gitignore) with `.env*` catch-all rules and updated approved network egress whitelist in [sentinel_security_guard.mjs](file:///c:/Users/philg/Pocketgull/pocketgull/scripts/sentinel_security_guard.mjs).
+- **[Container Security] Debian 12 Bookworm Base Image Upgrade (`Dockerfile`)**:
+  - Upgraded builder and production base images to `node:24-bookworm-slim` with OS-level `apt-get upgrade` to eliminate container vulnerability warnings.
+
+### Added & Enhanced
+- **[AI Integration] Gemini 3 GA & Thought Signature Circulation**:
+  - Upgraded default AI model targets to `gemini-3.5-flash` and `gemini-3.6-flash` across client services, ADK Live streaming, Genkit flows, and Flutter mobile companion app.
+  - Implemented Thought Signature Circulation to carry reasoning states between multi-turn chat turns.
+- **[Monetization & Clinical Supplies] Amazon Affiliate Links Integration**:
+  - Added `getAmazonAffiliateUrl()` and `getAmazonSearchUrl()` with affiliate tag **`tag=pgdpo-20`** across directive cards, nutraceutical recommendations, and summary node hover toolbars.
+
+### Refactored & Pruned
+- **[Feature Streamlining] Unhooked Speculative Overlays**:
+  - Pruned Client-Side Vocal Biomarker FFT Engine, Living Apple Lifecycle Tree, Instant Somatic Relief Suite, AIGA medal references, Shanty Karaoke Deck, and Vinyl DJ Lounge.
+
+---
+
 ## [1.7.0] - 2026-07-27
 
 **Container Security Hardening (5 CVE Fixes), Google Cloud Data Agent Proxy Integration, Multiplatform Flutter Web Download Architecture, and Java 21 Toolchain Alignment**

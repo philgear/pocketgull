@@ -201,8 +201,12 @@ try {
   // Also scan unstaged modified files as a safety net
   const gitUnstaged = execSync('git diff --name-only --diff-filter=d', { encoding: 'utf8', cwd: path.resolve(__dirname, '..') });
   gitUnstaged.split('\n').forEach(f => {
-    if (f.trim() && fs.existsSync(f.trim()) && !filesToScanSecrets.includes(path.resolve(f.trim()))) {
-      filesToScanSecrets.push(path.resolve(f.trim()));
+    const trimmed = f.trim();
+    if (trimmed) {
+      const resolved = path.resolve(trimmed);
+      if (!filesToScanSecrets.includes(resolved)) {
+        filesToScanSecrets.push(resolved);
+      }
     }
   });
 } catch (e) {
@@ -215,13 +219,6 @@ try {
 const skipExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.pdf', '.zip', '.sqlite', '.db', '.keystore', '.jks', '.lock'];
 
 for (const file of filesToScanSecrets) {
-  if (!fs.existsSync(file)) {
-    continue;
-  }
-  const stat = fs.statSync(file);
-  if (stat.isDirectory()) {
-    continue;
-  }
   const ext = path.extname(file).toLowerCase();
   if (skipExtensions.includes(ext)) {
     continue;
@@ -237,6 +234,7 @@ for (const file of filesToScanSecrets) {
   try {
     content = fs.readFileSync(file, 'utf8');
   } catch (e) {
+    // Gracefully skip directories (EISDIR), missing files (ENOENT), or inaccessible files
     continue;
   }
   for (const pattern of secretPatterns) {

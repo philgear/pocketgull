@@ -172,6 +172,7 @@ import { environment } from '../environments/environment';
             <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 border border-amber-400/30 text-amber-800 dark:text-amber-300 text-[9.5px] font-bold uppercase tracking-widest mb-1.5 shadow-2xs">
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
               Pocket-Gull Clinician Suite
+              <span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-400/40 text-[9px] font-mono font-bold tracking-normal">v1.4.0</span>
             </div>
             <h1 class="text-lg font-bold tracking-[0.12em] text-zinc-800 dark:text-zinc-100 uppercase pb-0.5">
               {{ isLocked() ? 'Resume Session' : 'Pocket Gull' }}

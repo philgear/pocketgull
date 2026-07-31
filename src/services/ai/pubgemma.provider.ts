@@ -8,7 +8,7 @@ import { AiModelId } from '../ai-provider.types';
   providedIn: 'root'
 })
 export class PubGemmaProvider implements IIntelligenceProvider {
-  readonly modelId = signal<AiModelId>('pubgemma-7b');
+  readonly modelId = signal<AiModelId>('pubgemma-27b');
 
   async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
     yield `[PUBGEMMA ${this.modelId().toUpperCase()} MEDICAL REPORT - ${lens}]\n`;

@@ -233,6 +233,24 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                         color: Colors.grey,
                       ),
                     ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEFF6FF),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: const Color(0xFFBFDBFE)),
+                      ),
+                      child: const Text(
+                        'v1.4.0 • GEMINI 3.6 GA • PUBGEMMA 27B',
+                        style: TextStyle(
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                          color: Color(0xFF1D4ED8),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

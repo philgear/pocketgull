@@ -45,7 +45,7 @@ class VerifyAiService {
 
   VerifyAiService({required String apiKey}) 
       : _model = GenerativeModel(
-          model: 'gemini-1.5-flash',
+          model: 'gemini-3.5-flash',
           apiKey: apiKey,
           generationConfig: GenerationConfig(
             responseMimeType: 'application/json',

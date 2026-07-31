@@ -1,73 +1,70 @@
-/**
- * Unit tests for FhirR5TelemetryService logic & alert thresholds.
- *
- * Covers:
- *  - SubscriptionTopic URI compliance (HL7 FHIR R5)
- *  - Stochastic packet generation & telemetry bounds
- *  - Tachycardia / Hypoxemia alert threshold classification
- */
-import { describe, it, expect } from 'vitest';
+import '@angular/compiler';
+import { Injector, runInInjectionContext, signal, PLATFORM_ID } from '@angular/core';
+import { describe, beforeEach, it, expect, vi } from 'vitest';
+import { FhirR5TelemetryService } from './fhir-r5-telemetry.service';
+import { PatientStateService } from './patient-state.service';
 
-export interface IFhirR5TelemetryPacket {
-  id: string;
-  topic: string;
-  timestamp: string;
-  heartRate: number;
-  spO2: number;
-  respirationRate: number;
-  hrvMs: number;
-  status: 'active' | 'paused' | 'alert';
-  flaggedBiomarker?: string;
-}
+describe('FhirR5TelemetryService Adaptive Alert Suppression (Wachter Doctrine)', () => {
+  let service: FhirR5TelemetryService;
+  let mockPatientState: any;
+  let injector: Injector;
 
-function generateMockFhirR5Packet(baseHr = 72, baseSpO2 = 98): IFhirR5TelemetryPacket {
-  const topic = 'http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream';
-  const currentHr = baseHr;
-  const currentSpO2 = baseSpO2;
-  const currentResp = 16;
-  const currentHrv = 45;
+  beforeEach(() => {
+    mockPatientState = {
+      vitals: signal<any>({ hr: 72, spO2: 98 }),
+      updateVital: vi.fn()
+    };
 
-  let alertFlag: string | undefined;
-  let status: 'active' | 'paused' | 'alert' = 'active';
+    injector = Injector.create({
+      providers: [
+        { provide: FhirR5TelemetryService, useClass: FhirR5TelemetryService },
+        { provide: PatientStateService, useValue: mockPatientState },
+        { provide: PLATFORM_ID, useValue: 'browser' }
+      ]
+    });
 
-  if (currentHr > 120 || currentHr < 55) {
-    status = 'alert';
-    alertFlag = `Tachycardia/Bradycardia Warning: ${currentHr} bpm`;
-  } else if (currentSpO2 < 93) {
-    status = 'alert';
-    alertFlag = `Hypoxemia Warning: SpO2 ${currentSpO2}%`;
-  }
-
-  return {
-    id: `r5-obs-${Date.now()}`,
-    topic,
-    timestamp: new Date().toISOString(),
-    heartRate: currentHr,
-    spO2: currentSpO2,
-    respirationRate: currentResp,
-    hrvMs: currentHrv,
-    status,
-    flaggedBiomarker: alertFlag
-  };
-}
-
-describe('FhirR5TelemetryService', () => {
-  it('should comply with HL7 FHIR R5 SubscriptionTopic specification', () => {
-    const packet = generateMockFhirR5Packet(72, 98);
-    expect(packet.topic).toBe('http://hl7.org/fhir/SubscriptionTopic/biometric-telemetry-stream');
-    expect(packet.status).toBe('active');
-    expect(packet.flaggedBiomarker).toBeUndefined();
+    service = runInInjectionContext(injector, () => injector.get(FhirR5TelemetryService));
   });
 
-  it('should flag Tachycardia warning when heart rate exceeds 120 bpm', () => {
-    const packet = generateMockFhirR5Packet(135, 98);
-    expect(packet.status).toBe('alert');
-    expect(packet.flaggedBiomarker).toContain('Tachycardia/Bradycardia Warning: 135 bpm');
+  it('should comply with HL7 FHIR R5 SubscriptionTopic specification and return normal state for normal vitals', () => {
+    const result = service.evaluateAdaptiveAlert(72, 98, 16, 45);
+
+    expect(result.status).toBe('active');
+    expect(result.alarmSuppressionState).toBe('normal');
+    expect(result.confidenceScore).toBeGreaterThanOrEqual(0.95);
+    expect(result.flaggedBiomarker).toBeUndefined();
   });
 
-  it('should flag Hypoxemia warning when SpO2 drops below 93%', () => {
-    const packet = generateMockFhirR5Packet(75, 89);
-    expect(packet.status).toBe('alert');
-    expect(packet.flaggedBiomarker).toContain('Hypoxemia Warning: SpO2 89%');
+  it('should suppress transient isolated HR spikes with normal HRV and respiration (motion artifact)', () => {
+    // Seed history with normal baseline
+    service.evaluateAdaptiveAlert(72, 98, 16, 45);
+    service.evaluateAdaptiveAlert(74, 98, 16, 45);
+
+    // Single-point HR spike
+    const result = service.evaluateAdaptiveAlert(135, 98, 16, 45);
+
+    expect(result.status).toBe('active');
+    expect(result.alarmSuppressionState).toBe('suppressed_transient');
+    expect(result.suppressionReason).toContain('Transient HR anomaly (135 bpm) suppressed');
+  });
+
+  it('should trigger active alert when HR spike is sustained across consecutive samples', () => {
+    service.evaluateAdaptiveAlert(135, 98, 16, 45);
+    const secondSpike = service.evaluateAdaptiveAlert(138, 98, 16, 45);
+
+    expect(secondSpike.status).toBe('alert');
+    expect(secondSpike.alarmSuppressionState).toBe('active_alert');
+    expect(secondSpike.flaggedBiomarker).toContain('Tachycardia/Bradycardia Warning');
+  });
+
+  it('should trigger immediate active alert when HR spike is correlated with low HRV distress', () => {
+    service.evaluateAdaptiveAlert(72, 98, 16, 45);
+
+    // Single HR spike combined with low HRV (< 25 ms) representing autonomic distress
+    const result = service.evaluateAdaptiveAlert(135, 98, 16, 18);
+
+    expect(result.status).toBe('alert');
+    expect(result.alarmSuppressionState).toBe('active_alert');
+    expect(result.confidenceScore).toBeGreaterThan(0.90);
   });
 });
