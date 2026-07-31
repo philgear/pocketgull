@@ -198,7 +198,7 @@ export interface IChatEntry {
                                 @for (entry of chatHistory(); track $index; let idx = $index) {
                                     @let isEntryFlipped = isChatEntryFlipped(idx);
                                     <div (dblclick)="toggleChatEntryFlip(idx); $event.stopPropagation()"
-                                         class="relative perspective-1000 group cursor-pointer mb-4 min-h-[100px]"
+                                         class="chat-entry relative perspective-1000 group cursor-pointer mb-4 min-h-[100px]"
                                          title="Double-click to flip over for Multimodal Telemetry & Evidence Trail">
                                         
                                         <div [class.rotate-y-180]="isEntryFlipped"
@@ -230,6 +230,7 @@ export interface IChatEntry {
                                                             <button (click)="speakPersona(entry.text, 'sentinel'); $event.stopPropagation()" class="hover:text-sky-500 font-bold" title="Speak with Sentinel voice">[🔦 SENTINEL]</button>
                                                             <button (click)="speakPersona(entry.text, 'scribes'); $event.stopPropagation()" class="hover:text-emerald-500 font-bold" title="Speak with Scribes voice">[📖 SCRIBES]</button>
                                                             <button (click)="actionInsert(entry.text); $event.stopPropagation()" class="hover:text-black dark:hover:text-white" title="Insert to chart">[LOG]</button>
+                                                            <button (click)="actionAnchor(entry.text); $event.stopPropagation()" class="hover:text-purple-400 font-bold" title="Anchor to Memory Palace">[ANCHOR]</button>
                                                          }
                                                      </div>
                                                 </div>
@@ -443,7 +444,7 @@ export class VoiceAssistantComponent implements OnDestroy {
     ybocsQuestionIndex = signal<number>(-1);
 
 
-    panelMode = signal<'selection' | 'chat' | 'dictation'>('selection');
+    panelMode = signal<'selection' | 'chat' | 'dictation'>('chat');
 
     openDrilldown(target: 'biomarkers' | 'occupational' | 'food_safety' | 'ybocs' | 'qaly' | 'foraging' | 'vagal') {
       this.state.activeDrilldownComponent.set(target);

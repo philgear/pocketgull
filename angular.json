@@ -43,6 +43,11 @@
               },
               {
                 "glob": "**/*",
+                "input": "src/assets/textures",
+                "output": "/assets/textures"
+              },
+              {
+                "glob": "**/*",
                 "input": "docs/study/dist",
                 "output": "/docs/study"
               }

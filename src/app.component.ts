@@ -33,6 +33,7 @@ import { SecureSplashComponent } from './components/secure-splash.component';
 import { SessionStateService } from './services/session-state.service';
 import { RulesEngineService } from './services/rules-engine.service';
 import { PocketGullInputComponent } from './components/shared/pocket-gull-input.component';
+import { ClinicalCdsDisclaimerBannerComponent } from './components/clinical-cds-disclaimer-banner.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
 import { PetAuditoryService } from './services/pet-auditory.service';
@@ -72,7 +73,8 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
     ConsentModalComponent,
     ZamecznikCanvasComponent,
     CompanionSyncModalComponent,
-    GlossaryModalComponent
+    GlossaryModalComponent,
+    ClinicalCdsDisclaimerBannerComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -904,6 +906,8 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
                      }
                  </div>
                  
+
+
                  @if (intelligence.researchHits()) {
                    <div class="overflow-hidden flex flex-col bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-gray-200 dark:border-zinc-800 transition-shadow duration-300 hover:shadow-md h-[300px] shrink-0">
                      <app-research-tab class="block h-full" [hits]="intelligence.researchHits()"></app-research-tab>
@@ -1324,6 +1328,7 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
         </div>
       </div>
     }
+    <app-clinical-cds-disclaimer-banner></app-clinical-cds-disclaimer-banner>
     <app-zamecznik-canvas></app-zamecznik-canvas>
   `,
   styles: [`
@@ -2439,16 +2444,18 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    const modelContext = (document as any).modelContext || (navigator as any).modelContext;
-    if (modelContext) {
-      this.mcpControllers.forEach(item => {
-        (modelContext as any).unregisterTool?.(item.name);
-        item.controller.abort();
-      });
-      this.mcpControllers = [];
+    if (typeof document !== 'undefined') {
+      const modelContext = (document as any).modelContext || (typeof navigator !== 'undefined' ? (navigator as any).modelContext : null);
+      if (modelContext) {
+        this.mcpControllers.forEach(item => {
+          (modelContext as any).unregisterTool?.(item.name);
+          item.controller.abort();
+        });
+        this.mcpControllers = [];
+      }
     }
 
-    if (this.boundOnWindowResize) {
+    if (typeof window !== 'undefined' && this.boundOnWindowResize) {
       window.removeEventListener('resize', this.boundOnWindowResize);
     }
     if (this.resizeDebounceTimer) {

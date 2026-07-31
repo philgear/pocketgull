@@ -38,11 +38,11 @@
   - `sentinel`, `companion` — Sentinel triage and companion apps
   - `types`, `build`, `deps` — TypeScript types, build config, dependencies
 - **Subject line rules**:
+  - **STRICT MAX LENGTH**: Must be **72 characters or fewer** (including `type(scope): ` prefix). Husky `commit-msg` hook strictly rejects subjects over 72 characters.
   - Use imperative mood ("add", "fix", "remove", not "added", "fixes", "removed")
   - Do NOT capitalize the first letter of the description
   - No period at the end
-  - Max 72 characters for the full subject line
-- **Body** (optional): If the diff is non-trivial, add a blank line after the subject, then a concise body explaining *why* the change was made, not *what* (the diff shows what). Wrap at 80 characters.
+- **Body** (optional): If the diff is non-trivial, add a blank line after the subject, then a concise body explaining *why* the change was made, not *what* (the diff shows what). Wrap at 80 characters. Move extra details here if the subject would exceed 72 characters.
 - **Breaking changes**: Prefix the body with `BREAKING CHANGE:` if the commit introduces breaking changes.
 - **Examples of good commit messages**:
   - `feat(ai): add Gemini 2.5 Flash streaming to voice assistant`

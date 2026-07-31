@@ -104,8 +104,8 @@ export class HybridProvider implements IIntelligenceProvider {
     for (const provider of chain) {
       try {
         return await provider.generateMetrics(reportText);
-      } catch (e) {
-        console.warn(`generateMetrics failed on ${provider.constructor.name}, trying next...`);
+      } catch (e: any) {
+        console.warn(`generateMetrics failed on ${provider.constructor.name}: ${e.message || e}`, e);
       }
     }
     return { complexity: 5, stability: 5, certainty: 5 };

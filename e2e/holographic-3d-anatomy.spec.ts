@@ -1,0 +1,50 @@
+import { test, expect } from '@playwright/test';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
+
+test.describe('Holographic 3D Skeletal Anatomy & Spatial Lenses Suite', () => {
+  test.beforeEach(async ({ page }) => {
+    test.setTimeout(60000);
+    await setupE2ePage(page);
+  });
+
+  test('should render Holographic 3D Anatomy viewer, toggle Spatial Lenses, and activate 360° spin HUD', async ({ page }) => {
+    // 1. Enter Demo Mode cleanly
+    await enterDemoMode(page);
+
+    // 2. Select patient Phil Gear
+    const dropdownBtn = page.locator('app-patient-dropdown button').first();
+    await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
+    await dropdownBtn.click();
+
+    const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
+    await philGearOption.click();
+    await page.waitForTimeout(1000);
+
+    // 3. Ensure core analysis container is loaded
+    await expect(page.locator('app-analysis-container')).toBeVisible({ timeout: 15000 });
+
+    // 4. Verify 3D Spatial Anatomy container is rendered
+    const anatomyContainer = page.locator('app-holographic-3d-anatomy');
+    await expect(anatomyContainer).toBeVisible({ timeout: 15000 });
+
+    // 5. Test Spatial Lens buttons (Western, TCM, Prana, Unified)
+    const tcmBtn = page.getByTestId('lens-tcm');
+    await expect(tcmBtn).toBeVisible();
+    await tcmBtn.click({ force: true });
+
+    const badge = page.getByTestId('telemetry-lens-badge');
+    await expect(badge).toContainText('tcm', { ignoreCase: true });
+
+    const pranaBtn = page.getByTestId('lens-ayurveda');
+    await pranaBtn.click({ force: true });
+
+    await expect(badge).toContainText('ayurveda', { ignoreCase: true });
+
+    // 6. Toggle 360° Auto-spin HUD button
+    const spinBtn = page.getByTestId('btn-360-spin');
+    await expect(spinBtn).toBeVisible();
+    await spinBtn.click({ force: true });
+
+    await expect(spinBtn).toContainText('Spin ON');
+  });
+});

@@ -12,7 +12,7 @@ test.describe('Spatial Scanner, 3D Body Viewer & Phantom Mirror Therapy E2E Suit
     await page.setViewportSize({ width: 1440, height: 900 });
 
     // Assert main analysis container loaded
-    const analysisContainer = page.locator('app-analysis-container, app-analysis-report, main');
+    const analysisContainer = page.locator('app-analysis-container, app-analysis-report, main').first();
     await expect(analysisContainer).toBeVisible({ timeout: 20000 });
 
     // Verify 3D Body Viewer tab or component renders

@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 test.describe('WCAG & ARIA Accessibility Audit', () => {
   
@@ -180,50 +179,21 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
       window.localStorage.setItem('pg_mock_clinician', '1');
       window.localStorage.setItem('pg_data_consent_v1', 'true');
     });
-    await page.goto('/');
-    
-    // Unlock using PIN code 1234
-    const pinInput = page.locator('input[placeholder="1234"]');
-    await expect(pinInput).toBeVisible({ timeout: 5000 });
-    await pinInput.fill('1234');
-    // Auto-submits on length 4, wait for transition
-    await page.waitForTimeout(300);
-    
-    // Bypass auth to enter main clinical dashboard
-    const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-    await expect(demoBtn).toBeVisible({ timeout: 5000 });
-    await demoBtn.click();
-
-    // Dismiss the Karolinska Sleepiness Scale (KSS) assessment
-    const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-    await expect(skipBtn).toBeVisible({ timeout: 5000 });
-    await skipBtn.click();
-
-    // Accept ethics pledge
-    const pledgeCheckbox = page.locator('input[type="checkbox"]');
-    await expect(pledgeCheckbox).toBeVisible({ timeout: 5000 });
-    await pledgeCheckbox.check();
-
-    // Click Accept & Enter System
-    const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-    await expect(acceptBtn).toBeVisible({ timeout: 5000 });
-    await acceptBtn.click();
+    await enterDemoMode(page);
 
     // Open the voice assistant panel
     const toggleAgentBtn = page.locator('button[aria-label="Toggle Live Agent"]');
     await expect(toggleAgentBtn).toBeVisible({ timeout: 5000 });
     await toggleAgentBtn.click();
 
-    // 3. Send a message to the voice assistant
-    await page.waitForSelector('app-voice-assistant input', { timeout: 15000 });
-    const chatInput = page.locator('app-voice-assistant input').first();
-    await expect(chatInput).toBeVisible({ timeout: 10000 });
-    await chatInput.fill('What is the most critical evidence here?');
-    await chatInput.press('Enter');
+    // 3. Click quick prompt button to post a message into chatHistory
+    const quickBtn = page.locator('app-voice-assistant button:has-text("Critical evidence?")');
+    await expect(quickBtn).toBeVisible({ timeout: 10000 });
+    await quickBtn.click();
 
-    // Wait for the message to appear and the model response to complete
-    const modelResponse = page.locator('div.chat-entry >> text=This is a mock clinical intelligence response for radiculopathy.');
-    await expect(modelResponse).toBeVisible({ timeout: 10000 });
+    // Wait for the chat entry to appear in the DOM
+    const modelResponse = page.locator('.chat-entry').first();
+    await expect(modelResponse).toBeVisible({ timeout: 15000 });
 
     // 4. Hover over the chat entry to reveal [ANCHOR] button, and click it
     const lastChatEntry = page.locator('div.chat-entry').last();

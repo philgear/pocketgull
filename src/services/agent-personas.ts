@@ -188,6 +188,8 @@ export function getPersonaForLens(lens: AnalysisLens): IAgentPersona {
             return AGENT_PERSONAS['debugger'];
         case 'Performance Optimization & Web Vitals':
             return AGENT_PERSONAS['beacon'];
+        case 'Teledentistry & Systemic Health':
+            return AGENT_PERSONAS['swoop'];
         default:
             return AGENT_PERSONAS['gulliver'];
     }

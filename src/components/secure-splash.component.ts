@@ -1264,7 +1264,9 @@ export class SecureSplashComponent implements OnInit {
     const item = this.dailyBeachItems[dayEpoch % this.dailyBeachItems.length];
     return {
       ...item,
-      svgGuide: this.sanitizer.bypassSecurityTrustHtml(item.svgGuide)
+      svgGuide: isPlatformBrowser(this.platformId)
+        ? this.sanitizer.bypassSecurityTrustHtml(item.svgGuide)
+        : ''
     };
   });
 

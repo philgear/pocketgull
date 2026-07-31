@@ -107,6 +107,15 @@ export class YbocsService {
     this.upsettingCompulsionId.set(null);
     this.severityAnswers.set({});
     this.dateCreated.set(new Date().toISOString());
+
+    const patientId = this.patientMgmt.selectedPatientId();
+    if (patientId) {
+      const patient = this.patientMgmt.patients().find(p => p.id === patientId);
+      if (patient) {
+        patient.history = patient.history.filter((h: any) => h.type !== 'Y-BOCsAssessment');
+        this.storage.savePatient(patient);
+      }
+    }
   }
 
   loadAssessment(assessment: Assessment) {

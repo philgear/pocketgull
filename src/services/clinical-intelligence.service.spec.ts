@@ -1,6 +1,7 @@
 import '@angular/compiler';
 import { Injector, runInInjectionContext, signal } from '@angular/core';
 import { ClinicalIntelligenceService } from './clinical-intelligence.service';
+import { DefensiveGuardrailsService } from './defensive-guardrails.service';
 import { IntelligenceProviderToken } from './ai/intelligence.provider.token';
 import { AiCacheService } from './ai-cache.service';
 import { NetworkStateService } from './network-state.service';
@@ -71,6 +72,7 @@ describe('ClinicalIntelligenceService - Philosophy Modes', () => {
     injector = Injector.create({
       providers: [
         { provide: ClinicalIntelligenceService, useClass: ClinicalIntelligenceService },
+        { provide: DefensiveGuardrailsService, useClass: DefensiveGuardrailsService },
         { provide: PatientStateService, useValue: mockPatientState },
         { provide: IntelligenceProviderToken, useValue: mockIntelligenceProvider },
         { provide: AiCacheService, useValue: mockAiCache },
