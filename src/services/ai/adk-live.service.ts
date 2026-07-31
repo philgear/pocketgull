@@ -300,7 +300,7 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
   private processJsonMessage(data: any) {
     if (data && typeof data === 'object' && 'error' in data && (data as any).error) {
       const errObj = (data as any).error;
-      console.error("[AdkLiveService] Server returned error:", sanitizeLogInput(String(errObj?.message || errObj)));
+      console.error("[AdkLiveService] Server returned error from live stream.");
       if (this.onMessage) {
          this.runInZone(() => {
              this.onMessage!({ text: `System Error: ${sanitizeLogInput(String(errObj?.message || 'Unknown stream error'))}` });
