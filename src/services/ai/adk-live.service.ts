@@ -293,7 +293,14 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       unparsedData = rawData;
     }
     
-    console.log("[AdkLiveService] Raw Live Message:", sanitizeLogInput(String(typeof unparsedData === 'object' ? JSON.stringify(unparsedData) : unparsedData)));
+    const messageType = Array.isArray(unparsedData) ? 'array' : typeof unparsedData;
+    const messageSize =
+      typeof rawData === 'string'
+        ? rawData.length
+        : messageType === 'object' && unparsedData
+          ? Object.keys(unparsedData).length
+          : 0;
+    console.log("[AdkLiveService] Live message received", { type: messageType, size: messageSize });
     this.processJsonMessage(unparsedData);
   }
 
