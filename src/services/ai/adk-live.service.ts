@@ -293,24 +293,20 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       unparsedData = rawData;
     }
     
-    const messageType = Array.isArray(unparsedData) ? 'array' : typeof unparsedData;
-    const messageSize =
-      typeof rawData === 'string'
-        ? rawData.length
-        : messageType === 'object' && unparsedData
-          ? Object.keys(unparsedData).length
-          : 0;
-    console.log("[AdkLiveService] Live message received", { type: messageType, size: messageSize });
+    const safeSize = typeof rawData === 'string' ? rawData.length : 0;
+    console.log("[AdkLiveService] Live message received. Payload size:", safeSize);
     this.processJsonMessage(unparsedData);
   }
 
   private processJsonMessage(data: any) {
-    if (data && typeof data === 'object' && 'error' in data && (data as any).error) {
-      const errObj = (data as any).error;
-      console.error("[AdkLiveService] Server returned error from live stream.");
+    if (!data || typeof data !== 'object') return;
+    const rawError = Object.prototype.hasOwnProperty.call(data, 'error') ? data.error : null;
+    if (rawError) {
+      console.error("[AdkLiveService] Stream error occurred.");
       if (this.onMessage) {
          this.runInZone(() => {
-             this.onMessage!({ text: `System Error: ${sanitizeLogInput(String(errObj?.message || 'Unknown stream error'))}` });
+             const safeMsg = typeof rawError === 'object' && rawError?.message ? String(rawError.message) : String(rawError);
+             this.onMessage!({ text: `System Error: ${sanitizeLogInput(safeMsg)}` });
              if (this.onModelTurnComplete) this.onModelTurnComplete();
          });
       }

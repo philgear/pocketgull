@@ -1028,12 +1028,13 @@ app.get('/api/patients', patientsRateLimiter, (req, res) => {
 
 app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
   try {
-    if (typeof req.body !== 'object' || req.body === null || !Array.isArray(req.body)) {
+    const rawBody: unknown = req.body;
+    if (!Array.isArray(rawBody)) {
       return res.status(400).json({ error: 'Body must be a JSON array of patients' });
     }
 
     const allowedFields = ['id', 'name', 'age', 'gender', 'vitals', 'symptoms', 'history', 'conditions', 'carePlan', 'metrics', 'demographics', 'assessment'];
-    const sanitizedArray = req.body.map((item: any) => {
+    const sanitizedArray = rawBody.map((item: any) => {
       if (!item || typeof item !== 'object') return {};
       const cleanItem: Record<string, any> = {};
       for (const k of Object.keys(item)) {
@@ -1045,12 +1046,13 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
       return cleanItem;
     });
 
-    // Save sanitized patient objects
-    const dbPath = getSafePatientsDbPath();
-    fs.writeFileSync(dbPath, JSON.stringify(sanitizedArray, null, 2));
+    // Save sanitized patient objects to safe DB path
+    const targetDbFile = getSafePatientsDbPath();
+    fs.writeFileSync(targetDbFile, JSON.stringify(sanitizedArray, null, 2));
 
-    console.log(`[API] Saved ${String(sanitizedArray.length)} patients to database.`);
-    res.status(200).json({ success: true, count: sanitizedArray.length });
+    const totalCount = Number(sanitizedArray.length) || 0;
+    console.log('[API] Saved %d patients to database.', totalCount);
+    res.status(200).json({ success: true, count: totalCount });
   } catch (err: any) {
     console.error('[API] Error saving patients database:', sanitizeLogInput(String(err?.message || err)));
     res.status(500).json({ error: 'Internal server error while saving database' });
@@ -1059,15 +1061,18 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
 
 app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
   try {
-    const id = sanitizeLogInput(String(req.params.id || ''));
-    if (typeof req.body !== 'object' || req.body === null || Array.isArray(req.body)) {
+    const rawId: unknown = req.params['id'];
+    const id = sanitizeLogInput(String(rawId || ''));
+
+    const rawBody: unknown = req.body;
+    if (!rawBody || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
       return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
     }
 
-    const dbPath = getSafePatientsDbPath();
+    const targetDbFile = getSafePatientsDbPath();
     let patients: any[] = [];
     try {
-      const data = fs.readFileSync(dbPath, 'utf8');
+      const data = fs.readFileSync(targetDbFile, 'utf8');
       patients = JSON.parse(data);
     } catch {}
 
@@ -1086,15 +1091,16 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       return clean;
     };
 
-    const sanitizedPayload = cleanPatientObj(req.body);
+    const sanitizedPayload = cleanPatientObj(rawBody);
     if (index !== -1) {
       patients[index] = { ...patients[index], ...sanitizedPayload, id }; // Ensure ID stays same
     } else {
       patients.push({ ...sanitizedPayload, id });
     }
 
-    fs.writeFileSync(dbPath, JSON.stringify(patients, null, 2));
-    console.log(`[API] Synced patient ${id} from mobile/app to database.`);
+    fs.writeFileSync(targetDbFile, JSON.stringify(patients, null, 2));
+    const safePatientId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
+    console.log('[API] Synced patient %s from mobile/app to database.', safePatientId);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
   } catch (err: any) {
     console.error('[API] Error syncing patient to database:', sanitizeLogInput(String(err?.message || err)));
