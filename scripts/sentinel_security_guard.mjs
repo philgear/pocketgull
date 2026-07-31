@@ -27,7 +27,7 @@ const APPROVED_EGRESS_DOMAINS = [
   'githubusercontent.com',
   'api.github.com',
   'pocketgull.app',
-  'pocketgull.health',
+  'www.pocketgull.app',
   'pocketgull.com',
   'fhir.org',
   'hl7.org',

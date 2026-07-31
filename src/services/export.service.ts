@@ -2642,7 +2642,7 @@ export class ExportService {
       type: 'collection',
       timestamp: new Date().toISOString(),
       meta: {
-        tag: [{ system: 'https://pocketgull.health/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Tri-Paradigm Clinical Export' }]
+        tag: [{ system: 'https://pocketgull.app/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Tri-Paradigm Clinical Export' }]
       },
       entry: [
         {
@@ -2676,7 +2676,7 @@ export class ExportService {
             status: 'active',
             intent: 'original-order',
             codeCodeableConcept: {
-              coding: [{ system: 'https://pocketgull.health/avs', code: 'AVS-528HZ-10ALPHA', display: 'Binaural Solfeggio Audio Entrainment (528 Hz / 10 Hz Alpha)' }]
+              coding: [{ system: 'https://pocketgull.app/avs', code: 'AVS-528HZ-10ALPHA', display: 'Binaural Solfeggio Audio Entrainment (528 Hz / 10 Hz Alpha)' }]
             },
             subject: { reference: `Patient/${sanitizedP.id}` },
             occurrenceDateTime: new Date().toISOString()
@@ -2692,7 +2692,7 @@ export class ExportService {
             patient: { reference: `Patient/${sanitizedP.id}` },
             dateTime: new Date().toISOString(),
             oralDiet: {
-              type: [{ coding: [{ system: 'https://pocketgull.health/nutrition', code: 'CHRONO-CIRCADIAN', display: 'Circadian Polyphenol & Bioactive Protocol' }] }],
+              type: [{ coding: [{ system: 'https://pocketgull.app/nutrition', code: 'CHRONO-CIRCADIAN', display: 'Circadian Polyphenol & Bioactive Protocol' }] }],
               nutrient: [
                 { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '702859005', display: 'Ashwagandha KSM-66 Withanolides 30mg' }] } },
                 { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '412089004', display: 'Lion’s Mane Hericenones 50mg' }] } }
@@ -2708,7 +2708,7 @@ export class ExportService {
             status: 'active',
             intent: 'order',
             medicationCodeableConcept: {
-              coding: [{ system: 'https://pocketgull.health/tcm', code: 'XIAO-YAO-SAN', display: 'Xiao Yao San (Free and Easy Wanderer Botanical Formula)' }]
+              coding: [{ system: 'https://pocketgull.app/tcm', code: 'XIAO-YAO-SAN', display: 'Xiao Yao San (Free and Easy Wanderer Botanical Formula)' }]
             },
             subject: { reference: `Patient/${sanitizedP.id}` }
           }
