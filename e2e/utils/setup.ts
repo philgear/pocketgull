@@ -212,7 +212,7 @@ export async function enterDemoMode(page: Page) {
       hasAttemptedPin = true;
       await pinInput.fill('1234').catch(() => {});
       await pinInput.press('Enter').catch(() => {});
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(1000).catch(() => {});
       continue;
     }
 
@@ -220,7 +220,7 @@ export async function enterDemoMode(page: Page) {
     const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
     if (await demoBtn.isVisible().catch(() => false)) {
       await demoBtn.click().catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(500).catch(() => {});
       continue;
     }
 
@@ -228,7 +228,7 @@ export async function enterDemoMode(page: Page) {
     const skipBtn = page.locator('button', { hasText: 'Skip' });
     if (await skipBtn.isVisible().catch(() => false)) {
       await skipBtn.click().catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(500).catch(() => {});
       continue;
     }
 
@@ -243,11 +243,11 @@ export async function enterDemoMode(page: Page) {
     const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
     if (await acceptBtn.isVisible().catch(() => false)) {
       await acceptBtn.click().catch(() => {});
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(500).catch(() => {});
       continue;
     }
 
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(300).catch(() => {});
   }
 
   // Final wait for splash screen to disappear
