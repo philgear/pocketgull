@@ -56,6 +56,11 @@
 - **Data Serialization**: Anytime patient data (symptoms, history, conditions) is serialized, exported, or passed across API boundaries, the payload MUST strictly conform to the **FHIR R4 Bundle** standard.
 - **Sanitization**: All incoming/outgoing string data must be sanitized using DOMPurify before being stored or rendered to ensure HIPAA-compatible privacy and security.
 
+## GCP Cloud Cost & Storage Lifecycle Standards
+- **Cloud Project Target**: All deployments MUST target the `gen-lang-client-0540208645` Google Cloud project.
+- **Cloud Run Scaling**: Ensure all Cloud Run microservices scale to 0 (`minScale: 0`) when idle to eliminate baseline computing charges.
+- **Artifact Registry & GCS Pruning**: Retain a 7-day cleanup policy (`olderThan: 604800s`, `keepCount: 3`) on Artifact Registry repositories (`cloud-run-source-deploy`, `gcr.io`) and GCS source buckets (`gs://run-sources-*`) to cap artifact storage usage at ~2–4 GB ($0.20/mo) and prevent unpruned build accumulation.
+
 ## Default Node & TypeScript Commands
 - **Strict Requirement**: Always use the explicit project Node module paths for typechecking and builds to prevent PATH resolution mismatches:
   - **TypeScript Typecheck**: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\typescript\lib\tsc.js -p c:\Users\philg\Pocketgull\pocketgull\tsconfig.json --noEmit`
