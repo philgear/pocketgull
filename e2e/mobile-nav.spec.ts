@@ -53,7 +53,9 @@ test.describe('Mobile Sub-Navbar Responsiveness', () => {
     const subNavbar = page.locator('nav').filter({ has: page.locator('#tour-patient-dropdown') });
     await expect(subNavbar).toBeVisible();
 
-    const artifactDir = 'C:/Users/philg/.gemini/antigravity-ide/brain/0fc781ba-7a56-4df7-a6e9-b99f15e47748';
+    const fs = await import('fs');
+    const artifactDir = path.join(process.cwd(), 'test-results', 'mobile-nav');
+    fs.mkdirSync(artifactDir, { recursive: true });
     
     // Take mobile nav screenshot
     await subNavbar.screenshot({ path: path.join(artifactDir, 'mobile_nav_layout.png') });

@@ -102,6 +102,20 @@ jobs:
           SKIP_HEALTHCARE_PROVISION: 'true'
           ASTRO_TELEMETRY_DISABLED: '1'
 
+      - name: Start Preview Server
+        run: |
+          npm run preview &
+          echo $! > .server.pid
+        env:
+          PORT: '4000'
+          CI: true
+          NODE_ENV: 'production'
+          GEMINI_API_KEY: 'placeholder-key-for-build'
+          SKIP_HEALTHCARE_PROVISION: 'true'
+
+      - name: Wait for Server
+        run: npx wait-on http://localhost:4000 --timeout 60000
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
@@ -112,6 +126,13 @@ jobs:
           PORT: '4000'
           GEMINI_API_KEY: 'placeholder-key-for-build'
           SKIP_HEALTHCARE_PROVISION: 'true'
+
+      - name: Stop Preview Server
+        if: always()
+        run: |
+          if [ -f .server.pid ]; then
+            kill $(cat .server.pid) || true
+          fi
 
       - name: Upload Playwright Report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
