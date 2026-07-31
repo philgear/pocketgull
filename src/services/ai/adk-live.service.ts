@@ -293,7 +293,10 @@ Macro Fleet Sentinel Context (Full-Duplex Diagnostics):
       unparsedData = rawData;
     }
     
-    const safeSize = typeof rawData === 'string' ? rawData.length : 0;
+    const payloadSizeCandidate = typeof rawData === 'string' ? rawData.length : 0;
+    const safeSize = Number.isFinite(payloadSizeCandidate) && payloadSizeCandidate >= 0
+      ? Math.floor(payloadSizeCandidate)
+      : 0;
     console.log("[AdkLiveService] Live message received. Payload size:", safeSize);
     this.processJsonMessage(unparsedData);
   }
