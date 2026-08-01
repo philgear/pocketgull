@@ -20,7 +20,8 @@ patientsRouter.post('/', (req, res) => {
     console.log(`[Patients API] Synced ${mockDatabase.length} patients to cloud.`);
     res.status(200).json({ message: 'Patients synced successfully' });
   } catch (error: any) {
-    console.error('[Patients API] Sync error:', error);
+    const safeErr = encodeURIComponent(String(error?.message || error || '')).slice(0, 500);
+    console.error('[Patients API] Sync error:', safeErr);
     res.status(500).json({ error: 'Internal server error during sync' });
   }
 });
