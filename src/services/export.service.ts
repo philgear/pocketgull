@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { MarkdownService } from './markdown.service';
 import * as DOMPurify from 'dompurify';
+import { marked } from 'marked';
 
 import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -558,21 +559,18 @@ export class ExportService {
   async downloadAsPdf(data: any, patientName: string = 'Patient'): Promise<void> {
     console.log('[ExportService] Opening styled print report for:', patientName);
 
-    // Ensure marked is loaded
-    let parser = this.markdownService?.parser();
-    if (!parser) {
-      await new Promise<void>(resolve => {
-        const interval = setInterval(() => {
-          parser = this.markdownService?.parser();
-          if (parser) { clearInterval(interval); resolve(); }
-        }, 50);
-        setTimeout(() => { clearInterval(interval); resolve(); }, 3000);
-      });
-    }
-
     const renderMd = (md: string): string => {
       if (!md) return '';
-      try { return (parser as any).parse(md) as string; } catch { return `<p>${md}</p>`; }
+      try {
+        if (typeof marked.parse === 'function') {
+          return marked.parse(md) as string;
+        } else if (typeof marked === 'function') {
+          return (marked as any)(md) as string;
+        }
+        return `<p>${md}</p>`;
+      } catch {
+        return `<p>${md}</p>`;
+      }
     };
 
     const timestamp = new Date().toLocaleString('en-US', {
