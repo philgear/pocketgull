@@ -2,8 +2,8 @@ import { IPatient } from '../services/patient.types';
 
 export const p004: IPatient = {
   id: "p004",
-  name: "Global Sentinel",
-  age: 72,
+  name: "Pongo Pygmaeus (Orangutan, Arboreal Hominid, 16y)",
+  age: 16,
   gender: "Male",
   lastVisit: "2026.03.12",
   preexistingConditions: [

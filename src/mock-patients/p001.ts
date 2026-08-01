@@ -2,7 +2,7 @@ import { IPatient } from '../services/patient.types';
 
 export const p001: IPatient = {
   "id": "p001",
-  "name": "Robert Davis",
+  "name": "Homo Sapiens (Male, Metabolic Syndrome, 58y)",
   "age": 58,
   "gender": "Male",
   "lastVisit": "2024.11.20",

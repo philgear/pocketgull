@@ -2,7 +2,7 @@ import { IPatient } from '../services/patient.types';
 
 export const p002: IPatient = {
   "id": "p002",
-  "name": "Sarah Jenkins",
+  "name": "Homo Sapiens (Female, Asthma & Respiratory, 42y)",
   "age": 42,
   "gender": "Female",
   "lastVisit": "2024.12.01",

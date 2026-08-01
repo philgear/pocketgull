@@ -2,7 +2,7 @@ import { IPatient } from '../services/patient.types';
 
 export const p003: IPatient = {
   id: "p003",
-  name: "William Henderson",
+  name: "Homo Sapiens (Male, Geriatric Cardiac, 81y)",
   age: 81,
   gender: "Male",
   lastVisit: "2024.12.05",
