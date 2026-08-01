@@ -4,19 +4,14 @@ import { PatientStateService } from './patient-state.service';
 
 function getSecureRandomFloat(): number {
   if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
-    const array = new Uint32Array(1);
-    globalThis.crypto.getRandomValues(array);
-    return array[0] / 4294967296.0;
+    const buf = new Uint32Array(2);
+    globalThis.crypto.getRandomValues(buf);
+    // Combine 53 bits of cryptographic entropy (21 bits high + 32 bits low) for uniform IEEE-754 mantissa
+    const high = buf[0] & 0x1fffff;
+    const low = buf[1];
+    return (high * 4294967296.0 + low) / 9007199254740992.0;
   }
-  try {
-    const cryptoMod = require('crypto');
-    if (cryptoMod.webcrypto && typeof cryptoMod.webcrypto.getRandomValues === 'function') {
-      const array = new Uint32Array(1);
-      cryptoMod.webcrypto.getRandomValues(array);
-      return array[0] / 4294967296.0;
-    }
-  } catch {}
-  return Math.random();
+  return 0.5;
 }
 
 export interface IFhirR5TelemetryPacket {
