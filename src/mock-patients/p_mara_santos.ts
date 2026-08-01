@@ -2,7 +2,7 @@ import { IPatient } from '../services/patient.types';
 
 export const p_mara_santos: IPatient = {
   "id": "p_mara_santos",
-  "name": "Mara Santos",
+  "name": "Homo Sapiens (Female, Neurological & Methylation, 34y)",
   "age": 34,
   "gender": "Female",
   "lastVisit": "2026.06.20",

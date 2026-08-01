@@ -114,7 +114,7 @@ export class DicomService {
     },
     {
       studyInstanceUid: '1.2.840.113619.2.134.1.mara.1',
-      patientName: 'Mara Santos',
+      patientName: 'Homo Sapiens (Female, Neurological & Methylation, 34y)',
       patientId: 'p_mara_santos',
       studyDate: '20260718',
       studyDescription: 'Postpartum Pelvic & Lumbar Spine MRI',
