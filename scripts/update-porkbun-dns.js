@@ -41,8 +41,8 @@ async function updateDomain(domain) {
     // Prepare target records for this domain
     const targets = [];
     
-    // For apex, www, and api subdomains, add all A and AAAA records
-    for (const sub of ['', 'www', 'api']) {
+    // For apex, www, api, and lean subdomains, add all A and AAAA records
+    for (const sub of ['', 'www', 'api', 'lean']) {
       for (const ip of cloudRunAIPs) {
         targets.push({ name: sub, type: 'A', content: ip });
       }
