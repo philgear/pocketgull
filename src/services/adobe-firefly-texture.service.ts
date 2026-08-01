@@ -26,7 +26,7 @@ export class AdobeFireflyTextureService {
   private readonly textureConfigs: Record<FireflyTextureType, IFireflyTextureMetadata> = {
     skin: {
       type: 'skin',
-      prompt: 'Adobe Firefly AI: Micro-cellular dermal epidermis, soft translucency, biophotonic glow',
+      prompt: 'Edwin Smith Surgical Codex Case I: Micro-cellular dermal integument, biophotonic SSS refraction, Type I/III collagen substrate, non-invasive PBR telemetry',
       resolution: 512,
       roughness: 0.35,
       metalness: 0.15,
@@ -36,7 +36,7 @@ export class AdobeFireflyTextureService {
     },
     muscle: {
       type: 'muscle',
-      prompt: 'Adobe Firefly AI: Striated muscle myofibril fiber matrix, deep teal collagen weave',
+      prompt: 'Edwin Smith Surgical Codex Case II: Striated myofibrillar fascicles, deep teal fascia collagen sheath, vascular endomysium strain mapping',
       resolution: 512,
       roughness: 0.45,
       metalness: 0.25,
@@ -46,7 +46,7 @@ export class AdobeFireflyTextureService {
     },
     skeleton: {
       type: 'skeleton',
-      prompt: 'Adobe Firefly AI: Compact osteon bone matrix, polished ivory trabecular lattice',
+      prompt: 'Edwin Smith Surgical Codex Case III: Compact osteon cortical bone matrix, Haversian canal lattice, polished ivory trabecular architecture',
       resolution: 512,
       roughness: 0.25,
       metalness: 0.10,
@@ -56,7 +56,7 @@ export class AdobeFireflyTextureService {
     },
     organs: {
       type: 'organs',
-      prompt: 'Adobe Firefly AI: Endothelial organ vascular membrane, glowing cardiac capillary web',
+      prompt: 'Edwin Smith Surgical Codex Case IV: Endothelial organ vascular membrane, glowing cardiac micro-capillary web, visceral perfusion substrate',
       resolution: 512,
       roughness: 0.30,
       metalness: 0.20,
