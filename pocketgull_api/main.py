@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Any, AsyncGenerator, Optional
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
@@ -110,6 +110,53 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+# ── Security Middleware & Exception Handler ───────────────────────────────────
+
+@app.middleware("http")
+async def security_middleware(request: Request, call_next):
+    # 1. Payload Size Guard (10MB limit)
+    content_length = request.headers.get("content-length")
+    if content_length and int(content_length) > 10 * 1024 * 1024:
+        return JSONResponse(
+            status_code=413,
+            content={"error": "Payload Too Large", "message": "Request body exceeds 10MB limit"}
+        )
+
+    # 2. Optional Internal API Key Header Verification
+    internal_key = os.getenv("INTERNAL_SIDECAR_API_KEY")
+    if internal_key and request.url.path not in ["/health", "/docs", "/openapi.json"]:
+        client_key = request.headers.get("X-Internal-API-Key")
+        if not client_key or client_key != internal_key:
+            return JSONResponse(
+                status_code=401,
+                content={"error": "Unauthorized", "message": "Invalid or missing X-Internal-API-Key"}
+            )
+
+    response = await call_next(request)
+
+    # 3. Inject OWASP Security Headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    return response
+
+
+@app.exception_handler(Exception)
+async def hipaa_zero_leak_exception_handler(request: Request, exc: Exception):
+    """Sanitizes HTTP 500 error responses to prevent internal stack trace & system path leaks."""
+    print(f"[SECURITY] Internal Sidecar Exception on {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal Processing Error",
+            "code": "ERR_INTERNAL_SIDECAR",
+            "message": "An internal error occurred. Request details logged securely."
+        }
+    )
 
 
 # ══════════════════════════════════════════════════════════════════════════════
