@@ -238,6 +238,63 @@ async def calculate_somatic_coherence(payload: SomaticCoherenceRequest) -> Somat
     )
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+# ML: TELEDENTISTRY & SYSTEMIC INFLAMMATORY BURDEN INDEX (SIBI) API
+# ══════════════════════════════════════════════════════════════════════════════
+
+class SibiTeledentistryRequest(BaseModel):
+    deep_pocket_sites: int = Field(default=4, description="Number of teeth with PPD >= 4mm")
+    bleeding_on_probing_percent: float = Field(default=25.0, description="Percentage of BOP sites (0 - 100%)")
+    hs_crp_mg_l: float = Field(default=2.4, description="High sensitivity C-reactive protein in mg/L")
+    tooth_wear_index_grade: int = Field(default=1, description="Smith & Knight TWI wear grade (0-4)")
+
+
+class SibiTeledentistryResponse(BaseModel):
+    sibi_score: float
+    cardiovascular_risk_multiplier: float
+    predicted_hba1c_elevation: float
+    endothelial_dysfunction_grade: str
+    primary_pathogens: list[str]
+    clinical_interventions: list[str]
+
+
+@app.post("/api/ml/sibi-teledentistry-score", response_model=SibiTeledentistryResponse, tags=["ML"])
+async def calculate_sibi_teledentistry_score(payload: SibiTeledentistryRequest) -> SibiTeledentistryResponse:
+    """Calculates Systemic Inflammatory Burden Index (SIBI) and periodontitis-cardiovascular cross-talk risk."""
+    raw_sibi = (payload.deep_pocket_sites * 6.0) + (payload.bleeding_on_probing_percent * 0.8) + (payload.hs_crp_mg_l * 12.0)
+    sibi = min(100.0, round(raw_sibi, 1))
+
+    if sibi >= 70.0 or payload.hs_crp_mg_l >= 3.0 or payload.deep_pocket_sites >= 6:
+        cv_mult = 2.4
+        hba1c_add = 0.6
+        grade = "Critical"
+    elif sibi >= 45.0 or payload.hs_crp_mg_l >= 2.0 or payload.deep_pocket_sites >= 3:
+        cv_mult = 1.7
+        hba1c_add = 0.4
+        grade = "Severe"
+    elif sibi >= 25.0 or payload.hs_crp_mg_l >= 1.0:
+        cv_mult = 1.3
+        hba1c_add = 0.2
+        grade = "Moderate"
+    else:
+        cv_mult = 1.0
+        hba1c_add = 0.0
+        grade = "Low"
+
+    return SibiTeledentistryResponse(
+        sibi_score=sibi,
+        cardiovascular_risk_multiplier=cv_mult,
+        predicted_hba1c_elevation=hba1c_add,
+        endothelial_dysfunction_grade=grade,
+        primary_pathogens=["Porphyromonas gingivalis", "Tannerella forsythia", "Treponema denticola"],
+        clinical_interventions=[
+            "Scaling & Root Planing (SRP) + Subantimicrobial Doxycycline",
+            "Green Tea EGCG & Essential Oil Oral Rinse",
+            "Coenzyme Q10 & Omega-3 Fatty Acid Supplementation"
+        ]
+    )
+
+
 @app.post("/ml/holistic-risk", summary="Calculate Multi-Modal Sleep Twin & Cross-Domain Holistic Patient Risk")
 async def get_holistic_patient_risk(payload: MultiModalPatientStateInput) -> dict[str, Any]:
     """Calculates unified holistic patient risk score fusing PSG sleep architecture, vitals, and passive wearable telemetry."""

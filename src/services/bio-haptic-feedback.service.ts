@@ -129,4 +129,17 @@ export class BioHapticFeedbackService {
       // Haptics unsupported or disabled
     }
   }
+
+  /**
+   * Triggers a dual-pulse Web Haptics vibration pattern for interactive card/tool feedback.
+   */
+  triggerDualPulse(firstPulseMs: number = 25, pauseMs: number = 40, secondPulseMs: number = 25): void {
+    if (typeof window === 'undefined' || !navigator.vibrate) return;
+
+    try {
+      navigator.vibrate([firstPulseMs, pauseMs, secondPulseMs]);
+    } catch {
+      // Haptics unsupported or disabled
+    }
+  }
 }
