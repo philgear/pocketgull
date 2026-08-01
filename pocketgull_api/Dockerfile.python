@@ -19,7 +19,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir pip==24.3.1 && \
+RUN pip install --no-cache-dir pip==25.0.1 setuptools==75.8.0 wheel==0.45.1 && \
     pip install --no-cache-dir -r requirements.txt
 
 # ==========================================

@@ -14,7 +14,7 @@ let isFirebaseInitialized = false;
   }
 
 export async function sendPushNotification(fcmToken: string, title: string, body: string, data?: any) {
-  const sanitize = (str: any) => String(str || '').replace(/[\r\n\u2028\u2029]+/g, ' ').replace(/[\x00-\x1F\x7F]+/g, ' ').slice(0, 500);
+  const sanitize = (str: any) => encodeURIComponent(String(str || '').replace(/[\r\n\u2028\u2029]+/g, ' ')).slice(0, 500);
   if (!isFirebaseInitialized || !fcmToken) {
     const tokenProvided = Boolean(fcmToken);
     const tokenLength = tokenProvided ? String(fcmToken).length : 0;

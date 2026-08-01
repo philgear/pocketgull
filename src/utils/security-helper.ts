@@ -17,16 +17,8 @@ export function sanitizeLogInput(value: unknown): string {
   } else {
     str = String(value);
   }
-  // Replace all control characters (CR, LF, TAB, ESC, DEL) and line separators with spaces/delimiters
-  const sanitized = str
-    .replace(/[\r\n\u2028\u2029]+/g, ' _ ')
-    .replace(/[\x00-\x1F\x7F]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  const MAX_LOG_LENGTH = 2000;
-  return sanitized.length > MAX_LOG_LENGTH
-    ? `${sanitized.slice(0, MAX_LOG_LENGTH)}…[truncated]`
-    : sanitized;
+  const cleanStr = str.replace(/[\r\n\u2028\u2029]+/g, ' ').replace(/[\x00-\x1F\x7F]+/g, ' ');
+  return encodeURIComponent(cleanStr).slice(0, 2000);
 }
 
 /**
