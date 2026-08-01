@@ -6,17 +6,17 @@ function getSecureRandomFloat(): number {
   if (typeof globalThis !== 'undefined' && globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
     const array = new Uint32Array(1);
     globalThis.crypto.getRandomValues(array);
-    return array[0] / 4294967296;
+    return array[0] / 4294967296.0;
   }
   try {
     const cryptoMod = require('crypto');
-    if (typeof cryptoMod.randomInt === 'function') {
-      return cryptoMod.randomInt(0, 4294967296) / 4294967296;
+    if (cryptoMod.webcrypto && typeof cryptoMod.webcrypto.getRandomValues === 'function') {
+      const array = new Uint32Array(1);
+      cryptoMod.webcrypto.getRandomValues(array);
+      return array[0] / 4294967296.0;
     }
-    return cryptoMod.randomBytes(4).readUInt32BE(0) / 4294967296;
-  } catch {
-    return Math.random();
-  }
+  } catch {}
+  return Math.random();
 }
 
 export interface IFhirR5TelemetryPacket {

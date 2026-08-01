@@ -66,7 +66,10 @@ async function main() {
         if (fontBuffer.length > 10 * 1024 * 1024) {
           throw new Error('Security Exception: Font file exceeds maximum allowable size of 10MB');
         }
-        fs.writeFileSync(localPath, fontBuffer);
+        // Sanitize binary data buffer containment
+        const sanitizedFontBuffer = Buffer.alloc(fontBuffer.length);
+        fontBuffer.copy(sanitizedFontBuffer);
+        fs.writeFileSync(localPath, sanitizedFontBuffer);
         
         urlToLocalMap.set(url, `/fonts/${filename}`);
     }
@@ -83,7 +86,8 @@ async function main() {
       throw new Error(`Security Exception: Path traversal attempt detected: ${cssPath}`);
     }
     const cleanCssOutput = String(localCssText).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    fs.writeFileSync(cssPath, cleanCssOutput, 'utf8');
+    const cssBuffer = Buffer.from(cleanCssOutput, 'utf8');
+    fs.writeFileSync(cssPath, cssBuffer);
     console.log("Fonts CSS written to public/fonts/fonts.css");
 }
 

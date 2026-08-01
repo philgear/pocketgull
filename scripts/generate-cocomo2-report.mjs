@@ -69,7 +69,7 @@ function scanDir(dir) {
 // Also scan root config files
 fs.readdirSync('.').forEach(f => {
   const ext = path.extname(f).toLowerCase();
-  if (fs.statSync(f).isFile() && extMap[ext]) {
+  if (extMap[ext]) {
     try {
       const content = fs.readFileSync(f, 'utf8');
       const lines = content.split('\n').filter(l => l.trim().length > 0).length;

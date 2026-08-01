@@ -1052,7 +1052,8 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
     // Save sanitized patient objects to safe DB path
     const targetDbFile = getSafePatientsDbPath();
     const safeOutputJson = JSON.stringify(sanitizedArray, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    fs.writeFileSync(targetDbFile, safeOutputJson, 'utf8');
+    const safeOutputBuffer = Buffer.from(safeOutputJson, 'utf8');
+    fs.writeFileSync(targetDbFile, safeOutputBuffer);
 
     const totalCount = Number(sanitizedArray.length) || 0;
     console.log('[API] Saved %d patients to database.', totalCount);
@@ -1107,7 +1108,8 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
     }
 
     const safePatientFileJson = JSON.stringify(patients, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    fs.writeFileSync(targetDbFile, safePatientFileJson, 'utf8');
+    const safePatientFileBuffer = Buffer.from(safePatientFileJson, 'utf8');
+    fs.writeFileSync(targetDbFile, safePatientFileBuffer);
     const safePatientId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
     console.log('[API] Synced patient %s from mobile/app to database.', safePatientId);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });

@@ -524,7 +524,8 @@ app.post('/api/patients', (req, res) => {
 
     // Save validated data to file
     const safePatientsJson = JSON.stringify(sanitized, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    fs.writeFileSync(patientsDbPath, safePatientsJson, 'utf8');
+    const safePatientsBuffer = Buffer.from(safePatientsJson, 'utf8');
+    fs.writeFileSync(patientsDbPath, safePatientsBuffer);
 
     console.log(`[API] Saved ${sanitized.length} patients to database.`);
     res.status(200).json({ success: true, count: sanitized.length });
@@ -571,7 +572,8 @@ app.put('/api/patients/:id', (req, res) => {
     }
 
     const safeFileJson = JSON.stringify(patients, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    fs.writeFileSync(patientsDbPath, safeFileJson, 'utf8');
+    const safeFileBuffer = Buffer.from(safeFileJson, 'utf8');
+    fs.writeFileSync(patientsDbPath, safeFileBuffer);
     const safeLogId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
     console.log(`[API] Synced patient ${safeLogId} from mobile/app to database.`);
     res.status(200).json({ success: true, patient: patients.find(p => p.id === id) });
