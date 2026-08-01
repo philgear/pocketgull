@@ -169,7 +169,7 @@ import { DoctorShiftSimulatorComponent } from './doctor-shift-simulator.componen
         <!-- Footer Bar -->
         <div class="border-t border-zinc-800 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 font-mono">
           <div class="text-xs text-zinc-400">
-            Enterprise Sales Desk: <strong class="text-zinc-200">enterprise&#64;pocketgull.health</strong>
+            Enterprise Sales Desk: <strong class="text-zinc-200">enterprise&#64;pocketgull.app</strong>
           </div>
 
           <div class="flex items-center gap-3">

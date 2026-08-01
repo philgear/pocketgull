@@ -29,8 +29,8 @@ if (!existsSync(LOG_DIR)) mkdirSync(LOG_DIR, { recursive: true });
 const auditStream = createWriteStream(securePathResolve(LOG_DIR, 'health-data-audit.log'), { flags: 'a' });
 
 function auditLog(event: string, patientId: string, detail: Record<string, unknown> = {}): void {
-  const safePatientId = String(patientId || '').replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
-  const safeEvent = String(event || '').replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
+  const safePatientId = /^[a-zA-Z0-9_-]{1,64}$/.test(patientId) ? patientId : 'anonymous_patient';
+  const safeEvent = /^[a-zA-Z0-9_-]{1,64}$/.test(event) ? event : 'generic_event';
   const entry = JSON.stringify({
     timestamp: new Date().toISOString(),
     event: safeEvent,

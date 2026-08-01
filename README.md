@@ -3,7 +3,7 @@
 **Aerial Perspective for the Clinical Ocean — Living Medical Intelligence Engine**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](file:///c:/Users/philg/Pocketgull/pocketgull/LICENSE)
-![Version](https://img.shields.io/badge/version-v1.3.0--active-blue)
+![Version](https://img.shields.io/badge/version-v1.4.0--active-blue)
 ![Angular](https://img.shields.io/badge/Angular-v22.0-DD0031?logo=angular)
 ![Three.js](https://img.shields.io/badge/Three.js-v0.185-000000?logo=three.js)
 ![Node.js](https://img.shields.io/badge/Node.js-v24.x-Green?logo=nodedotjs)
@@ -17,7 +17,7 @@
 
 ### 🌐 Live Production Application
 
-**[https://pocketgull.app](https://pocketgull.app)** — Deployed on **Google Cloud Run** with Google Vertex AI Enterprise (`gemini-2.5-flash`).
+**[https://pocketgull.app](https://pocketgull.app)** — Deployed on **Google Cloud Run** with Google Gemini 3 GA (`gemini-3.5-flash` & `gemini-3.6-flash`).
 
 ---
 
@@ -230,6 +230,7 @@ graph TB
 
 A living record of major system evolutions (Full details in [`docs/study/src/pages/changelog.mdx`](file:///c:/Users/philg/Pocketgull/pocketgull/docs/study/src/pages/changelog.mdx)):
 
+- **v1.4.0 (2026-07-31)**: Google Gemini 3 GA Model Migration (`gemini-3.5-flash` & `gemini-3.6-flash`), PubGemma 27B & MedGemma 3 27B upgrades, Thought Signature Circulation, Platinum Tier Competition Hub, Wachter/Brookings AI Governance suite, and CMS RPM Billing Audit Dashboard.
 - **v1.3.0 (2026-07-24)**: Sentinel Security & Egress Guard (`sentinel_security_guard.mjs`), Step-Security Harden-Runner v2.16.0, Node.js 24 migration, CodeQL 100% remediation.
 - **v1.2.0 (2026-07-22)**: 10 Standardized Clinical & Life Sovereignty Assessments, Dynamic 3D Paradigm Synchronization (Western Organs, Eastern Meridians, Ayurvedic Chakras), Rice Papercraft Theme.
 - **v1.1.0-rc3 (2026-07-21)**: 60fps 3D Patient Slide-in Transition, Triage Urgency Priority Sorting, Geo-Sentinel Surveillance Deck, FHIR R4 1-Click Export.

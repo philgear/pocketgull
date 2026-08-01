@@ -19,14 +19,14 @@ import { CommonModule } from '@angular/common';
             </h2>
           </div>
           <p class="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-            PhysioNet 2026 Multi-Modal Sleep Intelligence Engine • Interactive Hypnogram & Conformal Risk Bounds
+            PhysioNet 2026 Multi-Modal Sleep Intelligence Engine • Gemini 3.6 Flash & PubGemma 27B Grounded • Interactive Hypnogram & Conformal Risk Bounds
           </p>
         </div>
 
         <div class="flex items-center gap-2">
           <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1.5">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Two-Headed Hydra Active
+            Two-Headed Hydra (Gemini 3.6 Flash + PubGemma 27B) Active
           </span>
         </div>
       </header>

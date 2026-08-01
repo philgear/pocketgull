@@ -5,7 +5,6 @@ import { PatientManagementService } from '../services/patient-management.service
 import { ActuarialGleeAudioService } from '../services/actuarial-glee-audio.service';
 import { FloatingWaterConsciousnessComponent } from './floating-water-consciousness.component';
 import { SocialHealthGravitationComponent } from './social-health-gravitation.component';
-import { LyricaConcertComponent } from './lyrica-concert.component';
 
 export interface IConsciousnessState {
   id: 'focus' | 'calm' | 'sleep' | 'creativity' | 'grounding';
@@ -46,8 +45,7 @@ export interface IConsciousnessState {
   imports: [
     CommonModule,
     FloatingWaterConsciousnessComponent,
-    SocialHealthGravitationComponent,
-    LyricaConcertComponent
+    SocialHealthGravitationComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -500,10 +498,7 @@ export interface IConsciousnessState {
 
       </div>
 
-      <!-- Lyrica Generative Healing Concert & Music Video -->
-      <div class="mt-8 relative z-10">
-        <app-lyrica-concert></app-lyrica-concert>
-      </div>
+
 
       <!-- Social Health & Local Event Gravitation Matrix -->
       <div class="mt-8 relative z-10">

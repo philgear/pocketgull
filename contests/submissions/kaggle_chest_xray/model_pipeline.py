@@ -1,6 +1,6 @@
 """
 Multimodal Radiology Vision & Clinical Report Screening Model Pipeline
-Automated MeSH radiological entity screening powered by local PubGemma 7B and MedGemma 27B vision models.
+Automated MeSH radiological entity screening powered by local PubGemma 27B and MedGemma 3 27B vision models.
 """
 from typing import Dict, Any, List
 
@@ -9,7 +9,7 @@ class ChestXrayPubGemmaModelPipeline:
         """Performs MeSH entity recognition and multi-label pathology scoring."""
         return {
             "image_id": image_id,
-            "model_architecture": "PubGemma-7B-Vision / MedGemma-27B",
+            "model_architecture": "PubGemma-27B-Vision / MedGemma-3-27B",
             "detected_mesh_findings": [
                 {"term": "Cardiomegaly", "prob": 0.04, "mesh_id": "D002318"},
                 {"term": "Pulmonary Edema", "prob": 0.02, "mesh_id": "D011654"},

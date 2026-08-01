@@ -1,0 +1,32 @@
+import { Injector, runInInjectionContext } from '@angular/core';
+import { InfiniteClinicalSynthesisService } from './infinite-clinical-synthesis.service';
+
+describe('InfiniteClinicalSynthesisService', () => {
+  let service: InfiniteClinicalSynthesisService;
+  let injector: Injector;
+
+  beforeEach(() => {
+    injector = Injector.create({ providers: [] });
+    runInInjectionContext(injector, () => {
+      service = new InfiniteClinicalSynthesisService();
+    });
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should procedurally generate tri-paradigm clinical strategy with Amazon affiliate URLs', async () => {
+    const result = await service.synthesizeInfiniteStrategy({
+      symptomQuery: 'Ashwagandha for Sleep & Cortisol',
+      paradigmFocus: 'ayurvedic'
+    });
+
+    expect(result).toBeTruthy();
+    expect(result.title).toContain('Ashwagandha for Sleep & Cortisol');
+    expect(result.amazonStoreUrl).toContain('tag=pgdpo-20');
+    expect(result.amazonPharmacyUrl).toContain('pharmacy.amazon.com');
+    expect(result.nodes.length).toBeGreaterThan(0);
+    expect(result.nodes[0]?.items?.length).toBe(3);
+  });
+});

@@ -1,12 +1,15 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:26.5.0-alpine@sha256:e88a35be04478413b7c71c455cd9865de9b9360e1f43456be5951032d7ac1a66 AS builder
+FROM node:24-bookworm-slim AS builder
 
 WORKDIR /app
 
+# Set Node memory limit for build stability
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 # Patch OS-level vulnerabilities
-RUN apk update && apk upgrade --no-cache
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Install ALL dependencies (including devDependencies needed for ng build)
 COPY package*.json ./
@@ -17,6 +20,7 @@ RUN npm install --legacy-peer-deps && npm --prefix docs/study install --legacy-p
 
 # Copy source and build the docs/study Astro sub-project + Angular SSR app
 COPY . .
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
 # Prune devDependencies to keep production container small
@@ -25,12 +29,12 @@ RUN npm prune --omit=dev --legacy-peer-deps
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:26.5.0-alpine@sha256:e88a35be04478413b7c71c455cd9865de9b9360e1f43456be5951032d7ac1a66
+FROM node:24-bookworm-slim
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities in production image
-RUN apk update && apk upgrade --no-cache
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Set Node to production mode
 ENV NODE_ENV=production

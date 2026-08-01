@@ -65,3 +65,20 @@
 - **Strict Requirement**: Always use the explicit project Node module paths for typechecking and builds to prevent PATH resolution mismatches:
   - **TypeScript Typecheck**: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\typescript\lib\tsc.js -p c:\Users\philg\Pocketgull\pocketgull\tsconfig.json --noEmit`
   - **Angular Build**: `node c:\Users\philg\Pocketgull\pocketgull\node_modules\@angular\cli\bin\ng.js build`
+
+## AI Coding Hygiene & Continuous Cleanup
+- **End-of-Session Pruning**: Before wrapping up features or releases, proactively purge unused imports, delete unreferenced dead code, merge duplicate helper functions, and remove commented-out blocks.
+- **Secret & Egress Boundaries**: Never commit API keys or credentials. Ensure `.env*` is strictly matched in `.gitignore`, and verify all external domains with `Sentinel Security Guard`.
+
+## NN/g (Nielsen Norman Group) Usability & Accessibility Standards
+- **Form Accessibility**: All input components MUST include explicit `[attr.aria-describedby]` error/hint linking, `[attr.aria-invalid]`, and 44px+ touch target hitboxes (Fitts's Law).
+- **System Status Visibility**: Telemetry badges and connection state indicators MUST provide instant visual feedback without layout shifts.
+- **User Freedom & Exit Vectors**: Read-only or historical review states MUST display prominent, un-missable exit banners (e.g., `"Return to Current State"`).
+
+## HIPAA Safe Harbor Patient De-Identification Policy
+- **Demographic Archetypes**: Mock and test patient profiles MUST be de-identified using HIPAA §164.514 Safe Harbor standards (e.g., `Homo Sapiens (Female, Neurological, 34y)` or `Pongo Pygmaeus (Orangutan Comparative Model)`).
+- **Historical Legacies**: Preserve named historical/scientific luminaries who dedicated their lives to science (Curie, Darwin, Kahlo, Ramanujan, Smith, Pauling, Gear).
+
+## Biophysical PBR Substrates & Unbiased Cryptography
+- **Edwin Smith Surgical Codex**: Describe 3D WebGL PBR texture maps using Edwin Smith III's empirical surgical codex biophysical descriptions.
+- **Unbiased Cryptographic Floats**: When generating random floats from cryptographic entropy, use the 53-bit IEEE-754 mantissa formula `(high * 4294967296.0 + low) / 9007199254740992.0` to eliminate modulo bias.

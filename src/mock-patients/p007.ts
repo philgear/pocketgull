@@ -2,7 +2,7 @@ import { IPatient } from '../services/patient.types';
 
 export const p007: IPatient = {
   id: "p007",
-  name: "Maternal Sentinel",
+  name: "Homo Sapiens (Female, Maternal Archetype, 28y)",
   age: 28,
   gender: "Female",
   lastVisit: "2026.03.12",

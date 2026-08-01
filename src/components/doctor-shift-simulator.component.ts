@@ -323,7 +323,7 @@ export class DoctorShiftSimulatorComponent implements OnDestroy {
       id: 2,
       timeRange: '13:00 – 14:00',
       title: 'Multimodal Voice Dictation & SBAR Note Sync',
-      subtitle: 'Gemini 2.5 Flash Voice Assistant & Specialist Handoffs',
+      subtitle: 'Gemini 3.6 Flash Voice Assistant, PubGemma 27B MeSH & Specialist Handoffs',
       patientCount: 2,
       fatigueBaseline: 82,
       fatigueShielded: 30,
@@ -391,7 +391,7 @@ export class DoctorShiftSimulatorComponent implements OnDestroy {
       { id: 'sc05', time: '09:15 AM', patientName: 'Phil Gear, Ph.G', ward: 'Outpatient Clinic', chiefComplaint: 'L5-S1 radiculopathy, fatigue, circadian disruption', triageLevel: 'L3-YELLOW', triageColor: 'bg-amber-950 text-amber-300 border border-amber-500/50', parityAudit: 'Pass (Optimal)' },
       { id: 'sc06', time: '09:50 AM', patientName: 'Amara Okafor', ward: 'Outpatient Clinic', chiefComplaint: 'Hashimoto thyroiditis flare, brain fog, cold intolerance', triageLevel: 'L3-YELLOW', triageColor: 'bg-amber-950 text-amber-300 border border-amber-500/50', parityAudit: 'Pass (Optimal)' },
       { id: 'sc07', time: '10:30 AM', patientName: 'Robert Sterling', ward: 'Outpatient Clinic', chiefComplaint: 'Metabolic syndrome, HbA1c 7.8%, NAFLD suspicion', triageLevel: 'L4-GREEN', triageColor: 'bg-emerald-950 text-emerald-300 border border-emerald-500/50', parityAudit: 'Pass (Optimal)' },
-      { id: 'sc08', time: '11:15 AM', patientName: 'Maria Santos', ward: 'Outpatient Clinic', chiefComplaint: 'Long COVID dysautonomia, RSA vagal impairment', triageLevel: 'L3-YELLOW', triageColor: 'bg-amber-950 text-amber-300 border border-amber-500/50', parityAudit: 'Pass (Optimal)' }
+      { id: 'sc08', time: '11:15 AM', patientName: 'Homo Sapiens (Female, Long COVID Dysautonomia)', ward: 'Outpatient Clinic', chiefComplaint: 'Long COVID dysautonomia, RSA vagal impairment', triageLevel: 'L3-YELLOW', triageColor: 'bg-amber-950 text-amber-300 border border-amber-500/50', parityAudit: 'Pass (Optimal)' }
     ],
     2: [
       { id: 'sc09', time: '13:15 PM', patientName: 'Dr. James Thorne', ward: 'Specialist Handoff', chiefComplaint: 'SBAR Dictation Sync: Cardiology Handoff for E. Rostova', triageLevel: 'L2-ORANGE', triageColor: 'bg-orange-950 text-orange-300 border border-orange-500/50', parityAudit: 'Pass (Optimal)' },

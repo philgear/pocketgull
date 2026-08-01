@@ -37,14 +37,12 @@ import { CarePlanPrintPreviewComponent } from './care-plan-print-preview.compone
 import { EmergencyNutritionalBypassComponent } from './emergency-nutritional-bypass.component';
 import { MoodConsciousnessMatrixComponent } from './mood-consciousness-matrix.component';
 import { UkRioPubmedSourcingComponent } from './uk-rio-pubmed-sourcing.component';
-import { PatientFruitTreeComponent } from './patient-fruit-tree.component';
 import { DietaryAllergyShieldComponent } from './dietary-allergy-shield.component';
 import { LensInsightSparkShieldComponent } from './lens-insight-spark-shield.component';
 import { ParadigmClinicalDashboardComponent } from './paradigm-clinical-dashboard.component';
 import { GeolocationalHealthRelocationComponent } from './geolocational-health-relocation.component';
 import { ClinicalActLensMapperService } from '../services/clinical-act-lens-mapper.service';
 import { TypologyBadgeComponent } from './typology-badge.component';
-import { InstantPatientActionSuiteComponent } from './instant-patient-action-suite.component';
 import { PatientHealthTrajectoryStorybookComponent } from './patient-health-trajectory-storybook.component';
 import { HandoffModalComponent } from './handoff-modal.component';
 import { SdohNavigatorComponent } from './sdoh-navigator.component';
@@ -61,7 +59,7 @@ import { BystanderActionSuiteComponent } from './bystander-action-suite.componen
 import { FhirPassportModalComponent } from './fhir-passport-modal.component';
 import { getPersonaPropBadge } from '../services/agent-personas';
 import { ThemeService, AppTheme } from '../services/theme.service';
-import { ShantyKaraokeDeckComponent } from './shanty-karaoke-deck.component';
+import { RpmDashboardComponent } from './rpm-dashboard.component';
 
 import { ChronoClockDecisionRailComponent } from './chrono-clock-decision-rail.component';
 import { ChronoWeeklyMealPlannerComponent } from './chrono-weekly-meal-planner.component';
@@ -72,6 +70,7 @@ import { ChronobiologyMatrixComponent } from './chronobiology-matrix.component';
 import { FunctionalMedicineMatrixComponent } from './functional-medicine-matrix.component';
 import { BionicReadingService } from '../services/bionic-reading.service';
 import { SkepticalEpistemologyService } from '../services/skeptical-epistemology.service';
+import { FhirIntegrationService } from '../services/fhir-integration.service';
 import { SocraticChallengeCardComponent } from './socratic-challenge-card.component';
 
 import { TeledentistrySystemicLensComponent } from './analysis-report/teledentistry-systemic-lens.component';
@@ -115,12 +114,10 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
     EmergencyNutritionalBypassComponent,
     MoodConsciousnessMatrixComponent,
     UkRioPubmedSourcingComponent,
-    PatientFruitTreeComponent,
     DietaryAllergyShieldComponent,
     LensInsightSparkShieldComponent,
     ParadigmClinicalDashboardComponent,
     GeolocationalHealthRelocationComponent,
-    InstantPatientActionSuiteComponent,
     PatientHealthTrajectoryStorybookComponent,
     TypologyBadgeComponent,
     HandoffModalComponent,
@@ -135,12 +132,12 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
     Sec1557AuditModalComponent,
     BystanderActionSuiteComponent,
     FhirPassportModalComponent,
-    ShantyKaraokeDeckComponent,
     ChronoClockDecisionRailComponent,
     ChronoWeeklyMealPlannerComponent,
     ClinicalTrajectoryBiographyComponent,
     DualPaneConsultationComponent,
-    SocraticChallengeCardComponent
+    SocraticChallengeCardComponent,
+    RpmDashboardComponent
   ],
 
 
@@ -417,6 +414,13 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
                       <span class="hidden sm:inline font-mono">({{ activePersonaPropBadge().primaryProp }})</span>
                     </span>
                   </div>
+
+                  <!-- FDA 21 CFR 520(o) Non-Device CDS Transparency Badge -->
+                  <button type="button" (click)="showCdsModal.set(true)"
+                          class="flex items-center gap-1 px-2.5 py-1 rounded-md border text-[11px] font-bold uppercase tracking-wider bg-indigo-950/40 hover:bg-indigo-900/60 text-indigo-300 border-indigo-500/40 cursor-pointer transition shadow-xs"
+                          title="View FDA 21 CFR Section 520(o) Non-Device CDS Transparency & Epistemic Uncertainty Metrics">
+                    <span>🛡️</span> FDA 520(o) CDS ({{ cdsReport().overallConfidencePercent }}%)
+                  </button>
                 </div>
 
                 <!-- Higher-Order Paradigm Typology Badge & Dynamic Paradigm-Lens Overview Card -->
@@ -765,23 +769,7 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
                     </button>
                   }
 
-                  <!-- Karaoke Tool -->
-                  @if (state.getToolState('karaoke') !== 'hidden') {
-                    <button (click)="toggleAuxTool('karaoke')" (dblclick)="state.cycleToolState('karaoke')"
-                            [class.bg-[#10B981]]="state.getToolState('karaoke') === 'prescribed'"
-                            [class.text-white]="state.getToolState('karaoke') === 'prescribed'"
-                            [class.bg-[#F6B12B]]="activeAuxTool() === 'karaoke' && state.getToolState('karaoke') !== 'prescribed'"
-                            [class.text-zinc-950]="activeAuxTool() === 'karaoke' && state.getToolState('karaoke') !== 'prescribed'"
-                            [class.bg-zinc-100]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
-                            [class.dark:bg-zinc-900]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
-                            [class.text-zinc-800]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
-                            [class.dark:text-zinc-300]="activeAuxTool() !== 'karaoke' && state.getToolState('karaoke') === 'unassigned'"
-                            class="px-3 py-1.5 rounded-xl border border-zinc-300 dark:border-zinc-800 font-extrabold text-xs uppercase tracking-wider transition cursor-pointer flex items-center gap-1.5"
-                            title="Single-click to view. Double-click to prescribe to care plan.">
-                      <span>🎙️ Shanty Karaoke</span>
-                      @if (state.getToolState('karaoke') === 'prescribed') { <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-white text-emerald-950">💊 Prescribed</span> }
-                    </button>
-                  }
+
 
                   <!-- Clinical Assessments Suite Button -->
                   <button (click)="toggleAuxTool('assessments')"
@@ -828,12 +816,7 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
                   <div class="animate-in fade-in duration-200">
                     <app-life-perils-paradigm-matrix></app-life-perils-paradigm-matrix>
                   </div>
-                } @else if (activeAuxTool() === 'karaoke') {
-                  <div class="animate-in fade-in duration-200">
-                    @defer (on idle) {
-                      <app-shanty-karaoke-deck></app-shanty-karaoke-deck>
-                    }
-                  </div>
+
                 } @else if (activeAuxTool() === 'assessments') {
                   <div class="animate-in fade-in duration-200">
                     @defer (on idle) {
@@ -941,10 +924,7 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
           }
         }
 
-        <!-- Instant Patient Action Suite (Somatic Relief, Service Animal & Health Simulator) -->
-        @if (hasAnyReport() && !state.isEmergencyMode()) {
-          <app-instant-patient-action-suite></app-instant-patient-action-suite>
-        }
+
 
 
 
@@ -1417,9 +1397,7 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
               <app-geolocational-health-relocation></app-geolocational-health-relocation>
             }
 
-            @if (activeLens() === 'Summary Overview' && hasAnyReport()) {
-              <app-patient-fruit-tree></app-patient-fruit-tree>
-            }
+
 
             @if (activeLens() === 'Nutrition' && hasAnyReport()) {
               <app-dietary-allergy-shield></app-dietary-allergy-shield>
@@ -2036,6 +2014,24 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
               </div>
             </button>
 
+            <button (click)="showCdsModal.set(true); showClinicalToolsModal.set(false)"
+              class="p-3 rounded-2xl bg-indigo-950/40 hover:bg-indigo-900/60 border border-indigo-500/40 text-indigo-200 flex items-center gap-2.5 transition text-left cursor-pointer">
+              <span class="text-xl">⚖️</span>
+              <div>
+                <strong class="block font-bold text-white uppercase text-[11px] font-mono">FDA 520(o) CDS</strong>
+                <span class="text-[10.5px] text-zinc-400">Epistemic Uncertainty & H0 Falsifiability</span>
+              </div>
+            </button>
+
+            <button (click)="showRpmModal.set(true); showClinicalToolsModal.set(false)"
+              class="p-3 rounded-2xl bg-teal-950/40 hover:bg-teal-900/60 border border-teal-500/40 text-teal-200 flex items-center gap-2.5 transition text-left cursor-pointer">
+              <span class="text-xl">📊</span>
+              <div>
+                <strong class="block font-bold text-white uppercase text-[11px] font-mono">CMS RPM Billing</strong>
+                <span class="text-[10.5px] text-zinc-400">CPT 99453/99454/99457 Audit</span>
+              </div>
+            </button>
+
             <button (click)="toggleParadigm(); showClinicalToolsModal.set(false)"
               class="p-3 rounded-2xl bg-amber-950/40 hover:bg-amber-900/60 border border-amber-500/40 text-amber-200 flex items-center gap-2.5 transition text-left cursor-pointer">
               <span class="text-xl">☯️</span>
@@ -2056,9 +2052,136 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
       </div>
     }
 
+    <!-- CMS Remote Patient Monitoring (RPM) Dashboard Modal -->
+    @if (showRpmModal()) {
+      <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in no-print">
+        <div class="max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-end mb-2">
+            <button (click)="showRpmModal.set(false)" class="px-3 py-1 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold text-xs uppercase tracking-wider cursor-pointer border border-zinc-700">
+              ✕ Close Dashboard
+            </button>
+          </div>
+          <app-rpm-dashboard></app-rpm-dashboard>
+        </div>
+      </div>
+    }
+
     <!-- FHIR R4 Patient Health Passport Modal -->
     @if (showFhirPassportModal()) {
       <app-fhir-passport-modal (closeModal)="showFhirPassportModal.set(false)"></app-fhir-passport-modal>
+    }
+
+    <!-- FDA 21 CFR Section 520(o) CDS Transparency & Epistemic Uncertainty Modal -->
+    @if (showCdsModal()) {
+      <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in no-print">
+        <div class="bg-zinc-900 border border-indigo-500/40 rounded-3xl p-6 max-w-2xl w-full shadow-2xl space-y-5 text-zinc-100 max-h-[90vh] overflow-y-auto font-sans">
+          
+          <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-xl">
+                🛡️
+              </div>
+              <div>
+                <h3 class="text-base font-extrabold uppercase tracking-wider text-white">FDA 21 CFR 520(o) Non-Device CDS</h3>
+                <span class="text-xs text-indigo-400 font-mono">Epistemic Uncertainty & Reasoning Transparency</span>
+              </div>
+            </div>
+            <button (click)="showCdsModal.set(false)" class="w-8 h-8 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-bold flex items-center justify-center cursor-pointer transition">
+              ✕
+            </button>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 text-xs space-y-1">
+            <div class="flex items-center justify-between text-indigo-300 font-bold uppercase tracking-wider text-[11px] font-mono">
+              <span>Regulatory Standard: {{ cdsReport().regulatoryMetadata.cfrReference }}</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">Exempt Non-Device CDS</span>
+            </div>
+            <p class="text-zinc-300 text-[11.5px] leading-relaxed">
+              {{ cdsReport().disclaimer }}
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2">
+              <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block font-mono">Epistemic Confidence Score</span>
+              <div class="flex items-baseline gap-2">
+                <span class="text-3xl font-extrabold text-indigo-400 font-mono">{{ cdsReport().overallConfidencePercent }}%</span>
+                <span class="text-xs text-emerald-400 font-semibold">({{ cdsReport().evidenceLevel }})</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-zinc-800 overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full" [style.width.%]="cdsReport().overallConfidencePercent"></div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2">
+              <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block font-mono">Null Hypothesis H0 Falsifiability</span>
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-mono text-zinc-300">p-value: <strong class="text-sky-400">p = {{ cdsReport().falsifiability.pValue }}</strong></span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                      [class]="cdsReport().falsifiability.isFalsified ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'">
+                  {{ cdsReport().falsifiability.isFalsified ? 'H0 Rejected (p < 0.05)' : 'H0 Retained' }}
+                </span>
+              </div>
+              <p class="text-[11px] text-zinc-400 line-clamp-2">
+                {{ cdsReport().falsifiability.nullHypothesisH0 }}
+              </p>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider font-mono">Cochrane Risk of Bias (RoB 2) Scorecard</span>
+              <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800/80 font-bold text-[10px] uppercase">
+                Overall: {{ cdsReport().cochraneBias.overallRiskOfBias }}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10.5px] font-mono">
+              <div class="p-2 rounded-xl bg-zinc-900 border border-zinc-800">
+                <span class="text-zinc-500 block">Randomization</span>
+                <span class="text-emerald-400 font-bold">{{ cdsReport().cochraneBias.randomizationBias }}</span>
+              </div>
+              <div class="p-2 rounded-xl bg-zinc-900 border border-zinc-800">
+                <span class="text-zinc-500 block">Deviations</span>
+                <span class="text-emerald-400 font-bold">{{ cdsReport().cochraneBias.deviationFromInterventionBias }}</span>
+              </div>
+              <div class="p-2 rounded-xl bg-zinc-900 border border-zinc-800">
+                <span class="text-zinc-500 block">Missing Data</span>
+                <span class="text-amber-400 font-bold">{{ cdsReport().cochraneBias.missingDataBias }}</span>
+              </div>
+              <div class="p-2 rounded-xl bg-zinc-900 border border-zinc-800">
+                <span class="text-zinc-500 block">Measurement</span>
+                <span class="text-emerald-400 font-bold">{{ cdsReport().cochraneBias.measurementBias }}</span>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-zinc-400 italic">
+              "{{ cdsReport().cochraneBias.skepticalSummary }}"
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 text-xs space-y-1">
+            <span class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider block font-mono">Primary Benchmark Citation</span>
+            <div class="text-sky-300 font-mono text-[11.5px]">
+              {{ cdsReport().primaryCitation }}
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+            <span class="text-base">👩‍⚕️</span>
+            <div>
+              <strong class="block font-bold text-amber-300 uppercase text-[11px] font-mono">Attending Clinician Mandate</strong>
+              <span class="text-[11px] text-amber-200/90 leading-normal">{{ cdsReport().regulatoryMetadata.clinicianMandate }}</span>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button (click)="showCdsModal.set(false)" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider transition cursor-pointer">
+              Acknowledge & Close
+            </button>
+          </div>
+        </div>
+      </div>
     }
 
     <!-- Floating 3D Anatomy Research Overlay -->
@@ -2104,10 +2227,51 @@ export class AnalysisReportComponent implements OnDestroy {
   protected readonly lyricsService = inject(ParadigmLyricsService);
   protected readonly themeService = inject(ThemeService);
   protected readonly compassionateAnalogy = inject(CompassionateAnalogyService);
+  protected readonly skepticalService = inject(SkepticalEpistemologyService);
+  protected readonly fhirIntegration = inject(FhirIntegrationService);
+
+  getAmazonAffiliateUrl(itemName: string): string {
+    const clean = String(itemName || '').replace(/[^\w\s-]/g, '').trim();
+    return `https://www.amazon.com/s?k=${encodeURIComponent(clean)}&tag=pgdpo-20`;
+  }
+
+  getAmazonPharmacyUrl(medName: string): string {
+    const clean = String(medName || '').replace(/[^\w\s-]/g, '').trim();
+    return `https://pharmacy.amazon.com/search?q=${encodeURIComponent(clean)}&tag=pgdpo-20`;
+  }
 
   flowToastMessage = signal<string | null>(null);
   showHandoffModal = signal<boolean>(false);
   showSec1557Modal = signal<boolean>(false);
+  showCdsModal = signal<boolean>(false);
+  showRpmModal = signal<boolean>(false);
+
+  protected readonly cdsReport = computed(() => {
+    const lens = this.activeLens();
+    const issuesCount = Object.keys(this.state.issues() || {}).length;
+    return this.skepticalService.evaluateCdsCompliance(lens, issuesCount);
+  });
+
+  exportSmartOnFhirBundle() {
+    const patientData = {
+      patientId: this.state.patientId() || `patient-${Date.now()}`,
+      name: this.state.patientName() || 'Jane Doe',
+      age: this.state.patientAge() || 42,
+      vitals: this.state.vitals() || { hr: 72, spO2: 98 }
+    };
+
+    const bundle = this.fhirIntegration.buildFhirR4CarePlanBundle(patientData, this.activeLens());
+    const jsonStr = JSON.stringify(bundle, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `smart_fhir_r4_careplan_bundle_${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    this.flowToastMessage.set('SMART on FHIR R4 Bundle Exported Successfully!');
+    setTimeout(() => this.flowToastMessage.set(null), 3000);
+  }
   showPaperTextureMenu = signal<boolean>(false);
   activeAuxTool = signal<'none' | 'qaly' | 'solfeggio' | 'vagal' | 'storm' | 'foraging' | 'investment' | 'perils' | 'karaoke' | 'assessments'>('none');
   isAuxToolsExpanded = signal<boolean>(false);

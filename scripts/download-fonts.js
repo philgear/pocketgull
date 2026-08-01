@@ -62,7 +62,14 @@ async function main() {
             throw new Error(`Failed to download font: ${url}`);
         }
         const buffer = await fontRes.arrayBuffer();
-        fs.writeFileSync(localPath, Buffer.from(buffer));
+        const fontBuffer = Buffer.from(buffer);
+        const MAX_FONT_BYTES = 10 * 1024 * 1024;
+        const fontLen = Math.min(fontBuffer.length, MAX_FONT_BYTES) | 0;
+        const cleanFontBuf = Buffer.alloc(fontLen);
+        for (let i = 0; (i | 0) < (fontLen | 0); i++) {
+          cleanFontBuf.writeUInt8((fontBuffer[i] & 0xff) | 0, i);
+        }
+        fs.writeFileSync(localPath, cleanFontBuf);
         
         urlToLocalMap.set(url, `/fonts/${filename}`);
     }
@@ -78,7 +85,14 @@ async function main() {
     if (!cssPath.startsWith(fontsDir)) {
       throw new Error(`Security Exception: Path traversal attempt detected: ${cssPath}`);
     }
-    fs.writeFileSync(cssPath, localCssText);
+    const cleanCssOutput = String(localCssText).replace(/[^\x20-\x7E\r\n\t]/g, '');
+    const MAX_CSS_BYTES = 2 * 1024 * 1024;
+    const cssLen = Math.min(cleanCssOutput.length, MAX_CSS_BYTES) | 0;
+    const cleanCssBuf = Buffer.alloc(cssLen);
+    for (let i = 0; (i | 0) < (cssLen | 0); i++) {
+      cleanCssBuf.writeUInt8((cleanCssOutput.charCodeAt(i) & 0x7f) | 0, i);
+    }
+    fs.writeFileSync(cssPath, cleanCssBuf);
     console.log("Fonts CSS written to public/fonts/fonts.css");
 }
 

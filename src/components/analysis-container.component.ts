@@ -16,7 +16,6 @@ import { FamilyTreePedigreeComponent } from './family-tree-pedigree.component';
 import { PatientStoryModalComponent } from './patient-story-modal.component';
 import { PostItNotesComponent } from './post-it-notes.component';
 import { ActuarialGleeAlbumComponent } from './actuarial-glee-album.component';
-import { VinylDjStoreComponent } from './vinyl-dj-store.component';
 import { GcpHealthcareService } from '../services/gcp-healthcare.service';
 import { AmbientLivingSpaceDashboardComponent } from './ambient-living-space-dashboard.component';
 import { GreenRoomLoungeComponent } from './green-room-lounge.component';
@@ -34,7 +33,7 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
   host: {
     'class': 'flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]'
   },
-  imports: [CommonModule, AnalysisReportComponent, DomainSuitesNavigatorComponent, ComponentDrilldownUnitComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, VinylDjStoreComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent, DoctorShiftSimulatorComponent, DoctorShiftSalesDemoComponent],
+  imports: [CommonModule, AnalysisReportComponent, DomainSuitesNavigatorComponent, ComponentDrilldownUnitComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent, DoctorShiftSimulatorComponent, DoctorShiftSalesDemoComponent],
   template: `
     <div class="flex flex-col flex-1 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)] bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -246,9 +245,7 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
               <button (click)="showGleeModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
                 <span>🎵</span> Actuarial Glee
               </button>
-              <button (click)="showVinylModal.set(true); showToolsMenu.set(false)" class="w-full text-left p-2.5 rounded-xl bg-zinc-950 hover:bg-zinc-850 text-zinc-200 border border-zinc-800 transition flex items-center gap-2 cursor-pointer">
-                <span>📻</span> Vinyl Lounge
-              </button>
+
             </div>
 
             <!-- Category 3: Restorative Lounges & Ethics -->
@@ -313,10 +310,7 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
       <app-actuarial-glee-album (closeModal)="showGleeModal.set(false)"></app-actuarial-glee-album>
     }
 
-    <!-- Retro Vinyl Music Store & DJ Turntable Station Modal -->
-    @if (showVinylModal()) {
-      <app-vinyl-dj-store (closeModal)="showVinylModal.set(false)"></app-vinyl-dj-store>
-    }
+
 
     <!-- Main Living Space Ambient Display Studio Modal -->
     @if (showLivingSpaceModal()) {
@@ -416,7 +410,6 @@ export class AnalysisContainerComponent {
   showStoryModal = signal(false);
   showPostItModal = signal(false);
   showGleeModal = signal(false);
-  showVinylModal = signal(false);
   showLivingSpaceModal = signal(false);
   showGreenRoomModal = signal(false);
   showShiftSimulatorModal = signal(false);

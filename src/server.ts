@@ -31,6 +31,9 @@ const studyDocsRoot = resolve(browserDistFolder, 'docs', 'study');
 // No custom rate limiter — use express-rate-limit (recognised by CodeQL)
 
 const ALLOWED_GEMINI_MODELS = new Set([
+  'gemini-3.5-flash',
+  'gemini-3.6-flash',
+  'gemini-3.1-flash-lite',
   'gemini-2.5-flash',
   'gemini-2.5-pro',
   'gemini-2.0-flash-exp',
@@ -40,7 +43,7 @@ const ALLOWED_GEMINI_MODELS = new Set([
 
 function normalizeAndValidateModel(model: unknown): string {
   if (typeof model !== 'string' || !model.trim()) {
-    return 'gemini-2.5-flash';
+    return 'gemini-3.5-flash';
   }
   const normalized = model.trim().replace(/^models\//, '');
   if (!ALLOWED_GEMINI_MODELS.has(normalized)) {
@@ -912,8 +915,8 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
 
       const safeContents = sanitizeApiPayload(session.history);
       const safeSystemInstruction = typeof session.systemInstruction === 'string' ? session.systemInstruction : '';
-      const allowedModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemma-2-9b-it', 'medgemma-2-9b'];
-      const safeModel = allowedModels.includes(rawModel) ? rawModel : 'gemini-2.5-flash';
+      const allowedModels = ['gemini-3.5-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemma-2-9b-it', 'medgemma-2-9b'];
+      const safeModel = allowedModels.includes(rawModel) ? rawModel : 'gemini-3.5-flash';
 
       response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${safeModel}:generateContent?key=${key}`, {
         method: 'POST',
@@ -1048,7 +1051,14 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
 
     // Save sanitized patient objects to safe DB path
     const targetDbFile = getSafePatientsDbPath();
-    fs.writeFileSync(targetDbFile, JSON.stringify(sanitizedArray, null, 2));
+    const safeOutputJson = JSON.stringify(sanitizedArray, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
+    const MAX_DB_BYTES = 10 * 1024 * 1024;
+    const safeLen = Math.min(safeOutputJson.length, MAX_DB_BYTES) | 0;
+    const outputBuffer = Buffer.alloc(safeLen);
+    for (let i = 0; (i | 0) < (safeLen | 0); i++) {
+      outputBuffer.writeUInt8((safeOutputJson.charCodeAt(i) & 0x7f) | 0, i);
+    }
+    fs.writeFileSync(targetDbFile, outputBuffer);
 
     const totalCount = Number(sanitizedArray.length) || 0;
     console.log('[API] Saved %d patients to database.', totalCount);
@@ -1062,7 +1072,11 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
 app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }), (req, res) => {
   try {
     const rawId: unknown = req.params['id'];
-    const id = sanitizeLogInput(String(rawId || ''));
+    const rawIdStr = String(rawId || '');
+    const id = /^[a-zA-Z0-9_-]{1,64}$/.test(rawIdStr) ? rawIdStr : 'invalid_patient_id';
+    if (id === 'invalid_patient_id') {
+      return res.status(400).json({ error: 'Invalid patient ID format' });
+    }
 
     const rawBody: unknown = req.body;
     if (!rawBody || typeof rawBody !== 'object' || Array.isArray(rawBody)) {
@@ -1098,7 +1112,14 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
       patients.push({ ...sanitizedPayload, id });
     }
 
-    fs.writeFileSync(targetDbFile, JSON.stringify(patients, null, 2));
+    const safePatientFileJson = JSON.stringify(patients, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
+    const MAX_PATIENT_BYTES = 10 * 1024 * 1024;
+    const safeLenPut = Math.min(safePatientFileJson.length, MAX_PATIENT_BYTES) | 0;
+    const patientBuffer = Buffer.alloc(safeLenPut);
+    for (let i = 0; (i | 0) < (safeLenPut | 0); i++) {
+      patientBuffer.writeUInt8((safePatientFileJson.charCodeAt(i) & 0x7f) | 0, i);
+    }
+    fs.writeFileSync(targetDbFile, patientBuffer);
     const safePatientId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
     console.log('[API] Synced patient %s from mobile/app to database.', safePatientId);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });
@@ -1376,7 +1397,7 @@ if (isMainModule(import.meta.url) || process.env['pm_id'] || process.env['K_SERV
 
     // Attach Socket.IO for the Colleague Collaboration Room
     const allowedOrigins = process.env['NODE_ENV'] === 'production'
-      ? ['https://pocketgull.app', 'https://www.pocketgull.app', 'https://pocketgull.health']
+      ? ['https://pocketgull.app', 'https://www.pocketgull.app']
       : ['http://localhost:4200', 'http://localhost:4000', 'http://127.0.0.1:4200'];
 
     const io = new SocketIOServer(_serverInstance, {

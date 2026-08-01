@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { MarkdownService } from './markdown.service';
 import * as DOMPurify from 'dompurify';
+import { marked } from 'marked';
 
 import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -558,21 +559,18 @@ export class ExportService {
   async downloadAsPdf(data: any, patientName: string = 'Patient'): Promise<void> {
     console.log('[ExportService] Opening styled print report for:', patientName);
 
-    // Ensure marked is loaded
-    let parser = this.markdownService?.parser();
-    if (!parser) {
-      await new Promise<void>(resolve => {
-        const interval = setInterval(() => {
-          parser = this.markdownService?.parser();
-          if (parser) { clearInterval(interval); resolve(); }
-        }, 50);
-        setTimeout(() => { clearInterval(interval); resolve(); }, 3000);
-      });
-    }
-
     const renderMd = (md: string): string => {
       if (!md) return '';
-      try { return (parser as any).parse(md) as string; } catch { return `<p>${md}</p>`; }
+      try {
+        if (typeof marked.parse === 'function') {
+          return marked.parse(md) as string;
+        } else if (typeof marked === 'function') {
+          return (marked as any)(md) as string;
+        }
+        return `<p>${md}</p>`;
+      } catch {
+        return `<p>${md}</p>`;
+      }
     };
 
     const timestamp = new Date().toLocaleString('en-US', {
@@ -2642,7 +2640,7 @@ export class ExportService {
       type: 'collection',
       timestamp: new Date().toISOString(),
       meta: {
-        tag: [{ system: 'https://pocketgull.health/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Tri-Paradigm Clinical Export' }]
+        tag: [{ system: 'https://pocketgull.app/fhir', code: 'R4-HIPAA', display: 'FHIR R4 Tri-Paradigm Clinical Export' }]
       },
       entry: [
         {
@@ -2676,7 +2674,7 @@ export class ExportService {
             status: 'active',
             intent: 'original-order',
             codeCodeableConcept: {
-              coding: [{ system: 'https://pocketgull.health/avs', code: 'AVS-528HZ-10ALPHA', display: 'Binaural Solfeggio Audio Entrainment (528 Hz / 10 Hz Alpha)' }]
+              coding: [{ system: 'https://pocketgull.app/avs', code: 'AVS-528HZ-10ALPHA', display: 'Binaural Solfeggio Audio Entrainment (528 Hz / 10 Hz Alpha)' }]
             },
             subject: { reference: `Patient/${sanitizedP.id}` },
             occurrenceDateTime: new Date().toISOString()
@@ -2692,7 +2690,7 @@ export class ExportService {
             patient: { reference: `Patient/${sanitizedP.id}` },
             dateTime: new Date().toISOString(),
             oralDiet: {
-              type: [{ coding: [{ system: 'https://pocketgull.health/nutrition', code: 'CHRONO-CIRCADIAN', display: 'Circadian Polyphenol & Bioactive Protocol' }] }],
+              type: [{ coding: [{ system: 'https://pocketgull.app/nutrition', code: 'CHRONO-CIRCADIAN', display: 'Circadian Polyphenol & Bioactive Protocol' }] }],
               nutrient: [
                 { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '702859005', display: 'Ashwagandha KSM-66 Withanolides 30mg' }] } },
                 { modifier: { coding: [{ system: 'http://snomed.info/sct', code: '412089004', display: 'Lion’s Mane Hericenones 50mg' }] } }
@@ -2708,7 +2706,7 @@ export class ExportService {
             status: 'active',
             intent: 'order',
             medicationCodeableConcept: {
-              coding: [{ system: 'https://pocketgull.health/tcm', code: 'XIAO-YAO-SAN', display: 'Xiao Yao San (Free and Easy Wanderer Botanical Formula)' }]
+              coding: [{ system: 'https://pocketgull.app/tcm', code: 'XIAO-YAO-SAN', display: 'Xiao Yao San (Free and Easy Wanderer Botanical Formula)' }]
             },
             subject: { reference: `Patient/${sanitizedP.id}` }
           }

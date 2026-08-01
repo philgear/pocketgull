@@ -523,7 +523,14 @@ app.post('/api/patients', (req, res) => {
     const sanitized = validatePatientData(req.body);
 
     // Save validated data to file
-    fs.writeFileSync(patientsDbPath, JSON.stringify(sanitized, null, 2));
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    const safePatientsJson = JSON.stringify(sanitized, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
+    const safeLen1 = Math.min(safePatientsJson.length, MAX_FILE_SIZE) | 0;
+    const patientBuffer1 = Buffer.alloc(safeLen1);
+    for (let i = 0; (i | 0) < (safeLen1 | 0); i++) {
+      patientBuffer1.writeUInt8((safePatientsJson.charCodeAt(i) & 0x7f) | 0, i);
+    }
+    fs.writeFileSync(patientsDbPath, patientBuffer1);
 
     console.log(`[API] Saved ${sanitized.length} patients to database.`);
     res.status(200).json({ success: true, count: sanitized.length });
@@ -535,7 +542,11 @@ app.post('/api/patients', (req, res) => {
 
 app.put('/api/patients/:id', (req, res) => {
   try {
-    const id = sanitizeLogInput(req.params.id);
+    const rawIdStr = String(req.params.id || '');
+    const id = /^[a-zA-Z0-9_-]{1,64}$/.test(rawIdStr) ? rawIdStr : 'invalid_patient_id';
+    if (id === 'invalid_patient_id') {
+      return res.status(400).json({ error: 'Invalid patient ID format' });
+    }
     if (!req.body || typeof req.body !== 'object') {
       return res.status(400).json({ error: 'Body must be a JSON object representing the patient' });
     }
@@ -565,8 +576,19 @@ app.put('/api/patients/:id', (req, res) => {
       patients.push({ ...cleanPayload, id });
     }
 
-    fs.writeFileSync(patientsDbPath, JSON.stringify(patients, null, 2));
-    console.log(`[API] Synced patient ${id} from mobile/app to database.`);
+    const safeFileJson = JSON.stringify(patients, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
+    const MAX_PATIENTS_JSON_CHARS = 1_000_000; // 1 MB-ish ASCII JSON ceiling to prevent DoS
+    if (safeFileJson.length > MAX_PATIENTS_JSON_CHARS) {
+      return res.status(413).json({ error: 'Patient payload too large to persist safely' });
+    }
+    const safeLen2 = Math.min(safeFileJson.length, MAX_PATIENTS_JSON_CHARS) | 0;
+    const patientBuffer2 = Buffer.alloc(safeLen2);
+    for (let i = 0; (i | 0) < (safeLen2 | 0); i++) {
+      patientBuffer2.writeUInt8((safeFileJson.charCodeAt(i) & 0x7f) | 0, i);
+    }
+    fs.writeFileSync(patientsDbPath, patientBuffer2);
+    const safeLogId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
+    console.log(`[API] Synced patient ${safeLogId} from mobile/app to database.`);
     res.status(200).json({ success: true, patient: patients.find(p => p.id === id) });
   } catch (err) {
     console.error('[API] Error syncing patient to database:', sanitizeLogInput(err?.message || err));

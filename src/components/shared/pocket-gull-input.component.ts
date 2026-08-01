@@ -26,6 +26,8 @@ import { FormsModule } from '@angular/forms';
             [id]="inputId()"
             [placeholder]="placeholder()"
             [attr.aria-label]="ariaLabel() || label() || placeholder()"
+            [attr.aria-describedby]="error() ? inputId() + '-error' : (hint() ? inputId() + '-hint' : null)"
+            [attr.aria-invalid]="!!error()"
             [disabled]="disabled()"
             [value]="value()"
             (input)="onModelChange(inputEl.value)"
@@ -39,11 +41,13 @@ import { FormsModule } from '@angular/forms';
             [type]="type()"
             [placeholder]="placeholder()"
             [attr.aria-label]="ariaLabel() || label() || placeholder()"
+            [attr.aria-describedby]="error() ? inputId() + '-error' : (hint() ? inputId() + '-hint' : null)"
+            [attr.aria-invalid]="!!error()"
             [disabled]="disabled()"
             [value]="value()"
             (input)="onModelChange(inputEl.value)"
             [class]="inputClasses()"
-            class="input-base"
+            class="input-base min-h-[44px]"
           />
         }
         
@@ -55,7 +59,8 @@ import { FormsModule } from '@angular/forms';
       </div>
       
       @if (error() || hint()) {
-        <p [class]="error() ? 'text-brand-red-500 dark:text-brand-red-400' : 'text-gray-500 dark:text-zinc-400'" class="text-xs font-medium tracking-wide ml-1">
+        <p [id]="error() ? inputId() + '-error' : inputId() + '-hint'"
+           [class]="error() ? 'text-brand-red-500 dark:text-brand-red-400' : 'text-gray-500 dark:text-zinc-400'" class="text-xs font-medium tracking-wide ml-1 font-mono">
           {{ error() || hint() }}
         </p>
       }

@@ -181,7 +181,7 @@ jobs:
         id: deploy-preview
         uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v2.3.0
         with:
-          service: 'pocket-gull-v2'
+          service: 'pocket-gull'
           region: 'us-central1'
           image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/pocket-gull:pr-${{ github.event.number }}'
           tag: 'pr-${{ github.event.number }}'
@@ -286,7 +286,7 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@2028e2d7d30a78c6910e0632e48dd561b064884d # v2.3.0
         with:
-          service: 'pocket-gull-v2'
+          service: 'pocket-gull'
           region: 'us-central1'
           image: 'gcr.io/${{ secrets.GCP_PROJECT_ID }}/pocket-gull:${{ github.sha }}'
           env_vars: |
@@ -295,4 +295,4 @@ jobs:
             GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }}
             GOOGLE_CLOUD_REGION=us-central1
           # Secure deployment flags + secrets binding
-          flags: '--vpc-egress=private-ranges-only --concurrency=100 --max-instances=2 --min-instances=0 --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest,STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET:latest,AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID:latest,AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY:latest,AWS_HEALTHLAKE_ENDPOINT=AWS_HEALTHLAKE_ENDPOINT:latest'
+          flags: '--concurrency=100 --max-instances=10 --min-instances=0 --set-secrets=GEMINI_API_KEY=GEMINI_API_KEY:latest'

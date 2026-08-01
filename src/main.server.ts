@@ -26,8 +26,8 @@ const serverConfig: ApplicationConfig = {
             provide: AI_CONFIG,
             useFactory: () => ({
                 apiKey: process.env['GEMINI_API_KEY'] || '',
-                defaultModel: { modelId: 'gemini-2.5-flash', temperature: 0.1 },
-                verificationModel: { modelId: 'gemini-2.5-flash', temperature: 0.0 }
+                defaultModel: { modelId: 'gemini-3.5-flash', temperature: 0.1 },
+                verificationModel: { modelId: 'gemini-3.5-flash', temperature: 0.0 }
             } as IAiProviderConfig)
         },
         {

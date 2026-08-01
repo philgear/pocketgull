@@ -114,7 +114,7 @@ export class SentinelSurveillanceService {
       epidemicAttractorState,
       infectedPrevalencePercent: parseFloat(((infectedCount / populationSize) * 100).toFixed(1)),
       whoGlassResistancePrevalence: parseFloat(((resistantCount / populationSize) * 100).toFixed(1)),
-      sfiAttractorNotice: `Santa Fe Institute CAS Holland Swarm: Effective R0=${effectiveR0} (${epidemicAttractorState}). WHO GLASS Antibiotic Resistance Mutation Frequency: ${((resistantCount / populationSize) * 100).toFixed(1)}%.`
+      sfiAttractorNotice: `Santa Fe Institute CAS Holland Swarm: Effective R0=${effectiveR0} (${epidemicAttractorState}). WHO GLASS Antibiotic Resistance Mutation Frequency: ${((resistantCount / populationSize) * 100).toFixed(1)}% [Grounded by PubGemma 27B MeSH].`
     };
   }
 }

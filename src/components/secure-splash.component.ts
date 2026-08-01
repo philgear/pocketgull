@@ -9,6 +9,7 @@ import { GamificationService } from '../services/gamification.service';
 import { ThemeService } from '../services/theme.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PetAuditoryService } from '../services/pet-auditory.service';
+import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
 import { environment } from '../environments/environment';
 
 
@@ -18,7 +19,7 @@ import { environment } from '../environments/environment';
   imports: [CommonModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <main class="fixed inset-0 w-screen h-screen min-w-full min-h-full z-[999] flex flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-hidden bg-gradient-to-b from-zinc-950 via-teal-950/40 to-black">
+    <main [style.background]="telemetryGradient()" class="fixed inset-0 w-screen h-screen min-w-full min-h-full z-[999] flex flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-hidden">
       
       <!-- Papercraft Layered Living Breathing Landscape Backdrop -->
       <div class="absolute inset-0 w-full h-full min-h-full overflow-hidden pointer-events-none z-0">
@@ -172,6 +173,7 @@ import { environment } from '../environments/environment';
             <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 border border-amber-400/30 text-amber-800 dark:text-amber-300 text-[9.5px] font-bold uppercase tracking-widest mb-1.5 shadow-2xs">
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
               Pocket-Gull Clinician Suite
+              <span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-400/40 text-[9px] font-mono font-bold tracking-normal">v1.4.0</span>
             </div>
             <h1 class="text-lg font-bold tracking-[0.12em] text-zinc-800 dark:text-zinc-100 uppercase pb-0.5">
               {{ isLocked() ? 'Resume Session' : 'Pocket Gull' }}
@@ -1160,8 +1162,27 @@ export class SecureSplashComponent implements OnInit {
   theme = inject(ThemeService);
   state = inject(PatientStateService);
   public readonly petAuditory = inject(PetAuditoryService);
+  public readonly envTelemetryService = inject(EnvironmentalTelemetryService);
   private platformId = inject(PLATFORM_ID);
   readonly appVersion = environment.appVersion;
+
+  readonly telemetryGradient = computed(() => {
+    const t = this.envTelemetryService.telemetry();
+    const isStorm = this.envTelemetryService.isStormShieldActive();
+
+    if (isStorm) {
+      // Coastal low-pressure storm front gradient (Deep Slate Indigo & Thunderstorm Teal)
+      return 'linear-gradient(to bottom, #090d16 0%, #0f172a 50%, #020617 100%)';
+    } else if (t.uvIndex > 6.0) {
+      // High Solar Noon / Heliophysics UV Gradient (Amber Sun Burst & Solar Gold)
+      return 'linear-gradient(to bottom, #180e02 0%, #451a03 40%, #78350f 70%, #09090b 100%)';
+    } else if (t.aqi > 100) {
+      // Atmospheric Haze / Air Quality Telemetry Gradient (Warm Terracotta Haze)
+      return 'linear-gradient(to bottom, #1c1917 0%, #44403c 50%, #1c1917 100%)';
+    }
+    // Standard Circadian Deep Space & Teal Ambient
+    return 'linear-gradient(to bottom, #09090b 0%, #042f2e 50%, #020617 100%)';
+  });
 
   getTextureUrl(themeName: string): string {
     switch (themeName) {

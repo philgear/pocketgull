@@ -98,6 +98,21 @@ export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molec
           </button>
         </div>
 
+        <!-- 🧬 Species & Demographic Archetype Selector -->
+        <div class="flex items-center gap-1">
+          <span class="text-[10px] font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-wider mr-1 hidden lg:inline">Archetype:</span>
+          <select [value]="activeArchetype()" 
+                  (change)="onArchetypeChange($event)"
+                  aria-label="3D Species and Demographic Archetype Selector"
+                  class="min-h-[36px] px-2 py-1 rounded-md bg-white dark:bg-zinc-900 text-teal-800 dark:text-cyan-300 font-bold border border-slate-300 dark:border-zinc-800 text-[10.5px] cursor-pointer outline-none">
+            <option value="homo_sapiens_female">👩 Homo Sapiens (Female)</option>
+            <option value="homo_sapiens_male">👨 Homo Sapiens (Male)</option>
+            <option value="homo_sapiens_senior">👵 Homo Sapiens (Senior)</option>
+            <option value="homo_sapiens_pediatric">👶 Homo Sapiens (Paediatric)</option>
+            <option value="pongo_pygmaeus">🦧 Pongo Pygmaeus (Orangutan)</option>
+          </select>
+        </div>
+
         <!-- Occupational Hazard & Strain Telemetry Badge -->
         <div *ngIf="occupationalStrainInfo() as info" class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/10 dark:bg-cyan-950/50 border border-amber-500/30 dark:border-cyan-700/40 text-amber-900 dark:text-cyan-200">
           <span>{{ info.icon }}</span>
@@ -297,7 +312,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly webglError = signal<string>('');
     readonly showDermatomeLayer = signal<boolean>(false);
     readonly activeCameraPreset = signal<'front' | 'back' | 'left' | 'right' | 'cranial' | 'spinal' | 'visceral' | 'peripheral' | 'systemic'>('front');
-    readonly showPresetMenu = signal<boolean>(false);
+    readonly activeArchetype = signal<'homo_sapiens_female' | 'homo_sapiens_male' | 'homo_sapiens_senior' | 'homo_sapiens_pediatric' | 'pongo_pygmaeus'>('homo_sapiens_male');
+
+    onArchetypeChange(event: Event): void {
+      const val = (event.target as HTMLSelectElement).value as any;
+      this.activeArchetype.set(val);
+      if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate([20, 30, 20]);
+      }
+    }
     readonly activeCameraPresetLabel = computed(() => {
       switch (this.activeCameraPreset()) {
         case 'cranial': return '🧠 Cranial';

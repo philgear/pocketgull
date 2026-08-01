@@ -19,6 +19,7 @@ import { Medical3DViewerComponent } from './medical-3d-viewer.component';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
+import { ClinicalIconComponent } from './shared/clinical-icon.component';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -90,7 +91,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
 @Component({
   selector: 'app-summary-node',
   standalone: true,
-  imports: [CommonModule, FormsModule, PocketGullBadgeComponent, PocketGullButtonComponent, PocketGullInputComponent, Medical3DViewerComponent, SafeHtmlPipe, NgOptimizedImage],
+  imports: [CommonModule, FormsModule, PocketGullBadgeComponent, PocketGullButtonComponent, PocketGullInputComponent, Medical3DViewerComponent, SafeHtmlPipe, NgOptimizedImage, ClinicalIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   styles: [`
@@ -545,6 +546,18 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800" ariaLabel="Search Google"
           [icon]="ClinicalIcons.Google">
         </pocket-gull-button>
+        <a [href]="getAmazonSearchUrl()" target="_blank" rel="noopener noreferrer"
+           class="px-2 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[10px] font-bold font-mono transition flex items-center gap-1 shadow-xs"
+           title="Search on Amazon Store (Affiliate Link)">
+          <app-clinical-icon name="AmazonStore" size="xs" theme="ayurvedic"></app-clinical-icon>
+          <span>Amazon</span>
+        </a>
+        <a [href]="getAmazonPharmacyUrl()" target="_blank" rel="noopener noreferrer"
+           class="px-2 py-1 rounded-md bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-500/30 text-[10px] font-bold font-mono transition flex items-center gap-1 shadow-xs"
+           title="Search Amazon Pharmacy for Prescriptions (Affiliate Link)">
+          <app-clinical-icon name="AmazonRx" size="xs" theme="western"></app-clinical-icon>
+          <span>Amazon Rx</span>
+        </a>
         <pocket-gull-button (click)="toggleChat()" variant="ghost" size="sm"
           class="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800"
           [class.active-breathing]="!hasDiscoveredEvidenceFocus()"
@@ -1377,6 +1390,16 @@ Only include a rich-media block when the user explicitly requests visual or rese
 
   // ─── Existing node interactions ───────────────
   onDoubleClick() { this.update.emit({ key: this.node().key, note: this.node().note || '', showNote: true }); }
+  getAmazonSearchUrl(query?: string): string {
+    const text = query || this.sectionTitle() || 'nutraceutical';
+    const clean = String(text).replace(/<[^>]*>/g, ' ').replace(/[^\w\s-]/g, '').trim().slice(0, 50);
+    return `https://www.amazon.com/s?k=${encodeURIComponent(clean)}&tag=pgdpo-20`;
+  }
+  getAmazonPharmacyUrl(query?: string): string {
+    const text = query || this.sectionTitle() || 'medication';
+    const clean = String(text).replace(/<[^>]*>/g, ' ').replace(/[^\w\s-]/g, '').trim().slice(0, 50);
+    return `https://pharmacy.amazon.com/search?q=${encodeURIComponent(clean)}&tag=pgdpo-20`;
+  }
   getWikimediaSearchUrl(query: string): string {
     return `https://commons.wikimedia.org/w/index.php?search=${encodeURIComponent(query + ' anatomy medical')}&title=Special:MediaSearch&go=Go&type=image`;
   }

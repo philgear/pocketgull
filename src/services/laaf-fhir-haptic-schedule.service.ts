@@ -47,7 +47,7 @@ export interface ILaafHapticSchedulePayload {
 export class LaafFhirHapticScheduleService {
   private patientState = inject(PatientStateService);
 
-  readonly LAAF_FHIR_BASE_URL = 'http://pocketgull.health/fhir/StructureDefinition';
+  readonly LAAF_FHIR_BASE_URL = 'https://pocketgull.app/fhir/StructureDefinition';
 
   /**
    * Serializes LAAF Haptic Schedule into FHIR R4 Bundle containing CarePlan and DeviceRequest resources
@@ -73,7 +73,7 @@ export class LaafFhirHapticScheduleService {
       },
       identifier: [
         {
-          system: 'http://pocketgull.health/laaf/careplan',
+          system: 'https://pocketgull.app/laaf/careplan',
           value: carePlanId
         }
       ],
@@ -103,7 +103,7 @@ export class LaafFhirHapticScheduleService {
           {
             coding: [
               {
-                system: 'http://pocketgull.health/fhir/laaf-modality',
+                system: 'https://pocketgull.app/fhir/laaf-modality',
                 code: item.modality,
                 display: item.title
               }
@@ -119,7 +119,7 @@ export class LaafFhirHapticScheduleService {
           code: {
             coding: [
               {
-                system: 'http://pocketgull.health/laaf/haptic-code',
+                system: 'https://pocketgull.app/laaf/haptic-code',
                 code: item.modality,
                 display: item.title
               }
@@ -211,7 +211,7 @@ export class LaafFhirHapticScheduleService {
       codeCodeableConcept: {
         coding: [
           {
-            system: 'http://pocketgull.health/laaf/haptic-devices',
+            system: 'https://pocketgull.app/laaf/haptic-devices',
             code: item.modality,
             display: sanitize(item.title)
           }
