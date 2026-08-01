@@ -41,13 +41,11 @@ describe('ClinicalToolWorkbenchComponent Signal & Double-Flip Behavioral Suite',
     expect(component.tools().find(t => t.id === toolId)?.isFlipped).toBe(true);
   });
 
-  it('should run self-diagnostic suite on all tools', (done) => {
+  it('should run self-diagnostic suite on all tools', async () => {
     component.runAllDiagnostics();
     expect(component.tools().every(t => t.status === 'TESTING')).toBe(true);
 
-    setTimeout(() => {
-      expect(component.tools().every(t => t.status === 'PASS')).toBe(true);
-      done();
-    }, 700);
+    await new Promise<void>((resolve) => setTimeout(resolve, 700));
+    expect(component.tools().every(t => t.status === 'PASS')).toBe(true);
   });
 });
