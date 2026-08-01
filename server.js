@@ -575,6 +575,10 @@ app.put('/api/patients/:id', (req, res) => {
     }
 
     const safeFileJson = JSON.stringify(patients, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
+    const MAX_PATIENTS_JSON_CHARS = 1_000_000; // 1 MB-ish ASCII JSON ceiling to prevent DoS
+    if (safeFileJson.length > MAX_PATIENTS_JSON_CHARS) {
+      return res.status(413).json({ error: 'Patient payload too large to persist safely' });
+    }
     const fileBytes = new Uint8Array(safeFileJson.length);
     for (let i = 0; i < safeFileJson.length; i++) {
       fileBytes[i] = safeFileJson.charCodeAt(i) & 0xff;
