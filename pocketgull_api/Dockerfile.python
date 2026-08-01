@@ -1,17 +1,17 @@
 # ==========================================
 # Stage 1: Builder
 # ==========================================
-FROM python:3.13.2-alpine@sha256:323a717dc4a010fee21e3f1aac738ee10bb485de4e7593ce242b36ee48d6b352 AS builder
+FROM python:3.13.2-bookworm AS builder
 
 WORKDIR /app
 
 # Patch OS-level vulnerabilities + install build dependencies
-RUN apk update && apk upgrade --no-cache && apk add --no-cache \
-    build-base \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    build-essential \
     gcc \
     g++ \
-    musl-dev \
-    linux-headers
+    libhdf5-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a virtual environment to cleanly isolate installed packages
 RUN python -m venv /opt/venv
@@ -25,15 +25,15 @@ RUN pip install --no-cache-dir pip==25.0.1 setuptools==75.8.0 wheel==0.45.1 && \
 # ==========================================
 # Stage 2: Runtime
 # ==========================================
-FROM python:3.13.2-alpine@sha256:323a717dc4a010fee21e3f1aac738ee10bb485de4e7593ce242b36ee48d6b352
+FROM python:3.13.2-bookworm
 
 # Create a non-root user and group for security
-RUN addgroup -S appuser && adduser -S appuser -G appuser
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 WORKDIR /app
 
 # Update base OS packages to resolve vulnerabilities
-RUN apk update && apk upgrade --no-cache
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Copy the virtual environment from the builder stage
 COPY --from=builder /opt/venv /opt/venv

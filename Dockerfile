@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:24-bookworm-slim@sha256:4a02c31e670417622f67605d8f61536b306b9788b7bc9242944b0244795b8719 AS builder
+FROM node:24-bookworm@sha256:0d52b1f81d1192e106df5c68b7ca670868f121e7d03159ec3984e1b8b8092ec0 AS builder
 
 WORKDIR /app
 
@@ -29,7 +29,7 @@ RUN npm prune --omit=dev --legacy-peer-deps
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:24-bookworm-slim@sha256:4a02c31e670417622f67605d8f61536b306b9788b7bc9242944b0244795b8719
+FROM node:24-bookworm@sha256:0d52b1f81d1192e106df5c68b7ca670868f121e7d03159ec3984e1b8b8092ec0
 
 WORKDIR /app
 
