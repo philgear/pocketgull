@@ -3,23 +3,25 @@ import { CommonModule } from '@angular/common';
 import { YogaAsanaCoachingService, IYogaAsanaPose } from '../services/yoga-asana-coaching.service';
 import { DictationService } from '../services/dictation.service';
 import { BioHapticFeedbackService } from '../services/bio-haptic-feedback.service';
+import { ClinicalIconComponent } from './shared/clinical-icon.component';
 
 @Component({
   selector: 'app-yoga-asana-3d-coach',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ClinicalIconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="p-5 bg-white dark:bg-zinc-900 border border-teal-500/40 rounded-2xl shadow-xl space-y-6 font-sans">
       <!-- Title Header -->
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 dark:border-zinc-800 pb-3.5">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-600 dark:text-teal-400 font-extrabold text-lg">
-            🧘
+          <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-600 dark:text-teal-400 font-extrabold shadow-inner">
+            <app-clinical-icon name="YinYang" size="md" theme="tcm"></app-clinical-icon>
           </div>
           <div>
-            <h3 class="text-base font-black text-gray-900 dark:text-gray-100 uppercase tracking-wide">
+            <h3 class="text-base font-black text-gray-900 dark:text-gray-100 uppercase tracking-wide flex items-center gap-2">
               3D Somatic Yoga Asana & Movement Coach
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">SIGCHI AAA ACCESSIBLE</span>
             </h3>
             <p class="text-xs text-gray-500 dark:text-zinc-400">
               Interactive 3D skeletal pose animation, voice-guided breathing timing, and vagal decompression for spinal pain.
@@ -28,35 +30,37 @@ import { BioHapticFeedbackService } from '../services/bio-haptic-feedback.servic
         </div>
 
         <div class="flex items-center gap-2">
-          <button (click)="categoryFilter.set('all')"
+          <button (click)="selectCategory('all')"
                   [class.bg-teal-600]="categoryFilter() === 'all'"
                   [class.text-white]="categoryFilter() === 'all'"
                   [class.bg-gray-100]="categoryFilter() !== 'all'"
                   [class.dark:bg-zinc-800]="categoryFilter() !== 'all'"
                   [class.text-gray-700]="categoryFilter() !== 'all'"
                   [class.dark:text-zinc-300]="categoryFilter() !== 'all'"
-                  class="px-2.5 py-1 rounded-lg text-xs font-bold uppercase transition cursor-pointer">
+                  class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg text-xs font-bold uppercase transition cursor-pointer flex items-center justify-center">
             All ({{ poses.length }})
           </button>
-          <button (click)="categoryFilter.set('yoga')"
+          <button (click)="selectCategory('yoga')"
                   [class.bg-teal-600]="categoryFilter() === 'yoga'"
                   [class.text-white]="categoryFilter() === 'yoga'"
                   [class.bg-gray-100]="categoryFilter() !== 'yoga'"
                   [class.dark:bg-zinc-800]="categoryFilter() !== 'yoga'"
                   [class.text-gray-700]="categoryFilter() !== 'yoga'"
                   [class.dark:text-zinc-300]="categoryFilter() !== 'yoga'"
-                  class="px-2.5 py-1 rounded-lg text-xs font-bold uppercase transition cursor-pointer">
-            🧘 Yoga Asanas
+                  class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg text-xs font-bold uppercase transition cursor-pointer flex items-center justify-center gap-1.5">
+            <app-clinical-icon name="TridoshaVata" size="xs" theme="ayurvedic"></app-clinical-icon>
+            Yoga Asanas
           </button>
-          <button (click)="categoryFilter.set('pt')"
+          <button (click)="selectCategory('pt')"
                   [class.bg-teal-600]="categoryFilter() === 'pt'"
                   [class.text-white]="categoryFilter() === 'pt'"
                   [class.bg-gray-100]="categoryFilter() !== 'pt'"
                   [class.dark:bg-zinc-800]="categoryFilter() !== 'pt'"
                   [class.text-gray-700]="categoryFilter() !== 'pt'"
                   [class.dark:text-zinc-300]="categoryFilter() !== 'pt'"
-                  class="px-2.5 py-1 rounded-lg text-xs font-bold uppercase transition cursor-pointer">
-            🏋️ Physical Therapy
+                  class="min-h-[44px] min-w-[44px] px-3 py-2 rounded-lg text-xs font-bold uppercase transition cursor-pointer flex items-center justify-center gap-1.5">
+            <app-clinical-icon name="Stethoscope" size="xs" theme="western"></app-clinical-icon>
+            Physical Therapy
           </button>
           <button (click)="categoryFilter.set('pilates')"
                   [class.bg-teal-600]="categoryFilter() === 'pilates'"
@@ -249,8 +253,14 @@ export class YogaAsana3dCoachComponent {
     this.selectedPose.set(pose);
   }
 
+  selectCategory(cat: 'all' | 'yoga' | 'pt' | 'pilates' | 'procedural'): void {
+    this.categoryFilter.set(cat);
+    this.bioHaptic.triggerHapticPulse('hold');
+  }
+
   selectPose(pose: IYogaAsanaPose): void {
     this.selectedPose.set(pose);
+    this.bioHaptic.triggerHapticPulse('inhale');
   }
 
   narrateInstructions(pose: IYogaAsanaPose): void {
