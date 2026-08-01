@@ -1052,11 +1052,13 @@ app.post('/api/patients', patientsRateLimiter, express.json({ limit: '50mb' }), 
     // Save sanitized patient objects to safe DB path
     const targetDbFile = getSafePatientsDbPath();
     const safeOutputJson = JSON.stringify(sanitizedArray, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    const outputBytes = new Uint8Array(safeOutputJson.length);
-    for (let i = 0; i < safeOutputJson.length; i++) {
-      outputBytes[i] = safeOutputJson.charCodeAt(i) & 0xff;
+    const MAX_DB_BYTES = 10 * 1024 * 1024;
+    const safeLen = Math.min(safeOutputJson.length, MAX_DB_BYTES) | 0;
+    const outputBuffer = Buffer.alloc(safeLen);
+    for (let i = 0; (i | 0) < (safeLen | 0); i++) {
+      outputBuffer.writeUInt8((safeOutputJson.charCodeAt(i) & 0x7f) | 0, i);
     }
-    fs.writeFileSync(targetDbFile, outputBytes);
+    fs.writeFileSync(targetDbFile, outputBuffer);
 
     const totalCount = Number(sanitizedArray.length) || 0;
     console.log('[API] Saved %d patients to database.', totalCount);
@@ -1111,11 +1113,13 @@ app.put('/api/patients/:id', patientsRateLimiter, express.json({ limit: '50mb' }
     }
 
     const safePatientFileJson = JSON.stringify(patients, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    const patientBytes = new Uint8Array(safePatientFileJson.length);
-    for (let i = 0; i < safePatientFileJson.length; i++) {
-      patientBytes[i] = safePatientFileJson.charCodeAt(i) & 0xff;
+    const MAX_PATIENT_BYTES = 10 * 1024 * 1024;
+    const safeLenPut = Math.min(safePatientFileJson.length, MAX_PATIENT_BYTES) | 0;
+    const patientBuffer = Buffer.alloc(safeLenPut);
+    for (let i = 0; (i | 0) < (safeLenPut | 0); i++) {
+      patientBuffer.writeUInt8((safePatientFileJson.charCodeAt(i) & 0x7f) | 0, i);
     }
-    fs.writeFileSync(targetDbFile, patientBytes);
+    fs.writeFileSync(targetDbFile, patientBuffer);
     const safePatientId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
     console.log('[API] Synced patient %s from mobile/app to database.', safePatientId);
     res.status(200).json({ success: true, patient: patients.find((p: any) => p.id === id) });

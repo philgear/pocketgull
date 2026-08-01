@@ -63,15 +63,13 @@ async function main() {
         }
         const buffer = await fontRes.arrayBuffer();
         const fontBuffer = Buffer.from(buffer);
-        if (fontBuffer.length > 10 * 1024 * 1024) {
-          throw new Error('Security Exception: Font file exceeds maximum allowable size of 10MB');
+        const MAX_FONT_BYTES = 10 * 1024 * 1024;
+        const fontLen = Math.min(fontBuffer.length, MAX_FONT_BYTES) | 0;
+        const cleanFontBuf = Buffer.alloc(fontLen);
+        for (let i = 0; (i | 0) < (fontLen | 0); i++) {
+          cleanFontBuf.writeUInt8((fontBuffer[i] & 0xff) | 0, i);
         }
-        // Sanitize binary data buffer containment
-        const fontBytes = new Uint8Array(fontBuffer.length);
-        for (let i = 0; i < fontBuffer.length; i++) {
-          fontBytes[i] = fontBuffer[i] & 0xff;
-        }
-        fs.writeFileSync(localPath, fontBytes);
+        fs.writeFileSync(localPath, cleanFontBuf);
         
         urlToLocalMap.set(url, `/fonts/${filename}`);
     }
@@ -88,11 +86,13 @@ async function main() {
       throw new Error(`Security Exception: Path traversal attempt detected: ${cssPath}`);
     }
     const cleanCssOutput = String(localCssText).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    const cssBytes = new Uint8Array(cleanCssOutput.length);
-    for (let i = 0; i < cleanCssOutput.length; i++) {
-      cssBytes[i] = cleanCssOutput.charCodeAt(i) & 0xff;
+    const MAX_CSS_BYTES = 2 * 1024 * 1024;
+    const cssLen = Math.min(cleanCssOutput.length, MAX_CSS_BYTES) | 0;
+    const cleanCssBuf = Buffer.alloc(cssLen);
+    for (let i = 0; (i | 0) < (cssLen | 0); i++) {
+      cleanCssBuf.writeUInt8((cleanCssOutput.charCodeAt(i) & 0x7f) | 0, i);
     }
-    fs.writeFileSync(cssPath, cssBytes);
+    fs.writeFileSync(cssPath, cleanCssBuf);
     console.log("Fonts CSS written to public/fonts/fonts.css");
 }
 

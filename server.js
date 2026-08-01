@@ -523,12 +523,14 @@ app.post('/api/patients', (req, res) => {
     const sanitized = validatePatientData(req.body);
 
     // Save validated data to file
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
     const safePatientsJson = JSON.stringify(sanitized, null, 2).replace(/[^\x20-\x7E\r\n\t]/g, '');
-    const patientBytes = new Uint8Array(safePatientsJson.length);
-    for (let i = 0; i < safePatientsJson.length; i++) {
-      patientBytes[i] = safePatientsJson.charCodeAt(i) & 0xff;
+    const safeLen1 = Math.min(safePatientsJson.length, MAX_FILE_SIZE) | 0;
+    const patientBuffer1 = Buffer.alloc(safeLen1);
+    for (let i = 0; (i | 0) < (safeLen1 | 0); i++) {
+      patientBuffer1.writeUInt8((safePatientsJson.charCodeAt(i) & 0x7f) | 0, i);
     }
-    fs.writeFileSync(patientsDbPath, patientBytes);
+    fs.writeFileSync(patientsDbPath, patientBuffer1);
 
     console.log(`[API] Saved ${sanitized.length} patients to database.`);
     res.status(200).json({ success: true, count: sanitized.length });
@@ -579,11 +581,12 @@ app.put('/api/patients/:id', (req, res) => {
     if (safeFileJson.length > MAX_PATIENTS_JSON_CHARS) {
       return res.status(413).json({ error: 'Patient payload too large to persist safely' });
     }
-    const fileBytes = new Uint8Array(safeFileJson.length);
-    for (let i = 0; i < safeFileJson.length; i++) {
-      fileBytes[i] = safeFileJson.charCodeAt(i) & 0xff;
+    const safeLen2 = Math.min(safeFileJson.length, MAX_PATIENTS_JSON_CHARS) | 0;
+    const patientBuffer2 = Buffer.alloc(safeLen2);
+    for (let i = 0; (i | 0) < (safeLen2 | 0); i++) {
+      patientBuffer2.writeUInt8((safeFileJson.charCodeAt(i) & 0x7f) | 0, i);
     }
-    fs.writeFileSync(patientsDbPath, fileBytes);
+    fs.writeFileSync(patientsDbPath, patientBuffer2);
     const safeLogId = id.replace(/[\r\n\t]/g, '_').replace(/[^\x20-\x7E]/g, '');
     console.log(`[API] Synced patient ${safeLogId} from mobile/app to database.`);
     res.status(200).json({ success: true, patient: patients.find(p => p.id === id) });
