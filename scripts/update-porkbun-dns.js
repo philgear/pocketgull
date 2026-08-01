@@ -41,8 +41,17 @@ async function updateDomain(domain) {
     // Prepare target records for this domain
     const targets = [];
     
-    // For apex, www, api, and lean subdomains, add all A and AAAA records
-    for (const sub of ['', 'www', 'api', 'lean']) {
+    // Apex domain A and AAAA records
+    for (const ip of cloudRunAIPs) {
+      targets.push({ name: '', type: 'A', content: ip });
+    }
+    for (const ip of cloudRunAAAAIPs) {
+      targets.push({ name: '', type: 'AAAA', content: ip });
+    }
+
+    // Subdomains CNAME records to Google Cloud Run endpoint
+    for (const sub of ['www', 'api', 'lean']) {
+      targets.push({ name: sub, type: 'CNAME', content: 'ghs.googlehosted.com' });
       for (const ip of cloudRunAIPs) {
         targets.push({ name: sub, type: 'A', content: ip });
       }
