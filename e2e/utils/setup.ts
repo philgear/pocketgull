@@ -206,13 +206,11 @@ export async function enterDemoMode(page: Page) {
       return;
     }
 
-    // 1. PIN entry (only submit once to allow fade-out animation to complete)
-    const pinInput = page.locator('input[placeholder="1234"]');
-    if (!hasAttemptedPin && await pinInput.isVisible().catch(() => false)) {
-      hasAttemptedPin = true;
-      await pinInput.fill('1234').catch(() => {});
-      await pinInput.press('Enter').catch(() => {});
-      await page.waitForTimeout(1000).catch(() => {});
+    // 1. Enter Suite / Enter Clinical Suite button
+    const enterSuiteBtn = page.locator('button', { hasText: /Enter (Suite|Clinical Suite)/i }).first();
+    if (await enterSuiteBtn.isVisible().catch(() => false)) {
+      await enterSuiteBtn.click().catch(() => {});
+      await page.waitForTimeout(500).catch(() => {});
       continue;
     }
 
@@ -252,4 +250,27 @@ export async function enterDemoMode(page: Page) {
 
   // Final wait for splash screen to disappear
   await page.locator('.secure-splash-main').waitFor({ state: 'detached', timeout: 15000 }).catch(() => {});
+}
+
+/** Shared patient selection helper for all E2E specs */
+export async function selectPatientByName(page: Page, name: string) {
+  const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
+  if (await dropdownBtn.isVisible({ timeout: 10000 }).catch(() => false)) {
+    await dropdownBtn.click();
+    await page.waitForTimeout(300);
+
+    const option = page.locator('app-patient-dropdown button', { hasText: name }).first();
+    if (await option.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await option.click();
+    } else {
+      const searchInput = page.locator('app-patient-dropdown input[placeholder*="Search"]');
+      if (await searchInput.isVisible().catch(() => false)) {
+        await searchInput.fill(name);
+        await searchInput.dispatchEvent('input');
+        await page.waitForTimeout(300);
+        await page.locator('app-patient-dropdown button', { hasText: name }).first().click();
+      }
+    }
+    await page.waitForTimeout(500);
+  }
 }

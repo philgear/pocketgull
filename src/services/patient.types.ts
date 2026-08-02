@@ -154,6 +154,10 @@ export interface IPatientVitals {
     b12?: string;
     // Comprehensive Metabolic Panel (CMP)
     cmpLabs?: ICmpLabs;
+    // Activity & Autonomic Telemetry
+    steps?: string;
+    sleepEfficiency?: string;
+    hrvRmssd?: string;
 }
 
 export interface IDynamicMarker {

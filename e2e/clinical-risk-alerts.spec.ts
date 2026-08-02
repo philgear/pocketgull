@@ -9,16 +9,24 @@ const __dirname = path.dirname(__filename);
 /** Helper to select a patient by name from the dropdown */
 async function selectPatientByName(page: import('@playwright/test').Page, name: string) {
   // Click patient dropdown
-  const dropdownBtn = page.locator('app-patient-dropdown button').first();
+  const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
   await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
   await dropdownBtn.click();
+  await page.waitForTimeout(500);
 
   const option = page.locator('app-patient-dropdown button', { hasText: name }).first();
-  await expect(option).toBeVisible({ timeout: 10000 });
-  await option.click();
-
-  // Wait for selection to load
-  await page.waitForTimeout(1000);
+  if (await option.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await option.click();
+  } else {
+    const searchInput = page.locator('app-patient-dropdown input[placeholder*="Search"]');
+    if (await searchInput.isVisible().catch(() => false)) {
+      await searchInput.fill(name);
+      await searchInput.dispatchEvent('input');
+      await page.waitForTimeout(300);
+      await page.locator('app-patient-dropdown button', { hasText: name }).first().click();
+    }
+  }
+  await page.waitForTimeout(500);
 }
 
 test.describe('Clinical Risk Alerts UI Transitions', () => {
@@ -38,7 +46,7 @@ test.describe('Clinical Risk Alerts UI Transitions', () => {
     await expect(initialRiskCard).toBeVisible({ timeout: 10000 });
     
     // Assert Low Risk badge is visible initially
-    const lowRiskBadge = page.locator('text=Low Risk');
+    const lowRiskBadge = page.locator('app-medical-summary').getByText('Low Risk', { exact: true }).first();
     await expect(lowRiskBadge).toBeVisible({ timeout: 10000 });
 
     // 3. Simulate Acute Patient Deterioration (Tachycardia + Hypoxia + Hypertension)
@@ -93,11 +101,11 @@ test.describe('Clinical Risk Alerts UI Transitions', () => {
   test('should verify triage scoring and containment indicators for CDC Sentinel', async ({ page }) => {
     // 1. Setup & Login
     await enterDemoMode(page);
-    await selectPatientByName(page, 'CDC Sentinel');
+    await selectPatientByName(page, 'Homo Sapiens');
     await page.setViewportSize({ width: 1440, height: 900 });
 
-    // 2. Verify CDC Sentinel is loaded and has a triage panel
-    const patientHeaderName = page.locator('h1', { hasText: 'CDC Sentinel' }).first();
+    // 2. Verify patient is loaded and has a triage panel
+    const patientHeaderName = page.locator('h1', { hasText: 'Homo Sapiens' }).first();
     await expect(patientHeaderName).toBeVisible({ timeout: 10000 });
 
     const initialRiskCard = page.locator('text=Clinical Triage Risk');

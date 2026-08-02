@@ -15,7 +15,7 @@ async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) 
   await enterDemoMode(page);
 
   // Select patient Phil Gear from the dropdown
-  const dropdownBtn = page.locator('app-patient-dropdown button').first();
+  const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
   await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
   await dropdownBtn.click();
 

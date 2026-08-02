@@ -857,11 +857,16 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
 
       console.log(`[Vertex AI] Chat message via regional endpoint: ${vertexUrl}`);
       const sanitizeApiPayload = (val: any): any => {
-        if (typeof val === 'string') return val;
+        if (typeof val === 'string') {
+          return String(val).replace(/[^ -~\s]/g, '').slice(0, 10000);
+        }
         if (Array.isArray(val)) return val.map(sanitizeApiPayload);
         if (val && typeof val === 'object') {
           const clean: Record<string, any> = {};
-          for (const k of Object.keys(val)) clean[k] = sanitizeApiPayload(val[k]);
+          for (const k of Object.keys(val)) {
+            const cleanKey = String(k).replace(/[^a-zA-Z0-9_-]/g, '');
+            clean[cleanKey] = sanitizeApiPayload(val[k]);
+          }
           return clean;
         }
         return val;
@@ -903,11 +908,16 @@ app.post('/api/ai/chat/message', express.json(), async (req, res) => {
     } else {
       console.log(`[Gemini Developer API] Chat message model: ${rawModel}`);
       const sanitizeApiPayload = (val: any): any => {
-        if (typeof val === 'string') return val;
+        if (typeof val === 'string') {
+          return String(val).replace(/[^ -~\s]/g, '').slice(0, 10000);
+        }
         if (Array.isArray(val)) return val.map(sanitizeApiPayload);
         if (val && typeof val === 'object') {
           const clean: Record<string, any> = {};
-          for (const k of Object.keys(val)) clean[k] = sanitizeApiPayload(val[k]);
+          for (const k of Object.keys(val)) {
+            const cleanKey = String(k).replace(/[^a-zA-Z0-9_-]/g, '');
+            clean[cleanKey] = sanitizeApiPayload(val[k]);
+          }
           return clean;
         }
         return val;

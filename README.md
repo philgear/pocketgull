@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/social/square-1080x1080.png" width="380" alt="Pocket Gull — Origami Seagull Medical AI Strategy Engine" style="border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+</p>
+
 # 🕊️ POCKET GULL
 
 **Aerial Perspective for the Clinical Ocean — Living Medical Intelligence Engine**

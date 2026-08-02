@@ -109,14 +109,73 @@ export class Holographic3DAnatomyComponent implements AfterViewInit, OnDestroy {
   private camera?: THREE.PerspectiveCamera;
   private controls?: OrbitControls;
   private animationId?: number;
-
+  private raycaster = new THREE.Raycaster();
+  private mouse = new THREE.Vector2();
   private skeletalGroup = new THREE.Group();
   private tcmMeridianGroup = new THREE.Group();
   private ayurvedicChakraGroup = new THREE.Group();
+  private symptomAnchorGroup = new THREE.Group();
 
   readonly isAutoSpinning = signal<boolean>(false);
   readonly isWebGLFallback = signal<boolean>(false);
   readonly activeLens = signal<SpatialLensType>('western');
+  readonly selectedAnatomicalNode = signal<{ id: string; name: string; position: string } | null>(null);
+
+  private handlePointerDown(event: PointerEvent) {
+    const el = this.rendererContainer()?.nativeElement;
+    if (!el || !this.camera || !this.scene) return;
+
+    const rect = el.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(
+      [this.skeletalGroup, this.tcmMeridianGroup, this.ayurvedicChakraGroup],
+      true
+    );
+
+    if (intersects.length > 0) {
+      const hit = intersects[0];
+      const point = hit.point;
+
+      // Add a glowing crimson 3D symptom anchor particle at intersection
+      const anchorMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+      const anchorMesh = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 12), anchorMat);
+      anchorMesh.position.copy(point);
+      this.symptomAnchorGroup.add(anchorMesh);
+
+      // Determine anatomical location name based on Y coordinate
+      let name = 'Lumbar Vertebrae L4-L5';
+      let id = 'l4_l5';
+      if (point.y > 1.6) { name = 'Cervical Spine C3-C5 & TMJ'; id = 'c3_c5_tmj'; }
+      else if (point.y > 1.2) { name = 'Thoracic Spine & Scapula'; id = 't_spine'; }
+      else if (point.y > 0.8) { name = 'Lumbar Spine L4-L5'; id = 'l4_l5'; }
+      else if (point.y > 0.4) { name = 'Pelvic Girdle & Sacroiliac Joint'; id = 'pelvis'; }
+      else { name = 'FDI Tooth #19 / Lower Extremity Node'; id = 'fdi_19'; }
+
+      const posStr = `x: ${point.x.toFixed(2)}, y: ${point.y.toFixed(2)}, z: ${point.z.toFixed(2)}`;
+      this.selectedAnatomicalNode.set({ id, name, position: posStr });
+
+      // Register issue in central PatientStateService matching IBodyPartIssue
+      const currentIssues = this.state.issues();
+      const issue = {
+        id,
+        noteId: `note_${Date.now()}`,
+        name,
+        painLevel: 6,
+        description: `Pain / Symptom Heatmap Anchor at ${name} (${posStr})`,
+        symptoms: [`3D Skeletal Raycast Heatmap Anchor (${posStr})`],
+        recommendation: 'Targeted physical therapy & postural realignment.'
+      };
+
+      const updated = {
+        ...currentIssues,
+        [id]: [issue]
+      };
+      this.state.issues.set(updated);
+    }
+  }
 
   constructor() {
     effect(() => {
@@ -167,6 +226,9 @@ export class Holographic3DAnatomyComponent implements AfterViewInit, OnDestroy {
       this.scene.add(this.skeletalGroup);
       this.scene.add(this.tcmMeridianGroup);
       this.scene.add(this.ayurvedicChakraGroup);
+      this.scene.add(this.symptomAnchorGroup);
+
+      el.addEventListener('pointerdown', (evt) => this.handlePointerDown(evt));
 
       this.updateLensVisibility();
       this.animate();

@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   testDir: path.resolve(__dirname, 'e2e'),
   testMatch: '**/*.spec.ts',
-  testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.venv/**', '**/pg2/**', '**/branddesk/**'],
+  testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.temp/**', '**/Temp/**', '**/*.tmp', '**/.venv/**', '**/pg2/**', '**/branddesk/**', '**/tests/**'],
   outputDir: path.resolve(__dirname, 'tmp/playwright-results'),
   fullyParallel: true,
   timeout: 30 * 1000,

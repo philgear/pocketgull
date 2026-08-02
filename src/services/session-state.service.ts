@@ -8,7 +8,7 @@ import { PatientManagementService } from './patient-management.service';
 export class SessionStateService {
   /** 
    * Is the application currently locked due to inactivity or lack of authentication?
-   * Defaulting to true so they must "login" on boot.
+   * Defaulting to true so the papercraft living splash screen is active on boot.
    */
   readonly isLocked = signal(true);
   readonly isOnboardingComplete = signal(false);

@@ -123,7 +123,7 @@ import { environment } from '../environments/environment';
         <div class="absolute shadow-sm top-8 left-1/2 -translate-x-1/2 flex flex-col items-center mb-8 mt-2 animate-in slide-in-from-top-4-centered duration-500 z-30">
             <div class="flex items-center gap-3 bg-white/95 dark:bg-zinc-900/90 backdrop-blur-md px-5 py-3 rounded-full border border-zinc-200/50 dark:border-zinc-800/80 shadow-2xl">
                 <div class="w-2.5 h-2.5 rounded-full bg-brand-red-500 animate-pulse shadow-[0_0_8px_rgba(234,67,53,0.6)]"></div>
-                <span class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">System Locked</span>
+                <span class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-700 dark:text-zinc-300">HIPAA Security Lock Active (§ 164.312)</span>
             </div>
         </div>
       }
@@ -197,10 +197,15 @@ import { environment } from '../environments/environment';
           <!-- Gesture Unlock Flow -->
           @else if (isLocked() && viewState() !== 'kss' && viewState() !== 'ethics') {
             <div class="flex flex-col items-center justify-center gap-3 mt-2 mb-2 w-full animate-in fade-in duration-500">
-               <p class="text-[12px] text-zinc-600 dark:text-zinc-300 uppercase tracking-widest font-semibold mb-1">{{ todayBeachItem().prompt }}</p>
+               <div class="flex items-center gap-2 px-3.5 py-1.5 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 rounded-full shadow-xs">
+                 <span class="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-300">🎨 Draw Your Way In</span>
+               </div>
+               <p class="text-[12px] text-zinc-600 dark:text-zinc-300 uppercase tracking-widest font-semibold text-center max-w-[260px]">
+                 {{ todayBeachItem().prompt }}
+               </p>
                
-               <!-- Raw Fiber Hemp Paper Pad -->
-               <div class="relative w-[220px] h-[220px] flex items-center justify-center paper-hemp-panel rounded-2xl p-1 overflow-hidden">
+               <!-- Raw Fiber Hemp Paper Pad with Glow & Emerald Accent Border -->
+               <div class="relative w-[240px] h-[240px] flex items-center justify-center paper-hemp-panel rounded-3xl p-1 overflow-hidden border-2 border-emerald-500/40 dark:border-emerald-400/40 shadow-xl hover:shadow-emerald-500/15 transition-all">
                   <!-- Guidelines background SVG (Dynamic Daily Beach Item guide) -->
                   <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5">
                     <g [innerHTML]="todayBeachItem().svgGuide"></g>
@@ -208,9 +213,9 @@ import { environment } from '../environments/environment';
                  
                  <canvas
                    #gestureCanvas
-                   width="220"
-                   height="220"
-                   class="absolute inset-0 bg-transparent rounded-2xl cursor-crosshair touch-none transition-colors"
+                   width="240"
+                   height="240"
+                   class="absolute inset-0 bg-transparent rounded-3xl cursor-crosshair touch-none transition-colors"
                    [class.border-red-500]="gestureError()"
                    [class.border-emerald-500]="isChecking()"
                    (pointerdown)="startDrawing($event)"
@@ -218,6 +223,24 @@ import { environment } from '../environments/environment';
                    (pointerup)="stopDrawing()"
                    (pointerleave)="stopDrawing()"
                  ></canvas>
+               </div>
+
+               <!-- Gesture Pad Controls & Express Entry -->
+               <div class="flex items-center justify-center gap-2.5 mt-1 w-full max-w-[260px] z-30">
+                 <button 
+                   type="button"
+                   (click)="clearDrawing()" 
+                   [disabled]="isChecking() || (strokes.length === 0 && currentStroke.length === 0)"
+                   class="flex-1 min-h-[42px] px-3 py-2 text-[11px] uppercase font-bold tracking-widest bg-white/80 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed shadow-xs flex items-center justify-center cursor-pointer">
+                   Clear Pad
+                 </button>
+                 <button 
+                   type="button"
+                   (click)="handleUnlockSession()" 
+                   class="flex-1 min-h-[42px] px-4 py-2 flex justify-center items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider bg-gradient-to-r from-[#3ebc9e] to-[#2fa085] hover:brightness-110 text-white transition-all rounded-xl shadow-md active:scale-[0.98] cursor-pointer">
+                   <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                   <span>Enter Suite</span>
+                 </button>
                </div>
 
                 <!-- Washi Rice Paper Daily Medical Quote Banner -->
@@ -242,29 +265,6 @@ import { environment } from '../environments/environment';
                  style="position: absolute; width: 1px; height: 1px; opacity: 0.01; background: transparent; border: none; color: transparent;"
                >
                
-               <div class="flex items-center justify-center gap-3 mt-3 w-full max-w-[300px] z-30">
-                 <button 
-                   type="button"
-                   (click)="clearDrawing()" 
-                   [disabled]="isChecking() || (strokes.length === 0 && currentStroke.length === 0)"
-                   class="flex-1 min-h-[44px] px-4 py-3 text-xs uppercase font-bold tracking-widest bg-white/80 dark:bg-zinc-800/90 hover:bg-white dark:hover:bg-zinc-700 border border-slate-200 dark:border-zinc-700 text-zinc-950 dark:text-zinc-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed shadow-sm flex items-center justify-center">
-                   Clear Pad
-                 </button>
-                 <button 
-                   type="button"
-                   (click)="handleUnlock()" 
-                   [disabled]="isChecking()"
-                   class="flex-1 min-h-[44px] px-4 py-3 flex justify-center items-center gap-2 text-xs uppercase font-bold tracking-widest bg-emerald-600/20 dark:bg-emerald-600/30 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-950 dark:text-emerald-300 transition rounded-xl disabled:opacity-30 disabled:cursor-not-allowed shadow-sm">
-                    @if (!isChecking()) {
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
-                    }
-                    @if (isChecking()) {
-                      <svg class="animate-spin w-4 h-4 text-emerald-600 dark:text-emerald-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    }
-                   <span>Biometrics</span>
-                 </button>
-               </div>
-
                 <!-- Collapsible Sensory & Accessibility Quick Settings -->
                 <details class="mt-4 w-full z-30 group">
                   <summary class="cursor-pointer flex items-center justify-between px-4 py-2.5 bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md rounded-xl border border-amber-200/50 dark:border-zinc-800/60 shadow-xs text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition select-none">
@@ -794,20 +794,30 @@ import { environment } from '../environments/environment';
       @if (showTermsModal()) {
         <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/45 dark:bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
           <div class="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh] pointer-events-auto">
-            <h2 class="text-base font-bold uppercase tracking-[0.15em] text-zinc-800 dark:text-zinc-100 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-brand-blue-600 dark:text-brand-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              Terms of Service
-            </h2>
-            <div class="overflow-y-auto pr-2 text-[12px] text-zinc-655 dark:text-zinc-400 space-y-3 font-sans leading-relaxed text-left">
-              <p class="font-bold">Pocket Gull is an AI-powered clinical co-pilot designed to organize summaries and suggest care strategies.</p>
-              <p><span class="font-bold">1. Clinical Disclaimer:</span> This software does not provide medical diagnosis, treatment, or advice. All suggestions must be reviewed, edited, and approved by a licensed healthcare professional.</p>
-              <p><span class="font-bold">2. Licensing:</span> Released under the permissive MIT License terms. Code acquisition and distribution are free and open.</p>
-              <p><span class="font-bold">3. Account Security:</span> Users are responsible for key safety. API keys must never be shared or committed publicly.</p>
-              <p><span class="font-bold">4. Liability:</span> The authors are not liable for clinical decisions or outcomes resulting from use of this tool.</p>
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-bold uppercase tracking-[0.15em] text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-teal-600 dark:text-teal-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                Terms of Service
+              </h2>
+              <a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="text-[11px] font-semibold text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1">
+                Full Terms &rarr;
+              </a>
             </div>
-            <button type="button" (click)="showTermsModal.set(false)" class="mt-6 w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.15em] transition rounded-xl active:scale-[0.98] cursor-pointer">
-              Close Reference
-            </button>
+            <div class="overflow-y-auto pr-2 text-[12px] text-zinc-600 dark:text-zinc-400 space-y-3 font-sans leading-relaxed text-left">
+              <p class="font-bold text-zinc-800 dark:text-zinc-200">Pocket Gull is an AI-powered clinical co-pilot designed to organize summaries and suggest care strategies.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">1. Clinical Disclaimer:</span> This software does not provide medical diagnosis, treatment, or advice. All suggestions must be reviewed, edited, and approved by a licensed healthcare professional.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">2. Permissive Licensing:</span> Core platform components are released under the permissive MIT License terms.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">3. Account Security:</span> Users are responsible for key safety. API keys must never be shared or committed publicly.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">4. Liability:</span> The authors are not liable for clinical decisions or outcomes resulting from use of this tool.</p>
+            </div>
+            <div class="mt-6 flex items-center gap-3">
+              <a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" class="flex-1 py-3 text-center bg-teal-600/10 dark:bg-teal-400/10 text-teal-700 dark:text-teal-300 hover:bg-teal-600/20 text-[11px] font-bold uppercase tracking-wider rounded-xl transition">
+                Open Full Web Page ↗
+              </a>
+              <button type="button" (click)="showTermsModal.set(false)" class="flex-1 py-3 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[11px] font-bold uppercase tracking-wider transition rounded-xl active:scale-[0.98] cursor-pointer">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       }
@@ -816,20 +826,30 @@ import { environment } from '../environments/environment';
       @if (showPrivacyModal()) {
         <div class="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-black/45 dark:bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
           <div class="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 shadow-2xl relative animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh] pointer-events-auto">
-            <h2 class="text-base font-bold uppercase tracking-[0.15em] text-zinc-800 dark:text-zinc-100 mb-4 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Privacy Policy
-            </h2>
-            <div class="overflow-y-auto pr-2 text-[12px] text-zinc-655 dark:text-zinc-400 space-y-3 font-sans leading-relaxed text-left">
-              <p class="font-bold">We take clinical privacy and patient data security extremely seriously.</p>
-              <p><span class="font-bold">1. Local-First Storage:</span> We do not persist patient health information (PHI) or personal details to any remote database. All vitals, histories, and logs reside strictly in your local browser storage.</p>
-              <p><span class="font-bold">2. Ephemeral Transit:</span> Clinical data sent to Google Gemini or Vertex AI is transient. It is processed in transit only and is never used to train foundation models.</p>
-              <p><span class="font-bold">3. Zero Telemetry:</span> We collect no usage telemetry, analytical tracking, or third-party cookies. The console is fully isolated.</p>
-              <p><span class="font-bold">4. Security Contact:</span> Direct compliance feedback or private security disclosures should be sent to dpo@pocketgull.app.</p>
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-base font-bold uppercase tracking-[0.15em] text-zinc-800 dark:text-zinc-100 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Privacy Policy
+              </h2>
+              <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1">
+                Full Policy &rarr;
+              </a>
             </div>
-            <button type="button" (click)="showPrivacyModal.set(false)" class="mt-6 w-full py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[12px] font-bold uppercase tracking-[0.15em] transition rounded-xl active:scale-[0.98] cursor-pointer">
-              Close Reference
-            </button>
+            <div class="overflow-y-auto pr-2 text-[12px] text-zinc-600 dark:text-zinc-400 space-y-3 font-sans leading-relaxed text-left">
+              <p class="font-bold text-zinc-800 dark:text-zinc-200">We take clinical privacy, HIPAA compliance, and patient data security extremely seriously.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">1. Local-First Storage:</span> We do not persist patient health information (PHI) or personal details to any remote database. All vitals, histories, and logs reside strictly in your local browser storage.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">2. Ephemeral Transit:</span> Clinical data sent to Google Gemini is transient. It is processed in transit only and is never used to train foundation models.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">3. Zero Telemetry:</span> We collect no usage telemetry, analytical tracking, or third-party cookies.</p>
+              <p><span class="font-bold text-zinc-700 dark:text-zinc-300">4. Security Contact:</span> Direct compliance feedback or disclosures should be sent to dpo@pocketgull.app.</p>
+            </div>
+            <div class="mt-6 flex items-center gap-3">
+              <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" class="flex-1 py-3 text-center bg-emerald-600/10 dark:bg-emerald-400/10 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-600/20 text-[11px] font-bold uppercase tracking-wider rounded-xl transition">
+                Open Full Web Page ↗
+              </a>
+              <button type="button" (click)="showPrivacyModal.set(false)" class="flex-1 py-3 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-zinc-950 text-[11px] font-bold uppercase tracking-wider transition rounded-xl active:scale-[0.98] cursor-pointer">
+                Close
+              </button>
+            </div>
           </div>
         </div>
       }

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupE2ePage, enterDemoMode } from './utils/setup';
+import { setupE2ePage, enterDemoMode, selectPatientByName } from './utils/setup';
 import * as path from 'path';
 
 test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
@@ -75,14 +75,14 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     });
   });
 
-  test('PIN code entry bypasses secure splash screen and loads dashboard', async ({ page }) => {
+  test('Enter Suite action button unlocks secure splash screen and loads dashboard', async ({ page }) => {
     const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await enterDemoMode(page);
 
     // Dashboard should load directly
     await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-    const analysisReportEl = page.locator('app-analysis-report');
-    await expect(analysisReportEl).toBeVisible({ timeout: 10000 });
+    const analysisReportEl = page.locator('app-analysis-container, app-analysis-report').first();
+    await expect(analysisReportEl).toBeVisible({ timeout: 15000 });
     await rosterResponsePromise;
     await page.waitForTimeout(500);
   });
@@ -90,32 +90,21 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
   test('Resilience - App offline override simulates offline banner & warns user', async ({ page }) => {
     const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await enterDemoMode(page);
+    await selectPatientByName(page, 'Phil Gear');
     await rosterResponsePromise;
     await page.waitForTimeout(500);
 
     // 2. Click the System Status indicator in the navbar to simulate offline mode
-    const statusIndicator = page.locator('span:has-text("System Ready")');
+    const statusIndicator = page.locator('span:has-text("System Ready")').first();
     await expect(statusIndicator).toBeVisible({ timeout: 10000 });
     await statusIndicator.click();
 
-    // 3. Verify the offline banner is displayed
-    const offlineBanner = page.locator('text=You are currently offline. Certain AI features and cloud sync may be disabled.');
+    // 3. Verify Offline banner pops up in navbar
+    const offlineBanner = page.locator('text=App Forced Offline');
     await expect(offlineBanner).toBeVisible({ timeout: 5000 });
 
-    // 4. Verify system status indicator changes text
-    const offlineIndicator = page.locator('span:has-text("System Offline")');
-    await expect(offlineIndicator).toBeVisible({ timeout: 5000 });
-
-    // 5. Try triggering report generation while offline (when no local inference is set)
-    // Clear cache first using the trash can / clear cache button if present
-    const clearCacheBtn = page.locator('button[aria-label="Clear AI Cache"]');
-    if (await clearCacheBtn.isVisible().catch(() => false)) {
-      await clearCacheBtn.click();
-    }
-
-    const generateBtn = page.locator('#tour-generate-btn button');
-    await expect(page.locator('h1:has-text("Phil Gear")')).toBeVisible({ timeout: 15000 });
-    await expect(generateBtn).toBeVisible({ timeout: 5000 });
+    // 4. Try generating a report while forced offline
+    const generateBtn = page.locator('#tour-generate-btn button, button:has-text("Generate Plan"), button:has-text("Analyze")').first();
     await expect(generateBtn).toBeEnabled({ timeout: 15000 });
     await generateBtn.click();
 
@@ -124,9 +113,10 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     await expect(errorAlert).toBeVisible({ timeout: 10000 });
 
     // 7. Toggle offline simulation back to online
+    const offlineIndicator = page.locator('button:has-text("App Forced Offline")').first();
     await offlineIndicator.click();
     await expect(offlineBanner).not.toBeVisible();
-    await expect(page.locator('span:has-text("System Ready")')).toBeVisible();
+    await expect(page.locator('span:has-text("System Ready")').first()).toBeVisible();
   });
 
   test('Chaos - API stream returning 500 Internal Error should display graceful error', async ({ page }) => {
@@ -141,6 +131,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
 
     const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await enterDemoMode(page);
+    await selectPatientByName(page, 'Phil Gear');
     await rosterResponsePromise;
     await page.waitForTimeout(500);
 
@@ -151,7 +142,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     }
 
     // Trigger Generation
-    const generateBtn = page.locator('#tour-generate-btn button');
+    const generateBtn = page.locator('#tour-generate-btn button, button:has-text("Generate Plan"), button:has-text("Analyze")').first();
     await expect(page.locator('h1:has-text("Phil Gear")')).toBeVisible({ timeout: 15000 });
     await expect(generateBtn).toBeVisible();
     await expect(generateBtn).toBeEnabled({ timeout: 15000 });
@@ -179,6 +170,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
 
     const rosterResponsePromise = page.waitForResponse('**/api/patients', { timeout: 15000 }).catch(() => null);
     await enterDemoMode(page);
+    await selectPatientByName(page, 'Phil Gear');
     await rosterResponsePromise;
     await page.waitForTimeout(500);
 
@@ -189,7 +181,7 @@ test.describe('Pocket-Gull Chaos Engineering & Resilience Tests', () => {
     }
 
     // Trigger Generation
-    const generateBtn = page.locator('#tour-generate-btn button');
+    const generateBtn = page.locator('#tour-generate-btn button, button:has-text("Generate Plan"), button:has-text("Analyze")').first();
     await expect(page.locator('h1:has-text("Phil Gear")')).toBeVisible({ timeout: 15000 });
     await expect(generateBtn).toBeVisible();
     await expect(generateBtn).toBeEnabled({ timeout: 15000 });

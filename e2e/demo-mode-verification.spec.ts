@@ -1,11 +1,11 @@
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 async function selectPatientByName(page: import('@playwright/test').Page, name: string) {
-  const dropdownBtn = page.locator('app-patient-dropdown button').first();
+  const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
   await dropdownBtn.click();
-  const option = page.locator('app-patient-dropdown button', { hasText: name }).first();
+  const option = page.locator('.origin-top-left button, app-patient-dropdown button', { hasText: name }).first();
   await expect(option).toBeVisible({ timeout: 10000 });
   await option.click();
   await page.waitForTimeout(1000);
