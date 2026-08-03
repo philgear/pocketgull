@@ -14,7 +14,7 @@ export default defineConfig({
   timeout: 30 * 1000,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
-  workers: process.env['CI'] ? 2 : undefined,
+  workers: process.env['PLAYWRIGHT_WORKERS'] ? parseInt(process.env['PLAYWRIGHT_WORKERS'], 10) : (process.env['CI'] ? 2 : 4),
   reporter: 'html',
   use: {
     baseURL: process.env['BASE_URL'] || 'http://127.0.0.1:4000',

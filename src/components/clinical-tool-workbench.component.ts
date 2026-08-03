@@ -112,7 +112,10 @@ export interface IWorkbenchToolStatus {
 
               <div class="pt-3 border-t border-zinc-800/60 flex items-center justify-between text-[11px] text-zinc-500">
                 <span class="font-mono">Latency: <span class="text-zinc-300">{{ tool.latencyMs }}ms</span></span>
-                <span class="text-amber-400/80 font-medium group-hover:text-amber-300">Double-click to Flip 🔄</span>
+                <button type="button" (click)="onCardDblClick(tool.id); $event.stopPropagation()"
+                        class="text-amber-400 hover:text-amber-300 font-medium cursor-pointer transition flex items-center gap-1">
+                  Double-click or click to Flip 🔄
+                </button>
               </div>
             }
 
@@ -123,7 +126,10 @@ export interface IWorkbenchToolStatus {
                   <span class="font-bold text-amber-400 flex items-center gap-1">
                     🧠 Cognitive Diagnostic Insight
                   </span>
-                  <span class="text-[10px] text-zinc-500 font-mono">Flipped View</span>
+                  <button type="button" (click)="onCardDblClick(tool.id); $event.stopPropagation()"
+                          class="text-[10px] text-zinc-400 hover:text-zinc-200 font-mono cursor-pointer">
+                    Flipped View 🔄
+                  </button>
                 </div>
 
                 <p class="text-xs text-zinc-300 leading-relaxed font-sans">
@@ -134,11 +140,14 @@ export interface IWorkbenchToolStatus {
               <div class="pt-2 border-t border-zinc-800 flex items-center justify-between text-[11px]">
                 <button
                   (click)="testSingleTool(tool.id); $event.stopPropagation()"
-                  class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-medium transition-colors"
+                  class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-medium transition-colors cursor-pointer"
                 >
                   ⚡ Trigger Test
                 </button>
-                <span class="text-zinc-500 text-[10px]">Double-click to Return ↩️</span>
+                <button type="button" (click)="onCardDblClick(tool.id); $event.stopPropagation()"
+                        class="text-zinc-400 hover:text-zinc-200 text-[10px] cursor-pointer">
+                  Double-click or click to Return ↩️
+                </button>
               </div>
             }
           </div>

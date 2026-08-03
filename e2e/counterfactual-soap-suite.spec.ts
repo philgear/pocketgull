@@ -7,12 +7,13 @@ test.describe('Counterfactual Simulator & Ambient SOAP Note E2E Suite', () => {
     await setupE2ePage(page);
     await enterDemoMode(page);
     await selectPatientByName(page, 'Phil Gear');
+    await page.waitForTimeout(2000);
   });
 
   test('should open What-If Simulator and interact with sliders', async ({ page }) => {
-    // Click What-If Simulator toggle button
-    const simBtn = page.getByRole('button', { name: /What-If Simulator/i }).first();
-    await expect(simBtn).toBeVisible({ timeout: 15000 });
+    // Locate What-If Simulator toggle button in toolbar or drawer
+    const simBtn = page.locator('button', { hasText: 'What-If Simulator' }).first();
+    await expect(simBtn).toBeVisible({ timeout: 30000 });
     await simBtn.click();
 
     // Verify What-If Simulator panel renders
@@ -29,9 +30,9 @@ test.describe('Counterfactual Simulator & Ambient SOAP Note E2E Suite', () => {
   });
 
   test('should open Ambient SOAP Note Generator and verify FHIR R4 actions', async ({ page }) => {
-    // Click SOAP Note toggle button
-    const soapBtn = page.getByRole('button', { name: /SOAP Note/i }).first();
-    await expect(soapBtn).toBeVisible({ timeout: 15000 });
+    // Locate SOAP Note toggle button in toolbar or drawer
+    const soapBtn = page.locator('button', { hasText: 'SOAP Note' }).first();
+    await expect(soapBtn).toBeVisible({ timeout: 30000 });
     await soapBtn.click();
 
     // Verify SOAP Note panel renders

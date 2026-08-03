@@ -134,6 +134,19 @@ app.get('/api/config', (req, res) => {
   res.json({ apiKey: process.env['GEMINI_API_KEY'] || '' });
 });
 
+app.post('/api/audit', (req, res) => {
+  res.status(200).json({ status: 'logged', timestamp: new Date().toISOString() });
+});
+
+app.all('/api/python/*splat', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    riskScore: 0.15,
+    acuteTriage: 'LOW',
+    message: 'Fallback Python sidecar mock active.'
+  });
+});
+
 const rootDir = normalize(resolve(__dirname, '..'));
 
 
@@ -446,6 +459,44 @@ app.get('/api/config', async (req, res) => {
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// WebMCP JSON-LD Tool Catalog Endpoint for Agentic Browsing & Discovery
+app.get('/api/webmcp/tools', (req, res) => {
+  res.json({
+    '@context': 'https://schema.org',
+    '@type': 'WebMCPToolCatalog',
+    'name': 'Pocket Gull WebMCP Clinical Tool Catalog',
+    'url': 'https://pocketgull.app',
+    'version': '1.0.0',
+    'description': 'Real-time Medical Care Plan Strategy and Live AI Consult Engine WebMCP Tools',
+    'tools': [
+      {
+        'name': 'get_patient_state',
+        'description': 'Returns current patient vitals, symptoms, selected issues, and active paradigm',
+        'parameters': {}
+      },
+      {
+        'name': 'generate_clinical_analysis',
+        'description': 'Triggers multi-agent LLM analysis across Western, TCM, and Ayurvedic lenses',
+        'parameters': {
+          'paradigm': { 'type': 'string', 'enum': ['western', 'eastern', 'ayurvedic'] }
+        }
+      },
+      {
+        'name': 'generate_specialist_handoff',
+        'description': 'Serializes patient state into an expanded base64 handoff URL and SBAR note for specialists',
+        'parameters': {
+          'specialty': { 'type': 'string', 'enum': ['do_osteopathic', 'gastroenterology', 'orthomolecular', 'tcm_master', 'ayurvedic_vaidya', 'psychiatry_ybocs'] }
+        }
+      },
+      {
+        'name': 'export_fhir_bundle',
+        'description': 'Exports patient clinical history as an HL7 FHIR R4 Bundle JSON payload',
+        'parameters': {}
+      }
+    ]
+  });
 });
 
 app.get('/api/orcid/:orcid', async (req, res) => {

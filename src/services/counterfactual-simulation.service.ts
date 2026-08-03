@@ -13,7 +13,19 @@ export interface ICounterfactualScenario {
   providedIn: 'root'
 })
 export class CounterfactualSimulationService {
-  private patientState = inject(PatientStateService);
+  private patientState?: PatientStateService | null;
+
+  constructor(patientState?: PatientStateService) {
+    if (patientState) {
+      this.patientState = patientState;
+    } else {
+      try {
+        this.patientState = inject(PatientStateService, { optional: true });
+      } catch {
+        this.patientState = null;
+      }
+    }
+  }
 
   // Delta Signals
   readonly deltaHbA1c = signal<number>(0);
@@ -24,32 +36,32 @@ export class CounterfactualSimulationService {
 
   // Baseline extraction from PatientStateService
   readonly baselineHbA1c = computed<number>(() => {
-    const vitals = this.patientState.vitals();
+    const vitals = this.patientState?.vitals();
     const cmp = vitals?.cmpLabs;
     const val = parseFloat(String(cmp?.hba1c || '6.8'));
     return isNaN(val) ? 6.8 : val;
   });
 
   readonly baselineSteps = computed<number>(() => {
-    const vitals = this.patientState.vitals();
+    const vitals = this.patientState?.vitals();
     const val = parseFloat(String(vitals?.steps || '5400'));
     return isNaN(val) ? 5400 : val;
   });
 
   readonly baselineSleep = computed<number>(() => {
-    const vitals = this.patientState.vitals();
+    const vitals = this.patientState?.vitals();
     const val = parseFloat(String(vitals?.sleepEfficiency || '72'));
     return isNaN(val) ? 72 : val;
   });
 
   readonly baselineHrv = computed<number>(() => {
-    const vitals = this.patientState.vitals();
+    const vitals = this.patientState?.vitals();
     const val = parseFloat(String(vitals?.hrvRmssd || '34'));
     return isNaN(val) ? 34 : val;
   });
 
   readonly baselineSystolic = computed<number>(() => {
-    const vitals = this.patientState.vitals();
+    const vitals = this.patientState?.vitals();
     const bp = String(vitals?.bp || '128/82');
     const sys = parseInt(bp.split('/')[0], 10);
     return isNaN(sys) ? 128 : sys;
@@ -152,7 +164,7 @@ export class CounterfactualSimulationService {
   }
 
   applySimulationToPatientState(): void {
-    if (!this.hasActiveSimulation()) return;
+    if (!this.patientState || !this.hasActiveSimulation()) return;
 
     // Apply simulated vitals to active PatientStateService
     const currentVitals = this.patientState.vitals();

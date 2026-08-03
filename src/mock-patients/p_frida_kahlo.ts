@@ -11,8 +11,7 @@ export const p_frida_kahlo: IPatient = {
     "Severe streetcar accident trauma (1925)",
     "Multiple spinal fractures & pelvic fractures",
     "Right foot amputation (1953)",
-    "Chronic neuropathic pain",
-    "PhysioNet 2026 Challenge: Neuromuscular Phantom Limb & Central Sensitization Challenge"
+    "Chronic neuropathic pain"
   ],
   patientGoals: "Manage chronic, intractable neuropathic pain, support spinal stability, and address severe right leg/foot phantom pain.",
   tcmIntake: {

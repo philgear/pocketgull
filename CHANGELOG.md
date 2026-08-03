@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-08-03
+
+**What-If Counterfactual Simulation Engine, Automated Clinical SOAP Note Scribing, Hardware Telemetry & Somatic Grounding, and Playwright E2E Quality Audit Suite**
+
+### Added & Enhanced
+- **[Clinical AI / Counterfactual Engine] What-If Counterfactual Simulation (`counterfactual-simulation.service.ts`)**:
+  - Engineered predictive trajectory modeling for multi-variable clinical intervention testing.
+  - Generates real-time patient counterfactual outcomes across vitals, lab biomarkers, and risk scores.
+- **[Clinical / SOAP Scribe] Automated Clinical SOAP Note Scribing (`soap-note-generator.service.ts`)**:
+  - Implemented automated Subjective, Objective, Assessment, and Plan (SOAP) document synthesis from live multi-modal consult streams.
+- **[Hardware & Somatic / Telemetry] Hardware Sensor Telemetry & Somatic Grounding (`hardware-telemetry.service.ts`, `zamecznik-canvas.component.ts`)**:
+  - Integrated real-time hardware telemetry streams with interactive spatial 3D heatmaps and sensory grounding visualizers on the Zamecznik Canvas.
+- **[Testing & E2E / Quality Audit] Playwright Quality Audit & Chaos Test Suite (`e2e/`)**:
+  - Added full end-to-end test coverage including Cohort Triage HIPAA PDF generation (`cohort-triage-hipaa-pdf.spec.ts`), Somatic Grounding (`somatic-grounding-antigravity.spec.ts`), Project Master Quality Audit (`project-master-quality-audit.spec.ts`), and Chaos Engineering fault tolerance specs.
+
+### Fixed & Build Infrastructure
+- **[Build & Pipeline] On-Demand Build Scripts & Gateways (`scripts/ng-build.cjs`, `scripts/build-if-missing.cjs`)**:
+  - Standardized automated build triggers and fallback validation checks across development and deployment pipelines.
+- **[Dataset & Mock Profiles] Expanded Mock Patient Cohorts (`src/mock-patients/`)**:
+  - Synced baseline historical, physiological, and clinical telemetry profiles across patient records (`p003`–`p008`, `p_frida_kahlo`, `p_charles_darwin`, `p_edwin_smith_3`).
+
+---
+
 ## [1.8.0] - 2026-07-31
 
 **Gemini 3 GA Model Upgrade, Amazon Affiliate Links Integration, CodeQL & Scorecard Security Remediation, Component Streamlining, and Debian 12 Bookworm Container Hardening**

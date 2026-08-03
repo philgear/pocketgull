@@ -1342,8 +1342,10 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
 export class AppComponent implements OnDestroy {
   readonly showGlossaryModal = signal<boolean>(false);
   private _translateTimer: any = null;
+  readonly zamecznikCanvas = viewChild(ZamecznikCanvasComponent);
 
   triggerSomaticGrounding(): void {
+    this.zamecznikCanvas()?.open();
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('somatic-grounding-activate'));
     }
@@ -2083,6 +2085,12 @@ export class AppComponent implements OnDestroy {
   private mcpControllers: { name: string, controller: AbortController }[] = [];
 
   constructor() {
+    if (typeof window !== 'undefined') {
+      (window as any).__openZamecznikCanvas = () => {
+        this.triggerSomaticGrounding();
+      };
+    }
+
     effect(() => {
       const text = this.originalPreviewText();
       const level = this.selectedReadingLevel();

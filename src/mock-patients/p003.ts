@@ -10,8 +10,7 @@ export const p003: IPatient = {
     "Ischemic Heart Disease",
     "Chronic Kidney Disease (Stage 3a)",
     "Mild Cognitive Impairment / Early Alzheimer's",
-    "Osteoarthritis",
-    "PhysioNet 2026 Challenge: Synaptic Waveform & Gait Telemetry Instability Challenge"
+    "Osteoarthritis"
   ],
   patientGoals: "Family requested evaluation for increased confusion, recent fall at home, and gait instability.",
   vitals: {

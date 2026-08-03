@@ -33,6 +33,8 @@ const APPROVED_EGRESS_DOMAINS = [
   'hl7.org',
   'loinc.org',
   'snomed.info',
+  'schema.org',
+  'modelcontextprotocol.io',
   'ec.europa.eu',
   'europa.eu',
   'unitsofmeasure.org',

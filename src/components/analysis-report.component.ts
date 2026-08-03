@@ -830,21 +830,21 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
 
             <app-clinical-gauge
               label="Complexity"
-              [value]="metrics.complexity"
+              [value]="metrics.complexity ?? 5"
               type="complexity"
               description="Measures comorbid depth and case difficulty.">
             </app-clinical-gauge>
 
             <app-clinical-gauge
               label="Stability"
-              [value]="metrics.stability"
+              [value]="metrics.stability ?? 7"
               type="stability"
               description="Patient physiological and functional compensatory status.">
             </app-clinical-gauge>
 
             <app-clinical-gauge
               label="Certainty"
-              [value]="metrics.certainty"
+              [value]="metrics.certainty ?? 8"
               type="certainty"
               description="AI confidence based on available data density.">
             </app-clinical-gauge>

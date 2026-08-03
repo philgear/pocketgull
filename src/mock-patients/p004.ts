@@ -10,8 +10,7 @@ export const p004: IPatient = {
     "Ischemic Heart Disease (IHD)",
     "Chronic Obstructive Pulmonary Disease (COPD)",
     "Type 2 Diabetes Mellitus (T2DM)",
-    "Chronic Kidney Disease (CKD) Stage 3a",
-    "PhysioNet 2026 Challenge: Multi-Lead ECG Ischemia & ST-Elevation Telemetry Challenge"
+    "Chronic Kidney Disease (CKD) Stage 3a"
   ],
   patientGoals: "Optimize oxygenation, stabilize blood glucose, manage exertional chest tightness, and protect renal function.",
   vitals: {

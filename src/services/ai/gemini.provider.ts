@@ -254,7 +254,9 @@ export class GeminiProvider implements IIntelligenceProvider {
     }
 
     async sendMessage(message: string, files?: File[], enableGrounding?: boolean): Promise<string> {
-        if (!this.chatSessionId) throw new Error('Chat not started');
+        if (!this.chatSessionId) {
+            await this.startChat('', 'Clinical consult context');
+        }
 
         const encodedFiles = await Promise.all((files || []).map(async f => {
             return new Promise((resolve) => {

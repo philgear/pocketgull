@@ -71,8 +71,8 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
               @let guideline = getGuideline(marker.name);
 
               <div (dblclick)="toggleBiomarkerFlip(marker.name); $event.stopPropagation()"
-                   class="relative perspective-1000 group cursor-pointer h-48"
-                   title="Double-click to flip over for Food-as-Medicine Sourcing Guide & Bioavailability">
+                   class="relative perspective-1000 group cursor-pointer select-none h-48"
+                   title="Double-click or click badge to flip over for Food-as-Medicine Sourcing Guide & Bioavailability">
                 
                 <div [class.rotate-y-180]="isBiomarkerFlipped"
                      class="relative w-full h-full transition-transform duration-500 transform-style-3d">
@@ -88,9 +88,10 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
                     <div>
                       <div class="flex items-center justify-between mb-1.5">
                         <span class="text-xs font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">{{ marker.name }}</span>
-                        <span class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                        <button type="button" (click)="toggleBiomarkerFlip(marker.name); $event.stopPropagation()"
+                                class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 cursor-pointer transition">
                           dblclick 🔄
-                        </span>
+                        </button>
                       </div>
                       <div class="text-[11px] font-mono font-bold uppercase mb-2"
                            [class.text-rose-400]="isCritical"
@@ -117,7 +118,10 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
                         <span class="text-emerald-300 font-bold uppercase flex items-center gap-1">
                           <span>🥗</span> Food-as-Medicine Sourcing
                         </span>
-                        <span class="text-emerald-400 text-[9px]">dblclick flip</span>
+                        <button type="button" (click)="toggleBiomarkerFlip(marker.name); $event.stopPropagation()"
+                                class="text-emerald-400 hover:text-emerald-200 text-[9px] cursor-pointer">
+                          dblclick 🔄 flip
+                        </button>
                       </div>
                       <p class="text-[10px] text-emerald-100 leading-snug">
                         <strong>Dietary Sources:</strong> Pumpkin seeds, wild Alaskan salmon, organic dark leafy greens, grass-fed venison.

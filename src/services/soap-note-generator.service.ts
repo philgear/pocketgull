@@ -1,6 +1,14 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import DOMPurify from 'dompurify';
+import * as DOMPurify from 'dompurify';
 import { PatientStateService } from './patient-state.service';
+
+function sanitizeText(val: string): string {
+  const domp = (DOMPurify as any)?.default || DOMPurify;
+  if (typeof domp?.sanitize === 'function') {
+    return domp.sanitize(val);
+  }
+  return val;
+}
 
 export interface ISoapNote {
   subjective: string;
@@ -15,7 +23,19 @@ export interface ISoapNote {
   providedIn: 'root'
 })
 export class SoapNoteGeneratorService {
-  private patientState = inject(PatientStateService);
+  private patientState?: PatientStateService | null;
+
+  constructor(patientState?: PatientStateService) {
+    if (patientState) {
+      this.patientState = patientState;
+    } else {
+      try {
+        this.patientState = inject(PatientStateService, { optional: true });
+      } catch {
+        this.patientState = null;
+      }
+    }
+  }
 
   readonly isScribing = signal<boolean>(false);
   readonly subjective = signal<string>('Patient presents with intermittent fatigue, mild lumbar tension (L4-L5), and postprandial glucose spikes following high-glycemic meals.');
@@ -34,19 +54,19 @@ export class SoapNoteGeneratorService {
 
   /** Sanitized SOAP note outputs via DOMPurify for HIPAA compliance */
   readonly sanitizedSubjective = computed<string>(() => {
-    return DOMPurify.sanitize(this.subjective());
+    return sanitizeText(this.subjective());
   });
 
   readonly sanitizedObjective = computed<string>(() => {
-    return DOMPurify.sanitize(this.objective());
+    return sanitizeText(this.objective());
   });
 
   readonly sanitizedAssessment = computed<string>(() => {
-    return DOMPurify.sanitize(this.assessment());
+    return sanitizeText(this.assessment());
   });
 
   readonly sanitizedPlan = computed<string>(() => {
-    return DOMPurify.sanitize(this.plan());
+    return sanitizeText(this.plan());
   });
 
   /** Generate FHIR R4 DocumentReference bundle JSON string */
@@ -81,7 +101,7 @@ export class SoapNoteGeneratorService {
                 attachment: {
                   contentType: 'text/markdown',
                   data: btoa(
-                    DOMPurify.sanitize(
+                    sanitizeText(
                       `# SUBJECTIVE\n${this.subjective()}\n\n# OBJECTIVE\n${this.objective()}\n\n# ASSESSMENT\n${this.assessment()}\n\n# PLAN\n${this.plan()}`
                     )
                   )
@@ -98,13 +118,13 @@ export class SoapNoteGeneratorService {
   /** Append live audio transcript text into active SOAP note Subjective section */
   appendTranscriptSnippet(text: string): void {
     if (!text.trim()) return;
-    const sanitized = DOMPurify.sanitize(text.trim());
+    const sanitized = sanitizeText(text.trim());
     this.subjective.update(curr => `${curr} ${sanitized}`.trim());
   }
 
   /** Update Objective section with current real-time patient vitals */
   refreshObjectiveFromVitals(): void {
-    const v = this.patientState.vitals();
+    const v = this.patientState?.vitals();
     const bp = v?.bp || '128/82';
     const hr = v?.hr || '72';
     const spO2 = v?.spO2 || '98';

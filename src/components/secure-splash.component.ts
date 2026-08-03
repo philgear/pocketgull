@@ -164,7 +164,7 @@ import { environment } from '../environments/environment';
 
       <div class="w-full max-w-sm relative z-10 flex flex-col items-center">
         <!-- Dynamic Entry Panel (Pocket-Like Layered Papercraft Container) -->
-        <div id="seagull-safe-zone" class="w-full relative paper-pocket-container rounded-3xl p-3 xs:p-5 sm:p-6 animate-in slide-in-from-bottom-8 duration-700 ease-out backdrop-blur-2xl transition-all overflow-y-auto max-h-[85vh] hide-scrollbar">
+        <div id="seagull-safe-zone" class="w-full relative paper-pocket-container rounded-3xl p-3 xs:p-5 sm:p-6 animate-in fade-in duration-300 backdrop-blur-2xl transition-all overflow-y-auto min-h-[420px] max-h-[85vh] hide-scrollbar" style="contain: layout;">
           
           <!-- Tactile Paper Pocket Top Fold Notch -->
           <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#2AA4A0]/40 via-[#F6B12B]/40 to-[#EF6658]/40 border-b border-amber-300/40 dark:border-zinc-700/50"></div>
@@ -1235,6 +1235,11 @@ export class SecureSplashComponent implements OnInit {
   loadDemo = output<void>();
   selectAiStudio = output<void>();
   emergencyBypass = output<void>();
+
+  handleUnlockSession() {
+    this.session.isLocked.set(false);
+    this.emergencyBypass.emit();
+  }
 
   // State
   viewState = signal<'auth' | 'beta' | 'ethics' | 'kss' | 'signup'>('auth');

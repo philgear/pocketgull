@@ -11,9 +11,11 @@
 - **Note**: Do not modify these overrides without full regression testing of both the Angular build and the Astro `docs-study` workspace build.
 
 ## Python / FastAPI Standards
-- **Validation**: All request and response models in the `pocketgull_api` sidecar MUST be strictly typed using Pydantic models. Avoid returning untyped dictionaries.
-- **Async Execution**: Ensure all route handlers and I/O-bound functions (like calling external APIs or ML models) use `async`/`await` to prevent blocking the event loop.
-- **Formatting**: Adhere to PEP-8 standards. Use `black` and `ruff` for formatting and linting.
+- **Formatting & Linting**: Adhere to PEP-8 standards. Use **`ruff`** for linting/import sorting and **`black`** (88-character max line length) for code formatting.
+- **Pydantic Validation**: All request and response models in `pocketgull_api` sidecars MUST be strictly typed using Pydantic v2 `BaseModel` classes. Avoid returning raw dictionaries or untyped `Any`. Use `pydantic.Field` for numeric constraints, defaults, and API field descriptions.
+- **Async & Event Loop Hygiene**: Use `async def` for non-blocking I/O route handlers (`httpx`, async DB calls) and standard synchronous `def` for CPU-bound matrix/ML computations (`scikit-learn`, `numpy`) so FastAPI automatically dispatches them to the thread pool without blocking the main event loop.
+- **Structured Logging & Error Handling**: Mask internal exceptions by throwing `fastapi.HTTPException` with explicit HTTP status codes and structured detail payloads (`detail={"code": ..., "message": ...}`). Avoid `print()`; use standard `logging` or `structlog` to ensure GCP stdout ingestion parses log levels (`INFO`, `WARNING`, `ERROR`) cleanly.
+- **Docstring Conventions**: Use Google Style docstrings for all complex scoring methods, ML pipelines, and public service functions.
 
 ## Flutter / Dart Architecture
 - **State Management**: Use **Riverpod** for state management across the `pocketgull_flutter` companion app. Avoid `setState` for complex business logic.

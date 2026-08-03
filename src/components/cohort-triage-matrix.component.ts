@@ -142,7 +142,7 @@ export class CohortTriageMatrixComponent {
       const hba1cVal = parseFloat(String((v as any)?.cmpLabs?.hba1c || (v as any)?.hba1c || '6.5'));
       const hba1c = isNaN(hba1cVal) ? 6.5 : hba1cVal;
 
-      const bpStr = String(v.bp || '128/82');
+      const bpStr = String((v as any).bp || '128/82');
       const sys = parseInt(bpStr.split('/')[0], 10) || 128;
 
       let sibi = 3.0;

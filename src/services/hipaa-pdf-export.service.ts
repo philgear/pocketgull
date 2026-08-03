@@ -1,7 +1,15 @@
 import { Injectable, signal, inject } from '@angular/core';
-import DOMPurify from 'dompurify';
+import * as DOMPurify from 'dompurify';
 import { jsPDF } from 'jspdf';
 import { PatientStateService } from './patient-state.service';
+
+function sanitizeText(val: string): string {
+  const domp = (DOMPurify as any)?.default || DOMPurify;
+  if (typeof domp?.sanitize === 'function') {
+    return domp.sanitize(val);
+  }
+  return val;
+}
 
 export interface IHipaaAuditLog {
   timestamp: string;
@@ -24,8 +32,8 @@ export class HipaaPdfExportService {
     const entry: IHipaaAuditLog = {
       timestamp: new Date().toISOString(),
       patientId: 'p_active_patient',
-      patientName: DOMPurify.sanitize(patientName),
-      action: DOMPurify.sanitize(action),
+      patientName: sanitizeText(patientName),
+      action: sanitizeText(action),
       sanitized: true,
       hipaaStandard: '§ 164.312(b) Audit Controls'
     };
@@ -38,12 +46,12 @@ export class HipaaPdfExportService {
     const issues = this.patientState.issues();
 
     // DOMPurify Sanitization
-    const sanitizedName = DOMPurify.sanitize(patientName || 'Phil Gear');
-    const sanitizedBp = DOMPurify.sanitize(vitals?.bp || '128/82');
-    const sanitizedHr = DOMPurify.sanitize(vitals?.hr || '72');
-    const sanitizedSpO2 = DOMPurify.sanitize(vitals?.spO2 || '98');
-    const sanitizedCgm = DOMPurify.sanitize(vitals?.cgmGlucoseMgDl || '110');
-    const sanitizedHbA1c = DOMPurify.sanitize(vitals?.cmpLabs?.hba1c || '6.8');
+    const sanitizedName = sanitizeText(patientName || 'Phil Gear');
+    const sanitizedBp = sanitizeText(vitals?.bp || '128/82');
+    const sanitizedHr = sanitizeText(vitals?.hr || '72');
+    const sanitizedSpO2 = sanitizeText(vitals?.spO2 || '98');
+    const sanitizedCgm = sanitizeText(vitals?.cgmGlucoseMgDl || '110');
+    const sanitizedHbA1c = sanitizeText(vitals?.cmpLabs?.hba1c || '6.8');
 
     // Header Styling
     doc.setFillColor(15, 23, 42); // slate-900
@@ -89,7 +97,7 @@ export class HipaaPdfExportService {
       issueKeys.forEach(k => {
         const item = issues[k][0];
         if (item && y < 270) {
-          doc.text(`• [${k.toUpperCase()}] ${DOMPurify.sanitize(item.name || k)}: ${DOMPurify.sanitize(item.description || '')}`, 14, y);
+          doc.text(`• [${k.toUpperCase()}] ${sanitizeText(item.name || k)}: ${sanitizeText(item.description || '')}`, 14, y);
           y += 7;
         }
       });

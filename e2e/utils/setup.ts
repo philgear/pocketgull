@@ -55,8 +55,8 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
     }
   });
 
-  // Intercept Firebase Data Connect emulator requests to prevent ERR_CONNECTION_REFUSED
-  await page.route('**9399/v1/**', async route => {
+  // Intercept Firebase Data Connect emulator & cloud requests to prevent 404 / connection errors
+  await page.route(/(9399\/v1|firebasedataconnect\.googleapis\.com)/, async route => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -136,22 +136,22 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
     });
   });
 
-  // Intercept AI Chat Start endpoint
-  await page.route('**/api/ai/chat/start', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ sessionId: 'mock-session-id' })
-    });
-  });
-
-  // Intercept AI Chat Message endpoint
-  await page.route('**/api/ai/chat/message', async route => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ text: 'This is a mock clinical intelligence response.' })
-    });
+  // Intercept all AI Chat endpoints (/start, /message)
+  await page.route('**/*api/ai/chat*', async route => {
+    const url = route.request().url();
+    if (url.includes('/start')) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ sessionId: 'mock-session-id' })
+      });
+    } else {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ text: 'This is a mock clinical intelligence response.' })
+      });
+    }
   });
 
   // Set local storage flags and disable service workers
@@ -166,6 +166,7 @@ export async function setupE2ePage(page: Page, options: { mockClinician?: boolea
 
     window.localStorage.setItem('pg_tour_seen', '1');
     window.localStorage.setItem('pg_data_consent_v1', 'true');
+    window.sessionStorage.setItem('pg_session_onboarded', '1');
     if (mockClinician) {
       window.localStorage.setItem('pg_mock_clinician', '1');
     }
@@ -257,18 +258,23 @@ export async function selectPatientByName(page: Page, name: string) {
   const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
   if (await dropdownBtn.isVisible({ timeout: 10000 }).catch(() => false)) {
     await dropdownBtn.click();
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
 
-    const option = page.locator('app-patient-dropdown button', { hasText: name }).first();
-    if (await option.isVisible({ timeout: 3000 }).catch(() => false)) {
+    const option = page.locator('app-patient-dropdown .origin-top-left button', { hasText: name }).first();
+    if (await option.isVisible({ timeout: 5000 }).catch(() => false)) {
       await option.click();
-    } else {
-      const searchInput = page.locator('app-patient-dropdown input[placeholder*="Search"]');
-      if (await searchInput.isVisible().catch(() => false)) {
-        await searchInput.fill(name);
-        await searchInput.dispatchEvent('input');
-        await page.waitForTimeout(300);
-        await page.locator('app-patient-dropdown button', { hasText: name }).first().click();
+      await page.waitForTimeout(500);
+      return;
+    }
+
+    const searchInput = page.locator('app-patient-dropdown input[placeholder*="Search"]');
+    if (await searchInput.isVisible().catch(() => false)) {
+      await searchInput.fill(name);
+      await searchInput.dispatchEvent('input');
+      await page.waitForTimeout(500);
+      const searchOption = page.locator('app-patient-dropdown .origin-top-left button', { hasText: name }).first();
+      if (await searchOption.isVisible().catch(() => false)) {
+        await searchOption.click();
       }
     }
     await page.waitForTimeout(500);

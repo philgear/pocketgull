@@ -20,8 +20,7 @@ export const p008: IPatient = {
   preexistingConditions: [
     "Prostate Cancer (Sustained Remission)",
     "Coronary Artery Disease (Pauling Protocol Managed)",
-    "Macular Degeneration",
-    "PhysioNet 2026 Challenge: Orthomolecular High-Dose Ascorbate & Lp(a) Binding Challenge"
+    "Macular Degeneration"
   ],
   patientGoals: "Evaluate high-dose ascorbic acid therapy, Lp(a) binding neutralization, and cellular longevity.",
   vitals: {

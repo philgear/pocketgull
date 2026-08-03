@@ -28,6 +28,7 @@ export class SessionStateService {
         const sessionOnboarded = sessionStorage.getItem('pg_session_onboarded') === '1';
         if (sessionOnboarded) {
           this.isOnboardingComplete.set(true);
+          this.isLocked.set(false);
         }
       } catch (e) { /* ignore */ }
     }

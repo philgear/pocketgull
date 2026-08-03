@@ -9,8 +9,7 @@ export const p007: IPatient = {
   preexistingConditions: [
     "Gestational Hypertension",
     "Primigravida (32 Weeks Gestation)",
-    "Iron-Deficiency Anemia of Pregnancy",
-    "PhysioNet 2026 Challenge: Maternal-Fetal Hemodynamic & Uterine Artery Doppler Challenge"
+    "Iron-Deficiency Anemia of Pregnancy"
   ],
   patientGoals: "Optimize blood pressure, correct anemia, track fetal movements, and establish a postpartum hemorrhage prevention plan.",
   vitals: {

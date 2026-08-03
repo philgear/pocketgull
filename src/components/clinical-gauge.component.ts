@@ -95,43 +95,61 @@ export type GaugeDisplayMode = 'full' | 'spark';
 })
 export class ClinicalGaugeComponent {
   readonly label = input<string>('');
-  readonly value = input<number>(0);
+  readonly value = input<any>(0);
   readonly description = input<string>('');
   readonly type = input<GaugeType>('certainty');
   readonly mode = input<GaugeDisplayMode>('full');
   readonly survivalProbability = input<number | undefined>(undefined);
   readonly survivalCurvePoints = input<Array<{ age: number; personalizedSurvival: number }> | undefined>(undefined);
 
-  readonly fillPercentage = computed(() => {
-    if (this.survivalProbability() !== undefined) {
-      return Math.min(100, Math.max(0, this.survivalProbability()! * 100));
+  readonly numericValue = computed(() => {
+    const raw = this.value();
+    if (raw === null || raw === undefined || raw === 'undefined' || raw === 'NaN') {
+      const t = this.type();
+      if (t === 'stability') return 7;
+      if (t === 'certainty') return 8;
+      return 5;
     }
-    return Math.min(100, Math.max(0, this.value() * 10));
+    const num = Number(raw);
+    if (Number.isNaN(num)) {
+      const t = this.type();
+      if (t === 'stability') return 7;
+      if (t === 'certainty') return 8;
+      return 5;
+    }
+    return Math.min(10, Math.max(0, num));
+  });
+
+  readonly fillPercentage = computed(() => {
+    if (this.survivalProbability() !== undefined && this.survivalProbability() !== null && !Number.isNaN(Number(this.survivalProbability()))) {
+      return Math.min(100, Math.max(0, Number(this.survivalProbability()) * 100));
+    }
+    return Math.min(100, Math.max(0, this.numericValue() * 10));
   });
 
   readonly displayValue = computed(() => {
-    if (this.survivalProbability() !== undefined) {
-      return `${(this.survivalProbability()! * 100).toFixed(1)}%`;
+    if (this.survivalProbability() !== undefined && this.survivalProbability() !== null && !Number.isNaN(Number(this.survivalProbability()))) {
+      return `${(Number(this.survivalProbability()) * 100).toFixed(1)}%`;
     }
-    return `${this.value()}`;
+    return `${this.numericValue()}`;
   });
 
   readonly accessibilityLabel = computed(() => {
     const desc = this.description() ? `. ${this.description()}` : '';
     const valStr = (this.type() === 'survival' || this.type() === 'longevity')
       ? this.displayValue()
-      : `${this.value()} out of 10`;
+      : `${this.numericValue()} out of 10`;
     const labelPrefix = this.label() ? `${this.label()}: ` : '';
     return `${labelPrefix}${valStr}, Status: ${this.statusText()}${desc}`;
   });
 
   readonly statusText = computed(() => {
-    const val = this.value();
+    const val = this.numericValue();
     const t = this.type();
     const prob = this.survivalProbability();
 
     if (t === 'survival' || t === 'longevity') {
-      const p = prob !== undefined ? prob * 100 : val * 10;
+      const p = (prob !== undefined && prob !== null && !Number.isNaN(Number(prob))) ? Number(prob) * 100 : val * 10;
       if (p >= 90) return 'High Survival Reserve';
       if (p >= 75) return 'Compensated Longevity';
       return 'Elevated Actuarial Risk';
@@ -156,12 +174,12 @@ export class ClinicalGaugeComponent {
   });
 
   readonly statusBadgeClasses = computed(() => {
-    const val = this.value();
+    const val = this.numericValue();
     const t = this.type();
     const prob = this.survivalProbability();
 
     if (t === 'survival' || t === 'longevity') {
-      const p = prob !== undefined ? prob * 100 : val * 10;
+      const p = (prob !== undefined && prob !== null && !Number.isNaN(Number(prob))) ? Number(prob) * 100 : val * 10;
       if (p >= 90) return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
       if (p >= 75) return 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20';
       return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
@@ -186,12 +204,12 @@ export class ClinicalGaugeComponent {
   });
 
   readonly barColor = computed(() => {
-    const val = this.value();
+    const val = this.numericValue();
     const t = this.type();
     const prob = this.survivalProbability();
 
     if (t === 'survival' || t === 'longevity') {
-      const p = prob !== undefined ? prob * 100 : val * 10;
+      const p = (prob !== undefined && prob !== null && !Number.isNaN(Number(prob))) ? Number(prob) * 100 : val * 10;
       if (p >= 90) return 'linear-gradient(90deg, #10b981, #059669)';
       if (p >= 75) return 'linear-gradient(90deg, #06b6d4, #0891b2)';
       return 'linear-gradient(90deg, #f59e0b, #d97706)';
@@ -215,12 +233,12 @@ export class ClinicalGaugeComponent {
   });
 
   readonly ringColor = computed(() => {
-    const val = this.value();
+    const val = this.numericValue();
     const t = this.type();
     const prob = this.survivalProbability();
 
     if (t === 'survival' || t === 'longevity') {
-      const p = prob !== undefined ? prob * 100 : val * 10;
+      const p = (prob !== undefined && prob !== null && !Number.isNaN(Number(prob))) ? Number(prob) * 100 : val * 10;
       if (p >= 90) return '#10b981';
       if (p >= 75) return '#06b6d4';
       return '#f59e0b';

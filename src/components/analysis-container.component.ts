@@ -5,6 +5,7 @@ import { PatientStateService } from '../services/patient-state.service';
 import { AiCacheService } from '../services/ai-cache.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
 import { ExportService } from '../services/export.service';
+import { NetworkStateService } from '../services/network-state.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -97,10 +98,20 @@ import { HipaaPdfExportComponent } from './hipaa-pdf-export.component';
                    <span>Analysis Synced</span>
                 </div>
               }
-              
-              @if (!intelligence.isLoading()) {
 
-                <!-- B2B Executive Sales Pitch Demo Button -->
+              <!-- System Status & Offline Simulation Toggle -->
+              <button type="button" (click)="network.toggleForceOffline()"
+                title="Toggle forced offline simulation mode"
+                [class]="network.forceOffline()
+                  ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-red-500 bg-red-500/20 text-red-400 hover:bg-red-500/30 transition cursor-pointer shadow-sm'
+                  : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-sm'">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="network.isOnline() ? 'bg-emerald-400' : 'bg-red-400'"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2" [class]="network.isOnline() ? 'bg-emerald-500' : 'bg-red-500'"></span>
+                </span>
+                <span>{{ network.forceOffline() ? 'App Forced Offline' : 'System Ready' }}</span>
+              </button>
+                      <!-- B2B Executive Sales Pitch Demo Button -->
                 <button type="button" (click)="showSalesDemoModal.set(true)" title="Launch B2B Health System Executive Demo & ROI Calculator"
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-sm">
                   <span>💼</span> B2B Executive Demo
@@ -154,10 +165,9 @@ import { HipaaPdfExportComponent } from './hipaa-pdf-export.component';
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer shadow-sm">
                   <span>🎛️</span> Clinical Tools ▾
                 </button>
-              }
+              </div>
             </div>
-          </div>
-        }
+          }
 
         <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden relative">
           <div class="flex-1 min-h-0 min-w-0 h-full flex flex-col overflow-y-auto transition-all duration-300 p-4 sm:p-6">
@@ -267,7 +277,6 @@ import { HipaaPdfExportComponent } from './hipaa-pdf-export.component';
           }
         </div>
       </div>
-    </div>
 
     <!-- Popover Clinical Tools & Engagement Suites Drawer -->
     @if (showToolsMenu()) {
@@ -444,6 +453,7 @@ export class AnalysisContainerComponent {
   game = inject(GamificationService);
   exportService = inject(ExportService);
   gcpHealthcare = inject(GcpHealthcareService);
+  network = inject(NetworkStateService);
   ClinicalIcons = ClinicalIcons;
 
   isSlidingIn = signal(true);

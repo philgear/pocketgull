@@ -9,8 +9,7 @@ export const p_edwin_smith_3: IPatient = {
   preexistingConditions: [
     "Traumatic Skull Fracture",
     "Meningeal exposure",
-    "Cervical rigidity",
-    "PhysioNet 2026 Challenge: Cervical Vertebral Dislocation & Spinal Shock Challenge"
+    "Cervical rigidity"
   ],
   patientGoals: "Stabilize acute head injury, wound care, and address neck stiffness.",
   tcmIntake: {

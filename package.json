@@ -1,6 +1,6 @@
 {
   "name": "pocket-gull",
-  "version": "1.4.0",
+  "version": "1.9.0",
   "workspaces": [
     "docs/study",
     "companion-apps/avs-therapy",
@@ -82,7 +82,8 @@
     "build": "node scripts/build-all.mjs",
     "deploy": "gcloud builds submit . --tag us-central1-docker.pkg.dev/gen-lang-client-0540208645/cloud-run-source-deploy/pocketgull/pocket-gull:latest --project gen-lang-client-0540208645 && gcloud run deploy pocket-gull --image us-central1-docker.pkg.dev/gen-lang-client-0540208645/cloud-run-source-deploy/pocketgull/pocket-gull:latest --project gen-lang-client-0540208645 --region=us-central1 --min-instances=0 --update-env-vars=OTEL_SDK_DISABLED=true --timeout=25m --quiet",
     "lint": "node node_modules/typescript/lib/tsc.js -p tsconfig.json --noEmit",
-    "preview": "node dist/server/server.mjs",
+    "preview": "node scripts/build-if-missing.cjs && node dist/server/server.mjs",
+    "test:e2e": "node c:/Users/philg/Pocketgull/pocketgull/run-playwright.cjs test",
     "changelog": "echo \"Remember to update CHANGELOG.md before running npm run release\"",
     "serve:ssr:app": "node dist/server/server.mjs",
     "start": "node dist/server/server.mjs",
@@ -95,7 +96,6 @@
     "test": "vitest run --config vitest.config.ts && node scripts/run-python-tests.mjs",
     "test:watch": "vitest",
     "test:python": "node scripts/run-python-tests.mjs",
-    "test:e2e": "node run-playwright.cjs test",
     "test:e2e:ui": "playwright test --ui",
     "dns:update": "node scripts/update-porkbun-dns.js",
     "kube:start": "minikube start",
@@ -193,12 +193,13 @@
     "lighthouse": "^13.0.3",
     "lint-staged": "^17.0.5",
     "puppeteer": "^24.39.0",
-    "typescript": "^7.0.2",
+    "typescript": "~5.5.4",
     "vite": "^7.3.5 || ^8.0.0",
     "vitest": "^4.1.6",
     "webpack-dev-server": "^6.0.0"
   },
   "overrides": {
+    "typescript": "~5.5.4",
     "websocket-driver": "0.7.5",
     "esbuild": "0.28.1",
     "@esbuild/aix-ppc64": "0.28.1",
