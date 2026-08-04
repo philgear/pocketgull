@@ -2,7 +2,7 @@
 # Install: pip install -r requirements.txt
 
 # Core — required
-fastapi>=0.139.2
+fastapi>=0.141.1
 uvicorn[standard]>=0.52.0
 pydantic>=2.13.4
 numpy>=2.5.1
