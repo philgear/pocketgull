@@ -1948,7 +1948,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return null;
   }
 
-  getRecommendedCoreLensForParadigm(): { name: any; icon: string; reason: string } {
+  getRecommendedCoreLensForParadigm(): { name: AnalysisLens; icon: string; reason: string } {
     const p = this.state.activePhilosophy();
     if (p === 'eastern') {
       return { name: 'Functional Protocols', icon: '☯️', reason: 'Eastern TCM Zang-Fu & Qi Harmony' };
@@ -2746,7 +2746,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return text;
   }
 
-  isSectionEmpty(section: any): boolean {
+  isSectionEmpty(section: IReportSection): boolean {
     return !section.nodes || section.nodes.length === 0;
   }
 
@@ -2761,7 +2761,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return res?.status || null;
   }
 
-  statusSeverity(status: string): any {
+  statusSeverity(status: string): 'success' | 'warning' | 'error' | 'neutral' {
     switch (status) {
       case 'verified': return 'success';
       case 'warning': return 'warning';
@@ -3042,8 +3042,8 @@ export class AnalysisReportComponent implements OnDestroy {
   private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   showFloating3dOverlay = signal<boolean>(false);
-  private hoverTimerId: any = null;
-  private closeTimerId: any = null;
+  private hoverTimerId: ReturnType<typeof setTimeout> | number | null = null;
+  private closeTimerId: ReturnType<typeof setTimeout> | number | null = null;
 
   constructor() {
     effect(() => {
@@ -3319,7 +3319,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return this.medicalDecoder.annotateText(rawHtml);
   }
 
-  handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: any) {
+  handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: { note?: string; bracketState?: 'normal' | 'added' | 'removed'; showNote?: boolean; acceptedProposal?: string }) {
     if (event.note !== undefined) {
       this.updateAnnotation(node.key, { note: event.note });
       node.note = event.note; // Update local node state

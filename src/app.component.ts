@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal, viewChild, ElementRef, afterNextRender, effect, ChangeDetectorRef, untracked, OnDestroy, NgZone, HostListener } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, viewChild, ElementRef, afterNextRender, effect, ChangeDetectorRef, untracked, OnDestroy, NgZone, HostListener, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ClinicalIcons } from './assets/clinical-icons';
@@ -17,8 +17,9 @@ import { SecureStorageService } from './services/secure-storage.service';
 import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { GeminiProvider } from './services/ai/gemini.provider';
-import { ClinicalIntelligenceService } from './services/clinical-intelligence.service';
+import { ClinicalIntelligenceService, AnalysisLens } from './services/clinical-intelligence.service';
 import { PatientManagementService } from './services/patient-management.service';
+import { HistoryEntry, IPatient } from './services/patient.types';
 import { ThemeService, AppTheme } from './services/theme.service';
 import { NetworkStateService } from './services/network-state.service';
 import { HardwareTelemetryService } from './services/hardware-telemetry.service';
@@ -43,7 +44,7 @@ import { StressInterventionService } from './services/stress-intervention.servic
 import { CollaborationService } from './services/collaboration.service';
 import { CollaborationDockComponent } from './components/collaboration-dock.component';
 import { GamificationService } from './services/gamification.service';
-import { SwUpdate } from '@angular/service-worker';
+import { SwUpdate, VersionEvent } from '@angular/service-worker';
 import { FitbitService } from './services/fitbit.service';
 import { ConsentService } from './services/consent.service';
 import { ConsentModalComponent } from './components/consent-modal.component';
@@ -1371,7 +1372,7 @@ export class AppComponent implements OnDestroy {
   private secureStorage = inject(SecureStorageService);
   showTypefaceSite = signal(false);
   readonly showGlossaryModal = signal<boolean>(false);
-  private _translateTimer: any = null;
+  private _translateTimer: ReturnType<typeof setTimeout> | null = null;
   readonly zamecznikCanvas = viewChild(ZamecznikCanvasComponent);
 
   triggerSomaticGrounding(): void {
@@ -1381,14 +1382,16 @@ export class AppComponent implements OnDestroy {
     }
   }
 
-  private debouncedTranslate(text: string, level: any) {
+  private debouncedTranslate(text: string, level: string) {
     if (this._translateTimer) {
       clearTimeout(this._translateTimer);
     }
+    if (level === 'standard') return;
+    const target = level as 'simplified' | 'dyslexia' | 'child';
     this._translateTimer = setTimeout(async () => {
       this.isTranslating.set(true);
       try {
-        const translated = await this.clinicalIntelligence.translateReadingLevel(text, level);
+        const translated = await this.clinicalIntelligence.translateReadingLevel(text, target);
         this.previewText.set(translated);
         await this.analyzeCurrentTranslation();
       } catch (error) {
@@ -1397,7 +1400,7 @@ export class AppComponent implements OnDestroy {
       } finally {
         this.isTranslating.set(false);
       }
-    }, 600);
+    }, 300);
   }
 
   public navShell = inject(NavigationShellService);
@@ -2074,7 +2077,7 @@ export class AppComponent implements OnDestroy {
   private lastContainerHeight = 0;
   private lastContainerWidth = 0;
   private boundOnWindowResize: (() => void) | null = null;
-  private resizeDebounceTimer: any = null;
+  private resizeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   isMobile = signal<boolean>(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
   mobileActiveTab = signal<'chart' | 'tasks' | 'analysis'>('chart');
@@ -2129,7 +2132,7 @@ export class AppComponent implements OnDestroy {
 
     const swUpdate = inject(SwUpdate, { optional: true });
     if (swUpdate && swUpdate.isEnabled) {
-      swUpdate.versionUpdates.subscribe((evt: any) => {
+      swUpdate.versionUpdates.subscribe((evt: VersionEvent) => {
         if (evt.type === 'VERSION_READY') {
           if (confirm('A new version of Pocket-Gull is available! Would you like to reload now to apply the update?')) {
             window.location.reload();
@@ -2273,8 +2276,9 @@ export class AppComponent implements OnDestroy {
     this.patientMgmt.selectPatient('p_charles_darwin');
     // Inject pre-baked analysis outputs (no API call) synchronously
     this.state.activePhilosophy.set('western');
-    const darwinReport = (p_charles_darwin.history.find((h: any) => h.type === 'AnalysisRun') as any)?.report || {};
-    this.clinicalIntelligence.loadArchivedAnalysis(darwinReport);
+    const darwinAnalysis = p_charles_darwin.history.find((h: HistoryEntry) => h.type === 'AnalysisRun');
+    const darwinReport = darwinAnalysis && 'report' in darwinAnalysis ? darwinAnalysis.report : {};
+    this.clinicalIntelligence.loadArchivedAnalysis(darwinReport as Partial<Record<AnalysisLens, string>>);
     this.clinicalIntelligence.lastActivePhilosophy.set('western');
     this.clinicalIntelligence.lastPatientData.set(this.state.getAllDataForPrompt());
     // Start tour after data is loaded so targets exist in DOM
@@ -2285,7 +2289,7 @@ export class AppComponent implements OnDestroy {
     this.state.isEmergencyMode.set(true);
     this.state.clearState();
 
-    const emergencyPatient: any = {
+    const emergencyPatient: IPatient = {
       id: 'emergency_casualty',
       name: 'Emergency Patient',
       age: 30,
@@ -2312,9 +2316,9 @@ export class AppComponent implements OnDestroy {
 
     const currentPatients = this.patientMgmt.patients();
     if (!currentPatients.some(p => p.id === 'emergency_casualty')) {
-      const patientsSignal = this.patientMgmt.patients as any;
-      if (typeof patientsSignal.update === 'function') {
-        patientsSignal.update((list: any[]) => [...list, emergencyPatient]);
+      const patientsSignal = this.patientMgmt.patients;
+      if (typeof (patientsSignal as any).update === 'function') {
+        (patientsSignal as any).update((list: IPatient[]) => [...list, emergencyPatient]);
       }
     }
 
