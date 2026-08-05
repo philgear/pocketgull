@@ -68,10 +68,11 @@ slackRouter.post('/command', (req: Request, res: Response) => {
  * Dispatch a clinical triage alert payload to a Slack Webhook URL
  */
 slackRouter.post('/alert', async (req: Request, res: Response) => {
-  const { webhookUrl, patientArchetype, sibiScore, cvRiskMultiplier, symptoms } = req.body || {};
+  const { patientArchetype, sibiScore, cvRiskMultiplier, symptoms } = req.body || {};
+  const configuredWebhookUrl = process.env.SLACK_WEBHOOK_URL;
 
-  if (!webhookUrl) {
-    res.status(400).json({ error: 'Missing webhookUrl parameter' });
+  if (!configuredWebhookUrl) {
+    res.status(500).json({ error: 'Slack webhook is not configured on the server' });
     return;
   }
 
@@ -119,13 +120,17 @@ slackRouter.post('/alert', async (req: Request, res: Response) => {
 
   let parsedUrl: URL;
   try {
-    parsedUrl = new URL(webhookUrl);
+    parsedUrl = new URL(configuredWebhookUrl);
   } catch {
-    return res.status(400).json({ error: 'Invalid webhookUrl format' });
+    return res.status(500).json({ error: 'Configured Slack webhook URL is invalid' });
   }
 
-  if (parsedUrl.protocol !== 'https:' || (!parsedUrl.hostname.endsWith('.slack.com') && parsedUrl.hostname !== 'slack.com')) {
-    return res.status(400).json({ error: 'webhookUrl must be a valid https://hooks.slack.com endpoint' });
+  if (
+    parsedUrl.protocol !== 'https:' ||
+    parsedUrl.hostname !== 'hooks.slack.com' ||
+    !parsedUrl.pathname.startsWith('/services/')
+  ) {
+    return res.status(500).json({ error: 'Configured Slack webhook URL must be a valid https://hooks.slack.com/services/... endpoint' });
   }
 
   try {
