@@ -16,6 +16,8 @@ export class ThemeService {
   public analogyLensMode = signal<'clinical' | 'coach'>('clinical');
   public activeSeagullPersona = signal<'calm-gull' | 'active-skimmer' | 'deep-navigator' | 'storm-rider'>('deep-navigator');
   public textSizeScale = signal<'standard' | 'large' | 'extra-large'>('standard');
+  public isDyslexiaFontEnabled = signal<boolean>(false);
+  public isHighContrastEnabled = signal<boolean>(false);
   private platformId = inject(PLATFORM_ID);
   private storage = (() => {
     try { return inject(SecureStorageService); } catch (e) { return new SecureStorageService(); }
@@ -97,6 +99,22 @@ export class ThemeService {
         }
       });
 
+      effect(() => {
+        const dyslexia = this.isDyslexiaFontEnabled();
+        this.storage.setItem('pocket_gull_dyslexia_font', dyslexia ? 'true' : 'false');
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.toggle('dyslexia-font-active', dyslexia);
+        }
+      });
+
+      effect(() => {
+        const highContrast = this.isHighContrastEnabled();
+        this.storage.setItem('pocket_gull_high_contrast', highContrast ? 'true' : 'false');
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.toggle('high-contrast-active', highContrast);
+        }
+      });
+
       const savedReduceMotion = this.storage.getItem('pocket_gull_reduce_motion');
       if (savedReduceMotion === 'true') {
         this.reduceMotion.set(true);
@@ -131,6 +149,16 @@ export class ThemeService {
     const savedTextSize = this.storage.getItem('pocket_gull_text_size_scale') as any;
     if (savedTextSize && ['standard', 'large', 'extra-large'].includes(savedTextSize)) {
       this.textSizeScale.set(savedTextSize);
+    }
+
+    const savedDyslexia = this.storage.getItem('pocket_gull_dyslexia_font');
+    if (savedDyslexia === 'true') {
+      this.isDyslexiaFontEnabled.set(true);
+    }
+
+    const savedHighContrast = this.storage.getItem('pocket_gull_high_contrast');
+    if (savedHighContrast === 'true') {
+      this.isHighContrastEnabled.set(true);
     }
 
     const ALL_THEMES: AppTheme[] = ['light', 'dark', 'system', 'spark', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'curie', 'cern'];

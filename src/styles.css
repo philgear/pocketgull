@@ -3749,6 +3749,71 @@ html.theme-curie .thematic-3d-container {
   transform: scale(0.97);
 }
 
+/* ───────────────────────────────────────────────────────────── */
+/* ♿ CLINICAL INCLUSIVENESS & ACCESSIBILITY (a11y / DEI) SUITE */
+/* ───────────────────────────────────────────────────────────── */
+
+/* 1. Dyslexia-Friendly High-Legibility Font Stack */
+.dyslexia-font-active,
+.dyslexia-font-active * {
+  font-family: 'OpenDyslexic', 'Caslon Pro', 'Comic Sans MS', sans-serif !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+  line-height: 1.6 !important;
+}
+
+/* 2. WCAG AAA High-Contrast Mode (7:1 Contrast Compliance) */
+.high-contrast-active {
+  --tw-bg-opacity: 1 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+.high-contrast-active button,
+.high-contrast-active a,
+.high-contrast-active input,
+.high-contrast-active select {
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+.high-contrast-active .text-gray-400,
+.high-contrast-active .text-zinc-400,
+.high-contrast-active .text-zinc-500,
+.high-contrast-active .text-zinc-600 {
+  color: #f3f4f6 !important;
+}
+
+/* 3. Neurodivergent Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html.reduce-motion *,
+html.reduce-motion ::before,
+html.reduce-motion ::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* 4. Keyboard Traversal Focus Visible Rings (Fitts's Law) */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #10b981 !important;
+  outline-offset: 2px !important;
+}
+
+
 
 
 
