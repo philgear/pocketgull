@@ -248,7 +248,11 @@ app.post('/api/discord/slash', express.json(), async (req, res) => {
 app.post('/api/discord/voice-entrainment', express.json(), async (req, res) => {
   try {
     const { frequencyHz = 528, bpm = 110, channelId } = req.body || {};
-    console.log(`[Discord Voice Relay] Relaying ${frequencyHz} Hz Solfeggio + ${bpm} BPM audio entrainment to voice channel ${channelId || 'default'}.`);
+    const sanitizeForLog = (value) => String(value).replace(/[\r\n]/g, '');
+    const safeFrequencyHz = sanitizeForLog(frequencyHz);
+    const safeBpm = sanitizeForLog(bpm);
+    const safeChannelId = sanitizeForLog(channelId || 'default');
+    console.log(`[Discord Voice Relay] Relaying ${safeFrequencyHz} Hz Solfeggio + ${safeBpm} BPM audio entrainment to voice channel ${safeChannelId}.`);
     
     return res.json({
       status: 'streaming',
