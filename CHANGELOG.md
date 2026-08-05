@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-08-05
+
+**Tri-Paradigm Autonomous Swarm Engine, Pharmacogenomics CPIC Level 1A Safety Guard, and Biometric Sensor Fusion Telemetry Suite**
+
+### Added & Enhanced
+- **[Clinical AI / Multi-Agent Swarm] Tri-Paradigm Autonomous Swarm Consensus Engine (`tri-paradigm-swarm.service.ts`)**:
+  - Engineered parallel multi-agent clinical consensus debate execution across Western Allopathic (Gulliver), Eastern TCM Zang-Fu (Swoop), and Functional Medicine Bio-Hacking (Sentinel) specialists.
+  - Generates cross-paradigm points of agreement, divergent diagnostic risk flags, and unified 3-phase action plans.
+  - Built `TriParadigmSwarmCardComponent` with real-time consensus telemetry scoring.
+- **[Genomics / Safety] Pharmacogenomics & Spatial eQTL Dosing Safety (`pharmacogenomics.service.ts`)**:
+  - Implemented CYP450 diplotype variant screening (CYP2D6, CYP2C19, CYP3A4, SLCO1B1, MTHFR).
+  - Configured automated CPIC Level 1A contraindication and warning alerts for Codeine/Opioids, Simvastatin rhabdomyolysis, and Omeprazole clearance.
+  - Built `PharmacogenomicsCardComponent` for diplotype di-allelic status display.
+- **[Telemetry / Sensor Fusion] Continuous Biometric Sensor Fusion (`biometric-sensor-fusion.service.ts`)**:
+  - Implemented sub-second streaming sensor fusion of PPG HRV (RMSSD), CGM Glucose (mg/dL), and Respiration Rate (bpm) telemetry into `PatientStateService`.
+  - Built `BiometricSensorFusionCardComponent` with live streaming controls, vagal tone indicators, and postprandial glucose alerts.
+
+### Refactoring & Infrastructure
+- **[Flutter Infrastructure] AGP 8.7.0 & Kotlin 2.1.0 Upgrade**:
+  - Upgraded Android Gradle Plugin to `8.7.0` and Kotlin to `2.1.0` in `companion-apps/patient_app` and `companion-apps/provider_app` settings.gradle.
+- **[Testing & E2E] Playwright Accessibility DEI Spec (`accessibility-dei.spec.ts`)**:
+  - Added automated E2E test coverage verifying OpenDyslexic font toggling, WCAG AAA high contrast mode, and focus outline traversal.
+
 ## [1.10.0] - 2026-08-05
 
 **Clinical Inclusiveness & Accessibility (a11y/DEI) Suite, WebMCP Polyfill Service Extraction, and Full Component Type Safety Resolution**
