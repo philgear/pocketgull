@@ -1,0 +1,39 @@
+name: Feature & Clinical Enhancement Request
+description: Propose a new feature, clinical lens, or architectural improvement.
+title: "[FEATURE]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose an improvement or new clinical feature for Pocket Gull.
+  - type: textarea
+    id: feature-summary
+    attributes:
+      label: Feature Summary & Clinical Rationale
+      description: Explain the goal of this feature and how it benefits clinical workflows or patient care.
+      placeholder: Describe the feature and clinical benefit...
+    validations:
+      required: true
+  - type: dropdown
+    id: feature-category
+    attributes:
+      label: Feature Category
+      description: Select the target system category.
+      options:
+        - Multimodal Medical Lens (Western, TCM, Ayurveda, Orthomolecular)
+        - 3D Anatomical Spatial Lens & Shaders
+        - EHR Integration (FHIR R4 / SMART on FHIR / MyChart)
+        - Security & OpenSSF Compliance
+        - Voice / Audio Hardware Telemetry
+        - Other / UX Improvement
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Implementation Details
+      description: Any specific design patterns, services, or algorithms you recommend.
+      placeholder: Outline your proposed approach...
+    validations:
+      required: false
