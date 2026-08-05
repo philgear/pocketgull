@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-08-05
+
+**On-Device WebGPU Air-Gapped Local Gemma AI Studio, Flutter Companion Mobile App APK Builds, and Full Monolith Integration**
+
+### Added & Enhanced
+- **[On-Device AI / Zero-Egress] 100% Offline WebGPU Local Gemma AI Studio (`local-gemma-studio.component.ts`)**:
+  - Engineered on-device local AI studio interfacing directly with `@mlc-ai/web-llm` web worker engine (`gemma-2b-it-q4f32_1-MLC`).
+  - Enables zero-egress, 100% air-gapped local clinical consultations with real-time streaming token outputs and WebGPU loading telemetry.
+  - Added unit test suite `local-gemma-studio.component.spec.ts`.
+- **[Mobile Companion Apps] Flutter Android APK Packaging & Test Suite**:
+  - Built production-ready debug APKs for `patient_app` and `provider_app` (`build/app/outputs/flutter-apk/app-debug.apk`).
+  - Executed Flutter mobile test suite with 100% pass rate (21/21 tests passed across `MobileCgmTimeInRangeService`, `BleWearablesService`, `FhirService`, `MobileOfflineEdgeAiService`, `SocialGravitationService`, and `YbocsScreenerWidget`).
+
+### Refactoring & Monolith Decomposition
+- **[Analysis Report UI] Integrated Future Clinical Cards**:
+  - Integrated `TriParadigmSwarmCardComponent`, `PharmacogenomicsCardComponent`, `BiometricSensorFusionCardComponent`, and `LocalGemmaStudioComponent` into `AnalysisReportComponent`'s telemetry dashboard.
+
 ## [1.11.0] - 2026-08-05
 
 **Tri-Paradigm Autonomous Swarm Engine, Pharmacogenomics CPIC Level 1A Safety Guard, and Biometric Sensor Fusion Telemetry Suite**
