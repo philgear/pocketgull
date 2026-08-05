@@ -78,12 +78,20 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
 import { SocraticEpistemologyLensTabComponent } from './analysis-report/socratic-epistemology-lens-tab.component';
 import { NutritionalBypassLensTabComponent } from './analysis-report/nutritional-bypass-lens-tab.component';
 import { EmtHandoffLensTabComponent } from './analysis-report/emt-handoff-lens-tab.component';
+import { LocalGemmaStudioComponent } from './local-gemma-studio.component';
+import { TriParadigmSwarmCardComponent } from './tri-paradigm-swarm-card.component';
+import { PharmacogenomicsCardComponent } from './pharmacogenomics-card.component';
+import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-card.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
   imports: [
     CommonModule,
+    LocalGemmaStudioComponent,
+    TriParadigmSwarmCardComponent,
+    PharmacogenomicsCardComponent,
+    BiometricSensorFusionCardComponent,
     TeledentistrySystemicLensComponent,
     ChronobiologyMatrixLensTabComponent,
     FunctionalMedicineMatrixLensTabComponent,
@@ -622,6 +630,14 @@ import { EmtHandoffLensTabComponent } from './analysis-report/emt-handoff-lens-t
         @if (activeLens() !== 'EMT Handoff' && !state.isEmergencyMode() && intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
             
+            <!-- Tri-Paradigm Swarm, Pharmacogenomics, Biometric Fusion & Local Gemma Studio -->
+            <div class="col-span-full mb-4 space-y-4 font-mono">
+              <app-tri-paradigm-swarm-card></app-tri-paradigm-swarm-card>
+              <app-pharmacogenomics-card></app-pharmacogenomics-card>
+              <app-biometric-sensor-fusion-card></app-biometric-sensor-fusion-card>
+              <app-local-gemma-studio></app-local-gemma-studio>
+            </div>
+
             <!-- Multi-Paradigm Switchable Clinical Dashboard (Shown for Functional Protocols or Non-Western Paradigms) -->
             @if (activeLens() === 'Functional Protocols' || state.activePhilosophy() !== 'western') {
               <div class="col-span-full mb-4 space-y-4 font-mono">
