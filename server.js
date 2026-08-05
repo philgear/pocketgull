@@ -751,8 +751,7 @@ app.get(/(.*)/, (req, res) => {
 
   if (!isDoc) {
     // If it's not a doc and wasn't caught by express.static, it's a 404
-    const safeUrlForLog = String(req.originalUrl ?? req.url).replace(/[\r\n\t]/g, '_').replace(/[^a-zA-Z0-9_\-\.\/\?\&]/g, '_').slice(0, 200);
-    console.log('[SERVER] 404 Not Found: %s', safeUrlForLog);
+    console.log('[SERVER] 404 Not Found');
     return res.status(404).send('Not Found');
   }
 
