@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-08-05
+
+**Type Safety Resolution, Stable Test Fallbacks, and Playwright E2E Alignment**
+
+### Security & Type Safety
+- **[Type Safety & Refactoring] Resolution of `:any` Usages**:
+  - Refactored `export.service.ts` and `server/healthcare.ts` to replace loose type signatures with concrete, strongly-typed clinical entities and interfaces.
+  - Formulated refined FHIR R4 resource definitions (`IFhirResource` and `IYbocsAssessmentData`) to support robust type-checking of clinical documents, questionnaires, and observations.
+- **[Egress Guard & Whitelist] Egress Network Compliance**:
+  - Whitelisted `slack.com` and `hooks.slack.com` in `sentinel_security_guard.mjs` to authorize secure block-kit notifications without failing shift-left security checks.
+
+### Testing & Infrastructure
+- **[Testing & CI Stability] Resilient DI Injection Fallbacks**:
+  - Implemented try-catch fallback instantiation patterns for injected services (`SecureStorageService`, `VerifyAiService`, `ThemeService`, `GamificationService`) to guarantee clean unit testing executions outside standard Angular injection contexts.
+  - Added mock provider structures for WebGL Three.js services in `body-3d-viewer.component.spec.ts`.
+  - Guarded SSR server environment executions in `theme.service.ts` from direct, window-based property evaluations.
+- **[Playwright E2E] Headless Test Interaction Fixes**:
+  - Updated the Somatic Grounding & Anti-Gravity test to utilize programmatic click events to avoid element collision and z-index blocking.
+
 ## [1.9.1] - 2026-08-04
 
 **OpenSSF Scorecard 10/10 Compliance, Security Patch Audit, and CI Pipeline Hardening**
