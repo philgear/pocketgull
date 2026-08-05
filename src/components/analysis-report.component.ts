@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked, output, HostListener } from '@angular/core';
-import { CommonModule, DecimalPipe, TitleCasePipe } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
@@ -25,7 +25,6 @@ import { ClinicalGaugeComponent } from './clinical-gauge.component';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { ClinicalTrendComponent } from './clinical-trend.component';
 import { AiCacheService } from '../services/ai-cache.service';
-import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { MedicalDecoderService } from '../services/medical-decoder.service';
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
@@ -34,7 +33,6 @@ import { AssessmentsLensTabComponent } from './analysis-report/assessments-lens-
 import { ClinicalMenuComponent } from './clinical-menu.component';
 import { KssCognitiveShieldComponent } from './kss-cognitive-shield.component';
 import { CarePlanPrintPreviewComponent } from './care-plan-print-preview.component';
-import { EmergencyNutritionalBypassComponent } from './emergency-nutritional-bypass.component';
 import { MoodConsciousnessMatrixComponent } from './mood-consciousness-matrix.component';
 import { UkRioPubmedSourcingComponent } from './uk-rio-pubmed-sourcing.component';
 import { DietaryAllergyShieldComponent } from './dietary-allergy-shield.component';
@@ -55,7 +53,6 @@ import { ActuarialQalyCalculatorComponent } from './actuarial-qaly-calculator.co
 import { OccupationalHazardCardComponent } from './occupational-hazard-card.component';
 import { VagalBiofeedbackDockComponent } from './vagal-biofeedback-dock.component';
 import { Sec1557AuditModalComponent } from './sec1557-audit-modal.component';
-import { BystanderActionSuiteComponent } from './bystander-action-suite.component';
 import { FhirPassportModalComponent } from './fhir-passport-modal.component';
 import { getPersonaPropBadge } from '../services/agent-personas';
 import { ThemeService, AppTheme } from '../services/theme.service';
@@ -98,7 +95,6 @@ import { EmtHandoffLensTabComponent } from './analysis-report/emt-handoff-lens-t
     ClinicalSleepTwinDashboardComponent,
     ChronobiologyMatrixComponent,
     FunctionalMedicineMatrixComponent,
-    DecimalPipe,
     TitleCasePipe,
     SummaryNodeComponent,
     Body3DViewerComponent,
@@ -110,14 +106,12 @@ import { EmtHandoffLensTabComponent } from './analysis-report/emt-handoff-lens-t
     PocketGullBadgeComponent,
     ClinicalGaugeComponent,
     ClinicalTrendComponent,
-    PocketGullButtonComponent,
     RevealDirective,
     NodeAgentDialogComponent,
     ClinicalAssessmentsSuiteComponent,
     AssessmentsLensTabComponent,
     ClinicalMenuComponent,
     KssCognitiveShieldComponent,
-    EmergencyNutritionalBypassComponent,
     MoodConsciousnessMatrixComponent,
     UkRioPubmedSourcingComponent,
     DietaryAllergyShieldComponent,
@@ -136,7 +130,6 @@ import { EmtHandoffLensTabComponent } from './analysis-report/emt-handoff-lens-t
     ActuarialQalyCalculatorComponent,
     VagalBiofeedbackDockComponent,
     Sec1557AuditModalComponent,
-    BystanderActionSuiteComponent,
     FhirPassportModalComponent,
     ChronoClockDecisionRailComponent,
     ChronoWeeklyMealPlannerComponent,
