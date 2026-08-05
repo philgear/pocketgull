@@ -37,6 +37,7 @@ import { PocketGullInputComponent } from './components/shared/pocket-gull-input.
 import { ClinicalCdsDisclaimerBannerComponent } from './components/clinical-cds-disclaimer-banner.component';
 
 import { initializeWebMCPPolyfill } from '@mcp-b/webmcp-polyfill';
+import { WebMcpRegistrationService } from './services/webmcp-registration.service';
 import { PetAuditoryService } from './services/pet-auditory.service';
 import { StressInterventionService } from './services/stress-intervention.service';
 import { CollaborationService } from './services/collaboration.service';
@@ -2100,19 +2101,7 @@ export class AppComponent implements OnDestroy {
   readonly session = inject(SessionStateService);
   readonly fitbit = inject(FitbitService);
   readonly intelligence = inject(ClinicalIntelligenceService);
-  // Exposed for template access to clinical intelligence features
-
-  @HostListener('document:mousemove')
-  @HostListener('document:keydown')
-  @HostListener('document:touchstart')
-  @HostListener('document:wheel')
-  onUserInteraction() {
-    if (!this.session.isLocked()) {
-       this.session.resetIdleTimer();
-    }
-  }
-
-  private mcpControllers: { name: string, controller: AbortController }[] = [];
+  readonly webMcp = inject(WebMcpRegistrationService);
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -2188,283 +2177,19 @@ export class AppComponent implements OnDestroy {
       // 3. Also check AI Studio key selection (dev environment)
       await this.checkApiKey();
 
+      // Initialize WebMCP Polyfill and register tools via WebMcpRegistrationService
+      this.webMcp.registerTools({
+        onNavigateToBodyPart: () => {
+          this.mobileActiveTab.set('analysis');
+        },
+        onAddBookmark: (bmk: any) => {
+          this.patientMgmt.addBookmark(bmk);
+        }
+      });
+
       // Set up window resize listener for responsive layout
       this.boundOnWindowResize = this.onWindowResize.bind(this);
       window.addEventListener('resize', this.boundOnWindowResize);
-
-      // Initialize WebMCP Polyfill
-      const mContextInit = (document as any).modelContext || (navigator as any).modelContext;
-      if (!mContextInit) {
-        initializeWebMCPPolyfill();
-      }
-
-      const modelContext = (document as any).modelContext || (navigator as any).modelContext;
-      if (modelContext) {
-        // Register generate_medical_summary
-        const sumCtrl = new AbortController();
-        const sumTool = {
-          name: 'generate_medical_summary',
-          description: 'Generates a medical summary for the current patient based on the provided clinical notes and current patient data.',
-          inputSchema: {
-            type: 'object',
-            properties: {}
-          },
-          execute: async (params: any) => {
-            try {
-              const patientDataStr = this.state.getAllDataForPrompt();
-              const report = await this.clinicalIntelligence.generateComprehensiveReport(patientDataStr);
-              return {
-                content: [{ type: 'text', text: JSON.stringify(report) }]
-              };
-            } catch (e: any) {
-              return {
-                content: [{ type: 'text', text: `Failed to generate summary: ${e.message}` }],
-                isError: true
-              };
-            }
-          }
-        };
-        modelContext.registerTool(sumTool, { signal: sumCtrl.signal });
-        this.mcpControllers.push({ name: sumTool.name, controller: sumCtrl });
-
-        // Register translate_clinical_text
-        const transCtrl = new AbortController();
-        const transTool = {
-          name: 'translate_clinical_text',
-          description: 'Translates a clinical text to a specific reading level (e.g. simplified, child, dyslexia).',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              text: { type: 'string', description: 'The clinical text to translate.' },
-              targetLevel: { type: 'string', enum: ['simplified', 'child', 'dyslexia'], description: 'The target reading level.' }
-            },
-            required: ['text', 'targetLevel']
-          },
-          execute: async (params: any) => {
-            try {
-              // Validate targetLevel
-              if (!['simplified', 'child', 'dyslexia'].includes(params.targetLevel)) {
-                throw new Error("Invalid targetLevel. Must be one of: 'simplified', 'child', 'dyslexia'.");
-              }
-              const translation = await this.clinicalIntelligence.translateReadingLevel(params.text, params.targetLevel);
-              return {
-                content: [{ type: 'text', text: translation }]
-              };
-            } catch (e: any) {
-              return {
-                content: [{ type: 'text', text: `Failed to translate text: ${e.message}` }],
-                isError: true
-              };
-            }
-          }
-        };
-        modelContext.registerTool(transTool, { signal: transCtrl.signal });
-        this.mcpControllers.push({ name: transTool.name, controller: transCtrl });
-
-        // Register get_current_patient_data
-        const pdataCtrl = new AbortController();
-        const pdataTool = {
-          name: 'get_current_patient_data',
-          description: 'Retrieves the current patient data context being viewed in the application.',
-          inputSchema: {
-            type: 'object',
-            properties: {}
-          },
-          execute: async () => {
-            const patientData = this.state.getCurrentState();
-            return {
-              content: [{ type: 'text', text: JSON.stringify(patientData, null, 2) }]
-            };
-          }
-        };
-        modelContext.registerTool(pdataTool, { signal: pdataCtrl.signal });
-        this.mcpControllers.push({ name: pdataTool.name, controller: pdataCtrl });
-
-        // Register navigate_to_body_part
-        const navCtrl = new AbortController();
-        const navTool = {
-          name: 'navigate_to_body_part',
-          description: 'Navigates the UI to focus on a specific body part and opens the analysis tab.',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              partId: { type: 'string', description: 'The ID of the body part to navigate to (e.g., "head", "right_knee").' }
-            },
-            required: ['partId']
-          },
-          execute: async (params: any) => {
-            try {
-              if (BODY_PART_NAMES[params.partId]) {
-                this.ngZone.run(() => {
-                  this.state.selectPart(params.partId);
-                  this.mobileActiveTab.set('analysis');
-                });
-                return { content: [{ type: 'text', text: `Successfully navigated to ${BODY_PART_NAMES[params.partId]}` }] };
-              } else {
-                throw new Error(`Invalid body part ID: ${params.partId}`);
-              }
-            } catch (e: any) {
-              return { content: [{ type: 'text', text: `Failed to navigate: ${e.message}` }], isError: true };
-            }
-          }
-        };
-        modelContext.registerTool(navTool, { signal: navCtrl.signal });
-        this.mcpControllers.push({ name: navTool.name, controller: navCtrl });
-
-        // Register inject_clinical_note
-        const injectCtrl = new AbortController();
-        const injectTool = {
-          name: 'inject_clinical_note',
-          description: 'Injects structured clinical data (a note) for a specific body part.',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              partId: { type: 'string', description: 'The ID of the body part (e.g., "right_knee").' },
-              painLevel: { type: 'number', description: 'Pain level from 0 to 10.' },
-              description: { type: 'string', description: 'Clinical observations or description of the issue.' },
-              recommendation: { type: 'string', description: 'Recommended treatments or next steps.' }
-            },
-            required: ['partId', 'painLevel', 'description']
-          },
-          execute: async (params: any) => {
-            try {
-              const partName = BODY_PART_NAMES[params.partId] || 'Selection';
-              const newNoteId = `note_${Date.now()}`;
-              const newNote = {
-                id: params.partId,
-                noteId: newNoteId,
-                name: partName.toUpperCase(),
-                painLevel: params.painLevel,
-                description: params.description,
-                symptoms: [],
-                recommendation: params.recommendation || ''
-              };
-              this.ngZone.run(() => {
-                this.state.updateIssue(params.partId, newNote);
-                this.state.selectPart(params.partId);
-                this.state.selectNote(newNoteId);
-                this.mobileActiveTab.set('tasks');
-              });
-              return { content: [{ type: 'text', text: `Successfully injected clinical note for ${partName}` }] };
-            } catch (e: any) {
-              return { content: [{ type: 'text', text: `Failed to inject note: ${e.message}` }], isError: true };
-            }
-          }
-        };
-        modelContext.registerTool(injectTool, { signal: injectCtrl.signal });
-        this.mcpControllers.push({ name: injectTool.name, controller: injectCtrl });
-
-        // Register trigger_sync
-        const syncCtrl = new AbortController();
-        const syncTool = {
-          name: 'trigger_sync',
-          description: 'Triggers a data sync to the mobile application cloud backend.',
-          inputSchema: { type: 'object', properties: {} },
-          execute: async () => {
-            try {
-              this.ngZone.run(() => {
-                this.syncToMobile();
-              });
-              return { content: [{ type: 'text', text: 'Sync process initiated successfully.' }] };
-            } catch (e: any) {
-              return { content: [{ type: 'text', text: `Failed to initiate sync: ${e.message}` }], isError: true };
-            }
-          }
-        };
-        modelContext.registerTool(syncTool, { signal: syncCtrl.signal });
-        this.mcpControllers.push({ name: syncTool.name, controller: syncCtrl });
-
-        // Register research_clinical_term
-        const researchCtrl = new AbortController();
-        const researchTool = {
-          name: 'research_clinical_term',
-          description: 'Initiates a deep search for a clinical term or question in the Research Frame.',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              query: { type: 'string', description: 'The clinical term or question to research.' }
-            },
-            required: ['query']
-          },
-          execute: async (params: any) => {
-            try {
-              this.ngZone.run(() => {
-                this.state.requestResearchSearch(params.query);
-              });
-              return { content: [{ type: 'text', text: `Initiated research for: ${params.query}` }] };
-            } catch (e: any) {
-              return { content: [{ type: 'text', text: `Failed to initiate research: ${e.message}` }], isError: true };
-            }
-          }
-        };
-        modelContext.registerTool(researchTool, { signal: researchCtrl.signal });
-        this.mcpControllers.push({ name: researchTool.name, controller: researchCtrl });
-
-        // Register load_research_url
-        const loadUrlCtrl = new AbortController();
-        const loadUrlTool = {
-          name: 'load_research_url',
-          description: 'Loads a specific URL into the Research Frame (e.g., from a previous search result).',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              url: { type: 'string', description: 'The URL to load.' }
-            },
-            required: ['url']
-          },
-          execute: async (params: any) => {
-            try {
-              this.ngZone.run(() => {
-                this.state.requestResearchUrl(params.url);
-                this.state.toggleResearchFrame(true);
-              });
-              return { content: [{ type: 'text', text: `Loaded URL: ${params.url}` }] };
-            } catch (e: any) {
-              return { content: [{ type: 'text', text: `Failed to load URL: ${e.message}` }], isError: true };
-            }
-          }
-        };
-        modelContext.registerTool(loadUrlTool, { signal: loadUrlCtrl.signal });
-        this.mcpControllers.push({ name: loadUrlTool.name, controller: loadUrlCtrl });
-
-        // Register add_research_bookmark
-        const bmkCtrl = new AbortController();
-        const bmkTool = {
-          name: 'add_research_bookmark',
-          description: "Pre-stages a relevant literature link in the patient's bookmarks.",
-          inputSchema: {
-            type: 'object',
-            properties: {
-              title: { type: 'string', description: 'The title of the bookmark.' },
-              url: { type: 'string', description: 'The URL of the bookmark.' },
-              authors: { type: 'string', description: 'The authors of the literature.' },
-              doi: { type: 'string', description: 'The DOI of the literature.' },
-              isPeerReviewed: { type: 'boolean', description: 'Whether the literature is peer-reviewed.' },
-              cited: { type: 'boolean', description: 'Whether to include in summary references.' }
-            },
-            required: ['title', 'url']
-          },
-          execute: async (params: any) => {
-            try {
-              this.ngZone.run(() => {
-                this.patientMgmt.addBookmark({
-                  title: params.title,
-                  url: params.url,
-                  authors: params.authors,
-                  doi: params.doi,
-                  isPeerReviewed: params.isPeerReviewed || false,
-                  cited: params.cited !== undefined ? params.cited : true
-                });
-              });
-              return { content: [{ type: 'text', text: `Added bookmark: ${params.title}` }] };
-            } catch (e: any) {
-              return { content: [{ type: 'text', text: `Failed to add bookmark: ${e.message}` }], isError: true };
-            }
-          }
-        };
-        modelContext.registerTool(bmkTool, { signal: bmkCtrl.signal });
-        this.mcpControllers.push({ name: bmkTool.name, controller: bmkCtrl });
-      }
     });
 
     // Auto-expand analysis when a part is selected or clicked
@@ -2482,16 +2207,7 @@ export class AppComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (typeof document !== 'undefined') {
-      const modelContext = (document as any).modelContext || (typeof navigator !== 'undefined' ? (navigator as any).modelContext : null);
-      if (modelContext) {
-        this.mcpControllers.forEach(item => {
-          (modelContext as any).unregisterTool?.(item.name);
-          item.controller.abort();
-        });
-        this.mcpControllers = [];
-      }
-    }
+    this.webMcp.unregisterTools();
 
     if (typeof window !== 'undefined' && this.boundOnWindowResize) {
       window.removeEventListener('resize', this.boundOnWindowResize);
