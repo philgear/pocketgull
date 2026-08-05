@@ -12,8 +12,8 @@ import { SecureStorageService } from '../secure-storage.service';
 export class WebLLMProvider implements IIntelligenceProvider {
   private engine: import('@mlc-ai/web-llm').WebWorkerMLCEngine | null = null;
   private isLoaded = false;
-  private platformId = inject(PLATFORM_ID);
-  private storage = inject(SecureStorageService);
+  private platformId = (() => { try { return inject(PLATFORM_ID); } catch (e) { return 'browser'; } })();
+  private storage = (() => { try { return inject(SecureStorageService); } catch (e) { return null; } })();
   
   readonly loadingProgress = signal<string>('');
   readonly isLoadingProgress = signal<boolean>(false);
@@ -53,7 +53,7 @@ export class WebLLMProvider implements IIntelligenceProvider {
         { role: "user", content: `Patient Data:\n${patientData}\n\nLens:\n${lens}` }
     ];
     
-    const requestTemp = Number(this.storage.getItem('preferredModelTemperature')) || 0.5;
+    const requestTemp = Number(this.storage?.getItem('preferredModelTemperature')) || 0.5;
 
     const chunks = await this.engine.chat.completions.create({ 
         messages, 
