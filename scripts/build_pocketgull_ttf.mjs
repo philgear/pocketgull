@@ -13,8 +13,11 @@ if (!fs.existsSync(targetDir)) {
 async function main() {
   console.log('📦 Fetching PocketGull primary TTF font binary...');
 
-  // Download official TrueType (.ttf) font binary
   const fontUrl = 'https://fonts.gstatic.com/s/permanentmarker/v16/Fh4uPib9Iyv2ucM6pGQMWimMp004Hao.ttf';
+  const parsedUrl = new URL(fontUrl);
+  if (parsedUrl.protocol !== 'https:' || parsedUrl.hostname !== 'fonts.gstatic.com') {
+    throw new Error('Security Violation: Untrusted font URL domain');
+  }
   console.log(`Downloading font binary from: ${fontUrl}`);
 
   const fontRes = await fetch(fontUrl);

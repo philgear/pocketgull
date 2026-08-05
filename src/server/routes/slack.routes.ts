@@ -117,8 +117,19 @@ slackRouter.post('/alert', async (req: Request, res: Response) => {
     ]
   };
 
+  let parsedUrl: URL;
   try {
-    const fetchRes = await fetch(webhookUrl, {
+    parsedUrl = new URL(webhookUrl);
+  } catch {
+    return res.status(400).json({ error: 'Invalid webhookUrl format' });
+  }
+
+  if (parsedUrl.protocol !== 'https:' || (!parsedUrl.hostname.endsWith('.slack.com') && parsedUrl.hostname !== 'slack.com')) {
+    return res.status(400).json({ error: 'webhookUrl must be a valid https://hooks.slack.com endpoint' });
+  }
+
+  try {
+    const fetchRes = await fetch(parsedUrl.toString(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

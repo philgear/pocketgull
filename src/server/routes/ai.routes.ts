@@ -118,7 +118,7 @@ const BASE_CLINICAL_PROMPT = 'You are Pocket Gull Clinical Intelligence Engine. 
  */
 function sanitizeApiPayload(val: unknown): unknown {
   if (typeof val === 'string') {
-    return String(val).replace(/[^ -~\s]/g, '').slice(0, 10000);
+    return String(val).replace(/[^\x20-\x7E\t\r\n]/g, '').slice(0, 10000);
   }
   if (Array.isArray(val)) return val.map(sanitizeApiPayload);
   if (val && typeof val === 'object') {
@@ -321,7 +321,9 @@ export function createAiRouter(deps: IAiRouteDeps): Router {
         }
 
         const sanitizedInstruction = sanitizeSystemInstruction(body.systemInstruction);
-        const safeSystemInstruction = `${BASE_CLINICAL_PROMPT}\nClinical Directive Context: ${sanitizedInstruction}`;
+        const safeSystemInstruction = sanitizedInstruction
+          ? `${BASE_CLINICAL_PROMPT}\n\n[CLINICAL DIRECTIVE CONTEXT]\n${sanitizedInstruction}\n[END CLINICAL DIRECTIVE CONTEXT]`
+          : BASE_CLINICAL_PROMPT;
 
         const configOptions: Record<string, unknown> = {
           systemInstruction: safeSystemInstruction,

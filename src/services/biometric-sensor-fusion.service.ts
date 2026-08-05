@@ -73,17 +73,28 @@ export class BiometricSensorFusionService {
     this.isStreaming.set(false);
   }
 
+  private getRandomFloat(): number {
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      const arr = new Uint32Array(2);
+      crypto.getRandomValues(arr);
+      const high = arr[0] & 0x1fffff;
+      const low = arr[1];
+      return (high * 4294967296.0 + low) / 9007199254740992.0;
+    }
+    return 0.5;
+  }
+
   public tickSensorFrame(): IBiometricStreamFrame {
     // Generate realistic biophysical fluctuations
     const prev = this.currentFrame() || this.initDefaultFrame();
-    const hrvDelta = (Math.random() - 0.48) * 4;
-    const glucoseDelta = (Math.random() - 0.49) * 3;
-    const respDelta = (Math.random() - 0.5) * 1;
+    const hrvDelta = (this.getRandomFloat() - 0.48) * 4;
+    const glucoseDelta = (this.getRandomFloat() - 0.49) * 3;
+    const respDelta = (this.getRandomFloat() - 0.5) * 1;
 
     const ppgHrvMs = Math.max(25, Math.min(110, Math.round((prev.ppgHrvMs + hrvDelta) * 10) / 10));
     const cgmGlucoseMgDl = Math.max(65, Math.min(220, Math.round((prev.cgmGlucoseMgDl + glucoseDelta) * 10) / 10));
     const respiratoryRateBpm = Math.max(10, Math.min(28, Math.round(prev.respiratoryRateBpm + respDelta)));
-    const spo2Pct = 97 + Math.floor(Math.random() * 3); // 97-99%
+    const spo2Pct = 97 + Math.floor(this.getRandomFloat() * 3); // 97-99%
 
     let fusionStatus: 'optimal' | 'mild_anomaly' | 'critical_triage' = 'optimal';
     const alerts: IBiometricFusionAlert[] = [];

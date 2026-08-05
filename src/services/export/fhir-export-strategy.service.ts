@@ -65,10 +65,22 @@ export class FhirExportStrategyService {
           return cleaned;
         }
       }
-      return inputStr.replace(/<[^>]*>?/gm, '').replace(/[\"\']/g, '');
+      let result = inputStr;
+      let prev = '';
+      while (result !== prev) {
+        prev = result;
+        result = result.replace(/<[^>]*>?/gm, '');
+      }
+      return result.replace(/[\"\']/g, '');
     } catch (e) {
       console.debug('[FhirExport] DOMPurify sanitization fallback:', (e as Error)?.message);
-      return inputStr.replace(/<[^>]*>?/gm, '');
+      let result = inputStr;
+      let prev = '';
+      while (result !== prev) {
+        prev = result;
+        result = result.replace(/<[^>]*>?/gm, '');
+      }
+      return result;
     }
   }
 

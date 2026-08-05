@@ -135,7 +135,7 @@ async function refreshTokenIfNeeded(patientId: string): Promise<IGoogleHealthTok
   if (!token) return null;
   if (Date.now() < token.expiresAt - 60_000) return token;
 
-  const cleanPatientIdForLog = String(patientId || '').replace(/[\r\n\t]/g, '_').replace(/[^a-zA-Z0-9_\-\.]/g, '_').slice(0, 100);
+  const cleanPatientIdForLog = sanitizeLogInput(String(patientId || '')).slice(0, 100);
   console.log('[GoogleHealth] Refreshing token for patient %s...', cleanPatientIdForLog);
   try {
     const res = await fetch(GOOGLE_TOKEN_URL, {

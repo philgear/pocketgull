@@ -52,7 +52,16 @@ export class DiscordActivityService {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const frameId = urlParams.get('frame_id');
-      const isDiscordIframe = frameId !== null || window.name.includes('discord') || document.referrer.includes('discord.com');
+      let isDiscordReferrer = false;
+      if (document.referrer) {
+        try {
+          const referrerHost = new URL(document.referrer).hostname.toLowerCase();
+          isDiscordReferrer = referrerHost === 'discord.com' || referrerHost.endsWith('.discord.com');
+        } catch {
+          isDiscordReferrer = false;
+        }
+      }
+      const isDiscordIframe = frameId !== null || window.name.includes('discord') || isDiscordReferrer;
       
       if (isDiscordIframe) {
         this.isEmbedded.set(true);
