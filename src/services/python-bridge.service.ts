@@ -334,7 +334,11 @@ export class PythonBridgeService {
         return result;
       }
     } catch (err: any) {
-      console.warn('[PythonBridge] fetchRiskScore server error or timeout, using local indices:', err.message);
+      if (err?.name === 'AbortError') {
+        console.info('[PythonBridge] fetchRiskScore request timed out / aborted, using local fallback.');
+      } else {
+        console.warn('[PythonBridge] fetchRiskScore server error or timeout, using local indices:', err?.message || err);
+      }
     }
     
     return localResult;

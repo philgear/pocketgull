@@ -12,6 +12,9 @@ import { PatientManagementService } from '../services/patient-management.service
 import { ThemeService } from '../services/theme.service';
 import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
 import { AdobeFireflyTextureService } from '../services/adobe-firefly-texture.service';
+import { BodyMeshFactoryService } from '../services/body-mesh-factory.service';
+import { RaycastSelectionService } from '../services/raycast-selection.service';
+import { SeverityParticleService } from '../services/severity-particle.service';
 import { Holographic3DAnatomyComponent } from './holographic-3d-anatomy.component';
 import { IBodyPartIssue } from '../services/patient.types';
 
@@ -67,7 +70,7 @@ const PART_NAMES: Record<string, string> = {
     'chakra_muladhara': 'Muladhara (Root Earth Base Support Chakra)'
 };
 
-export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive' | 'orch_or';
+export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'orch_or';
 
 @Component({
     selector: 'app-body-3d-viewer',
@@ -536,48 +539,25 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         const onPointerMove = (e: MouseEvent) => {
             const rect = container.getBoundingClientRect();
-            this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            const mouse = this.raycastService.getNormalizedMouse(e.clientX, e.clientY, rect);
 
             this.tooltipX.set(e.clientX - rect.left);
             this.tooltipY.set(e.clientY - rect.top);
 
-            if (!this.camera || !this.mannequinGroup) return;
+            const hit = this.raycastService.pickObject(mouse, this.camera, this.mannequinGroup);
+            if (hit) {
+                container.style.cursor = 'pointer';
+                const issues = this.state.issues()[hit.hitPartId] || [];
+                const maxPain = issues.reduce((m, i) => Math.max(m, i.painLevel), 0);
+                const desc = issues[0]?.description || '';
 
-            this.raycaster.setFromCamera(this.mouse, this.camera);
-            const intersects = this.raycaster.intersectObjects(this.mannequinGroup.children, true);
-
-            if (intersects.length > 0) {
-                let hitPartId = '';
-                let currObj: THREE.Object3D | null = intersects[0].object;
-                
-                while (currObj && currObj !== this.mannequinGroup) {
-                    if (currObj.userData['id']) {
-                        hitPartId = currObj.userData['id'];
-                        break;
-                    }
-                    currObj = currObj.parent;
-                }
-
-                if (hitPartId) {
-                    container.style.cursor = 'pointer';
-                    const name = PART_NAMES[hitPartId] || hitPartId;
-                    const issues = this.state.issues()[hitPartId] || [];
-                    const maxPain = issues.reduce((m, i) => Math.max(m, i.painLevel), 0);
-                    const desc = issues[0]?.description || '';
-
-                    let systemLabel = '🩺 Allopathic System';
-                    if (hitPartId.startsWith('acupoint_')) systemLabel = '🌿 TCM Jing-Luo Acupoint';
-                    else if (hitPartId.startsWith('chakra_')) systemLabel = '🧘 Sushumna Chakra Node';
-
-                    this.hoveredPartId.set(hitPartId);
-                    this.hoveredPartName.set(name);
-                    this.hoveredPartSystem.set(systemLabel);
-                    this.hoveredPartPain.set(maxPain);
-                    this.hoveredPartNotes.set(desc);
-                    this.showHoverTooltip.set(true);
-                    return;
-                }
+                this.hoveredPartId.set(hit.hitPartId);
+                this.hoveredPartName.set(hit.partName);
+                this.hoveredPartSystem.set(hit.systemLabel);
+                this.hoveredPartPain.set(maxPain);
+                this.hoveredPartNotes.set(desc);
+                this.showHoverTooltip.set(true);
+                return;
             }
 
             container.style.cursor = 'grab';
@@ -587,39 +567,22 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
         const onPointerDown = (e: MouseEvent) => {
             if (e.button !== 0) return; // Primary click
             const rect = container.getBoundingClientRect();
-            this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-            this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            const mouse = this.raycastService.getNormalizedMouse(e.clientX, e.clientY, rect);
 
-            if (!this.camera || !this.mannequinGroup) return;
+            const hit = this.raycastService.pickObject(mouse, this.camera, this.mannequinGroup);
+            if (hit) {
+                const hitPartId = hit.hitPartId;
+                const name = hit.partName;
+                this.state.selectPart(hitPartId);
+                this.partSelected.emit({ id: hitPartId, name });
 
-            this.raycaster.setFromCamera(this.mouse, this.camera);
-            const intersects = this.raycaster.intersectObjects(this.mannequinGroup.children, true);
-
-            if (intersects.length > 0) {
-                let hitPartId = '';
-                let currObj: THREE.Object3D | null = intersects[0].object;
-
-                while (currObj && currObj !== this.mannequinGroup) {
-                    if (currObj.userData['id']) {
-                        hitPartId = currObj.userData['id'];
-                        break;
-                    }
-                    currObj = currObj.parent;
-                }
-
-                if (hitPartId) {
-                    const name = PART_NAMES[hitPartId] || hitPartId;
-                    this.state.selectPart(hitPartId);
-                    this.partSelected.emit({ id: hitPartId, name });
-
-                    const existingIssue = (this.state.issues()[hitPartId] || [])[0];
-                    if (existingIssue) {
-                        this.quickPainLevel.set(existingIssue.painLevel);
-                        this.quickSymptomText.set(existingIssue.description || '');
-                    } else {
-                        this.quickPainLevel.set(3);
-                        this.quickSymptomText.set('');
-                    }
+                const existingIssue = (this.state.issues()[hitPartId] || [])[0];
+                if (existingIssue) {
+                    this.quickPainLevel.set(existingIssue.painLevel);
+                    this.quickSymptomText.set(existingIssue.description || '');
+                } else {
+                    this.quickPainLevel.set(3);
+                    this.quickSymptomText.set('');
                 }
             }
         };
@@ -710,6 +673,10 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
       this.updatePartColors();
     }
 
+    private meshFactory = inject(BodyMeshFactoryService);
+    private raycastService = inject(RaycastSelectionService);
+    private particleService = inject(SeverityParticleService);
+
     private renderer!: THREE.WebGLRenderer;
     private scene!: THREE.Scene;
     private camera!: THREE.PerspectiveCamera;
@@ -778,17 +745,7 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             const mode = this.anatomyViewMode();
             this.updateTransparency(mode);
             if (this.bloomPass) {
-                this.bloomPass.strength = (mode === 'organs' || mode === 'molecular' || mode === 'arboreal' || mode === 'automotive') ? 0.3 : 0.15;
-            }
-        });
-
-        // React to Plain Language / Deep Rationale analogy lens modes (Arborist & Mechanic)
-        effect(() => {
-            const analogy = this.themeService.analogyLensMode();
-            if (analogy === 'arborist') {
-                this.state.anatomyViewMode.set('arboreal');
-            } else if (analogy === 'mechanic') {
-                this.state.anatomyViewMode.set('automotive');
+                this.bloomPass.strength = (mode === 'organs' || mode === 'molecular') ? 0.3 : 0.15;
             }
         });
 
@@ -870,10 +827,11 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
 
         try {
             this.initScene();
-            this.createMannequin();
-            this.createArborealTreeModel();
-            this.createAutomotiveChassisModel();
-            this.createMolecularScienceModel();
+            const mannequinData = this.meshFactory.createMannequinGroup();
+            this.mannequinGroup = mannequinData.group;
+            this.parts = mannequinData.parts;
+            this.scene.add(this.mannequinGroup);
+
             this.startAnimation();
             this.setupInteractions();
 
@@ -1198,18 +1156,23 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
             color: 0xd97706, roughness: 0.2, metalness: 0.4, emissive: 0xd97706, emissiveIntensity: 0.4, transparent: true, opacity: 0.0, depthWrite: false
         });
 
-        // Procedural Shader Material for Molecular Pain Heatmaps
+        // Enhanced Procedural GLSL Shader Material with Myocardial Ischemia & Cerebral Perfusion Lenses
         const molecularMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 uPainLevel: { value: 0.0 },
                 uTime: { value: 0.0 },
                 uColor: { value: new THREE.Color(0x00ffff) },
-                uHeatColor: { value: new THREE.Color(0xff0066) }
+                uHeatColor: { value: new THREE.Color(0xff0066) },
+                uVascularColor: { value: new THREE.Color(0x38bdf8) },
+                uNerveSignalColor: { value: new THREE.Color(0xfacc15) },
+                uIschemiaColor: { value: new THREE.Color(0xd97706) },
+                uCerebralPerfusionColor: { value: new THREE.Color(0xa855f7) }
             },
             vertexShader: `
                 varying vec2 vUv;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
+                varying vec3 vWorldPosition;
                 uniform float uTime;
                 uniform float uPainLevel;
                 void main() {
@@ -1217,11 +1180,17 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     vNormal = normalize(normalMatrix * normal);
                     
                     vec3 pos = position;
+                    // Dynamic arterial/venous vessel wall expansion
+                    float vascularPulse = sin(uTime * 7.5 + pos.y * 12.0) * 0.015;
+                    pos += normal * vascularPulse;
+
                     if (uPainLevel > 0.0) {
                         float pulse = sin(uTime * 6.0) * 0.5 + 0.5;
                         pos += normal * pulse * uPainLevel * 0.05;
                     }
                     
+                    vec4 worldPos = modelMatrix * vec4(pos, 1.0);
+                    vWorldPosition = worldPos.xyz;
                     vPosition = (modelViewMatrix * vec4(pos, 1.0)).xyz;
                     gl_Position = projectionMatrix * vec4(vPosition, 1.0);
                 }
@@ -1231,19 +1200,40 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                 uniform float uTime;
                 uniform vec3 uColor;
                 uniform vec3 uHeatColor;
+                uniform vec3 uVascularColor;
+                uniform vec3 uNerveSignalColor;
+                uniform vec3 uIschemiaColor;
+                uniform vec3 uCerebralPerfusionColor;
                 varying vec2 vUv;
                 varying vec3 vNormal;
                 varying vec3 vPosition;
+                varying vec3 vWorldPosition;
                 void main() {
                     float pulse = (sin(uTime * 6.0) * 0.5 + 0.5) * uPainLevel;
                     vec3 viewDir = normalize(-vPosition);
                     float rim = 1.0 - max(dot(viewDir, vNormal), 0.0);
                     rim = smoothstep(0.4, 1.0, rim);
                     
-                    vec3 baseColor = mix(uColor, uHeatColor, uPainLevel);
-                    vec3 finalColor = mix(baseColor, vec3(1.0, 1.0, 1.0), pulse * 0.7 + rim * uPainLevel);
+                    // ⚡ High-speed nerve action potential impulse wave
+                    float nerveWave = sin(vWorldPosition.y * 35.0 - uTime * 14.0);
+                    float nerveImpulse = smoothstep(0.85, 1.0, nerveWave);
                     
-                    gl_FragColor = vec4(finalColor, mix(0.1, 0.9, uPainLevel));
+                    // 🫀 Arterial systolic pressure wave cycle & Myocardial Ischemia pulse
+                    float vascularWave = sin(uTime * 8.0 - vWorldPosition.y * 8.0) * 0.5 + 0.5;
+                    float ischemiaPulse = sin(uTime * 10.0) * 0.5 + 0.5;
+
+                    // 🧠 Cerebral Perfusion Flow Wave (Cranial region)
+                    float cerebralWave = sin(vWorldPosition.y * 20.0 + uTime * 5.0) * 0.5 + 0.5;
+
+                    vec3 baseColor = mix(uColor, uHeatColor, uPainLevel);
+                    vec3 vascularTone = mix(baseColor, uVascularColor, vascularWave * 0.5);
+                    vec3 ischemiaTone = mix(vascularTone, uIschemiaColor, ischemiaPulse * 0.35);
+                    vec3 cerebralTone = mix(ischemiaTone, uCerebralPerfusionColor, cerebralWave * 0.3);
+                    vec3 nerveGlow = mix(cerebralTone, uNerveSignalColor, nerveImpulse * 0.85);
+
+                    vec3 finalColor = mix(nerveGlow, vec3(1.0, 1.0, 1.0), pulse * 0.7 + rim * uPainLevel);
+                    
+                    gl_FragColor = vec4(finalColor, mix(0.2, 0.95, max(uPainLevel, nerveImpulse * 0.6)));
                 }
             `,
             transparent: true,
@@ -2109,22 +2099,8 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     }
 
     private updateTransparency(mode: AnatomyViewMode) {
-        if (mode === 'arboreal') {
-            if (this.mannequinGroup) this.mannequinGroup.visible = false;
-            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
-            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
-            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = true;
-        } else if (mode === 'automotive') {
-            if (this.mannequinGroup) this.mannequinGroup.visible = false;
-            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
-            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
-            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = true;
-        } else {
-            if (this.mannequinGroup) this.mannequinGroup.visible = true;
-            if (this.arborealTreeGroup) this.arborealTreeGroup.visible = false;
-            if (this.automotiveChassisGroup) this.automotiveChassisGroup.visible = false;
-            if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
-        }
+        if (this.mannequinGroup) this.mannequinGroup.visible = true;
+        if (this.molecularScienceGroup) this.molecularScienceGroup.visible = false;
 
         this.parts.forEach((group) => {
             const isSelected = this.state.selectedPartId() === group.userData['id'];
@@ -2153,18 +2129,6 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
                     else if (layer === 'organ') { material.opacity = 0.95; material.depthWrite = true; }
                     else if (layer === 'bone') { material.opacity = 0.20; material.depthWrite = false; }
                     else { material.opacity = 0; material.depthWrite = false; }
-                }
-                else if (mode === 'arboreal') {
-                    if (layer === 'skin') { material.opacity = 0.30; material.depthWrite = false; }
-                    else if (layer === 'organ') { material.opacity = 0.90; material.depthWrite = true; }
-                    else if (layer === 'bone') { material.opacity = 0.60; material.depthWrite = true; }
-                    else { material.opacity = 0.20; material.depthWrite = false; }
-                }
-                else if (mode === 'automotive') {
-                    if (layer === 'skin') { material.opacity = 0.20; material.depthWrite = false; }
-                    else if (layer === 'bone') { material.opacity = 0.95; material.depthWrite = true; }
-                    else if (layer === 'organ') { material.opacity = 0.85; material.depthWrite = true; }
-                    else { material.opacity = 0.15; material.depthWrite = false; }
                 }
                 else if (mode === 'molecular') {
                     if (layer === 'skin') { material.opacity = 0.10; material.depthWrite = false; }

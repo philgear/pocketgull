@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IIntelligenceProvider } from './intelligence.provider';
 import { IClinicalMetrics } from '../clinical-intelligence.service';
 import { IVerificationIssue } from '../../components/analysis-report.types';
+import { SecureStorageService } from '../secure-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class WebLLMProvider implements IIntelligenceProvider {
   private engine: import('@mlc-ai/web-llm').WebWorkerMLCEngine | null = null;
   private isLoaded = false;
   private platformId = inject(PLATFORM_ID);
+  private storage = inject(SecureStorageService);
   
   readonly loadingProgress = signal<string>('');
   readonly isLoadingProgress = signal<boolean>(false);
@@ -51,7 +53,7 @@ export class WebLLMProvider implements IIntelligenceProvider {
         { role: "user", content: `Patient Data:\n${patientData}\n\nLens:\n${lens}` }
     ];
     
-    const requestTemp = Number(localStorage.getItem('preferredModelTemperature')) || 0.5;
+    const requestTemp = Number(this.storage.getItem('preferredModelTemperature')) || 0.5;
 
     const chunks = await this.engine.chat.completions.create({ 
         messages, 

@@ -18,7 +18,7 @@ patientsRouter.post('/', (req, res) => {
     mockDatabase = patientsToSync;
     
     const cleanLength = Number(mockDatabase.length || 0);
-    console.log(`[Patients API] Synced ${cleanLength} patients to cloud.`);
+    console.log('[Patients API] Synced %d patients to cloud.', cleanLength);
     res.status(200).json({ message: 'Patients synced successfully' });
   } catch (error: any) {
     const safeErr = String(error?.message || error || '').replace(/[^a-zA-Z0-9_\-\.\:\s]/g, '_').slice(0, 500);

@@ -3,22 +3,42 @@ import { IVerificationIssue } from '../components/analysis-report.types';
 import { AI_CONFIG } from './ai-provider.types';
 import { AiCacheService } from './ai-cache.service';
 import { getStoredApiKey } from './secure-key';
+import { SecureStorageService } from './secure-storage.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class VerifyAiService {
-    private config = inject(AI_CONFIG);
+    private config = (() => {
+        try {
+            return inject(AI_CONFIG);
+        } catch (e) {
+            return { apiKey: '', verificationModel: { modelId: 'gemini-3.5-flash', temperature: 0.1 } } as any;
+        }
+    })();
     private _ai: any = null;
-    private cache = inject(AiCacheService);
+    private cache = (() => {
+        try {
+            return inject(AiCacheService);
+        } catch (e) {
+            return new AiCacheService();
+        }
+    })();
+    private storage = (() => {
+        try {
+            return inject(SecureStorageService);
+        } catch (e) {
+            return new SecureStorageService();
+        }
+    })();
 
     private async getAi(): Promise<any> {
         if (!this._ai) {
             let initialKey = (window as any).GEMINI_API_KEY || this.config.apiKey;
-            if (!initialKey && typeof localStorage !== 'undefined') {
+            if (!initialKey) {
                 try {
-                    initialKey = getStoredApiKey();
-                } catch (e) { console.error("VerifyAiService: localStorage error", e); }
+                    initialKey = getStoredApiKey(this.storage);
+                } catch (e) { console.error("VerifyAiService: storage error", e); }
             }
             if (!initialKey && typeof process !== 'undefined' && process.env) {
                 initialKey = process.env.GEMINI_API_KEY;

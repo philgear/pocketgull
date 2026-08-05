@@ -3,6 +3,7 @@ import { Firestore, collection, doc, setDoc, getDoc, onSnapshot } from '@angular
 import { Auth, authState, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut } from '@angular/fire/auth';
 import { IPatient } from './patient.types';
 import { environment } from '../environments/environment';
+import { SecureStorageService } from './secure-storage.service';
 
 export interface IRegisteredClinician {
   name: string;
@@ -17,6 +18,7 @@ export interface IRegisteredClinician {
 export class FirestoreSyncService {
   private firestore = inject(Firestore, { optional: true });
   private auth = inject(Auth, { optional: true });
+  private storage = inject(SecureStorageService);
 
   /** Signal emitting the current user's UID or null if unauthenticated. */
   public readonly currentUser = signal<string | null>(null);
@@ -24,6 +26,10 @@ export class FirestoreSyncService {
   public readonly currentUserEmail = signal<string | null>(null);
   /** Signal emitting whether the initial auth state is still loading. */
   public readonly isAuthLoading = signal<boolean>(true);
+  /** Signal emitting the last Firestore sync error, or null if healthy. */
+  public readonly syncError = signal<string | null>(null);
+  /** Signal emitting whether a sync operation is in progress. */
+  public readonly isSyncing = signal<boolean>(false);
 
   getRegisteredClinicians(): IRegisteredClinician[] {
     const defaultList = [
@@ -31,18 +37,11 @@ export class FirestoreSyncService {
       { name: 'Phil Gear', email: 'dpo@pocketgull.app', clinic: 'PocketGull Clinic', pin: '1234' },
       { name: 'Admin', email: 'admin@pocketgull.app', clinic: 'PocketGull Admin Vault', pin: '1234' }
     ];
-    if (typeof localStorage === 'undefined') {
-      return defaultList;
+    const stored = this.storage.getJSON<IRegisteredClinician[] | null>('pg_registered_clinicians', null);
+    if (stored) {
+      return stored;
     }
-    try {
-      const stored = localStorage.getItem('pg_registered_clinicians');
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch (e) {}
-    try {
-      localStorage.setItem('pg_registered_clinicians', JSON.stringify(defaultList));
-    } catch (e) {}
+    this.storage.setJSON('pg_registered_clinicians', defaultList);
     return defaultList;
   }
 
@@ -57,9 +56,7 @@ export class FirestoreSyncService {
       throw new Error('This email is already registered.');
     }
     list.push({ name, email, clinic, pin });
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('pg_registered_clinicians', JSON.stringify(list));
-    }
+    this.storage.setJSON('pg_registered_clinicians', list);
     return true;
   }
 
@@ -76,87 +73,45 @@ export class FirestoreSyncService {
             signOut(this.auth!);
             this.currentUser.set(null);
             this.currentUserEmail.set(null);
+            alert(`Access Denied: The account ${user.email} is not authorized. Please contact administrator.`);
           }
-        } else if (this.currentUser() !== 'mock-google-clinician') {
+        } else {
           this.currentUser.set(null);
           this.currentUserEmail.set(null);
         }
       });
-
-      // Retrieve incoming redirect results on boot
-      if (typeof window !== 'undefined') {
-        getRedirectResult(this.auth)
-          .then(result => {
-            this.isAuthLoading.set(false);
-            if (result?.user) {
-              if (this.isEmailRegistered(result.user.email || '')) {
-                console.log('[Firebase Auth] Logged in via redirect result:', result.user.uid);
-                this.currentUser.set(result.user.uid);
-                this.currentUserEmail.set(result.user.email);
-              } else {
-                console.error('[Firebase Auth] Unauthorized email via redirect result:', result.user.email);
-                signOut(this.auth!);
-                this.currentUser.set(null);
-                this.currentUserEmail.set(null);
-              }
-            }
-          })
-          .catch(err => {
-            this.isAuthLoading.set(false);
-            console.warn('[Firebase Auth] Redirect result lookup warning:', err.message);
-          });
-      }
     } else {
       this.isAuthLoading.set(false);
     }
   }
 
-  /** Triggers a Google OAuth popup, falling back to redirect, or using a mock if keys are placeholders. */
-  async signInWithGoogle(mockEmail?: string) {
-    const isPlaceholder = !environment.firebase.apiKey || environment.firebase.apiKey.includes('placeholder');
-    if (isPlaceholder || !this.auth) {
-      console.warn('[Firebase Auth] Using placeholder configuration. Authenticating with mock clinician credentials...');
-      await new Promise(resolve => setTimeout(resolve, 800));
-      const email = mockEmail || 'dpo@pocketgull.app';
-      if (!this.isEmailRegistered(email)) {
-        throw new Error('Access Denied: Clinician email is not registered.');
-      }
-      this.currentUser.set('mock-google-clinician');
-      this.currentUserEmail.set(email);
-      return;
-    }
-
+  /**
+   * Triggers Google Sign-In via popup or redirect fallback
+   */
+  async loginWithGoogle(): Promise<void> {
+    if (!this.auth) throw new Error('Firebase Auth is not configured.');
     const provider = new GoogleAuthProvider();
-    provider.addScope('profile');
-    provider.addScope('email');
-
+    provider.setCustomParameters({ prompt: 'select_account' });
     try {
-      console.log('[Firebase Auth] Initiating Google Popup Sign-in...');
-      const result = await signInWithPopup(this.auth, provider);
-      if (result.user && !this.isEmailRegistered(result.user.email || '')) {
-        console.error('[Firebase Auth] Post-sign-in unauthorized email:', result.user.email);
-        await signOut(this.auth);
-        this.currentUser.set(null);
-        this.currentUserEmail.set(null);
-        throw new Error('Access Denied: Clinician account unauthorized.');
-      }
+      await signInWithPopup(this.auth, provider);
     } catch (err: any) {
-      if (err.message?.includes('Access Denied')) {
-        throw err;
-      }
-      // Handle blocked popup or third-party cookies block via redirect
-      console.warn('[Firebase Auth] Popup blocked or failed. Redirecting user instead:', err.message);
-      try {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
         await signInWithRedirect(this.auth, provider);
-      } catch (redirectErr: any) {
-        console.error('[Firebase Auth] Redirect attempt failed:', redirectErr.message);
-        throw redirectErr;
+      } else {
+        throw err;
       }
     }
   }
 
-  async logout() {
-    if (this.auth && this.currentUser() !== 'mock-google-clinician') {
+  async signInWithGoogle(targetEmail?: string): Promise<void> {
+    return this.loginWithGoogle();
+  }
+
+  /**
+   * Logs out current user from Firebase Auth session
+   */
+  async logout(): Promise<void> {
+    if (this.auth) {
       await signOut(this.auth);
     }
     this.currentUser.set(null);
@@ -164,39 +119,54 @@ export class FirestoreSyncService {
   }
 
   /**
-   * Pushes a patient document to the secure Firestore vault under the clinician's namespace.
+   * Listens to real-time changes for a specific patient's document in Firestore.
    */
-  async syncPatientToCloud(patient: IPatient) {
-    const uid = this.currentUser();
-    if (!uid) {
-      console.warn('[FirestoreSyncService] Cannot sync. Clinician is not authenticated.');
-      return;
+  syncPatient(patientId: string, onUpdate: (patient: IPatient) => void): () => void {
+    if (!this.firestore) {
+      console.warn('[FirestoreSyncService] Firestore not initialized, returning noop cleanup.');
+      return () => {};
     }
-    if (uid === 'mock-google-clinician' || !this.firestore) {
-      console.log('[FirestoreSyncService] Mock sync complete (No cloud write).');
-      return;
-    }
-    const docRef = doc(this.firestore, `clinicians/${uid}/patients/${patient.id}`);
-    await setDoc(docRef, patient, { merge: true });
-    console.log(`[FirestoreSyncService] Successfully synced ${patient.id} to cloud vault.`);
+
+    const patientDocRef = doc(this.firestore, 'patients', patientId);
+    
+    // Subscribe to snapshot updates
+    const unsubscribe = onSnapshot(patientDocRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data() as IPatient;
+        console.log(`[FirestoreSyncService] Received live update for patient: ${patientId}`);
+        onUpdate(data);
+      }
+    }, (error) => {
+      const msg = `Sync error for patient ${patientId}: ${error?.message || error}`;
+      console.error(`[FirestoreSyncService] ${msg}`);
+      this.syncError.set(msg);
+    });
+
+    return unsubscribe;
   }
 
   /**
-   * Pulls a specific patient chart from the secure Firestore vault.
+   * Saves or updates a patient record in Firestore.
    */
-  async fetchPatientFromCloud(patientId: string): Promise<IPatient | null> {
-    const uid = this.currentUser();
-    if (!uid) return null;
-    if (uid === 'mock-google-clinician' || !this.firestore) {
-      console.log('[FirestoreSyncService] Mock fetch complete (Returning null).');
-      return null;
+  async savePatient(patient: IPatient): Promise<void> {
+    if (!this.firestore) {
+      throw new Error('Firestore is not configured in this environment.');
     }
-    
-    const docRef = doc(this.firestore, `clinicians/${uid}/patients/${patientId}`);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      return snap.data() as IPatient;
-    }
-    return null;
+
+    const patientDocRef = doc(this.firestore, 'patients', patient.id);
+    const sanitizedData = JSON.parse(JSON.stringify(patient)); // Ensure clean object serialization
+
+    await setDoc(patientDocRef, {
+      ...sanitizedData,
+      lastSyncedAt: new Date().toISOString()
+    }, { merge: true });
+
+    console.log(`[FirestoreSyncService] Successfully saved patient: ${patient.id}`);
+    this.syncError.set(null); // Clear any previous sync error on success
+  }
+
+  /** Clears the current sync error (e.g. after user acknowledges it). */
+  clearSyncError(): void {
+    this.syncError.set(null);
   }
 }

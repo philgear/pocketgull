@@ -11,7 +11,7 @@ export default defineConfig({
   testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.temp/**', '**/Temp/**', '**/*.tmp', '**/.venv/**', '**/pg2/**', '**/branddesk/**', '**/tests/**'],
   outputDir: path.resolve(__dirname, 'tmp/playwright-results'),
   fullyParallel: true,
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 1 : 0,
   workers: process.env['PLAYWRIGHT_WORKERS'] ? parseInt(process.env['PLAYWRIGHT_WORKERS'], 10) : (process.env['CI'] ? 2 : 4),

@@ -157,7 +157,7 @@ import { SentinelSurveillanceService } from '../services/sentinel-surveillance.s
               </div>
             } @else {
               <div class="space-y-3">
-                @for (item of surveillance.awareStewardship(); track item.medication) {
+                @for (item of surveillance.awareStewardship(); track item.medication + '-' + $index) {
                   <div class="p-3.5 rounded-lg bg-zinc-950/80 border border-zinc-800/60">
                     <div class="flex items-center justify-between mb-1.5">
                       <h4 class="font-bold text-white text-xs">{{ item.medication }}</h4>

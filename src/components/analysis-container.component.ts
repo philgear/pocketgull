@@ -4,6 +4,7 @@ import { AnalysisReportComponent } from './analysis-report.component';
 import { PatientStateService } from '../services/patient-state.service';
 import { AiCacheService } from '../services/ai-cache.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
+import { APP_VERSION } from '../version';
 import { ExportService } from '../services/export.service';
 import { NetworkStateService } from '../services/network-state.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
@@ -252,7 +253,7 @@ import { HipaaPdfExportComponent } from './hipaa-pdf-export.component';
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] opacity-90 hover:opacity-100 transition-opacity border-t border-zinc-200/50 dark:border-zinc-800/60 pt-3">
                 <div class="space-y-1">
                   <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-200">System Identification</div>
-                  <div class="text-[12px] font-semibold text-zinc-800 dark:text-zinc-300 uppercase tracking-widest">Pocket Gull Analysis Engine v 0.1</div>
+                  <div class="text-[12px] font-semibold text-zinc-800 dark:text-zinc-300 uppercase tracking-widest">Pocket Gull Analysis Engine v{{ appVersion }}</div>
                 </div>
                 <div class="space-y-1">
                   <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-200">Analysis Metadata</div>
@@ -445,6 +446,7 @@ import { HipaaPdfExportComponent } from './hipaa-pdf-export.component';
   `]
 })
 export class AnalysisContainerComponent {
+  appVersion = APP_VERSION;
   @ViewChild(AnalysisReportComponent) reportRef?: AnalysisReportComponent;
   state = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);

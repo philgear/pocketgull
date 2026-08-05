@@ -58,8 +58,13 @@ async function checkAuthentication() {
     }
 }
 
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 async function validateLocalMetadata() {
-    const zenodoJsonPath = path.resolve('.zenodo.json');
+    const zenodoJsonPath = path.resolve(__dirname, '../.zenodo.json');
     if (!fs.existsSync(zenodoJsonPath)) {
         console.error('❌ .zenodo.json file missing from repository root.');
         return false;

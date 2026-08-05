@@ -86,7 +86,9 @@ export class PetAuditoryService {
     if (this.recognition) {
       try {
         this.recognition.stop();
-      } catch (e) {}
+      } catch (e) {
+        // Recognition may already be stopped; expected during teardown
+      }
     }
   }
 
@@ -108,8 +110,8 @@ export class PetAuditoryService {
     }
     if (this.audioCtx) {
       this.nodes.forEach(n => {
-        try { n.stop(); } catch(e) {}
-        try { n.disconnect(); } catch(e) {}
+        try { n.stop(); } catch(e) { /* AudioNode may already be stopped */ }
+        try { n.disconnect(); } catch(e) { /* AudioNode may already be disconnected */ }
       });
       this.nodes = [];
     }

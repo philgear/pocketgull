@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, signal, effect, ElementRef,
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { DomSanitizer } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { APP_VERSION } from '../version';
 import { SessionStateService } from '../services/session-state.service';
 import { FirestoreSyncService } from '../services/firestore-sync.service';
 import { CircadianSleepinessService, KssScore } from '../services/circadian-sleepiness.service';
@@ -11,15 +12,19 @@ import { PatientStateService } from '../services/patient-state.service';
 import { PetAuditoryService } from '../services/pet-auditory.service';
 import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
 import { environment } from '../environments/environment';
-
+import { PocketgullIconComponent } from './pocketgull-icon.component';
+import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
+import { PapercraftBackdropComponent } from './papercraft-backdrop.component';
+import { SecureStorageService } from '../services/secure-storage.service';
 
 @Component({
   selector: 'app-secure-splash',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PocketgullIconComponent, SafeHtmlPipe, PapercraftBackdropComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <main [style.background]="telemetryGradient()" class="fixed inset-0 w-screen h-screen min-w-full min-h-full z-[999] flex flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-3xl secure-splash-main animate-in fade-in duration-[800ms] overflow-hidden">
+      <app-papercraft-backdrop [wavePeriod]="wavePeriod()"></app-papercraft-backdrop>
       
       <!-- Papercraft Layered Living Breathing Landscape Backdrop -->
       <div class="absolute inset-0 w-full h-full min-h-full overflow-hidden pointer-events-none z-0">
@@ -173,12 +178,13 @@ import { environment } from '../environments/environment';
             <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 border border-amber-400/30 text-amber-800 dark:text-amber-300 text-[9.5px] font-bold uppercase tracking-widest mb-1.5 shadow-2xs">
               <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
               Pocket-Gull Clinician Suite
-              <span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-400/40 text-[9px] font-mono font-bold tracking-normal">v1.4.0</span>
+              <span class="px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-400/40 text-[9px] font-mono font-bold tracking-normal">v{{ appVersion }}</span>
             </div>
-            <h1 class="text-lg font-bold tracking-[0.12em] text-zinc-800 dark:text-zinc-100 uppercase pb-0.5">
+            <h1 class="text-2xl sm:text-3xl font-pocketgull tracking-tight text-zinc-900 dark:text-amber-400 uppercase pb-0.5 drop-shadow-sm flex items-center justify-center gap-2">
+              <app-pocketgull-icon name="seagull" />
               {{ isLocked() ? 'Resume Session' : 'Pocket Gull' }}
             </h1>
-            <p class="text-[11px] uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
+            <p class="text-[11px] font-pocketgull-inter uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">
               {{ isLocked() ? 'Idle Timeout Protection Active' : 'Clinical Intelligence Engine' }}
             </p>
           </div>
@@ -208,7 +214,7 @@ import { environment } from '../environments/environment';
                <div class="relative w-[240px] h-[240px] flex items-center justify-center paper-hemp-panel rounded-3xl p-1 overflow-hidden border-2 border-emerald-500/40 dark:border-emerald-400/40 shadow-xl hover:shadow-emerald-500/15 transition-all">
                   <!-- Guidelines background SVG (Dynamic Daily Beach Item guide) -->
                   <svg class="absolute inset-0 w-full h-full pointer-events-none text-[#3ebc9e]/40 dark:text-[#2fa085]/30 stroke-current" viewBox="0 0 100 100" fill="none" stroke-width="1.5">
-                    <g [innerHTML]="todayBeachItem().svgGuide"></g>
+                    <g [innerHTML]="todayBeachItem().svgGuide | safeHtml"></g>
                   </svg>
                  
                  <canvas
@@ -775,16 +781,16 @@ import { environment } from '../environments/environment';
         </button>
 
         <!-- Terms and Privacy Links -->
-        <div class="mt-2.5 flex items-center justify-center gap-4 text-[10px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 z-30">
-          <button type="button" (click)="showTermsModal.set(true)" class="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-0 cursor-pointer">Terms of Service</button>
+        <div class="mt-2.5 flex items-center justify-center gap-2 text-[10px] uppercase tracking-wider font-semibold text-zinc-400 dark:text-zinc-500 z-30">
+          <button type="button" (click)="showTermsModal.set(true)" class="min-h-[32px] px-2.5 py-1.5 inline-flex items-center justify-center hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none cursor-pointer">Terms of Service</button>
           <span class="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-800"></span>
-          <button type="button" (click)="showPrivacyModal.set(true)" class="hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none p-0 cursor-pointer">Privacy Policy</button>
+          <button type="button" (click)="showPrivacyModal.set(true)" class="min-h-[32px] px-2.5 py-1.5 inline-flex items-center justify-center hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors bg-transparent border-none cursor-pointer">Privacy Policy</button>
         </div>
 
         <div class="mt-2 flex items-center justify-center gap-2">
           <p class="text-[10px] text-zinc-500 dark:text-zinc-500 font-mono uppercase tracking-[0.2em]">v{{ appVersion }}</p>
-          <a href="https://github.com/philgear/pocketgull" target="_blank" rel="noopener noreferrer" class="text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" aria-label="View on GitHub">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          <a href="https://github.com/philgear/pocketgull" target="_blank" rel="noopener noreferrer" class="min-h-[32px] min-w-[32px] inline-flex items-center justify-center text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors" aria-label="View on GitHub">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
           </a>
         </div>
 
@@ -1184,7 +1190,8 @@ export class SecureSplashComponent implements OnInit {
   public readonly petAuditory = inject(PetAuditoryService);
   public readonly envTelemetryService = inject(EnvironmentalTelemetryService);
   private platformId = inject(PLATFORM_ID);
-  readonly appVersion = environment.appVersion;
+  private secureStorage = inject(SecureStorageService);
+  readonly appVersion = APP_VERSION;
 
   readonly telemetryGradient = computed(() => {
     const t = this.envTelemetryService.telemetry();
@@ -1225,7 +1232,7 @@ export class SecureSplashComponent implements OnInit {
       this.isAudioPlaying.set(true);
     }
   }
-  
+
   // Inputs
   apiKeyError = input<string | null>(null);
   hasApiKey = input<boolean>(false);
@@ -1307,23 +1314,17 @@ export class SecureSplashComponent implements OnInit {
 
   todayBeachItem = computed(() => {
     const dayEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-    const item = this.dailyBeachItems[dayEpoch % this.dailyBeachItems.length];
-    return {
-      ...item,
-      svgGuide: isPlatformBrowser(this.platformId)
-        ? this.sanitizer.bypassSecurityTrustHtml(item.svgGuide)
-        : ''
-    };
+    return this.dailyBeachItems[dayEpoch % this.dailyBeachItems.length];
   });
 
   readonly dailyQuotesAndHumor = [
+    { text: '"Feeling gratitude and not expressing it is like wrapping a present and not giving it."', author: '— William Arthur Ward (Greater Good Gratitude)' },
+    { text: '"Self-compassion is simply giving ourselves the same kindness we would give to a patient in distress."', author: '— Dr. Kristin Neff (Mindful Self-Compassion)' },
     { text: '"Wherever the art of Medicine is loved, there is also a love of Humanity."', author: '— Hippocrates' },
-    { text: 'Why did the skeleton cancel his medical appointment? He had no body to go with!', author: '— Medical Humor 💀' },
+    { text: '"Between stimulus and response there is a space. In that space is our power to choose our response."', author: '— Viktor E. Frankl (Somatic Grounding)' },
+    { text: 'Remember: Deep breathing and coffee are both vital electrolyte restoration protocols.', author: '— Night Shift Resiliency ☕' },
     { text: '"The good physician treats the disease; the great physician treats the patient who has the disease."', author: '— Sir William Osler' },
-    { text: 'Statistically, 9 out of 10 clinical errors start with "Hey watch this..."', author: '— ER Wisdom 🩺' },
-    { text: '"Medicine is a science of uncertainty and an art of probability."', author: '— Sir William Osler' },
-    { text: 'Remember: Coffee is technically an intravenous electrolyte solution for clinicians.', author: '— Night Shift Motto ☕' },
-    { text: '"Observation, Reason, Human Understanding, Courage; these make the physician."', author: '— Martin H. Fischer' }
+    { text: '"Presence is the most precious gift we can offer to another human being."', author: '— Thich Nhat Hanh (Greater Good Mindfulness)' }
   ];
 
   todayQuote = computed(() => {
@@ -1369,8 +1370,8 @@ export class SecureSplashComponent implements OnInit {
   gestureCanvasRef = viewChild<ElementRef<HTMLCanvasElement>>('gestureCanvas');
   private ctx: CanvasRenderingContext2D | null = null;
   isDrawing = false;
-  strokes: Array<Array<{x: number, y: number}>> = [];
-  currentStroke: Array<{x: number, y: number}> = [];
+  strokes: Array<Array<{x: number, y: number, pressure: number}>> = [];
+  currentStroke: Array<{x: number, y: number, pressure: number}> = [];
   private verificationTimeoutId: any = null;
   gestureError = signal(false);
 
@@ -1605,7 +1606,7 @@ export class SecureSplashComponent implements OnInit {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      const isMock = localStorage.getItem('pg_mock_clinician') === '1';
+      const isMock = this.secureStorage.getItem('pg_mock_clinician') === '1';
       const email = this.syncService.currentUserEmail() || '';
       this.isAuthorized.set(isMock || this.syncService.isEmailRegistered(email));
     }
@@ -1636,7 +1637,7 @@ export class SecureSplashComponent implements OnInit {
 
     effect(() => {
       const email = this.syncService.currentUserEmail() || '';
-      const isMock = isPlatformBrowser(this.platformId) ? localStorage.getItem('pg_mock_clinician') === '1' : false;
+      const isMock = this.secureStorage.getItem('pg_mock_clinician') === '1';
       this.isAuthorized.set(isMock || this.syncService.isEmailRegistered(email));
     });
   }
@@ -1912,13 +1913,15 @@ export class SecureSplashComponent implements OnInit {
     osc2.stop(ctx.currentTime + 1.3);
   }
 
-  private getCanvasCoords(e: PointerEvent): {x: number, y: number} {
+  private getCanvasCoords(e: PointerEvent): {x: number, y: number, pressure: number} {
     const canvas = this.gestureCanvasRef()?.nativeElement;
-    if (!canvas) return { x: 0, y: 0 };
+    if (!canvas) return { x: 0, y: 0, pressure: 0.5 };
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    return { x, y };
+    // Capture Wacom / Stylus pressure (0.0 to 1.0; fallback 0.5 for mouse/touch)
+    const pressure = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
+    return { x, y, pressure };
   }
 
   private redrawCanvas() {
@@ -1933,11 +1936,9 @@ export class SecureSplashComponent implements OnInit {
     const strokeStyle = isDark ? '#10b981' : '#059669';
     const shadowColor = isDark ? '#34d399' : '#10b981';
 
-    const drawPoints = (points: Array<{x: number, y: number}>) => {
+    const drawPoints = (points: Array<{x: number, y: number, pressure: number}>) => {
       if (points.length === 0) return;
       
-      ctx.beginPath();
-      ctx.lineWidth = 6;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.strokeStyle = strokeStyle;
@@ -1945,15 +1946,23 @@ export class SecureSplashComponent implements OnInit {
       ctx.shadowBlur = 6;
 
       if (points.length === 1) {
-        ctx.arc(points[0].x, points[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+        const radius = 3 + points[0].pressure * 6;
+        ctx.beginPath();
+        ctx.arc(points[0].x, points[0].y, radius, 0, Math.PI * 2);
         ctx.fillStyle = strokeStyle;
         ctx.fill();
       } else {
-        ctx.moveTo(points[0].x, points[0].y);
+        // Render pressure-sensitive segments for Wacom / Stylus input
         for (let i = 1; i < points.length; i++) {
-          ctx.lineTo(points[i].x, points[i].y);
+          const prev = points[i - 1];
+          const curr = points[i];
+          const segLineWidth = 2.5 + curr.pressure * 7;
+          ctx.beginPath();
+          ctx.lineWidth = segLineWidth;
+          ctx.moveTo(prev.x, prev.y);
+          ctx.lineTo(curr.x, curr.y);
+          ctx.stroke();
         }
-        ctx.stroke();
       }
     };
 

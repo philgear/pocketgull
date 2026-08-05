@@ -13,6 +13,7 @@ import { RichMediaService, IRichMediaCard } from '../services/rich-media.service
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { AdkLiveService } from '../services/ai/adk-live.service';
 import { StorageService } from '../services/storage.service';
+import { SecureStorageService } from '../services/secure-storage.service';
 import { inject as baseInject } from '@angular/core';
 import { getStoredApiKey } from '../services/secure-key';
 import { YbocsService } from '../services/ybocs/ybocs.service';
@@ -110,6 +111,12 @@ export interface IChatEntry {
                     <span class="font-bold text-gray-400 dark:text-zinc-500 tracking-[0.2em] text-[12px] uppercase">Live Session</span>
                 </div>
                 <div class="flex items-center gap-2">
+                    <button
+                        (click)="dispatchDiscordTranscript()"
+                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1.5 transition-all px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-[11px] font-bold"
+                        title="Dispatch Transcript to Discord Webhook">
+                        <span>💬</span> Discord Dispatch
+                    </button>
                     <button
                         (click)="isMuted.set(!isMuted())"
                         class="text-gray-400 dark:text-zinc-500 hover:text-black dark:hover:text-white flex items-center justify-center transition-colors px-2 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800"
@@ -438,6 +445,7 @@ export class VoiceAssistantComponent implements OnDestroy {
     markdownService = inject(MarkdownService);
     richMedia = inject(RichMediaService);
     storage = inject(StorageService);
+    secureStorage = inject(SecureStorageService);
 
     ybocsService = inject(YbocsService);
     voiceAssistantMode = signal<'standard' | 'ybocs' | 'chrono' | 'avs'>('standard');
@@ -692,7 +700,7 @@ export class VoiceAssistantComponent implements OnDestroy {
                 this.recognition.onend = () => {
                     // Loop if still listening
                     if (this.live.isListening() && this.agentState() !== 'processing') {
-                        try { this.recognition.start(); } catch {}
+                        try { this.recognition.start(); } catch (e) { console.debug('[VoiceAssistant] Recognition already active:', (e as Error)?.message); }
                     }
                 };
             }
@@ -752,9 +760,9 @@ Only include a rich-media block when the user explicitly requests visual or rese
             
             // Initialize ADK Live Service with user's actual token (from API key context)
             // Check window (SSR inject) first, then fallback to local storage
-            const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
+            const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey(this.secureStorage) || '';
             if (!apiKey) {
-                 console.error("AdkLiveService Error: No GEMINI_API_KEY found in window or localStorage.");
+                 console.error("AdkLiveService Error: No GEMINI_API_KEY found in window or SecureStorageService.");
                  this.permissionError.set('Missing API Key. Please re-enter it on the home screen.');
                  return;
             }
@@ -882,7 +890,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
         
         let htmlContent = cleanMd;
         const parser = this.markdownService.parser();
-        if (parser) { try { htmlContent = (parser as any).parse(cleanMd); } catch { htmlContent = `<p>${cleanMd}</p>`; } }
+        if (parser) { try { htmlContent = (parser as any).parse(cleanMd); } catch (e) { console.debug('[VoiceAssistant] Markdown parse fallback:', (e as Error)?.message); htmlContent = `<p>${cleanMd}</p>`; } }
 
         this.chatHistory.update(h => {
             const next = [...h];
@@ -941,7 +949,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
                            });
                            this.scrollToBottom();
                        });
-                   } catch { /* JSON not fully formed yet */ }
+                   } catch (e) { console.debug('[VoiceAssistant] Streaming JSON not yet complete:', (e as Error)?.message); }
                }
             }
             return next;
@@ -957,7 +965,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
         
         // Restart UI STT if still listening
         if (this.live.isListening() && this.recognition) {
-             try { this.recognition.start(); } catch {}
+             try { this.recognition.start(); } catch (e) { console.debug('[VoiceAssistant] Recognition already active:', (e as Error)?.message); }
         }
     }
 
@@ -996,7 +1004,7 @@ Only include a rich-media block when the user explicitly requests visual or rese
                     particles: c.particles,
                     loading: true
                 }));
-        } catch { return undefined; }
+        } catch (e) { console.debug('[VoiceAssistant] Card parse fallback:', (e as Error)?.message); return undefined; }
     }
 
     triggerFileInput() {
@@ -1146,7 +1154,7 @@ To enable full interactive consultations, custom question answering, and live vo
         } else {
             this.live.startListening();
             if (this.recognition) {
-                 try { this.recognition.start(); } catch {}
+                 try { this.recognition.start(); } catch (e) { console.debug('[VoiceAssistant] Recognition already active:', (e as Error)?.message); }
             }
         }
     }
@@ -1227,7 +1235,7 @@ To enable full interactive consultations, custom question answering, and live vo
             utterance.onend = () => {
                 this.agentState.set('listening');
                 if (this.recognition) {
-                    try { this.recognition.start(); } catch {}
+                    try { this.recognition.start(); } catch (e) { console.debug('[VoiceAssistant] Recognition already active:', (e as Error)?.message); }
                 }
             };
             window.speechSynthesis.speak(utterance);
@@ -1303,7 +1311,7 @@ To enable full interactive consultations, custom question answering, and live vo
             this.speakClientSide(finishedText);
             
             this.voiceAssistantMode.set('standard');
-            localStorage.removeItem('voice_assistant_mode');
+            this.secureStorage.removeItem('voice_assistant_mode');
         }
     }
 
@@ -1329,6 +1337,35 @@ To enable full interactive consultations, custom question answering, and live vo
             htmlContent: `<p class="text-purple-600 dark:text-purple-400 font-bold">🧠 Autonomic Co-Regulation & AVS Voice Guide Active</p><p>${introText}</p>`
         }]);
         this.speakClientSide(introText);
+    }
+
+    async dispatchDiscordTranscript() {
+        const history = this.chatHistory();
+        if (history.length === 0) return;
+
+        const transcriptSummary = history.map(h => `**${h.role === 'user' ? 'Clinician' : 'Gemini AI'}**: ${h.text}`).join('\n\n');
+        const patientName = this.state.patientName() || 'Anonymous Patient';
+        const vitals = this.state.vitals();
+        const symptomsList = Object.keys(this.state.issues()).join(', ') || 'None specified';
+
+        try {
+            await fetch('/api/discord/webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    embedTitle: `🎙️ Pocket Gull Live Session Transcript — [${patientName}]`,
+                    embedDescription: transcriptSummary.slice(0, 2000),
+                    fields: [
+                        { name: 'Patient Vitals', value: `HR: ${vitals.hr || '--'} bpm | BP: ${vitals.bp || '--'} | SpO2: ${vitals.spO2 || '--'}%`, inline: true },
+                        { name: 'Primary Symptoms', value: symptomsList, inline: true },
+                    ],
+                    color: 0x416B1F
+                })
+            });
+            console.log('[Discord Dispatch] Live transcript posted to Discord channel.');
+        } catch (e) {
+            console.error('[Discord Dispatch] Failed to post transcript:', e);
+        }
     }
 }
 

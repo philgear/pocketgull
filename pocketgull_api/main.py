@@ -360,8 +360,12 @@ class DataFrameIngestRequest(BaseModel):
     records: list[dict[str, Any]] = Field(..., description="Array of row dicts from df.to_json(orient='records')")
 
 
+from pydantic import BaseModel, ConfigDict, Field
+
 class PatientVitalsResponse(BaseModel):
     """Mirrors IPatientVitals from patient.types.ts — all fields optional strings."""
+    model_config = ConfigDict(populate_by_name=True)
+
     bp: Optional[str] = None
     hr: Optional[str] = None
     temp: Optional[str] = None
@@ -373,9 +377,6 @@ class PatientVitalsResponse(BaseModel):
     magnesium: Optional[str] = None
     zinc: Optional[str] = None
     b12: Optional[str] = None
-
-    class Config:
-        populate_by_name = True
 
 
 # EHR column name aliases — extend as needed for your specific EHR export format
@@ -1309,8 +1310,8 @@ async def compute_biophysics_telemetry(input_data: BiophysicsTelemetryInput) -> 
         buffer_state = "Alkalemia (High Buffer Ratio)"
 
     # Action Friction & Negentropy
-    friction = float(round(1.0 + (input_data.heart_rate_bpm / input_data.hrv_rmssd_ms), 2))
-    negentropy = float(min(100.0, max(0.0, input_data.hrv_rmssd_ms * 1.8)))
+    friction = round(1.0 + (input_data.heart_rate_bpm / input_data.hrv_rmssd_ms), 2)
+    negentropy = min(100.0, max(0.0, input_data.hrv_rmssd_ms * 1.8))
 
     return BiophysicsTelemetryResponse(
         calculated_ph=ph_calc,

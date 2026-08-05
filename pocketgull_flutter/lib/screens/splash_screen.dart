@@ -295,9 +295,12 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    'SECURITY GATEWAY',
-                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2.0, color: Colors.grey),
+                                  const Flexible(
+                                    child: Text(
+                                      'SECURITY GATEWAY',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 2.0, color: Colors.grey),
+                                    ),
                                   ),
                                   Row(
                                     children: [

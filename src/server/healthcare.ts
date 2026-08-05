@@ -151,7 +151,7 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
      };
 
      // 2. Map preexisting conditions to standard FHIR R4 Conditions
-     const fhirConditions: any[] = [];
+     const fhirConditions: Record<string, unknown>[] = [];
      if (Array.isArray(payload.preexistingConditions)) {
          payload.preexistingConditions.forEach((conditionName: string, index: number) => {
              fhirConditions.push({
@@ -197,7 +197,7 @@ healthcareRouter.post('/fhir/export', express.json({ limit: '50mb' }), async (re
      }
 
      // 3. Map vitals to standard FHIR R4 Observations
-     const fhirObservations: any[] = [];
+     const fhirObservations: Record<string, unknown>[] = [];
      const vitals = payload.vitals || {};
      const lastVisitDate = payload.lastVisit ? new Date(payload.lastVisit.replace(/\./g, '-')).toISOString() : new Date().toISOString();
 
@@ -431,18 +431,18 @@ healthcareRouter.get('/fhir/import/:id', async (req, res) => {
      if (conditionsRes.ok) {
          const bundle = await conditionsRes.json();
          if (bundle.entry && Array.isArray(bundle.entry)) {
-             conditions = bundle.entry.map((e: any) => e.resource?.code?.text).filter(Boolean);
+             conditions = bundle.entry.map((e: { resource?: { code?: { text?: string } } }) => e.resource?.code?.text).filter(Boolean);
          }
      }
 
      // 3. Search for Observations of this Patient
      const observationsUrl = `https://healthcare.googleapis.com/v1/projects/${projectId}/locations/${defaultLocation}/datasets/${defaultDatasetId}/fhirStores/${fhirStoreId}/fhir/Observation?subject=Patient/${fhirPatientId}`;
      const observationsRes = await fetch(sanitizeUrl(observationsUrl), { headers });
-     const vitals: any = {};
+     const vitals: Record<string, string> = {};
      if (observationsRes.ok) {
          const bundle = await observationsRes.json();
          if (bundle.entry && Array.isArray(bundle.entry)) {
-             bundle.entry.forEach((e: any) => {
+             bundle.entry.forEach((e: { resource?: any }) => {
                  const obs = e.resource;
                  if (!obs) return;
                  const code = obs.code?.coding?.[0]?.code;
@@ -572,14 +572,14 @@ function redactLocalPHI(text: string): string {
   return redacted;
 }
 
-function sanitizeLocalPayloadPHI(payload: any): any {
+function sanitizeLocalPayloadPHI(payload: unknown): unknown {
   if (!payload || typeof payload !== 'object') return payload;
-  const clone = JSON.parse(JSON.stringify(payload));
-  if (clone.name) clone.name = '[REDACTED NAME]';
-  if (clone.email) clone.email = '[REDACTED EMAIL]';
-  if (clone.phone) clone.phone = '[REDACTED PHONE]';
-  if (clone.ssn) clone.ssn = '[REDACTED SSN]';
-  if (clone.birthDate) clone.birthDate = '[REDACTED DATE]';
+  const clone = JSON.parse(JSON.stringify(payload)) as Record<string, unknown>;
+  if ('name' in clone) clone['name'] = '[REDACTED NAME]';
+  if ('email' in clone) clone['email'] = '[REDACTED EMAIL]';
+  if ('phone' in clone) clone['phone'] = '[REDACTED PHONE]';
+  if ('ssn' in clone) clone['ssn'] = '[REDACTED SSN]';
+  if ('birthDate' in clone) clone['birthDate'] = '[REDACTED DATE]';
   return clone;
 }
 
@@ -761,7 +761,8 @@ healthcareRouter.post('/pubsub/webhook', express.json(), async (req, res) => {
     let notificationPayload: any = {};
     try {
       notificationPayload = JSON.parse(decodedData);
-    } catch {
+    } catch (e) {
+      console.debug('[Healthcare] Pub/Sub message JSON parse fallback:', (e as Error)?.message);
       notificationPayload = { raw: decodedData };
     }
 

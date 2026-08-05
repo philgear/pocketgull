@@ -18,9 +18,9 @@ export async function sendPushNotification(fcmToken: string, title: string, body
   const cleanTokenLength = Number(fcmToken ? String(fcmToken).length : 0);
   const cleanTokenProvided = fcmToken ? 'true' : 'false';
   if (!isFirebaseInitialized || !fcmToken) {
-    console.log(`[Notification Service Mock] Sending push notification (tokenProvided=${cleanTokenProvided}, tokenLength=${cleanTokenLength}):`);
-    console.log(`  Title: ${sanitize(title)}`);
-    console.log(`  Body:  ${sanitize(body)}`);
+    console.log('[Notification Service Mock] Sending push notification (tokenProvided=%s, tokenLength=%d):', cleanTokenProvided, cleanTokenLength);
+    console.log('  Title: %s', sanitize(title));
+    console.log('  Body:  %s', sanitize(body));
     return;
   }
 

@@ -13,6 +13,7 @@ import { TaskFlowComponent } from './components/task-flow.component';
 import { IntakeFormComponent } from './components/intake-form.component';
 import { VoiceAssistantComponent } from './components/voice-assistant.component';
 import { getStoredApiKey, setStoredApiKey } from './services/secure-key';
+import { SecureStorageService } from './services/secure-storage.service';
 import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
 import { GeminiProvider } from './services/ai/gemini.provider';
@@ -49,12 +50,18 @@ import { ResearchTabComponent } from './components/research-tab.component';
 import { ZamecznikCanvasComponent } from './components/shared/zamecznik-canvas.component';
 import { CompanionSyncModalComponent } from './components/companion-sync-modal.component';
 import { GlossaryModalComponent } from './components/glossary-modal.component';
+import { PocketgullTypefaceSiteComponent } from './components/pocketgull-typeface-site.component';
+import { PocketgullIconComponent } from './components/pocketgull-icon.component';
+import { NavigationShellService } from './services/navigation-shell.service';
+
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
+    PocketgullTypefaceSiteComponent,
+    PocketgullIconComponent,
     PatientDropdownComponent,
     MedicalChartComponent,
     AnalysisContainerComponent,
@@ -490,6 +497,14 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
               <span class="hidden sm:inline">Research</span>
             </button>
 
+            <button (click)="showTypefaceSite.set(true)"
+                    id="tour-typeface-trigger"
+                    aria-label="PocketGull Typeface Specimen Suite"
+                    title="Open PocketGull Typeface Specimen Suite"
+                    class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-amber-500/40 text-amber-700 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold uppercase tracking-widest transition-colors cursor-pointer rounded-md">
+              <app-pocketgull-icon name="seagull" />
+              <span class="hidden sm:inline font-pocketgull">Typeface</span>
+            </button>
             
             <a href="/docs/study/" target="_blank" rel="noopener"
                id="tour-docs-trigger"
@@ -1003,6 +1018,18 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
         }
 
 
+    <!-- PocketGull Typeface Specimen Suite Modal Site -->
+    @if (showTypefaceSite()) {
+      <div class="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-300">
+        <div class="relative w-full max-w-7xl max-h-[90vh] bg-white dark:bg-zinc-950 rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-y-auto">
+          <button (click)="showTypefaceSite.set(false)" class="absolute top-6 right-6 z-[10000] px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-amber-500 hover:text-zinc-950 rounded-full transition-colors font-bold text-xs">
+            ✕ Close Specimen
+          </button>
+          <app-pocketgull-typeface-site />
+        </div>
+      </div>
+    }
+
     <!-- Preview & Print Modal (Dieter Rams Style) -->
     @if (showPreviewModal()) {
       <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 no-print">
@@ -1340,6 +1367,8 @@ import { GlossaryModalComponent } from './components/glossary-modal.component';
   `]
 })
 export class AppComponent implements OnDestroy {
+  private secureStorage = inject(SecureStorageService);
+  showTypefaceSite = signal(false);
   readonly showGlossaryModal = signal<boolean>(false);
   private _translateTimer: any = null;
   readonly zamecznikCanvas = viewChild(ZamecznikCanvasComponent);
@@ -1370,6 +1399,7 @@ export class AppComponent implements OnDestroy {
     }, 600);
   }
 
+  public navShell = inject(NavigationShellService);
   public tour = inject(WalkthroughTourService);
   public readonly petAuditory = inject(PetAuditoryService);
   private readonly stressIntervention = inject(StressInterventionService);
@@ -2005,7 +2035,7 @@ export class AppComponent implements OnDestroy {
   }
 
   cycleTheme() {
-    const themes: AppTheme[] = ['light', 'dark', 'system', 'spark', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'curie'];
+    const themes: AppTheme[] = ['light', 'dark', 'system', 'spark', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'curie', 'cern'];
     const current = this.theme.currentTheme();
     const nextIdx = (themes.indexOf(current) + 1) % themes.length;
     this.theme.setTheme(themes[nextIdx]);
@@ -2145,10 +2175,10 @@ export class AppComponent implements OnDestroy {
         }
       } catch (_e) { /* network offline */ }
 
-      // 2. Check for stored API key in localStorage (manual entry / offline fallback)
+      // 2. Check for stored API key via SecureStorageService (manual entry / offline fallback)
       if (!this.hasApiKey()) {
         try {
-          const storedKey = getStoredApiKey();
+          const storedKey = getStoredApiKey(this.secureStorage);
           if (storedKey) {
             this.hasApiKey.set(true);
           }
@@ -2510,7 +2540,7 @@ export class AppComponent implements OnDestroy {
       return;
     }
     try {
-      setStoredApiKey(key);
+      setStoredApiKey(key, this.secureStorage);
     } catch (e) { /* ignore */ }
     this.apiKeyError.set(null);
     this.isDemoMode.set(false);

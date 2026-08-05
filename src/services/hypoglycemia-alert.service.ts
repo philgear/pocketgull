@@ -47,8 +47,8 @@ export class HypoglycemiaAlertService {
             this.dismissAlert();
           }
         });
-      } catch {
-        // Fallback for bare testing context
+      } catch (e) {
+        console.warn('[HypoglycemiaAlertService] Failed to initialize glucose monitor subscription:', e);
       }
     }
   }
@@ -80,7 +80,7 @@ export class HypoglycemiaAlertService {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate([150, 75, 150, 75, 300]);
-      } catch {}
+      } catch (e) { console.debug('[HypoglycemiaAlertService] Haptic vibration unavailable:', e); }
     }
   }
 

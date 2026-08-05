@@ -148,7 +148,7 @@ export class ImportService {
           if (resource.content?.[0]?.attachment?.contentType === 'text/plain') {
             const data = resource.content[0].attachment.data;
             if (data) {
-                try { embeddedText = atob(data); } catch(err) {} 
+                try { embeddedText = atob(data); } catch(err) { console.warn('[ImportService] Failed to decode base64 FHIR attachment:', err); }
             }
           }
 

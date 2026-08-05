@@ -193,7 +193,8 @@ export class NanoProvider implements IIntelligenceProvider {
           systemPrompt: "You are a clinical educator. Translate/rewrite the medical text into the requested cognitive level and target language. Output only the rewritten translation."
         });
         return await session.prompt(`Adapt this text to a ${resolvedCognitive} cognitive level and translate to ${resolvedLang}:\n\n${text}`);
-      } catch {
+      } catch (e) {
+        console.debug('[NanoProvider] Prompt API translation fallback failed:', (e as Error)?.message);
         return text;
       }
     }
@@ -206,7 +207,8 @@ export class NanoProvider implements IIntelligenceProvider {
         systemPrompt: "You are an expert medical translation editor. Compare the original medical text and its translated version. Analyze readability, style, and check if any key clinical facts were lost or altered. Respond in clean, concise markdown."
       });
       return await session.prompt(`Original:\n${original}\n\nTranslated:\n${translated}\n\nProvide the translation analysis:`);
-    } catch {
+    } catch (e) {
+      console.debug('[NanoProvider] Translation analysis unavailable:', (e as Error)?.message);
       return "Translation delegated to on-device Nano limits and may lack external stylistic analysis.";
     }
   }

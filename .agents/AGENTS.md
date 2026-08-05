@@ -72,6 +72,14 @@
 - **End-of-Session Pruning**: Before wrapping up features or releases, proactively purge unused imports, delete unreferenced dead code, merge duplicate helper functions, and remove commented-out blocks.
 - **Secret & Egress Boundaries**: Never commit API keys or credentials. Ensure `.env*` is strictly matched in `.gitignore`, and verify all external domains with `Sentinel Security Guard`.
 
+## Gemini Safety Filter Policy (Clinical CDS)
+- **Canonical Reference**: `SECURITY.md §2` documents the full policy. All Genkit flows in `src/server/genkit.ts` reference this section.
+- **DANGEROUS_CONTENT = `OFF`**: Clinical text routinely discusses drug dosages, toxic exposures, overdose management, suicidal ideation screening (PHQ-9/C-SSRS), and trauma. Any threshold above `OFF` produces false-positive blocking on standard-of-care care plans.
+- **Imaging & OCR Flows = All `OFF`**: Medical imaging (X-rays, dermatology, wound assessment) and clinical document OCR require fully permissive safety settings across all categories.
+- **HARASSMENT & HATE_SPEECH = `BLOCK_ONLY_HIGH`**: Retained as baseline protection; rarely triggered by clinical text.
+- **SEXUALLY_EXPLICIT = `BLOCK_ONLY_HIGH`** (text flows) / **`OFF`** (imaging flows): Permits OB/GYN, STI, and reproductive health content.
+- **Do NOT revert to `BLOCK_LOW_AND_ABOVE` or `BLOCK_MEDIUM_AND_ABOVE`**: These thresholds silently block legitimate medical content and were the root cause of the Cognitive Localization translation failure.
+
 ## NN/g (Nielsen Norman Group) Usability & Accessibility Standards
 - **Form Accessibility**: All input components MUST include explicit `[attr.aria-describedby]` error/hint linking, `[attr.aria-invalid]`, and 44px+ touch target hitboxes (Fitts's Law).
 - **System Status Visibility**: Telemetry badges and connection state indicators MUST provide instant visual feedback without layout shifts.

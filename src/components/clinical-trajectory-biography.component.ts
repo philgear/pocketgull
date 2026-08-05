@@ -66,8 +66,7 @@ export class ClinicalTrajectoryBiographyComponent {
   protected readonly compassionateAnalogy = inject(CompassionateAnalogyService);
 
   readonly biography = computed(() => {
-    const name = this.patientState.patientName() || 'Traveler';
-    const persona = this.themeService.analogyLensMode();
-    return this.compassionateAnalogy.generateTrajectoryBiography(name, persona);
+    const name = this.patientState.patientName() || 'Patient';
+    return this.compassionateAnalogy.generateTrajectoryBiography(name);
   });
 }

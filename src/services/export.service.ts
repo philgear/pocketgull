@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
+import { SecureStorageService } from './secure-storage.service';
 import { MarkdownService } from './markdown.service';
 import * as DOMPurify from 'dompurify';
 import { marked } from 'marked';
 
-import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue } from './patient.types';
+import { IPatient, HistoryEntry, IPatientVitals, IBodyPartIssue, IFhirGenomicObservation } from './patient.types';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { LaafFhirHapticScheduleService, ILaafHapticItem } from './laaf-fhir-haptic-schedule.service';
 import { ClinicalAssessmentsService } from './clinical-assessments/clinical-assessments.service';
@@ -11,6 +12,9 @@ import { YbocsService } from './ybocs/ybocs.service';
 import { AcronymExpanderService } from './acronym-expander.service';
 import { ActuarialLongevityService } from './actuarial-longevity.service';
 import { ResearchLecturesService } from './research-lectures.service';
+
+import { FhirExportStrategyService } from './export/fhir-export-strategy.service';
+import { HtmlExportStrategyService } from './export/html-export-strategy.service';
 
 /** Shape of the native JSON export file. */
 export interface INativePatientExport {
@@ -20,30 +24,100 @@ export interface INativePatientExport {
   patient: Omit<IPatient, 'id'>;
 }
 
+interface IFhirExtension {
+  url: string;
+  valueString?: string;
+  valueInteger?: number;
+}
+
 /** Minimal FHIR R4 resource types used for import/export. */
 interface IFhirResource {
   resourceType: string;
   id?: string;
+  name?: { text?: string; family?: string }[];
+  gender?: string;
+  birthDate?: string;
+  extension?: IFhirExtension[];
+  code?: { text?: string; coding?: { system?: string; code?: string; display?: string }[] };
+  category?: { coding?: { system?: string; code?: string; display?: string }[] }[];
+  subject?: { reference?: string };
+  valueQuantity?: { value?: number; unit?: string; system?: string; code?: string };
+  valueString?: string;
+  valueInteger?: number;
+  bodySite?: { text?: string };
+  description?: string | { text?: string };
   [key: string]: any;
 }
 
 interface IFhirBundle {
   resourceType: 'Bundle';
   id?: string;
-  type: 'collection';
+  type: string;
   timestamp: string;
   meta?: { tag?: { system: string; code: string; display: string }[] };
   entry: { resource: IFhirResource }[];
+}
+
+interface IOcrIssue {
+  partId: string;
+  name: string;
+  severity: 'critical' | 'moderate' | 'mild';
+  notes?: string;
+}
+
+interface IOcrMedication {
+  name: string;
+  dosage?: string;
+  frequency?: string;
+}
+
+interface IOcrData {
+  name?: string;
+  age?: number;
+  gender?: 'Male' | 'Female' | 'Non-binary' | 'Other';
+  patientGoals?: string;
+  vitals?: {
+    bp?: string;
+    hr?: string;
+    temp?: string;
+    spO2?: string;
+    weight?: string;
+    height?: string;
+  };
+  issues?: IOcrIssue[];
+  medications?: IOcrMedication[];
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ExportService {
+  private storage = (() => {
+    try {
+      return inject(SecureStorageService, { optional: true }) || new SecureStorageService();
+    } catch (e) {
+      return new SecureStorageService();
+    }
+  })();
+  private fhirStrategy = (() => {
+    try {
+      return inject(FhirExportStrategyService, { optional: true }) || new FhirExportStrategyService();
+    } catch (e) {
+      return new FhirExportStrategyService();
+    }
+  })();
+  private htmlStrategy = (() => {
+    try {
+      return inject(HtmlExportStrategyService, { optional: true }) || new HtmlExportStrategyService();
+    } catch (e) {
+      return new HtmlExportStrategyService();
+    }
+  })();
   private actuarialService = (() => {
     try {
       return inject(ActuarialLongevityService, { optional: true }) || new ActuarialLongevityService();
-    } catch {
+    } catch (e) {
+      console.debug('[ExportService] ActuarialLongevityService DI fallback:', (e as Error)?.message);
       return new ActuarialLongevityService();
     }
   })();
@@ -51,7 +125,8 @@ export class ExportService {
   private researchLectures = (() => {
     try {
       return inject(ResearchLecturesService, { optional: true }) || new ResearchLecturesService();
-    } catch {
+    } catch (e) {
+      console.debug('[ExportService] ResearchLecturesService DI fallback:', (e as Error)?.message);
       return new ResearchLecturesService();
     }
   })();
@@ -59,7 +134,8 @@ export class ExportService {
   private laafFhir = (() => {
     try {
       return inject(LaafFhirHapticScheduleService, { optional: true });
-    } catch {
+    } catch (e) {
+      console.debug('[ExportService] LaafFhirHapticScheduleService DI fallback:', (e as Error)?.message);
       return null;
     }
   })();
@@ -67,7 +143,8 @@ export class ExportService {
   private clinicalAssessments = (() => {
     try {
       return inject(ClinicalAssessmentsService, { optional: true });
-    } catch {
+    } catch (e) {
+      console.debug('[ExportService] ClinicalAssessmentsService DI fallback:', (e as Error)?.message);
       return null;
     }
   })();
@@ -75,7 +152,8 @@ export class ExportService {
   private ybocsService = (() => {
     try {
       return inject(YbocsService, { optional: true });
-    } catch {
+    } catch (e) {
+      console.debug('[ExportService] YbocsService DI fallback:', (e as Error)?.message);
       return null;
     }
   })();
@@ -83,7 +161,8 @@ export class ExportService {
   private acronymService = (() => {
     try {
       return inject(AcronymExpanderService, { optional: true });
-    } catch {
+    } catch (e) {
+      console.debug('[ExportService] AcronymExpanderService DI fallback:', (e as Error)?.message);
       return null;
     }
   })();
@@ -98,8 +177,8 @@ export class ExportService {
           return cleaned;
         }
       }
-    } catch {
-      // Fallback
+    } catch (e) {
+      console.debug('[ExportService] DOMPurify sanitize fallback:', (e as Error)?.message);
     }
 
     // Pure character-by-character tag stripper state machine (100% immune to CodeQL multi-character flags)
@@ -119,12 +198,16 @@ export class ExportService {
     return result;
   }
 
-  public buildFhirR4Bundle(patientData: any): any {
-    const sanitizedP = this.sanitizeObject(patientData);
+  public buildFhirR4Bundle(patientData: Partial<IPatient>): IFhirBundle {
+    const sanitizedP = this.sanitizeObject(patientData) as IPatient & {
+      conditions?: string[];
+      genomicProfile?: Partial<IFhirGenomicObservation>[];
+      patientState?: { occupation?: string };
+    };
     const nowIso = new Date().toISOString();
     const patientRef = `Patient/${sanitizedP.id || 'p001'}`;
 
-    const entries: any[] = [
+    const entries: { resource: IFhirResource }[] = [
       {
         resource: {
           resourceType: 'Patient',
@@ -369,9 +452,8 @@ export class ExportService {
       }
     });
 
-    // --- Genomic Observations ---
     if (Array.isArray(sanitizedP.genomicProfile)) {
-      sanitizedP.genomicProfile.forEach((g: any, idx: number) => {
+      sanitizedP.genomicProfile.forEach((g: Partial<IFhirGenomicObservation>, idx: number) => {
         entries.push({
           resource: {
             resourceType: 'Observation',
@@ -526,16 +608,21 @@ export class ExportService {
     };
   }
 
-  async exportPdfReport(data: any, patientName: string = 'Patient'): Promise<void> {
+  async exportPdfReport(
+    data: string | { report?: Record<string, string>; summary?: string; cognitiveLevel?: string; language?: string },
+    patientName: string = 'Patient'
+  ): Promise<void> {
     return this.downloadAsPdf(data, patientName);
   }
 
-  private sanitizeObject(obj: any): any {
+  private sanitizeObject(obj: unknown): unknown {
     if (typeof obj === 'string') return this.sanitizeForExport(obj);
     if (Array.isArray(obj)) return obj.map(item => this.sanitizeObject(item));
     if (typeof obj === 'object' && obj !== null) {
-      const res: any = {};
-      for (const key of Object.keys(obj)) res[key] = this.sanitizeObject(obj[key]);
+      const res: Record<string, unknown> = {};
+      for (const key of Object.keys(obj)) {
+        res[key] = this.sanitizeObject((obj as Record<string, unknown>)[key]);
+      }
       return res;
     }
     return obj;
@@ -544,7 +631,8 @@ export class ExportService {
   private get markdownService(): MarkdownService | null {
     try {
       return inject(MarkdownService, { optional: true });
-    } catch {
+    } catch (e) {
+      console.debug('[ExportService] MarkdownService DI fallback:', (e as Error)?.message);
       return null;
     }
   }
@@ -556,7 +644,10 @@ export class ExportService {
    * Uses the PocketGull design system: Inter font, brand colours, section cards,
    * markdown-rendered prose, proper tables, blockquotes, and page-break hints.
    */
-  async downloadAsPdf(data: any, patientName: string = 'Patient'): Promise<void> {
+  async downloadAsPdf(
+    data: string | { report?: Record<string, string>; summary?: string; cognitiveLevel?: string; language?: string },
+    patientName: string = 'Patient'
+  ): Promise<void> {
     console.log('[ExportService] Opening styled print report for:', patientName);
 
     const renderMd = (md: string): string => {
@@ -568,7 +659,8 @@ export class ExportService {
           return (marked as any)(md) as string;
         }
         return `<p>${md}</p>`;
-      } catch {
+      } catch (e) {
+        console.debug('[ExportService] Markdown parse fallback:', (e as Error)?.message);
         return `<p>${md}</p>`;
       }
     };
@@ -599,10 +691,11 @@ export class ExportService {
       'Patient Education': '#7C3AED',
     };
 
-    const report = typeof data.report === 'object' ? data.report : {};
-    const summary = data.summary || '';
-    const cognitiveLevel = data.cognitiveLevel || 'standard';
-    const language = data.language || 'English';
+    const isString = typeof data === 'string';
+    const report = (!isString && data && typeof data.report === 'object') ? data.report : {};
+    const summary = isString ? data : (data?.summary || '');
+    const cognitiveLevel = (!isString && data?.cognitiveLevel) || 'standard';
+    const language = (!isString && data?.language) || 'English';
 
     const cognitiveBadgeHtml = (cognitiveLevel !== 'standard' || (language && language.toLowerCase() !== 'english')) ? `
             <div style="margin-bottom: 24px; padding: 12px 18px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; font-family: monospace; font-size: 9pt; color: #c2410c; display: flex; align-items: center; justify-content: space-between;">
@@ -686,7 +779,7 @@ export class ExportService {
   <title>Pocket Gull Clinical Report — ${patientName}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Permanent+Marker&family=Caveat:wght@700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -702,7 +795,15 @@ export class ExportService {
       --amber: #D97706;
       --violet: #7C3AED;
       --radius: 10px;
-      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-display: 'Permanent Marker', 'Caveat', cursive, sans-serif;
+      --font-clinical: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+      --font: var(--font-clinical);
+    }
+
+    h1, h2, h3, .brand-name, .doc-title {
+      font-family: var(--font-display) !important;
+      letter-spacing: -0.01em;
     }
 
     /* Provide missing tailwind dimensions for inline icons */
@@ -1145,13 +1246,25 @@ export class ExportService {
           parser = this.markdownService?.parser();
           if (parser) { clearInterval(interval); resolve(); }
         }, 50);
-        setTimeout(() => { clearInterval(interval); resolve(); }, 3000);
+        setTimeout(() => { clearInterval(interval); resolve(); }, 500);
       });
     }
 
     const renderMd = (md: string): string => {
       if (!md) return '';
-      try { return (parser as any).parse(md) as string; } catch { return `<p>${md}</p>`; }
+      try {
+        if (parser && typeof (parser as any).parse === 'function') {
+          return (parser as any).parse(md) as string;
+        } else if (typeof marked.parse === 'function') {
+          return marked.parse(md) as string;
+        } else if (typeof marked === 'function') {
+          return (marked as any)(md) as string;
+        }
+        return `<p>${md.replace(/\n/g, '<br/>')}</p>`;
+      } catch (e) {
+        console.debug('[ExportService] Markdown parse fallback:', (e as Error)?.message);
+        return `<p>${md.replace(/\n/g, '<br/>')}</p>`;
+      }
     };
 
     const timestamp = new Date().toLocaleString('en-US', {
@@ -1830,6 +1943,13 @@ export class ExportService {
 
     </div>
   </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        window.print();
+      }, 400);
+    });
+  </script>
 </body>
 </html>`;
 
@@ -1851,7 +1971,10 @@ export class ExportService {
   /**
    * Generates and downloads a FHIR DiagnosticReport (JSON) for the analysis only.
    */
-  async downloadAsFhir(data: any, patientName: string = 'Patient'): Promise<void> {
+  async downloadAsFhir(
+    data: { summary?: string; report?: string | Record<string, string> },
+    patientName: string = 'Patient'
+  ): Promise<void> {
     console.log('[ExportService] Starting FHIR DiagnosticReport generation...');
     try {
       const fhirReport = {
@@ -2003,7 +2126,7 @@ export class ExportService {
 
       vitalMappings.forEach(({ field, loinc, display }) => {
         const value = vitals[field];
-        if (!value) return;
+        if (!value || typeof value !== 'string') return;
         entries.push({
           resource: {
             resourceType: 'Observation',
@@ -2087,18 +2210,18 @@ export class ExportService {
 
       // 5. Y-BOCs Assessments (QuestionnaireResponse and Observation)
       patient.history
-        .filter(h => h.type === 'Y-BOCsAssessment')
-        .forEach((entry: any, i) => {
+        .forEach((entry, i) => {
+          if (entry.type !== 'Y-BOCsAssessment') return;
           const assessment = entry.assessment;
           if (!assessment) return;
 
           // Add QuestionnaireResponse
-          const items: any[] = [];
+          const items: { linkId: string; text?: string; item?: unknown[]; answer?: { valueString?: string; valueInteger?: number }[] }[] = [];
           
           // Add checklist answers
           if (assessment.checklistAnswers) {
-            const checklistItems: any[] = [];
-            Object.entries(assessment.checklistAnswers).forEach(([idStr, val]: [string, any]) => {
+            const checklistItems: { linkId: string; answer: { valueString: string }[] }[] = [];
+            Object.entries(assessment.checklistAnswers).forEach(([idStr, val]: [string, { past: boolean; current: boolean }]) => {
               checklistItems.push({
                 linkId: `symptom-${idStr}`,
                 answer: [{
@@ -2117,8 +2240,8 @@ export class ExportService {
 
           // Add severity answers
           if (assessment.severityAnswers) {
-            const severityItems: any[] = [];
-            Object.entries(assessment.severityAnswers).forEach(([idStr, val]: [string, any]) => {
+            const severityItems: { linkId: string; answer: { valueInteger: number }[] }[] = [];
+            Object.entries(assessment.severityAnswers).forEach(([idStr, val]: [string, number]) => {
               severityItems.push({
                 linkId: `question-${idStr}`,
                 answer: [{
@@ -2320,7 +2443,7 @@ export class ExportService {
     const name = fhirPatient?.name?.[0]?.text || fhirPatient?.name?.[0]?.family || 'Imported Patient';
     const gender = this._fromFhirGender(fhirPatient?.gender);
     const age = fhirPatient?.birthDate ? this._ageFromBirthDate(fhirPatient.birthDate) : 0;
-    const lastVisitExt = fhirPatient?.extension?.find((e: any) => e.url?.includes('last-visit'));
+    const lastVisitExt = fhirPatient?.extension?.find(e => e.url?.includes('last-visit'));
     const lastVisit = lastVisitExt?.valueString || new Date().toISOString().split('T')[0].replace(/-/g, '.');
 
     // Conditions
@@ -2354,8 +2477,8 @@ export class ExportService {
     );
     issueObs.forEach(obs => {
       const partId = obs['bodySite']?.text || 'unknown';
-      const painExt = obs['extension']?.find((e: any) => e.url?.includes('pain-level'));
-      const noteIdExt = obs['extension']?.find((e: any) => e.url?.includes('note-id'));
+      const painExt = obs.extension?.find(e => e.url?.includes('pain-level'));
+      const noteIdExt = obs.extension?.find(e => e.url?.includes('note-id'));
       const issue: IBodyPartIssue = {
         id: partId,
         noteId: noteIdExt?.valueString || `note_imported_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -2370,7 +2493,7 @@ export class ExportService {
 
     // Goals
     const goalResource = resources.find(r => r['resourceType'] === 'Goal');
-    const patientGoals = goalResource?.description?.text || '';
+    const patientGoals = (typeof goalResource?.description === 'object' ? goalResource.description?.text : goalResource?.description) || '';
 
     // Analysis history
     const history: HistoryEntry[] = [];
@@ -2386,8 +2509,8 @@ export class ExportService {
             summary: report['conclusion'] || 'Imported Analysis',
             report: parsed,
           });
-        } catch {
-          // Skip malformed reports
+        } catch (e) {
+          console.debug('[ExportService] Skipping malformed FHIR report:', (e as Error)?.message);
         }
       });
 
@@ -2453,7 +2576,7 @@ export class ExportService {
       'Content-Type': 'application/json'
     };
     if (typeof window !== 'undefined') {
-      const userKey = window.localStorage?.getItem('GEMINI_API_KEY') || (window as any).GEMINI_API_KEY;
+      const userKey = this.storage.getItem('GEMINI_API_KEY') || (window as any).GEMINI_API_KEY;
       if (userKey) {
         headers['X-Gemini-API-Key'] = userKey.trim();
       }
@@ -2473,7 +2596,7 @@ export class ExportService {
       throw new Error(`OCR extraction failed: ${errText || response.statusText}`);
     }
 
-    const ocrData = await response.json();
+    const ocrData = (await response.json()) as IOcrData;
 
     const patient: IPatient = {
       id: `ocr_${Date.now()}`,
@@ -2506,7 +2629,7 @@ export class ExportService {
     };
 
     if (ocrData.issues && Array.isArray(ocrData.issues)) {
-      ocrData.issues.forEach((issue: any) => {
+      ocrData.issues.forEach((issue) => {
         const partId = issue.partId;
         if (!patient.issues[partId]) {
           patient.issues[partId] = [];
@@ -2523,9 +2646,9 @@ export class ExportService {
     }
 
     if (ocrData.medications && Array.isArray(ocrData.medications)) {
-      patient.medications = ocrData.medications.map((m: any) => ({
+      patient.medications = ocrData.medications.map((m) => ({
         id: `ocr_med_${Math.random().toString(36).substr(2, 5)}`,
-        name: m.name,
+        name: m.name || '',
         value: `${m.dosage || ''} - ${m.frequency || ''}`.trim()
       }));
     }
@@ -2633,7 +2756,7 @@ export class ExportService {
   }
 
   exportPatientToFhirJson(patient: IPatient): void {
-    const sanitizedP = this.sanitizeObject(patient);
+    const sanitizedP = this.sanitizeObject(patient) as IPatient;
     const bundle: IFhirBundle = {
       resourceType: 'Bundle',
       id: `bundle-${sanitizedP.id}-${Date.now()}`,
@@ -2718,7 +2841,7 @@ export class ExportService {
 
   // ─── Helpers ──────────────────────────────────────────────
 
-  private _downloadJson(data: any, filename: string): void {
+  private _downloadJson(data: unknown, filename: string): void {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

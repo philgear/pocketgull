@@ -3,8 +3,8 @@ name: "Fuzz Testing"
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'pocketgull_api/**'
+  pull_request:
+    branches: [ "main" ]
   schedule:
     # Run every Saturday at 4:00 AM UTC
     - cron: '0 4 * * 6'

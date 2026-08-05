@@ -308,8 +308,8 @@ export class PocketGullButtonComponent implements AfterContentChecked {
     ].filter(Boolean).join(' ');
   }
 
-  private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch { return null; } })();
-  private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch { return null; } })();
+  private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch (e) { console.debug('[PocketGullButton] PetAuditoryService DI fallback:', (e as Error)?.message); return null; } })();
+  private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch (e) { console.debug('[PocketGullButton] ThemeService DI fallback:', (e as Error)?.message); return null; } })();
 
   onClick(event: MouseEvent) {
     if (!this.disabled() && !this.loading()) {

@@ -31,7 +31,8 @@ export class SoapNoteGeneratorService {
     } else {
       try {
         this.patientState = inject(PatientStateService, { optional: true });
-      } catch {
+      } catch (e) {
+        console.debug('[SoapNoteGenerator] PatientStateService DI fallback:', (e as Error)?.message);
         this.patientState = null;
       }
     }

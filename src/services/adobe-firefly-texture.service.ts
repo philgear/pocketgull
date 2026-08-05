@@ -107,8 +107,8 @@ export class AdobeFireflyTextureService {
 
         this.textureCache.set(type, loadedTexture);
         return loadedTexture;
-      } catch {
-        // Fallback on exception
+      } catch (e) {
+        console.debug('[AdobeFireflyTexture] Texture load fallback to procedural:', (e as Error)?.message);
       }
     }
 

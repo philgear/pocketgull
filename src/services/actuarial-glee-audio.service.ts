@@ -792,7 +792,7 @@ export class ActuarialGleeAudioService {
     if (this.audioCtx) {
       try {
         this.audioCtx.close();
-      } catch (e) {}
+      } catch (e) { /* Context may already be closed */ }
       this.audioCtx = null;
     }
     this.masterGain = null;

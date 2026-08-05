@@ -21,7 +21,8 @@ export class CounterfactualSimulationService {
     } else {
       try {
         this.patientState = inject(PatientStateService, { optional: true });
-      } catch {
+      } catch (e) {
+        console.debug('[CounterfactualSimulation] PatientStateService DI fallback:', (e as Error)?.message);
         this.patientState = null;
       }
     }

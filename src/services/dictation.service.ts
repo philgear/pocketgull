@@ -317,7 +317,8 @@ export class DictationService {
 
       window.speechSynthesis.speak(utterance);
       return true;
-    } catch {
+    } catch (e) {
+      console.debug('[DictationService] Speech synthesis failed:', (e as Error)?.message);
       return false;
     }
   }

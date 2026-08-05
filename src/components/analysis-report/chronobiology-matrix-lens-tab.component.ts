@@ -4,6 +4,7 @@ import { ChronobiologyMatrixComponent } from '../chronobiology-matrix.component'
 import { ChronoClockDecisionRailComponent } from '../chrono-clock-decision-rail.component';
 import { ChronoWeeklyMealPlannerComponent } from '../chrono-weekly-meal-planner.component';
 import { ClinicalSleepTwinDashboardComponent } from '../clinical-sleep-twin-dashboard.component';
+import { FunctionalCircadianSynergyBridgeComponent } from './functional-circadian-synergy-bridge.component';
 
 @Component({
   selector: 'app-chronobiology-matrix-lens-tab',
@@ -13,11 +14,15 @@ import { ClinicalSleepTwinDashboardComponent } from '../clinical-sleep-twin-dash
     ChronobiologyMatrixComponent,
     ChronoClockDecisionRailComponent,
     ChronoWeeklyMealPlannerComponent,
-    ClinicalSleepTwinDashboardComponent
+    ClinicalSleepTwinDashboardComponent,
+    FunctionalCircadianSynergyBridgeComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="w-full space-y-6">
+      <!-- Cross-Lens Functional-Circadian Synergy Engine -->
+      <app-functional-circadian-synergy-bridge></app-functional-circadian-synergy-bridge>
+
       <!-- Chrono-Clock Decision Rail -->
       <app-chrono-clock-decision-rail></app-chrono-clock-decision-rail>
 
@@ -33,3 +38,4 @@ import { ClinicalSleepTwinDashboardComponent } from '../clinical-sleep-twin-dash
   `
 })
 export class ChronobiologyMatrixLensTabComponent {}
+

@@ -47,9 +47,14 @@ Pocket Gull's valuation scales rapidly based on its development and validation p
 
 | Stage | Valuation Range | Key Drivers & Justification |
 | :--- | :--- | :--- |
-| **Pre-Revenue / Tech Asset Only** <br>*(Current Phase)* | **$2.5M – $5.0M** | **Proprietary Tech Stack & Architecture:** <br>• Dual-engine containerized backend (Node.js/Express + FastAPI Python sidecar)<br>• Real-time, full-duplex voice consultation pipeline (Gemini Live API)<br>• Google Cloud Healthcare API & FHIR compliance architecture. |
-| **Early Clinical Pilot** <br>*(1–3 active clinics or health systems)* | **$6.0M – $10.0M** | **Real-World Validation:** <br>• Clinical user adoption/usage metrics (active consultations logged).<br>• Proof of time-savings (e.g., "reduces charting time by 30%").<br>• Letter of Intent (LOI) signed for future commercial transition. |
+| **Pre-Revenue / Tech Asset Only** <br>*(Current Phase)* | **$5.0M – $8.0M** | **Proprietary Tech Stack & Architecture (COCOMO II: $15.86M cost-to-replicate):** <br>• 338K SLOC across 993 files (Angular, Flutter/Dart, Python FastAPI)<br>• 673 person-months estimated effort (56.1 solo-developer-years)<br>• Dual-engine containerized backend (Node.js/Express + FastAPI Python sidecar)<br>• Real-time, full-duplex voice consultation pipeline (Gemini Live API)<br>• Google Cloud Healthcare API & FHIR compliance architecture<br>• OpenSSF Scorecard 10/10, zero SBOM NOASSERTION, zero swallowed errors. |
+| **Early Clinical Pilot** <br>*(1–3 active clinics or health systems)* | **$10.0M – $18.0M** | **Real-World Validation:** <br>• Clinical user adoption/usage metrics (active consultations logged).<br>• Proof of time-savings (e.g., "reduces charting time by 30%").<br>• Letter of Intent (LOI) signed for future commercial transition. |
 | **Commercial SaaS** <br>*(Contracted ARR)* | **8x – 15x ARR** *(Annual Recurring Revenue)* | **Market Traction:** <br>• High enterprise retention rate.<br>• Integration into primary EHR systems (Epic/Cerner App Orchard). |
+
+---
+
+> [!TIP]
+> **Multi-Model Cost-to-Replicate Analysis:** Four independent estimation models (COCOMO II, COSYSMO, COCOTS, SLIM/QSM) converge on a **$15.9M – $24.9M** cost-to-replicate range. See [multi_model_cost_estimation.md](file:///c:/Users/philg/Pocketgull/pocketgull/docs/multi_model_cost_estimation.md) for the full breakdown, including a 18-component COTS integration inventory and systems engineering overhead calculation.
 
 ---
 
@@ -126,7 +131,7 @@ graph TD
 ### 2. Vertex AI Operations Best Practices
 * **Vertex AI Search Grounding:** Ground Gemini's responses in internal clinical reference manuals or NIH guidelines using Vertex AI Search to eliminate hallucinations and secure factual citations.
 * **Supervised Fine-Tuning (SFT):** Fine-tune Gemini 1.5 Flash in the **Vertex AI Model Registry** on de-identified clinical notes to capture specialized medical shorthand.
-* **Automated Safety Evaluation:** Use **Vertex AI Pipelines** (based on Kubeflow) to build automated regression evaluation loops ensuring safety threshold filters (`BLOCK_MEDIUM_AND_ABOVE`) remain hardened.
+* **Safety Filter Policy:** Clinical CDS flows use `DANGEROUS_CONTENT = OFF` per [SECURITY.md §2](file:///c:/Users/philg/Pocketgull/pocketgull/SECURITY.md) to prevent false-positive blocking of standard-of-care content (drug dosages, overdose management, PHQ-9 screening). See `src/server/genkit.ts` for canonical implementation.
 
 
 

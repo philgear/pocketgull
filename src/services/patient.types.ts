@@ -221,11 +221,33 @@ export interface IAyurvedicStatus {
     dominantGunas?: string[];
 }
 
+export interface IFunctionalMedicineTelemetry {
+    inflammatoryScore: number; // 0-100
+    hsCrpEstimate: string; // e.g. "2.4 mg/L"
+    mitochondrialReserve: number; // 0-100 %
+    atpSynthesisRate: string; // e.g. "94% Optimal"
+    mucosalBarrierIntegrity: number; // 0-100 %
+    zonulinIndex: string; // e.g. "Normal (18 ng/mL)"
+    detoxificationCapacity: number; // 0-100 %
+    activeNode: 'Assimilate' | 'Defense & Repair' | 'Energize' | 'Biotransformation' | 'Transport' | 'Communication' | 'Structural';
+}
+
+export interface IChronobiologyTelemetry {
+    circadianDisruptionIndex: number; // 0-100
+    scnPhase: 'Morning Peak' | 'Solar Zenith' | 'Dusk Transition' | 'Melatonin Onset' | 'Nadir';
+    bmal1ExpressionPct: number; // 0-100%
+    per2DiurnalSlope: string; // e.g. "Steep (-0.45 ug/dL/hr)"
+    melatoninAmplitude: 'Robust' | 'Suppressed' | 'Blunted';
+    trfWindowHours: string; // e.g. "10:00 - 18:00 (8h TRF)"
+}
+
 export interface IPatientState {
     issues: Record<string, IBodyPartIssue[]>;
     patientGoals: string;
     vitals: IPatientVitals;
     ayurvedicStatus?: IAyurvedicStatus;
+    functionalMedicineTelemetry?: IFunctionalMedicineTelemetry;
+    chronobiologyTelemetry?: IChronobiologyTelemetry;
     dynamicNutrients?: IDynamicMarker[];
     oxidativeStressMarkers?: IDynamicMarker[];
     antioxidantSources?: IDynamicMarker[];
@@ -534,6 +556,14 @@ export interface IBookmark {
     ayurvedicDoshas?: ('Vata' | 'Pitta' | 'Kapha')[];
 }
 
+export interface IYbocsAssessmentData {
+    checklistAnswers?: Record<string, { past: boolean; current: boolean }>;
+    severityAnswers?: Record<string, number>;
+    dateCreated?: string;
+    totalScore?: number;
+    severityCategory?: string;
+}
+
 export type HistoryEntry = {
     type: 'Visit';
     date: string;
@@ -580,7 +610,7 @@ export type HistoryEntry = {
     type: 'Y-BOCsAssessment';
     date: string;
     summary: string;
-    assessment: any;
+    assessment: IYbocsAssessmentData;
 };
 
 export interface IPatient extends IPatientState {

@@ -118,7 +118,8 @@ export class HardwareTelemetryService {
       this.telemetry.set(data);
       this.error.set(null);
       this.logTelemetry(data);
-    } catch {
+    } catch (e) {
+      console.debug('[HardwareTelemetry] Fetch failed, using client fallback:', (e as Error)?.message);
       const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 8;
       const mem = (typeof navigator !== 'undefined' && (navigator as any).deviceMemory) || 16;
       const fallbackData: IHardwareTelemetry = {

@@ -1272,8 +1272,8 @@ export class MedicalChartSummaryComponent {
     try {
       const data = await firstValueFrom(this.http.get('/api/health/baselines'));
       this.baselines.set(data);
-    } catch {
-      // Ignore baseline fetch errors
+    } catch (e) {
+      console.debug('[MedicalSummary] Baseline fetch skipped:', (e as Error)?.message);
     }
   }
 

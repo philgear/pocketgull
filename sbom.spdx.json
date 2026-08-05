@@ -9,7 +9,7 @@
       "Tool: Pocket-Gull Automated Sentinel Guard",
       "Organization: Pocket-Gull Engineering"
     ],
-    "created": "2026-07-28T21:15:29.363Z"
+    "created": "2026-08-05T13:33:31.268Z"
   },
   "packages": [
     {
@@ -24,466 +24,466 @@
     {
       "name": "@angular/build",
       "SPDXID": "SPDXRef-Package--angular-build",
-      "versionInfo": "~22.0.7",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.8",
+      "downloadLocation": "https://github.com/angular/angular-cli",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/cli",
       "SPDXID": "SPDXRef-Package--angular-cli",
-      "versionInfo": "^22.0.7",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.7",
+      "downloadLocation": "https://github.com/angular/angular-cli",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/common",
       "SPDXID": "SPDXRef-Package--angular-common",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/compiler",
       "SPDXID": "SPDXRef-Package--angular-compiler",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/compiler-cli",
       "SPDXID": "SPDXRef-Package--angular-compiler-cli",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/core",
       "SPDXID": "SPDXRef-Package--angular-core",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/fire",
       "SPDXID": "SPDXRef-Package--angular-fire",
-      "versionInfo": "^20.0.1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "20.0.1",
+      "downloadLocation": "https://github.com/angular/angularfire",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/forms",
       "SPDXID": "SPDXRef-Package--angular-forms",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/platform-browser",
       "SPDXID": "SPDXRef-Package--angular-platform-browser",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/platform-server",
       "SPDXID": "SPDXRef-Package--angular-platform-server",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.1.0",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/router",
       "SPDXID": "SPDXRef-Package--angular-router",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/service-worker",
       "SPDXID": "SPDXRef-Package--angular-service-worker",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@angular/ssr",
       "SPDXID": "SPDXRef-Package--angular-ssr",
-      "versionInfo": "^22.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "22.0.5",
+      "downloadLocation": "https://github.com/angular/angular-cli",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@aws-crypto/sha256-js",
       "SPDXID": "SPDXRef-Package--aws-crypto-sha256-js",
-      "versionInfo": "^5.2.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "5.2.0",
+      "downloadLocation": "git@github.com:aws/aws-sdk-js-crypto-helpers",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@google-cloud/agones-sdk",
       "SPDXID": "SPDXRef-Package--google-cloud-agones-sdk",
-      "versionInfo": "^1.58.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "1.59.0",
+      "downloadLocation": "googleforgames/agones",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@google-cloud/secret-manager",
       "SPDXID": "SPDXRef-Package--google-cloud-secret-manager",
-      "versionInfo": "^6.3.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "6.3.0",
+      "downloadLocation": "https://github.com/googleapis/google-cloud-node",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@mcp-b/webmcp-polyfill",
       "SPDXID": "SPDXRef-Package--mcp-b-webmcp-polyfill",
-      "versionInfo": "^2.2.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "2.3.2",
+      "downloadLocation": "https://github.com/WebMCP-org/npm-packages",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@mlc-ai/web-llm",
       "SPDXID": "SPDXRef-Package--mlc-ai-web-llm",
-      "versionInfo": "^0.2.83",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.2.84",
+      "downloadLocation": "https://github.com/mlc-ai/web-llm",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/api",
       "SPDXID": "SPDXRef-Package--opentelemetry-api",
-      "versionInfo": "^1.9.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "1.9.1",
+      "downloadLocation": "open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/exporter-logs-otlp-http",
       "SPDXID": "SPDXRef-Package--opentelemetry-exporter-logs-otlp-http",
-      "versionInfo": "^0.221.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.221.0",
+      "downloadLocation": "https://github.com/open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/exporter-metrics-otlp-http",
       "SPDXID": "SPDXRef-Package--opentelemetry-exporter-metrics-otlp-http",
-      "versionInfo": "^0.221.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.221.0",
+      "downloadLocation": "open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/exporter-trace-otlp-http",
       "SPDXID": "SPDXRef-Package--opentelemetry-exporter-trace-otlp-http",
-      "versionInfo": "^0.221.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.221.0",
+      "downloadLocation": "open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/sdk-logs",
       "SPDXID": "SPDXRef-Package--opentelemetry-sdk-logs",
-      "versionInfo": "^0.221.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.221.0",
+      "downloadLocation": "https://github.com/open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/sdk-metrics",
       "SPDXID": "SPDXRef-Package--opentelemetry-sdk-metrics",
-      "versionInfo": "^2.9.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "2.9.0",
+      "downloadLocation": "open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/sdk-trace-base",
       "SPDXID": "SPDXRef-Package--opentelemetry-sdk-trace-base",
-      "versionInfo": "^2.9.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "2.9.0",
+      "downloadLocation": "open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@opentelemetry/sdk-trace-node",
       "SPDXID": "SPDXRef-Package--opentelemetry-sdk-trace-node",
-      "versionInfo": "^2.10.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "2.10.0",
+      "downloadLocation": "open-telemetry/opentelemetry-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "@tailwindcss/typography",
       "SPDXID": "SPDXRef-Package--tailwindcss-typography",
-      "versionInfo": "^0.5.19",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.5.20",
+      "downloadLocation": "https://github.com/tailwindlabs/tailwindcss-typography",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@types/crypto-js",
       "SPDXID": "SPDXRef-Package--types-crypto-js",
-      "versionInfo": "^4.2.2",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "4.2.2",
+      "downloadLocation": "https://github.com/DefinitelyTyped/DefinitelyTyped",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@types/express",
       "SPDXID": "SPDXRef-Package--types-express",
-      "versionInfo": "^5.0.6",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "5.0.6",
+      "downloadLocation": "https://github.com/DefinitelyTyped/DefinitelyTyped",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "@types/three",
       "SPDXID": "SPDXRef-Package--types-three",
-      "versionInfo": "^0.185.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.185.0",
+      "downloadLocation": "https://github.com/DefinitelyTyped/DefinitelyTyped",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "autoprefixer",
       "SPDXID": "SPDXRef-Package-autoprefixer",
-      "versionInfo": "^10.4.27",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "10.5.2",
+      "downloadLocation": "postcss/autoprefixer",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "avs-therapy",
       "SPDXID": "SPDXRef-Package-avs-therapy",
-      "versionInfo": "workspace:*",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.0.0",
+      "downloadLocation": "https://github.com/philgear/pocketgull/tree/main/avs-therapy",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "LicenseRef-Proprietary-Understory"
     },
     {
       "name": "chart.js",
       "SPDXID": "SPDXRef-Package-chart-js",
-      "versionInfo": "^4.5.1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "4.5.1",
+      "downloadLocation": "https://github.com/chartjs/Chart.js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "compression",
       "SPDXID": "SPDXRef-Package-compression",
-      "versionInfo": "^1.8.1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "1.8.1",
+      "downloadLocation": "expressjs/compression",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "cors",
       "SPDXID": "SPDXRef-Package-cors",
-      "versionInfo": "^2.8.6",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "2.8.6",
+      "downloadLocation": "expressjs/cors",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "crypto-js",
       "SPDXID": "SPDXRef-Package-crypto-js",
-      "versionInfo": "^4.2.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "4.2.0",
+      "downloadLocation": "http://github.com/brix/crypto-js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "docs-study",
       "SPDXID": "SPDXRef-Package-docs-study",
-      "versionInfo": "workspace:*",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "1.0.0-rc10",
+      "downloadLocation": "https://github.com/philgear/pocketgull/tree/main/docs-study",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "LicenseRef-Proprietary-Understory"
     },
     {
       "name": "dompurify",
       "SPDXID": "SPDXRef-Package-dompurify",
-      "versionInfo": "^3.4.12",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "3.4.12",
+      "downloadLocation": "git://github.com/cure53/DOMPurify",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "(MPL-2.0 OR Apache-2.0)"
     },
     {
       "name": "express",
       "SPDXID": "SPDXRef-Package-express",
-      "versionInfo": "^5.2.1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "5.2.1",
+      "downloadLocation": "expressjs/express",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "firebase",
       "SPDXID": "SPDXRef-Package-firebase",
-      "versionInfo": "^12.16.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "12.16.0",
+      "downloadLocation": "https://github.com/firebase/firebase-js-sdk",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "google-auth-library",
       "SPDXID": "SPDXRef-Package-google-auth-library",
-      "versionInfo": "^10.6.2",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "10.9.0",
+      "downloadLocation": "https://github.com/googleapis/google-cloud-node",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "helmet",
       "SPDXID": "SPDXRef-Package-helmet",
-      "versionInfo": "^8.1.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "8.2.0",
+      "downloadLocation": "git://github.com/helmetjs/helmet",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "http-proxy-middleware",
       "SPDXID": "SPDXRef-Package-http-proxy-middleware",
       "versionInfo": "4.2.0",
-      "downloadLocation": "NOASSERTION",
+      "downloadLocation": "https://github.com/chimurai/http-proxy-middleware",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "jspdf",
       "SPDXID": "SPDXRef-Package-jspdf",
-      "versionInfo": "^4.2.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "4.2.1",
+      "downloadLocation": "https://github.com/parallax/jsPDF",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "lean-qr",
       "SPDXID": "SPDXRef-Package-lean-qr",
-      "versionInfo": "^2.7.1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "2.7.2",
+      "downloadLocation": "https://github.com/davidje13/lean-qr",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "marked",
       "SPDXID": "SPDXRef-Package-marked",
-      "versionInfo": "^18.0.5",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "18.0.5",
+      "downloadLocation": "git://github.com/markedjs/marked",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "patch-package",
       "SPDXID": "SPDXRef-Package-patch-package",
-      "versionInfo": "^8.0.1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "8.0.1",
+      "downloadLocation": "github:ds300/patch-package",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "pocketgull-api",
       "SPDXID": "SPDXRef-Package-pocketgull-api",
-      "versionInfo": "workspace:*",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.9.0",
+      "downloadLocation": "https://github.com/philgear/pocketgull/tree/main/pocketgull_api",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "LicenseRef-Proprietary-Understory"
     },
     {
       "name": "postcss",
       "SPDXID": "SPDXRef-Package-postcss",
-      "versionInfo": "^8.5.19",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "8.5.23",
+      "downloadLocation": "postcss/postcss",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "rxjs",
       "SPDXID": "SPDXRef-Package-rxjs",
-      "versionInfo": "^7.8.2",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "7.8.2",
+      "downloadLocation": "https://github.com/reactivex/rxjs",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "Apache-2.0"
     },
     {
       "name": "sloc",
       "SPDXID": "SPDXRef-Package-sloc",
-      "versionInfo": "^0.3.2",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.3.2",
+      "downloadLocation": "git://github.com/flosse/sloc",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "socket.io",
       "SPDXID": "SPDXRef-Package-socket-io",
-      "versionInfo": "^4.2.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "4.8.3",
+      "downloadLocation": "https://github.com/socketio/socket.io",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "socket.io-client",
       "SPDXID": "SPDXRef-Package-socket-io-client",
-      "versionInfo": "^4.2.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "4.8.3",
+      "downloadLocation": "https://github.com/socketio/socket.io",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "swagger-ui-express",
       "SPDXID": "SPDXRef-Package-swagger-ui-express",
-      "versionInfo": "^5.0.1",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "5.0.1",
+      "downloadLocation": "git@github.com:scottie1984/swagger-ui-express",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "tailwindcss",
       "SPDXID": "SPDXRef-Package-tailwindcss",
-      "versionInfo": "^3.4.19",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "3.4.19",
+      "downloadLocation": "https://github.com/tailwindlabs/tailwindcss#v3",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "three",
       "SPDXID": "SPDXRef-Package-three",
-      "versionInfo": "^0.185.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "0.185.0",
+      "downloadLocation": "https://github.com/mrdoob/three.js",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "ws",
       "SPDXID": "SPDXRef-Package-ws",
-      "versionInfo": "^8.21.0",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "8.21.0",
+      "downloadLocation": "https://github.com/websockets/ws",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     },
     {
       "name": "zod",
       "SPDXID": "SPDXRef-Package-zod",
-      "versionInfo": "^4.3.6",
-      "downloadLocation": "NOASSERTION",
+      "versionInfo": "4.4.3",
+      "downloadLocation": "https://github.com/colinhacks/zod",
       "filesAnalyzed": false,
-      "licenseConcluded": "NOASSERTION"
+      "licenseConcluded": "MIT"
     }
   ]
 }

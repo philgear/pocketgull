@@ -3,20 +3,34 @@ kind: Fleet
 metadata:
   name: pocketgull-consult-fleet
   namespace: default
+  labels:
+    app.kubernetes.io/name: pocketgull-agones
+    app.kubernetes.io/part-of: discord-embedded-activity
 spec:
   replicas: 3 # keep 3 warm pods ready
   scheduling: Packed # group pods tightly on nodes
   template:
+    metadata:
+      annotations:
+        agones.dev/sdk-version: "1.38.0"
+        discord.com/activity-sdk: "enabled"
     spec:
       ports:
       - name: websocket-port
         containerPort: 4200
         portPolicy: Dynamic # let Agones allocate a random node port for WebSocket media streams
+      - name: discord-voice-port
+        containerPort: 4201
+        portPolicy: Dynamic # WebRTC media stream port for Discord voice entrainment
+      health:
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        failureThreshold: 3
       template:
         spec:
           containers:
           - name: pocketgull-app
-            image: gcr.io/philgear-understory/pocketgull:latest
+            image: gcr.io/gen-lang-client-0540208645/pocketgull:latest
             imagePullPolicy: Always
             securityContext:
               allowPrivilegeEscalation: false
@@ -30,5 +44,11 @@ spec:
             env:
             - name: PORT
               value: "4200"
+            - name: VOICE_PORT
+              value: "4201"
             - name: NODE_ENV
               value: "production"
+            - name: DISCORD_ACTIVITY_ENABLED
+              value: "true"
+            - name: GCP_PROJECT_ID
+              value: "gen-lang-client-0540208645"

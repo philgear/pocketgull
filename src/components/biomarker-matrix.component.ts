@@ -154,11 +154,6 @@ export class BiomarkerMatrixComponent {
   protected readonly themeService = inject(ThemeService);
 
   readonly personaBiomarkerTitle = computed(() => {
-    const mode = this.themeService.analogyLensMode();
-    if (mode === 'arborist') return '🌳 Sap & Aquifer Biomarker Telemetry';
-    if (mode === 'mechanic') return '🏎️ Fluid Line & Compression PSI Telemetry';
-    if (mode === 'gentleman') return '🎩 Brass Governor & Etheric Dial Telemetry';
-    if (mode === 'muse') return '✨ Harmonic Solfeggio Resonance Telemetry';
     return '🔬 Biomarker Matrix Telemetry';
   });
 

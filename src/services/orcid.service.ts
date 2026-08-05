@@ -1,5 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { SecureStorageService } from './secure-storage.service';
 
 export interface IOrcidWork {
   title: string;
@@ -21,6 +22,7 @@ export interface IOrcidProfile {
 })
 export class OrcidService {
   private http = inject(HttpClient);
+  private storage = inject(SecureStorageService);
 
   readonly orcidId = signal<string | null>(null);
   readonly orcidProfile = signal<IOrcidProfile | null>(null);
@@ -31,12 +33,10 @@ export class OrcidService {
   readonly isConnected = computed(() => !!this.orcidId());
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      const savedId = localStorage.getItem('orcid_id');
-      if (savedId) {
-        this.orcidId.set(savedId);
-        this.fetchProfile(savedId);
-      }
+    const savedId = this.storage.getItem('orcid_id');
+    if (savedId) {
+      this.orcidId.set(savedId);
+      this.fetchProfile(savedId);
     }
   }
 
@@ -60,9 +60,7 @@ export class OrcidService {
       this.orcidId.set(cleanId);
       this.orcidProfile.set(parsed);
       
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('orcid_id', cleanId);
-      }
+      this.storage.setItem('orcid_id', cleanId);
       return true;
     } catch (err: any) {
       console.error('Failed to load ORCID profile:', err);
@@ -80,9 +78,7 @@ export class OrcidService {
     this.orcidId.set(null);
     this.orcidProfile.set(null);
     this.error.set(null);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('orcid_id');
-    }
+    this.storage.removeItem('orcid_id');
   }
 
   private async fetchProfile(id: string) {
@@ -103,31 +99,41 @@ export class OrcidService {
     const person = raw?.person;
     const givenNames = person?.name?.['given-names']?.value || '';
     const familyName = person?.name?.['family-name']?.value || '';
-    const name = [givenNames, familyName].filter(Boolean).join(' ') || 'Unknown Researcher';
+    const name = `${givenNames} ${familyName}`.trim() || 'Anonymous Researcher';
 
-    // Parse Keywords
-    const keywordsRaw = person?.keywords?.keyword || [];
-    const keywords = keywordsRaw.map((k: any) => k.content).filter(Boolean);
+    const keywords: string[] = [];
+    if (person?.keywords?.keyword && Array.isArray(person.keywords.keyword)) {
+      for (const k of person.keywords.keyword) {
+        if (k?.content) keywords.push(k.content);
+      }
+    }
 
-    // Parse URLs
-    const urlsRaw = person?.['researcher-urls']?.['researcher-url'] || [];
-    const urls = urlsRaw.map((u: any) => ({
-      name: u['url-name'] || 'Website',
-      url: u.url?.value || ''
-    })).filter((u: any) => !!u.url);
+    const urls: { name: string; url: string }[] = [];
+    if (person?.['researcher-urls']?.['researcher-url'] && Array.isArray(person['researcher-urls']['researcher-url'])) {
+      for (const u of person['researcher-urls']['researcher-url']) {
+        if (u?.url?.value) {
+          urls.push({ name: u['url-name'] || u.url.value, url: u.url.value });
+        }
+      }
+    }
 
-    // Parse Works
-    const worksRaw = raw?.['activities-summary']?.works?.group || [];
     const works: IOrcidWork[] = [];
-
-    for (const group of worksRaw) {
-      const summary = group['work-summary']?.[0];
-      if (summary) {
-        const title = summary.title?.title?.value || 'Untitled Work';
-        const url = summary.url?.value || '';
-        const type = summary.type || '';
-        const year = summary['publication-date']?.year?.value || '';
-        works.push({ title, url, type, year });
+    const groups = raw?.['activities-summary']?.works?.group;
+    if (groups && Array.isArray(groups)) {
+      for (const group of groups) {
+        const summaries = group?.['work-summary'];
+        if (summaries && Array.isArray(summaries) && summaries.length > 0) {
+          const work = summaries[0]; // Get primary summary
+          const title = work?.title?.title?.value;
+          if (title) {
+            works.push({
+              title,
+              url: work.url?.value,
+              type: work.type,
+              year: work['publication-date']?.year?.value
+            });
+          }
+        }
       }
     }
 

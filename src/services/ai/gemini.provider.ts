@@ -5,6 +5,7 @@ import { AI_CONFIG } from '../ai-provider.types';
 import { IClinicalMetrics } from '../clinical-intelligence.service';
 import { IVerificationIssue } from '../../components/analysis-report.types';
 import { VerifyAiService } from '../verify-ai.service';
+import { SecureStorageService } from '../secure-storage.service';
 
 
 @Injectable({
@@ -13,6 +14,9 @@ import { VerifyAiService } from '../verify-ai.service';
 export class GeminiProvider implements IIntelligenceProvider {
     private config = inject(AI_CONFIG);
     private verifier = inject(VerifyAiService);
+    private storage = (() => {
+        try { return inject(SecureStorageService); } catch (e) { return new SecureStorageService(); }
+    })();
 
     // Chat session ID for server-side session management
     private chatSessionId: string | null = null;
@@ -21,11 +25,9 @@ export class GeminiProvider implements IIntelligenceProvider {
         const headers: Record<string, string> = {
             'Content-Type': 'application/json'
         };
-        if (typeof window !== 'undefined') {
-            const userKey = window.localStorage?.getItem('GEMINI_API_KEY') || (window as any).GEMINI_API_KEY;
-            if (userKey) {
-                headers['X-Gemini-API-Key'] = userKey.trim();
-            }
+        const userKey = this.storage.getItem('GEMINI_API_KEY') || (typeof window !== 'undefined' ? (window as any).GEMINI_API_KEY : null);
+        if (userKey) {
+            headers['X-Gemini-API-Key'] = userKey.trim();
         }
         return headers;
     }

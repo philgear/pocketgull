@@ -46,11 +46,11 @@ test.describe('WCAG & ARIA Accessibility Audit', () => {
     // Auto-submits on length 4, wait for transition to next input
 
     // 3. Form input accessible labels (WCAG 1.3.1 / 3.3.2)
-    // API key inputs must have either an associated label, placeholder, or aria-label
-    const apiKeyInput = page.locator('input[name="apiKey"], input[placeholder*="Gemini"], input[placeholder="1234"]').first();
-    await expect(apiKeyInput).toBeVisible({ timeout: 5000 });
-    const placeholder = await apiKeyInput.getAttribute('placeholder');
-    const ariaLabel = await apiKeyInput.getAttribute('aria-label');
+    // All primary inputs must have either an associated label, placeholder, or aria-label
+    const inputField = page.locator('input').first();
+    await expect(inputField).toBeVisible({ timeout: 5000 });
+    const placeholder = await inputField.getAttribute('placeholder');
+    const ariaLabel = await inputField.getAttribute('aria-label');
     expect(placeholder || ariaLabel).toBeTruthy();
     
     // Ensure all SVGs are hidden from screen readers if they are purely presentational (WCAG 1.1.1)

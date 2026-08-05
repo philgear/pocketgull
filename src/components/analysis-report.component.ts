@@ -78,6 +78,8 @@ import { ChronobiologyMatrixLensTabComponent } from './analysis-report/chronobio
 import { FunctionalMedicineMatrixLensTabComponent } from './analysis-report/functional-medicine-matrix-lens-tab.component';
 import { MaternalPostpartumLensTabComponent } from './analysis-report/maternal-postpartum-lens-tab.component';
 import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/seven-generations-stewardship-lens-tab.component';
+import { SocraticEpistemologyLensTabComponent } from './analysis-report/socratic-epistemology-lens-tab.component';
+import { NutritionalBypassLensTabComponent } from './analysis-report/nutritional-bypass-lens-tab.component';
 
 @Component({
   selector: 'app-analysis-report',
@@ -89,6 +91,8 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
     FunctionalMedicineMatrixLensTabComponent,
     MaternalPostpartumLensTabComponent,
     SevenGenerationsStewardshipLensTabComponent,
+    SocraticEpistemologyLensTabComponent,
+    NutritionalBypassLensTabComponent,
     ClinicalSleepTwinDashboardComponent,
     ChronobiologyMatrixComponent,
     FunctionalMedicineMatrixComponent,
@@ -1594,12 +1598,12 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
                  [class.dark:text-sky-200]="!themeService.isPlainLanguageMode()">
               <div class="flex items-center gap-3">
                 <span class="text-xl">
-                  {{ themeService.analogyLensMode() === 'arborist' ? '🌳' : (themeService.analogyLensMode() === 'mechanic' ? '🚗' : (themeService.isPlainLanguageMode() ? '📖' : '🔬')) }}
+                  {{ themeService.isPlainLanguageMode() ? '📖' : '🔬' }}
                 </span>
                 <div>
                   <h4 class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
                     <span>
-                      {{ themeService.analogyLensMode() === 'arborist' ? 'Plain Language Arborist Analogy Active' : (themeService.analogyLensMode() === 'mechanic' ? 'Plain Language Mechanic Analogy Active' : (themeService.isPlainLanguageMode() ? 'Plain Language Health Literacy Active' : 'Deep Clinical Rationale Active')) }}
+                      {{ themeService.isPlainLanguageMode() ? 'Plain Language Health Literacy Active' : 'Deep Clinical Rationale Active' }}
                     </span>
                     <span class="text-[9px] px-2 py-0.5 rounded-md font-mono uppercase font-bold"
                           [class.bg-emerald-500/20]="themeService.isPlainLanguageMode()"
@@ -1608,11 +1612,11 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
                           [class.bg-sky-500/20]="!themeService.isPlainLanguageMode()"
                           [class.text-sky-700]="!themeService.isPlainLanguageMode()"
                           [class.dark:text-sky-300]="!themeService.isPlainLanguageMode()">
-                      {{ themeService.isPlainLanguageMode() ? (themeService.analogyLensMode() === 'arborist' ? 'Botanical Tree Analogy' : (themeService.analogyLensMode() === 'mechanic' ? 'Automotive Chassis Analogy' : 'Patient Literacy')) : 'Physician & Specialist Level' }}
+                      {{ themeService.isPlainLanguageMode() ? 'Patient Literacy' : 'Physician & Specialist Level' }}
                     </span>
                   </h4>
                   <p class="text-[11px] opacity-90 font-medium mt-0.5">
-                    {{ themeService.analogyLensMode() === 'arborist' ? 'Clinical symptoms are translated into sap pressure, root hydration, and canopy foliage health for intuitive patient understanding.' : (themeService.analogyLensMode() === 'mechanic' ? 'Clinical symptoms are translated into engine RPM, hydraulic fluid pressure, and trailer hitch mechanical load.' : (themeService.isPlainLanguageMode() ? 'All clinical notes, recommendations, and diagnostic rationales are simplified for easy understanding.' : 'All clinical notes detail deep pathophysiological mechanisms, ICD-10 codes, and clinical evidence.')) }}
+                    {{ themeService.isPlainLanguageMode() ? 'All clinical notes, recommendations, and diagnostic rationales are simplified for easy understanding.' : 'All clinical notes detail deep pathophysiological mechanisms, ICD-10 codes, and clinical evidence.' }}
                   </p>
                 </div>
               </div>
@@ -1729,30 +1733,11 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
               @if (state.sentinelScope() === 'macro-fleet') {
                 <div class="mt-3 p-3 bg-white/90 dark:bg-zinc-950/90 rounded-md border border-emerald-500/30 text-gray-800 dark:text-zinc-200 animate-fadeIn">
                   <div class="flex items-center justify-between font-bold text-emerald-800 dark:text-emerald-300 mb-1">
-                    @if (themeService.analogyLensMode() === 'arborist') {
-                      <span>🌲 Sylvan Redwood Forest Sentinel (5,400 Grove Hectares Active)</span>
-                      <span>Hydration: 94.2% | Mycorrhizal Mesh: Synchronized</span>
-                    } @else if (themeService.analogyLensMode() === 'mechanic') {
-                      <span>🏎️ Commercial Fleet Motor Pool Sentinel (128 Vehicles Monitored)</span>
-                      <span>Obd-II Fleet DTC: 0 Critical | Fuel Eff: 98.4%</span>
-                    } @else if (themeService.analogyLensMode() === 'gentleman') {
-                      <span>🎩 Royal Naval Armada & Observatory Sentinel (42 Frigates)</span>
-                      <span>Atmospheric Depression: -2.4 hPa | Gales: Minimal</span>
-                    } @else {
-                      <span>🔬 Global WHO Population Health Registry Sentinel</span>
-                      <span>Herd Immunity: 96.1% | Regional AQI: Optimal</span>
-                    }
+                    <span>🔬 Global WHO Population Health Registry Sentinel</span>
+                    <span>Herd Immunity: 96.1% | Regional AQI: Optimal</span>
                   </div>
                   <p class="text-[11px] font-sans text-gray-600 dark:text-zinc-400 leading-snug">
-                    @if (themeService.analogyLensMode() === 'arborist') {
-                      "Forest canopy transpiration and subterranean root signals aggregated. Patient vitals synchronized with regional Sylvan grove resilience metrics."
-                    } @else if (themeService.analogyLensMode() === 'mechanic') {
-                      "Motor pool ECU telemetry and chassis load logs synthesized across 128 fleet units. Preventative maintenance schedule active."
-                    } @else if (themeService.analogyLensMode() === 'gentleman') {
-                      "Imperial naval chronometer governors and oceanic barometric depressions logged across all stations."
-                    } @else {
-                      "FHIR R4 population health registries and epidemiological surveillance networks connected to active patient strategy."
-                    }
+                    "FHIR R4 population health registries and epidemiological surveillance networks connected to active patient strategy."
                   </p>
                 </div>
               }
@@ -1770,6 +1755,12 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
               <div class="mb-6">
                 <app-dual-pane-consultation></app-dual-pane-consultation>
               </div>
+            }
+
+            <!-- Modular Report Lens Tabs -->
+            @defer (on idle) {
+              <app-socratic-epistemology-lens-tab></app-socratic-epistemology-lens-tab>
+              <app-nutritional-bypass-lens-tab></app-nutritional-bypass-lens-tab>
             }
 
             <!-- AI Comprehensive Report Sections -->
@@ -2435,7 +2426,8 @@ export class AnalysisReportComponent implements OnDestroy {
           try {
             const fullUrl = new URL(href, window.location.origin).href;
             this.state.openResearchUrl(fullUrl);
-          } catch {
+          } catch (e) {
+            console.debug('[AnalysisReport] URL parse fallback to raw href:', (e as Error)?.message);
             this.state.openResearchUrl(href);
           }
         }

@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-08-04
+
+**OpenSSF Scorecard 10/10 Compliance, Security Patch Audit, and CI Pipeline Hardening**
+
+### Security & Compliance
+- **[Security Audit & Dependency Patching] Workspace Vulnerability Elimination**:
+  - Remediated 12 reported advisories across `@angular/core`, `@angular/common`, `@angular/platform-server`, `undici`, `ip-address`, `brace-expansion`, `fast-uri`, and `socket.io-parser`.
+  - Updated Python FastAPI sidecar requirements (`pocketgull_api/requirements.txt`) for `pandas==3.0.5`, `fastapi==0.141.1`, `uvicorn==0.52.0`, and `joblib==1.5.3`.
+- **[OpenSSF Scorecard & CI Hardening] Scorecard 10/10 Verification**:
+  - Registered and linked active passing OpenSSF Best Practices badge (`#13644`) in [`README.md`](file:///c:/Users/philg/Pocketgull/pocketgull/README.md).
+  - Pinned GitHub Actions dependencies in [.github/workflows/ci.yml](file:///c:/Users/philg/Pocketgull/pocketgull/.github/workflows/ci.yml) to exact release SHA commit hashes.
+  - Enabled continuous container packaging (`docker/build-push-action` + SLSA provenance) and Atheris fuzz testing triggers on main branch pushes and pull requests.
+  - Resolved CodeQL workflow matrix initialization parameters for Python and JS/TS.
+
 ## [1.9.0] - 2026-08-03
 
 **What-If Counterfactual Simulation Engine, Automated Clinical SOAP Note Scribing, Hardware Telemetry & Somatic Grounding, and Playwright E2E Quality Audit Suite**

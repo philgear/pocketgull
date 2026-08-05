@@ -60,7 +60,8 @@ async function getNvidiaTelemetry(): Promise<IGpuTelemetry[]> {
         temperatureC: parseFloat(parts[6]) || 0
       };
     });
-  } catch {
+  } catch (e) {
+    console.debug('[Telemetry] nvidia-smi query failed (not installed?):', (e as Error)?.message);
     return [];
   }
 }
@@ -93,7 +94,7 @@ async function getAmdTelemetry(): Promise<IGpuTelemetry[]> {
           }
         });
         if (gpus.length > 0) return gpus;
-      } catch {}
+      } catch (e) { console.debug('[Telemetry] rocm-smi JSON parse failed:', (e as Error)?.message); }
     }
 
     // Fallback text parsing if JSON failed or isn't supported
@@ -137,7 +138,8 @@ async function getAmdTelemetry(): Promise<IGpuTelemetry[]> {
       }];
     }
     return [];
-  } catch {
+  } catch (e) {
+    console.debug('[Telemetry] rocm-smi query failed (not installed?):', (e as Error)?.message);
     return [];
   }
 }
@@ -165,7 +167,7 @@ async function getIntelTelemetry(): Promise<IGpuTelemetry[]> {
             temperatureC: dev.temperature || 0
           }];
         }
-      } catch {}
+      } catch (e) { console.debug('[Telemetry] xpu-smi JSON parse failed:', (e as Error)?.message); }
     }
 
     // Direct sysfs fallback (common on modern Linux containers/servers)
@@ -188,7 +190,8 @@ async function getIntelTelemetry(): Promise<IGpuTelemetry[]> {
       }];
     }
     return [];
-  } catch {
+  } catch (e) {
+    console.debug('[Telemetry] Intel GPU probe failed (not installed?):', (e as Error)?.message);
     return [];
   }
 }
@@ -206,7 +209,8 @@ async function getWindowsGpuTelemetry(): Promise<IGpuTelemetry[]> {
     let parsed: any;
     try {
       parsed = JSON.parse(raw);
-    } catch {
+    } catch (e) {
+      console.debug('[Telemetry] WMI JSON parse failed:', (e as Error)?.message);
       return [];
     }
 
@@ -265,7 +269,8 @@ async function getWindowsGpuTelemetry(): Promise<IGpuTelemetry[]> {
     }
 
     return gpus;
-  } catch {
+  } catch (e) {
+    console.debug('[Telemetry] Windows GPU aggregation failed:', (e as Error)?.message);
     return [];
   }
 }
@@ -310,7 +315,7 @@ export async function getHardwareTelemetry(): Promise<IHardwareTelemetry> {
         });
         gpus.push(...parsedGpus);
       }
-    } catch {}
+    } catch (e) { console.debug('[Telemetry] Windows nvidia-smi fallback failed:', (e as Error)?.message); }
   }
 
   // WMI-based GPU scan fallback on Windows for AMD, Intel, or missing Nvidia
@@ -396,7 +401,7 @@ export async function getHardwareTelemetry(): Promise<IHardwareTelemetry> {
           gpu.memoryFreeMiB = gpu.memoryTotalMiB;
         }
       }
-    } catch {}
+    } catch (e) { console.debug('[Telemetry] macOS system_profiler probe failed:', (e as Error)?.message); }
   }
 
   // Fallback fake/mock GPU if none detected but we are in a dev simulation context
@@ -427,7 +432,7 @@ export async function getHardwareTelemetry(): Promise<IHardwareTelemetry> {
       if (winCpuLoad) {
         cpuLoadPercent = parseInt(winCpuLoad.trim()) || 10;
       }
-    } catch {}
+    } catch (e) { console.debug('[Telemetry] Windows CPU load query failed:', (e as Error)?.message); }
   } else {
     const loadAvg = os.loadavg();
     // loadAvg[0] represents 1 min load average, normalized to number of cores

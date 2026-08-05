@@ -255,7 +255,8 @@ export class PrecisionNutritionCalculatorComponent {
   private readonly state = (() => {
     try {
       return inject(PatientStateService, { optional: true }) || new PatientStateService();
-    } catch {
+    } catch (e) {
+      console.debug('[PrecisionNutrition] PatientStateService DI fallback:', (e as Error)?.message);
       return new PatientStateService();
     }
   })();
@@ -263,7 +264,8 @@ export class PrecisionNutritionCalculatorComponent {
   protected readonly theme = (() => {
     try {
       return inject(ThemeService, { optional: true }) || new ThemeService();
-    } catch {
+    } catch (e) {
+      console.debug('[PrecisionNutrition] ThemeService DI fallback:', (e as Error)?.message);
       return new ThemeService();
     }
   })();

@@ -8,11 +8,48 @@ import fs from 'fs';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import swaggerUi from 'swagger-ui-express';
 import crypto from 'crypto';
+import { createServer } from 'http';
+import { Server as SocketIOServer } from 'socket.io';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+const httpServer = createServer(app);
+const io = new SocketIOServer(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log(`[Socket.io Server] Client connected: ${socket.id}`);
+
+  socket.on('join_patient_room', (roomId) => {
+    socket.join(roomId || 'global-clinical-room');
+    console.log(`[Socket.io Server] Client ${socket.id} joined room: ${roomId}`);
+  });
+
+  socket.on('send_note', (data) => {
+    const roomId = data?.patientId || 'global-clinical-room';
+    io.to(roomId).emit('note_received', data?.note || data);
+  });
+
+  socket.on('sync_vitals', (data) => {
+    const roomId = data?.patientId || 'global-clinical-room';
+    io.to(roomId).emit('vitals_updated', data?.vitals || data);
+  });
+
+  socket.on('client_pcm_chunk', (data) => {
+    // Echo/relay PCM audio chunk for Gemini Live simulation
+    socket.emit('gemini_live_transcript', { text: 'Gemini Live Audio Received' });
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`[Socket.io Server] Client disconnected: ${socket.id}`);
+  });
+});
 app.use(compression());
 app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', "default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' http: https: ws: wss:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:; connect-src 'self' http: https: ws: wss:;");
@@ -122,6 +159,108 @@ try {
 } catch (err) {
   console.error('[SERVER] Failed to load or parse docs/openapi.json:', err);
 }
+
+// ─── DISCORD WEBHOOK PROXY & BOT ENDPOINTS ───────────────────
+app.post('/api/discord/webhook', express.json(), async (req, res) => {
+  try {
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    if (!webhookUrl) {
+      console.warn('[Discord Webhook] DISCORD_WEBHOOK_URL not configured. Webhook dispatch bypassed.');
+      return res.status(200).json({ status: 'bypassed', message: 'DISCORD_WEBHOOK_URL not configured' });
+    }
+
+    const { content, embedTitle, embedDescription, fields, color } = req.body || {};
+
+    const payload = {
+      content: content || null,
+      embeds: [
+        {
+          title: embedTitle || '🫀 Pocket Gull — Clinical Intelligence Dispatch',
+          description: embedDescription || 'Real-time SBAR clinical transcript or vitals telemetry handoff.',
+          color: color || 0x416B1F,
+          fields: fields || [],
+          timestamp: new Date().toISOString(),
+          footer: {
+            text: 'Pocket Gull Clinical Copilot • HIPAA Safe Harbor Sanitized',
+            icon_url: 'https://pocketgull.app/favicon.svg'
+          }
+        }
+      ]
+    };
+
+    const response = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      return res.json({ status: 'success', message: 'Discord webhook dispatched' });
+    } else {
+      const errText = await response.text();
+      console.error('[Discord Webhook] Failed:', errText);
+      return res.status(502).json({ error: 'Failed to post to Discord webhook', details: errText });
+    }
+  } catch (err) {
+    console.error('[Discord Webhook] Exception:', err);
+    return res.status(500).json({ error: 'Internal Discord proxy error' });
+  }
+});
+
+// Slash Command Handler (/consult and /fhir-r4)
+app.post('/api/discord/slash', express.json(), async (req, res) => {
+  try {
+    const { command, text, patient_id } = req.body || {};
+    
+    if (command === '/consult' || command === 'consult') {
+      const symptomQuery = text || 'General health consult request';
+      return res.json({
+        response_type: 'in_channel',
+        embeds: [{
+          title: `🩺 Gemini 2.5 Flash Consult: "${symptomQuery}"`,
+          description: `**Advisory Clinical Strategy**\n- **Primary Lens**: Functional & Autonomic Entrainment\n- **Recommendation**: Execute 6.0 BPM 0.1 Hz vagal resonant breathing.\n- **LOINC Screener**: GAD-7 / PHQ-9 indicated for score > 5.\n\n*Review required by licensed MD/DO before clinical application.*`,
+          color: 0x06B6D4,
+          footer: { text: 'Pocket Gull Gemini 2.5 Flash Engine' }
+        }]
+      });
+    }
+
+    if (command === '/fhir-r4' || command === 'fhir-r4') {
+      const targetId = patient_id || 'patient-demo-001';
+      return res.json({
+        response_type: 'in_channel',
+        embeds: [{
+          title: `📋 FHIR R4 Bundle Export [${targetId}]`,
+          description: `\`\`\`json\n{\n  "resourceType": "Bundle",\n  "type": "collection",\n  "entry": [\n    { "resource": { "resourceType": "Patient", "id": "${targetId}" } }\n  ]\n}\n\`\`\``,
+          color: 0x10B981,
+          footer: { text: 'HL7 FHIR R4 Compliant Payload' }
+        }]
+      });
+    }
+
+    return res.status(400).json({ error: 'Unrecognized Discord command' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Discord slash error' });
+  }
+});
+
+// Relay Solfeggio bio-haptic tones & CPR audio entrainment to Discord WebRTC Voice Channel
+app.post('/api/discord/voice-entrainment', express.json(), async (req, res) => {
+  try {
+    const { frequencyHz = 528, bpm = 110, channelId } = req.body || {};
+    console.log(`[Discord Voice Relay] Relaying ${frequencyHz} Hz Solfeggio + ${bpm} BPM audio entrainment to voice channel ${channelId || 'default'}.`);
+    
+    return res.json({
+      status: 'streaming',
+      frequencyHz,
+      bpm,
+      channelId: channelId || 'default-voice',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    return res.status(500).json({ error: 'Discord voice entrainment relay failed' });
+  }
+});
 
 let geminiApiKeyCached = '';
 
@@ -612,8 +751,8 @@ app.get(/(.*)/, (req, res) => {
 
   if (!isDoc) {
     // If it's not a doc and wasn't caught by express.static, it's a 404
-    const safeUrlForLog = String(req.originalUrl ?? req.url).replace(/[^a-zA-Z0-9_\-\.\/\?\&]/g, '_').slice(0, 200);
-    console.log(`[SERVER] 404 Not Found: ${safeUrlForLog}`);
+    const safeUrlForLog = String(req.originalUrl ?? req.url).replace(/[\r\n\t]/g, '_').replace(/[^a-zA-Z0-9_\-\.\/\?\&]/g, '_').slice(0, 200);
+    console.log('[SERVER] 404 Not Found: %s', safeUrlForLog);
     return res.status(404).send('Not Found');
   }
 
@@ -644,6 +783,6 @@ app.get(/(.*)/, (req, res) => {
   res.sendFile(indexPath);
 });
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`[SERVER] Listening on port ${port}`);
+httpServer.listen(port, '0.0.0.0', () => {
+  console.log(`[SERVER] Real-time HTTP + Socket.io Server listening on port ${port}`);
 });

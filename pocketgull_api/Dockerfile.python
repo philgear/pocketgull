@@ -6,7 +6,7 @@ FROM python:3.13-slim-bookworm AS builder
 WORKDIR /app
 
 # Patch OS-level vulnerabilities + install build dependencies
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     g++ \
@@ -26,6 +26,8 @@ RUN pip install --no-cache-dir pip==25.0.1 setuptools==75.8.0 wheel==0.45.1 && \
 # Stage 2: Runtime
 # ==========================================
 FROM python:3.13-slim-bookworm
+
+RUN apt-get update && apt-get dist-upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user and group for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser

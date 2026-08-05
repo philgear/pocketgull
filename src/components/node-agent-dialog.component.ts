@@ -12,6 +12,7 @@ import { ClinicalIcons } from '../assets/clinical-icons';
 import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
 import { AdkLiveService } from '../services/ai/adk-live.service';
 import { getStoredApiKey } from '../services/secure-key';
+import { SecureStorageService } from '../services/secure-storage.service';
 
 export interface INodeAgentDialogData {
     nodeKey: string;
@@ -599,6 +600,7 @@ interface IChatEntry {
 })
 export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDestroy {
     protected readonly ClinicalIcons = ClinicalIcons;
+    private secureStorage = inject(SecureStorageService);
 
     data = input.required<INodeAgentDialogData>();
     patientData = input<string>('');
@@ -681,7 +683,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDes
         const rawText = this.data().nodeText;
         if (parser && rawText) {
             try { this.contextHtml.set((parser as any).parse(rawText)); }
-            catch { this.contextHtml.set(`<p>${rawText}</p>`); }
+            catch (e) { console.debug('[NodeAgentDialog] Markdown parse fallback:', (e as Error)?.message); this.contextHtml.set(`<p>${rawText}</p>`); }
         } else {
             this.contextHtml.set(`<p>${rawText}</p>`);
         }
@@ -726,7 +728,7 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDes
                 this.recognition.onerror = (e: any) => console.log("UI STT Error:", e.error);
                 this.recognition.onend = () => {
                     if (this.live.isListening() && this.live.isConnected()) {
-                        try { this.recognition.start(); } catch {}
+                        try { this.recognition.start(); } catch (e) { console.debug('[NodeAgentDialog] Recognition already active:', (e as Error)?.message); }
                     }
                 };
             }
@@ -954,7 +956,7 @@ ${patientCtx}`;
         const parser = this.markdown.parser();
         let html = md;
         if (parser) {
-            try { html = (parser as any).parse(md); } catch { html = `<p>${md}</p>`; }
+            try { html = (parser as any).parse(md); } catch (e) { console.debug('[NodeAgentDialog] Markdown parse fallback:', (e as Error)?.message); html = `<p>${md}</p>`; }
         }
         this.chatHistory.update(h => [...h, { role: 'model', text: md, html }]);
         this.shouldScrollToBottom = true;
@@ -971,7 +973,7 @@ ${patientCtx}`;
         if (!this.live.isConnected()) {
             this.isLoading.set(true);
             try {
-                const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey() || '';
+                const apiKey = (window as any).GEMINI_API_KEY || getStoredApiKey(this.secureStorage) || '';
                 if (!apiKey) {
                     this.appendModelMessage('System Note: Missing API Key. Please configure it to use voice.');
                     this.isLoading.set(false);
@@ -997,7 +999,7 @@ ${patientCtx}`;
             this.live.startListening();
             this._liveUserText = ''; // Reset voice text buffer
             if (this.recognition) {
-                try { this.recognition.start(); } catch {}
+                try { this.recognition.start(); } catch (e) { console.debug('[NodeAgentDialog] Recognition already active:', (e as Error)?.message); }
             }
         }
     }
@@ -1022,7 +1024,7 @@ ${patientCtx}`;
         const parser = this.markdown.parser();
         let html = this._liveModelText;
         if (parser) {
-            try { html = (parser as any).parse(this._liveModelText); } catch { html = `<p>${this._liveModelText}</p>`; }
+            try { html = (parser as any).parse(this._liveModelText); } catch (e) { console.debug('[NodeAgentDialog] Live markdown parse fallback:', (e as Error)?.message); html = `<p>${this._liveModelText}</p>`; }
         } else {
             html = `<p>${this._liveModelText}</p>`;
         }
@@ -1060,7 +1062,7 @@ ${patientCtx}`;
         this.shouldScrollToBottom = true;
 
         if (this.live.isListening() && this.recognition) {
-            try { this.recognition.start(); } catch {}
+            try { this.recognition.start(); } catch (e) { console.debug('[NodeAgentDialog] Recognition already active:', (e as Error)?.message); }
         }
     }
 }

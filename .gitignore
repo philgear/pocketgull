@@ -38,9 +38,10 @@ chrome-debug-profile/
 *.sln
 *.sw?
 
-# Local environment secrets
+# Local environment secrets & legal formation documents
 .env*
 **/.env*
+docs/legal/
 
 # Generated Release Packages
 packages/
