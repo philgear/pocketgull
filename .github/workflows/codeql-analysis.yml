@@ -38,7 +38,7 @@ jobs:
 
     - name: Setup Python & Dependencies
       if: matrix.language == 'python'
-      uses: actions/setup-python@42375567e7c4133481231a384564c74068305001 # v5.3.0
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
