@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-08-05
+
+**Clinical Inclusiveness & Accessibility (a11y/DEI) Suite, WebMCP Polyfill Service Extraction, and Full Component Type Safety Resolution**
+
+### Added & Enhanced
+- **[Accessibility / DEI] Clinical Inclusiveness & Accessibility Suite**:
+  - **Dyslexia-Friendly Legibility Stack**: Added OpenDyslexic & Caslon high-legibility optical font toggles into `ThemeService` and `styles.css` with persistent storage via `SecureStorageService`.
+  - **WCAG 2.2 AAA Contrast Compliance**: Implemented `.high-contrast-active` mode ensuring 7:1 contrast ratios across dark/light mode surfaces and clinical values.
+  - **Neurodivergent Reduced Motion**: Added `@media (prefers-reduced-motion: reduce)` and `.reduce-motion` overrides in `styles.css` to disable unwanted CSS keyframes and Three.js 3D auto-rotations for sensitive users.
+  - **Fitts's Law Motor Traversal**: Enforced 44px × 44px minimum touch targets and 3px emerald focus outlines (`focus-visible`) for keyboard-only navigation (`Tab` / `Enter` / `Space`).
+  - **Biophysical Phototypes**: Added Fitzpatrick Skin Phototype PBR color palette parameters (Types I–VI) to `BodyMeshFactoryService`.
+
+### Refactoring & Monolith Decomposition
+- **[Architecture & Decomposition] Standalone Sub-components & Services**:
+  - Extracted `EmtHandoffLensTabComponent` (~380 lines) from `analysis-report.component.ts` for offline CPR metronome and camera pulse acquisition.
+  - Extracted `WebMcpRegistrationService` (~252 lines) from `app.component.ts` to encapsulate WebMCP polyfill initialization and browser modelContext tool registrations.
+- **[Type Safety Resolution] Complete Elimination of Loose `:any` Types**:
+  - Resolved all loose `:any` usages across `app.component.ts` and `analysis-report.component.ts` with strict, explicit TypeScript types (`IPatient`, `HistoryEntry`, `AnalysisLens`, `VersionEvent`, `ReturnType<typeof setTimeout>`).
+
 ## [1.9.2] - 2026-08-05
 
 **Type Safety Resolution, Stable Test Fallbacks, and Playwright E2E Alignment**
