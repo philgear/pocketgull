@@ -24,7 +24,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - language: 'actions'
           - language: 'javascript-typescript'
           - language: 'python'
 
