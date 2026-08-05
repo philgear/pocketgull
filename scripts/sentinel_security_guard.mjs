@@ -57,6 +57,7 @@ const APPROVED_EGRESS_DOMAINS = [
   'amazon.com',
   'www.amazon.com',
   'pharmacy.amazon.com',
+  'cpicpgx.org',
   'aws.amazon.com',
   'amazonaws.com',
   'healthlake.us-east-1.amazonaws.com',
