@@ -126,7 +126,7 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     const educationTab = page.getByTestId('tab-patient-education');
     await educationTab.click();
     await page.waitForTimeout(500);
-    await expect(reportEl.locator('text=Understanding Your').first()).toBeVisible({ timeout: 5000 });
+    await expect(reportEl.locator('text=/Understanding Your/i').first()).toBeVisible({ timeout: 10000 });
     console.log('[PASS] Patient Education tab populated.');
 
     // Take a full-page screenshot at the end

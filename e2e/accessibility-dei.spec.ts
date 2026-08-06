@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test';
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 test.describe('Clinical Inclusiveness & Accessibility (a11y/DEI) Suite', () => {
   test.beforeEach(async ({ page }) => {
     await setupE2ePage(page, { mockClinician: true });
+    await enterDemoMode(page);
   });
 
   test('verifies Dyslexia font toggle and high contrast DOM classes', async ({ page }) => {
