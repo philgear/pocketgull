@@ -340,7 +340,14 @@ app.post('/api/csp-report', express.json({ type: ['application/json', 'applicati
   if (process.env['NODE_ENV'] === 'production') {
     return res.status(404).send('Not Found');
   }
-  console.log('[CSP Violation Report]:', sanitizeLogInput(req.body));
+  // Extract only known CSP fields to break taint chain from req.body
+  const report = req.body?.['csp-report'] ?? req.body ?? {};
+  const safeReport = {
+    documentUri: sanitizeLogInput(String(report['document-uri'] ?? '')),
+    violatedDirective: sanitizeLogInput(String(report['violated-directive'] ?? '')),
+    blockedUri: sanitizeLogInput(String(report['blocked-uri'] ?? '')),
+  };
+  console.log('[CSP Violation Report]:', JSON.stringify(safeReport));
   res.status(204).end();
 });
 

@@ -321,15 +321,17 @@ export function createAiRouter(deps: IAiRouteDeps): Router {
         }
 
         const sanitizedInstruction = sanitizeSystemInstruction(body.systemInstruction);
-        const safeSystemInstruction = sanitizedInstruction
-          ? `${BASE_CLINICAL_PROMPT}\n\n[CLINICAL DIRECTIVE CONTEXT]\n${sanitizedInstruction}\n[END CLINICAL DIRECTIVE CONTEXT]`
-          : BASE_CLINICAL_PROMPT;
 
+        // System prompt is always the static clinical base — never includes user input
         const configOptions: Record<string, unknown> = {
-          // lgtm[js/system-prompt-injection] — sanitized via sanitizeSystemInstruction() and delimited with [CLINICAL DIRECTIVE CONTEXT] bounds
-          systemInstruction: safeSystemInstruction,
+          systemInstruction: BASE_CLINICAL_PROMPT,
           temperature: body.temperature ?? 0.1
         };
+
+        // User-provided clinical directives are injected as a prefixed context message, not as system prompt
+        const contextPrefix = sanitizedInstruction
+          ? `[CLINICAL DIRECTIVE CONTEXT]\n${sanitizedInstruction}\n[END CLINICAL DIRECTIVE CONTEXT]\n\n`
+          : '';
 
         // Lean Tools: Only supply tools to lenses that require biochemistry / sequence analysis
         if (body.lens === 'Precision Nutrients' || body.lens === 'Functional Protocols') {
@@ -350,7 +352,7 @@ export function createAiRouter(deps: IAiRouteDeps): Router {
 
         const streamingResponse = await ai.models.generateContentStream({
           model: rawModel,
-          contents: [{ role: 'user', parts: [{ text: body.patientData }] }],
+          contents: [{ role: 'user', parts: [{ text: `${contextPrefix}${body.patientData}` }] }],
           config: configOptions
         });
 
