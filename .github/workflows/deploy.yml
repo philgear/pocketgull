@@ -90,6 +90,9 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
       - name: Rebuild Native Binaries
         run: npm rebuild esbuild --update-binary || true
 
@@ -111,20 +114,19 @@ jobs:
           PORT: '4000'
           CI: true
           NODE_ENV: 'production'
+          PLAYWRIGHT_TESTING: 'true'
           GEMINI_API_KEY: 'placeholder-key-for-build'
           SKIP_HEALTHCARE_PROVISION: 'true'
 
       - name: Wait for Server
         run: npx wait-on http://localhost:4000 --timeout 60000
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
-
       - name: Run E2E Tests
         run: npm run test:e2e
         env:
           CI: true
           PORT: '4000'
+          PLAYWRIGHT_TESTING: 'true'
           GEMINI_API_KEY: 'placeholder-key-for-build'
           SKIP_HEALTHCARE_PROVISION: 'true'
 
