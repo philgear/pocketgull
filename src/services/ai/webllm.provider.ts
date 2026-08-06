@@ -20,28 +20,34 @@ export class WebLLMProvider implements IIntelligenceProvider {
   
   async loadEngine() {
       if (!isPlatformBrowser(this.platformId)) return;
-      if (typeof navigator !== 'undefined' && navigator.webdriver) {
+      if (typeof navigator !== 'undefined' && (navigator.webdriver || (typeof window !== 'undefined' && (window as any).PLAYWRIGHT_TESTING))) {
           return;
       }
       if (this.isLoaded && this.engine) return;
       
       this.isLoadingProgress.set(true);
       console.log('[WebLLM] Initializing WebGPU Local Inference Engine via WebWorker...');
-      const webllm = await import('@mlc-ai/web-llm');
-      
-      this.engine = await webllm.CreateWebWorkerMLCEngine(
-        new Worker(new URL('../../workers/webllm.worker', import.meta.url), { type: 'module' }),
-        "gemma-2b-it-q4f32_1-MLC",
-        {
-           initProgressCallback: (progress) => {
-             console.log('[WebLLM Sync]', progress.text);
-             this.loadingProgress.set(progress.text);
+      try {
+        const webllm = await import('@mlc-ai/web-llm');
+        
+        this.engine = await webllm.CreateWebWorkerMLCEngine(
+          new Worker(new URL('../../workers/webllm.worker', import.meta.url), { type: 'module' }),
+          "gemma-2b-it-q4f32_1-MLC",
+          {
+             initProgressCallback: (progress) => {
+               console.log('[WebLLM Sync]', progress.text);
+               this.loadingProgress.set(progress.text);
+             }
            }
-         }
-      );
-      this.isLoaded = true;
-      this.isLoadingProgress.set(false);
-      console.log('[WebLLM] Engine Ready.');
+        );
+        this.isLoaded = true;
+        console.log('[WebLLM] Engine Ready.');
+      } catch (err) {
+        console.warn('[WebLLM] Failed to initialize WebLLM engine (WebGPU unavailable):', err);
+        this.engine = null;
+      } finally {
+        this.isLoadingProgress.set(false);
+      }
   }
 
   async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {

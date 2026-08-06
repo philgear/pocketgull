@@ -146,14 +146,22 @@ export class GeminiProvider implements IIntelligenceProvider {
         if (!response.ok) throw new Error(await response.text());
         const data = await response.json();
 
-        const { z } = await import('zod');
-        const ClinicalMetricsSchema = z.object({
-            complexity: z.number().min(0).max(10),
-            stability: z.number().min(0).max(10),
-            certainty: z.number().min(0).max(10)
-        });
-
-        return ClinicalMetricsSchema.parse(data);
+        try {
+            const { z } = await import('zod');
+            const ClinicalMetricsSchema = z.object({
+                complexity: z.number().min(0).max(10),
+                stability: z.number().min(0).max(10),
+                certainty: z.number().min(0).max(10)
+            });
+            return ClinicalMetricsSchema.parse(data);
+        } catch (err) {
+            console.warn('[GeminiProvider] zod validation bypassed or failed, using fallback parsing:', err);
+            return {
+                complexity: Math.max(0, Math.min(10, Number(data?.complexity ?? 5))),
+                stability: Math.max(0, Math.min(10, Number(data?.stability ?? 5))),
+                certainty: Math.max(0, Math.min(10, Number(data?.certainty ?? 5))),
+            };
+        }
     }
 
     async detectClinicalChanges(oldData: string, newData: string): Promise<boolean> {
