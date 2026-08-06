@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { ThemeService } from './theme.service';
 import { PatientStateService } from './patient-state.service';
+import { SecureStorageService } from './secure-storage.service';
 
 export interface ITourStep {
   targetId: string;
@@ -15,6 +16,7 @@ const TOUR_SEEN_KEY = 'pg_tour_seen';
 export class WalkthroughTourService {
   private theme = inject(ThemeService);
   private state = inject(PatientStateService);
+  private storage = inject(SecureStorageService);
 
   /** -1 = inactive, 0..N = active step index */
   currentStep = signal<number>(-1);
@@ -97,7 +99,7 @@ export class WalkthroughTourService {
   totalSteps = computed(() => this.steps().length);
 
   start() {
-    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function' && localStorage.getItem(TOUR_SEEN_KEY)) return;
+    if (this.storage.getItem(TOUR_SEEN_KEY)) return;
     this.currentStep.set(0);
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -164,8 +166,6 @@ export class WalkthroughTourService {
     this.currentStep.set(-1);
     this.state.toggleLiveAgent(false);
     this.state.toggleResearchFrame(false);
-    if (typeof localStorage !== 'undefined' && typeof localStorage.setItem === 'function') {
-      localStorage.setItem(TOUR_SEEN_KEY, '1');
-    }
+    this.storage.setItem(TOUR_SEEN_KEY, '1');
   }
 }

@@ -11,8 +11,7 @@ export const p_charles_darwin: IPatient = {
     "Chronic Gastrointestinal Disease",
     "Cyclic Vomiting Syndrome (suspected)",
     "Systemic eczema & skin rashes",
-    "Mitochondrial dysfunction / Chagas disease (suspected)",
-    "PhysioNet 2026 Challenge: Trypanosoma Cardiac Conduction & Vagal Gastric Dysmotility Challenge"
+    "Mitochondrial dysfunction / Chagas disease (suspected)"
   ],
   patientGoals: "Resolve debilitating chronic fatigue, severe episodic vomiting, flatulence, and chest palpitations.",
   vitals: {

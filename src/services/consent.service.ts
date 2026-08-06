@@ -1,18 +1,17 @@
-import { Injectable, PLATFORM_ID, inject, signal, afterNextRender } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, signal, afterNextRender } from '@angular/core';
+import { SecureStorageService } from './secure-storage.service';
 
 const CONSENT_KEY = 'pg_data_consent_v1';
 
 /**
  * Manages informed consent state for HIPAA-aligned data handling.
- * Persists consent acknowledgment in localStorage.
+ * Persists consent acknowledgment via SecureStorageService.
  *
  * @see ACM Code of Ethics §1.6 — Respect Privacy
  */
 @Injectable({ providedIn: 'root' })
 export class ConsentService {
-    private platformId = inject(PLATFORM_ID);
-    private isBrowser = isPlatformBrowser(this.platformId);
+    private storage = inject(SecureStorageService);
 
     /** Whether the user has acknowledged the data consent modal */
     readonly hasConsented = signal<boolean>(true);
@@ -21,7 +20,7 @@ export class ConsentService {
     readonly consentTimestamp = signal<string | null>(null);
 
     constructor() {
-        if (this.isBrowser) {
+        if (this.storage.isAvailable) {
             afterNextRender(() => {
                 const consented = this.loadConsent();
                 this.hasConsented.set(consented);
@@ -33,42 +32,26 @@ export class ConsentService {
     }
 
     private loadConsent(): boolean {
-        if (!this.isBrowser) return true; // SSR bypass
-        try {
-            return localStorage.getItem(CONSENT_KEY) === 'true';
-        } catch {
-            return false;
-        }
+        return this.storage.getItem(CONSENT_KEY) === 'true';
     }
 
     private loadTimestamp(): string | null {
-        if (!this.isBrowser) return null;
-        try {
-            return localStorage.getItem(`${CONSENT_KEY}_ts`);
-        } catch {
-            return null;
-        }
+        return this.storage.getItem(`${CONSENT_KEY}_ts`);
     }
 
     /** Record user's informed consent */
     acceptConsent(): void {
-        if (!this.isBrowser) return;
         const ts = new Date().toISOString();
-        try {
-            localStorage.setItem(CONSENT_KEY, 'true');
-            localStorage.setItem(`${CONSENT_KEY}_ts`, ts);
-        } catch { /* quota exceeded fallback */ }
+        this.storage.setItem(CONSENT_KEY, 'true');
+        this.storage.setItem(`${CONSENT_KEY}_ts`, ts);
         this.hasConsented.set(true);
         this.consentTimestamp.set(ts);
     }
 
     /** Revoke consent and clear data acknowledgment */
     revokeConsent(): void {
-        if (!this.isBrowser) return;
-        try {
-            localStorage.removeItem(CONSENT_KEY);
-            localStorage.removeItem(`${CONSENT_KEY}_ts`);
-        } catch { /* noop */ }
+        this.storage.removeItem(CONSENT_KEY);
+        this.storage.removeItem(`${CONSENT_KEY}_ts`);
         this.hasConsented.set(false);
         this.consentTimestamp.set(null);
     }

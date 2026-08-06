@@ -1,25 +1,29 @@
+import { SecureStorageService } from './secure-storage.service';
+
 const STORAGE_KEY = '_pg_g_ak';
 
-export function getStoredApiKey(): string {
+export function getStoredApiKey(storage?: SecureStorageService): string {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = storage ? storage.getItem(STORAGE_KEY) : null;
     if (!raw) return '';
     // Reverse and base64 decode to deobfuscate
     return atob(raw.split('').reverse().join(''));
-  } catch {
+  } catch (e) {
+    console.debug('[SecureKey] API key retrieval failed:', (e as Error)?.message);
     return '';
   }
 }
 
-export function setStoredApiKey(key: string): void {
+export function setStoredApiKey(key: string, storage?: SecureStorageService): void {
+  if (!storage) return;
   try {
     if (!key) {
-      localStorage.removeItem(STORAGE_KEY);
+      storage.removeItem(STORAGE_KEY);
       return;
     }
     // Base64 encode and reverse to obfuscate
     const obfuscated = btoa(key).split('').reverse().join('');
-    localStorage.setItem(STORAGE_KEY, obfuscated);
+    storage.setItem(STORAGE_KEY, obfuscated);
   } catch (e) {
     console.error('Failed to save configuration key:', e);
   }

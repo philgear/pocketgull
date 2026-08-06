@@ -135,7 +135,12 @@ async function refreshTokenIfNeeded(patientId: string): Promise<IGoogleHealthTok
   if (!token) return null;
   if (Date.now() < token.expiresAt - 60_000) return token;
 
-  console.log(`[GoogleHealth] Refreshing token for patient ${sanitizeLogInput(patientId)}...`);
+  const patientIdLogRef = crypto
+    .createHash('sha256')
+    .update(String(patientId ?? '') + 'pocketgull-patient-log-salt')
+    .digest('hex')
+    .slice(0, 16);
+  console.log('[GoogleHealth] Refreshing token for patient ref=%s...', patientIdLogRef);
   try {
     const res = await fetch(GOOGLE_TOKEN_URL, {
       method: 'POST',
@@ -218,7 +223,7 @@ fitbitRouter.post('/consent', (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 fitbitRouter.get('/auth', (req, res) => {
   try {
-    const patientId = (req.query['patientId'] as string) || 'p_phil_gear';
+    const patientId = (req.query['patientId'] as string) || 'p_default_patient';
 
     // ── COMPLIANCE GATE: Informed consent must be recorded first ──────────────
     const consent = consentStore.get(patientId);
@@ -329,7 +334,7 @@ fitbitRouter.get('/callback', async (req, res) => {
 // GET /api/fitbit/status?patientId=xxx
 // ─────────────────────────────────────────────────────────────────────────────
 fitbitRouter.get('/status', (req, res) => {
-  const patientId = (req.query['patientId'] as string) || 'p_phil_gear';
+  const patientId = (req.query['patientId'] as string) || 'p_default_patient';
   const token = tokenStore.get(patientId);
   const consent = consentStore.get(patientId);
 

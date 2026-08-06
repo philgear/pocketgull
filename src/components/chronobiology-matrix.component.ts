@@ -42,8 +42,8 @@ import { PatientStateService } from '../services/patient-state.service';
         <!-- 1. Circadian Disruption Index Card -->
         @let isCdiFlipped = isCardFlipped('cdi');
         <div (dblclick)="toggleCardFlip('cdi'); $event.stopPropagation()"
-             class="relative perspective-1000 group cursor-pointer h-60"
-             title="Double-click to flip over for Light Exposure & SCN Clock Protocol">
+             class="relative perspective-1000 group cursor-pointer select-none h-60"
+             title="Double-click or click badge to flip over for Light Exposure & SCN Clock Protocol">
           
           <div [class.rotate-y-180]="isCdiFlipped"
                class="relative w-full h-full transition-transform duration-500 transform-style-3d">
@@ -54,9 +54,10 @@ import { PatientStateService } from '../services/patient-state.service';
                 <div class="flex justify-between items-start mb-3">
                   <div class="flex items-center gap-1.5 font-mono">
                     <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Circadian Disruption</span>
-                    <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                    <button type="button" (click)="toggleCardFlip('cdi'); $event.stopPropagation()"
+                            class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 cursor-pointer transition">
                       dblclick 🔄
-                    </span>
+                    </button>
                   </div>
                   <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
                     CDI Score
@@ -92,7 +93,10 @@ import { PatientStateService } from '../services/patient-state.service';
                   <span class="text-amber-300 font-bold uppercase flex items-center gap-1">
                     <span>☀️</span> SCN Sunlight Protocol
                   </span>
-                  <span class="text-amber-400 font-mono text-[10px]">dblclick flip</span>
+                  <button type="button" (click)="toggleCardFlip('cdi'); $event.stopPropagation()"
+                          class="text-amber-400 hover:text-amber-200 text-[10px] font-mono cursor-pointer">
+                    dblclick 🔄 flip
+                  </button>
                 </div>
                 <div class="space-y-1.5 text-amber-100">
                   <p><strong>Action Tip:</strong> Get 10–15 mins of outdoor sunlight within 30 mins of waking to anchor SCN PER1/PER2 gene expression.</p>
@@ -101,7 +105,7 @@ import { PatientStateService } from '../services/patient-state.service';
               </div>
               <div class="pt-1.5 border-t border-amber-900 font-mono text-[9px] text-amber-400 flex justify-between">
                 <span>Chrono-Habit Active</span>
-                <span>Double-click to return</span>
+                <button type="button" (click)="toggleCardFlip('cdi'); $event.stopPropagation()" class="hover:underline cursor-pointer">Double-click or click to return ↩️</button>
               </div>
             </div>
 
@@ -111,8 +115,8 @@ import { PatientStateService } from '../services/patient-state.service';
         <!-- 2. Cortisol Diurnal Slope Card -->
         @let isCortFlipped = isCardFlipped('cortisol');
         <div (dblclick)="toggleCardFlip('cortisol'); $event.stopPropagation()"
-             class="relative perspective-1000 group cursor-pointer h-60"
-             title="Double-click to flip over for Cortisol Diurnal Curve Rationale">
+             class="relative perspective-1000 group cursor-pointer select-none h-60"
+             title="Double-click or click badge to flip over for Cortisol Diurnal Curve Rationale">
           
           <div [class.rotate-y-180]="isCortFlipped"
                class="relative w-full h-full transition-transform duration-500 transform-style-3d">
@@ -123,9 +127,10 @@ import { PatientStateService } from '../services/patient-state.service';
                 <div class="flex justify-between items-start mb-3 font-mono">
                   <div class="flex items-center gap-1.5">
                     <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Cortisol Diurnal Slope</span>
-                    <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                    <button type="button" (click)="toggleCardFlip('cortisol'); $event.stopPropagation()"
+                            class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 cursor-pointer transition">
                       dblclick 🔄
-                    </span>
+                    </button>
                   </div>
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-500/10 text-rose-300 border border-rose-500/20">
                     CAR Awakening
@@ -161,7 +166,10 @@ import { PatientStateService } from '../services/patient-state.service';
                   <span class="text-rose-300 font-bold uppercase flex items-center gap-1">
                     <span>🧘</span> HPA-Axis Reset Protocol
                   </span>
-                  <span class="text-rose-400 font-mono text-[10px]">dblclick flip</span>
+                  <button type="button" (click)="toggleCardFlip('cortisol'); $event.stopPropagation()"
+                          class="text-rose-400 hover:text-rose-200 font-mono text-[10px] cursor-pointer">
+                    dblclick 🔄 flip
+                  </button>
                 </div>
                 <div class="space-y-1.5 text-rose-100">
                   <p><strong>Everyday Meaning:</strong> Cortisol should spike 30 mins after waking (CAR) then steadily decline by bedtime.</p>
@@ -170,7 +178,7 @@ import { PatientStateService } from '../services/patient-state.service';
               </div>
               <div class="pt-1.5 border-t border-rose-900 font-mono text-[9px] text-rose-400 flex justify-between">
                 <span>HPA-Axis Shield Active</span>
-                <span>Double-click to return</span>
+                <button type="button" (click)="toggleCardFlip('cortisol'); $event.stopPropagation()" class="hover:underline cursor-pointer">Double-click or click to return ↩️</button>
               </div>
             </div>
 
@@ -180,8 +188,8 @@ import { PatientStateService } from '../services/patient-state.service';
         <!-- 3. REM & Deep Sleep Architecture Card -->
         @let isSleepFlipped = isCardFlipped('sleep');
         <div (dblclick)="toggleCardFlip('sleep'); $event.stopPropagation()"
-             class="relative perspective-1000 group cursor-pointer h-60"
-             title="Double-click to flip over for Glymphatic & Deep Sleep Protocol">
+             class="relative perspective-1000 group cursor-pointer select-none h-60"
+             title="Double-click or click badge to flip over for Glymphatic & Deep Sleep Protocol">
           
           <div [class.rotate-y-180]="isSleepFlipped"
                class="relative w-full h-full transition-transform duration-500 transform-style-3d">
@@ -192,9 +200,10 @@ import { PatientStateService } from '../services/patient-state.service';
                 <div class="flex justify-between items-start mb-3 font-mono">
                   <div class="flex items-center gap-1.5">
                     <span class="text-xs font-bold text-zinc-400 uppercase tracking-wider">Sleep Architecture</span>
-                    <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                    <button type="button" (click)="toggleCardFlip('sleep'); $event.stopPropagation()"
+                            class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 cursor-pointer transition">
                       dblclick 🔄
-                    </span>
+                    </button>
                   </div>
                   <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
                     EEG Delta
@@ -229,7 +238,10 @@ import { PatientStateService } from '../services/patient-state.service';
                   <span class="text-indigo-300 font-bold uppercase flex items-center gap-1">
                     <span>🧠</span> Glymphatic Clearance Protocol
                   </span>
-                  <span class="text-indigo-400 font-mono text-[10px]">dblclick flip</span>
+                  <button type="button" (click)="toggleCardFlip('sleep'); $event.stopPropagation()"
+                          class="text-indigo-400 hover:text-indigo-200 font-mono text-[10px] cursor-pointer">
+                    dblclick 🔄 flip
+                  </button>
                 </div>
                 <div class="space-y-1.5 text-indigo-100">
                   <p><strong>Glymphatic Clearance:</strong> During N3 deep sleep, brain CSF flow expands 60% to clear amyloid-beta and tau proteins.</p>
@@ -238,7 +250,7 @@ import { PatientStateService } from '../services/patient-state.service';
               </div>
               <div class="pt-1.5 border-t border-indigo-900 font-mono text-[9px] text-indigo-400 flex justify-between">
                 <span>Glymphatic Shield Active</span>
-                <span>Double-click to return</span>
+                <button type="button" (click)="toggleCardFlip('sleep'); $event.stopPropagation()" class="hover:underline cursor-pointer">Double-click or click to return ↩️</button>
               </div>
             </div>
 

@@ -42,8 +42,8 @@ export class DicomService {
   mockStudies: IDicomStudy[] = [
     {
       studyInstanceUid: '1.2.840.113619.2.134.1.phil.1',
-      patientName: 'Phil Gear',
-      patientId: 'p_phil_gear',
+      patientName: 'Alexander Vance',
+      patientId: 'p_default_patient',
       studyDate: '20260716',
       studyDescription: 'Lumbar Spine MRI (L4-L5 herniation check)',
       modalities: ['MR']
@@ -155,7 +155,7 @@ export class DicomService {
     this.error.set(null);
 
     const activePatient = this.patientManager.selectedPatient();
-    const activePid = this.patientManager.selectedPatientId() || 'p_phil_gear';
+    const activePid = this.patientManager.selectedPatientId() || 'p_default_patient';
     const patientName = activePatient?.name || 'Active Patient';
 
     if (this.patientState.isDemoMode()) {

@@ -60,8 +60,8 @@ export class ClinicalIntelligenceService {
     private orcid = inject(OrcidService);
     private webgpu = inject(WebLLMProvider);
     readonly guardrails = inject(DefensiveGuardrailsService);
-    private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch { return null; } })();
-    private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch { return null; } })();
+    private petAuditory = (() => { try { return inject(PetAuditoryService, { optional: true }); } catch (e) { console.debug('[ClinicalIntelligence] PetAuditoryService DI fallback:', (e as Error)?.message); return null; } })();
+    private themeService = (() => { try { return inject(ThemeService, { optional: true }); } catch (e) { console.debug('[ClinicalIntelligence] ThemeService DI fallback:', (e as Error)?.message); return null; } })();
 
     readonly isLoading = signal<boolean>(false);
     readonly webgpuProgress = this.webgpu.loadingProgress;
@@ -552,7 +552,12 @@ Recommends voluntary pre-conception carrier screening for autosomal recessive tr
         const newReport: Partial<Record<AnalysisLens, string>> = {};
 
         if (!isEmergency && this.lastPatientData() && this.lastActivePhilosophy() === currentPhilosophy) {
-            const isSignificant = await this.ai.detectClinicalChanges(this.lastPatientData()!, patientData);
+            let isSignificant = true; // Default: treat as changed (safe fallback)
+            try {
+                isSignificant = await this.ai.detectClinicalChanges(this.lastPatientData()!, patientData);
+            } catch (e) {
+                console.warn('[ClinicalIntelligence] detectClinicalChanges failed, treating as significant change', (e as Error)?.message);
+            }
 
             if (!isSignificant) {
                 console.log("Clinical Delta: No significant changes detected. Reusing existing report.");

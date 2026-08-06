@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 
 enum BleConnectionState {
@@ -70,13 +71,27 @@ class BleWearablesService {
 
   final _vitalsController = StreamController<BleVitalsData>.broadcast();
   final _stateController = StreamController<BleConnectionState>.broadcast();
+  final _ppgController = StreamController<List<double>>.broadcast();
+  final _ecgController = StreamController<List<double>>.broadcast();
+
+  bool _isSimulationActive = false;
+  Timer? _simTimer;
+  int _simStep = 0;
+  final double _hrvRmssd = 45.0;
+
+  final List<double> _ppgBuffer = [];
+  final List<double> _ecgBuffer = [];
 
   BleConnectionState get state => _state;
   BleDiscoveredDevice? get activeDevice => _activeDevice;
   BleVitalsData get currentVitals => _currentVitals;
+  bool get isSimulationActive => _isSimulationActive;
+  double get hrvRmssd => _hrvRmssd;
 
   Stream<BleVitalsData> get vitalsStream => _vitalsController.stream;
   Stream<BleConnectionState> get stateStream => _stateController.stream;
+  Stream<List<double>> get ppgStream => _ppgController.stream;
+  Stream<List<double>> get ecgStream => _ecgController.stream;
 
   // Standard GATT UUIDs
   static const String hrServiceUuid = '0000180d-0000-1000-8000-00805f9b34fb';
@@ -109,9 +124,75 @@ class BleWearablesService {
   }
 
   void disconnect() {
+    stopSyntheticStream();
     _state = BleConnectionState.disconnected;
     _activeDevice = null;
     _stateController.add(_state);
+  }
+
+  void startSyntheticStream() {
+    if (_isSimulationActive) return;
+    _isSimulationActive = true;
+    _state = BleConnectionState.connected;
+    _stateController.add(_state);
+    _activeDevice = BleDiscoveredDevice(
+      id: 'synthetic-001',
+      name: 'Synthetic PPG/ECG Sensor',
+      rssi: -55,
+      serviceUuids: [hrServiceUuid, spo2ServiceUuid],
+    );
+
+    _simTimer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
+      _simStep++;
+      final hrBase = 72.0;
+      final rsa = (mathSin(_simStep * 0.06) * 4.0);
+      final currentHr = (hrBase + rsa).round();
+
+      // PPG AC Wave calculation
+      final ppgPeriod = 50.0 / (currentHr / 60.0);
+      final ppgPhase = (_simStep % ppgPeriod.round()) / ppgPeriod;
+      double ppgVal = 0.0;
+      if (ppgPhase < 0.2) {
+        ppgVal = mathSin((ppgPhase / 0.2) * 3.14159) * 0.8;
+      } else if (ppgPhase >= 0.2 && ppgPhase < 0.35) {
+        ppgVal = 0.8 - (ppgPhase - 0.2) * 2.0;
+      } else {
+        ppgVal = 0.15;
+      }
+      _ppgBuffer.add(ppgVal.clamp(0.0, 1.0));
+      if (_ppgBuffer.length > 200) _ppgBuffer.removeAt(0);
+
+      // ECG Lead-I P-QRS-T calculation
+      final ecgPeriod = ppgPeriod;
+      final ecgPhase = (_simStep % ecgPeriod.round()) / ecgPeriod;
+      double ecgVal = 0.0;
+      if (ecgPhase < 0.1) {
+        ecgVal = mathSin((ecgPhase / 0.1) * 3.14159) * 0.12;
+      } else if (ecgPhase >= 0.18 && ecgPhase < 0.22) {
+        ecgVal = 1.0; // R-spike
+      } else if (ecgPhase >= 0.22 && ecgPhase < 0.25) {
+        ecgVal = -0.3; // S-dip
+      } else if (ecgPhase >= 0.35 && ecgPhase < 0.55) {
+        ecgVal = mathSin(((ecgPhase - 0.35) / 0.2) * 3.14159) * 0.25; // T-wave
+      }
+      _ecgBuffer.add(ecgVal);
+      if (_ecgBuffer.length > 200) _ecgBuffer.removeAt(0);
+
+      _ppgController.add(List<double>.from(_ppgBuffer));
+      _ecgController.add(List<double>.from(_ecgBuffer));
+
+      updateTelemetry(hr: currentHr, spO2: 98.0);
+    });
+  }
+
+  void stopSyntheticStream() {
+    _simTimer?.cancel();
+    _simTimer = null;
+    _isSimulationActive = false;
+  }
+
+  double mathSin(double rad) {
+    return math.sin(rad);
   }
 
   void updateTelemetry({
@@ -135,7 +216,10 @@ class BleWearablesService {
   }
 
   void dispose() {
+    stopSyntheticStream();
     _vitalsController.close();
     _stateController.close();
+    _ppgController.close();
+    _ecgController.close();
   }
 }

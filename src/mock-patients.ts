@@ -13,7 +13,7 @@ import { p_edwin_smith_3 } from './mock-patients/p_edwin_smith_3';
 import { p_charles_darwin } from './mock-patients/p_charles_darwin';
 import { p_marie_curie } from './mock-patients/p_marie_curie';
 import { p_srinivasa_ramanujan } from './mock-patients/p_srinivasa_ramanujan';
-import { p_phil_gear } from './mock-patients/p_phil_gear';
+import { p_default_patient } from './mock-patients/p_default_patient';
 
 export const MOCK_PATIENTS: IPatient[] = [
   p001,
@@ -30,5 +30,5 @@ export const MOCK_PATIENTS: IPatient[] = [
   p_charles_darwin,
   p_marie_curie,
   p_srinivasa_ramanujan,
-  p_phil_gear
+  p_default_patient
 ];

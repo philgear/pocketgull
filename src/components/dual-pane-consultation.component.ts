@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
 import { ThemeService } from '../services/theme.service';
@@ -50,16 +50,17 @@ import { CompassionateAnalogyService } from '../services/compassionate-analogy.s
           <div class="space-y-3 font-mono text-xs">
             <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300">
               <div class="text-[10px] text-sky-400 font-bold uppercase mb-1">Diagnoses & Coding</div>
-              <div>• ICD-10 R06.02: Shortness of breath</div>
-              <div>• ICD-10 I10: Essential primary hypertension</div>
-              <div>• SNOMED 407563006: Microvascular endothelial stress</div>
+              @for (cond of activeConditions(); track cond) {
+                <div>• {{ cond }}</div>
+              }
+              <div>• SNOMED {{ activeSnomed().code }}: {{ activeSnomed().display }}</div>
             </div>
 
             <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300">
               <div class="text-[10px] text-sky-400 font-bold uppercase mb-1">Pathophysiological Telemetry</div>
-              <div>• Cardiac Output: 5.2 L/min | MAP: 93 mmHg</div>
+              <div>• Heart Rate: {{ patientState.vitals().hr || '72' }} bpm | BP: {{ patientState.vitals().bp || '120/80' }} mmHg</div>
               <div>• Cortisol Evaporation Rate: High-velocity sympathovagal shift</div>
-              <div>• Gut Microbiome Diversity: Reduced Short-Chain Fatty Acid synthesis</div>
+              <div>• Oxygen Saturation: {{ patientState.vitals().spO2 || '98%' }}</div>
             </div>
 
             <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300">
@@ -74,15 +75,13 @@ import { CompassionateAnalogyService } from '../services/compassionate-analogy.s
         <div class="p-5 rounded-2xl bg-zinc-900/90 border border-emerald-800/40 space-y-4">
           <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
             <div class="flex items-center gap-2">
-              <span class="text-xl">
-                {{ themeService.analogyLensMode() === 'arborist' ? '🌳' : (themeService.analogyLensMode() === 'mechanic' ? '🏎️' : (themeService.analogyLensMode() === 'gentleman' ? '🎩' : '✨')) }}
-              </span>
+              <span class="text-xl">📖</span>
               <h4 class="font-extrabold text-xs uppercase tracking-wider text-emerald-400 font-mono">
                 Patient Persona View (Compassionate Translation)
               </h4>
             </div>
             <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 font-mono border border-emerald-800/50 uppercase font-bold">
-              {{ themeService.analogyLensMode() }} Mode Active
+              Plain Language Active
             </span>
           </div>
 
@@ -119,20 +118,33 @@ export class DualPaneConsultationComponent {
   protected readonly themeService = inject(ThemeService);
   protected readonly compassionateAnalogy = inject(CompassionateAnalogyService);
 
-  getActiveTranslation() {
-    const name = this.patientState.patientName() || 'Friend';
-    const issues = ['acute stress', 'elevated blood pressure'];
-    const vitals = '120/80 mmHg';
+  readonly activeSnomed = computed(() => {
+    const prof = this.patientState.occupationalProfile();
+    return {
+      code: prof?.snomedCode || '417893002',
+      display: prof?.snomedDisplay || 'Work-related stress disorder (disorder)'
+    };
+  });
 
-    switch (this.themeService.analogyLensMode()) {
-      case 'mechanic':
-        return this.compassionateAnalogy.generateMechanicTranslation(name, vitals, issues);
-      case 'gentleman':
-        return this.compassionateAnalogy.generateGentlemanTranslation(name, vitals, issues);
-      case 'muse':
-        return this.compassionateAnalogy.generateMuseTranslation(name, vitals, issues);
-      default:
-        return this.compassionateAnalogy.generateArboristTranslation(name, vitals, issues);
+  readonly activeConditions = computed(() => {
+    const history = this.patientState.patientHistory();
+    const vitals = this.patientState.vitals();
+    const conds: string[] = [];
+    if (vitals.bp) conds.push(`ICD-10 I10: Essential primary hypertension (${vitals.bp} mmHg)`);
+    if (vitals.hr && parseInt(vitals.hr, 10) > 90) conds.push(`ICD-10 R00.0: Tachycardia (${vitals.hr} bpm)`);
+    if (history.length > 0) {
+      history.slice(0, 2).forEach(h => conds.push(`ICD-10 Z91.89: ${h.summary}`));
     }
+    if (conds.length === 0) conds.push('ICD-10 Z00.00: General adult medical examination');
+    return conds;
+  });
+
+  getActiveTranslation() {
+    const name = this.patientState.patientName() || 'Patient';
+    const vitals = this.patientState.vitals()?.bp || '120/80 mmHg';
+    const history = this.patientState.patientHistory();
+    const issues = history.length > 0 ? history.map(h => h.summary) : ['autonomic stress', 'elevated BP'];
+
+    return this.compassionateAnalogy.generateClinicalPatientTranslation(name, vitals, issues);
   }
 }

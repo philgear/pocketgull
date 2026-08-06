@@ -9,7 +9,8 @@ final fhirServiceProvider = Provider<FhirService>((ref) {
 class FhirService {
   /// Converts an active PatientState into a fully compliant FHIR R4 Bundle JSON document.
   Map<String, dynamic> exportPatientToFhirBundle(PatientState state) {
-    final patientId = 'patient_${state.name.replaceAll(' ', '_').toLowerCase()}';
+    final sanitizedName = sanitizeString(state.name);
+    final patientId = 'patient_${sanitizedName.replaceAll(' ', '_').toLowerCase()}';
     final nowIso = DateTime.now().toIso8601String();
 
     final List<Map<String, dynamic>> entries = [];
@@ -28,9 +29,9 @@ class FhirService {
       'name': [
         {
           'use': 'official',
-          'text': sanitizeString(state.name),
-          'family': sanitizeString(state.name.split(' ').last),
-          'given': state.name.split(' ').take(state.name.split(' ').length - 1).map(sanitizeString).toList(),
+          'text': sanitizedName,
+          'family': sanitizeString(sanitizedName.split(' ').last),
+          'given': sanitizedName.split(' ').take(sanitizedName.split(' ').length - 1).map(sanitizeString).toList(),
         }
       ],
       'gender': 'unknown',

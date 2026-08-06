@@ -846,15 +846,15 @@ export class ChronoWeeklyMealPlannerComponent implements OnDestroy {
 
   stopCephalicAvs(): void {
     if (this.oscLeft) {
-      try { this.oscLeft.stop(); this.oscLeft.disconnect(); } catch (_) {}
+      try { this.oscLeft.stop(); this.oscLeft.disconnect(); } catch (_) { /* Node may already be stopped */ }
       this.oscLeft = null;
     }
     if (this.oscRight) {
-      try { this.oscRight.stop(); this.oscRight.disconnect(); } catch (_) {}
+      try { this.oscRight.stop(); this.oscRight.disconnect(); } catch (_) { /* Node may already be stopped */ }
       this.oscRight = null;
     }
     if (this.audioCtx) {
-      try { this.audioCtx.close(); } catch (_) {}
+      try { this.audioCtx.close(); } catch (_) { /* Context may already be closed */ }
       this.audioCtx = null;
     }
     this.isPlayingAvs.set(false);

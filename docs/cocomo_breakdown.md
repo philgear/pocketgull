@@ -7,13 +7,26 @@ This report details the Constructive Cost Model II (COCOMO II) estimation at the
 
 | Metric | Estimated Value | Details / Assumptions |
 |---|---|---|
-| **Total Lines of Code (SLOC)** | **79,519** | Source lines of code excluding comments/blanks across all scanned modules. |
-| **Total Size (KSLOC)** | **79.519** | Thousands of Source Lines of Code. |
+| **Total Lines of Code (SLOC)** | **338,582** | Source lines of code excluding comments/blanks across all scanned modules. |
+| **Total Size (KSLOC)** | **338.582** | Thousands of Source Lines of Code. |
 | **Exponent B** | **1.0887** | Based on scale factors: Precedentedness, Flexibility, Risk Resolution, Team Cohesion, and Process Maturity. |
 | **Effort Adjustment Factor (EAF)** | **0.4033** | Based on multipliers: Reliability, Complexity, Time constraints, Personnel experience. |
-| **Estimated Effort (Person-Months)** | **138.99 PM** | The total developer months required under standard velocity. |
-| **Estimated Effort (Person-Hours)** | **21,127 hrs** | Based on 152 working hours per person-month. |
-| **Estimated Schedule (TDEV)** | **15.96 months** | Recommended calendar schedule for a standard team size. |
+| **Estimated Effort (Person-Months)** | **673.01 PM** | The total developer months required under standard velocity. |
+| **Estimated Effort (Person-Hours)** | **102,297 hrs** | Based on 152 working hours per person-month. |
+| **Estimated Schedule (TDEV)** | **25.18 months** | Recommended calendar schedule for a standard team size. |
+| **Optimal Team Size** | **26.7 FTE** | Derived from PM / TDEV. |
+| **Solo Developer Equivalent** | **56.1 years** | Single-developer calendar time at standard velocity. |
+| **Cost-to-Replicate (Blended $155/hr)** | **$15.86M** | At blended junior/mid/senior market rates. |
+
+### SLOC Breakdown by Module (Aug 5, 2026)
+
+| Module | Files | SLOC | Share |
+|---|---|---|---|
+| Angular `src/` (TypeScript) | 365 | 90,013 | 26.6% |
+| Flutter / Dart (Mobile Suite) | 589 | 242,067 | 71.5% |
+| Python FastAPI Sidecar | 26 | 3,479 | 1.0% |
+| AVS Companion (TypeScript) | 13 | 3,023 | 0.9% |
+| **Total** | **993** | **338,582** | **100%** |
 
 ---
 

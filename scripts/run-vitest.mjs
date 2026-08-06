@@ -1,7 +1,7 @@
 import { spawnSync } from 'child_process';
 import path from 'path';
 
-const projectDir = 'c:/Users/philg/Pocketgull/pocketgull';
+const projectDir = process.cwd();
 const cliPath = path.join(projectDir, 'node_modules/vitest/vitest.mjs');
 const configPath = path.join(projectDir, 'vitest.config.ts');
 

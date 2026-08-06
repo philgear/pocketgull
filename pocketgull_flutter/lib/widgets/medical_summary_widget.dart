@@ -76,23 +76,28 @@ class _MedicalSummaryWidgetState extends ConsumerState<MedicalSummaryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context),
-          const SizedBox(height: 24),
-          _buildSectionTitle(context, 'Current Visit / Chief Complaint'),
-          _buildChiefComplaint(context),
-          const SizedBox(height: 24),
-          _buildSectionTitle(context, 'Biometric Telemetry'),
-          _buildVitalsGrid(context),
-          _buildClinicalRiskCard(context, ref),
-          const SizedBox(height: 24),
-          _buildSectionTitle(context, 'Active Strategy Overview'),
-          _buildActiveCarePlan(context),
-        ],
+    return Semantics(
+      container: true,
+      header: true,
+      label: 'Medical Summary & Patient Strategy Overview',
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context),
+            const SizedBox(height: 24),
+            _buildSectionTitle(context, 'Current Visit / Chief Complaint'),
+            _buildChiefComplaint(context),
+            const SizedBox(height: 24),
+            _buildSectionTitle(context, 'Biometric Telemetry'),
+            _buildVitalsGrid(context),
+            _buildClinicalRiskCard(context, ref),
+            const SizedBox(height: 24),
+            _buildSectionTitle(context, 'Active Strategy Overview'),
+            _buildActiveCarePlan(context),
+          ],
+        ),
       ),
     );
   }
@@ -297,9 +302,15 @@ class _MedicalSummaryWidgetState extends ConsumerState<MedicalSummaryWidget> {
 
   Widget _buildActiveCarePlan(BuildContext context) {
     final patientState = ref.watch(patientProvider);
-    final List<String> goals = patientState.patientGoals is List<String>
-        ? (patientState.patientGoals as List<String>)
-        : (patientState.patientGoals as List<dynamic>).map((e) => e.toString()).toList();
+    final dynamic rawGoalsObj = patientState.patientGoals;
+
+    final String rawGoalsStr = rawGoalsObj is List
+        ? rawGoalsObj.join('\n')
+        : (rawGoalsObj?.toString() ?? '');
+
+    final List<String> goals = rawGoalsStr.trim().isNotEmpty
+        ? rawGoalsStr.split(RegExp(r'\n|;')).map((e) => e.trim()).where((e) => e.isNotEmpty).toList()
+        : [];
 
     if (goals.isEmpty) {
       return const Text('No active care plan goals established for this patient.', style: TextStyle(fontSize: 12, color: Colors.grey));

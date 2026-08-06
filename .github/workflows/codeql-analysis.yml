@@ -4,7 +4,7 @@ permissions: read-all
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "**" ]
   pull_request:
     branches: [ "main" ]
   schedule:
@@ -25,28 +25,37 @@ jobs:
       matrix:
         include:
           - language: 'javascript-typescript'
-            build-mode: 'none'
           - language: 'python'
-            build-mode: 'none'
 
     steps:
     - name: Harden Runner
-      uses: step-security/harden-runner@v2.20.0
+      uses: step-security/harden-runner@v2.10.4
       with:
         egress-policy: audit
 
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+    - name: Setup Python & Dependencies
+      if: matrix.language == 'python'
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python Sidecar Dependencies
+      if: matrix.language == 'python'
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r pocketgull_api/requirements.txt || true
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81 # v4.37.3
+      uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}
         queries: security-extended
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.37.4
+      uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{ matrix.language }}"
 

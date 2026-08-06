@@ -1,37 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { setupE2ePage } from './utils/setup';
+import { setupE2ePage, enterDemoMode } from './utils/setup';
 
-async function enterDemoMode(page: import('@playwright/test').Page) {
-  await page.goto('/');
-
-  // PIN entry
-  const pinInput = page.locator('input[placeholder="1234"]');
-  await expect(pinInput).toBeVisible({ timeout: 10000 });
-  await pinInput.fill('1234');
-  await pinInput.press('Enter');
-
-  // Select Demo Mode
-  const demoBtn = page.locator('button', { hasText: 'Demo Mode' });
-  await expect(demoBtn).toBeVisible({ timeout: 10000 });
-  await demoBtn.click();
-
-  // Skip KSS
-  const skipBtn = page.locator('button', { hasText: 'Skip assessment' });
-  await expect(skipBtn).toBeVisible({ timeout: 10000 });
-  await skipBtn.click();
-
-  // Ethics pledge
-  const pledgeCheckbox = page.locator('input[type="checkbox"]');
-  await expect(pledgeCheckbox).toBeVisible({ timeout: 10000 });
-  await pledgeCheckbox.check();
-
-  const acceptBtn = page.locator('button', { hasText: 'Accept & Enter System' });
-  await expect(acceptBtn).toBeVisible({ timeout: 10000 });
-  await acceptBtn.click();
-
-  // Verify Main Viewport loads
-  await expect(page.locator('main')).toBeVisible({ timeout: 15000 });
-}
 
 test.describe('Analytical Data Integrity & Clinical Engine Verification', () => {
   test.beforeEach(async ({ page }) => {

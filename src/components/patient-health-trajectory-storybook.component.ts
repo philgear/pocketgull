@@ -320,10 +320,19 @@ export class PatientHealthTrajectoryStorybookComponent implements OnDestroy {
   }
 
   formatParagraphText(text: string): string {
-    if (this.readingStyle() === 'bionic') {
-      return text.replace(/\b([A-Za-z]{1,3})([A-Za-z]*)\b/g, '<strong class="font-extrabold text-indigo-600 dark:text-indigo-400">$1</strong>$2');
+    // XSS-safe: strip all HTML tags before applying bionic formatting
+    let sanitized = '';
+    let inTag = false;
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === '<') { inTag = true; continue; }
+      if (text[i] === '>') { inTag = false; continue; }
+      if (!inTag) sanitized += text[i];
     }
-    return text;
+
+    if (this.readingStyle() === 'bionic') {
+      return sanitized.replace(/\b([A-Za-z]{1,3})([A-Za-z]*)\b/g, '<strong class="font-extrabold text-indigo-600 dark:text-indigo-400">$1</strong>$2');
+    }
+    return sanitized;
   }
 
   toggleAudiobookSpeech() {

@@ -11,9 +11,11 @@
 - **Note**: Do not modify these overrides without full regression testing of both the Angular build and the Astro `docs-study` workspace build.
 
 ## Python / FastAPI Standards
-- **Validation**: All request and response models in the `pocketgull_api` sidecar MUST be strictly typed using Pydantic models. Avoid returning untyped dictionaries.
-- **Async Execution**: Ensure all route handlers and I/O-bound functions (like calling external APIs or ML models) use `async`/`await` to prevent blocking the event loop.
-- **Formatting**: Adhere to PEP-8 standards. Use `black` and `ruff` for formatting and linting.
+- **Formatting & Linting**: Adhere to PEP-8 standards. Use **`ruff`** for linting/import sorting and **`black`** (88-character max line length) for code formatting.
+- **Pydantic Validation**: All request and response models in `pocketgull_api` sidecars MUST be strictly typed using Pydantic v2 `BaseModel` classes. Avoid returning raw dictionaries or untyped `Any`. Use `pydantic.Field` for numeric constraints, defaults, and API field descriptions.
+- **Async & Event Loop Hygiene**: Use `async def` for non-blocking I/O route handlers (`httpx`, async DB calls) and standard synchronous `def` for CPU-bound matrix/ML computations (`scikit-learn`, `numpy`) so FastAPI automatically dispatches them to the thread pool without blocking the main event loop.
+- **Structured Logging & Error Handling**: Mask internal exceptions by throwing `fastapi.HTTPException` with explicit HTTP status codes and structured detail payloads (`detail={"code": ..., "message": ...}`). Avoid `print()`; use standard `logging` or `structlog` to ensure GCP stdout ingestion parses log levels (`INFO`, `WARNING`, `ERROR`) cleanly.
+- **Docstring Conventions**: Use Google Style docstrings for all complex scoring methods, ML pipelines, and public service functions.
 
 ## Flutter / Dart Architecture
 - **State Management**: Use **Riverpod** for state management across the `pocketgull_flutter` companion app. Avoid `setState` for complex business logic.
@@ -70,6 +72,14 @@
 - **End-of-Session Pruning**: Before wrapping up features or releases, proactively purge unused imports, delete unreferenced dead code, merge duplicate helper functions, and remove commented-out blocks.
 - **Secret & Egress Boundaries**: Never commit API keys or credentials. Ensure `.env*` is strictly matched in `.gitignore`, and verify all external domains with `Sentinel Security Guard`.
 
+## Gemini Safety Filter Policy (Clinical CDS)
+- **Canonical Reference**: `SECURITY.md §2` documents the full policy. All Genkit flows in `src/server/genkit.ts` reference this section.
+- **DANGEROUS_CONTENT = `OFF`**: Clinical text routinely discusses drug dosages, toxic exposures, overdose management, suicidal ideation screening (PHQ-9/C-SSRS), and trauma. Any threshold above `OFF` produces false-positive blocking on standard-of-care care plans.
+- **Imaging & OCR Flows = All `OFF`**: Medical imaging (X-rays, dermatology, wound assessment) and clinical document OCR require fully permissive safety settings across all categories.
+- **HARASSMENT & HATE_SPEECH = `BLOCK_ONLY_HIGH`**: Retained as baseline protection; rarely triggered by clinical text.
+- **SEXUALLY_EXPLICIT = `BLOCK_ONLY_HIGH`** (text flows) / **`OFF`** (imaging flows): Permits OB/GYN, STI, and reproductive health content.
+- **Do NOT revert to `BLOCK_LOW_AND_ABOVE` or `BLOCK_MEDIUM_AND_ABOVE`**: These thresholds silently block legitimate medical content and were the root cause of the Cognitive Localization translation failure.
+
 ## NN/g (Nielsen Norman Group) Usability & Accessibility Standards
 - **Form Accessibility**: All input components MUST include explicit `[attr.aria-describedby]` error/hint linking, `[attr.aria-invalid]`, and 44px+ touch target hitboxes (Fitts's Law).
 - **System Status Visibility**: Telemetry badges and connection state indicators MUST provide instant visual feedback without layout shifts.
@@ -82,3 +92,15 @@
 ## Biophysical PBR Substrates & Unbiased Cryptography
 - **Edwin Smith Surgical Codex**: Describe 3D WebGL PBR texture maps using Edwin Smith III's empirical surgical codex biophysical descriptions.
 - **Unbiased Cryptographic Floats**: When generating random floats from cryptographic entropy, use the 53-bit IEEE-754 mantissa formula `(high * 4294967296.0 + low) / 9007199254740992.0` to eliminate modulo bias.
+
+## CI/CD Pipeline & GitHub Security Guardrails
+- **System Dependencies & Harden Runner**: Any workflow job installing Python packages with C extensions (e.g. `h5py` requiring `libhdf5-dev`) MUST set `disable-sudo: false` in `step-security/harden-runner` and include `sudo apt-get update && sudo apt-get install -y libhdf5-dev`.
+- **CodeQL Taint Chain Patterning**: Never rely on legacy `lgtm[]` comments. Break taint chains structurally:
+  - *System Prompt Injection*: Keep `systemInstruction` strictly static (`BASE_CLINICAL_PROMPT`). Pass sanitized user directives as a `[CLINICAL DIRECTIVE CONTEXT]` prefix in the user content array.
+  - *Network Data Writes*: Validate binary header magic bytes (e.g., `0x00 0x01 0x00 0x00` for TTF) and copy to a new `Buffer.alloc()` before writing to disk.
+  - *Log Injection*: Destructure explicit primitive fields into a new typed object and stringify instead of logging raw `req.body` objects directly.
+- **Playwright E2E Test Setup**: All E2E test suites MUST call `await enterDemoMode(page)` in `beforeEach` after `setupE2ePage(page)` to ensure the app navigates away from `about:blank`, unlocks the splash screen, and renders DOM elements before querying attributes or clicking buttons. Use case-insensitive locators (`text=/.../i`) for text matching.
+- **Monorepo Docker Context**: The root `Dockerfile` MUST copy all package manifests across all workspaces (`COPY docs/study/package*.json ./docs/study/`, `COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/`, `COPY pocketgull_api/package*.json ./pocketgull_api/`) and run `npm install --legacy-peer-deps --workspaces`.
+- **PR vs. Release Isolation**: Production release workflows (`release.yml`) MUST enforce `if: github.event_name != 'pull_request'` at the job level so GHCR package pushes and SLSA attestations trigger only on `main` branch pushes or release tags (`v*`).
+- **Portable Script Paths**: All scripts in `package.json` and `scripts/` MUST use relative paths (`./run-playwright.cjs`, `process.cwd()`) — never hardcoded local machine paths (`c:/Users/philg/...`).
+

@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { DoubleFlipStateMachineService, DoubleClickState } from '../services/double-flip-state-machine.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { BioHapticFeedbackService } from '../services/bio-haptic-feedback.service';
+import { ResidencyOsceSimulatorComponent } from './residency-osce-simulator.component';
+import { SlackIntegrationCardComponent } from './slack-integration-card.component';
+import { PopulationHealthEquityHubComponent } from './population-health-equity-hub.component';
 
 export interface IWorkbenchToolStatus {
   id: string;
@@ -18,7 +21,12 @@ export interface IWorkbenchToolStatus {
 @Component({
   selector: 'app-clinical-tool-workbench',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule,
+    ResidencyOsceSimulatorComponent,
+    SlackIntegrationCardComponent,
+    PopulationHealthEquityHubComponent
+  ],
   template: `
     <div class="p-6 bg-zinc-950 text-zinc-100 rounded-2xl border border-zinc-800 shadow-2xl max-w-7xl mx-auto space-y-6">
       
@@ -72,78 +80,123 @@ export interface IWorkbenchToolStatus {
           <div>Flips: <span class="text-amber-400 font-bold">{{ stateMachine.doubleFlipTelemetry().flipCount }}</span></div>
           <div>Hysteresis: <span class="text-cyan-400 font-bold">{{ stateMachine.doubleFlipTelemetry().hysteresisRatio }}</span></div>
         </div>
+           <!-- Navigation Tabs -->
+      <div class="flex flex-wrap items-center gap-2 p-1.5 bg-zinc-900 rounded-xl border border-zinc-800 text-xs font-bold font-mono">
+        <button (click)="activeWorkbenchTab.set('tools')"
+                [class.bg-cyan-500]="activeWorkbenchTab() === 'tools'"
+                [class.text-zinc-950]="activeWorkbenchTab() === 'tools'"
+                [class.text-zinc-300]="activeWorkbenchTab() !== 'tools'"
+                class="px-3.5 py-2 rounded-lg transition cursor-pointer">
+          🛠️ Diagnostic Tools
+        </button>
+        <button (click)="activeWorkbenchTab.set('osce')"
+                [class.bg-amber-500]="activeWorkbenchTab() === 'osce'"
+                [class.text-zinc-950]="activeWorkbenchTab() === 'osce'"
+                [class.text-zinc-300]="activeWorkbenchTab() !== 'osce'"
+                class="px-3.5 py-2 rounded-lg transition cursor-pointer">
+          🎓 Residency OSCE Trainer
+        </button>
+        <button (click)="activeWorkbenchTab.set('slack')"
+                [class.bg-purple-500]="activeWorkbenchTab() === 'slack'"
+                [class.text-zinc-950]="activeWorkbenchTab() === 'slack'"
+                [class.text-zinc-300]="activeWorkbenchTab() !== 'slack'"
+                class="px-3.5 py-2 rounded-lg transition cursor-pointer">
+          💬 Slack Command & Alerts
+        </button>
+        <button (click)="activeWorkbenchTab.set('equity')"
+                [class.bg-indigo-500]="activeWorkbenchTab() === 'equity'"
+                [class.text-zinc-950]="activeWorkbenchTab() === 'equity'"
+                [class.text-zinc-300]="activeWorkbenchTab() !== 'equity'"
+                class="px-3.5 py-2 rounded-lg transition cursor-pointer">
+          🌍 Population Health Equity Hub
+        </button>
       </div>
 
-      <!-- Workbench Interactive Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        @for (tool of tools(); track tool.id) {
-          <div
-            (dblclick)="onCardDblClick(tool.id)"
-            class="relative min-h-[220px] rounded-xl border transition-all duration-300 cursor-pointer select-none group perspective-1000 p-4 flex flex-col justify-between"
-            [ngClass]="{
-              'bg-zinc-900/80 border-zinc-800 hover:border-teal-500/50 hover:shadow-lg hover:shadow-teal-950/30': !tool.isFlipped,
-              'bg-zinc-900 border-amber-500/40 shadow-xl shadow-amber-950/40 ring-1 ring-amber-500/20': tool.isFlipped
-            }"
-          >
-            <!-- FRONT SIDE: Clinical Controls -->
-            @if (!tool.isFlipped) {
-              <div>
-                <div class="flex items-center justify-between text-xs mb-2">
-                  <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono">{{ tool.category }}</span>
-                  <span
-                    class="px-2 py-0.5 rounded font-mono font-semibold text-[10px]"
-                    [ngClass]="{
-                      'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': tool.status === 'PASS',
-                      'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20': tool.status === 'OPERATIONAL',
-                      'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse': tool.status === 'TESTING'
-                    }"
+      @if (activeWorkbenchTab() === 'tools') {
+        <!-- Workbench Interactive Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          @for (tool of tools(); track tool.id) {
+            <div
+              (dblclick)="onCardDblClick(tool.id)"
+              class="relative min-h-[220px] rounded-xl border transition-all duration-300 cursor-pointer select-none group perspective-1000 p-4 flex flex-col justify-between"
+              [ngClass]="{
+                'bg-zinc-900/80 border-zinc-800 hover:border-teal-500/50 hover:shadow-lg hover:shadow-teal-950/30': !tool.isFlipped,
+                'bg-zinc-900 border-amber-500/40 shadow-xl shadow-amber-950/40 ring-1 ring-amber-500/20': tool.isFlipped
+              }"
+            >
+              <!-- FRONT SIDE: Clinical Controls -->
+              @if (!tool.isFlipped) {
+                <div>
+                  <div class="flex items-center justify-between text-xs mb-2">
+                    <span class="px-2 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono">{{ tool.category }}</span>
+                    <span
+                      class="px-2 py-0.5 rounded font-mono font-semibold text-[10px]"
+                      [ngClass]="{
+                        'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20': tool.status === 'PASS',
+                        'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20': tool.status === 'OPERATIONAL',
+                        'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse': tool.status === 'TESTING'
+                      }"
+                    >
+                      {{ tool.status }}
+                    </span>
+                  </div>
+
+                  <h3 class="text-sm font-semibold text-zinc-100 group-hover:text-teal-400 transition-colors">
+                    {{ tool.name }}
+                  </h3>
+                  <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                    {{ tool.description }}
+                  </p>
+                </div>
+
+                <div class="pt-3 border-t border-zinc-800/60 flex items-center justify-between text-[11px] text-zinc-500">
+                  <span class="font-mono">Latency: <span class="text-zinc-300">{{ tool.latencyMs }}ms</span></span>
+                  <button type="button" (click)="onCardDblClick(tool.id); $event.stopPropagation()"
+                          class="text-amber-400 hover:text-amber-300 font-medium cursor-pointer transition flex items-center gap-1">
+                    Double-click to Flip 🔄
+                  </button>
+                </div>
+              } @else {
+                <!-- BACK SIDE: Cognitive Diagnostics & Mechanism Insight -->
+                <div class="space-y-2">
+                  <div class="flex items-center justify-between text-xs pb-1.5 border-b border-amber-500/20">
+                    <span class="font-bold text-amber-400 flex items-center gap-1">
+                      🧠 Cognitive Diagnostic Insight
+                    </span>
+                    <button type="button" (click)="onCardDblClick(tool.id); $event.stopPropagation()"
+                            class="text-[10px] text-zinc-400 hover:text-zinc-200 font-mono cursor-pointer">
+                      Flipped View 🔄
+                    </button>
+                  </div>
+
+                  <p class="text-xs text-zinc-300 leading-relaxed font-sans">
+                    {{ tool.cognitiveInsight }}
+                  </p>
+                </div>
+
+                <div class="pt-2 border-t border-zinc-800 flex items-center justify-between text-[11px]">
+                  <button
+                    (click)="testSingleTool(tool.id); $event.stopPropagation()"
+                    class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-medium transition-colors cursor-pointer"
                   >
-                    {{ tool.status }}
-                  </span>
+                    ⚡ Trigger Test
+                  </button>
+                  <button type="button" (click)="onCardDblClick(tool.id); $event.stopPropagation()"
+                          class="text-zinc-400 hover:text-zinc-200 text-[10px] cursor-pointer">
+                    Return ↩️
+                  </button>
                 </div>
-
-                <h3 class="text-sm font-semibold text-zinc-100 group-hover:text-teal-400 transition-colors">
-                  {{ tool.name }}
-                </h3>
-                <p class="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-                  {{ tool.description }}
-                </p>
-              </div>
-
-              <div class="pt-3 border-t border-zinc-800/60 flex items-center justify-between text-[11px] text-zinc-500">
-                <span class="font-mono">Latency: <span class="text-zinc-300">{{ tool.latencyMs }}ms</span></span>
-                <span class="text-amber-400/80 font-medium group-hover:text-amber-300">Double-click to Flip 🔄</span>
-              </div>
-            }
-
-            <!-- BACK SIDE: Cognitive Diagnostics & Mechanism Insight -->
-            @if (tool.isFlipped) {
-              <div class="space-y-2">
-                <div class="flex items-center justify-between text-xs pb-1.5 border-b border-amber-500/20">
-                  <span class="font-bold text-amber-400 flex items-center gap-1">
-                    🧠 Cognitive Diagnostic Insight
-                  </span>
-                  <span class="text-[10px] text-zinc-500 font-mono">Flipped View</span>
-                </div>
-
-                <p class="text-xs text-zinc-300 leading-relaxed font-sans">
-                  {{ tool.cognitiveInsight }}
-                </p>
-              </div>
-
-              <div class="pt-2 border-t border-zinc-800 flex items-center justify-between text-[11px]">
-                <button
-                  (click)="testSingleTool(tool.id); $event.stopPropagation()"
-                  class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-medium transition-colors"
-                >
-                  ⚡ Trigger Test
-                </button>
-                <span class="text-zinc-500 text-[10px]">Double-click to Return ↩️</span>
-              </div>
-            }
-          </div>
-        }
-      </div>
+              }
+            </div>
+          }
+        </div>
+      } @else if (activeWorkbenchTab() === 'osce') {
+        <app-residency-osce-simulator />
+      } @else if (activeWorkbenchTab() === 'slack') {
+        <app-slack-integration-card />
+      } @else if (activeWorkbenchTab() === 'equity') {
+        <app-population-health-equity-hub />
+      }
 
     </div>
   `
@@ -151,6 +204,8 @@ export interface IWorkbenchToolStatus {
 export class ClinicalToolWorkbenchComponent {
   readonly stateMachine = inject(DoubleFlipStateMachineService);
   private readonly haptics = inject(BioHapticFeedbackService);
+
+  readonly activeWorkbenchTab = signal<'tools' | 'osce' | 'slack' | 'equity'>('tools');
 
   readonly tools = signal<IWorkbenchToolStatus[]>([
     {

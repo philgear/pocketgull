@@ -14,7 +14,7 @@ test.describe('Y-BOCs Diagnostic Screener E2E Tests', () => {
     await enterDemoMode(page);
 
     // Click patient dropdown to select Phil Gear
-    const dropdownBtn = page.locator('app-patient-dropdown button').first();
+    const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
     await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
     await dropdownBtn.click();
 

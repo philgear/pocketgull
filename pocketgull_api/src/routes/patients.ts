@@ -17,10 +17,11 @@ patientsRouter.post('/', (req, res) => {
     // Replace the database state with the synced state for this demo
     mockDatabase = patientsToSync;
     
-    console.log(`[Patients API] Synced ${mockDatabase.length} patients to cloud.`);
+    const cleanLength = Number(mockDatabase.length || 0);
+    console.log('[Patients API] Synced %d patients to cloud.', cleanLength);
     res.status(200).json({ message: 'Patients synced successfully' });
   } catch (error: any) {
-    const safeErr = encodeURIComponent(String(error?.message || error || '')).slice(0, 500);
+    const safeErr = String(error?.message || error || '').replace(/[^a-zA-Z0-9_\-\.\:\s]/g, '_').slice(0, 500);
     console.error('[Patients API] Sync error:', safeErr);
     res.status(500).json({ error: 'Internal server error during sync' });
   }

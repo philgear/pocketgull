@@ -162,8 +162,8 @@ export class VisionAccessibilityAssistComponent {
         gain.connect(ctx.destination);
         osc.start();
         osc.stop(ctx.currentTime + 1.2);
-      } catch {
-        // Fallback for non-WebAudio environments
+      } catch (e) {
+        console.debug('[VisionAccessibility] WebAudio unavailable:', (e as Error)?.message);
       }
     }
     this.triggerHaptic([50, 30, 50]);
@@ -186,8 +186,8 @@ export class VisionAccessibilityAssistComponent {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
       try {
         navigator.vibrate(pattern);
-      } catch {
-        // Ignore if ungranted
+      } catch (e) {
+        console.debug('[VisionAccessibility] Haptic vibration unavailable:', (e as Error)?.message);
       }
     }
   }

@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM node:26-bookworm@sha256:057896e7e3f542ff82f7e65f106ac04e646775316449e676dfe8fb053d3b43ef AS builder
+FROM node:24-bookworm AS builder
 
 WORKDIR /app
 
@@ -16,9 +16,9 @@ COPY package*.json ./
 COPY docs/study/package*.json ./docs/study/
 COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/
 COPY pocketgull_api/package*.json ./pocketgull_api/
-RUN npm ci --legacy-peer-deps && npm --prefix docs/study ci --legacy-peer-deps
+RUN npm install --legacy-peer-deps --workspaces
 
-# Copy source and build the docs/study Astro sub-project + Angular SSR app
+# Copy source and build Angular SSR app
 COPY . .
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
@@ -29,7 +29,7 @@ RUN npm prune --omit=dev --legacy-peer-deps
 # ==========================================
 # Stage 2: Production
 # ==========================================
-FROM node:26-bookworm@sha256:057896e7e3f542ff82f7e65f106ac04e646775316449e676dfe8fb053d3b43ef
+FROM node:24-bookworm
 
 WORKDIR /app
 

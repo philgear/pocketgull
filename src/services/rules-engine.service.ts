@@ -217,7 +217,8 @@ export class RulesEngineService {
     try {
       const normalised = pattern.replace(/^\(\?i\)/, '');
       return new RegExp(normalised, 'i').test(text);
-    } catch {
+    } catch (e) {
+      console.warn(`[RulesEngine] Invalid regex pattern '${pattern}':`, (e as Error)?.message);
       return false;
     }
   }

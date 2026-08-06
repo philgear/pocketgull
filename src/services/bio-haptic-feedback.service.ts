@@ -125,8 +125,8 @@ export class BioHapticFeedbackService {
       } else if (phase === 'exhale') {
         navigator.vibrate([300, 100, 150]);
       }
-    } catch {
-      // Haptics unsupported or disabled
+    } catch (e) {
+      console.debug('[BioHapticFeedback] Haptics unavailable:', (e as Error)?.message);
     }
   }
 
@@ -138,8 +138,8 @@ export class BioHapticFeedbackService {
 
     try {
       navigator.vibrate([firstPulseMs, pauseMs, secondPulseMs]);
-    } catch {
-      // Haptics unsupported or disabled
+    } catch (e) {
+      console.debug('[BioHapticFeedback] Dual-pulse haptics unavailable:', (e as Error)?.message);
     }
   }
 }

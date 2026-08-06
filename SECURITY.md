@@ -32,9 +32,50 @@ As a clinical co-pilot, Pocket Gull operates under strict security and data-hand
 - **Transient Inference**: Payloads sent to the Google Gemini API or other external AI inference engines are ephemeral. We strictly rely on enterprise or opt-out tiers to ensure data is **not** used to train foundation models.
 
 ### 2. Generative AI Safeguards (Google Responsible AI)
-- **Safety Filters**: All interactions with Genkit and the Gemini API use strict `safetySettings` bounded to `BLOCK_MEDIUM_AND_ABOVE`. This actively filters out hate speech, dangerous content (e.g., weapon synthesis instructions), and harassment.
+
+#### Clinical CDS Safety Filter Policy
+
+Pocket Gull is a **clinical decision-support (CDS) tool** under **FDA 21 CFR §520(o)**, where the entire subject matter is medical content — diseases, medications, drug dosages, toxicology, trauma assessment, self-harm screening (PHQ-9/C-SSRS), surgical procedures, and reproductive health. Gemini's consumer-oriented safety filters were designed to protect untrained users from harmful chatbot output; in a clinical CDS context, these same filters can **silently block** legitimate care plan text, translation, and analysis.
+
+All Genkit flows in `src/server/genkit.ts` reference this section for their safety settings.
+
+**Per-Category Thresholds (Text Flows)**:
+
+| Category | Threshold | Rationale |
+|---|---|---|
+| `HARM_CATEGORY_HARASSMENT` | `BLOCK_ONLY_HIGH` | Rarely triggered by clinical text. Retains protection against genuinely abusive content while allowing mental health assessments discussing abuse/DV screening. |
+| `HARM_CATEGORY_HATE_SPEECH` | `BLOCK_ONLY_HIGH` | Almost never relevant to clinical text. Retains baseline protection. |
+| `HARM_CATEGORY_SEXUALLY_EXPLICIT` | `BLOCK_ONLY_HIGH` | Permits OB/GYN, STI screening, reproductive endocrinology, and sexual health education. See "Imaging Flows" below for stricter relaxation on multimodal inputs. |
+| `HARM_CATEGORY_DANGEROUS_CONTENT` | **`OFF`** | Clinical text *routinely* discusses drug dosages, toxic exposures, overdose management, suicidal ideation screening, and weapon injuries (trauma assessment). Any threshold above `OFF` produces false-positive blocking on standard-of-care clinical plans. |
+
+**Per-Category Thresholds (Imaging & Document OCR Flows)**:
+
+| Category | Threshold | Rationale |
+|---|---|---|
+| All categories | **`OFF`** | Medical imaging (X-rays, dermatological photography, wound assessment, anatomical imaging) and clinical document OCR can trigger false positives across *all* safety categories. These flows require fully permissive settings to function. |
+
+**Affected Flows**:
+- `generateMetricsFlow` — Text policy
+- `detectClinicalChangesFlow` — Text policy
+- `translateReadingLevelFlow` — Text policy
+- `analyzeTranslationFlow` — Text policy
+- `synthesizeKnowledgeFlow` — Text policy
+- `analyzeImageFlow` — Imaging policy (all `OFF`)
+- `scanDocumentFlow` — Imaging policy (all `OFF`)
+
+#### Defense-in-Depth (Why Consumer Safety Filters Are Redundant)
+
+Pocket Gull maintains its own multi-layer safety stack that renders Gemini's consumer-grade safety filters redundant for this application context:
+
+1. **`DefensiveGuardrailsService`** — Application-level clinical guardrails
+2. **DOMPurify Sanitization** — HIPAA-grade input/output sanitization on all AI text
+3. **FDA 21 CFR §520(o) CDS Transparency** — All AI output is explicitly positioned as non-diagnostic decision support requiring human clinician verification
+4. **Authenticated Access** — Behind PIN/gesture auth; not a public-facing chatbot
+5. **FHIR R4 Serialization** — Structured data boundaries on all clinical payloads
+6. **Gödel Incompleteness Bound** — Epistemic uncertainty disclosure on every analysis
+7. **Human-in-the-Loop Task Bracketing** — Manual clinician vetting before any AI suggestion can be saved or executed
+
 - **Adversarial Testing**: The repository contains active adversarial test suites (`tests/safety.spec.ts`) to simulate prompt injection and ensure safety layers do not degrade.
-- **Human-in-the-Loop**: The architecture enforces manual clinician vetting ("Task Bracketing") before any AI suggestion can be saved or executed.
 
 ### 3. Application Security (AppSec)
 - **Content Security Policy (CSP)**: Strict CSP headers are configured to prevent XSS (Cross-Site Scripting) and unauthorized data exfiltration.

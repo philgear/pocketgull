@@ -1,11 +1,13 @@
 import { Component, ChangeDetectionStrategy, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PatientStateService } from '../services/patient-state.service';
+import { BioHapticFeedbackService } from '../services/bio-haptic-feedback.service';
+import { ConformalReadmissionCardComponent } from './conformal-readmission-card.component';
 
 @Component({
   selector: 'app-vagal-biofeedback-dock',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ConformalReadmissionCardComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="relative w-full mb-8 p-5 sm:p-7 bg-[#F9F3D9] dark:bg-zinc-950 text-[#1C1C1C] dark:text-zinc-100 rounded-2xl border-2 border-[#F6B12B] dark:border-[#F6B12B]/80 shadow-[4px_6px_0px_0px_rgba(28,28,28,0.85)] font-mono overflow-hidden pocket-gull-card">
@@ -13,7 +15,10 @@ import { PatientStateService } from '../services/patient-state.service';
       <!-- Background Texture & Papercraft Overlay -->
       <div class="absolute inset-0 opacity-15 pointer-events-none mix-blend-multiply bg-[radial-gradient(#1c1c1c_1px,transparent_1px)] [background-size:12px_12px]"></div>
 
-      <!-- Top Bar Header -->
+      <!-- Conformal Prediction & Pareto Trade-Off Card -->
+      <app-conformal-readmission-card class="mb-6 block" />
+
+      <!-- Top Header & Status Telemetry Bar -->
       <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b-2 border-dashed border-[#1C1C1C]/20 dark:border-zinc-800 pb-5 mb-6 font-mono">
         <div class="flex items-center gap-3.5">
           <div class="w-12 h-12 rounded-xl bg-[#F6B12B] text-zinc-950 border-2 border-[#1C1C1C] flex items-center justify-center text-2xl shadow-[2px_2px_0px_0px_rgba(28,28,28,0.9)] animate-bounce shrink-0">
@@ -227,6 +232,7 @@ import { PatientStateService } from '../services/patient-state.service';
 })
 export class VagalBiofeedbackDockComponent {
   patientState = inject(PatientStateService);
+  bioHaptic = inject(BioHapticFeedbackService);
   sessionCount = signal<number>(2);
 
   readonly flippedCards = signal<Set<string>>(new Set());
@@ -244,24 +250,28 @@ export class VagalBiofeedbackDockComponent {
 
   logBreathingSession() {
     this.sessionCount.update(c => c + 1);
+    this.bioHaptic.playSolfeggioTone(528, 2500);
+    this.bioHaptic.triggerHapticPulse('exhale');
     this.patientState.addClinicalNote({
       id: `vagal-session-${Date.now()}`,
-      text: '🫁 Completed 5-Min 0.1 Hz Resonant Vagal Breathing micro-session. HRV coherence boosted.',
+      text: '🫁 Completed 5-Min 0.1 Hz Resonant Vagal Breathing micro-session. HRV coherence boosted with 528Hz Solfeggio bio-haptic feedback.',
       sourceLens: 'Functional Protocols',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
     });
-    alert('🫁 Vagal Breathing Session Logged to Chart!');
+    alert('🫁 Vagal Breathing Session Logged! 528Hz Solfeggio & Web Haptic Feedback Engaged.');
   }
 
   logHrvCoherence() {
     this.sessionCount.update(c => c + 1);
+    this.bioHaptic.playSolfeggioTone(432, 2000);
+    this.bioHaptic.triggerDualPulse();
     this.patientState.addClinicalNote({
       id: `hrv-checkin-${Date.now()}`,
-      text: '💓 Recorded High HRV Coherence check-in (RMSSD > 65 ms). Autonomic balance confirmed.',
+      text: '💓 Recorded High HRV Coherence check-in (RMSSD > 65 ms). 432Hz Harmonic Solfeggio active.',
       sourceLens: 'Functional Protocols',
       date: new Date().toISOString().split('T')[0].replace(/-/g, '.')
     });
-    alert('💓 High HRV Coherence Logged!');
+    alert('💓 High HRV Coherence Logged with 432Hz Harmonic Entrainment!');
   }
 
   logElixirTea() {

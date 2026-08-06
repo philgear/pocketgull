@@ -8,6 +8,10 @@ import { ThemeService } from '../services/theme.service';
 import { EnvironmentalTelemetryService } from '../services/environmental-telemetry.service';
 import { AdobeFireflyTextureService } from '../services/adobe-firefly-texture.service';
 
+import { BodyMeshFactoryService } from '../services/body-mesh-factory.service';
+import { RaycastSelectionService } from '../services/raycast-selection.service';
+import { SeverityParticleService } from '../services/severity-particle.service';
+
 // Mock Angular effect to avoid ChangeDetectionScheduler requirement in headless Vitest tests
 vi.mock('@angular/core', async (importOriginal) => {
   const original = await importOriginal<any>();
@@ -38,6 +42,9 @@ describe('Body3DViewerComponent Signal & Spatial Anatomy Behavioral Suite', () =
         { provide: PatientManagementService, useValue: {} },
         { provide: ThemeService, useValue: { isDarkMode: signal(true) } },
         { provide: EnvironmentalTelemetryService, useValue: {} },
+        { provide: BodyMeshFactoryService, useValue: {} },
+        { provide: RaycastSelectionService, useValue: {} },
+        { provide: SeverityParticleService, useValue: {} },
         AdobeFireflyTextureService
       ]
     });

@@ -60,6 +60,9 @@ async function updateDomain(domain) {
       }
     }
 
+    // GitHub Pages custom domain
+    targets.push({ name: 'typeface', type: 'CNAME', content: 'philgear.github.io' });
+
     const existingRecords = data.records || [];
 
     // 2. Add or verify target records

@@ -26,6 +26,13 @@
           e.preventDefault();
         }
       }, true);
+      window.addEventListener('unhandledrejection', function (e) {
+        var reason = (e && e.reason && (e.reason.message || e.reason.stack)) || String(e.reason || '');
+        if (reason.indexOf('u[v]') !== -1 || isAllowedGoogleApisHost(reason)) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+        }
+      }, true);
     })();
   </script>
   <base href="/">

@@ -154,14 +154,20 @@ interface ISentinelContainmentOption {
             <!-- 1. NSGA-II Multi-Objective Pareto Frontier Sliders -->
             <div class="flex-1 min-w-[280px]">
               <div class="flex items-center justify-between text-xs font-bold text-gray-700 dark:text-zinc-300 mb-1.5 uppercase tracking-wider">
-                <span>🎯 NSGA-II Pareto Frontier Axis Weights</span>
-                <span class="text-[10px] text-indigo-500 font-mono">Dynamic Multi-Objective</span>
+                <span class="flex items-center gap-1.5">
+                  <span>🎯 NSGA-II Pareto Frontier Axis Weights</span>
+                  <span class="px-1.5 py-0.5 text-[9px] font-mono font-extrabold rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">Live Recalculation</span>
+                </span>
+                <button type="button" (click)="resetParetoWeights()" class="text-[10px] text-indigo-500 hover:text-indigo-400 font-mono underline cursor-pointer">
+                  Reset 33/33/34
+                </button>
               </div>
               <div class="grid grid-cols-3 gap-3 text-[11px]">
                 <div>
                   <label class="block text-gray-500 dark:text-zinc-400 mb-1 font-semibold">💵 Cost: {{ (paretoWeights().costWeight * 100).toFixed(0) }}%</label>
                   <input type="range" min="0" max="100" [value]="paretoWeights().costWeight * 100"
                     (input)="updateParetoWeight('costWeight', $event)"
+                    (change)="updateParetoWeight('costWeight', $event)"
                     aria-label="Cost Weight"
                     class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
                 </div>
@@ -169,6 +175,7 @@ interface ISentinelContainmentOption {
                   <label class="block text-gray-500 dark:text-zinc-400 mb-1 font-semibold">⏱️ Speed: {{ (paretoWeights().speedWeight * 100).toFixed(0) }}%</label>
                   <input type="range" min="0" max="100" [value]="paretoWeights().speedWeight * 100"
                     (input)="updateParetoWeight('speedWeight', $event)"
+                    (change)="updateParetoWeight('speedWeight', $event)"
                     aria-label="Speed Weight"
                     class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-sky-500" />
                 </div>
@@ -176,6 +183,7 @@ interface ISentinelContainmentOption {
                   <label class="block text-gray-500 dark:text-zinc-400 mb-1 font-semibold">🏋️ Adherence: {{ (paretoWeights().adherenceWeight * 100).toFixed(0) }}%</label>
                   <input type="range" min="0" max="100" [value]="paretoWeights().adherenceWeight * 100"
                     (input)="updateParetoWeight('adherenceWeight', $event)"
+                    (change)="updateParetoWeight('adherenceWeight', $event)"
                     aria-label="Adherence Weight"
                     class="w-full h-1.5 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-purple-500" />
                 </div>
@@ -405,10 +413,24 @@ interface ISentinelContainmentOption {
                     </div>
                   </div>
 
-                  <!-- Action choice indicator / match text -->
-                  <div class="pt-3 border-t border-gray-150 dark:border-zinc-800/80 flex items-center justify-between">
-                    <span class="text-[12px] font-medium text-gray-400 dark:text-zinc-550 uppercase tracking-widest">Clinical Response</span>
-                    <span class="text-[12px] font-bold text-gray-800 dark:text-zinc-200">{{ opt.efficacy }}</span>
+                  <!-- Action choice indicator / match text & Prescribe Button -->
+                  <div class="pt-3 border-t border-gray-150 dark:border-zinc-800/80 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <span class="text-[10px] font-bold text-gray-400 dark:text-zinc-500 uppercase tracking-widest block">Clinical Response</span>
+                      <span class="text-xs font-bold text-gray-800 dark:text-zinc-200">{{ opt.efficacy }}</span>
+                    </div>
+
+                    <button type="button"
+                            (click)="prescribeOption(opt.name, opt.paradigm, opt.efficacy, matchScore)"
+                            [class.bg-emerald-600]="prescribedOptions().has(opt.name)"
+                            [class.text-white]="prescribedOptions().has(opt.name)"
+                            [class.bg-zinc-100]="!prescribedOptions().has(opt.name)"
+                            [class.dark:bg-zinc-800]="!prescribedOptions().has(opt.name)"
+                            [class.text-zinc-800]="!prescribedOptions().has(opt.name)"
+                            [class.dark:text-zinc-200]="!prescribedOptions().has(opt.name)"
+                            class="px-3 py-1.5 rounded-xl text-[11px] font-extrabold uppercase tracking-wider transition-all duration-200 border border-zinc-200 dark:border-zinc-700 hover:shadow-md cursor-pointer flex items-center gap-1.5 active:scale-[0.98]">
+                      <span>{{ prescribedOptions().has(opt.name) ? '💊 Prescribed' : '+ Prescribe to Care Plan' }}</span>
+                    </button>
                   </div>
 
                 </div>
@@ -573,6 +595,7 @@ export class CostBenefitAnalysisComponent {
   // Active view: treatment options or preventive protocols
   activeMode = signal<'treatment' | 'prevention'>('treatment');
   compliancePricingMode = signal<'cash' | 'aca'>('cash');
+  prescribedOptions = signal<Set<string>>(new Set());
 
   // Preference engine state
   prefs = signal({
@@ -586,6 +609,24 @@ export class CostBenefitAnalysisComponent {
   clinicianRole = this.patientState.clinicianRole;
   genomicProfile = this.patientState.genomicProfile;
 
+  prescribeOption(optName: string, paradigm: string, efficacy: string, matchScore: number) {
+    this.patientState.addClinicalNote({
+      id: `presc_${Date.now()}`,
+      date: new Date().toISOString(),
+      text: `Prescribed ${paradigm} Strategy: ${optName} (${efficacy}, ${matchScore}% Match)`,
+      sourceLens: `${paradigm} Care Plan`
+    });
+    this.prescribedOptions.update(set => {
+      const next = new Set(set);
+      if (next.has(optName)) {
+        next.delete(optName);
+      } else {
+        next.add(optName);
+      }
+      return next;
+    });
+  }
+
   togglePref(key: 'lowCost' | 'lowEffort' | 'naturalFocus') {
     this.prefs.update(p => ({ ...p, [key]: !p[key] }));
   }
@@ -593,6 +634,10 @@ export class CostBenefitAnalysisComponent {
   updateParetoWeight(key: 'costWeight' | 'speedWeight' | 'adherenceWeight', event: Event) {
     const val = parseFloat((event.target as HTMLInputElement).value) / 100.0;
     this.paretoWeights.update(w => ({ ...w, [key]: val }));
+  }
+
+  resetParetoWeights() {
+    this.paretoWeights.set({ costWeight: 0.33, speedWeight: 0.33, adherenceWeight: 0.34 });
   }
 
   setClinicianRole(event: Event) {
@@ -773,12 +818,12 @@ export class CostBenefitAnalysisComponent {
     {
       paradigm: 'Western',
       name: 'Screening Metrics & Low-Dose Aspirin',
-      costLabel: 'Low (Preventive Benefit)',
-      costValue: 1,
+      costLabel: 'Moderate ($40 copay)',
+      costValue: 3,
       effortLabel: 'Annual Checks / Daily Pill',
-      effortValue: 1,
+      effortValue: 2,
       dosingFrequencyPerDay: 1,
-      efficacyDays: 7,
+      efficacyDays: 5,
       efficacy: 'Proactive Primary Prevention',
       holisticLabel: 'Vascular & Metabolic Screening',
       isNatural: false,
@@ -798,11 +843,11 @@ export class CostBenefitAnalysisComponent {
       paradigm: 'Eastern',
       name: 'Seasonal Acupuncture & Meridian Tuning',
       costLabel: 'Moderate ($80/month)',
-      costValue: 3,
+      costValue: 4,
       effortLabel: 'Monthly Maintenance Visit',
-      effortValue: 3,
+      effortValue: 2,
       dosingFrequencyPerDay: 1,
-      efficacyDays: 30,
+      efficacyDays: 21,
       efficacy: 'Harmonious Qi Maintenance',
       holisticLabel: 'Preventive Yin/Yang Balancing',
       isNatural: true,
@@ -824,9 +869,9 @@ export class CostBenefitAnalysisComponent {
       costLabel: 'Very Low ($5/month)',
       costValue: 1,
       effortLabel: 'Daily Morning Rituals',
-      effortValue: 4,
+      effortValue: 5,
       dosingFrequencyPerDay: 2,
-      efficacyDays: 60,
+      efficacyDays: 45,
       efficacy: 'Root Constitutional Wellness',
       holisticLabel: 'Daily Dosha Harmonization',
       isNatural: true,

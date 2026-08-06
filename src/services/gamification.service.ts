@@ -1,4 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { SecureStorageService } from './secure-storage.service';
 
 export interface IQuest {
   id: string;
@@ -163,17 +164,21 @@ export class GamificationService {
     return 'All missions completed! Feel free to triage other patients or explore additional systems.';
   });
 
+  private storage = (() => {
+    try { return inject(SecureStorageService); } catch (e) { return new SecureStorageService(); }
+  })();
+
   constructor() {
-    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
-      const savedPoints = localStorage.getItem('pg_game_points');
-      const savedQuests = localStorage.getItem('pg_game_quests');
-      if (savedPoints) {
-        this.points.set(parseInt(savedPoints, 10));
-      }
-      if (savedQuests) {
-        try {
-          this.completedQuestIds.set(JSON.parse(savedQuests));
-        } catch (_) {}
+    const savedPoints = this.storage.getItem('pg_game_points');
+    const savedQuests = this.storage.getItem('pg_game_quests');
+    if (savedPoints) {
+      this.points.set(parseInt(savedPoints, 10));
+    }
+    if (savedQuests) {
+      try {
+        this.completedQuestIds.set(JSON.parse(savedQuests));
+      } catch (e) {
+        console.warn('[GamificationService] Failed to parse saved quest state, resetting:', e);
       }
     }
   }
@@ -186,18 +191,14 @@ export class GamificationService {
 
     this.completedQuestIds.update(ids => {
       const next = [...ids, questId];
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('pg_game_quests', JSON.stringify(next));
-      }
+      this.storage.setItem('pg_game_quests', JSON.stringify(next));
       return next;
     });
 
     const oldLevel = this.level();
     this.points.update(p => {
       const nextPts = p + quest.xpReward;
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('pg_game_points', nextPts.toString());
-      }
+      this.storage.setItem('pg_game_points', nextPts.toString());
       return nextPts;
     });
 
@@ -214,10 +215,8 @@ export class GamificationService {
   reset() {
     this.points.set(0);
     this.completedQuestIds.set([]);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('pg_game_points');
-      localStorage.removeItem('pg_game_quests');
-    }
+    this.storage.removeItem('pg_game_points');
+    this.storage.removeItem('pg_game_quests');
   }
 
   private playQuestChime(xp: number) {
@@ -244,7 +243,10 @@ export class GamificationService {
 
       osc.start(now);
       osc.stop(now + 0.35);
-    } catch (_) {}
+    } catch (e) {
+      // AudioContext unavailable (SSR or user gesture not yet received)
+      if (typeof console !== 'undefined') console.debug('[GamificationService] Quest chime skipped:', e?.message);
+    }
   }
 
   private playLevelUpArpeggio() {
@@ -271,6 +273,9 @@ export class GamificationService {
         osc.start(noteTime);
         osc.stop(noteTime + 0.45);
       });
-    } catch (_) {}
+    } catch (e) {
+      // AudioContext unavailable (SSR or user gesture not yet received)
+      if (typeof console !== 'undefined') console.debug('[GamificationService] Level-up arpeggio skipped:', e?.message);
+    }
   }
 }

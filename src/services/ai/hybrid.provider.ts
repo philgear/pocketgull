@@ -10,6 +10,19 @@ import { NetworkStateService } from '../network-state.service';
 import { HardwareTelemetryService } from '../hardware-telemetry.service';
 import { PatientStateService } from '../patient-state.service';
 
+/**
+ * Thrown when all available AI providers in the hybrid chain have been exhausted.
+ * Callers should catch this to show appropriate UI feedback rather than silently degrading.
+ */
+export class AIProviderExhaustedError extends Error {
+  public readonly providerErrors: string[];
+  constructor(method: string, errors: string[]) {
+    super(`[HybridProvider] All providers exhausted for ${method}: ${errors.join('; ')}`);
+    this.name = 'AIProviderExhaustedError';
+    this.providerErrors = errors;
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -108,7 +121,7 @@ export class HybridProvider implements IIntelligenceProvider {
         console.warn(`generateMetrics failed on ${provider.constructor.name}: ${e.message || e}`, e);
       }
     }
-    return { complexity: 5, stability: 5, certainty: 5 };
+    throw new AIProviderExhaustedError('generateMetrics', chain.map(p => p.constructor.name));
   }
 
   async detectClinicalChanges(oldData: string, newData: string): Promise<boolean> {
@@ -120,7 +133,7 @@ export class HybridProvider implements IIntelligenceProvider {
         console.warn(`detectClinicalChanges failed on ${provider.constructor.name}, trying next...`);
       }
     }
-    return true;
+    throw new AIProviderExhaustedError('detectClinicalChanges', chain.map(p => p.constructor.name));
   }
 
   async verifySection(lens: string, content: string, sourceData: string): Promise<{ status: string, issues: IVerificationIssue[] }> {
@@ -132,7 +145,7 @@ export class HybridProvider implements IIntelligenceProvider {
         console.warn(`verifySection failed on ${provider.constructor.name}, trying next...`);
       }
     }
-    return { status: 'Verification bypassed due to engine limits', issues: [] };
+    throw new AIProviderExhaustedError('verifySection', chain.map(p => p.constructor.name));
   }
 
   async translateReadingLevel(
@@ -161,7 +174,8 @@ export class HybridProvider implements IIntelligenceProvider {
         console.warn(`analyzeTranslation failed on ${provider.constructor.name}, trying next...`);
       }
     }
-    return "Analysis bypassed";
+    console.error('[HybridProvider] All providers exhausted for analyzeTranslation');
+    return "Analysis unavailable — all AI engines failed.";
   }
 
   async analyzeImage(base64Image: string, context?: string): Promise<string> {

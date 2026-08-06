@@ -74,7 +74,7 @@ export interface IDietaryAllergen {
                 <span>{{ item.name }}</span>
                 @if (item.name.includes('Red Dye')) {
                   <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    PHIL GEAR ALLERGY MATCH
+                    PATIENT ALLERGY MATCH
                   </span>
                 }
               </h4>
@@ -167,9 +167,9 @@ export class DietaryAllergyShieldComponent {
 
   activePatientName = computed(() => {
     const pId = this.patientManagement.selectedPatientId();
-    if (!pId) return 'Phil Gear';
+    if (!pId) return 'Alexander Vance';
     const patient = this.patientManagement.patients().find(p => p.id === pId);
-    return patient ? patient.name : 'Phil Gear';
+    return patient ? patient.name : 'Alexander Vance';
   });
 
   activeAllergens = computed<IDietaryAllergen[]>(() => {

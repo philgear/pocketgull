@@ -3,8 +3,8 @@ name: "Fuzz Testing"
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'pocketgull_api/**'
+  pull_request:
+    branches: [ "main" ]
   schedule:
     # Run every Saturday at 4:00 AM UTC
     - cron: '0 4 * * 6'
@@ -21,15 +21,16 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Install Dependencies
         run: |
+          sudo apt-get update && sudo apt-get install -y libhdf5-dev
           python -m pip install --upgrade pip
           pip install -r pocketgull_api/requirements.txt
           pip install atheris

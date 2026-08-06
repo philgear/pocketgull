@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { SecureStorageService } from '../services/secure-storage.service';
 import { YbocsService } from '../services/ybocs/ybocs.service';
 import { symptomCategories, symptomItems, severityQuestions } from '../services/ybocs/data';
 import { SymptomItem } from '../services/ybocs/types';
@@ -208,6 +209,7 @@ import { SymptomItem } from '../services/ybocs/types';
 })
 export class YbocsScreenerComponent {
   readonly ybocs = inject(YbocsService);
+  private secureStorage = inject(SecureStorageService);
 
   readonly activeChecklistTab = signal<'obsessions' | 'compulsions'>('obsessions');
   readonly saveSuccessMessage = signal<string | null>(null);
@@ -252,7 +254,7 @@ export class YbocsScreenerComponent {
       btn.click();
     }
     // Set a flag in session state or storage that redirects voice assistant to Y-BOCs screener mode
-    localStorage.setItem('voice_assistant_mode', 'ybocs');
+    this.secureStorage.setItem('voice_assistant_mode', 'ybocs');
     // Dispatch a custom event to notify VoiceAssistantComponent instantly
     window.dispatchEvent(new CustomEvent('voice-mode-change', { detail: 'ybocs' }));
   }

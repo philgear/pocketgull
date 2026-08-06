@@ -461,7 +461,7 @@ class _SentinelTriageWidgetState extends ConsumerState<SentinelTriageWidget>
                 ],
               ),
               if (selectedPatient?.patientGoals != null &&
-                  (selectedPatient!.patientGoals as String).isNotEmpty) ...[
+                  selectedPatient!.patientGoals.toString().isNotEmpty) ...[
                 const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.only(left: 12),
@@ -474,7 +474,7 @@ class _SentinelTriageWidgetState extends ConsumerState<SentinelTriageWidget>
                     ),
                   ),
                   child: Text(
-                    selectedPatient.patientGoals,
+                    selectedPatient.patientGoals.toString(),
                     style: TextStyle(
                       fontSize: 12,
                       fontStyle: FontStyle.italic,

@@ -347,8 +347,8 @@ export class MedhaSaktiMatrixComponent implements OnDestroy {
       this.gainNode.connect(this.audioCtx.destination);
 
       this.oscillator.start();
-    } catch {
-      // Graceful fallback for non-audio environments or test runner
+    } catch (e) {
+      console.debug('[MedhaSaktiMatrix] Solfeggio tone start failed:', (e as Error)?.message);
     }
   }
 
@@ -367,7 +367,8 @@ export class MedhaSaktiMatrixComponent implements OnDestroy {
           this.oscillator = null;
         }
       }, 160);
-    } catch {
+    } catch (e) {
+      console.debug('[MedhaSaktiMatrix] Solfeggio tone stop failed:', (e as Error)?.message);
       this.oscillator = null;
     }
   }

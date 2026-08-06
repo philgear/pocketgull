@@ -71,11 +71,12 @@ export const generateMetricsFlow = ai.defineFlow(
       config: {
         temperature: 0,
         responseMimeType: 'application/json',
+        // Clinical CDS Safety Policy: See SECURITY.md §2
         safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' }
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' }
         ]
       }
     });
@@ -109,11 +110,12 @@ export const detectClinicalChangesFlow = ai.defineFlow(
       prompt,
       config: {
         temperature: 0,
+        // Clinical CDS Safety Policy: See SECURITY.md §2
         safetySettings: [
-          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' }
+          { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+          { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' }
         ]
       }
     });
@@ -204,11 +206,12 @@ CRITICAL RULES:
         system: systemInstruction,
         config: {
           temperature: 0.2,
+          // Clinical CDS Safety Policy: See SECURITY.md §2
           safetySettings: [
-            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' }
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' }
           ]
         }
       });
@@ -219,6 +222,12 @@ CRITICAL RULES:
       // Strip ending tags
       cleaned = cleaned.replace(/\s*(?:###?\s*)?\[?END CARE PLAN\]?\s*$/i, '');
       cleaned = cleaned.trim();
+
+      // Guard against empty responses (safety filter blocked everything)
+      if (!cleaned) {
+        throw new Error('Translation returned empty — safety filter may have blocked clinical content. Falling back to local cognitive transformation.');
+      }
+
       return cleaned;
     }
 );
@@ -252,11 +261,12 @@ CRITIQUE:`;
         prompt,
         config: { 
           temperature: 0.2,
+          // Clinical CDS Safety Policy: See SECURITY.md §2
           safetySettings: [
-            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' }
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' }
           ]
         }
       });
@@ -303,11 +313,14 @@ Note: This is an AI preliminary analysis for decision-support, not an official d
         ],
         config: { 
           temperature: 0.1,
+          // Clinical CDS Safety Policy (Imaging): See SECURITY.md §2
+          // Medical imaging (X-rays, dermatology, wound assessment) requires
+          // fully permissive settings to avoid false-positive blocking.
           safetySettings: [
-            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' }
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'OFF' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'OFF' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'OFF' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' }
           ]
         }
       });
@@ -354,11 +367,12 @@ Return ONLY a JSON array of objects with this exact structure:
         config: {
           temperature: 0.1,
           responseMimeType: 'application/json',
+          // Clinical CDS Safety Policy: See SECURITY.md §2
           safetySettings: [
-            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_LOW_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_LOW_AND_ABOVE' }
+            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_ONLY_HIGH' },
+            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'OFF' }
           ]
         }
       });

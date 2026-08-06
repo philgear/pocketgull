@@ -232,7 +232,8 @@ export class RichMediaService {
 
             // Step 3: last resort — try the raw original query (some specific terms work as-is)
             return await this._fetchWikimedia(query.split(/\s+/).slice(0, 3).join(' '), limit);
-        } catch {
+        } catch (e) {
+            console.debug('[RichMediaService] Wikimedia fetch failed:', (e as Error)?.message);
             return [];
         }
     }
@@ -269,7 +270,8 @@ export class RichMediaService {
                     url: `https://pubmed.ncbi.nlm.nih.gov/${id}/`
                 } as IPubmedCitation;
             }).filter((c): c is IPubmedCitation => c !== null);
-        } catch {
+        } catch (e) {
+            console.debug('[RichMediaService] PubMed fetch failed:', (e as Error)?.message);
             return [];
         }
     }

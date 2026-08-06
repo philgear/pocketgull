@@ -11,7 +11,8 @@ export function sanitizeLogInput(value: unknown): string {
   if (typeof value === 'object') {
     try {
       str = JSON.stringify(value);
-    } catch {
+    } catch (e) {
+      console.debug('[SecurityHelper] JSON.stringify fallback:', (e as Error)?.message);
       str = String(value);
     }
   } else {
@@ -35,7 +36,8 @@ export function getSecureRandomId(): string {
   try {
     const crypto = require('crypto');
     return crypto.randomBytes(8).toString('hex');
-  } catch {
+  } catch (e) {
+    console.debug('[SecurityHelper] Node crypto fallback to Math.random:', (e as Error)?.message);
     return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
   }
 }
@@ -68,7 +70,8 @@ export function isValidRedirectUrl(url: string, allowedDomains: string[] = ['poc
     const parsed = new URL(url);
     const hostname = parsed.hostname.toLowerCase();
     return allowedDomains.some(domain => hostname === domain || hostname.endsWith('.' + domain));
-  } catch {
+  } catch (e) {
+    console.debug('[SecurityHelper] URL parse rejection:', (e as Error)?.message);
     return false;
   }
 }

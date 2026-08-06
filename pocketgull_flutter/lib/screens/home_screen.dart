@@ -32,8 +32,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Connect to the Node.js/Angular server
-      ref.read(collaborationServiceProvider).connect('http://localhost:4000');
+      // Connect to the unified Node.js/Express Socket.io server on port 3000
+      ref.read(collaborationServiceProvider).connect('http://localhost:3000');
     });
   }
 

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupE2ePage, enterDemoMode } from './utils/setup';
+import { setupE2ePage, enterDemoMode, selectPatientByName } from './utils/setup';
 
 test.describe('General Clinical & Sovereignty Assessments Suite E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -11,14 +11,8 @@ test.describe('General Clinical & Sovereignty Assessments Suite E2E Tests', () =
     // 1. Enter Demo Mode cleanly via state-machine setup
     await enterDemoMode(page);
 
-    // 2. Select patient Phil Gear
-    const dropdownBtn = page.locator('app-patient-dropdown button').first();
-    await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
-    await dropdownBtn.click();
-
-    const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
-    await philGearOption.click();
-    await page.waitForTimeout(1000);
+    // 2. Select patient Alexander Vance
+    await selectPatientByName(page, 'Alexander Vance');
 
     // 3. Ensure core analysis container is loaded
     await expect(page.locator('app-analysis-container')).toBeVisible({ timeout: 15000 });

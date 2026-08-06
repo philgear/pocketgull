@@ -1,6 +1,8 @@
+import { APP_VERSION } from '../version';
+
 export const environment = {
   production: false,
-  appVersion: '0.3.0',
+  appVersion: APP_VERSION,
   firebase: {
     projectId: 'growthyself',
     appId: '1:placeholder:web:abcd1234',

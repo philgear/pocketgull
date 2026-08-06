@@ -46,6 +46,13 @@ test.describe('10-Dimensional Master Domain Suites E2E Verification', () => {
       'Ayurvedic Tridosha'
     ];
 
+    // Click "Show All" toggle if present so all 12 domain suite buttons are rendered
+    const showAllSuitesBtn = page.locator('button', { hasText: /Show All|All 12|Master Suites/i }).first();
+    if (await showAllSuitesBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await showAllSuitesBtn.click();
+      await page.waitForTimeout(500);
+    }
+
     for (const suiteName of suites) {
       const tabButton = page.locator(`button:has-text("${suiteName}")`).first();
       await expect(tabButton).toBeVisible();

@@ -9,8 +9,7 @@ export const p006: IPatient = {
   preexistingConditions: [
     "Preterm Birth History (32 weeks gestation)",
     "Mild-Intermittent Asthma",
-    "Recent Rotavirus Enteritis (Resolving)",
-    "PhysioNet 2026 Challenge: Pediatric Autonomic Airway Reactivity & Dehydration Challenge"
+    "Recent Rotavirus Enteritis (Resolving)"
   ],
   patientGoals: "Rehydrate after diarrhoeal episode, reduce airway hyperreactivity, and support pediatric immune health.",
   vitals: {

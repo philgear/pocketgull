@@ -2,8 +2,11 @@ name: "Release & Publish"
 
 on:
   push:
+    branches: [ "main" ]
     tags:
       - 'v*'
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: write
@@ -23,6 +26,7 @@ jobs:
   release:
     name: Build, Publish & Sign Release
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     permissions:
       contents: write
       packages: write
@@ -33,7 +37,7 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@v2.20.0
         with:
-          disable-sudo: true
+          disable-sudo: false
           egress-policy: audit
 
       - name: Checkout Repository
@@ -42,16 +46,20 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v4
         with:
           node-version: '24.x'
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Application
         run: npm run build
+        env:
+          CI: true
+          GEMINI_API_KEY: 'placeholder-key-for-build'
+          SKIP_HEALTHCARE_PROVISION: 'true'
 
       # --- Docker Image: Build & Push to GHCR ---
 
@@ -77,13 +85,14 @@ jobs:
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       # --- SLSA Provenance Attestation ---
 
       - name: Attest Build Provenance
+        if: github.event_name != 'pull_request'
         uses: actions/attest-build-provenance@db473fddc028af60658334401dc6fa3ffd8669fd # v2.3.0
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -117,7 +126,8 @@ jobs:
           echo '```' >> release_notes.md
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
         with:
           generate_release_notes: true
           body_path: release_notes.md

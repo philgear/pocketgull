@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { IIntelligenceProvider } from './intelligence.provider';
 import { IClinicalMetrics } from '../clinical-intelligence.service';
 import { IVerificationIssue } from '../../components/analysis-report.types';
+import { SecureStorageService } from '../secure-storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,35 +12,42 @@ import { IVerificationIssue } from '../../components/analysis-report.types';
 export class WebLLMProvider implements IIntelligenceProvider {
   private engine: import('@mlc-ai/web-llm').WebWorkerMLCEngine | null = null;
   private isLoaded = false;
-  private platformId = inject(PLATFORM_ID);
+  private platformId = (() => { try { return inject(PLATFORM_ID); } catch (e) { return 'browser'; } })();
+  private storage = (() => { try { return inject(SecureStorageService); } catch (e) { return null; } })();
   
   readonly loadingProgress = signal<string>('');
   readonly isLoadingProgress = signal<boolean>(false);
   
   async loadEngine() {
       if (!isPlatformBrowser(this.platformId)) return;
-      if (typeof navigator !== 'undefined' && navigator.webdriver) {
+      if (typeof navigator !== 'undefined' && (navigator.webdriver || (typeof window !== 'undefined' && (window as any).PLAYWRIGHT_TESTING))) {
           return;
       }
       if (this.isLoaded && this.engine) return;
       
       this.isLoadingProgress.set(true);
       console.log('[WebLLM] Initializing WebGPU Local Inference Engine via WebWorker...');
-      const webllm = await import('@mlc-ai/web-llm');
-      
-      this.engine = await webllm.CreateWebWorkerMLCEngine(
-        new Worker(new URL('../../workers/webllm.worker', import.meta.url), { type: 'module' }),
-        "gemma-2b-it-q4f32_1-MLC",
-        {
-           initProgressCallback: (progress) => {
-             console.log('[WebLLM Sync]', progress.text);
-             this.loadingProgress.set(progress.text);
+      try {
+        const webllm = await import('@mlc-ai/web-llm');
+        
+        this.engine = await webllm.CreateWebWorkerMLCEngine(
+          new Worker(new URL('../../workers/webllm.worker', import.meta.url), { type: 'module' }),
+          "gemma-2b-it-q4f32_1-MLC",
+          {
+             initProgressCallback: (progress) => {
+               console.log('[WebLLM Sync]', progress.text);
+               this.loadingProgress.set(progress.text);
+             }
            }
-         }
-      );
-      this.isLoaded = true;
-      this.isLoadingProgress.set(false);
-      console.log('[WebLLM] Engine Ready.');
+        );
+        this.isLoaded = true;
+        console.log('[WebLLM] Engine Ready.');
+      } catch (err) {
+        console.warn('[WebLLM] Failed to initialize WebLLM engine (WebGPU unavailable):', err);
+        this.engine = null;
+      } finally {
+        this.isLoadingProgress.set(false);
+      }
   }
 
   async *generateReportStream$(patientData: string, lens: string, systemInstruction: string): AsyncIterable<string> {
@@ -51,7 +59,7 @@ export class WebLLMProvider implements IIntelligenceProvider {
         { role: "user", content: `Patient Data:\n${patientData}\n\nLens:\n${lens}` }
     ];
     
-    const requestTemp = Number(localStorage.getItem('preferredModelTemperature')) || 0.5;
+    const requestTemp = Number(this.storage?.getItem('preferredModelTemperature')) || 0.5;
 
     const chunks = await this.engine.chat.completions.create({ 
         messages, 

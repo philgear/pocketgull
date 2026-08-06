@@ -118,7 +118,7 @@ interface INoteTimelineItem extends IBodyPartIssue {
 
                   <!-- Contextual Biomarker Metrics Grid -->
                   <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
-                    @for (item of organContext().metrics; track item.label) {
+                    @for (item of organContext().metrics; track item.label + '-' + $index) {
                       <div class="p-2 bg-white dark:bg-zinc-800/90 rounded-lg border border-gray-100 dark:border-zinc-700/60 shadow-2xs">
                         <div class="text-[10px] font-semibold text-gray-400 dark:text-zinc-400 uppercase tracking-wider truncate">{{ item.label }}</div>
                         <div class="text-sm font-bold text-gray-900 dark:text-zinc-100 mt-0.5 flex items-baseline gap-1">

@@ -1,0 +1,22 @@
+# Path-based auto-labeling rules for GitHub Pull Requests
+
+"3d-anatomy":
+  - "src/components/body-3d-viewer.component.ts"
+  - "src/services/adobe-firefly-texture.service.ts"
+  - "public/assets/textures/**"
+
+"security":
+  - "scripts/sentinel_security_guard.mjs"
+  - "SECURITY.md"
+  - ".github/workflows/codeql-analysis.yml"
+  - "src/server.ts"
+
+"fhir-ehr":
+  - "src/services/gcp-healthcare.service.ts"
+  - "src/services/fhir-integration.service.ts"
+  - "src/components/mychart-brief-modal.component.ts"
+
+"ui-signals":
+  - "src/components/secure-splash.component.ts"
+  - "src/components/analysis-container.component.ts"
+  - "src/services/patient-state.service.ts"

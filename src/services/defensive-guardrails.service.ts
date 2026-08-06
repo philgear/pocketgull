@@ -118,7 +118,8 @@ export class DefensiveGuardrailsService {
     try {
       const val = fn();
       return val !== undefined && val !== null ? val : fallback;
-    } catch {
+    } catch (e) {
+      console.debug('[DefensiveGuardrails] safelyAccess fallback triggered:', (e as Error)?.message);
       return fallback;
     }
   }

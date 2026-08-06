@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OshaWorkplaceSafetyService } from '../services/osha-workplace-safety.service';
+import { APP_VERSION } from '../version';
 
 export interface IGreenRoomReflection {
   id: string;
@@ -100,7 +101,7 @@ export interface IGreenRoomReflection {
 
       <!-- Bottom Status Bar -->
       <div class="pt-4 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-zinc-400">
-        <div>Restorative Green Room Lounge · Pocket-Gull Clinician Care Engine v1.1.0</div>
+        <div>Restorative Green Room Lounge · Pocket-Gull Clinician Care Engine v{{ appVersion }}</div>
         <div class="flex items-center gap-2">
           <span>GCP Project: gen-lang-client-0540208645</span>
         </div>
@@ -110,6 +111,7 @@ export interface IGreenRoomReflection {
   `
 })
 export class GreenRoomLoungeComponent {
+  appVersion = APP_VERSION;
   oshaService = inject(OshaWorkplaceSafetyService);
 
   closeModal = output<void>();

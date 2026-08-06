@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, computed, ViewEncapsulation, signal, OnDestroy, effect, viewChild, ElementRef, untracked, output, HostListener } from '@angular/core';
-import { CommonModule, DecimalPipe, TitleCasePipe } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { ClinicalIntelligenceService, ITranscriptEntry, AnalysisLens } from '../services/clinical-intelligence.service';
 import { PatientStateService } from '../services/patient-state.service';
 import { PatientManagementService } from '../services/patient-management.service';
@@ -25,7 +25,6 @@ import { ClinicalGaugeComponent } from './clinical-gauge.component';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { ClinicalTrendComponent } from './clinical-trend.component';
 import { AiCacheService } from '../services/ai-cache.service';
-import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { MedicalDecoderService } from '../services/medical-decoder.service';
 import { RevealDirective } from '../directives/reveal.directive';
 import { NodeAgentDialogComponent, INodeAgentDialogData } from './node-agent-dialog.component';
@@ -34,7 +33,6 @@ import { AssessmentsLensTabComponent } from './analysis-report/assessments-lens-
 import { ClinicalMenuComponent } from './clinical-menu.component';
 import { KssCognitiveShieldComponent } from './kss-cognitive-shield.component';
 import { CarePlanPrintPreviewComponent } from './care-plan-print-preview.component';
-import { EmergencyNutritionalBypassComponent } from './emergency-nutritional-bypass.component';
 import { MoodConsciousnessMatrixComponent } from './mood-consciousness-matrix.component';
 import { UkRioPubmedSourcingComponent } from './uk-rio-pubmed-sourcing.component';
 import { DietaryAllergyShieldComponent } from './dietary-allergy-shield.component';
@@ -55,7 +53,6 @@ import { ActuarialQalyCalculatorComponent } from './actuarial-qaly-calculator.co
 import { OccupationalHazardCardComponent } from './occupational-hazard-card.component';
 import { VagalBiofeedbackDockComponent } from './vagal-biofeedback-dock.component';
 import { Sec1557AuditModalComponent } from './sec1557-audit-modal.component';
-import { BystanderActionSuiteComponent } from './bystander-action-suite.component';
 import { FhirPassportModalComponent } from './fhir-passport-modal.component';
 import { getPersonaPropBadge } from '../services/agent-personas';
 import { ThemeService, AppTheme } from '../services/theme.service';
@@ -78,21 +75,34 @@ import { ChronobiologyMatrixLensTabComponent } from './analysis-report/chronobio
 import { FunctionalMedicineMatrixLensTabComponent } from './analysis-report/functional-medicine-matrix-lens-tab.component';
 import { MaternalPostpartumLensTabComponent } from './analysis-report/maternal-postpartum-lens-tab.component';
 import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/seven-generations-stewardship-lens-tab.component';
+import { SocraticEpistemologyLensTabComponent } from './analysis-report/socratic-epistemology-lens-tab.component';
+import { NutritionalBypassLensTabComponent } from './analysis-report/nutritional-bypass-lens-tab.component';
+import { EmtHandoffLensTabComponent } from './analysis-report/emt-handoff-lens-tab.component';
+import { LocalGemmaStudioComponent } from './local-gemma-studio.component';
+import { TriParadigmSwarmCardComponent } from './tri-paradigm-swarm-card.component';
+import { PharmacogenomicsCardComponent } from './pharmacogenomics-card.component';
+import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-card.component';
 
 @Component({
   selector: 'app-analysis-report',
   standalone: true,
   imports: [
     CommonModule,
+    LocalGemmaStudioComponent,
+    TriParadigmSwarmCardComponent,
+    PharmacogenomicsCardComponent,
+    BiometricSensorFusionCardComponent,
     TeledentistrySystemicLensComponent,
     ChronobiologyMatrixLensTabComponent,
     FunctionalMedicineMatrixLensTabComponent,
     MaternalPostpartumLensTabComponent,
     SevenGenerationsStewardshipLensTabComponent,
+    SocraticEpistemologyLensTabComponent,
+    NutritionalBypassLensTabComponent,
+    EmtHandoffLensTabComponent,
     ClinicalSleepTwinDashboardComponent,
     ChronobiologyMatrixComponent,
     FunctionalMedicineMatrixComponent,
-    DecimalPipe,
     TitleCasePipe,
     SummaryNodeComponent,
     Body3DViewerComponent,
@@ -104,14 +114,12 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
     PocketGullBadgeComponent,
     ClinicalGaugeComponent,
     ClinicalTrendComponent,
-    PocketGullButtonComponent,
     RevealDirective,
     NodeAgentDialogComponent,
     ClinicalAssessmentsSuiteComponent,
     AssessmentsLensTabComponent,
     ClinicalMenuComponent,
     KssCognitiveShieldComponent,
-    EmergencyNutritionalBypassComponent,
     MoodConsciousnessMatrixComponent,
     UkRioPubmedSourcingComponent,
     DietaryAllergyShieldComponent,
@@ -130,7 +138,6 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
     ActuarialQalyCalculatorComponent,
     VagalBiofeedbackDockComponent,
     Sec1557AuditModalComponent,
-    BystanderActionSuiteComponent,
     FhirPassportModalComponent,
     ChronoClockDecisionRailComponent,
     ChronoWeeklyMealPlannerComponent,
@@ -623,6 +630,14 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
         @if (activeLens() !== 'EMT Handoff' && !state.isEmergencyMode() && intel.analysisMetrics(); as metrics) {
           <div class="mb-10 grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
             
+            <!-- Tri-Paradigm Swarm, Pharmacogenomics, Biometric Fusion & Local Gemma Studio -->
+            <div class="col-span-full mb-4 space-y-4 font-mono">
+              <app-tri-paradigm-swarm-card></app-tri-paradigm-swarm-card>
+              <app-pharmacogenomics-card></app-pharmacogenomics-card>
+              <app-biometric-sensor-fusion-card></app-biometric-sensor-fusion-card>
+              <app-local-gemma-studio></app-local-gemma-studio>
+            </div>
+
             <!-- Multi-Paradigm Switchable Clinical Dashboard (Shown for Functional Protocols or Non-Western Paradigms) -->
             @if (activeLens() === 'Functional Protocols' || state.activePhilosophy() !== 'western') {
               <div class="col-span-full mb-4 space-y-4 font-mono">
@@ -830,21 +845,21 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
 
             <app-clinical-gauge
               label="Complexity"
-              [value]="metrics.complexity"
+              [value]="metrics.complexity ?? 5"
               type="complexity"
               description="Measures comorbid depth and case difficulty.">
             </app-clinical-gauge>
 
             <app-clinical-gauge
               label="Stability"
-              [value]="metrics.stability"
+              [value]="metrics.stability ?? 7"
               type="stability"
               description="Patient physiological and functional compensatory status.">
             </app-clinical-gauge>
 
             <app-clinical-gauge
               label="Certainty"
-              [value]="metrics.certainty"
+              [value]="metrics.certainty ?? 8"
               type="certainty"
               description="AI confidence based on available data density.">
             </app-clinical-gauge>
@@ -930,385 +945,7 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
 
         <!-- EMT Handoff Component/Layout -->
         @if (activeLens() === 'EMT Handoff') {
-          <div class="flex flex-col gap-6 animate-in fade-in duration-500">
-            <!-- 🚨 Bystander 911 Action Suite & Role Assignment -->
-            <app-bystander-action-suite></app-bystander-action-suite>
-            <!-- Crimson alert banner -->
-            <div class="p-4 bg-red-955/40 border border-red-800/60 rounded-xl text-red-200 text-xs flex items-center justify-between shadow-inner">
-              <div class="flex items-center gap-2.5">
-                <span class="text-lg">🚨</span>
-                <div>
-                  <h4 class="font-bold uppercase tracking-wider text-red-400">Offline Emergency First Aid Active</h4>
-                  <p class="opacity-90 mt-0.5">Session-isolated, temporary clinical sandbox. No persistent data is saved.</p>
-                </div>
-              </div>
-              <pocket-gull-button (click)="toggleCprMetronome()" 
-                [variant]="isCprMetronomeActive() ? 'primary' : 'outline'" 
-                class="shrink-0 font-bold uppercase tracking-widest text-[12px] py-1.5 px-3 border border-red-500/30 transition-all active:scale-95"
-                [class.bg-red-600]="isCprMetronomeActive()"
-                [class.text-white]="isCprMetronomeActive()">
-                🔊 {{ isCprMetronomeActive() ? 'Stop Metronome' : 'CPR Metronome (' + (patientAgeCategory() === 'infant' ? '120' : '110') + ' BPM)' }}
-              </pocket-gull-button>
-            </div>
-
-            <!-- Patient Demographic Selector (Age & Pregnancy) -->
-            <div class="p-4 bg-gray-50 dark:bg-zinc-900 border border-gray-150 dark:border-zinc-800/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <span class="text-[12px] font-bold text-gray-400 dark:text-zinc-550 uppercase tracking-widest block mb-1">Target Patient Demographic</span>
-                <div class="flex items-center gap-2">
-                  <button type="button" (click)="patientAgeCategory.set('adult')"
-                    [class]="patientAgeCategory() === 'adult' ? 'bg-zinc-850 dark:bg-zinc-100 text-white dark:text-zinc-950 border-transparent' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700'"
-                    class="px-3 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                    🧑 Adult
-                  </button>
-                  <button type="button" (click)="patientAgeCategory.set('infant'); isPatientPregnant.set(false)"
-                    [class]="patientAgeCategory() === 'infant' ? 'bg-zinc-850 dark:bg-zinc-100 text-white dark:text-zinc-950 border-transparent' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700'"
-                    class="px-3 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                    👶 Infant (Baby)
-                  </button>
-                  <button type="button" (click)="patientAgeCategory.set('geriatric')"
-                    [class]="patientAgeCategory() === 'geriatric' ? 'bg-zinc-850 dark:bg-zinc-100 text-white dark:text-zinc-950 border-transparent' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700'"
-                    class="px-3 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                    🧓 Geriatric (Elder)
-                  </button>
-                </div>
-              </div>
-
-              @if (patientAgeCategory() === 'adult') {
-                <div class="flex items-center gap-2">
-                  <span class="text-[12px] uppercase tracking-wider font-bold text-gray-500 dark:text-zinc-400">Pregnancy Check:</span>
-                  <button type="button" (click)="isPatientPregnant.set(!isPatientPregnant())"
-                    [class]="isPatientPregnant() ? 'bg-pink-500/10 text-pink-600 border-pink-500/40' : 'bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 border-gray-200 dark:border-zinc-700'"
-                    class="px-3 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition flex items-center gap-1.5">
-                    🤰 {{ isPatientPregnant() ? 'Pregnant Patient' : 'Not Pregnant' }}
-                  </button>
-                </div>
-              }
-            </div>
-
-            <!-- CPR Visual Coach HUD -->
-            @if (isCprMetronomeActive()) {
-              <div class="p-5 bg-zinc-950 border border-red-900/60 rounded-2xl flex flex-col items-center justify-center gap-4 text-center animate-in slide-in-from-top-4 duration-300">
-                <div class="flex items-center gap-4">
-                  <div class="text-[12px] uppercase font-mono tracking-widest text-zinc-500">Cycle {{ cprCycleCount() }}</div>
-                  <div class="w-1.5 h-1.5 rounded-full bg-zinc-800"></div>
-                  <div class="text-[12px] uppercase font-mono tracking-widest text-red-500 font-extrabold animate-pulse">
-                    @if (cprCompressionCount() <= 30) {
-                      COMPRESSION: {{ cprCompressionCount() }} / 30
-                    } @else {
-                      RESCUE BREATH PHASE
-                    }
-                  </div>
-                </div>
-                
-                <!-- Bouncing Target Indicator synchronized with compression clicks -->
-                <div class="relative w-20 h-20 flex items-center justify-center">
-                  <div class="absolute inset-0 rounded-full border border-red-500/20"></div>
-                  <div class="rounded-full flex items-center justify-center text-white text-lg font-bold transition-all duration-75"
-                       [class.w-16]="cprCompressionCount() % 2 === 0" [class.h-16]="cprCompressionCount() % 2 === 0" [class.bg-red-650]="cprCompressionCount() % 2 === 0"
-                       [class.w-12]="cprCompressionCount() % 2 !== 0" [class.h-12]="cprCompressionCount() % 2 !== 0" [class.bg-red-950]="cprCompressionCount() % 2 !== 0"
-                       [class.bg-blue-600]="cprCompressionCount() > 30" [style.transform]="cprCompressionCount() > 30 ? 'scale(1.1)' : 'none'">
-                    @if (cprCompressionCount() <= 30) {
-                      ❤️
-                    } @else {
-                      💨
-                    }
-                  </div>
-                </div>
-                
-                <p class="text-sm font-bold text-zinc-200 max-w-md">{{ cprCoachPrompt() }}</p>
-              </div>
-            }
-
-            <!-- Three-column grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- Column 1: Vitals & Camera Pulse Sensor -->
-              <pocket-gull-card title="Emergency Vitals" [icon]="ClinicalIcons.Assessment">
-                <div class="grid grid-cols-2 gap-3 mb-4">
-                  <div class="p-2.5 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
-                    <span class="text-[12px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-550 block mb-0.5">Heart Rate</span>
-                    <div class="text-lg font-extrabold text-red-500 dark:text-red-400">
-                      {{ state.vitals().hr || '--' }} <span class="text-[12px] font-normal text-gray-500 dark:text-zinc-500">BPM</span>
-                    </div>
-                  </div>
-                  <div class="p-2.5 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
-                    <span class="text-[12px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-550 block mb-0.5">SpO2</span>
-                    <div class="text-lg font-extrabold text-blue-500 dark:text-blue-400">
-                      {{ state.vitals().spO2 || '--' }} <span class="text-[12px] font-normal text-gray-500 dark:text-zinc-500">%</span>
-                    </div>
-                  </div>
-                  <div class="p-2.5 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
-                    <span class="text-[12px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-550 block mb-0.5">Temperature</span>
-                    <div class="text-lg font-extrabold text-amber-500 dark:text-amber-400">
-                      {{ state.vitals().temp || '--' }} <span class="text-[12px] font-normal text-gray-500 dark:text-zinc-500">°F</span>
-                    </div>
-                  </div>
-                  <div class="p-2.5 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/80">
-                    <span class="text-[12px] font-bold uppercase tracking-wider text-gray-400 dark:text-zinc-550 block mb-0.5">Blood Pressure</span>
-                    <div class="text-lg font-extrabold text-purple-500 dark:text-purple-400">
-                      {{ state.vitals().bp || '--' }}
-                    </div>
-                  </div>
-                </div>
-
-                <div class="border-t border-gray-100 dark:border-zinc-800/80 pt-3 flex flex-col gap-2">
-                  @if (!isPulseAcquiring()) {
-                    <button type="button" (click)="startPulseAcquisition()" class="w-full py-2 bg-emerald-600/10 dark:bg-emerald-600/20 hover:bg-emerald-600/20 dark:hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-600 dark:text-emerald-450 font-bold uppercase tracking-widest text-[12px] rounded-xl transition flex items-center justify-center gap-2 active:scale-[0.98]">
-                      <span>📷 Acquire pulse via Camera</span>
-                    </button>
-                  } @else {
-                    <div class="p-2 bg-zinc-950 border border-emerald-900/40 rounded-xl flex flex-col gap-2">
-                      <div class="flex items-center justify-between text-[12px] uppercase font-bold text-emerald-555">
-                        <span class="animate-pulse">Hold finger on camera lens...</span>
-                        <span>{{ pulseProgress() | number:'1.0-0' }}%</span>
-                      </div>
-                      
-                      <div class="h-6 overflow-hidden flex items-end justify-center gap-[2px] bg-emerald-950/20 rounded">
-                        <div class="w-1.5 bg-emerald-500 transition-all duration-75" [style.height.%]="20 + (pulseProgress() % 4 === 0 ? 60 : pulseProgress() % 4 === 1 ? 40 : 15)"></div>
-                        <div class="w-1.5 bg-emerald-500 transition-all duration-75" [style.height.%]="30 + (pulseProgress() % 4 === 1 ? 55 : pulseProgress() % 4 === 2 ? 35 : 10)"></div>
-                        <div class="w-1.5 bg-emerald-500 transition-all duration-75" [style.height.%]="25 + (pulseProgress() % 4 === 2 ? 65 : pulseProgress() % 4 === 3 ? 45 : 20)"></div>
-                        <div class="w-1.5 bg-emerald-500 transition-all duration-75" [style.height.%]="40 + (pulseProgress() % 4 === 3 ? 50 : pulseProgress() % 4 === 0 ? 30 : 15)"></div>
-                      </div>
-
-                      <div class="w-full bg-zinc-800 rounded-full h-1 overflow-hidden">
-                        <div class="bg-emerald-500 h-full transition-all" [style.width.%]="pulseProgress()"></div>
-                      </div>
-                      <button type="button" (click)="cancelPulseAcquisition()" class="py-0.5 text-[8.5px] uppercase tracking-widest text-zinc-500 hover:text-zinc-300 font-bold">
-                        Cancel
-                      </button>
-                    </div>
-                  }
-                </div>
-              </pocket-gull-card>
-
-              <!-- Column 2: Bystander Actions Timeline -->
-              <pocket-gull-card title="Bystander Actions Timeline" [icon]="ClinicalIcons.FollowUp">
-                @if (state.clinicalNotes().length === 0) {
-                  <div class="h-32 flex items-center justify-center border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg">
-                    <p class="text-[12px] text-gray-400 dark:text-zinc-500 font-medium">No actions logged yet.</p>
-                  </div>
-                } @else {
-                  <div class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
-                    @for (note of state.clinicalNotes(); track note.id) {
-                      <div class="p-2 bg-gray-50 dark:bg-zinc-900 rounded-lg border border-gray-100 dark:border-zinc-800/60 flex items-start justify-between gap-3">
-                        <div class="flex-1 min-w-0">
-                          <p class="text-[12px] text-gray-700 dark:text-zinc-300 font-medium break-words leading-relaxed">{{ note.text }}</p>
-                          <span class="text-[8.5px] text-gray-400 dark:text-zinc-500 mt-1 block">{{ note.date }}</span>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                }
-              </pocket-gull-card>
-
-              <!-- Column 3: Patient Emergency Medical ID (ICE) -->
-              <pocket-gull-card title="Patient Emergency Medical ID (ICE)" [icon]="ClinicalIcons.Education">
-                <div class="space-y-3 text-[12px]">
-                  <div class="flex items-center justify-between border-b border-gray-100 dark:border-zinc-800/85 pb-2">
-                    <span class="text-gray-450 dark:text-zinc-500 uppercase tracking-wider font-semibold text-[8.5px]">Blood Type</span>
-                    <span class="font-extrabold text-red-500 dark:text-red-400">{{ medicalId().bloodType }}</span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 border-b border-gray-100 dark:border-zinc-800/85 pb-2">
-                    <span class="text-gray-450 dark:text-zinc-500 uppercase tracking-wider font-semibold text-[8.5px]">Severe Allergies</span>
-                    <span class="font-bold text-amber-600 dark:text-amber-450">{{ medicalId().allergies }}</span>
-                  </div>
-                  <div class="flex flex-col gap-0.5 border-b border-gray-100 dark:border-zinc-800/85 pb-2">
-                    <span class="text-gray-450 dark:text-zinc-500 uppercase tracking-wider font-semibold text-[8.5px]">Medications</span>
-                    <span class="text-gray-700 dark:text-zinc-300 leading-normal">{{ medicalId().medications }}</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-gray-450 dark:text-zinc-500 uppercase tracking-wider font-semibold text-[8.5px]">ICE Contact</span>
-                    <span class="font-bold text-gray-700 dark:text-zinc-300">{{ medicalId().emergencyContact.split(' ')[0] }}</span>
-                  </div>
-                </div>
-              </pocket-gull-card>
-            </div>
-
-            <!-- GPS SOS Telemetry -->
-            <div class="p-4 bg-zinc-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div class="text-left flex-1">
-                <span class="text-[12px] font-bold text-red-500 dark:text-red-400 uppercase tracking-widest block mb-0.5">Emergency SOS Location Telemetry</span>
-                @if (isGpsAcquired()) {
-                  <span class="text-xs font-bold text-gray-700 dark:text-zinc-300">📡 Coords: {{ gpsCoords() }}</span>
-                } @else {
-                  <span class="text-xs text-gray-500 dark:text-zinc-400 font-medium">Location Telemetry has not been shared. Click button to enable.</span>
-                }
-              </div>
-              @if (isGpsAcquired()) {
-                <a [href]="smsHref()" class="px-4 py-2 bg-red-650 hover:bg-red-700 text-white font-bold text-[9.5px] uppercase tracking-wider rounded-xl transition flex items-center gap-1.5 active:scale-95 shadow-[0_4px_12px_rgba(220,38,38,0.2)] no-underline">
-                  🚨 Broadcast SOS SMS
-                </a>
-              } @else {
-                <button type="button" (click)="loadLiveGpsCoordinates()" class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-[9.5px] uppercase tracking-wider rounded-xl transition flex items-center gap-1.5 active:scale-95 shadow-sm">
-                  📡 Enable & Share GPS Location
-                </button>
-              }
-            </div>
-
-            <!-- Emergency Bypass Rapid Nutritional Triage Telemetry -->
-            <app-emergency-nutritional-bypass></app-emergency-nutritional-bypass>
-
-
-            <!-- First Aid Quick Guides -->
-            <pocket-gull-card title="Emergency Offline Treatment Guides" [icon]="ClinicalIcons.Medication">
-              <div class="flex flex-wrap gap-2 mb-4 border-b border-gray-150 dark:border-zinc-800/80 pb-3">
-                 <button type="button" (click)="activeFirstAidGuide.set(activeFirstAidGuide() === 'bleeding' ? null : 'bleeding')"
-                   [class]="activeFirstAidGuide() === 'bleeding' ? 'bg-red-500/10 text-red-600 border-red-500/40' : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-350'"
-                   class="px-2.5 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                   🩸 Bleeding Control
-                 </button>
-                 <button type="button" (click)="activeFirstAidGuide.set(activeFirstAidGuide() === 'choking' ? null : 'choking')"
-                   [class]="activeFirstAidGuide() === 'choking' ? 'bg-amber-500/10 text-amber-600 border-amber-500/40' : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-350'"
-                   class="px-2.5 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                   💨 Choking / Heimlich
-                 </button>
-                 <button type="button" (click)="activeFirstAidGuide.set(activeFirstAidGuide() === 'overdose' ? null : 'overdose')"
-                   [class]="activeFirstAidGuide() === 'overdose' ? 'bg-purple-500/10 text-purple-650 border-purple-500/40' : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-350'"
-                   class="px-2.5 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                   💊 Overdose Response
-                 </button>
-                 <button type="button" (click)="activeFirstAidGuide.set(activeFirstAidGuide() === 'stroke' ? null : 'stroke')"
-                   [class]="activeFirstAidGuide() === 'stroke' ? 'bg-blue-500/10 text-blue-600 border-blue-500/40' : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-350'"
-                   class="px-2.5 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                   🧠 Stroke (FAST)
-                 </button>
-                 <button type="button" (click)="activeFirstAidGuide.set(activeFirstAidGuide() === 'burns' ? null : 'burns')"
-                   [class]="activeFirstAidGuide() === 'burns' ? 'bg-orange-500/10 text-orange-600 border-orange-500/40' : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-350'"
-                   class="px-2.5 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                   🔥 Burn Care
-                 </button>
-                 <button type="button" (click)="activeFirstAidGuide.set(activeFirstAidGuide() === 'heat' ? null : 'heat')"
-                   [class]="activeFirstAidGuide() === 'heat' ? 'bg-amber-600/10 text-amber-700 border-amber-650/40' : 'bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-350'"
-                   class="px-2.5 py-1.5 text-[12px] uppercase tracking-wider font-bold rounded-lg border transition">
-                   ☀️ Heat Stroke
-                 </button>
-               </div>
-               
-               <div class="text-[12px] leading-relaxed text-gray-700 dark:text-zinc-300">
-                 @if (activeFirstAidGuide() === 'bleeding') {
-                   <div class="space-y-2 animate-in fade-in duration-200">
-                     @if (patientAgeCategory() === 'infant') {
-                       <p class="font-bold text-red-500">🩸 Infant Bleeding Control (Direct Pressure Only):</p>
-                       <ol class="list-decimal pl-5 space-y-1">
-                         <li><strong>Direct Pressure:</strong> Place sterile gauze or clean cloth on the wound. Apply continuous, firm direct pressure using 2-3 fingers.</li>
-                         <li><strong>No Windlass Tourniquets:</strong> Avoid adult windlass tourniquets on infants. Continue firm direct pressure until EMS arrives.</li>
-                         <li><strong>Elevation & Warmth:</strong> Elevate the limb slightly if possible. Keep infant warm to prevent hypothermia.</li>
-                       </ol>
-                     } @else if (isPatientPregnant()) {
-                       <p class="font-bold text-red-500">🩸 Severe Bleeding Control (Pregnancy Specific):</p>
-                       <ol class="list-decimal pl-5 space-y-1">
-                         <li><strong>Direct Pressure:</strong> Apply firm, continuous direct pressure with sterile dressings.</li>
-                         <li><strong>Tourniquet:</strong> If bleeding is life-threatening on a limb, apply a tourniquet 2-3 inches above the wound. Tighten until bleeding stops.</li>
-                         <li><strong>Left Lateral Position:</strong> Maintain left lateral tilt (elevate right hip) to prevent supine hypotensive syndrome (uterus pressing inferior vena cava) while managing bleeding.</li>
-                       </ol>
-                     } @else {
-                       <p class="font-bold text-red-500">🩸 Bleeding Control Protocol:</p>
-                       <ol class="list-decimal pl-5 space-y-1">
-                         <li><strong>Direct Pressure:</strong> Place sterile gauze or clean cloth directly on the wound and apply firm, continuous pressure.</li>
-                         <li><strong>Elevation:</strong> Elevate the injured limb above the level of the heart if possible.</li>
-                         <li><strong>Tourniquet (Severe Bleeding):</strong> If bleeding is life-threatening on a limb and direct pressure fails, apply a tourniquet 2-3 inches above the wound (never on a joint). Tighten until bleeding stops. Record time.</li>
-                       </ol>
-                     }
-                   </div>
-                 } @else if (activeFirstAidGuide() === 'choking') {
-                   <div class="space-y-2 animate-in fade-in duration-200">
-                     @if (patientAgeCategory() === 'infant') {
-                       <p class="font-bold text-amber-500">💨 Infant Choking Protocol (Back Blows & Chest Thrusts):</p>
-                       <ol class="list-decimal pl-5 space-y-1">
-                         <li><strong>Assess:</strong> Look for ineffective cough, blue lips, or silent choking. Do NOT perform abdominal Heimlich thrusts.</li>
-                         <li><strong>5 Back Blows:</strong> Support the infant's head and neck. Place face down along your forearm, resting on your thigh with the head lower than the chest. Deliver 5 firm back blows with the heel of your hand between the shoulder blades.</li>
-                         <li><strong>5 Chest Thrusts:</strong> Support the head and flip the infant face up along your forearm. Place 2 fingers on the center of the breastbone (just below the nipple line) and compress 5 times. Repeat cycles.</li>
-                       </ol>
-                     } @else if (isPatientPregnant()) {
-                       <p class="font-bold text-amber-500">💨 Pregnancy Choking Protocol (Chest Thrusts):</p>
-                       <ol class="list-decimal pl-5 space-y-1">
-                         <li><strong>Assess:</strong> Confirm patient cannot speak or cough. Do NOT perform abdominal Heimlich thrusts.</li>
-                         <li><strong>Chest Thrust Position:</strong> Wrap arms around the patient's chest from behind, placing your hands in the center of the breastbone (sternum).</li>
-                         <li><strong>Deliver Chest Thrusts:</strong> Pull backward with quick, distinct inward thrusts until the airway is cleared or the patient becomes unresponsive.</li>
-                       </ol>
-                     } @else {
-                       <p class="font-bold text-amber-500">💨 Conscious Choking Protocol (Heimlich):</p>
-                       <ol class="list-decimal pl-5 space-y-1">
-                         <li><strong>Confirm Choking:</strong> Ask "Are you choking?" Look for hands clutched to throat, inability to speak/cough.</li>
-                         <li><strong>Abdominal Thrusts:</strong> Stand behind the person. Wrap arms around waist. Place thumb side of fist slightly above the navel. Grasp fist with other hand.</li>
-                         <li><strong>Deliver Thrusts:</strong> Perform quick, upward and inward thrusts until the object is expelled or the person becomes unconscious.</li>
-                       </ol>
-                     }
-                   </div>
-                 } @else if (activeFirstAidGuide() === 'overdose') {
-                   <div class="space-y-2 animate-in fade-in duration-200">
-                     <p class="font-bold text-purple-650">💊 Opioid Overdose Response Protocol:</p>
-                     <ol class="list-decimal pl-5 space-y-1">
-                       <li><strong>Assess:</strong> Look for slow/stopped breathing, blue/gray lips/nails, unresponsive to sternum rub.</li>
-                       <li><strong>Call & Narcan:</strong> Administer Naloxone (Narcan) nasal spray (spray entire bottle into one nostril). Call emergency services.</li>
-                       <li><strong>Rescue Breathing:</strong> If not breathing, perform rescue breathing (1 breath every 5 seconds) and prepare CPR if pulse is absent.</li>
-                     </ol>
-                   </div>
-                 } @else if (activeFirstAidGuide() === 'stroke') {
-                   <div class="space-y-2 animate-in fade-in duration-200">
-                     <p class="font-bold text-blue-500">🧠 Stroke FAST Check Protocol:</p>
-                     <ul class="space-y-1.5 pl-4">
-                       <li><strong>F - Face Drooping:</strong> Ask the person to smile. Does one side of the face droop?</li>
-                       <li><strong>A - Arm Weakness:</strong> Ask the person to raise both arms. Does one arm drift downward?</li>
-                       <li><strong>S - Speech Difficulty:</strong> Ask the person to repeat a simple phrase. Is their speech slurred or strange?</li>
-                       <li><strong>T - Time to call 911:</strong> If they show any of these signs, note the time and call emergency services immediately.</li>
-                     </ul>
-                   </div>
-                 } @else if (activeFirstAidGuide() === 'burns') {
-                   <div class="space-y-2 animate-in fade-in duration-200">
-                     <p class="font-bold text-orange-500">🔥 Burn Care Protocol:</p>
-                     <ol class="list-decimal pl-5 space-y-1">
-                       <li><strong>Cool Immediately:</strong> Run cool (not cold/ice) water over the burn for 10-20 minutes.</li>
-                       <li><strong>Cover Loosely:</strong> Cover with a clean, dry, non-adherent dressing or plastic wrap. Do not apply butter, ointments, or toothpaste.</li>
-                       <li><strong>Demographic Warnings:</strong>
-                         @if (patientAgeCategory() === 'infant') {
-                           <strong>Infants are at high risk of hypothermia!</strong> Do not cool large burns (over 10% body surface area) for long periods. Keep the baby warm.
-                         } @else if (patientAgeCategory() === 'geriatric') {
-                           <strong>Elderly skin is thin and heals slowly!</strong> Be extremely gentle; do not pop blisters, and monitor for signs of shock.
-                         } @else {
-                           Avoid popping blisters. Seek emergency care for third-degree (charred/white skin) or face/hand/joint burns.
-                         }
-                       </li>
-                     </ol>
-                   </div>
-                 } @else if (activeFirstAidGuide() === 'heat') {
-                   <div class="space-y-2 animate-in fade-in duration-200">
-                     <p class="font-bold text-amber-700">☀️ Heat Stroke Protocol:</p>
-                     <ol class="list-decimal pl-5 space-y-1">
-                       <li><strong>Assess:</strong> Look for body temperature >103°F, red/hot/dry skin (or heavy sweating), rapid pulse, confusion/unconsciousness.</li>
-                       <li><strong>Cool Rapidly:</strong> Move patient to shade/AC. Cool with water spray, wet sheets, fan, or ice packs in armpits, groin, and neck.</li>
-                       <li><strong>Hydration Warning:</strong>
-                         @if (patientAgeCategory() === 'infant' || patientAgeCategory() === 'geriatric') {
-                           <strong>Do NOT force fluids</strong> if the patient is confused, drowsy, or vomiting, as they may aspirate. Seek immediate EMS transport.
-                         } @else {
-                           If fully conscious and able to swallow, give sips of cool water or electrolyte drink. Do not give aspirin or acetaminophen.
-                         }
-                       </li>
-                     </ol>
-                   </div>
-                 } @else {
-                   <p class="text-gray-400 dark:text-zinc-500 italic text-center py-4">Select an emergency guide above for offline step-by-step first aid instructions.</p>
-                 }
-               </div>
-             </pocket-gull-card>
-
-            <!-- Centered QR Code and FHIR section -->
-            <div class="flex flex-col items-center justify-center mt-4 p-6 bg-gray-50 dark:bg-zinc-900/40 border border-gray-100 dark:border-zinc-800/60 rounded-2xl">
-              <h3 class="text-xs font-bold text-gray-900 dark:text-zinc-200 uppercase tracking-widest mb-1 text-center">EMT Handoff QR Code</h3>
-              <p class="text-[12px] text-gray-500 dark:text-zinc-400 max-w-sm text-center mb-6">Scan with any mobile device to securely transfer patient vitals and treatment timeline in offline HL7 FHIR format.</p>
-              
-              @if (qrDataUrl()) {
-                <div class="p-4 bg-white rounded-xl shadow-md border border-gray-200 mb-6 flex items-center justify-center">
-                  <img [src]="qrDataUrl()" class="w-48 h-48 sm:w-64 sm:h-64 select-none pointer-events-none" style="image-rendering: pixelated;" alt="EMT Handoff FHIR QR Code" />
-                </div>
-              } @else {
-                <div class="w-48 h-48 sm:w-64 sm:h-64 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg flex items-center justify-center mb-6">
-                  <p class="text-xs text-gray-400">Loading QR Code...</p>
-                </div>
-              }
-
-            </div>
-          </div>
+          <app-emt-handoff-lens-tab></app-emt-handoff-lens-tab>
         }
 
         <!--AI Primary Lens Report Section & Dedicated Lens Widgets-->
@@ -1594,12 +1231,12 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
                  [class.dark:text-sky-200]="!themeService.isPlainLanguageMode()">
               <div class="flex items-center gap-3">
                 <span class="text-xl">
-                  {{ themeService.analogyLensMode() === 'arborist' ? '🌳' : (themeService.analogyLensMode() === 'mechanic' ? '🚗' : (themeService.isPlainLanguageMode() ? '📖' : '🔬')) }}
+                  {{ themeService.isPlainLanguageMode() ? '📖' : '🔬' }}
                 </span>
                 <div>
                   <h4 class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2">
                     <span>
-                      {{ themeService.analogyLensMode() === 'arborist' ? 'Plain Language Arborist Analogy Active' : (themeService.analogyLensMode() === 'mechanic' ? 'Plain Language Mechanic Analogy Active' : (themeService.isPlainLanguageMode() ? 'Plain Language Health Literacy Active' : 'Deep Clinical Rationale Active')) }}
+                      {{ themeService.isPlainLanguageMode() ? 'Plain Language Health Literacy Active' : 'Deep Clinical Rationale Active' }}
                     </span>
                     <span class="text-[9px] px-2 py-0.5 rounded-md font-mono uppercase font-bold"
                           [class.bg-emerald-500/20]="themeService.isPlainLanguageMode()"
@@ -1608,11 +1245,11 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
                           [class.bg-sky-500/20]="!themeService.isPlainLanguageMode()"
                           [class.text-sky-700]="!themeService.isPlainLanguageMode()"
                           [class.dark:text-sky-300]="!themeService.isPlainLanguageMode()">
-                      {{ themeService.isPlainLanguageMode() ? (themeService.analogyLensMode() === 'arborist' ? 'Botanical Tree Analogy' : (themeService.analogyLensMode() === 'mechanic' ? 'Automotive Chassis Analogy' : 'Patient Literacy')) : 'Physician & Specialist Level' }}
+                      {{ themeService.isPlainLanguageMode() ? 'Patient Literacy' : 'Physician & Specialist Level' }}
                     </span>
                   </h4>
                   <p class="text-[11px] opacity-90 font-medium mt-0.5">
-                    {{ themeService.analogyLensMode() === 'arborist' ? 'Clinical symptoms are translated into sap pressure, root hydration, and canopy foliage health for intuitive patient understanding.' : (themeService.analogyLensMode() === 'mechanic' ? 'Clinical symptoms are translated into engine RPM, hydraulic fluid pressure, and trailer hitch mechanical load.' : (themeService.isPlainLanguageMode() ? 'All clinical notes, recommendations, and diagnostic rationales are simplified for easy understanding.' : 'All clinical notes detail deep pathophysiological mechanisms, ICD-10 codes, and clinical evidence.')) }}
+                    {{ themeService.isPlainLanguageMode() ? 'All clinical notes, recommendations, and diagnostic rationales are simplified for easy understanding.' : 'All clinical notes detail deep pathophysiological mechanisms, ICD-10 codes, and clinical evidence.' }}
                   </p>
                 </div>
               </div>
@@ -1729,30 +1366,11 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
               @if (state.sentinelScope() === 'macro-fleet') {
                 <div class="mt-3 p-3 bg-white/90 dark:bg-zinc-950/90 rounded-md border border-emerald-500/30 text-gray-800 dark:text-zinc-200 animate-fadeIn">
                   <div class="flex items-center justify-between font-bold text-emerald-800 dark:text-emerald-300 mb-1">
-                    @if (themeService.analogyLensMode() === 'arborist') {
-                      <span>🌲 Sylvan Redwood Forest Sentinel (5,400 Grove Hectares Active)</span>
-                      <span>Hydration: 94.2% | Mycorrhizal Mesh: Synchronized</span>
-                    } @else if (themeService.analogyLensMode() === 'mechanic') {
-                      <span>🏎️ Commercial Fleet Motor Pool Sentinel (128 Vehicles Monitored)</span>
-                      <span>Obd-II Fleet DTC: 0 Critical | Fuel Eff: 98.4%</span>
-                    } @else if (themeService.analogyLensMode() === 'gentleman') {
-                      <span>🎩 Royal Naval Armada & Observatory Sentinel (42 Frigates)</span>
-                      <span>Atmospheric Depression: -2.4 hPa | Gales: Minimal</span>
-                    } @else {
-                      <span>🔬 Global WHO Population Health Registry Sentinel</span>
-                      <span>Herd Immunity: 96.1% | Regional AQI: Optimal</span>
-                    }
+                    <span>🔬 Global WHO Population Health Registry Sentinel</span>
+                    <span>Herd Immunity: 96.1% | Regional AQI: Optimal</span>
                   </div>
                   <p class="text-[11px] font-sans text-gray-600 dark:text-zinc-400 leading-snug">
-                    @if (themeService.analogyLensMode() === 'arborist') {
-                      "Forest canopy transpiration and subterranean root signals aggregated. Patient vitals synchronized with regional Sylvan grove resilience metrics."
-                    } @else if (themeService.analogyLensMode() === 'mechanic') {
-                      "Motor pool ECU telemetry and chassis load logs synthesized across 128 fleet units. Preventative maintenance schedule active."
-                    } @else if (themeService.analogyLensMode() === 'gentleman') {
-                      "Imperial naval chronometer governors and oceanic barometric depressions logged across all stations."
-                    } @else {
-                      "FHIR R4 population health registries and epidemiological surveillance networks connected to active patient strategy."
-                    }
+                    "FHIR R4 population health registries and epidemiological surveillance networks connected to active patient strategy."
                   </p>
                 </div>
               }
@@ -1770,6 +1388,12 @@ import { SevenGenerationsStewardshipLensTabComponent } from './analysis-report/s
               <div class="mb-6">
                 <app-dual-pane-consultation></app-dual-pane-consultation>
               </div>
+            }
+
+            <!-- Modular Report Lens Tabs -->
+            @defer (on idle) {
+              <app-socratic-epistemology-lens-tab></app-socratic-epistemology-lens-tab>
+              <app-nutritional-bypass-lens-tab></app-nutritional-bypass-lens-tab>
             }
 
             <!-- AI Comprehensive Report Sections -->
@@ -2340,7 +1964,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return null;
   }
 
-  getRecommendedCoreLensForParadigm(): { name: any; icon: string; reason: string } {
+  getRecommendedCoreLensForParadigm(): { name: AnalysisLens; icon: string; reason: string } {
     const p = this.state.activePhilosophy();
     if (p === 'eastern') {
       return { name: 'Functional Protocols', icon: '☯️', reason: 'Eastern TCM Zang-Fu & Qi Harmony' };
@@ -2435,7 +2059,8 @@ export class AnalysisReportComponent implements OnDestroy {
           try {
             const fullUrl = new URL(href, window.location.origin).href;
             this.state.openResearchUrl(fullUrl);
-          } catch {
+          } catch (e) {
+            console.debug('[AnalysisReport] URL parse fallback to raw href:', (e as Error)?.message);
             this.state.openResearchUrl(href);
           }
         }
@@ -3137,7 +2762,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return text;
   }
 
-  isSectionEmpty(section: any): boolean {
+  isSectionEmpty(section: IReportSection): boolean {
     return !section.nodes || section.nodes.length === 0;
   }
 
@@ -3152,7 +2777,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return res?.status || null;
   }
 
-  statusSeverity(status: string): any {
+  statusSeverity(status: string): 'success' | 'warning' | 'error' | 'neutral' {
     switch (status) {
       case 'verified': return 'success';
       case 'warning': return 'warning';
@@ -3433,8 +3058,8 @@ export class AnalysisReportComponent implements OnDestroy {
   private _autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
   showFloating3dOverlay = signal<boolean>(false);
-  private hoverTimerId: any = null;
-  private closeTimerId: any = null;
+  private hoverTimerId: ReturnType<typeof setTimeout> | number | null = null;
+  private closeTimerId: ReturnType<typeof setTimeout> | number | null = null;
 
   constructor() {
     effect(() => {
@@ -3710,7 +3335,7 @@ export class AnalysisReportComponent implements OnDestroy {
     return this.medicalDecoder.annotateText(rawHtml);
   }
 
-  handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: any) {
+  handleNodeUpdate(node: ISummaryNode | ISummaryNodeItem, event: { note?: string; bracketState?: 'normal' | 'added' | 'removed'; showNote?: boolean; acceptedProposal?: string }) {
     if (event.note !== undefined) {
       this.updateAnnotation(node.key, { note: event.note });
       node.note = event.note; // Update local node state

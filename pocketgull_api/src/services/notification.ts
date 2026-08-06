@@ -14,13 +14,13 @@ let isFirebaseInitialized = false;
   }
 
 export async function sendPushNotification(fcmToken: string, title: string, body: string, data?: any) {
-  const sanitize = (str: any) => encodeURIComponent(String(str || '').replace(/[\r\n\u2028\u2029]+/g, ' ')).slice(0, 500);
+  const sanitize = (str: any) => String(str || '').replace(/[^a-zA-Z0-9_\-\.\/\?\&\s]/g, '_').slice(0, 500);
+  const cleanTokenLength = Number(fcmToken ? String(fcmToken).length : 0);
+  const cleanTokenProvided = fcmToken ? 'true' : 'false';
   if (!isFirebaseInitialized || !fcmToken) {
-    const tokenProvided = Boolean(fcmToken);
-    const tokenLength = tokenProvided ? String(fcmToken).length : 0;
-    console.log(`[Notification Service Mock] Sending push notification (tokenProvided=${tokenProvided}, tokenLength=${tokenLength}):`);
-    console.log(`  Title: ${sanitize(title)}`);
-    console.log(`  Body:  ${sanitize(body)}`);
+    console.log('[Notification Service Mock] Sending push notification (tokenProvided=%s, tokenLength=%d):', cleanTokenProvided, cleanTokenLength);
+    console.log('  Title: %s', sanitize(title));
+    console.log('  Body:  %s', sanitize(body));
     return;
   }
 
@@ -34,7 +34,7 @@ export async function sendPushNotification(fcmToken: string, title: string, body
   };
 
   try {
-    const response = await admin.messaging().send(message);
+    const response = await (admin as any).messaging().send(message);
     console.log('[Notification Service] Successfully sent message:', sanitize(response));
   } catch (error: any) {
     console.error('[Notification Service] Error sending push notification:', sanitize(error?.message));

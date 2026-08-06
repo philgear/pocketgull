@@ -1,7 +1,8 @@
 import { Injectable, signal, effect, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { SecureStorageService } from './secure-storage.service';
 
-export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'papercraft' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'curie';
+export type AppTheme = 'light' | 'dark' | 'system' | 'spark' | 'papercraft' | 'pocketgull-geararts' | 'hemp' | 'rice' | 'construction' | 'white-marble' | 'black-marble' | 'papyrus' | 'pool' | 'mandala' | 'curie' | 'cern';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +13,17 @@ export class ThemeService {
   public activeParadigm = signal<'western' | 'tcm' | 'ayurveda' | 'unified'>('unified');
   public reduceMotion = signal<boolean>(false);
   public isPlainLanguageMode = signal<boolean>(false);
-  public analogyLensMode = signal<'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse' | 'coach'>('clinical');
+  public analogyLensMode = signal<'clinical' | 'coach'>('clinical');
   public activeSeagullPersona = signal<'calm-gull' | 'active-skimmer' | 'deep-navigator' | 'storm-rider'>('deep-navigator');
   public textSizeScale = signal<'standard' | 'large' | 'extra-large'>('standard');
+  public isDyslexiaFontEnabled = signal<boolean>(false);
+  public isHighContrastEnabled = signal<boolean>(false);
   private platformId = inject(PLATFORM_ID);
+  private storage = (() => {
+    try { return inject(SecureStorageService); } catch (e) { return new SecureStorageService(); }
+  })();
 
-  public setAnalogyLensMode(mode: 'clinical' | 'arborist' | 'mechanic' | 'gentleman' | 'muse' | 'coach') {
+  public setAnalogyLensMode(mode: 'clinical' | 'coach') {
     this.analogyLensMode.set(mode);
     if (mode !== 'clinical') {
       this.isPlainLanguageMode.set(true);
@@ -30,11 +36,9 @@ export class ThemeService {
     if (isPlatformBrowser(this.platformId)) {
       this.initTheme();
       
-      if (typeof localStorage !== 'undefined') {
-        const savedPersona = localStorage.getItem('pocket_gull_seagull_persona') as any;
-        if (savedPersona && ['calm-gull', 'active-skimmer', 'deep-navigator', 'storm-rider'].includes(savedPersona)) {
-          this.activeSeagullPersona.set(savedPersona);
-        }
+      const savedPersona = this.storage.getItem('pocket_gull_seagull_persona') as any;
+      if (savedPersona && ['calm-gull', 'active-skimmer', 'deep-navigator', 'storm-rider'].includes(savedPersona)) {
+        this.activeSeagullPersona.set(savedPersona);
       }
 
       effect(() => {
@@ -55,9 +59,7 @@ export class ThemeService {
 
       effect(() => {
         const persona = this.activeSeagullPersona();
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('pocket_gull_seagull_persona', persona);
-        }
+        this.storage.setItem('pocket_gull_seagull_persona', persona);
         if (typeof document !== 'undefined') {
           document.documentElement.setAttribute('data-seagull-persona', persona);
         }
@@ -65,9 +67,7 @@ export class ThemeService {
 
       effect(() => {
         const reduce = this.reduceMotion();
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('pocket_gull_reduce_motion', reduce ? 'true' : 'false');
-        }
+        this.storage.setItem('pocket_gull_reduce_motion', reduce ? 'true' : 'false');
         if (typeof document !== 'undefined') {
           if (reduce) {
             document.documentElement.classList.add('reduce-motion');
@@ -79,9 +79,7 @@ export class ThemeService {
 
       effect(() => {
         const isPlain = this.isPlainLanguageMode();
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('pocket_gull_plain_language', isPlain ? 'true' : 'false');
-        }
+        this.storage.setItem('pocket_gull_plain_language', isPlain ? 'true' : 'false');
         if (typeof document !== 'undefined') {
           if (isPlain) {
             document.documentElement.classList.add('plain-language-mode');
@@ -93,9 +91,7 @@ export class ThemeService {
 
       effect(() => {
         const scale = this.textSizeScale();
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('pocket_gull_text_size_scale', scale);
-        }
+        this.storage.setItem('pocket_gull_text_size_scale', scale);
         
         if (typeof document !== 'undefined') {
           document.documentElement.classList.remove('text-scale-standard', 'text-scale-large', 'text-scale-extra-large');
@@ -103,15 +99,25 @@ export class ThemeService {
         }
       });
 
-      if (typeof localStorage !== 'undefined') {
-        const savedReduceMotion = localStorage.getItem('pocket_gull_reduce_motion');
-        if (savedReduceMotion === 'true') {
-          this.reduceMotion.set(true);
-        } else if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-          if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            this.reduceMotion.set(true);
-          }
+      effect(() => {
+        const dyslexia = this.isDyslexiaFontEnabled();
+        this.storage.setItem('pocket_gull_dyslexia_font', dyslexia ? 'true' : 'false');
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.toggle('dyslexia-font-active', dyslexia);
         }
+      });
+
+      effect(() => {
+        const highContrast = this.isHighContrastEnabled();
+        this.storage.setItem('pocket_gull_high_contrast', highContrast ? 'true' : 'false');
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.toggle('high-contrast-active', highContrast);
+        }
+      });
+
+      const savedReduceMotion = this.storage.getItem('pocket_gull_reduce_motion');
+      if (savedReduceMotion === 'true') {
+        this.reduceMotion.set(true);
       } else if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
           this.reduceMotion.set(true);
@@ -135,26 +141,34 @@ export class ThemeService {
   }
 
   private initTheme() {
-    if (typeof localStorage === 'undefined') return;
-
-    const savedPlainLanguage = localStorage.getItem('pocket_gull_plain_language');
+    const savedPlainLanguage = this.storage.getItem('pocket_gull_plain_language');
     if (savedPlainLanguage === 'true') {
       this.isPlainLanguageMode.set(true);
     }
 
-    const savedTextSize = localStorage.getItem('pocket_gull_text_size_scale') as any;
+    const savedTextSize = this.storage.getItem('pocket_gull_text_size_scale') as any;
     if (savedTextSize && ['standard', 'large', 'extra-large'].includes(savedTextSize)) {
       this.textSizeScale.set(savedTextSize);
     }
 
-    const ALL_THEMES: AppTheme[] = ['light', 'dark', 'system', 'spark', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'curie'];
-    const urlParams = new URLSearchParams(window.location.search);
+    const savedDyslexia = this.storage.getItem('pocket_gull_dyslexia_font');
+    if (savedDyslexia === 'true') {
+      this.isDyslexiaFontEnabled.set(true);
+    }
+
+    const savedHighContrast = this.storage.getItem('pocket_gull_high_contrast');
+    if (savedHighContrast === 'true') {
+      this.isHighContrastEnabled.set(true);
+    }
+
+    const ALL_THEMES: AppTheme[] = ['light', 'dark', 'system', 'spark', 'papercraft', 'hemp', 'rice', 'construction', 'white-marble', 'black-marble', 'papyrus', 'pool', 'mandala', 'curie', 'cern'];
+    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
     const urlTheme = urlParams.get('theme') as AppTheme;
     if (urlTheme && ALL_THEMES.includes(urlTheme)) {
       this.currentTheme.set(urlTheme);
       this.resolveTheme(urlTheme);
     } else {
-      const savedTheme = localStorage.getItem('pocket_gull_theme') as AppTheme;
+      const savedTheme = this.storage.getItem('pocket_gull_theme') as AppTheme;
       if (savedTheme && ALL_THEMES.includes(savedTheme) && savedTheme !== 'spark') {
         this.currentTheme.set(savedTheme);
       } else {
@@ -167,7 +181,7 @@ export class ThemeService {
       this.setAnalogyLensMode(urlLens);
     }
 
-    const savedReduceMotion = localStorage.getItem('pocket_gull_reduce_motion');
+    const savedReduceMotion = this.storage.getItem('pocket_gull_reduce_motion');
     if (savedReduceMotion === 'true') {
       this.reduceMotion.set(true);
     }
@@ -175,7 +189,7 @@ export class ThemeService {
 
   private saveTheme(theme: AppTheme) {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('pocket_gull_theme', theme);
+      this.storage.setItem('pocket_gull_theme', theme);
     }
   }
 
@@ -206,12 +220,18 @@ export class ThemeService {
       'papercraft-mode', 'papercraft-hemp', 'papercraft-rice', 'papercraft-construction',
       'theme-white-marble', 'theme-black-marble', 'theme-papyrus',
       'theme-pool', 'theme-pool-light', 'theme-pool-dark',
-      'theme-mandala', 'theme-curie'
+      'theme-mandala', 'theme-curie', 'theme-cern'
     );
     document.documentElement.setAttribute('data-theme', this.currentTheme());
 
     const theme = this.currentTheme();
-    if (theme === 'papercraft' || theme === 'hemp' || theme === 'rice' || theme === 'construction') {
+    if (theme === 'cern') {
+      document.documentElement.classList.add('theme-cern');
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', '#f4f4f0');
+      }
+    } else if (theme === 'papercraft' || theme === 'hemp' || theme === 'rice' || theme === 'construction') {
       document.documentElement.classList.add('papercraft-mode');
       if (theme === 'hemp') document.documentElement.classList.add('papercraft-hemp');
       if (theme === 'rice') document.documentElement.classList.add('papercraft-rice');
@@ -283,7 +303,7 @@ export class ThemeService {
   }
 
   private applyParadigmToDom(paradigm: 'western' | 'tcm' | 'ayurveda' | 'unified') {
-    if (typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId)) return;
 
     const root = document.documentElement;
     root.setAttribute('data-clinical-paradigm', paradigm);
@@ -429,8 +449,8 @@ export class ThemeService {
 
       if (actionType === 'click') this.triggerHapticFeedback('light');
       else if (actionType === 'toggle') this.triggerHapticFeedback('medium');
-    } catch {
-      // AudioContext fail safe
+    } catch (e) {
+      console.debug('[ThemeService] AudioContext unavailable:', (e as Error)?.message);
     }
   }
 
@@ -448,8 +468,8 @@ export class ThemeService {
       else if (pattern === 'heavy') navigator.vibrate(35);
       else if (pattern === 'double') navigator.vibrate([15, 30, 15]);
       else if (pattern === 'success') navigator.vibrate([10, 20, 25, 40]);
-    } catch {
-      // Haptic fail safe
+    } catch (e) {
+      console.debug('[ThemeService] Haptic vibration unavailable:', (e as Error)?.message);
     }
   }
 

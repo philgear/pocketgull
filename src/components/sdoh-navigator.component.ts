@@ -137,7 +137,7 @@ export class SdohNavigatorComponent {
   patientManager = inject(PatientManagementService);
 
   activePatientName = computed(() => {
-    return this.patientState.patientName() || 'Phil Gear';
+    return this.patientState.patientName() || 'Alexander Vance';
   });
 
   sdohMetrics = computed<ISdohMetric[]>(() => {

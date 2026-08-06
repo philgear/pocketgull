@@ -4,7 +4,9 @@ import { AnalysisReportComponent } from './analysis-report.component';
 import { PatientStateService } from '../services/patient-state.service';
 import { AiCacheService } from '../services/ai-cache.service';
 import { ClinicalIntelligenceService } from '../services/clinical-intelligence.service';
+import { APP_VERSION } from '../version';
 import { ExportService } from '../services/export.service';
+import { NetworkStateService } from '../services/network-state.service';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
 import { PatientManagementService } from '../services/patient-management.service';
 import { ClinicalIcons } from '../assets/clinical-icons';
@@ -25,6 +27,10 @@ import { DoctorShiftSalesDemoComponent } from './doctor-shift-sales-demo.compone
 import { DomainSuitesNavigatorComponent } from './suites/domain-suites-navigator.component';
 
 import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.component';
+import { CounterfactualSimulatorComponent } from './counterfactual-simulator.component';
+import { SoapNoteGeneratorComponent } from './soap-note-generator.component';
+import { CohortTriageMatrixComponent } from './cohort-triage-matrix.component';
+import { HipaaPdfExportComponent } from './hipaa-pdf-export.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,7 +39,7 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
   host: {
     'class': 'flex flex-col flex-1 min-h-0 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)]'
   },
-  imports: [CommonModule, AnalysisReportComponent, DomainSuitesNavigatorComponent, ComponentDrilldownUnitComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent, DoctorShiftSimulatorComponent, DoctorShiftSalesDemoComponent],
+  imports: [CommonModule, CounterfactualSimulatorComponent, SoapNoteGeneratorComponent, CohortTriageMatrixComponent, HipaaPdfExportComponent, AnalysisReportComponent, DomainSuitesNavigatorComponent, ComponentDrilldownUnitComponent, HumanDignityPactComponent, MyChartBriefModalComponent, FamilyTreePedigreeComponent, PatientStoryModalComponent, PostItNotesComponent, ActuarialGleeAlbumComponent, AmbientLivingSpaceDashboardComponent, GreenRoomLoungeComponent, DoctorShiftSimulatorComponent, DoctorShiftSalesDemoComponent],
   template: `
     <div class="flex flex-col flex-1 h-full w-full overflow-hidden max-md:h-full max-md:min-h-[calc(100dvh-140px)] bg-[#F3F4F6] dark:bg-zinc-950">
       
@@ -93,13 +99,59 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
                    <span>Analysis Synced</span>
                 </div>
               }
-              
-              @if (!intelligence.isLoading()) {
 
-                <!-- B2B Executive Sales Pitch Demo Button -->
+              <!-- System Status & Offline Simulation Toggle -->
+              <button type="button" (click)="network.toggleForceOffline()"
+                title="Toggle forced offline simulation mode"
+                [class]="network.forceOffline()
+                  ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-red-500 bg-red-500/20 text-red-400 hover:bg-red-500/30 transition cursor-pointer shadow-sm'
+                  : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-sm'">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [class]="network.isOnline() ? 'bg-emerald-400' : 'bg-red-400'"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2" [class]="network.isOnline() ? 'bg-emerald-500' : 'bg-red-500'"></span>
+                </span>
+                <span>{{ network.forceOffline() ? 'App Forced Offline' : 'System Ready' }}</span>
+              </button>
+                      <!-- B2B Executive Sales Pitch Demo Button -->
                 <button type="button" (click)="showSalesDemoModal.set(true)" title="Launch B2B Health System Executive Demo & ROI Calculator"
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-sm">
                   <span>💼</span> B2B Executive Demo
+                </button>
+
+                <!-- Cohort Triage Matrix Button -->
+                <button type="button" (click)="showCohortMatrixModal.set(!showCohortMatrixModal())"
+                  title="Open Multi-Patient Cohort Triage Matrix"
+                  [class]="showCohortMatrixModal()
+                    ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-blue-400 bg-blue-500 text-zinc-950 transition cursor-pointer shadow-md'
+                    : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-blue-500/40 bg-blue-500/10 text-blue-300 hover:bg-blue-600 hover:text-white transition cursor-pointer shadow-sm'">
+                  <span>📊 Cohort Matrix</span>
+                </button>
+
+                <!-- HIPAA PDF Export Button -->
+                <button type="button" (click)="showHipaaPdfModal.set(!showHipaaPdfModal())"
+                  title="Open 1-Click HIPAA Audit & FHIR R4 Bundle PDF Export"
+                  [class]="showHipaaPdfModal()
+                    ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-amber-400 bg-amber-500 text-zinc-950 transition cursor-pointer shadow-md'
+                    : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-600 hover:text-white transition cursor-pointer shadow-sm'">
+                  <span>📄 HIPAA PDF</span>
+                </button>
+
+                <!-- Ambient SOAP Note Generator Button -->
+                <button type="button" (click)="showSoapModal.set(!showSoapModal())"
+                  title="Open Ambient Real-Time FHIR R4 SOAP Note Generator"
+                  [class]="showSoapModal()
+                    ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-purple-400 bg-purple-500 text-zinc-950 transition cursor-pointer shadow-md'
+                    : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer shadow-sm'">
+                  <span>📝 SOAP Note</span>
+                </button>
+
+                <!-- What-If Sandbox Simulator Toggle Button -->
+                <button type="button" (click)="showSimulatorModal.set(!showSimulatorModal())"
+                  title="Open Interactive What-If Counterfactual Health Simulator"
+                  [class]="showSimulatorModal()
+                    ? 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-emerald-400 bg-emerald-500 text-zinc-950 transition cursor-pointer shadow-md'
+                    : 'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-600 hover:text-white transition cursor-pointer shadow-sm'">
+                  <span>🔮 What-If Simulator</span>
                 </button>
 
                 <!-- View Mode Switcher: Classic Lenses vs Functional Domain Suites -->
@@ -114,13 +166,41 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-extrabold uppercase rounded-xl border border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white transition cursor-pointer shadow-sm">
                   <span>🎛️</span> Clinical Tools ▾
                 </button>
-              }
+              </div>
             </div>
-          </div>
-        }
+          }
 
         <div class="flex-1 flex flex-col min-w-0 min-h-0 h-full overflow-hidden relative">
           <div class="flex-1 min-h-0 min-w-0 h-full flex flex-col overflow-y-auto transition-all duration-300 p-4 sm:p-6">
+            
+            <!-- Cohort Triage Matrix Panel -->
+            @if (showCohortMatrixModal()) {
+              <div class="mb-4 w-full shrink-0">
+                <app-cohort-triage-matrix />
+              </div>
+            }
+
+            <!-- HIPAA Audit PDF Export Panel -->
+            @if (showHipaaPdfModal()) {
+              <div class="mb-4 w-full shrink-0">
+                <app-hipaa-pdf-export />
+              </div>
+            }
+
+            <!-- Ambient Real-Time SOAP Note Generator Panel -->
+            @if (showSoapModal()) {
+              <div class="mb-4 w-full shrink-0">
+                <app-soap-note-generator />
+              </div>
+            }
+
+            <!-- What-If Counterfactual Sandbox Panel -->
+            @if (showSimulatorModal()) {
+              <div class="mb-4 w-full shrink-0">
+                <app-counterfactual-simulator />
+              </div>
+            }
+
             <div class="flex-1 flex flex-col min-h-0 min-w-0 h-full overflow-y-auto relative" [class.slide-in-panel]="isSlidingIn()">
                 @if (viewMode() === 'suites') {
                   <app-domain-suites-navigator class="w-full h-auto block overflow-visible" />
@@ -173,7 +253,7 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-['Inter'] opacity-90 hover:opacity-100 transition-opacity border-t border-zinc-200/50 dark:border-zinc-800/60 pt-3">
                 <div class="space-y-1">
                   <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-200">System Identification</div>
-                  <div class="text-[12px] font-semibold text-zinc-800 dark:text-zinc-300 uppercase tracking-widest">Pocket Gull Analysis Engine v 0.1</div>
+                  <div class="text-[12px] font-semibold text-zinc-800 dark:text-zinc-300 uppercase tracking-widest">Pocket Gull Analysis Engine v{{ appVersion }}</div>
                 </div>
                 <div class="space-y-1">
                   <div class="text-[12px] font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-200">Analysis Metadata</div>
@@ -198,7 +278,6 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
           }
         </div>
       </div>
-    </div>
 
     <!-- Popover Clinical Tools & Engagement Suites Drawer -->
     @if (showToolsMenu()) {
@@ -367,6 +446,7 @@ import { ComponentDrilldownUnitComponent } from './component-drilldown-unit.comp
   `]
 })
 export class AnalysisContainerComponent {
+  appVersion = APP_VERSION;
   @ViewChild(AnalysisReportComponent) reportRef?: AnalysisReportComponent;
   state = inject(PatientStateService);
   patientManagement = inject(PatientManagementService);
@@ -375,10 +455,15 @@ export class AnalysisContainerComponent {
   game = inject(GamificationService);
   exportService = inject(ExportService);
   gcpHealthcare = inject(GcpHealthcareService);
+  network = inject(NetworkStateService);
   ClinicalIcons = ClinicalIcons;
 
   isSlidingIn = signal(true);
   viewMode = signal<'lenses' | 'suites'>('lenses');
+  showSimulatorModal = signal(false);
+  showSoapModal = signal(false);
+  showCohortMatrixModal = signal(false);
+  showHipaaPdfModal = signal(false);
 
   constructor() {
     // Re-trigger 3D slide-in animation whenever a patient is selected or analysis completes

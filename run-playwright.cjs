@@ -4,6 +4,14 @@
  * that occur when endpoint security software locks temp inspection folders.
  */
 const fs = require('fs');
+const path = require('path');
+
+const workspaceTemp = path.join(__dirname, '.playwright_temp');
+if (!fs.existsSync(workspaceTemp)) {
+  try { fs.mkdirSync(workspaceTemp, { recursive: true }); } catch (e) {}
+}
+process.env.TMP = workspaceTemp;
+process.env.TEMP = workspaceTemp;
 
 const origReaddirSync = fs.readdirSync;
 fs.readdirSync = function(p, options) {
@@ -49,7 +57,16 @@ if (fs.promises && fs.promises.readdir) {
   };
 }
 
-// Now launch Playwright CLI with remaining args
-const path = require('path');
-process.argv = [process.argv[0], path.resolve(__filename), ...process.argv.slice(2)];
-require(path.resolve(__dirname, 'node_modules/@playwright/test/cli.js'));
+// Now launch Playwright CLI with remaining args using spawnSync to ensure clean process context
+const { spawnSync } = require('child_process');
+const cliPath = path.resolve(__dirname, 'node_modules/@playwright/test/cli.js');
+const userArgs = process.argv.slice(2);
+const cliArgs = userArgs[0] === 'test' ? userArgs : ['test', ...userArgs];
+
+const res = spawnSync(process.execPath, [cliPath, ...cliArgs], {
+  stdio: 'inherit',
+  env: process.env,
+  cwd: __dirname
+});
+
+process.exit(res.status ?? 0);

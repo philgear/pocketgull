@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ISummaryNode, ISummaryNodeItem } from './analysis-report.types';
 import { DictationService } from '../services/dictation.service';
+import { SecureStorageService } from '../services/secure-storage.service';
 import { PocketGullBadgeComponent } from './shared/pocket-gull-badge.component';
 import { ClinicalIcons } from '../assets/clinical-icons';
 import { PocketGullButtonComponent } from './shared/pocket-gull-button.component';
@@ -996,6 +997,7 @@ function parseHtmlToClaims(html: string): IClaimUnit[] {
     `,
 })
 export class SummaryNodeComponent implements AfterViewChecked {
+  private secureStorage = inject(SecureStorageService);
   node = input.required<ISummaryNode | ISummaryNodeItem>();
   nodeItem = input<ISummaryNodeItem>({} as any);
   type = input<'paragraph' | 'list-item'>('paragraph');
@@ -1043,10 +1045,8 @@ export class SummaryNodeComponent implements AfterViewChecked {
   hasDiscoveredEvidenceFocus = signal(true);
 
   constructor() {
-    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
-      const discovered = localStorage.getItem('pocketgull_evidence_focus_discovered');
-      this.hasDiscoveredEvidenceFocus.set(discovered === 'true');
-    }
+    const discovered = this.secureStorage.getItem('pocketgull_evidence_focus_discovered');
+    this.hasDiscoveredEvidenceFocus.set(discovered === 'true');
   }
 
   // ─── Claim bracketing ────────────────────────
@@ -1161,9 +1161,7 @@ export class SummaryNodeComponent implements AfterViewChecked {
   toggleChat() {
     if (!this.hasDiscoveredEvidenceFocus()) {
       this.hasDiscoveredEvidenceFocus.set(true);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('pocketgull_evidence_focus_discovered', 'true');
-      }
+      this.secureStorage.setItem('pocketgull_evidence_focus_discovered', 'true');
     }
 
     if (this.showChat()) {
@@ -1334,12 +1332,12 @@ Only include a rich-media block when the user explicitly requests visual or rese
             particles: c.particles,
             loading: true
           }));
-      } catch { /* malformed JSON — ignore block */ }
+      } catch (e) { console.debug('[SummaryNode] Malformed rich card JSON:', (e as Error)?.message); }
     }
 
     let html = cleanMd;
     const parser = this.markdown.parser();
-    if (parser) { try { html = (parser as any).parse(cleanMd); } catch { html = `<p>${cleanMd}</p>`; } }
+    if (parser) { try { html = (parser as any).parse(cleanMd); } catch (e) { console.debug('[SummaryNode] Markdown parse fallback:', (e as Error)?.message); html = `<p>${cleanMd}</p>`; } }
     const claims = parseHtmlToClaims(html);
 
     const entry: IInlineChatEntry = { role: 'model', text: cleanMd, html, claims, richCards };

@@ -1,12 +1,24 @@
+// Server-side polyfill for Domino / SSR missing CSSStyleDeclaration.setProperty
+try {
+  const g = (typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : {}) as any;
+  if (g) {
+    if (g.CSSStyleDeclaration && g.CSSStyleDeclaration.prototype) {
+      if (typeof g.CSSStyleDeclaration.prototype.setProperty !== 'function') {
+        g.CSSStyleDeclaration.prototype.setProperty = function (name: string, value: string) {
+          try { this[name] = value; } catch {}
+        };
+      }
+    }
+  }
+} catch {}
+
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { BootstrapContext, bootstrapApplication, provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { BootstrapContext, bootstrapApplication, provideClientHydration } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { provideServerRendering } from '@angular/platform-server';
 import { provideZonelessChangeDetection, ApplicationConfig } from '@angular/core';
 import { AI_CONFIG, IAiProviderConfig } from './services/ai-provider.types';
 import { IntelligenceProviderToken } from './services/ai/intelligence.provider.token';
-import { PubGemmaProvider } from './services/ai/pubgemma.provider';
-import { NanoProvider } from './services/ai/nano.provider';
 import { HybridProvider } from './services/ai/hybrid.provider';
 
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
@@ -14,7 +26,7 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { environment } from './environments/environment';
 
-const serverConfig: ApplicationConfig = {
+export const config: ApplicationConfig = {
     providers: [
         provideServerRendering(),
         provideZonelessChangeDetection(),
@@ -39,6 +51,6 @@ const serverConfig: ApplicationConfig = {
 };
 
 const bootstrap = (context: BootstrapContext) =>
-    bootstrapApplication(AppComponent, serverConfig, context);
+    bootstrapApplication(AppComponent, config, context);
 
 export default bootstrap;

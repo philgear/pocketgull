@@ -225,7 +225,7 @@ export class PatientStateService {
   readonly requestedSearchEngine = signal<'google' | 'pubmed' | 'ayurveda' | 'tcm' | null>(null);
   readonly viewingPastVisit = signal<HistoryEntry | null>(null);
   readonly bodyViewerMode = signal<'3d' | '2d'>('3d');
-  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic' | 'arboreal' | 'automotive'>('skin');
+  readonly anatomyViewMode = signal<'skin' | 'muscle' | 'skeleton' | 'organs' | 'molecular' | 'eastern' | 'ayurvedic'>('skin');
   readonly customModelUrl = signal<string | null>(null);
   readonly activePatientSummary = signal<string | null>(null);
   readonly draftSummaryItems = signal<IDraftSummaryItem[]>([]);
@@ -359,6 +359,42 @@ export class PatientStateService {
   readonly oxidativeStressMarkers = signal<import('./patient.types').IDynamicMarker[]>([]);
   readonly antioxidantSources = signal<import('./patient.types').IDynamicMarker[]>([]);
   readonly medications = signal<import('./patient.types').IDynamicMarker[]>([]);
+
+  // --- Functional Medicine & Chronobiology Telemetry Signals ---
+  readonly functionalMedicineTelemetry = signal<import('./patient.types').IFunctionalMedicineTelemetry>({
+    inflammatoryScore: 38,
+    hsCrpEstimate: '2.4 mg/L',
+    mitochondrialReserve: 76,
+    atpSynthesisRate: '92% Optimal',
+    mucosalBarrierIntegrity: 84,
+    zonulinIndex: 'Normal (18 ng/mL)',
+    detoxificationCapacity: 88,
+    activeNode: 'Defense & Repair'
+  });
+
+  readonly chronobiologyTelemetry = signal<import('./patient.types').IChronobiologyTelemetry>({
+    circadianDisruptionIndex: 42,
+    scnPhase: 'Dusk Transition',
+    bmal1ExpressionPct: 74,
+    per2DiurnalSlope: 'Steep (-0.45 ug/dL/hr)',
+    melatoninAmplitude: 'Robust',
+    trfWindowHours: '10:00 - 18:00 (8h TRF)'
+  });
+
+  /** Computed Cross-Lens Functional-Circadian Synergy Index (0-100, lower is better sync & lower stress) */
+  readonly functionalCircadianSynergy = computed(() => {
+    const inflam = this.functionalMedicineTelemetry()?.inflammatoryScore ?? 38;
+    const cdi = this.chronobiologyTelemetry()?.circadianDisruptionIndex ?? 42;
+    const combinedBurden = Math.round((inflam * 0.55) + (cdi * 0.45));
+    const status = combinedBurden < 30 ? 'High Coherence' : combinedBurden < 60 ? 'Moderate Stress' : 'Circadian-Inflammatory Cascade';
+    return {
+      score: combinedBurden,
+      status,
+      inflammatoryContribution: Math.round(inflam * 0.55),
+      circadianContribution: Math.round(cdi * 0.45),
+      isCascadeRisk: combinedBurden >= 50
+    };
+  });
   
   readonly clinicalNotes = signal<IClinicalNote[]>([]);
   readonly checklist = signal<IChecklistItem[]>([]);
@@ -1224,7 +1260,8 @@ Pain Areas:   `;
       const base64State = btoa(JSON.stringify(stateObj));
       const baseUrl = window.location.origin + window.location.pathname;
       return `${baseUrl}?share=${encodeURIComponent(base64State)}&mode=handoff`;
-    } catch {
+    } catch (e) {
+      console.debug('[PatientState] Share URL generation failed:', (e as Error)?.message);
       return window.location.href;
     }
   }

@@ -10,8 +10,7 @@ export const p005: IPatient = {
     "Hypertensive Heart Disease",
     "Type 2 Diabetes Mellitus (T2DM)",
     "Nephritis / Chronic Kidney Disease (Stage 3b)",
-    "Mild Cognitive Impairment (Early Alzheimer's)",
-    "PhysioNet 2026 Challenge: Cardiorenal Fluid Retentive Hemodynamic Challenge"
+    "Mild Cognitive Impairment (Early Alzheimer's)"
   ],
   patientGoals: "Manage blood pressure, optimize glycemic status, protect renal clearance, and support cognitive function and fall prevention.",
   vitals: {

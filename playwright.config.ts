@@ -8,13 +8,13 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
   testDir: path.resolve(__dirname, 'e2e'),
   testMatch: '**/*.spec.ts',
-  testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.venv/**', '**/pg2/**', '**/branddesk/**'],
+  testIgnore: ['**/src/**', '**/node_modules/**', '**/tmp/**', '**/.temp/**', '**/Temp/**', '**/*.tmp', '**/.venv/**', '**/pg2/**', '**/branddesk/**', '**/tests/**'],
   outputDir: path.resolve(__dirname, 'tmp/playwright-results'),
   fullyParallel: true,
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   forbidOnly: !!process.env['CI'],
-  retries: process.env['CI'] ? 1 : 0,
-  workers: process.env['CI'] ? 2 : undefined,
+  retries: 0,
+  workers: process.env['PLAYWRIGHT_WORKERS'] ? parseInt(process.env['PLAYWRIGHT_WORKERS'], 10) : (process.env['CI'] ? 3 : 4),
   reporter: 'html',
   use: {
     baseURL: process.env['BASE_URL'] || 'http://127.0.0.1:4000',

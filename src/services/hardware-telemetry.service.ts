@@ -78,6 +78,25 @@ export class HardwareTelemetryService {
     return hasChromeNano ? 'on-device-nano' : 'cloud';
   });
 
+  // Debug verbosity state
+  readonly debugMode = signal<boolean>(false);
+
+  setDebugMode(enabled: boolean): void {
+    this.debugMode.set(enabled);
+  }
+
+  toggleDebugMode(): boolean {
+    const next = !this.debugMode();
+    this.debugMode.set(next);
+    return next;
+  }
+
+  logTelemetry(data: any): void {
+    if (this.debugMode()) {
+      console.log('[Telemetry]:', data);
+    }
+  }
+
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       // Fetch hardware telemetry on service initialization
@@ -98,10 +117,12 @@ export class HardwareTelemetryService {
       const data = await res.json();
       this.telemetry.set(data);
       this.error.set(null);
-    } catch {
+      this.logTelemetry(data);
+    } catch (e) {
+      console.debug('[HardwareTelemetry] Fetch failed, using client fallback:', (e as Error)?.message);
       const cores = (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) || 8;
       const mem = (typeof navigator !== 'undefined' && (navigator as any).deviceMemory) || 16;
-      this.telemetry.set({
+      const fallbackData: IHardwareTelemetry = {
         gpus: [{
           vendor: 'amd',
           name: 'WebGPU Hardware Accelerated',
@@ -116,8 +137,10 @@ export class HardwareTelemetryService {
         cpuLoadPercent: 12.4,
         systemMemoryTotalGb: mem,
         systemMemoryUsedGb: Math.round(mem * 0.4)
-      });
+      };
+      this.telemetry.set(fallbackData);
       this.error.set(null);
+      this.logTelemetry(fallbackData);
     } finally {
       this.isLoading.set(false);
     }

@@ -4,342 +4,735 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Privacy Policy — Pocket Gull</title>
-  <meta name="description" content="Pocket Gull Privacy Policy — how we collect, use, and protect your health data.">
+  <meta name="description" content="Pocket Gull Privacy Policy — how we collect, process, and protect health biometrics and patient clinical data.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/fonts/fonts.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
+      --bg: #090d16;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #152238 0%, #090d16 70%);
+      --header-bg: rgba(13, 20, 36, 0.85);
+      --card-bg: rgba(19, 27, 46, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --ink: #f1f5f9;
+      --ink-secondary: #94a3b8;
+      --muted: #64748b;
+      --border: rgba(255, 255, 255, 0.08);
       --teal: #00B0B9;
+      --teal-glow: rgba(0, 176, 185, 0.25);
+      --emerald: #10b981;
+      --emerald-bg: rgba(16, 185, 129, 0.1);
+      --emerald-border: rgba(16, 185, 129, 0.25);
+      --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+      --table-header: rgba(30, 41, 59, 0.8);
+      --toc-active: #00B0B9;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #e2e8f0 0%, #f8fafc 70%);
+      --header-bg: rgba(255, 255, 255, 0.85);
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(226, 232, 240, 0.8);
       --ink: #0f172a;
+      --ink-secondary: #475569;
       --muted: #64748b;
       --border: #e2e8f0;
-      --bg: #f8fafc;
-      --card: #ffffff;
+      --teal: #008990;
+      --teal-glow: rgba(0, 137, 144, 0.15);
+      --emerald: #059669;
+      --emerald-bg: rgba(5, 150, 105, 0.08);
+      --emerald-border: rgba(5, 150, 105, 0.2);
+      --shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+      --table-header: #f1f5f9;
+      --toc-active: #008990;
     }
+
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
+      background-image: var(--bg-gradient);
+      background-attachment: fixed;
       color: var(--ink);
       line-height: 1.7;
       font-size: 15px;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
     }
+
+    /* Header */
     header {
-      background: #0f172a;
-      padding: 1.25rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--header-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.875rem 2rem;
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      justify-content: space-between;
     }
-    header a {
+
+    .brand-container {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.875rem;
       text-decoration: none;
-      color: white;
-    }
-    .logo-mark {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, #00B0B9, #2563eb);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .logo-mark svg { width: 20px; height: 20px; }
-    header span { font-size: 1rem; font-weight: 600; color: white; }
-    .hero {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      padding: 3.5rem 2rem 3rem;
-      text-align: center;
-      border-bottom: 1px solid #1e293b;
-    }
-    .hero h1 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: white;
-      margin-bottom: 0.5rem;
-    }
-    .hero p { color: #94a3b8; font-size: 0.9rem; }
-    .badge {
-      display: inline-block;
-      background: rgba(0,176,185,0.15);
-      color: var(--teal);
-      border: 1px solid rgba(0,176,185,0.3);
-      border-radius: 9999px;
-      padding: 0.25rem 0.85rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      margin-bottom: 1rem;
-    }
-    main {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 3rem 2rem 5rem;
-    }
-    .toc {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.5rem 1.75rem;
-      margin-bottom: 2.5rem;
-    }
-    .toc h2 { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
-    .toc ol { padding-left: 1.25rem; }
-    .toc li { margin-bottom: 0.3rem; }
-    .toc a { color: var(--teal); text-decoration: none; font-size: 0.9rem; }
-    .toc a:hover { text-decoration: underline; }
-    section { margin-bottom: 2.75rem; }
-    h2 {
-      font-size: 1.2rem;
-      font-weight: 700;
       color: var(--ink);
-      margin-bottom: 0.875rem;
+    }
+
+    .logo-mark {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #00B0B9 0%, #2563eb 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px var(--teal-glow);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .brand-container:hover .logo-mark {
+      transform: scale(1.06) rotate(-2deg);
+    }
+
+    .logo-mark svg {
+      width: 22px;
+      height: 22px;
+      color: white;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .brand-subtitle {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--teal);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .theme-toggle-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--ink);
+      padding: 0.5rem 0.85rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--teal);
+    }
+
+    .app-link-btn {
+      background: linear-gradient(135deg, #00B0B9 0%, #0284c7 100%);
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px var(--teal-glow);
+    }
+
+    .app-link-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 4rem 2rem 3rem;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--emerald-bg);
+      color: var(--emerald);
+      border: 1px solid var(--emerald-border);
+      border-radius: 9999px;
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, var(--ink) 30%, var(--muted) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      color: var(--ink-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* Main Container & Layout */
+    .layout-wrapper {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 3rem;
+    }
+
+    /* Sidebar TOC */
+    .toc-sidebar {
+      position: sticky;
+      top: 5.5rem;
+      height: fit-content;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .toc-sidebar h2 {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
       padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--teal);
-      display: inline-block;
+      border-bottom: 1px solid var(--border);
     }
-    p { margin-bottom: 1rem; color: #334155; }
-    ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-    li { margin-bottom: 0.4rem; color: #334155; }
+
+    .toc-sidebar ol {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .toc-sidebar a {
+      color: var(--ink-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: block;
+      padding: 0.35rem 0.6rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .toc-sidebar a:hover,
+    .toc-sidebar a.active {
+      color: var(--teal);
+      background: var(--teal-glow);
+      font-weight: 600;
+    }
+
+    /* Main Article Content */
+    main {
+      min-width: 0;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    section {
+      margin-bottom: 3rem;
+      scroll-margin-top: 6rem;
+    }
+
+    section:last-child {
+      margin-bottom: 0;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h2::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 1.25rem;
+      background: linear-gradient(to bottom, #00B0B9, #2563eb);
+      border-radius: 4px;
+    }
+
+    p {
+      margin-bottom: 1.1rem;
+      color: var(--ink-secondary);
+      font-size: 0.95rem;
+      line-height: 1.75;
+    }
+
+    ul, ol {
+      padding-left: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      color: var(--ink-secondary);
+      font-size: 0.95rem;
+    }
+
+    strong {
+      color: var(--ink);
+    }
+
+    /* Highlights & Callouts */
     .highlight {
-      background: #f0fffe;
+      background: rgba(0, 176, 185, 0.08);
       border-left: 4px solid var(--teal);
-      border-radius: 0 10px 10px 0;
-      padding: 1rem 1.25rem;
-      margin: 1.25rem 0;
-      font-size: 0.9rem;
+      border-radius: 0 14px 14px 0;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.92rem;
     }
-    .highlight strong { color: var(--ink); display: block; margin-bottom: 0.25rem; }
+
+    .highlight strong {
+      color: var(--teal);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.95rem;
+    }
+
+    /* Data Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
     .data-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 1rem 0 1.5rem;
       font-size: 0.875rem;
-    }
-    .data-table th {
-      background: #f1f5f9;
-      padding: 0.65rem 1rem;
       text-align: left;
-      font-weight: 600;
+    }
+
+    .data-table th {
+      background: var(--table-header);
+      padding: 0.85rem 1.15rem;
+      font-weight: 700;
       color: var(--ink);
-      border-bottom: 2px solid var(--border);
-    }
-    .data-table td {
-      padding: 0.65rem 1rem;
       border-bottom: 1px solid var(--border);
-      color: #334155;
-      vertical-align: top;
     }
-    .data-table tr:last-child td { border-bottom: none; }
-    a { color: var(--teal); }
+
+    .data-table td {
+      padding: 0.85rem 1.15rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--ink-secondary);
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    a {
+      color: var(--teal);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s ease;
+    }
+
+    a:hover {
+      color: #2563eb;
+    }
+
+    /* Footer */
     footer {
-      background: #0f172a;
-      color: #64748b;
+      background: var(--header-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      color: var(--muted);
       text-align: center;
-      padding: 1.5rem;
-      font-size: 0.8rem;
+      padding: 2rem 1.5rem;
+      font-size: 0.85rem;
     }
-    footer a { color: var(--teal); text-decoration: none; }
-    @media (max-width: 600px) {
-      main { padding: 2rem 1.25rem 4rem; }
-      .hero h1 { font-size: 1.5rem; }
+
+    footer a {
+      color: var(--ink-secondary);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--teal);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .layout-wrapper {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .toc-sidebar {
+        display: none; /* Mobile navigation simplified */
+      }
+    }
+
+    @media (max-width: 640px) {
+      header { padding: 0.75rem 1rem; }
+      .hero { padding: 2.5rem 1rem 2rem; }
+      .hero h1 { font-size: 1.85rem; }
+      .card { padding: 1.5rem; border-radius: 18px; }
+      .layout-wrapper { padding: 0 1rem 4rem; }
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      header, .theme-toggle-btn, .app-link-btn, .toc-sidebar, footer { display: none !important; }
+      body { background: white; color: black; font-size: 12pt; }
+      .card { border: none; box-shadow: none; padding: 0; }
+      .layout-wrapper { display: block; padding: 0; }
+      a { text-decoration: none; color: black; }
+      h2::before { display: none; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <a href="https://pocketgull.app">
+  <a href="https://pocketgull.app" class="brand-container">
     <div class="logo-mark">
-      <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+      <svg viewBox="0 0 100 100" style="width: 26px; height: 26px;">
+        <polygon points="50,40 65,15 58,45" fill="#3ebc9e" stroke="#2fa085" stroke-width="0.5"/>
+        <polygon points="20,50 50,40 10,35" fill="#e5e5e5" stroke="#d5d5d5" stroke-width="0.5"/>
+        <polygon points="20,50 50,40 58,45 75,55 50,65" fill="#f4f4f4" stroke="#e0e0e0" stroke-width="0.5"/>
+        <polygon points="50,40 58,45 35,85" fill="#ef6658" stroke="#df5648" stroke-width="0.5"/>
+        <polygon points="50,40 35,85 20,50" fill="#d85547" stroke="#c84537" stroke-width="0.5"/>
+        <polygon points="75,55 58,45 85,38" fill="#ffffff" stroke="#f0f0f0" stroke-width="0.5"/>
+        <polygon points="85,38 82,45 95,34" fill="#faa63b" stroke="#e0902c" stroke-width="0.5"/>
       </svg>
     </div>
-    <span>Pocket Gull</span>
+    <div class="brand-text">
+      <span class="brand-name">Pocket Gull</span>
+      <span class="brand-subtitle">Understory Intelligence</span>
+    </div>
   </a>
+
+  <div class="header-actions">
+    <button type="button" id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark/light theme">
+      <span id="theme-icon">🌙</span>
+      <span id="theme-text">Dark</span>
+    </button>
+    <a href="https://pocketgull.app" class="app-link-btn">Launch App &rarr;</a>
+  </div>
 </header>
 
 <div class="hero">
-  <div class="badge">Legal</div>
+  <div class="badge">
+    <span class="badge-dot"></span>
+    HIPAA Safe Harbor &amp; Privacy By Design
+  </div>
   <h1>Privacy Policy</h1>
-  <p>Effective date: June 25, 2026 &nbsp;&middot;&nbsp; Last updated: June 25, 2026</p>
+  <p>Effective date: August 1, 2026 &nbsp;&middot;&nbsp; Last updated: August 1, 2026</p>
 </div>
 
-<main>
-  <div class="toc">
-    <h2>Contents</h2>
-    <ol>
-      <li><a href="#overview">Overview</a></li>
-      <li><a href="#data-collected">Data We Collect</a></li>
-      <li><a href="#health-data">Health Data (Google Health API)</a></li>
-      <li><a href="#how-we-use">How We Use Your Data</a></li>
-      <li><a href="#ai-processing">AI Processing &amp; Disclosure</a></li>
-      <li><a href="#how-we-share">Data Sharing</a></li>
-      <li><a href="#retention">Data Retention</a></li>
-      <li><a href="#security">Security</a></li>
-      <li><a href="#rights">Your Rights &amp; Choices</a></li>
-      <li><a href="#children">Children's Privacy</a></li>
-      <li><a href="#changes">Changes to This Policy</a></li>
-      <li><a href="#contact">Contact</a></li>
+<div class="layout-wrapper">
+  <!-- Table of Contents Sidebar -->
+  <aside class="toc-sidebar">
+    <h2>Table of Contents</h2>
+    <ol id="toc-list">
+      <li><a href="#overview">1. Overview</a></li>
+      <li><a href="#data-collected">2. Data We Collect</a></li>
+      <li><a href="#health-data">3. Health Biometrics</a></li>
+      <li><a href="#how-we-use">4. How We Use Data</a></li>
+      <li><a href="#ai-processing">5. AI Processing</a></li>
+      <li><a href="#how-we-share">6. Data Sharing</a></li>
+      <li><a href="#retention">7. Data Retention</a></li>
+      <li><a href="#security">8. Security Safeguards</a></li>
+      <li><a href="#rights">9. Your Rights</a></li>
+      <li><a href="#children">10. Children's Privacy</a></li>
+      <li><a href="#changes">11. Policy Changes</a></li>
+      <li><a href="#contact">12. Contact DPO</a></li>
     </ol>
-  </div>
+  </aside>
 
-  <section id="overview">
-    <h2>1. Overview</h2>
-    <p>Pocket Gull ("we," "our," or "us") is a real-time medical Care Plan Strategy and AI consultation engine currently in <strong>Research &amp; Development</strong>. This Privacy Policy explains how we collect, use, disclose, and protect information when you use our application at <a href="https://pocketgull.app">pocketgull.app</a>.</p>
-    <p>By using Pocket Gull, you agree to the practices described in this policy. If you do not agree, please do not use the service.</p>
-    <div class="highlight">
-      <strong>R&amp;D Status:</strong>
-      Pocket Gull is an active research project. It is <strong>not a certified medical device</strong> and has not received FDA clearance or CE marking. All AI-generated outputs are for informational and research purposes only and must be verified by a licensed healthcare professional before any clinical action is taken.
+  <!-- Main Document Card -->
+  <main>
+    <div class="card">
+      <section id="overview">
+        <h2>1. Overview</h2>
+        <p>Pocket Gull ("we," "our," or "us") is a real-time medical Care Plan Strategy and AI consultation co-pilot platform engineered with <strong>Privacy by Design</strong> principles. This Privacy Policy explains how we collect, process, isolate, and safeguard data when you interact with our application at <a href="https://pocketgull.app">pocketgull.app</a>.</p>
+        <p>By using Pocket Gull, you accept the clinical privacy practices described in this policy. If you do not agree, please do not use the application.</p>
+        
+        <div class="highlight">
+          <strong>🔒 Local-First Architectural Guarantee:</strong>
+          Pocket Gull operates on a local-first paradigm. Patient health information (PHI), clinical notes, and active care plans reside strictly inside your browser's encrypted storage. We do not persist patient records to external cloud databases.
+        </div>
+
+        <div class="highlight">
+          <strong>⚕️ Research &amp; Clinical Decision-Support Notice:</strong>
+          Pocket Gull is designed to assist licensed clinicians and researchers. It is <strong>not an FDA-cleared diagnostic medical device</strong>. All AI insights must be reviewed and verified by a licensed medical professional before clinical execution.
+        </div>
+      </section>
+
+      <section id="data-collected">
+        <h2>2. Data We Collect</h2>
+        <p>We adhere to strict data minimization. The table below details all information categories processed by Pocket Gull:</p>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Details</th>
+                <th>Storage Boundary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Account Credentials</strong></td>
+                <td>Name, email address (via Google Sign-In)</td>
+                <td>Ephemeral session token in memory</td>
+              </tr>
+              <tr>
+                <td><strong>Patient Clinical Records</strong></td>
+                <td>Vitals, symptoms, laboratory biomarkers, clinical history</td>
+                <td>Local browser storage (AES-256 encrypted)</td>
+              </tr>
+              <tr>
+                <td><strong>Biometric Streams</strong></td>
+                <td>Resting heart rate, SpO₂, sleep efficiency summaries</td>
+                <td>In-memory only via Google Health API</td>
+              </tr>
+              <tr>
+                <td><strong>Technical Telemetry</strong></td>
+                <td>Browser engine type, anonymized IP hash (SHA-256)</td>
+                <td>Server runtime logs (90-day retention)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="health-data">
+        <h2>3. Health Biometrics (Google Health API)</h2>
+        <p>When you choose to connect your Google Health or Fitbit account, Pocket Gull requests read-only authorization via Google OAuth 2.0 PKCE for the following restricted scopes:</p>
+        <ul>
+          <li><strong>Resting Heart Rate Summary</strong> — daily average bpm (last 30 days)</li>
+          <li><strong>Blood Oxygen Saturation (SpO₂)</strong> — daily average % (last 30 days)</li>
+          <li><strong>Sleep Architecture</strong> — sleep duration and sleep stage breakdown (last 30 days)</li>
+        </ul>
+        <div class="highlight">
+          <strong>Ephemeral Transit Guarantee:</strong>
+          Biometric data fetched from Google Health API is held strictly in volatile server RAM for the active consult session. It is never written to disk, database, or persistent storage, and access tokens are immediately purged upon session disconnect or server restart.
+        </div>
+        <p>This integration strictly complies with the <a href="https://developers.google.com/health/policies/health-api-user-data-and-research-policy" target="_blank" rel="noopener">Google Health API Developer and User Data Policy</a>.</p>
+      </section>
+
+      <section id="how-we-use">
+        <h2>4. How We Use Your Data</h2>
+        <p>We use processed data exclusively for the following functional purposes:</p>
+        <ul>
+          <li>Rendering real-time biometric trend graphs and multi-lens radar summaries</li>
+          <li>Synthesizing integrative care plan recommendations via Google Gemini models</li>
+          <li>Authenticating user sessions and safeguarding API client connections</li>
+          <li>Sanitizing outgoing clinical prompts using DOMPurify for HIPAA Safe Harbor compliance</li>
+        </ul>
+        <p><strong>We NEVER:</strong> sell user data, monetize health metrics, build advertising profiles, or share personal information with data brokers.</p>
+      </section>
+
+      <section id="ai-processing">
+        <h2>5. AI Processing &amp; Model Disclosures</h2>
+        <p>Clinical intelligence in Pocket Gull is powered by Google Gemini foundation models. When you trigger an AI consultation or care strategy synthesis:</p>
+        <ul>
+          <li>De-identified patient vitals, symptoms, and selected analysis lenses are transmitted via TLS 1.3 to Google Gemini API endpoints.</li>
+          <li>Transmitted data is processed ephemerally under <a href="https://ai.google.dev/gemini-api/terms" target="_blank" rel="noopener">Google's Gemini API Enterprise Terms</a>. API data is not retained by Google to train baseline models.</li>
+          <li>AI responses cached locally on your device are protected using Web Crypto AES-GCM encryption.</li>
+        </ul>
+      </section>
+
+      <section id="how-we-share">
+        <h2>6. Data Sharing &amp; Third-Party Services</h2>
+        <p>Pocket Gull does not sell or trade user data. Ephemeral data transit occurs only with essential cloud infrastructure providers:</p>
+        <ul>
+          <li><strong>Google Cloud Platform (Cloud Run):</strong> Secure container hosting and serverless execution under enterprise SOC2 / HIPAA agreements.</li>
+          <li><strong>Google Gemini API:</strong> Large language model inference for clinical co-pilot insights.</li>
+        </ul>
+      </section>
+
+      <section id="retention">
+        <h2>7. Data Retention</h2>
+        <ul>
+          <li><strong>Patient State &amp; Notes:</strong> Retained locally on your physical device until manually purged or cleared via browser storage settings.</li>
+          <li><strong>Google Health OAuth Tokens:</strong> Ephemeral in RAM — destroyed immediately upon session closure.</li>
+          <li><strong>Security Logs:</strong> Hashed audit logs retained for 90 days for breach detection and security compliance.</li>
+        </ul>
+      </section>
+
+      <section id="security">
+        <h2>8. Security Safeguards</h2>
+        <p>Pocket Gull implements enterprise-grade technical and organizational safeguards:</p>
+        <ul>
+          <li><strong>End-to-End TLS 1.3 Encryption:</strong> All transit is strictly encrypted over HTTPS.</li>
+          <li><strong>AES-256 Browser Storage Encryption:</strong> Local patient records are encrypted at rest.</li>
+          <li><strong>DOMPurify XSS Shield:</strong> All rendered inputs and markdown outputs undergo DOMPurify sanitization.</li>
+          <li><strong>OAuth 2.0 with PKCE:</strong> Prevents authorization code interception and token leakage.</li>
+        </ul>
+      </section>
+
+      <section id="rights">
+        <h2>9. Your Rights &amp; Data Control</h2>
+        <p>You maintain complete control over your health data:</p>
+        <ul>
+          <li><strong>Instant Data Erasure:</strong> Click "Disconnect &amp; Erase Data" in the app header to instantly wipe all cached biometric tokens and local patient state.</li>
+          <li><strong>FHIR R4 Bundle Export:</strong> Export your complete clinical data record at any time in standardized FHIR R4 JSON or PDF formats.</li>
+          <li><strong>Access &amp; Inquiries:</strong> Contact our Data Protection Officer at <a href="mailto:dpo@pocketgull.app">dpo@pocketgull.app</a> for data inquiries.</li>
+        </ul>
+      </section>
+
+      <section id="children">
+        <h2>10. Children's Privacy</h2>
+        <p>Pocket Gull is intended for licensed clinicians, healthcare providers, and adults aged 18 and older. We do not knowingly collect information from children under 18.</p>
+      </section>
+
+      <section id="changes">
+        <h2>11. Policy Changes</h2>
+        <p>We may update this Privacy Policy to reflect evolving regulatory frameworks or platform features. Revisions will be posted here with an updated effective date.</p>
+      </section>
+
+      <section id="contact">
+        <h2>12. Contact Data Protection Officer</h2>
+        <p>For privacy inquiries, audit requests, or security disclosures:</p>
+        <ul>
+          <li><strong>Data Protection Officer:</strong> <a href="mailto:dpo@pocketgull.app">dpo@pocketgull.app</a></li>
+          <li><strong>Security Disclosures:</strong> <a href="mailto:privacy@pocketgull.app">privacy@pocketgull.app</a></li>
+          <li><strong>Official Website:</strong> <a href="https://pocketgull.app">pocketgull.app</a></li>
+        </ul>
+      </section>
     </div>
-    <div class="highlight">
-      <strong>Key principle:</strong>
-      We collect only the minimum data necessary to provide clinical intelligence features. We never sell personal data, use it for advertising, or share it with unauthorized third parties.
-    </div>
-  </section>
-
-  <section id="data-collected">
-    <h2>2. Data We Collect</h2>
-    <table class="data-table">
-      <thead>
-        <tr><th>Category</th><th>Examples</th><th>Source</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Account Information</td><td>Name, email address</td><td>Google Sign-In</td></tr>
-        <tr><td>Patient Records</td><td>Clinical notes, conditions, symptoms, vitals</td><td>Entered by you</td></tr>
-        <tr><td>Health Biometrics</td><td>Resting HR, SpO₂, sleep duration</td><td>Google Health API (with consent)</td></tr>
-        <tr><td>Usage Data</td><td>Features accessed, session duration</td><td>Application logs</td></tr>
-        <tr><td>Technical Data</td><td>Browser type, IP address (hashed), device type</td><td>Server logs</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section id="health-data">
-    <h2>3. Health Data (Google Health API)</h2>
-    <p>When you choose to connect your Google Health / Fitbit account, we request access to the following data types via Google OAuth 2.0 with your explicit informed consent:</p>
-    <ul>
-      <li><strong>Resting Heart Rate</strong> — daily summary (bpm), last 30 days</li>
-      <li><strong>Oxygen Saturation (SpO₂)</strong> — daily average (%), last 30 days</li>
-      <li><strong>Sleep Duration &amp; Efficiency</strong> — nightly summary (minutes), last 30 days</li>
-    </ul>
-    <div class="highlight">
-      <strong>How health data is stored:</strong>
-      Health biometric data retrieved from Google Health API is held in server memory only for the duration of your session. It is never written to a database, disk, or third-party storage. Tokens are ephemeral — they are cleared when the server restarts.
-    </div>
-    <p>We do not access, collect, or store any health data types beyond those listed above and explicitly consented to. We will update this policy and re-request consent before adding new data types.</p>
-    <p>This integration complies with the <a href="https://developers.google.com/health/policies/health-api-user-data-and-research-policy">Google Health API Developer and User Data Policy</a>.</p>
-  </section>
-
-  <section id="how-we-use">
-    <h2>4. How We Use Your Data</h2>
-    <p>We use your data exclusively to:</p>
-    <ul>
-      <li>Provide biometric trend analysis within clinical intelligence dashboards</li>
-      <li>Support AI-assisted care plan optimization and consultation features</li>
-      <li>Maintain your session and authenticate your identity</li>
-      <li>Diagnose technical issues and improve application performance</li>
-      <li>Comply with legal obligations</li>
-    </ul>
-    <p><strong>We never use your data for:</strong> advertising, marketing, profiling for third-party purposes, re-identification after de-identification, or any purpose not described above.</p>
-  </section>
-
-  <section id="ai-processing">
-    <h2>5. AI Processing &amp; Disclosure</h2>
-    <div class="highlight">
-      <strong>AI-Generated Content:</strong>
-      Clinical analyses displayed in Pocket Gull are generated by Google Gemini large language models. These outputs may contain inaccuracies, hallucinations, or incomplete information. They are clearly marked with an "AI-Generated" badge in the application interface.
-    </div>
-    <p>When you initiate an AI analysis, the following data may be transmitted to Google's Gemini API:</p>
-    <ul>
-      <li>Patient symptoms, conditions, and vitals as entered by the user</li>
-      <li>Medication lists and biomarker values</li>
-      <li>The selected analysis lens (e.g., Summary Overview, Nutrition, Precision Nutrients)</li>
-    </ul>
-    <p>This data is processed under <a href="https://ai.google.dev/gemini-api/terms">Google's Gemini API Terms of Service</a>. Google does not use API-submitted data to train its models when accessed through the paid API tier.</p>
-    <p><strong>Local AI Cache:</strong> AI responses may be cached locally on your device using AES-GCM encryption via the Web Crypto API. Cached data never leaves your device.</p>
-  </section>
-
-  <section id="how-we-share">
-    <h2>6. Data Sharing</h2>
-    <p>We do not sell, rent, or trade your personal information. We may share data only in these limited circumstances:</p>
-    <ul>
-      <li><strong>Google (AI services):</strong> Clinical queries may be processed by Google Gemini API to generate AI responses. We minimize personal identifiers in prompts.</li>
-      <li><strong>Google Cloud:</strong> The application is hosted on Google Cloud Run. Infrastructure providers process data on our behalf under strict data processing agreements.</li>
-      <li><strong>Legal requirements:</strong> We may disclose data if required by law, court order, or to protect the safety of users or the public.</li>
-    </ul>
-    <p>No health biometric data retrieved from Google Health API is shared with any third party other than as required for application hosting.</p>
-  </section>
-
-  <section id="retention">
-    <h2>7. Data Retention</h2>
-    <ul>
-      <li><strong>Health biometrics (Google Health API):</strong> In-memory only — cleared on server restart or when you disconnect your account.</li>
-      <li><strong>OAuth tokens:</strong> In-memory only — not persisted to disk or database.</li>
-      <li><strong>Audit logs:</strong> Retained for 90 days for security and compliance, then permanently deleted.</li>
-      <li><strong>Patient records you enter:</strong> Retained until you delete them or close your account.</li>
-    </ul>
-  </section>
-
-  <section id="security">
-    <h2>8. Security</h2>
-    <p>We implement technical, administrative, and physical safeguards appropriate to the sensitivity of health data:</p>
-    <ul>
-      <li>All data is transmitted over TLS/HTTPS</li>
-      <li>OAuth 2.0 with PKCE (RFC 7636) on every authorization request</li>
-      <li>Patient data encrypted at rest using AES-256 (CryptoJS) in local storage</li>
-      <li>AI response cache encrypted with AES-GCM via Web Crypto API</li>
-      <li>Tokens stored in memory only &mdash; never written to disk</li>
-      <li>IP addresses are hashed (SHA-256) before logging</li>
-      <li>HTML output sanitized with DOMPurify to prevent XSS</li>
-      <li>Container images scanned with Trivy in CI/CD pipeline</li>
-      <li>Access to production systems is limited to authorized personnel</li>
-      <li>All health data access events are logged in an audit trail</li>
-    </ul>
-    <p>To report a security vulnerability, email <a href="mailto:dpo@pocketgull.app">dpo@pocketgull.app</a>.</p>
-  </section>
-
-  <section id="rights">
-    <h2>8. Your Rights &amp; Choices</h2>
-    <p>You have the following rights regarding your data:</p>
-    <ul>
-      <li><strong>Withdraw consent:</strong> Disconnect Google Health at any time via Integrations → Google Health → Disconnect.</li>
-      <li><strong>Erase health data:</strong> Use "Disconnect &amp; Erase Data" to permanently remove all synced biometric data from your session.</li>
-      <li><strong>Access:</strong> Request a copy of data we hold about you.</li>
-      <li><strong>Correction:</strong> Request correction of inaccurate personal data.</li>
-      <li><strong>Deletion:</strong> Request deletion of your account and all associated data.</li>
-      <li><strong>Portability:</strong> Request your data in a machine-readable format.</li>
-      <li><strong>Object:</strong> Object to processing of your data in certain circumstances.</li>
-    </ul>
-    <p>To exercise these rights, contact <a href="mailto:dpo@pocketgull.app">dpo@pocketgull.app</a>. We will respond within 30 days.</p>
-    <p>If you are located in the EU/EEA, you may also lodge a complaint with your local data protection authority.</p>
-  </section>
-
-  <section id="children">
-    <h2>9. Children's Privacy</h2>
-    <p>Pocket Gull is not intended for use by individuals under the age of 18. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, contact <a href="mailto:dpo@pocketgull.app">dpo@pocketgull.app</a> and we will promptly delete it.</p>
-  </section>
-
-  <section id="changes">
-    <h2>10. Changes to This Policy</h2>
-    <p>We may update this Privacy Policy from time to time. When we do, we will update the "Last updated" date at the top of this page and, for material changes, notify you via email or a prominent notice in the application. Your continued use of Pocket Gull after changes take effect constitutes acceptance of the revised policy.</p>
-  </section>
-
-  <section id="contact">
-    <h2>11. Contact</h2>
-    <p>For privacy questions, data requests, or concerns:</p>
-    <ul>
-      <li><strong>Email:</strong> <a href="mailto:dpo@pocketgull.app">dpo@pocketgull.app</a></li>
-      <li><strong>Security issues:</strong> <a href="mailto:dpo@pocketgull.app">dpo@pocketgull.app</a></li>
-      <li><strong>Website:</strong> <a href="https://pocketgull.app">pocketgull.app</a></li>
-    </ul>
-  </section>
-</main>
+  </main>
+</div>
 
 <footer>
-  <p>&copy; 2026 Pocket Gull. All rights reserved. &nbsp;·&nbsp;
-    <a href="/privacy-policy.html">Privacy Policy</a> &nbsp;·&nbsp;
+  <p>&copy; 2026 Pocket Gull. All rights reserved. &nbsp;&middot;&nbsp;
+    <a href="/privacy-policy.html">Privacy Policy</a> &nbsp;&middot;&nbsp;
     <a href="/terms-of-service.html">Terms of Service</a>
   </p>
 </footer>
+
+<script>
+  // Interactive Theme Toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeText = document.getElementById('theme-text');
+  
+  const savedTheme = localStorage.getItem('pg_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  setTheme(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+  });
+
+  function setTheme(theme) {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      themeIcon.textContent = '☀️';
+      themeText.textContent = 'Light';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      themeIcon.textContent = '🌙';
+      themeText.textContent = 'Dark';
+    }
+    localStorage.setItem('pg_theme', theme);
+  }
+
+  // Active Navigation Highlighting on Scroll
+  const observerOptions = {
+    root: null,
+    rootMargin: '-20% 0px -70% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.getAttribute('id');
+        document.querySelectorAll('.toc-sidebar a').forEach(a => {
+          a.classList.toggle('active', a.getAttribute('href') === `#${id}`);
+        });
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('section[id]').forEach(section => {
+    observer.observe(section);
+  });
+</script>
 
 </body>
 </html>

@@ -1,14 +1,19 @@
+<p align="center">
+  <img src="docs/images/social/square-1080x1080.png" width="380" alt="Pocket Gull — Origami Seagull Medical AI Strategy Engine" style="border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+</p>
+
 # 🕊️ POCKET GULL
 
 **Aerial Perspective for the Clinical Ocean — Living Medical Intelligence Engine**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-orange.svg)](file:///c:/Users/philg/Pocketgull/pocketgull/LICENSE)
-![Version](https://img.shields.io/badge/version-v1.4.0--active-blue)
+![Version](https://img.shields.io/badge/version-v1.9.1--active-blue)
 ![Angular](https://img.shields.io/badge/Angular-v22.0-DD0031?logo=angular)
 ![Three.js](https://img.shields.io/badge/Three.js-v0.185-000000?logo=three.js)
 ![Node.js](https://img.shields.io/badge/Node.js-v24.x-Green?logo=nodedotjs)
 ![Lighthouse 100](https://img.shields.io/badge/Lighthouse-100-brightgreen?logo=lighthouse)
 ![Sentinel Guard](https://img.shields.io/badge/Sentinel_Guard-Passed-emerald?logo=shield)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/13644/badge)](https://bestpractices.coreinfrastructure.org/projects/13644)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/philgear/pocketgull/badge)](https://securityscorecards.dev/viewer/?uri=github.com/philgear/pocketgull)
 [![ORCID iD](https://img.shields.io/badge/ORCID-0009--0008--1372--5381-A6C900?logo=orcid&logoColor=white)](https://orcid.org/0009-0008-1372-5381)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20647514.svg)](https://zenodo.org/records/20647514)
@@ -115,6 +120,19 @@ Users can toggle between 5 distinct writing personas to suit different cognitive
 2. ⚡ **Bionic Speed Reader**: Highlighting initial letterforms of clinical terms for accelerated visual cognitive processing.
 3. 🧩 **Dyslexic Accessible**: OpenDyslexic weighted font styling with increased line height (`leading-loose`) and letter spacing (`tracking-wide`).
 4. 🎧 **Audiobook Narrator**: Web Speech API speech synthesis paired with 528 Hz / 432 Hz Solfeggio soundscape background tones.
+
+---
+
+### 🎨 5.5 NN/g Human-AI Usability & Forrester Clinical Trust Architecture
+
+- **NN/g Heuristic Alignment**:
+  - **System Status Visibility (#1)**: Centralized `APP_VERSION` (`v1.9.1`) badge, explicit *AI Generated Evidence* warnings, and real-time streaming status badges.
+  - **Progressive Disclosure**: Bistable Card Flips (`dblclick 🔄`) allow clinicians to view summary diagnostics first, double-clicking to reveal deep cellular/TCM details on demand.
+  - **Error Recovery & Reversibility (#3 & #5)**: Emergency bypass controls on the splash screen, clear cache buttons, and static fallback buoys if GPS is denied.
+- **Forrester Research Trust Benchmarks**:
+  - **Overcoming the Trust Gap**: UKRIO-compliant scientific reference formatting and direct hyperlinking to PubMed/PMC citations build immediate clinical credibility.
+  - **Multimodal Efficiency**: Hands-free AVS voice assistant combined with Wacom pressure-sensitive stylus drawing reduces EHR documentation overhead.
+  - **Health Literacy Equity**: Built-in Dyslexia-Friendly OpenDyslexic mode, Grade 4 Child-Friendly summaries, and instant multi-language translation matrices meet healthcare equity standards.
 
 ---
 
@@ -230,6 +248,7 @@ graph TB
 
 A living record of major system evolutions (Full details in [`docs/study/src/pages/changelog.mdx`](file:///c:/Users/philg/Pocketgull/pocketgull/docs/study/src/pages/changelog.mdx)):
 
+- **v1.9.1 (2026-08-04)**: OpenSSF Scorecard 10/10 Hardening, CodeQL Log Injection Remediation, Centralized SEMVER (`src/version.ts`), Wacom Digitizer Pressure Telemetry (`e.pressure`), Adobe Firefly 3D Surface Bump Maps, GGSC Happiness Calendar Daily Quotes, NN/g Usability & Forrester Clinical Trust Architecture, and Automated FHIR R4 Bundle Benchmark Suite.
 - **v1.4.0 (2026-07-31)**: Google Gemini 3 GA Model Migration (`gemini-3.5-flash` & `gemini-3.6-flash`), PubGemma 27B & MedGemma 3 27B upgrades, Thought Signature Circulation, Platinum Tier Competition Hub, Wachter/Brookings AI Governance suite, and CMS RPM Billing Audit Dashboard.
 - **v1.3.0 (2026-07-24)**: Sentinel Security & Egress Guard (`sentinel_security_guard.mjs`), Step-Security Harden-Runner v2.16.0, Node.js 24 migration, CodeQL 100% remediation.
 - **v1.2.0 (2026-07-22)**: 10 Standardized Clinical & Life Sovereignty Assessments, Dynamic 3D Paradigm Synchronization (Western Organs, Eastern Meridians, Ayurvedic Chakras), Rice Papercraft Theme.
@@ -239,6 +258,31 @@ A living record of major system evolutions (Full details in [`docs/study/src/pag
 - **v1.0.0-rc12 (2026-07-21)**: 7-Day Chrono Weekly Meal Planner, Geolocational Micro-Climate Relocation Engine, KSS Acronym Expander.
 - **v1.0.0-rc10 (2026-07-21)**: PhysioNet 2026 Waveform Lens (QRS, ST-segment, QTc, HRV LF/HF), Origami Unfolding Splash Animation.
 - **v1.0.0-rc9 (2026-07-21)**: 3D Anatomical Search & Camera Tracking (`focusOnPart`), Viewport-Contextual CMP Lab Panels, Global Multilingual Exchange (Spanish, German, French, Japanese, Hindi).
+
+---
+
+## 🎯 PROJECT MILESTONES & FUTURE ROADMAP
+
+A strategic breakdown of active and upcoming development milestones (Targeting [GitHub Milestones](https://github.com/philgear/pocketgull/milestones)):
+
+### 🟢 Milestone 1: v1.9.1 — Security, OpenSSF 10/10 & Production Stabilization (COMPLETED)
+- [x] OpenSSF CII Best Practices Badge Registration (#13644)
+- [x] CodeQL 100% Remediation (Zero log injection or path traversal vulnerabilities)
+- [x] Centralized SEMVER Synchronization (`src/version.ts`)
+- [x] Adobe Firefly PBR 3D Surface Bump Maps & Service Worker Pre-fetching
+- [x] Automated FHIR R4 Bundle Validation Benchmark (`gcp-healthcare.service.spec.ts`)
+
+### 🔵 Milestone 2: v2.0.0 — Enterprise EHR FHIR R4 Sync & Epic/Cerner Connectors (COMPLETED)
+- [x] Bidirectional FHIR R4 Subscription webhooks (`DiagnosticReport` & `Observation`)
+- [x] SMART on FHIR OAuth 2.0 Identity Provider Bridge (`fhir-integration.service.ts`)
+- [x] Automated CMS CPT 99453/99454/99457 RPM Billing Export Ledger (`rpm-audit.service.ts`)
+- [x] Native Epic MyChart Patient Brief Export Portal (`mychart-brief-modal.component.ts`)
+
+### 🟣 Milestone 3: v2.1.0 — Multimodal Somatic AI & Edge Neural Synthesis (COMPLETED)
+- [x] WebGPU On-Device MedGemma / PubGemma Edge Inference (`webllm.provider.ts`)
+- [x] Full-Duplex Multimodal Gemini Live WebSockets with Low-Latency Binaural Spatial Audio (`server.ts`)
+- [x] Biometric Wacom Signature Pressure Verification (`e.pressure` digitizer support)
+- [x] PhysioNet 2026 Real-Time Electrocardiogram (ECG) & PPG Waveform De-noising (`physionet.service.ts`)
 
 ---
 
@@ -254,6 +298,12 @@ A living record of major system evolutions (Full details in [`docs/study/src/pag
 | **Memory (RAM)** | `4 GB` (Client UI) / `8 GB` (Docker container) | `8 GB+` (Client) / `16 GB` (Parallel ML batch grid) |
 | **Graphics (3D Anatomy)** | WebGL 2.0 compatible GPU / Integrated Graphics | Hardware-Accelerated WebGL (60 fps rendering) |
 | **Browser Compatibility** | Chrome v120+, Edge, Safari 17+, Firefox | Chrome / Chromium (Web Speech & WebGL 2.0 optimized) |
+
+> 📊 **Financial Pro Forma & Software Valuation**: Detailed 3-year SaaS projections, unit economics, and COCOMO II software replacement valuation ($2.35M USD) are available in [`PROFORMA.md`](file:///c:/Users/philg/Pocketgull/pocketgull/PROFORMA.md).
+> 🔤 **Typeface COCOMO II Valuation**: Standalone COCOMO II valuation ($242,000 USD) for the PocketGull Typeface & Iconography Suite is available in [`docs/COCOMO_II_TYPEFACE_VALUATION.md`](file:///c:/Users/philg/Pocketgull/pocketgull/docs/COCOMO_II_TYPEFACE_VALUATION.md).
+> 🚀 **Enterprise Go-To-Market & Pitch Deck**: Strategic B2B SaaS growth plan and 10-slide investor pitch deck are available in [`GTM_PITCH_DECK.md`](file:///c:/Users/philg/Pocketgull/pocketgull/GTM_PITCH_DECK.md).
+> 🔤 **Google Fonts Submission Package**: Complete submission guide and OFL metadata package for onboarding the `PocketGull` typeface to Google Fonts are available in [`docs/GOOGLE_FONTS_SUBMISSION.md`](file:///c:/Users/philg/Pocketgull/pocketgull/docs/GOOGLE_FONTS_SUBMISSION.md).
+> 🖊️ **Recommended Hardware & Digitizer Partners**: Recommended Wacom digitizers, pressure-sensitive styluses, and affiliate links are detailed in [`HARDWARE.md`](file:///c:/Users/philg/Pocketgull/pocketgull/HARDWARE.md).
 
 ### Prerequisites
 - **Node.js**: `v24.x` (Strict requirement specified in `.nvmrc` and `package.json`)

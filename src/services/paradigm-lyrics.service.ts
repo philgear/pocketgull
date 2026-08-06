@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 export interface IParadigmLyric {
   id: string;
-  paradigm: 'western' | 'eastern' | 'ayurvedic' | 'longevity' | 'arborist' | 'mechanic' | 'gentleman' | 'muse';
+  paradigm: 'western' | 'eastern' | 'ayurvedic' | 'longevity';
   quote: string;
   source: string;
   context: string;
@@ -14,7 +14,6 @@ export interface IParadigmLyric {
   providedIn: 'root'
 })
 export class ParadigmLyricsService {
-
   readonly lyrics = signal<IParadigmLyric[]>([
     {
       id: 'lyric-w1',
@@ -78,61 +77,14 @@ export class ParadigmLyricsService {
       context: 'Epigenetic Telomere Preservation',
       clinicalImpact: 'Demonstrates that lifestyle, sleep, and vagal tone directly extend telomere length and projected QALY healthspan.',
       color: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30'
-    },
-    {
-      id: 'lyric-arb',
-      paradigm: 'arborist',
-      quote: 'A tree that sways in the wind never breaks in the storm. Deep roots hold the wisdom of recovery.',
-      source: 'Sylvan Redwood Forest Lore',
-      context: 'Botanical Canopy & Taproot Resilience',
-      clinicalImpact: 'Promotes vagal stress baroreflex resilience and sap flow transport to upper leaf foliage.',
-      color: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30'
-    },
-    {
-      id: 'lyric-mech',
-      paradigm: 'mechanic',
-      quote: 'Don\'t drive like my brother! Smooth idling at 72 RPM, fresh synthetic oil, and no rattles under the hood.',
-      source: 'Click & Clack (Car Talk Warm Garage)',
-      context: 'Chassis Alignment & ECU Tuning',
-      clinicalImpact: 'Reduces diagnostic anxiety around check-engine DTC codes and encourages routine wellness tune-ups.',
-      color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/30'
-    },
-    {
-      id: 'lyric-gent',
-      paradigm: 'gentleman',
-      quote: 'By Jove! Scientific fortitude, curiosity, and proper stewardship overcome every atmospheric squall.',
-      source: 'Jules Verne / Polymath Annals',
-      context: 'Erudite Barometric Chronometer Governor',
-      clinicalImpact: 'Fosters erudite intellectual resilience and barometric pressure stabilization.',
-      color: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30'
-    },
-    {
-      id: 'lyric-muse',
-      paradigm: 'muse',
-      quote: 'You are the artist, your breath is the brush, and your life is a living masterpiece in progress.',
-      source: 'Solfeggio 528 Hz Resonant Muse',
-      context: '528 Hz Biological Symphony Palette',
-      clinicalImpact: 'Inspires creative emotional flow, vagal harmony, and 528 Hz cellular restoration.',
-      color: 'bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30'
     }
   ]);
 
-  getLyricsForParadigm(paradigm: 'western' | 'eastern' | 'ayurvedic' | 'arborist' | 'mechanic' | 'gentleman' | 'muse' | string): IParadigmLyric[] {
+  getLyricsForParadigm(paradigm: 'western' | 'eastern' | 'ayurvedic' | 'longevity' | string): IParadigmLyric[] {
     const p = (paradigm || 'western').toLowerCase();
-    if (p.includes('arborist')) return this.lyrics().filter(l => l.paradigm === 'arborist');
-    if (p.includes('mechanic')) return this.lyrics().filter(l => l.paradigm === 'mechanic');
-    if (p.includes('gentleman')) return this.lyrics().filter(l => l.paradigm === 'gentleman');
-    if (p.includes('muse')) return this.lyrics().filter(l => l.paradigm === 'muse');
     if (p.includes('eastern')) return this.lyrics().filter(l => l.paradigm === 'eastern');
     if (p.includes('ayurved')) return this.lyrics().filter(l => l.paradigm === 'ayurvedic');
     if (p.includes('longevity')) return this.lyrics().filter(l => l.paradigm === 'longevity');
     return this.lyrics().filter(l => l.paradigm === 'western');
-  }
-
-  getRandomLyricForParadigm(paradigm: string): IParadigmLyric {
-    const list = this.getLyricsForParadigm(paradigm);
-    if (list.length === 0) return this.lyrics()[0];
-    const index = Math.floor(Math.random() * list.length);
-    return list[index];
   }
 }

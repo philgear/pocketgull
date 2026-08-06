@@ -6,6 +6,7 @@ import 'package:vector_math/vector_math_64.dart' as v;
 import '../providers/patient_provider.dart';
 import '../models/body_part_geometry.dart';
 import '../models/patient_types.dart';
+import '../services/collaboration_service.dart';
 
 class NativeBodyViewer extends ConsumerStatefulWidget {
   final PatientState? staticPatient;
@@ -85,6 +86,15 @@ class _NativeBodyViewerState extends ConsumerState<NativeBodyViewer> {
         
         debugPrint('3D Selection: $partId (X: $normalizedX, Y: $normalizedY)');
         ref.read(patientProvider.notifier).selectPart(partId);
+
+        // Real-time WebSocket sync of symptom anchor with Angular platform
+        try {
+          ref.read(collaborationServiceProvider).syncVitals({
+            'selectedPartId': partId,
+            'timestamp': DateTime.now().toIso8601String(),
+            'source': 'flutter-3d-body-viewer',
+          });
+        } catch (_) {}
       } : null,
       child: Container(
         decoration: BoxDecoration(
