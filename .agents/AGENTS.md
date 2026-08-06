@@ -92,3 +92,15 @@
 ## Biophysical PBR Substrates & Unbiased Cryptography
 - **Edwin Smith Surgical Codex**: Describe 3D WebGL PBR texture maps using Edwin Smith III's empirical surgical codex biophysical descriptions.
 - **Unbiased Cryptographic Floats**: When generating random floats from cryptographic entropy, use the 53-bit IEEE-754 mantissa formula `(high * 4294967296.0 + low) / 9007199254740992.0` to eliminate modulo bias.
+
+## CI/CD Pipeline & GitHub Security Guardrails
+- **System Dependencies & Harden Runner**: Any workflow job installing Python packages with C extensions (e.g. `h5py` requiring `libhdf5-dev`) MUST set `disable-sudo: false` in `step-security/harden-runner` and include `sudo apt-get update && sudo apt-get install -y libhdf5-dev`.
+- **CodeQL Taint Chain Patterning**: Never rely on legacy `lgtm[]` comments. Break taint chains structurally:
+  - *System Prompt Injection*: Keep `systemInstruction` strictly static (`BASE_CLINICAL_PROMPT`). Pass sanitized user directives as a `[CLINICAL DIRECTIVE CONTEXT]` prefix in the user content array.
+  - *Network Data Writes*: Validate binary header magic bytes (e.g., `0x00 0x01 0x00 0x00` for TTF) and copy to a new `Buffer.alloc()` before writing to disk.
+  - *Log Injection*: Destructure explicit primitive fields into a new typed object and stringify instead of logging raw `req.body` objects directly.
+- **Playwright E2E Test Setup**: All E2E test suites MUST call `await enterDemoMode(page)` in `beforeEach` after `setupE2ePage(page)` to ensure the app navigates away from `about:blank`, unlocks the splash screen, and renders DOM elements before querying attributes or clicking buttons. Use case-insensitive locators (`text=/.../i`) for text matching.
+- **Monorepo Docker Context**: The root `Dockerfile` MUST copy all package manifests across all workspaces (`COPY docs/study/package*.json ./docs/study/`, `COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/`, `COPY pocketgull_api/package*.json ./pocketgull_api/`) and run `npm install --legacy-peer-deps --workspaces`.
+- **PR vs. Release Isolation**: Production release workflows (`release.yml`) MUST enforce `if: github.event_name != 'pull_request'` at the job level so GHCR package pushes and SLSA attestations trigger only on `main` branch pushes or release tags (`v*`).
+- **Portable Script Paths**: All scripts in `package.json` and `scripts/` MUST use relative paths (`./run-playwright.cjs`, `process.cwd()`) — never hardcoded local machine paths (`c:/Users/philg/...`).
+
