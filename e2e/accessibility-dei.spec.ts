@@ -1,3 +1,4 @@
+import { test, expect } from '@playwright/test';
 import { setupE2ePage, enterDemoMode } from './utils/setup';
 
 test.describe('Clinical Inclusiveness & Accessibility (a11y/DEI) Suite', () => {
