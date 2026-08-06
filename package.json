@@ -79,7 +79,6 @@
     "sentinel:audit": "node scripts/sentinel_security_guard.mjs",
     "sbom:generate": "node scripts/generate-sbom.mjs",
     "mcp:warmup": "node scripts/mcp-warmup.js",
-    "mcp:server": "node ./mcp-server/pocketgull-mcp-server.mjs",
     "build": "node scripts/build-all.mjs",
     "deploy": "gcloud builds submit . --tag us-central1-docker.pkg.dev/gen-lang-client-0540208645/cloud-run-source-deploy/pocketgull/pocket-gull:latest --project gen-lang-client-0540208645 && gcloud run deploy pocket-gull --image us-central1-docker.pkg.dev/gen-lang-client-0540208645/cloud-run-source-deploy/pocketgull/pocket-gull:latest --project gen-lang-client-0540208645 --region=us-central1 --min-instances=0 --update-env-vars=OTEL_SDK_DISABLED=true --timeout=25m --quiet",
     "lint": "node node_modules/typescript/lib/tsc.js -p tsconfig.json --noEmit",
