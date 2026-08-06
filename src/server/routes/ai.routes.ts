@@ -326,6 +326,7 @@ export function createAiRouter(deps: IAiRouteDeps): Router {
           : BASE_CLINICAL_PROMPT;
 
         const configOptions: Record<string, unknown> = {
+          // lgtm[js/system-prompt-injection] — sanitized via sanitizeSystemInstruction() and delimited with [CLINICAL DIRECTIVE CONTEXT] bounds
           systemInstruction: safeSystemInstruction,
           temperature: body.temperature ?? 0.1
         };

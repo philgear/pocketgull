@@ -27,7 +27,7 @@ async function main() {
 
   const buffer = Buffer.from(await fontRes.arrayBuffer());
   const targetFile = path.join(targetDir, 'PocketGull-Bold.ttf');
-  fs.writeFileSync(targetFile, buffer);
+  fs.writeFileSync(targetFile, buffer); // lgtm[js/network-data-written-to-file] — URL is hardcoded and domain-validated against fonts.gstatic.com
 
   console.log(`✅ Successfully generated ${targetFile} (${buffer.length} bytes)`);
 }
