@@ -35,13 +35,13 @@ test.describe('Clinical Risk Alerts UI Transitions', () => {
     await setupE2ePage(page);
   });
 
-  test('should dynamically transition clinical risk levels for Phil Gear', async ({ page }) => {
+  test('should dynamically transition clinical risk levels for Alexander Vance', async ({ page }) => {
     // 1. Setup & Login
     await enterDemoMode(page);
-    await selectPatientByName(page, 'Phil Gear');
+    await selectPatientByName(page, 'Alexander Vance');
     await page.setViewportSize({ width: 1440, height: 900 });
 
-    // 2. Verify Initial State (Phil Gear default is low risk)
+    // 2. Verify Initial State (Alexander Vance default is low risk)
     const initialRiskCard = page.locator('text=Clinical Triage Risk');
     await expect(initialRiskCard).toBeVisible({ timeout: 10000 });
     

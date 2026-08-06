@@ -191,7 +191,7 @@ export class HealthyHobbiesLifestyleComponent {
 
   activePatientName = computed(() => {
     const p = this.activePatient();
-    return p ? p.name : 'Phil Gear';
+    return p ? p.name : 'Alexander Vance';
   });
 
   hobbyOptions = computed<IHealthyHobbyOption[]>(() => {

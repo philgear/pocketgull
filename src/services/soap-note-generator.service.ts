@@ -93,8 +93,8 @@ export class SoapNoteGeneratorService {
               text: 'Clinical Progress SOAP Note'
             },
             subject: {
-              reference: 'Patient/p_phil_gear',
-              display: 'Phil Gear'
+              reference: 'Patient/p_default_patient',
+              display: 'Alexander Vance'
             },
             date: new Date().toISOString(),
             content: [

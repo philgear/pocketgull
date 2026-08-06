@@ -11,8 +11,8 @@ test.describe('General Clinical & Sovereignty Assessments Suite E2E Tests', () =
     // 1. Enter Demo Mode cleanly via state-machine setup
     await enterDemoMode(page);
 
-    // 2. Select patient Phil Gear
-    await selectPatientByName(page, 'Phil Gear');
+    // 2. Select patient Alexander Vance
+    await selectPatientByName(page, 'Alexander Vance');
 
     // 3. Ensure core analysis container is loaded
     await expect(page.locator('app-analysis-container')).toBeVisible({ timeout: 15000 });

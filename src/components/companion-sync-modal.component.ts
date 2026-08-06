@@ -120,7 +120,7 @@ export class CompanionSyncModalComponent {
   copied = signal(false);
 
   currentPatientName = computed(() => {
-    return this.patientState.patientName() || 'Phil Gear, Ph.G';
+    return this.patientState.patientName() || 'Alexander Vance';
   });
 
   deepLinkUrl = computed(() => {

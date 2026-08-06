@@ -158,6 +158,8 @@ export interface IPatientVitals {
     steps?: string;
     sleepEfficiency?: string;
     hrvRmssd?: string;
+    crp?: string;
+    [key: string]: any;
 }
 
 export interface IDynamicMarker {
@@ -282,6 +284,7 @@ export interface IPatientState {
     travelProfile?: ITravelMedicineProfile;
     awareStewardship?: IWhoAwareClassification[];
     environmentalIndex?: IEnvironmentalHealthIndex;
+    [key: string]: any;
 }
 
 export interface IEwarsOutbreakAlert {

@@ -7,7 +7,7 @@ describe('ExportService FHIR R4 Tri-Paradigm Bundle Suite', () => {
 
   const mockPatient: IPatient = {
     id: 'pt-77',
-    name: 'Phil Gear',
+    name: 'Alexander Vance',
     age: 38,
     gender: 'Male',
     vitals: { hr: '76', bp: '118/76', spO2: '99', temp: '36.6', weight: '75', height: '175' },
@@ -29,7 +29,7 @@ describe('ExportService FHIR R4 Tri-Paradigm Bundle Suite', () => {
 
     const patientEntry = bundle.entry.find((e: any) => e.resource.resourceType === 'Patient');
     expect(patientEntry).toBeDefined();
-    expect(patientEntry.resource.name[0].text).toBe('Phil Gear');
+    expect(patientEntry.resource.name[0].text).toBe('Alexander Vance');
 
     const hrObs = bundle.entry.find((e: any) => e.resource.resourceType === 'Observation' && e.resource.code?.coding?.[0]?.code === '8867-4');
     expect(hrObs).toBeDefined();

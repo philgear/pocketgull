@@ -10,28 +10,28 @@ const __dirname = path.dirname(__filename);
 // Screenshot output directory
 const SCREENSHOT_DIR = path.join(__dirname, '..', 'test-results', 'screenshots');
 
-/** Helper to enter demo mode and select Phil Gear */
+/** Helper to enter demo mode and select Alexander Vance */
 async function enterDemoModeWithPhilGear(page: import('@playwright/test').Page) {
   await enterDemoMode(page);
 
-  // Select patient Phil Gear from the dropdown
+  // Select patient Alexander Vance from the dropdown
   const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
   await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
   await dropdownBtn.click();
 
-  const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
-  await expect(philGearOption).toBeVisible({ timeout: 10000 });
-  await philGearOption.click();
+  const alexanderVanceOption = page.locator('.origin-top-left button', { hasText: 'Alexander Vance' }).first();
+  await expect(alexanderVanceOption).toBeVisible({ timeout: 10000 });
+  await alexanderVanceOption.click();
   await page.waitForTimeout(1500);
 }
 
-test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
+test.describe('Alexander Vance — Default Patient & Full Lens Verification', () => {
   test.beforeEach(async ({ page }) => {
     test.setTimeout(90000);
     await setupE2ePage(page);
   });
 
-  test('Phil Gear can be selected and loaded', async ({ page }) => {
+  test('Alexander Vance can be selected and loaded', async ({ page }) => {
     page.on('console', msg => {
       if (msg.type() === 'error') console.log('PAGE ERROR:', msg.text());
     });
@@ -39,17 +39,17 @@ test.describe('Phil Gear — Default Patient & Full Lens Verification', () => {
     await enterDemoModeWithPhilGear(page);
     await page.setViewportSize({ width: 1440, height: 900 });
 
-    // The analysis report component should be present (loaded for Phil Gear)
+    // The analysis report component should be present (loaded for Alexander Vance)
     await expect(page.locator('app-analysis-container, app-analysis-report').first()).toBeVisible({ timeout: 20000 });
 
     // await page.screenshot({
-    //   path: path.join(SCREENSHOT_DIR, 'phil_gear_default_patient.png'),
+    //   path: path.join(SCREENSHOT_DIR, 'alexander_vance_default_patient.png'),
     //   fullPage: false,
     // });
-    console.log('[PASS] Phil Gear loaded as default patient.');
+    console.log('[PASS] Alexander Vance loaded as default patient.');
   });
 
-  test('Phil Gear — all 6 analysis lens tabs are visible and populated', async ({ page }) => {
+  test('Alexander Vance — all 6 analysis lens tabs are visible and populated', async ({ page }) => {
     await enterDemoModeWithPhilGear(page);
     await page.setViewportSize({ width: 1440, height: 900 });
 

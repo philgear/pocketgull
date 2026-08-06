@@ -223,7 +223,7 @@ fitbitRouter.post('/consent', (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 fitbitRouter.get('/auth', (req, res) => {
   try {
-    const patientId = (req.query['patientId'] as string) || 'p_phil_gear';
+    const patientId = (req.query['patientId'] as string) || 'p_default_patient';
 
     // ── COMPLIANCE GATE: Informed consent must be recorded first ──────────────
     const consent = consentStore.get(patientId);
@@ -334,7 +334,7 @@ fitbitRouter.get('/callback', async (req, res) => {
 // GET /api/fitbit/status?patientId=xxx
 // ─────────────────────────────────────────────────────────────────────────────
 fitbitRouter.get('/status', (req, res) => {
-  const patientId = (req.query['patientId'] as string) || 'p_phil_gear';
+  const patientId = (req.query['patientId'] as string) || 'p_default_patient';
   const token = tokenStore.get(patientId);
   const consent = consentStore.get(patientId);
 

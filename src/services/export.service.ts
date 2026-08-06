@@ -2061,12 +2061,19 @@ export class ExportService {
 
     return {
       id: `p_${Date.now()}`,
+      name: (data.patient as any)?.name || 'Imported Patient',
+      age: (data.patient as any)?.age || 40,
+      gender: (data.patient as any)?.gender || 'Other',
+      lastVisit: (data.patient as any)?.lastVisit || new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+      vitals: (data.patient as any)?.vitals || { bp: '120/80', hr: '70', temp: '98.6', spO2: '98', weight: '70kg', height: '170cm' },
+      issues: (data.patient as any)?.issues || {},
+      patientGoals: (data.patient as any)?.patientGoals || '',
       ...data.patient,
       // Ensure required arrays exist even from older exports
       history: data.patient.history ?? [],
       bookmarks: data.patient.bookmarks ?? [],
       preexistingConditions: data.patient.preexistingConditions ?? [],
-    };
+    } as IPatient;
   }
 
   // ─── FHIR R4 Bundle Export / Import ───────────────────────

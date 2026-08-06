@@ -69,7 +69,7 @@ export class HipaaPdfExportComponent {
 
   exportPdf(): void {
     const p = this.pm.selectedPatient();
-    const name = p?.name || 'Phil Gear';
+    const name = p?.name || 'Alexander Vance';
     this.pdfService.generateClinicalSummaryPdf(name);
   }
 

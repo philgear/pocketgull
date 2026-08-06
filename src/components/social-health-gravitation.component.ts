@@ -227,7 +227,7 @@ export class SocialHealthGravitationComponent {
 
   activePatientName = computed(() => {
     const p = this.activePatient();
-    return p ? p.name : 'Phil Gear';
+    return p ? p.name : 'Alexander Vance';
   });
 
   vectors = computed<ISocialVector[]>(() => {
