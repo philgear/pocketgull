@@ -1,7 +1,7 @@
 import { spawnSync } from 'child_process';
 import path from 'path';
 
-const projectDir = 'c:/Users/philg/Pocketgull/pocketgull';
+const projectDir = process.cwd();
 const cliPath = path.join(projectDir, 'node_modules/@playwright/test/cli.js');
 const configPath = path.join(projectDir, 'playwright.config.ts');
 const specPath = process.argv[2] || 'e2e/emergency-mode.spec.ts';
