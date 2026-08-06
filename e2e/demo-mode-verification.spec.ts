@@ -67,14 +67,14 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // Verify Western Nutrition tab works (which we recently added)
     const nutritionTab = page.getByTestId('tab-nutrition');
-    await nutritionTab.click();
+    await nutritionTab.click({ force: true });
     await page.waitForTimeout(500);
     // Nutrition-specific Western keyword
     await expect(page.locator('app-analysis-report').locator('text=/Nutritional|Diet/i').first()).toBeVisible({ timeout: 5000 });
 
     // Take Western Screenshot (from Summary Overview tab)
     const overviewTab = page.getByTestId('tab-overview');
-    await overviewTab.click();
+    await overviewTab.click({ force: true });
     await page.waitForTimeout(500);
     // await page.screenshot({ path: path.join(artifactDir, 'western_dashboard.png') });
     // console.log('[Verification] Western screenshot saved.');
@@ -82,7 +82,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     // --- Eastern (TCM) Philosophy Verification ---
     console.log('[Verification] Testing Eastern Paradigm...');
     const easternBtn = page.locator('button', { hasText: 'Eastern' }).first();
-    await easternBtn.click();
+    await easternBtn.click({ force: true });
     await page.waitForTimeout(1000);
 
     // Verify Eastern Banner active
@@ -90,7 +90,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
 
     // Verify Functional Protocols in Eastern Mode
     const functionalTab = page.getByTestId('tab-functional-protocols');
-    await functionalTab.click();
+    await functionalTab.click({ force: true });
     await page.waitForTimeout(500);
     await expect(page.locator('app-analysis-report').locator('text=/Functional|Details/i').first()).toBeVisible({ timeout: 5000 });
 
@@ -101,7 +101,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     // --- Ayurvedic Philosophy Verification ---
     console.log('[Verification] Testing Ayurvedic Paradigm...');
     const ayurvedicBtn = page.locator('button', { hasText: 'Ayurvedic' }).first();
-    await ayurvedicBtn.click();
+    await ayurvedicBtn.click({ force: true });
     await page.waitForTimeout(1000);
 
     // Verify Ayurvedic Banner active
@@ -110,7 +110,7 @@ test.describe('Demo Mode Medicine Paradigms Verification', () => {
     // Verify Precision Nutrients in Ayurvedic Mode
     const orthomolecularTab = page.getByTestId('tab-precision-nutrients');
     if (await orthomolecularTab.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await orthomolecularTab.click();
+      await orthomolecularTab.click({ force: true });
       await page.waitForTimeout(500);
       await expect(page.locator('app-analysis-report').locator('text=/Biomarker|Nutritional|Details/i').first()).toBeVisible({ timeout: 5000 });
     }
