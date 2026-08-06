@@ -1,3 +1,17 @@
+// Server-side polyfill for Domino / SSR missing CSSStyleDeclaration.setProperty
+try {
+  const g = (typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : {}) as any;
+  if (g) {
+    if (g.CSSStyleDeclaration && g.CSSStyleDeclaration.prototype) {
+      if (typeof g.CSSStyleDeclaration.prototype.setProperty !== 'function') {
+        g.CSSStyleDeclaration.prototype.setProperty = function (name: string, value: string) {
+          try { this[name] = value; } catch {}
+        };
+      }
+    }
+  }
+} catch {}
+
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { BootstrapContext, bootstrapApplication, provideClientHydration } from '@angular/platform-browser';
 import { AppComponent } from './app.component';

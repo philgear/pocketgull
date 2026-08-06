@@ -1,5 +1,19 @@
 process.env['OTEL_SDK_DISABLED'] = 'true';
 
+// Server-side polyfill for Domino / SSR missing CSSStyleDeclaration.setProperty
+try {
+  const g = (typeof globalThis !== 'undefined' ? globalThis : typeof global !== 'undefined' ? global : {}) as any;
+  if (g) {
+    if (g.CSSStyleDeclaration && g.CSSStyleDeclaration.prototype) {
+      if (typeof g.CSSStyleDeclaration.prototype.setProperty !== 'function') {
+        g.CSSStyleDeclaration.prototype.setProperty = function (name: string, value: string) {
+          try { this[name] = value; } catch {}
+        };
+      }
+    }
+  }
+} catch {}
+
 import '@angular/compiler';
 import {
   AngularNodeAppEngine,

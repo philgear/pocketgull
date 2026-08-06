@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.13.0] - 2026-08-05
+
+**PocketGull Typeface Repository, Domino SSR `CSSStyleDeclaration.setProperty` Polyfill & E2E Stability**
+
+### Added & Fixed
+- **[SSR Stability / Domino Polyfill] Server-Side `CSSStyleDeclaration.setProperty` Fallback (`server.ts` & `main.server.ts`)**:
+  - Implemented top-level server polyfill for Domino's missing `CSSStyleDeclaration.setProperty` method to prevent `NotYetImplemented` runtime exceptions during Angular Server-Side Rendering (SSR).
+  - Guarded `applyParadigmToDom()` in `ThemeService` with `isPlatformBrowser` checks to ensure DOM style mutations only execute on client runtime.
+  - Added preview server startup health check step (`Verify Preview Server Started`) to `.github/workflows/deploy.yml`.
+- **[Playwright E2E / Test Suite Fix] Duplicate Identifier Fix (`domain-suites-navigation.spec.ts`)**:
+  - Resolved `SyntaxError` caused by duplicate `const showAllBtn` declaration in `domain-suites-navigation.spec.ts`.
+- **[Design & Typography] PocketGull Typeface Repository & Google Fonts Package**:
+  - Initialized and published standalone [`philgear/PocketGull-typeface`](https://github.com/philgear/PocketGull-typeface) repository with automated GitHub Actions Pages deployment (`deploy-pages.yml`).
+  - Added COCOMO II Software Cost Valuation ($242,000 USD) in `docs/COCOMO_II_TYPEFACE_VALUATION.md`.
+
 ## [1.12.0] - 2026-08-05
 
 **On-Device WebGPU Air-Gapped Local Gemma AI Studio, Flutter Companion Mobile App APK Builds, and Full Monolith Integration**

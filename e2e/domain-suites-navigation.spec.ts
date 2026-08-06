@@ -47,9 +47,9 @@ test.describe('10-Dimensional Master Domain Suites E2E Verification', () => {
     ];
 
     // Click "Show All" toggle if present so all 12 domain suite buttons are rendered
-    const showAllBtn = page.locator('button', { hasText: /Show All|All 12|Master Suites/i }).first();
-    if (await showAllBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await showAllBtn.click();
+    const showAllSuitesBtn = page.locator('button', { hasText: /Show All|All 12|Master Suites/i }).first();
+    if (await showAllSuitesBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await showAllSuitesBtn.click();
       await page.waitForTimeout(500);
     }
 

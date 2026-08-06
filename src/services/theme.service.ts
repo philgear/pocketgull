@@ -303,7 +303,7 @@ export class ThemeService {
   }
 
   private applyParadigmToDom(paradigm: 'western' | 'tcm' | 'ayurveda' | 'unified') {
-    if (typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId)) return;
 
     const root = document.documentElement;
     root.setAttribute('data-clinical-paradigm', paradigm);
