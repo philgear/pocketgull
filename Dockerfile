@@ -16,7 +16,7 @@ COPY package*.json ./
 COPY docs/study/package*.json ./docs/study/
 COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/
 COPY pocketgull_api/package*.json ./pocketgull_api/
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps --workspaces
 
 # Copy source and build Angular SSR app
 COPY . .
