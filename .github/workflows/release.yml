@@ -26,6 +26,7 @@ jobs:
   release:
     name: Build, Publish & Sign Release
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     permissions:
       contents: write
       packages: write
