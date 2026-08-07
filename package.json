@@ -190,7 +190,7 @@
     "astro": "^7.1.3",
     "genkit": "^1.40.1",
     "husky": "^9.1.7",
-    "jsdom": "^29.1.1",
+    "jsdom": "^30.0.1",
     "lighthouse": "^13.0.3",
     "lint-staged": "^17.0.5",
     "puppeteer": "^24.39.0",
