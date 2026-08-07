@@ -1,6 +1,6 @@
 {
   "name": "pocket-gull",
-  "version": "1.9.1",
+  "version": "1.14.0",
   "workspaces": [
     "docs/study",
     "companion-apps/avs-therapy",
@@ -74,7 +74,7 @@
     "@google-cloud/storage": false
   },
   "scripts": {
-    "postinstall": "patch-package",
+    "postinstall": "npx --no-install patch-package || true",
     "dev": "node --max-old-space-size=8192 node_modules/@angular/cli/bin/ng.js serve",
     "sentinel:audit": "node scripts/sentinel_security_guard.mjs",
     "sbom:generate": "node scripts/generate-sbom.mjs",
@@ -109,6 +109,7 @@
     "@angular/compiler": "^22.1.0",
     "@angular/compiler-cli": "^22.1.0",
     "@angular/core": "^22.1.0",
+    "@angular/elements": "^22.1.0",
     "@angular/fire": "^20.0.1",
     "@angular/forms": "^22.1.0",
     "@angular/platform-browser": "^22.1.0",
@@ -151,7 +152,7 @@
     "marked": "^18.0.5",
     "patch-package": "^8.0.1",
     "pocketgull-api": "workspace:*",
-    "postcss": "^8.5.19",
+    "postcss": "^8.5.26",
     "rxjs": "^7.8.2",
     "sloc": "^0.3.2",
     "socket.io": "^4.2.0",
@@ -229,8 +230,8 @@
     "@esbuild/win32-ia32": "0.28.1",
     "@esbuild/win32-x64": "0.28.1",
     "adm-zip": ">=0.6.0",
-    "hono": ">=4.12.5",
-    "@hono/node-server": ">=1.19.10",
+    "hono": ">=4.13.0",
+    "@hono/node-server": ">=2.1.0",
     "express-rate-limit": ">=8.3.0",
     "immutable": ">=5.1.5",
     "tar": ">=7.5.22",
@@ -246,22 +247,23 @@
     "uuid": "11.1.1",
     "qs": ">=6.15.2",
     "@anthropic-ai/sdk": "^0.92.0",
-    "@babel/core": "^7.29.1",
+    "@babel/core": ">=7.29.7",
     "dompurify": "^3.4.12",
     "form-data": "^4.0.6",
     "http-proxy-middleware": "4.2.0",
     "piscina": "^5.3.0",
-    "undici": "7.29.0",
+    "undici": "8.10.0",
     "ws": "^8.21.0",
     "protobufjs": "^7.6.5",
     "vite": "^7.3.5 || ^8.0.0",
     "launch-editor": ">=2.14.1",
-    "js-yaml": "^4.1.0",
-    "brace-expansion": "^2.1.3",
+    "js-yaml": ">=4.1.1",
+    "brace-expansion": "^2.1.4",
     "svgo": "^4.0.2",
-    "fast-uri": "^3.0.6",
+    "fast-uri": "^4.1.2",
+    "ip-address": ">=10.4.0",
     "@angular/build": {
-      "undici": "7.29.0",
+      "undici": "8.10.0",
       "esbuild": {
         ".": "0.28.1",
         "@esbuild/aix-ppc64": "0.28.1",
@@ -293,10 +295,10 @@
       },
       "http-proxy-middleware": "3.0.7",
       "webpack-dev-server": "^6.0.0",
-      "brace-expansion": "^2.1.3",
+      "brace-expansion": "^2.1.4",
       "minimatch": "^10.0.3",
       "rimraf": "^6.0.1",
-      "postcss": "^8.5.18"
+      "postcss": "^8.5.26"
     }
   },
   "lint-staged": {
