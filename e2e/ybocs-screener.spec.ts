@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setupE2ePage, enterDemoMode } from './utils/setup';
+import { setupE2ePage, enterDemoMode, selectPatientByName } from './utils/setup';
 
 test.describe('Y-BOCs Diagnostic Screener E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -13,14 +13,8 @@ test.describe('Y-BOCs Diagnostic Screener E2E Tests', () => {
 
     await enterDemoMode(page);
 
-    // Click patient dropdown to select Phil Gear
-    const dropdownBtn = page.locator('app-patient-dropdown pocket-gull-button button, app-patient-dropdown button').first();
-    await expect(dropdownBtn).toBeVisible({ timeout: 15000 });
-    await dropdownBtn.click();
-
-    const philGearOption = page.locator('.origin-top-left button', { hasText: 'Phil Gear' }).first();
-    await philGearOption.click();
-    await page.waitForTimeout(1500);
+    // Select Phil Gear using shared utility (avoids flaky raw locator)
+    await selectPatientByName(page, 'Phil Gear');
 
     // Wait for core AI container (deferred block) to be visible
     await expect(page.locator('app-analysis-container')).toBeVisible({ timeout: 15000 });
