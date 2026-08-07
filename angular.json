@@ -22,6 +22,11 @@
             "preserveSymlinks": true,
             "assets": [
               {
+                "glob": "llms.txt",
+                "input": "src",
+                "output": "/"
+              },
+              {
                 "glob": "robots.txt",
                 "input": "src",
                 "output": "/"

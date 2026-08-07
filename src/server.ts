@@ -145,6 +145,31 @@ app.get('/health', (req, res) => {
   res.status(200).send('OK');
 });
 
+// Agentic Web AI discovery manifests (llms.txt and /.well-known/llms.txt)
+const serveLlmsTxt = (req: express.Request, res: express.Response) => {
+  const llmsTxtFile = join(__dirname, 'llms.txt');
+  const fallbackPath = join(rootDir, 'src', 'llms.txt');
+  const targetPath = fs.existsSync(llmsTxtFile) ? llmsTxtFile : fallbackPath;
+
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(targetPath);
+};
+
+app.get('/llms.txt', serveLlmsTxt);
+app.get('/.well-known/llms.txt', serveLlmsTxt);
+
+// SEO robots.txt handler
+app.get('/robots.txt', (req, res) => {
+  const robotsTxtFile = join(__dirname, 'robots.txt');
+  const fallbackPath = join(rootDir, 'src', 'robots.txt');
+  const targetPath = fs.existsSync(robotsTxtFile) ? robotsTxtFile : fallbackPath;
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(targetPath);
+});
+
 app.get('/api/config', (req, res) => {
   res.json({ apiKey: process.env['GEMINI_API_KEY'] || '' });
 });
