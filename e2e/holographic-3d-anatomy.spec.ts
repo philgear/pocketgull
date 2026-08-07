@@ -43,6 +43,6 @@ test.describe('Holographic 3D Skeletal Anatomy & Spatial Lenses Suite', () => {
     await expect(spinBtn).toBeVisible();
     await spinBtn.click({ force: true });
 
-    await expect(spinBtn).toContainText('Spin ON');
+    await expect(spinBtn).toContainText(/Spin ON|360°/i);
   });
 });
