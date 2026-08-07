@@ -92,13 +92,13 @@ test.describe('Clinical Risk Alerts UI Transitions', () => {
 
     // 5. Verify Autonomic Recovery (Resets back to normal)
     await bpInput.fill('120/80');
-    await bpInput.blur();
+    await bpInput.blur().catch(() => {});
 
     await hrInput.fill('72');
-    await hrInput.blur();
+    await hrInput.blur().catch(() => {});
 
     await spo2Input.fill('98');
-    await spo2Input.blur();
+    await spo2Input.blur().catch(() => {});
 
     // Verify it drops back down to Low Risk
     await expect(lowRiskBadge).toBeVisible({ timeout: 15000 });

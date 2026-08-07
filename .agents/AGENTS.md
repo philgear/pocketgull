@@ -17,6 +17,15 @@
 - **Structured Logging & Error Handling**: Mask internal exceptions by throwing `fastapi.HTTPException` with explicit HTTP status codes and structured detail payloads (`detail={"code": ..., "message": ...}`). Avoid `print()`; use standard `logging` or `structlog` to ensure GCP stdout ingestion parses log levels (`INFO`, `WARNING`, `ERROR`) cleanly.
 - **Docstring Conventions**: Use Google Style docstrings for all complex scoring methods, ML pipelines, and public service functions.
 
+## Ruby / Rails & Gems Standards
+- **Ruby Version**: Require **Ruby 3.3.x+** with YJIT enabled for all Rails engines and micro-gems (`pocketgull-fhir-rails`, `pocketgull-ruby`).
+- **Linting & Code Quality**: Use **`rubocop`** with `rubocop-rails` and `rubocop-performance`. Enforce zero-offense passes before PR submission.
+- **Rails Engine Isolation**: All Rails engines MUST be strictly namespaced under `module Pocketgull` (e.g., `Pocketgull::Fhir::Rails::Engine`). Prevent global constant leakage into host applications.
+- **Dependency Hygiene**: Gemspecs MUST use explicit version constraints (`~>`) and avoid un-pinned open dependencies. Prefer standard library (`net/http`, `json`, `uri`) over external gems wherever practical.
+- **Environment Isolation**: Strictly separate real clinical API calls from mock/test stubs using `Rails.env.test?` and `ENV['POCKETGULL_LIVE_DEMO']`. Never execute live external OAuth endpoints in test suites.
+- **Testing**: Use **`Minitest`** or **`RSpec`** with `WebMock` / `VCR` for all HTTP & ActionCable WebSocket channel testing.
+- **Containerization**: Always use **Alpine Linux (`ruby:3.3-alpine`)** for Docker builds to maintain zero base-OS vulnerabilities and low memory footprints on AWS App Runner / ECS Fargate.
+
 ## Flutter / Dart Architecture
 - **State Management**: Use **Riverpod** for state management across the `pocketgull_flutter` companion app. Avoid `setState` for complex business logic.
 - **Widget Composability**: Keep widget classes small and focused. Extract deeply nested UI trees into standalone, reusable, stateless widgets.
@@ -103,4 +112,12 @@
 - **Monorepo Docker Context**: The root `Dockerfile` MUST copy all package manifests across all workspaces (`COPY docs/study/package*.json ./docs/study/`, `COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/`, `COPY pocketgull_api/package*.json ./pocketgull_api/`) and run `npm install --legacy-peer-deps --workspaces`.
 - **PR vs. Release Isolation**: Production release workflows (`release.yml`) MUST enforce `if: github.event_name != 'pull_request'` at the job level so GHCR package pushes and SLSA attestations trigger only on `main` branch pushes or release tags (`v*`).
 - **Portable Script Paths**: All scripts in `package.json` and `scripts/` MUST use relative paths (`./run-playwright.cjs`, `process.cwd()`) — never hardcoded local machine paths (`c:/Users/philg/...`).
+
+## Agentic & AI Pairing Rules
+- **Empirical Verification Guarantee**: Never declare a task resolved or a bug fixed based solely on code edits. Always gather concrete runtime evidence by executing the explicit TypeScript typecheck (`tsc --noEmit`), Vitest suite (`npm test`), or Angular build (`ng build`).
+- **Context & Symbol Defensiveness**: Never mutate function signatures, interfaces, or dependency overrides from partial/truncated file views. If an imported symbol or type is referenced, inspect its authoritative definition first to prevent broken contract calls across workspace packages.
+- **Sub-Dependency Peer Traceability**: When adding or upgrading a root package override (e.g., `undici`, `esbuild`, `postcss`), always verify peer dependency requirements of consumer dev-tools (such as `jsdom`, `@angular/build`, or `vitest`) using `npm view <package> dependencies` to prevent runtime loader failures in CI.
+- **Strict Pre-Commit Self-Healing**: Husky pre-commit hooks (`lint-staged`, commit-msg 72-char limit, Sentinel security guard) are mandatory. If a pre-commit check fails, read the un-truncated log output, fix the root cause, and re-commit. Never bypass hooks with `--no-verify`.
+- **Token Budget & Research Subagent Isolation**: Offload heavy codebase surveys, log extractions, or multi-file research to background subagents (`research` or `self`). Allow the primary session to maintain clean focus on implementation and verification.
+
 
