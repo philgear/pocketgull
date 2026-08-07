@@ -159,6 +159,17 @@ const serveLlmsTxt = (req: express.Request, res: express.Response) => {
 app.get('/llms.txt', serveLlmsTxt);
 app.get('/.well-known/llms.txt', serveLlmsTxt);
 
+// SEO robots.txt handler
+app.get('/robots.txt', (req, res) => {
+  const robotsTxtFile = join(__dirname, 'robots.txt');
+  const fallbackPath = join(rootDir, 'src', 'robots.txt');
+  const targetPath = fs.existsSync(robotsTxtFile) ? robotsTxtFile : fallbackPath;
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(targetPath);
+});
+
 app.get('/api/config', (req, res) => {
   res.json({ apiKey: process.env['GEMINI_API_KEY'] || '' });
 });
