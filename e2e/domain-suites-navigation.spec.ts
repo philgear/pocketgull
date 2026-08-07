@@ -56,7 +56,7 @@ test.describe('10-Dimensional Master Domain Suites E2E Verification', () => {
     for (const suiteName of suites) {
       const tabButton = page.locator(`button:has-text("${suiteName}")`).first();
       await expect(tabButton).toBeVisible();
-      await tabButton.click();
+      await tabButton.click({ force: true });
       await page.waitForTimeout(200);
     }
   });

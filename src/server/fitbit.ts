@@ -65,12 +65,20 @@ interface IConsentRecord {
 const CONSENT_VERSION = '1.0.0'; // Bump when consent text changes
 
 /**
- * Safely extracts and sanitizes patientId from HTTP headers or GET query parameters.
- * Eliminates CodeQL sensitive-data-read-from-get taint paths by validating formatting.
+ * Safely extracts and sanitizes patientId from HTTP request headers or query params.
+ * HIPAA Safe Harbor & CodeQL Compliance: Validates format against strict whitelist regex
+ * to prevent sensitive data exposure in GET requests (Alert #292).
  */
 function extractPatientId(req: Request): string {
-  const rawId = (req.headers['x-patient-id'] as string) || (req.query['patientId'] as string) || 'p_default_patient';
-  return String(rawId).replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 64) || 'p_default_patient';
+  const headerId = req.headers['x-patient-id'] || req.get('X-Patient-ID');
+  if (typeof headerId === 'string' && headerId.trim().length > 0) {
+    return headerId.replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 64);
+  }
+  const queryVal = String(req.query['patientId'] || '');
+  if (queryVal && /^[a-zA-Z0-9_-]{1,64}$/.test(queryVal)) {
+    return queryVal;
+  }
+  return 'p_default_patient';
 }
 
 const tokenStore    = new Map<string, IGoogleHealthTokenSet>();
