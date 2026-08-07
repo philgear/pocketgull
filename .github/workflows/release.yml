@@ -101,6 +101,9 @@ jobs:
 
       # --- GitHub Release ---
 
+      - name: Generate SPDX SBOM
+        run: npm run sbom:generate
+
       - name: Create Release Archive
         run: |
           tar czf pocketgull-${{ github.ref_name }}.tar.gz \
@@ -133,5 +136,6 @@ jobs:
           body_path: release_notes.md
           files: |
             pocketgull-${{ github.ref_name }}.tar.gz
+            sbom.spdx.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
