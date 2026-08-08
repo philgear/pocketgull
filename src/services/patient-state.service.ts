@@ -969,6 +969,7 @@ export class PatientStateService {
     this.issues.set({});
     this.patientGoals.set('');
     this.dietaryProtocol.set('');
+    this.occupation.set('');
         this.vitals.set({
             bp: '', hr: '', temp: '', spO2: '', weight: '', height: '',
             vitC: '', vitD3: '', magnesium: '', zinc: '', b12: ''
@@ -1034,6 +1035,7 @@ export class PatientStateService {
     if (patient.name) this.patientName.set(patient.name);
     if (patient.age) this.patientAge.set(patient.age);
     if (patient.gender) this.patientGender.set(patient.gender);
+    if (patient.occupation) this.occupation.set(patient.occupation);
     if (patient.history) this.patientHistory.set(patient.history);
     this.issues.set(state.issues || {});
     console.log('[PatientStateService] loadState completed successfully');
