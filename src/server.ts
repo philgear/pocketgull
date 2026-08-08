@@ -147,9 +147,15 @@ app.get('/health', (req, res) => {
 
 // Agentic Web AI discovery manifests (llms.txt and /.well-known/llms.txt)
 const serveLlmsTxt = (req: express.Request, res: express.Response) => {
-  const llmsTxtFile = join(__dirname, 'llms.txt');
-  const fallbackPath = join(rootDir, 'src', 'llms.txt');
-  const targetPath = fs.existsSync(llmsTxtFile) ? llmsTxtFile : fallbackPath;
+  const candidatePaths = [
+    join(__dirname, 'llms.txt'),
+    join(__dirname, '..', 'browser', 'llms.txt'),
+    join(__dirname, '..', 'llms.txt'),
+    join(rootDir, 'public', 'llms.txt'),
+    join(rootDir, 'src', 'llms.txt'),
+    join(rootDir, 'llms.txt')
+  ];
+  const targetPath = candidatePaths.find(p => fs.existsSync(p)) || candidatePaths[candidatePaths.length - 1];
 
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
@@ -161,9 +167,15 @@ app.get('/.well-known/llms.txt', serveLlmsTxt);
 
 // SEO robots.txt handler
 app.get('/robots.txt', (req, res) => {
-  const robotsTxtFile = join(__dirname, 'robots.txt');
-  const fallbackPath = join(rootDir, 'src', 'robots.txt');
-  const targetPath = fs.existsSync(robotsTxtFile) ? robotsTxtFile : fallbackPath;
+  const candidatePaths = [
+    join(__dirname, 'robots.txt'),
+    join(__dirname, '..', 'browser', 'robots.txt'),
+    join(__dirname, '..', 'robots.txt'),
+    join(rootDir, 'public', 'robots.txt'),
+    join(rootDir, 'src', 'robots.txt'),
+    join(rootDir, 'robots.txt')
+  ];
+  const targetPath = candidatePaths.find(p => fs.existsSync(p)) || candidatePaths[candidatePaths.length - 1];
 
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
