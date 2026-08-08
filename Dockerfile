@@ -11,12 +11,15 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 # Patch OS-level vulnerabilities
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
-# Install ALL dependencies (including devDependencies needed for ng build)
+# Set Node environment to development during build stage to install devDependencies
+ENV NODE_ENV=development
+
+# Install ALL dependencies (including devDependencies needed for tsc & ng build)
 COPY package*.json ./
 COPY docs/study/package*.json ./docs/study/
 COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/
 COPY pocketgull_api/package*.json ./pocketgull_api/
-RUN npm install --legacy-peer-deps --workspaces
+RUN npm install --legacy-peer-deps --workspaces --include=dev
 
 # Copy source and build Angular SSR app
 COPY . .
