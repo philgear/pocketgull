@@ -157,7 +157,7 @@ app.get('/health', manifestRateLimiter, (req, res) => {
 });
 
 // Agentic Web AI discovery manifests (llms.txt and /.well-known/llms.txt)
-const serveLlmsTxt = (req: express.Request, res: express.Response) => {
+app.get('/llms.txt', manifestRateLimiter, (req: express.Request, res: express.Response): void => {
   const candidatePaths = [
     join(process.cwd(), 'public', 'llms.txt'),
     join(process.cwd(), 'llms.txt'),
@@ -173,10 +173,25 @@ const serveLlmsTxt = (req: express.Request, res: express.Response) => {
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
   res.sendFile(targetPath);
-};
+});
 
-app.get('/llms.txt', manifestRateLimiter, serveLlmsTxt);
-app.get('/.well-known/llms.txt', manifestRateLimiter, serveLlmsTxt);
+app.get('/.well-known/llms.txt', manifestRateLimiter, (req: express.Request, res: express.Response): void => {
+  const candidatePaths = [
+    join(process.cwd(), 'public', 'llms.txt'),
+    join(process.cwd(), 'llms.txt'),
+    join(__dirname, 'llms.txt'),
+    join(__dirname, '..', 'browser', 'llms.txt'),
+    join(__dirname, '..', 'llms.txt'),
+    join(rootDir, 'public', 'llms.txt'),
+    join(rootDir, 'src', 'llms.txt'),
+    join(rootDir, 'llms.txt')
+  ];
+  const targetPath = candidatePaths.find(p => fs.existsSync(p)) || candidatePaths[candidatePaths.length - 1];
+
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(targetPath);
+});
 
 // SEO robots.txt handler
 app.get('/robots.txt', manifestRateLimiter, (req, res) => {
