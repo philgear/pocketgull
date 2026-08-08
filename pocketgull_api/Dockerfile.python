@@ -1,7 +1,7 @@
 # ==========================================
 # Stage 1: Builder
 # ==========================================
-FROM python:3.13-slim-bookworm AS builder
+FROM python:3.13-slim-bookworm@sha256:de572b33eae61a53675a87bbd02b5e365df7b6b2b06c9276124e965cec08c452 AS builder
 
 WORKDIR /app
 
@@ -17,15 +17,16 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python dependencies
+# Install Python dependencies (hash-pinned bootstrap for supply-chain integrity)
+COPY requirements-bootstrap.txt .
 COPY requirements.txt .
-RUN pip install --no-cache-dir pip==25.0.1 setuptools==75.8.0 wheel==0.45.1 && \
+RUN pip install --require-hashes --no-cache-dir -r requirements-bootstrap.txt && \
     pip install --no-cache-dir -r requirements.txt
 
 # ==========================================
 # Stage 2: Runtime
 # ==========================================
-FROM python:3.13-slim-bookworm
+FROM python:3.13-slim-bookworm@sha256:de572b33eae61a53675a87bbd02b5e365df7b6b2b06c9276124e965cec08c452
 
 RUN apt-get update && apt-get dist-upgrade -y && rm -rf /var/lib/apt/lists/*
 

@@ -23,12 +23,12 @@
             "assets": [
               {
                 "glob": "llms.txt",
-                "input": "src",
+                "input": "public",
                 "output": "/"
               },
               {
                 "glob": "robots.txt",
-                "input": "src",
+                "input": "public",
                 "output": "/"
               },
               {
@@ -50,11 +50,6 @@
                 "glob": "**/*",
                 "input": "src/assets/textures",
                 "output": "/assets/textures"
-              },
-              {
-                "glob": "**/*",
-                "input": "docs/study/dist",
-                "output": "/docs/study"
               }
             ],
             "styles": [

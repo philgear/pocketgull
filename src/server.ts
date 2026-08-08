@@ -141,13 +141,26 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/health', (req, res) => {
+const isTestingEnv = Boolean(process.env['CI'] || process.env['PLAYWRIGHT_TESTING'] || process.env['NODE_ENV'] === 'test');
+
+const manifestRateLimiter = rateLimit({
+  windowMs: 60_000,
+  max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: { trustProxy: false },
+  message: { error: 'Too many requests. Please try again later.' }
+});
+
+app.get('/health', manifestRateLimiter, (req, res) => {
   res.status(200).send('OK');
 });
 
 // Agentic Web AI discovery manifests (llms.txt and /.well-known/llms.txt)
-const serveLlmsTxt = (req: express.Request, res: express.Response) => {
+app.get('/llms.txt', manifestRateLimiter, (req: express.Request, res: express.Response): void => {
   const candidatePaths = [
+    join(process.cwd(), 'public', 'llms.txt'),
+    join(process.cwd(), 'llms.txt'),
     join(__dirname, 'llms.txt'),
     join(__dirname, '..', 'browser', 'llms.txt'),
     join(__dirname, '..', 'llms.txt'),
@@ -160,14 +173,31 @@ const serveLlmsTxt = (req: express.Request, res: express.Response) => {
   res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
   res.setHeader('Cache-Control', 'public, max-age=3600');
   res.sendFile(targetPath);
-};
+});
 
-app.get('/llms.txt', serveLlmsTxt);
-app.get('/.well-known/llms.txt', serveLlmsTxt);
+app.get('/.well-known/llms.txt', manifestRateLimiter, (req: express.Request, res: express.Response): void => {
+  const candidatePaths = [
+    join(process.cwd(), 'public', 'llms.txt'),
+    join(process.cwd(), 'llms.txt'),
+    join(__dirname, 'llms.txt'),
+    join(__dirname, '..', 'browser', 'llms.txt'),
+    join(__dirname, '..', 'llms.txt'),
+    join(rootDir, 'public', 'llms.txt'),
+    join(rootDir, 'src', 'llms.txt'),
+    join(rootDir, 'llms.txt')
+  ];
+  const targetPath = candidatePaths.find(p => fs.existsSync(p)) || candidatePaths[candidatePaths.length - 1];
+
+  res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(targetPath);
+});
 
 // SEO robots.txt handler
-app.get('/robots.txt', (req, res) => {
+app.get('/robots.txt', manifestRateLimiter, (req, res) => {
   const candidatePaths = [
+    join(process.cwd(), 'public', 'robots.txt'),
+    join(process.cwd(), 'robots.txt'),
     join(__dirname, 'robots.txt'),
     join(__dirname, '..', 'browser', 'robots.txt'),
     join(__dirname, '..', 'robots.txt'),
@@ -182,15 +212,15 @@ app.get('/robots.txt', (req, res) => {
   res.sendFile(targetPath);
 });
 
-app.get('/api/config', (req, res) => {
+app.get('/api/config', manifestRateLimiter, (req, res) => {
   res.json({ apiKey: process.env['GEMINI_API_KEY'] || '' });
 });
 
-app.post('/api/audit', (req, res) => {
+app.post('/api/audit', manifestRateLimiter, (req, res) => {
   res.status(200).json({ status: 'logged', timestamp: new Date().toISOString() });
 });
 
-app.all('/api/python/*splat', (req, res) => {
+app.all('/api/python/*splat', manifestRateLimiter, (req, res) => {
   res.status(200).json({
     status: 'ok',
     riskScore: 0.15,
@@ -371,8 +401,6 @@ app.use((req, res, next) => {
   next();
 });
 
-const isTestingEnv = Boolean(process.env['CI'] || process.env['PLAYWRIGHT_TESTING'] || process.env['NODE_ENV'] === 'test');
-
 const apiLimiter = rateLimit({
   windowMs: 60_000,
   max: isTestingEnv || process.env['NODE_ENV'] !== 'production' ? 100_000 : 100,
@@ -454,18 +482,7 @@ const docsRateLimiter = rateLimit({
   message: { error: 'Too many requests. Please try again later.' }
 });
 
-// Serve Astro Study Docs — pure static serving, no user-controlled path computation.
-// express.static resolves paths relative to studyDocsRoot internally and safely.
-// A simple regex redirect handles the trailing-slash convention without touching resolve().
-app.use('/docs/study', docsRateLimiter, (req, res, next) => {
-  // Only redirect directory-style paths that lack a trailing slash and have no file extension.
-  if (req.path !== '/' && !req.path.endsWith('/') && !req.path.includes('.')) {
-    const safePath = req.path.replace(/[^a-zA-Z0-9\-_\/]/g, '');
-    return res.redirect(301, `/docs/study${safePath}/`);
-  }
-  next();
-});
-app.use('/docs/study', docsRateLimiter, express.static(studyDocsRoot, { index: 'index.html', extensions: ['html'] }));
+// Pure Angular documentation hub served via Angular SSR / SPA static browser assets
 
 /**
  * Serve static files from /.

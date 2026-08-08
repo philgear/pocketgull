@@ -147,15 +147,21 @@ export class GeminiProvider implements IIntelligenceProvider {
         const data = await response.json();
 
         try {
-            const { z } = await import('zod');
-            const ClinicalMetricsSchema = z.object({
-                complexity: z.number().min(0).max(10),
-                stability: z.number().min(0).max(10),
-                certainty: z.number().min(0).max(10)
-            });
-            return ClinicalMetricsSchema.parse(data);
+            if (
+                typeof data === 'object' && data !== null &&
+                typeof data.complexity === 'number' &&
+                typeof data.stability === 'number' &&
+                typeof data.certainty === 'number'
+            ) {
+                return {
+                    complexity: Math.max(0, Math.min(10, data.complexity)),
+                    stability: Math.max(0, Math.min(10, data.stability)),
+                    certainty: Math.max(0, Math.min(10, data.certainty))
+                };
+            }
+            throw new Error('Invalid metrics payload');
         } catch (err) {
-            console.warn('[GeminiProvider] zod validation bypassed or failed, using fallback parsing:', err);
+            console.warn('[GeminiProvider] metrics validation bypassed or failed, using fallback parsing:', err);
             return {
                 complexity: Math.max(0, Math.min(10, Number(data?.complexity ?? 5))),
                 stability: Math.max(0, Math.min(10, Number(data?.stability ?? 5))),
