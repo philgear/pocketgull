@@ -229,7 +229,14 @@ export class AndroscogginForagingPhytoncideComponent {
 
   readonly flippedItems = signal<Set<string>>(new Set());
 
-  toggleItemFlip(id: string) {
+  private lastItemFlipTimeMap = new Map<string, number>();
+
+  toggleItemFlip(id: string, event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    const last = this.lastItemFlipTimeMap.get(id) || 0;
+    if (now - last < 200) return;
+    this.lastItemFlipTimeMap.set(id, now);
     const current = new Set(this.flippedItems());
     if (current.has(id)) current.delete(id);
     else current.add(id);

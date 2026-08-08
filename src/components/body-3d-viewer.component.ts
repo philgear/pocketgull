@@ -215,7 +215,7 @@ export type AnatomyViewMode = 'skin' | 'muscle' | 'skeleton' | 'organs' | 'molec
         <!-- Selected Anatomical Node Overlay Card with 3D Double-Click Flip State Machine -->
         @if (state.selectedPartId(); as partId) {
           @let isFlipped = isSelectedPartFlipped();
-          <div (dblclick)="isSelectedPartFlipped.set(!isSelectedPartFlipped()); $event.stopPropagation()"
+          <div (dblclick)="toggleSelectedPartFlip($event)"
                class="absolute bottom-4 right-4 z-40 max-w-xs sm:max-w-sm w-full perspective-1000 group cursor-pointer h-52 font-mono select-none"
                title="Double-click to flip over for Somatic Innervation & Vagus Nerve Rationale">
             
@@ -399,6 +399,15 @@ export class Body3DViewerComponent implements AfterViewInit, OnDestroy {
     readonly quickSymptomText = signal<string>('');
 
     readonly isSelectedPartFlipped = signal<boolean>(false);
+    private lastPartFlipTime = 0;
+
+    toggleSelectedPartFlip(event?: Event) {
+      if (event) event.stopPropagation();
+      const now = Date.now();
+      if (now - this.lastPartFlipTime < 200) return;
+      this.lastPartFlipTime = now;
+      this.isSelectedPartFlipped.update(v => !v);
+    }
     readonly isHighContrastVision = signal<boolean>(false);
     readonly isReducedMotion = signal<boolean>(false);
 

@@ -18,7 +18,7 @@ import {
     <div class="flex flex-col gap-6 animate-in fade-in duration-300">
       <!-- Header Suite Card with 3D Double-Click Flip State Machine -->
       <div class="relative perspective-1000 group cursor-pointer"
-           (dblclick)="isHeaderFlipped.set(!isHeaderFlipped())"
+           (dblclick)="toggleHeaderFlip($event)"
            title="Double-click to flip over for Motivational Interviewing (OARS) & Plain-Language Rationale">
         
         <div [class.rotate-y-180]="isHeaderFlipped()"
@@ -32,7 +32,7 @@ import {
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-850">
                   Master Life Data Provider & Clinical Suite
                 </span>
-                <span (click)="isHeaderFlipped.set(!isHeaderFlipped()); $event.stopPropagation()"
+                <span (click)="toggleHeaderFlip($event)"
                       class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/30 hover:bg-purple-500/20 transition cursor-pointer select-none">
                   dblclick 🔄 flip OARS
                 </span>
@@ -341,6 +341,15 @@ export class ClinicalAssessmentsSuiteComponent {
   svc = inject(ClinicalAssessmentsService);
 
   readonly isHeaderFlipped = signal<boolean>(false);
+  private lastHeaderFlipTime = 0;
+
+  toggleHeaderFlip(event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    if (now - this.lastHeaderFlipTime < 200) return;
+    this.lastHeaderFlipTime = now;
+    this.isHeaderFlipped.update(v => !v);
+  }
   readonly toastMessage = signal<string | null>(null);
 
   readonly currentTitle = computed(() => {

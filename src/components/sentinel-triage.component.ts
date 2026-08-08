@@ -174,7 +174,7 @@ interface ISentinelPacket {
 
           <!-- Containment Protocol & AI Synthesis Recommendation with 3D Double-Click Flip State Machine -->
           @let isDirectiveFlipped = isDirectiveFlippedSignal();
-          <div (dblclick)="isDirectiveFlippedSignal.set(!isDirectiveFlippedSignal()); $event.stopPropagation()"
+          <div (dblclick)="toggleDirectiveFlip($event)"
                class="relative perspective-1000 group cursor-pointer min-h-[140px]"
                title="Double-click to flip over for HIPAA Privacy & SSRF Safety Guardrail Rationale">
             
@@ -249,6 +249,15 @@ export class SentinelTriageComponent implements OnInit, OnDestroy {
   platformId = inject(PLATFORM_ID);
 
   readonly isDirectiveFlippedSignal = signal<boolean>(false);
+  private lastDirectiveFlipTime = 0;
+
+  toggleDirectiveFlip(event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    if (now - this.lastDirectiveFlipTime < 200) return;
+    this.lastDirectiveFlipTime = now;
+    this.isDirectiveFlippedSignal.update(v => !v);
+  }
 
   mapCanvas = viewChild<ElementRef<HTMLCanvasElement>>('mapCanvas');
 

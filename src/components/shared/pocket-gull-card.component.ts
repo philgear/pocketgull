@@ -139,7 +139,13 @@ export class PocketGullCardComponent {
 
   readonly isFlipped = signal<boolean>(false);
 
-  toggleFlip() {
+  private lastFlipTime = 0;
+
+  toggleFlip(event?: MouseEvent) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    if (now - this.lastFlipTime < 200) return;
+    this.lastFlipTime = now;
     if (this.flippable()) {
       this.isFlipped.update(v => !v);
     }
