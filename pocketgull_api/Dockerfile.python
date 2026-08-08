@@ -17,9 +17,10 @@ RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y --no-install
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install Python dependencies
+# Install Python dependencies (hash-pinned bootstrap for supply-chain integrity)
+COPY requirements-bootstrap.txt .
 COPY requirements.txt .
-RUN pip install --no-cache-dir pip==25.0.1 setuptools==75.8.0 wheel==0.45.1 && \
+RUN pip install --require-hashes --no-cache-dir -r requirements-bootstrap.txt && \
     pip install --no-cache-dir -r requirements.txt
 
 # ==========================================

@@ -43,7 +43,7 @@ source "$VENV_DIR/bin/activate"
 
 # 3. Upgrade Pip & Install Requirements
 echo "📥 Installing / Updating Pocket-Gull Python dependencies..."
-pip install pip==25.0.1 setuptools==75.8.0 wheel==0.45.1 --quiet
+pip install --require-hashes -r requirements-bootstrap.txt --quiet
 pip install -r requirements.txt --quiet
 
 # 4. Verify Sidecar Imports
