@@ -14,12 +14,12 @@ RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 # Set Node environment to development during build stage to install devDependencies
 ENV NODE_ENV=development
 
-# Install ALL dependencies (including devDependencies needed for tsc & ng build)
+# Install ALL dependencies (including root & workspace devDependencies needed for tsc & ng build)
 COPY package*.json ./
 COPY docs/study/package*.json ./docs/study/
 COPY companion-apps/avs-therapy/package*.json ./companion-apps/avs-therapy/
 COPY pocketgull_api/package*.json ./pocketgull_api/
-RUN npm install --legacy-peer-deps --workspaces --include=dev
+RUN npm install --legacy-peer-deps --include-workspace-root --workspaces --include=dev
 
 # Copy source and build Angular SSR app
 COPY . .
