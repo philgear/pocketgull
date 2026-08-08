@@ -212,7 +212,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                 <!-- Real-time Clinical Triage Risk Score Card with 3D Double-Click Flip State Machine -->
                 @if (pythonBridge.riskScore(); as risk) {
                   <div class="relative perspective-1000 group cursor-pointer select-none mb-8"
-                       (dblclick)="isTriageFlipped.set(!isTriageFlipped())"
+                       (dblclick)="toggleTriageFlip($event)"
                        title="Double-click or click badge to flip over for Plain-Language Patient Summary & Action Steps">
                     
                     <div [class.rotate-y-180]="isTriageFlipped()"
@@ -224,7 +224,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                           <div>
                             <div class="flex items-center gap-2 mb-1">
                               <h2 class="text-xs font-bold text-gray-500 dark:text-zinc-400 uppercase tracking-[0.15em]">Clinical Triage Risk</h2>
-                              <button type="button" (click)="isTriageFlipped.set(!isTriageFlipped()); $event.stopPropagation()"
+                              <button type="button" (click)="toggleTriageFlip($event)"
                                       class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 cursor-pointer transition">
                                 dblclick 🔄 flip
                               </button>
@@ -293,7 +293,7 @@ import { SafeHtmlPipe } from '../pipes/safe-html-new.pipe';
                               <span>💡</span>
                               <span>Plain-Language Health Summary</span>
                             </div>
-                            <button type="button" (click)="isTriageFlipped.set(!isTriageFlipped()); $event.stopPropagation()"
+                            <button type="button" (click)="toggleTriageFlip($event)"
                                     class="text-[10px] text-emerald-400 hover:text-emerald-200 font-mono cursor-pointer">
                               dblclick 🔄 flip back
                             </button>
@@ -1227,6 +1227,15 @@ export class MedicalChartSummaryComponent {
   isBiometricsExpanded = signal<boolean>(false);
   showHealthsheet = signal<boolean>(false);
   readonly isTriageFlipped = signal<boolean>(false);
+  private lastTriageFlipTime = 0;
+
+  toggleTriageFlip(event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    if (now - this.lastTriageFlipTime < 200) return;
+    this.lastTriageFlipTime = now;
+    this.isTriageFlipped.update(v => !v);
+  }
 
   toggleBiometrics() {
     this.isBiometricsExpanded.update(v => !v);

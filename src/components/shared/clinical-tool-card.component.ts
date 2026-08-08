@@ -233,6 +233,10 @@ export class ClinicalToolCardComponent {
 
   handleDoubleClick(event: MouseEvent) {
     event.stopPropagation();
+    // If single click expanded the drawer during the first click of a double-click, reset it
+    if (this.isExpanded()) {
+      this.isExpanded.set(false);
+    }
     this.toggleState.emit(this.tool().id);
   }
 

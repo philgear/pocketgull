@@ -78,7 +78,7 @@ interface IChatEntry {
             <!-- Context Node Preview with 3D Double-Click Flip State Machine -->
             <div class="px-4 pt-3 pb-1">
               <div class="relative perspective-1000 group cursor-pointer"
-                   (dblclick)="isContextFlipped.set(!isContextFlipped())"
+                   (dblclick)="toggleContextFlip($event)"
                    title="Double-click to flip over for Evidence Audit & Source Claim Trail">
                 
                 <div [class.rotate-y-180]="isContextFlipped()"
@@ -623,6 +623,15 @@ export class NodeAgentDialogComponent implements OnInit, AfterViewChecked, OnDes
     userInput = '';
     contextHtml = signal('');
     isContextFlipped = signal(false);
+    private lastContextFlipTime = 0;
+
+    toggleContextFlip(event?: Event) {
+        if (event) event.stopPropagation();
+        const now = Date.now();
+        if (now - this.lastContextFlipTime < 200) return;
+        this.lastContextFlipTime = now;
+        this.isContextFlipped.update(v => !v);
+    }
     permissionError = signal<string | null>(null);
 
     private shouldScrollToBottom = false;

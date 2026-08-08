@@ -474,7 +474,14 @@ export class VoiceAssistantComponent implements OnDestroy {
 
     readonly flippedEntries = signal<Set<number>>(new Set());
 
-    toggleChatEntryFlip(index: number) {
+    private lastChatEntryFlipMap = new Map<number, number>();
+
+    toggleChatEntryFlip(index: number, event?: Event) {
+        if (event) event.stopPropagation();
+        const now = Date.now();
+        const last = this.lastChatEntryFlipMap.get(index) || 0;
+        if (now - last < 200) return;
+        this.lastChatEntryFlipMap.set(index, now);
         const set = new Set(this.flippedEntries());
         if (set.has(index)) set.delete(index);
         else set.add(index);

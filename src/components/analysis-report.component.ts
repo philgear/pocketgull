@@ -676,7 +676,7 @@ import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-ca
                   <div class="flex flex-wrap items-center gap-2">
                   <!-- QALY Tool -->
                   @if (state.getToolState('qaly') !== 'hidden') {
-                    <button (click)="toggleAuxTool('qaly')" (dblclick)="state.cycleToolState('qaly')"
+                    <button (click)="handleAuxToolClick('qaly')" (dblclick)="handleAuxToolDblClick('qaly')"
                             [class.bg-[#10B981]]="state.getToolState('qaly') === 'prescribed'"
                             [class.text-white]="state.getToolState('qaly') === 'prescribed'"
                             [class.bg-orange-500]="activeAuxTool() === 'qaly' && state.getToolState('qaly') !== 'prescribed'"
@@ -696,7 +696,7 @@ import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-ca
                   
                   <!-- Vagal Tool -->
                   @if (state.getToolState('vagal') !== 'hidden') {
-                    <button (click)="toggleAuxTool('vagal')" (dblclick)="state.cycleToolState('vagal')"
+                    <button (click)="handleAuxToolClick('vagal')" (dblclick)="handleAuxToolDblClick('vagal')"
                             [class.bg-[#10B981]]="state.getToolState('vagal') === 'prescribed'"
                             [class.text-white]="state.getToolState('vagal') === 'prescribed'"
                             [class.bg-orange-500]="activeAuxTool() === 'vagal' && state.getToolState('vagal') !== 'prescribed'"
@@ -714,7 +714,7 @@ import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-ca
 
                   <!-- Storm Tool -->
                   @if (state.getToolState('storm') !== 'hidden') {
-                    <button (click)="toggleAuxTool('storm')" (dblclick)="state.cycleToolState('storm')"
+                    <button (click)="handleAuxToolClick('storm')" (dblclick)="handleAuxToolDblClick('storm')"
                             [class.bg-[#10B981]]="state.getToolState('storm') === 'prescribed'"
                             [class.text-white]="state.getToolState('storm') === 'prescribed'"
                             [class.bg-orange-500]="activeAuxTool() === 'storm' && state.getToolState('storm') !== 'prescribed'"
@@ -732,7 +732,7 @@ import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-ca
 
                   <!-- Foraging Tool -->
                   @if (state.getToolState('foraging') !== 'hidden') {
-                    <button (click)="toggleAuxTool('foraging')" (dblclick)="state.cycleToolState('foraging')"
+                    <button (click)="handleAuxToolClick('foraging')" (dblclick)="handleAuxToolDblClick('foraging')"
                             [class.bg-[#10B981]]="state.getToolState('foraging') === 'prescribed'"
                             [class.text-white]="state.getToolState('foraging') === 'prescribed'"
                             [class.bg-orange-500]="activeAuxTool() === 'foraging' && state.getToolState('foraging') !== 'prescribed'"
@@ -750,7 +750,7 @@ import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-ca
 
                   <!-- Investment Tool -->
                   @if (state.getToolState('investment') !== 'hidden') {
-                    <button (click)="toggleAuxTool('investment')" (dblclick)="state.cycleToolState('investment')"
+                    <button (click)="handleAuxToolClick('investment')" (dblclick)="handleAuxToolDblClick('investment')"
                             [class.bg-[#10B981]]="state.getToolState('investment') === 'prescribed'"
                             [class.text-white]="state.getToolState('investment') === 'prescribed'"
                             [class.bg-orange-500]="activeAuxTool() === 'investment' && state.getToolState('investment') !== 'prescribed'"
@@ -768,7 +768,7 @@ import { BiometricSensorFusionCardComponent } from './biometric-sensor-fusion-ca
 
                   <!-- Perils Tool -->
                   @if (state.getToolState('perils') !== 'hidden') {
-                    <button (click)="toggleAuxTool('perils')" (dblclick)="state.cycleToolState('perils')"
+                    <button (click)="handleAuxToolClick('perils')" (dblclick)="handleAuxToolDblClick('perils')"
                             [class.bg-[#10B981]]="state.getToolState('perils') === 'prescribed'"
                             [class.text-white]="state.getToolState('perils') === 'prescribed'"
                             [class.bg-orange-500]="activeAuxTool() === 'perils' && state.getToolState('perils') !== 'prescribed'"
@@ -1913,6 +1913,27 @@ export class AnalysisReportComponent implements OnDestroy {
     if (theme === 'spark') return '✨ Spark Mode';
     if (theme === 'system') return '💻 System OS';
     return '☀️ Light Mode';
+  }
+
+  private auxToolClickTimer: ReturnType<typeof setTimeout> | null = null;
+
+  handleAuxToolClick(tool: 'qaly' | 'solfeggio' | 'vagal' | 'storm' | 'foraging' | 'investment' | 'perils' | 'karaoke' | 'assessments') {
+    if (this.auxToolClickTimer) {
+      clearTimeout(this.auxToolClickTimer);
+      this.auxToolClickTimer = null;
+    }
+    this.auxToolClickTimer = setTimeout(() => {
+      this.toggleAuxTool(tool);
+      this.auxToolClickTimer = null;
+    }, 250);
+  }
+
+  handleAuxToolDblClick(tool: string) {
+    if (this.auxToolClickTimer) {
+      clearTimeout(this.auxToolClickTimer);
+      this.auxToolClickTimer = null;
+    }
+    this.state.cycleToolState(tool);
   }
 
   toggleAuxTool(tool: 'qaly' | 'solfeggio' | 'vagal' | 'storm' | 'foraging' | 'investment' | 'perils' | 'karaoke' | 'assessments') {

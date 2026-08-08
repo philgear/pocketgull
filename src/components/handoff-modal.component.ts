@@ -286,7 +286,14 @@ export class HandoffModalComponent {
 
   readonly flippedSpecialties = signal<Set<string>>(new Set());
 
-  toggleSpecialtyFlip(id: string) {
+  private lastSpecialtyFlipMap = new Map<string, number>();
+
+  toggleSpecialtyFlip(id: string, event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    const last = this.lastSpecialtyFlipMap.get(id) || 0;
+    if (now - last < 200) return;
+    this.lastSpecialtyFlipMap.set(id, now);
     const current = new Set(this.flippedSpecialties());
     if (current.has(id)) current.delete(id);
     else current.add(id);

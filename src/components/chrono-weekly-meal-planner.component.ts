@@ -291,7 +291,14 @@ export class ChronoWeeklyMealPlannerComponent implements OnDestroy {
 
   readonly flippedMeals = signal<Set<string>>(new Set());
 
-  toggleMealFlip(id: string) {
+  private lastMealFlipTimeMap = new Map<string, number>();
+
+  toggleMealFlip(id: string, event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    const last = this.lastMealFlipTimeMap.get(id) || 0;
+    if (now - last < 200) return;
+    this.lastMealFlipTimeMap.set(id, now);
     const current = new Set(this.flippedMeals());
     if (current.has(id)) current.delete(id);
     else current.add(id);

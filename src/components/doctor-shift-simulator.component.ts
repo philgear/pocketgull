@@ -130,7 +130,7 @@ export interface IShiftPatientCase {
           </div>
 
           <!-- 3D Double-Click Flip Analytics & Telemetry State Machine -->
-          <div (dblclick)="isAnalyticsFlipped.set(!isAnalyticsFlipped())"
+          <div (dblclick)="toggleAnalyticsFlip($event)"
             class="relative perspective-1000 group cursor-pointer min-h-[220px] font-mono select-none"
             title="Double-click to flip over for Dr. Sarah Chen's Ergonomic Wellness & Vagal RSA Micro-Break">
 
@@ -285,6 +285,15 @@ export class DoctorShiftSimulatorComponent implements OnDestroy {
   currentPhaseIndex = signal<number>(0);
   isAutoPlaying = signal<boolean>(false);
   isAnalyticsFlipped = signal<boolean>(false);
+  private lastAnalyticsFlipTime = 0;
+
+  toggleAnalyticsFlip(event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    if (now - this.lastAnalyticsFlipTime < 200) return;
+    this.lastAnalyticsFlipTime = now;
+    this.isAnalyticsFlipped.update(v => !v);
+  }
 
   private autoPlayTimer: any = null;
 

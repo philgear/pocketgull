@@ -88,7 +88,7 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
                     <div>
                       <div class="flex items-center justify-between mb-1.5">
                         <span class="text-xs font-bold text-gray-900 dark:text-zinc-100 uppercase tracking-wider">{{ marker.name }}</span>
-                        <button type="button" (click)="toggleBiomarkerFlip(marker.name); $event.stopPropagation()"
+                        <button type="button" (click)="toggleBiomarkerFlip(marker.name, $event); $event.stopPropagation()"
                                 class="text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 cursor-pointer transition">
                           dblclick 🔄
                         </button>
@@ -118,7 +118,7 @@ const WHO_CDC_GUIDELINES: Record<string, string> = {
                         <span class="text-emerald-300 font-bold uppercase flex items-center gap-1">
                           <span>🥗</span> Food-as-Medicine Sourcing
                         </span>
-                        <button type="button" (click)="toggleBiomarkerFlip(marker.name); $event.stopPropagation()"
+                        <button type="button" (click)="toggleBiomarkerFlip(marker.name, $event); $event.stopPropagation()"
                                 class="text-emerald-400 hover:text-emerald-200 text-[9px] cursor-pointer">
                           dblclick 🔄 flip
                         </button>
@@ -189,7 +189,13 @@ export class BiomarkerMatrixComponent {
 
   readonly flippedBiomarkers = signal<Set<string>>(new Set());
 
-  toggleBiomarkerFlip(name: string) {
+  private lastBiomarkerFlipTime = 0;
+
+  toggleBiomarkerFlip(name: string, event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    if (now - this.lastBiomarkerFlipTime < 200) return;
+    this.lastBiomarkerFlipTime = now;
     const set = new Set(this.flippedBiomarkers());
     if (set.has(name)) set.delete(name);
     else set.add(name);

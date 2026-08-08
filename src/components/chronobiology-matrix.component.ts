@@ -293,7 +293,14 @@ export class ChronobiologyMatrixComponent {
 
   readonly flippedCards = signal<Set<string>>(new Set());
 
-  toggleCardFlip(id: string) {
+  private lastFlipTimeMap = new Map<string, number>();
+
+  toggleCardFlip(id: string, event?: Event) {
+    if (event) event.stopPropagation();
+    const now = Date.now();
+    const last = this.lastFlipTimeMap.get(id) || 0;
+    if (now - last < 200) return;
+    this.lastFlipTimeMap.set(id, now);
     const current = new Set(this.flippedCards());
     if (current.has(id)) current.delete(id);
     else current.add(id);
