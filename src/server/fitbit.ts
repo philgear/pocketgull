@@ -65,11 +65,11 @@ interface IConsentRecord {
 const CONSENT_VERSION = '1.0.0'; // Bump when consent text changes
 
 /**
- * Safely extracts and sanitizes patientId from HTTP headers or GET query parameters.
- * Eliminates CodeQL sensitive-data-read-from-get taint paths by validating formatting.
+ * Safely extracts and sanitizes patientId strictly from HTTP request headers.
+ * Eliminates CodeQL sensitive-data-read-from-get taint paths by preventing query param logging.
  */
 function extractPatientId(req: Request): string {
-  const rawId = (req.headers['x-patient-id'] as string) || (req.query['patientId'] as string) || 'p_default_patient';
+  const rawId = (req.headers['x-patient-id'] as string) || (req.headers['patient-id'] as string) || 'p_default_patient';
   return String(rawId).replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 64) || 'p_default_patient';
 }
 
@@ -277,7 +277,10 @@ fitbitRouter.get('/auth', (req, res) => {
 // ─────────────────────────────────────────────────────────────────────────────
 fitbitRouter.get('/callback', async (req, res) => {
   try {
-    const { code, state, error: oauthError } = req.query as Record<string, string>;
+    const rawQuery = req.query as Record<string, unknown>;
+    const oauthError = typeof rawQuery['error'] === 'string' ? rawQuery['error'].trim() : '';
+    const code = typeof rawQuery['code'] === 'string' ? rawQuery['code'].trim() : '';
+    const state = typeof rawQuery['state'] === 'string' ? rawQuery['state'].trim() : '';
 
     if (oauthError) {
       return res.redirect(`/?fitbit=denied`);

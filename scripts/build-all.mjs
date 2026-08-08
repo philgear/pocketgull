@@ -40,16 +40,4 @@ execSync('node node_modules/@angular/cli/bin/ng.js build', {
   env: cleanEnv,
   stdio: 'inherit'
 });
-console.log('✅ Angular SSR Build Completed Successfully.\n');
-
-console.log('Building Astro study docs with isolated env...');
-try {
-  execSync('npx astro build', {
-    cwd: docsDir,
-    env: cleanEnv,
-    stdio: 'inherit'
-  });
-  console.log('✅ Astro Study Docs Build Completed Successfully.\n');
-} catch (err) {
-  console.warn('⚠️ Astro docs build skipped or failed non-fatally:', err.message);
-}
+console.log('✅ Pure Angular SSR & Docs Build Completed Successfully.\n');

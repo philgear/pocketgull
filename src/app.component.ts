@@ -54,6 +54,7 @@ import { CompanionSyncModalComponent } from './components/companion-sync-modal.c
 import { GlossaryModalComponent } from './components/glossary-modal.component';
 import { PocketgullTypefaceSiteComponent } from './components/pocketgull-typeface-site.component';
 import { PocketgullIconComponent } from './components/pocketgull-icon.component';
+import { DocsStudyComponent } from './components/docs-study.component';
 import { NavigationShellService } from './services/navigation-shell.service';
 
 @Component({
@@ -83,7 +84,8 @@ import { NavigationShellService } from './services/navigation-shell.service';
     ZamecznikCanvasComponent,
     CompanionSyncModalComponent,
     GlossaryModalComponent,
-    ClinicalCdsDisclaimerBannerComponent
+    ClinicalCdsDisclaimerBannerComponent,
+    DocsStudyComponent
   ],
   providers: [],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -508,7 +510,7 @@ import { NavigationShellService } from './services/navigation-shell.service';
               <span class="hidden sm:inline font-pocketgull">Typeface</span>
             </button>
             
-            <a href="/docs/study/" target="_blank" rel="noopener"
+            <button (click)="showDocsStudy.set(true)"
                id="tour-docs-trigger"
                aria-label="Docs"
                class="group shrink-0 flex items-center gap-2 max-sm:px-2 max-sm:py-1.5 px-4 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest hover:bg-[#EEEEEE] dark:hover:bg-zinc-800 hover:border-gray-400 dark:hover:border-zinc-500 transition-colors cursor-pointer">
@@ -517,7 +519,7 @@ import { NavigationShellService } from './services/navigation-shell.service';
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
               </svg>
               <span class="hidden sm:inline">Docs</span>
-            </a>
+            </button>
             <!-- Somatic Box-Breathing Grounding (Zamecznik Canvas) -->
             <button (click)="triggerSomaticGrounding()" 
                     aria-label="Somatic Grounding & Box Breathing"
@@ -1032,6 +1034,11 @@ import { NavigationShellService } from './services/navigation-shell.service';
       </div>
     }
 
+    <!-- Native Angular Documentation Suite -->
+    @if (showDocsStudy()) {
+      <app-docs-study></app-docs-study>
+    }
+
     <!-- Preview & Print Modal (Dieter Rams Style) -->
     @if (showPreviewModal()) {
       <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 no-print">
@@ -1371,9 +1378,15 @@ import { NavigationShellService } from './services/navigation-shell.service';
 export class AppComponent implements OnDestroy {
   private secureStorage = inject(SecureStorageService);
   showTypefaceSite = signal(false);
+  showDocsStudy = signal(false);
   readonly showGlossaryModal = signal<boolean>(false);
   private _translateTimer: ReturnType<typeof setTimeout> | null = null;
   readonly zamecznikCanvas = viewChild(ZamecznikCanvasComponent);
+
+  @HostListener('window:close-docs-study')
+  onCloseDocsStudy() {
+    this.showDocsStudy.set(false);
+  }
 
   triggerSomaticGrounding(): void {
     this.zamecznikCanvas()?.open();

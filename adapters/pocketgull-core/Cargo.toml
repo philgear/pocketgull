@@ -1,0 +1,16 @@
+[package]
+name = "pocketgull-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["Phil Gear <phil@pocketgull.io>"]
+description = "Zero-allocation clinical DSP engine, SIBI calculation, FHIR R4 serialization, and QR matrix generator."
+license = "MIT"
+
+[lib]
+name = "pocketgull_core"
+crate-type = ["rlib", "staticlib", "cdylib"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+qrcode = { version = "0.14", default-features = false }

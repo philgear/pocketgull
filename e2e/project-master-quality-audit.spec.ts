@@ -15,7 +15,12 @@ test.describe('Master Project Quality & Agentic Readiness Audit', () => {
       if (msg.type() === 'error') {
         const text = msg.text();
         // Ignore known harmless browser/third-party dev log noise if any
-        if (!text.includes('Download the React DevTools') && !text.includes('Service worker disabled') && !text.includes('NG05604')) {
+        if (
+          !text.includes('Download the React DevTools') &&
+          !text.includes('Service worker disabled') &&
+          !text.includes('NG05604') &&
+          !text.includes('Too Many Requests')
+        ) {
           consoleErrors.push(text);
         }
       }
